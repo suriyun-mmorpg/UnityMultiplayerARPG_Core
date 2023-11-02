@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(-900)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.CHARACTER_ALIGN_ON_GROUND)]
     public class CharacterAlignOnGround : MonoBehaviour
     {
         public Transform rootBoneTransform;

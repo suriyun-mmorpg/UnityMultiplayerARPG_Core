@@ -45,5 +45,12 @@ namespace MultiplayerARPG
         /// Clear server's collection (and other relates variables)
         /// </summary>
         void ClearBuildings();
+
+        /// <summary>
+        /// Count buildings which build by player
+        /// </summary>
+        /// <param name="characterId"></param>
+        /// <returns></returns>
+        int CountPlayerBuildings(string characterId, int entityId);
     }
 }

@@ -63,33 +63,7 @@ namespace MultiplayerARPG
         public DamageInfo DamageInfo { get { return damageInfo; } }
         [SerializeField]
         private DamageIncremental damageAmount = default;
-        public DamageIncremental DamageAmount
-        {
-            get
-            {
-                // Adjust base stats by default level
-                if (defaultLevel <= 1)
-                {
-                    return damageAmount;
-                }
-                else
-                {
-                    if (!_adjustDamageAmount.HasValue)
-                    {
-                        _adjustDamageAmount = new DamageIncremental()
-                        {
-                            damageElement = damageAmount.damageElement,
-                            amount = new IncrementalMinMaxFloat()
-                            {
-                                baseAmount = damageAmount.amount.baseAmount + (damageAmount.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
-                                amountIncreaseEachLevel = damageAmount.amount.amountIncreaseEachLevel,
-                            }
-                        };
-                    }
-                    return _adjustDamageAmount.Value;
-                }
-            }
-        }
+        public DamageIncremental DamageAmount { get { return damageAmount; } }
         [SerializeField]
         private float moveSpeedRateWhileAttacking = 0f;
         public float MoveSpeedRateWhileAttacking { get { return moveSpeedRateWhileAttacking; } }
@@ -146,21 +120,6 @@ namespace MultiplayerARPG
         #endregion
 
         [System.NonSerialized]
-        private CharacterStatsIncremental? _adjustStats = null;
-        [System.NonSerialized]
-        private AttributeIncremental[] _adjustAttributes = null;
-        [System.NonSerialized]
-        private ResistanceIncremental[] _adjustResistances = null;
-        [System.NonSerialized]
-        private ArmorIncremental[] _adjustArmors = null;
-        [System.NonSerialized]
-        private DamageIncremental? _adjustDamageAmount = null;
-        [System.NonSerialized]
-        private IncrementalMinMaxInt? _adjustRandomExp = null;
-        [System.NonSerialized]
-        private IncrementalMinMaxInt? _adjustRandomGold = null;
-
-        [System.NonSerialized]
         private List<CurrencyRandomAmount> _cacheRandomCurrencies = null;
         public List<CurrencyRandomAmount> CacheRandomCurrencies
         {
@@ -205,132 +164,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override CharacterStatsIncremental Stats
-        {
-            get
-            {
-                // Adjust base stats by default level
-                if (defaultLevel <= 1)
-                {
-                    return base.Stats;
-                }
-                else
-                {
-                    if (!_adjustStats.HasValue)
-                    {
-                        _adjustStats = new CharacterStatsIncremental()
-                        {
-                            baseStats = base.Stats.baseStats + (base.Stats.statsIncreaseEachLevel * -(defaultLevel - 1)),
-                            statsIncreaseEachLevel = base.Stats.statsIncreaseEachLevel,
-                        };
-                    }
-                    return _adjustStats.Value;
-                }
-            }
-        }
-
-        public override AttributeIncremental[] Attributes
-        {
-            get
-            {
-                // Adjust base attributes by default level
-                if (defaultLevel <= 1)
-                {
-                    return base.Attributes;
-                }
-                else
-                {
-                    if (_adjustAttributes == null)
-                    {
-                        _adjustAttributes = new AttributeIncremental[base.Attributes.Length];
-                        AttributeIncremental tempValue;
-                        for (int i = 0; i < base.Attributes.Length; ++i)
-                        {
-                            tempValue = base.Attributes[i];
-                            _adjustAttributes[i] = new AttributeIncremental()
-                            {
-                                attribute = tempValue.attribute,
-                                amount = new IncrementalFloat()
-                                {
-                                    baseAmount = tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
-                                    amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
-                                }
-                            };
-                        }
-                    }
-                    return _adjustAttributes;
-                }
-            }
-        }
-
-        public override ResistanceIncremental[] Resistances
-        {
-            get
-            {
-                // Adjust base resistances by default level
-                if (defaultLevel <= 1)
-                {
-                    return base.Resistances;
-                }
-                else
-                {
-                    if (_adjustResistances == null)
-                    {
-                        _adjustResistances = new ResistanceIncremental[base.Resistances.Length];
-                        ResistanceIncremental tempValue;
-                        for (int i = 0; i < base.Resistances.Length; ++i)
-                        {
-                            tempValue = base.Resistances[i];
-                            _adjustResistances[i] = new ResistanceIncremental()
-                            {
-                                damageElement = tempValue.damageElement,
-                                amount = new IncrementalFloat()
-                                {
-                                    baseAmount = tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
-                                    amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
-                                }
-                            };
-                        }
-                    }
-                    return _adjustResistances;
-                }
-            }
-        }
-
-        public override ArmorIncremental[] Armors
-        {
-            get
-            {
-                // Adjust base armors by default level
-                if (defaultLevel <= 1)
-                {
-                    return base.Armors;
-                }
-                else
-                {
-                    if (_adjustArmors == null)
-                    {
-                        _adjustArmors = new ArmorIncremental[base.Armors.Length];
-                        ArmorIncremental tempValue;
-                        for (int i = 0; i < base.Armors.Length; ++i)
-                        {
-                            tempValue = base.Armors[i];
-                            _adjustArmors[i] = new ArmorIncremental()
-                            {
-                                damageElement = tempValue.damageElement,
-                                amount = new IncrementalFloat()
-                                {
-                                    baseAmount = tempValue.amount.baseAmount + (tempValue.amount.amountIncreaseEachLevel * -(defaultLevel - 1)),
-                                    amountIncreaseEachLevel = tempValue.amount.amountIncreaseEachLevel,
-                                }
-                            };
-                        }
-                    }
-                    return _adjustArmors;
-                }
-            }
-        }
-
         [System.NonSerialized]
         private Dictionary<BaseSkill, int> _cacheSkillLevels = null;
         public override Dictionary<BaseSkill, int> CacheSkillLevels
@@ -343,84 +176,16 @@ namespace MultiplayerARPG
             }
         }
 
-        public IncrementalMinMaxInt AdjustedRandomExp
-        {
-            get
-            {
-                // Adjust base stats by default level
-                if (defaultLevel <= 1)
-                {
-                    return randomExp;
-                }
-                else
-                {
-                    if (!_adjustRandomExp.HasValue)
-                    {
-                        MinMaxFloat adjustBaseAmount = new MinMaxFloat()
-                        {
-                            min = randomExp.baseAmount.min,
-                            max = randomExp.baseAmount.max,
-                        };
-                        adjustBaseAmount += randomExp.amountIncreaseEachLevel * -(defaultLevel - 1);
-                        _adjustRandomExp = new IncrementalMinMaxInt()
-                        {
-                            baseAmount = new MinMaxInt()
-                            {
-                                min = (int)adjustBaseAmount.min,
-                                max = (int)adjustBaseAmount.max,
-                            },
-                            amountIncreaseEachLevel = randomExp.amountIncreaseEachLevel,
-                        };
-                    }
-                    return _adjustRandomExp.Value;
-                }
-            }
-        }
-
-        public IncrementalMinMaxInt AdjustedRandomGold
-        {
-            get
-            {
-                // Adjust base stats by default level
-                if (defaultLevel <= 1)
-                {
-                    return randomGold;
-                }
-                else
-                {
-                    if (!_adjustRandomGold.HasValue)
-                    {
-                        MinMaxFloat adjustBaseAmount = new MinMaxFloat()
-                        {
-                            min = randomExp.baseAmount.min,
-                            max = randomExp.baseAmount.max,
-                        };
-                        adjustBaseAmount += randomGold.amountIncreaseEachLevel * -(defaultLevel - 1);
-                        _adjustRandomGold = new IncrementalMinMaxInt()
-                        {
-                            baseAmount = new MinMaxInt()
-                            {
-                                min = (int)adjustBaseAmount.min,
-                                max = (int)adjustBaseAmount.max,
-                            },
-                            amountIncreaseEachLevel = randomGold.amountIncreaseEachLevel,
-                        };
-                    }
-                    return _adjustRandomGold.Value;
-                }
-            }
-        }
-
-        private readonly List<MonsterSkill> tempRandomSkills = new List<MonsterSkill>();
+        private readonly List<MonsterSkill> _tempRandomSkills = new List<MonsterSkill>();
 
         public virtual int RandomExp(int level)
         {
-            return AdjustedRandomExp.GetAmount(level).Random();
+            return randomExp.GetAmount(level).Random();
         }
 
         public virtual int RandomGold(int level)
         {
-            return AdjustedRandomGold.GetAmount(level).Random();
+            return randomGold.GetAmount(level).Random();
         }
 
         public virtual void RandomItems(System.Action<BaseItem, int> onRandomItem, float rate = 1f)
@@ -457,14 +222,14 @@ namespace MultiplayerARPG
             if (skills == null || skills.Length == 0)
                 return false;
 
-            if (tempRandomSkills.Count != skills.Length)
+            if (_tempRandomSkills.Count != skills.Length)
             {
-                tempRandomSkills.Clear();
-                tempRandomSkills.AddRange(skills);
+                _tempRandomSkills.Clear();
+                _tempRandomSkills.AddRange(skills);
             }
 
             float random = Random.value;
-            foreach (MonsterSkill monsterSkill in tempRandomSkills)
+            foreach (MonsterSkill monsterSkill in _tempRandomSkills)
             {
                 if (monsterSkill.skill == null)
                     continue;
@@ -474,7 +239,7 @@ namespace MultiplayerARPG
                     skill = monsterSkill.skill;
                     level = monsterSkill.level;
                     // Shuffle for next random
-                    tempRandomSkills.Shuffle();
+                    _tempRandomSkills.Shuffle();
                     return true;
                 }
             }
@@ -565,7 +330,506 @@ namespace MultiplayerARPG
                 itemDropManager.maxDropItems = maxDropItems;
                 maxDropItems = 0;
             }
+            if (defaultLevel < 1)
+            {
+                hasChanges = true;
+                defaultLevel = 1;
+            }
+            if (AdjustDamageAmount())
+                hasChanges = true;
+            if (AdjustStats())
+                hasChanges = true;
+            if (AdjustAttributes())
+                hasChanges = true;
+            if (AdjustResistances())
+                hasChanges = true;
+            if (AdjustArmors())
+                hasChanges = true;
+            if (AdjustRandomExp())
+                hasChanges = true;
+            if (AdjustRandomGold())
+                hasChanges = true;
             return hasChanges || base.Validate();
+        }
+
+        public bool AdjustDamageAmount()
+        {
+            if (DefaultLevel <= 1)
+            {
+                // Min level is `1` don't have to adjust it
+                return false;
+            }
+            bool hasChanges = false;
+            var setting = damageAmount;
+            var incrementalAmount = setting.amount;
+            var baseAmount = incrementalAmount.baseAmount;
+            var amountIncreaseEachLevel = incrementalAmount.amountIncreaseEachLevel;
+            float adjustedValue;
+            // Min
+            if (AdjustFloatValue(baseAmount.min, amountIncreaseEachLevel.min, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.min = adjustedValue;
+                incrementalAmount.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                Debug.LogWarning($"Invalid min damage amount's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // Max
+            if (AdjustFloatValue(baseAmount.max, amountIncreaseEachLevel.max, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.max = adjustedValue;
+                incrementalAmount.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                Debug.LogWarning($"Invalid max damage amount's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            if (hasChanges)
+            {
+                setting.amount = incrementalAmount;
+                damageAmount = setting;
+            }
+            return hasChanges;
+        }
+
+        public bool AdjustStats()
+        {
+            if (DefaultLevel <= 1)
+            {
+                // Min level is `1` don't have to adjust it
+                return false;
+            }
+            bool hasChanges = false;
+            CharacterStatsIncremental setting = Stats;
+            CharacterStats baseAmount = setting.baseStats;
+            CharacterStats amountIncreaseEachLevel = setting.statsIncreaseEachLevel;
+            float adjustedValue;
+            // hp
+            if (AdjustFloatValue(baseAmount.hp, amountIncreaseEachLevel.hp, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.hp = adjustedValue;
+                Debug.LogWarning($"Invalid hp stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // hpRecovery
+            if (AdjustFloatValue(baseAmount.hpRecovery, amountIncreaseEachLevel.hpRecovery, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.hpRecovery = adjustedValue;
+                Debug.LogWarning($"Invalid hpRecovery stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // hpLeechRate
+            if (AdjustFloatValue(baseAmount.hpLeechRate, amountIncreaseEachLevel.hpLeechRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.hpLeechRate = adjustedValue;
+                Debug.LogWarning($"Invalid hpLeechRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // mp
+            if (AdjustFloatValue(baseAmount.mp, amountIncreaseEachLevel.mp, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.mp = adjustedValue;
+                Debug.LogWarning($"Invalid mp stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // mpRecovery
+            if (AdjustFloatValue(baseAmount.mpRecovery, amountIncreaseEachLevel.mpRecovery, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.mpRecovery = adjustedValue;
+                Debug.LogWarning($"Invalid mpRecovery stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // mpLeechRate
+            if (AdjustFloatValue(baseAmount.mpLeechRate, amountIncreaseEachLevel.mpLeechRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.mpLeechRate = adjustedValue;
+                Debug.LogWarning($"Invalid mpLeechRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // stamina
+            if (AdjustFloatValue(baseAmount.stamina, amountIncreaseEachLevel.stamina, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.stamina = adjustedValue;
+                Debug.LogWarning($"Invalid stamina stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // staminaRecovery
+            if (AdjustFloatValue(baseAmount.staminaRecovery, amountIncreaseEachLevel.staminaRecovery, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.staminaRecovery = adjustedValue;
+                Debug.LogWarning($"Invalid staminaRecovery stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // staminaLeechRate
+            if (AdjustFloatValue(baseAmount.staminaLeechRate, amountIncreaseEachLevel.staminaLeechRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.staminaLeechRate = adjustedValue;
+                Debug.LogWarning($"Invalid staminaLeechRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // food
+            if (AdjustFloatValue(baseAmount.food, amountIncreaseEachLevel.food, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.food = adjustedValue;
+                Debug.LogWarning($"Invalid food stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // water
+            if (AdjustFloatValue(baseAmount.water, amountIncreaseEachLevel.water, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.water = adjustedValue;
+                Debug.LogWarning($"Invalid water stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // accuracy
+            if (AdjustFloatValue(baseAmount.accuracy, amountIncreaseEachLevel.accuracy, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.accuracy = adjustedValue;
+                Debug.LogWarning($"Invalid accuracy stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // evasion
+            if (AdjustFloatValue(baseAmount.evasion, amountIncreaseEachLevel.evasion, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.evasion = adjustedValue;
+                Debug.LogWarning($"Invalid evasion stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // criRate
+            if (AdjustFloatValue(baseAmount.criRate, amountIncreaseEachLevel.criRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.criRate = adjustedValue;
+                Debug.LogWarning($"Invalid criRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // criDmgRate
+            if (AdjustFloatValue(baseAmount.criDmgRate, amountIncreaseEachLevel.criDmgRate, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.criDmgRate = adjustedValue;
+                Debug.LogWarning($"Invalid criDmgRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // blockRate
+            if (AdjustFloatValue(baseAmount.blockRate, amountIncreaseEachLevel.blockRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.blockRate = adjustedValue;
+                Debug.LogWarning($"Invalid blockRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // blockDmgRate
+            if (AdjustFloatValue(baseAmount.blockDmgRate, amountIncreaseEachLevel.blockDmgRate, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.blockDmgRate = adjustedValue;
+                Debug.LogWarning($"Invalid blockDmgRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // moveSpeed
+            if (AdjustFloatValue(baseAmount.moveSpeed, amountIncreaseEachLevel.moveSpeed, out adjustedValue, 0.01f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.moveSpeed = adjustedValue;
+                Debug.LogWarning($"Invalid moveSpeed stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // atkSpeed
+            if (AdjustFloatValue(baseAmount.atkSpeed, amountIncreaseEachLevel.atkSpeed, out adjustedValue, 0.01f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.atkSpeed = adjustedValue;
+                Debug.LogWarning($"Invalid atkSpeed stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // weightLimit
+            if (AdjustFloatValue(baseAmount.weightLimit, amountIncreaseEachLevel.weightLimit, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.weightLimit = adjustedValue;
+                Debug.LogWarning($"Invalid weightLimit stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // slotLimit
+            if (AdjustFloatValue(baseAmount.slotLimit, amountIncreaseEachLevel.slotLimit, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.slotLimit = adjustedValue;
+                Debug.LogWarning($"Invalid slotLimit stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // goldRate
+            if (AdjustFloatValue(baseAmount.goldRate, amountIncreaseEachLevel.goldRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.goldRate = adjustedValue;
+                Debug.LogWarning($"Invalid goldRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // expRate
+            if (AdjustFloatValue(baseAmount.expRate, amountIncreaseEachLevel.expRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.expRate = adjustedValue;
+                Debug.LogWarning($"Invalid expRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // itemDropRate
+            if (AdjustFloatValue(baseAmount.itemDropRate, amountIncreaseEachLevel.itemDropRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.itemDropRate = adjustedValue;
+                Debug.LogWarning($"Invalid itemDropRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // moveSpeed
+            if (AdjustFloatValue(baseAmount.moveSpeed, amountIncreaseEachLevel.moveSpeed, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.moveSpeed = adjustedValue;
+                Debug.LogWarning($"Invalid moveSpeed stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // atkSpeed
+            if (AdjustFloatValue(baseAmount.atkSpeed, amountIncreaseEachLevel.atkSpeed, out adjustedValue, 0.01f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.atkSpeed = adjustedValue;
+                Debug.LogWarning($"Invalid atkSpeed stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // weightLimit
+            if (AdjustFloatValue(baseAmount.weightLimit, amountIncreaseEachLevel.weightLimit, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.weightLimit = adjustedValue;
+                Debug.LogWarning($"Invalid weightLimit stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // slotLimit
+            if (AdjustFloatValue(baseAmount.slotLimit, amountIncreaseEachLevel.slotLimit, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.slotLimit = adjustedValue;
+                Debug.LogWarning($"Invalid slotLimit stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // goldRate
+            if (AdjustFloatValue(baseAmount.goldRate, amountIncreaseEachLevel.goldRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.goldRate = adjustedValue;
+                Debug.LogWarning($"Invalid goldRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // expRate
+            if (AdjustFloatValue(baseAmount.expRate, amountIncreaseEachLevel.expRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.expRate = adjustedValue;
+                Debug.LogWarning($"Invalid expRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // itemDropRate
+            if (AdjustFloatValue(baseAmount.itemDropRate, amountIncreaseEachLevel.itemDropRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.itemDropRate = adjustedValue;
+                Debug.LogWarning($"Invalid itemDropRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // jumpHeight
+            if (AdjustFloatValue(baseAmount.jumpHeight, amountIncreaseEachLevel.jumpHeight, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.jumpHeight = adjustedValue;
+                Debug.LogWarning($"Invalid jumpHeight stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // headDamageAbsorbs
+            if (AdjustFloatValue(baseAmount.headDamageAbsorbs, amountIncreaseEachLevel.headDamageAbsorbs, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.headDamageAbsorbs = adjustedValue;
+                Debug.LogWarning($"Invalid headDamageAbsorbs stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // bodyDamageAbsorbs
+            if (AdjustFloatValue(baseAmount.bodyDamageAbsorbs, amountIncreaseEachLevel.bodyDamageAbsorbs, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.bodyDamageAbsorbs = adjustedValue;
+                Debug.LogWarning($"Invalid bodyDamageAbsorbs stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // fallDamageAbsorbs
+            if (AdjustFloatValue(baseAmount.fallDamageAbsorbs, amountIncreaseEachLevel.fallDamageAbsorbs, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.fallDamageAbsorbs = adjustedValue;
+                Debug.LogWarning($"Invalid fallDamageAbsorbs stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // gravityRate
+            if (AdjustFloatValue(baseAmount.gravityRate, amountIncreaseEachLevel.gravityRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.gravityRate = adjustedValue;
+                Debug.LogWarning($"Invalid gravityRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            if (hasChanges)
+            {
+                Stats = setting;
+            }
+            return false;
+        }
+
+        public bool AdjustAttributes()
+        {
+            if (DefaultLevel <= 1)
+            {
+                // Min level is `1` don't have to adjust it
+                return false;
+            }
+            bool hasChanges = false;
+            for (int i = 0; i < Attributes.Length; ++i)
+            {
+                var setting = Attributes[i];
+                var incrementalAmount = setting.amount;
+                var baseAmount = incrementalAmount.baseAmount;
+                var amountIncreaseEachLevel = incrementalAmount.amountIncreaseEachLevel;
+                float adjustedValue;
+                if (AdjustFloatValue(baseAmount, amountIncreaseEachLevel, out adjustedValue, 1f))
+                {
+                    hasChanges = true;
+                    incrementalAmount.amountIncreaseEachLevel = adjustedValue;
+                    setting.amount = incrementalAmount;
+                    Attributes[i] = setting;
+                    Debug.LogWarning($"Invalid {setting.attribute} attribute's increase each level setting for {this} adjusted to {adjustedValue}");
+                }
+            }
+            return hasChanges;
+        }
+
+        public bool AdjustResistances()
+        {
+            if (DefaultLevel <= 1)
+            {
+                // Min level is `1` don't have to adjust it
+                return false;
+            }
+            bool hasChanges = false;
+            for (int i = 0; i < Resistances.Length; ++i)
+            {
+                var setting = Resistances[i];
+                var incrementalAmount = setting.amount;
+                var baseAmount = incrementalAmount.baseAmount;
+                var amountIncreaseEachLevel = incrementalAmount.amountIncreaseEachLevel;
+                float adjustedValue;
+                if (AdjustFloatValue(baseAmount, amountIncreaseEachLevel, out adjustedValue, 1f))
+                {
+                    hasChanges = true;
+                    incrementalAmount.amountIncreaseEachLevel = adjustedValue;
+                    setting.amount = incrementalAmount;
+                    Resistances[i] = setting;
+                    Debug.LogWarning($"Invalid {setting.damageElement} resistance's increase each level setting for {this} adjusted to {adjustedValue}");
+                }
+            }
+            return hasChanges;
+        }
+
+        public bool AdjustArmors()
+        {
+            if (DefaultLevel <= 1)
+            {
+                // Min level is `1` don't have to adjust it
+                return false;
+            }
+            bool hasChanges = false;
+            for (int i = 0; i < Armors.Length; ++i)
+            {
+                var setting = Armors[i];
+                var incrementalAmount = setting.amount;
+                var baseAmount = incrementalAmount.baseAmount;
+                var amountIncreaseEachLevel = incrementalAmount.amountIncreaseEachLevel;
+                float adjustedValue;
+                if (AdjustFloatValue(baseAmount, amountIncreaseEachLevel, out adjustedValue, 1f))
+                {
+                    hasChanges = true;
+                    incrementalAmount.amountIncreaseEachLevel = adjustedValue;
+                    setting.amount = incrementalAmount;
+                    Armors[i] = setting;
+                    Debug.LogWarning($"Invalid {setting.damageElement} armor's increase each level setting for {this} adjusted to {adjustedValue}");
+                }
+            }
+            return hasChanges;
+        }
+
+        public bool AdjustRandomExp()
+        {
+            if (DefaultLevel <= 1)
+            {
+                // Min level is `1` don't have to adjust it
+                return false;
+            }
+            bool hasChanges = false;
+            var setting = randomExp;
+            var baseAmount = setting.baseAmount;
+            var amountIncreaseEachLevel = setting.amountIncreaseEachLevel;
+            float adjustedValue;
+            // Min
+            if (AdjustFloatValue(baseAmount.min, amountIncreaseEachLevel.min, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.min = adjustedValue;
+                setting.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                Debug.LogWarning($"Invalid min random exp's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // Max
+            if (AdjustFloatValue(baseAmount.max, amountIncreaseEachLevel.max, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.max = adjustedValue;
+                setting.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                Debug.LogWarning($"Invalid max random exp's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            if (hasChanges)
+            {
+                randomExp = setting;
+            }
+            return hasChanges;
+        }
+
+        public bool AdjustRandomGold()
+        {
+            if (DefaultLevel <= 1)
+            {
+                // Min level is `1` don't have to adjust it
+                return false;
+            }
+            bool hasChanges = false;
+            var setting = randomGold;
+            var baseAmount = setting.baseAmount;
+            var amountIncreaseEachLevel = setting.amountIncreaseEachLevel;
+            float adjustedValue;
+            // Min
+            if (AdjustFloatValue(baseAmount.min, amountIncreaseEachLevel.min, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.min = adjustedValue;
+                setting.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                Debug.LogWarning($"Invalid min random gold's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // Max
+            if (AdjustFloatValue(baseAmount.max, amountIncreaseEachLevel.max, out adjustedValue, 1f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.max = adjustedValue;
+                setting.amountIncreaseEachLevel = amountIncreaseEachLevel;
+                Debug.LogWarning($"Invalid max random gold's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            if (hasChanges)
+            {
+                randomGold = setting;
+            }
+            return hasChanges;
+        }
+
+        public bool AdjustFloatValue(float baseAmount, float amountIncreaseEachLevel, out float adjustedAmountIncreaseEachLevel, float minValue)
+        {
+            adjustedAmountIncreaseEachLevel = amountIncreaseEachLevel;
+            float adjustedValue = baseAmount - (amountIncreaseEachLevel * (defaultLevel - 1));
+            if (adjustedValue < minValue)
+            {
+                adjustedAmountIncreaseEachLevel = baseAmount / (defaultLevel - 1);
+                // Cut to 3 decimal
+                adjustedAmountIncreaseEachLevel *= 1000f;
+                adjustedAmountIncreaseEachLevel = Mathf.FloorToInt(adjustedAmountIncreaseEachLevel);
+                adjustedAmountIncreaseEachLevel /= 1000f;
+                if (adjustedAmountIncreaseEachLevel > 0.001f)
+                {
+                    // Some buffer
+                    adjustedAmountIncreaseEachLevel -= 0.001f;
+                }
+                return true;
+            }
+            return false;
         }
     }
 }

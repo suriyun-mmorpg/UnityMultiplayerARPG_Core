@@ -17,13 +17,13 @@
 
         public void OnClickAccept()
         {
-            GameInstance.PlayingCharacterEntity.Dueling.CallServerAcceptDuelingRequest();
+            GameInstance.PlayingCharacterEntity.Dueling.CallCmdAcceptDuelingRequest();
             Hide();
         }
 
         public void OnClickDecline()
         {
-            GameInstance.PlayingCharacterEntity.Dueling.CallServerDeclineDuelingRequest();
+            GameInstance.PlayingCharacterEntity.Dueling.CallCmdDeclineDuelingRequest();
             Hide();
         }
     }

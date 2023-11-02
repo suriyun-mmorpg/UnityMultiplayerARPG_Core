@@ -12,7 +12,9 @@ namespace MultiplayerARPG
         {
             CharacterQuest data = (CharacterQuest)obj;
             info.AddValue("dataId", data.dataId);
+            info.AddValue("randomTasksIndex", data.randomTasksIndex);
             info.AddValue("isComplete", data.isComplete);
+            info.AddValue("completeTime", data.completeTime);
             info.AddValue("isTracking", data.isTracking);
             info.AddValue("killedMonsters", data.killedMonsters);
             info.AddValue("completedTasks", data.completedTasks);
@@ -26,7 +28,19 @@ namespace MultiplayerARPG
         {
             CharacterQuest data = (CharacterQuest)obj;
             data.dataId = info.GetInt32("dataId");
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.randomTasksIndex = info.GetByte("randomTasksIndex");
+            }
+            catch { }
             data.isComplete = info.GetBoolean("isComplete");
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.completeTime = info.GetInt64("completeTime");
+            }
+            catch { }
             // TODO: Backward compatible, this will be removed in future version
             try
             {

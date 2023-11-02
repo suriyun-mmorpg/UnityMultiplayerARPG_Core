@@ -8,7 +8,7 @@ using LiteNetLib.Utils;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(LiteNetLibIdentity))]
-    [DefaultExecutionOrder(0)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.BASE_GAME_ENTITY)]
     public abstract partial class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
         public const byte STATE_DATA_CHANNEL = 3;
@@ -294,13 +294,10 @@ namespace MultiplayerARPG
         internal void DoUpdate()
         {
             Profiler.BeginSample("EntityComponents - Update");
-            if (IsUpdateEntityComponents)
+            for (int i = 0; i < EntityComponents.Length; ++i)
             {
-                for (int i = 0; i < EntityComponents.Length; ++i)
-                {
-                    if (EntityComponents[i].Enabled)
-                        EntityComponents[i].EntityUpdate();
-                }
+                if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
+                    EntityComponents[i].EntityUpdate();
             }
             Profiler.EndSample();
             Profiler.BeginSample("BaseGameEntity - EntityUpdate");
@@ -351,13 +348,10 @@ namespace MultiplayerARPG
         {
             bool isUpdateEntityComponents = IsUpdateEntityComponents;
             Profiler.BeginSample("EntityComponents - LateUpdate");
-            if (isUpdateEntityComponents)
+            for (int i = 0; i < EntityComponents.Length; ++i)
             {
-                for (int i = 0; i < EntityComponents.Length; ++i)
-                {
-                    if (EntityComponents[i].Enabled)
-                        EntityComponents[i].EntityLateUpdate();
-                }
+                if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
+                    EntityComponents[i].EntityLateUpdate();
             }
             Profiler.EndSample();
             Profiler.BeginSample("BaseGameEntity - OnUpdateEntityComponentsChanged");
@@ -393,48 +387,54 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SendClientState()
+        public virtual void SendClientState(long writeTimestamp)
         {
             if (Movement != null && Movement.Enabled)
             {
                 bool shouldSendReliably;
                 s_EntityStateDataWriter.Reset();
-                if (Movement.WriteClientState(s_EntityStateDataWriter, out shouldSendReliably))
+                if (Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
                 {
                     TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                     s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                    s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                     s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                     ClientSendMessage(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
                 }
             }
         }
 
-        public virtual void SendServerState()
+        public virtual void SendServerState(long writeTimestamp)
         {
             if (Movement != null && Movement.Enabled)
             {
                 bool shouldSendReliably;
                 s_EntityStateDataWriter.Reset();
-                if (Movement.WriteServerState(s_EntityStateDataWriter, out shouldSendReliably))
+                if (Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out shouldSendReliably))
                 {
                     TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                     s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
+                    s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                     s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                     ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
                 }
             }
         }
 
-        public virtual void ReadClientStateAtServer(NetDataReader reader)
+        public virtual void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             if (Movement != null)
-                Movement.ReadClientStateAtServer(reader);
+            {
+                Movement.ReadClientStateAtServer(peerTimestamp, reader);
+            }
         }
 
-        public virtual void ReadServerStateAtClient(NetDataReader reader)
+        public virtual void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (Movement != null)
-                Movement.ReadServerStateAtClient(reader);
+            {
+                Movement.ReadServerStateAtClient(peerTimestamp, reader);
+            }
         }
 
         protected virtual void OnValidate()
@@ -485,46 +485,46 @@ namespace MultiplayerARPG
         }
 
         #region Animations
-        public void CallAllPlayJumpAnimation()
+        public void CallRpcPlayJumpAnimation()
         {
-            RPC(AllPlayJumpAnimation);
+            RPC(RpcPlayJumpAnimation);
         }
 
         [AllRpc]
-        protected void AllPlayJumpAnimation()
+        protected void RpcPlayJumpAnimation()
         {
             PlayJumpAnimation();
         }
 
-        public void CallAllPlayPickupAnimation()
+        public void CallRpcPlayPickupAnimation()
         {
-            RPC(AllPlayPickupAnimation);
+            RPC(RpcPlayPickupAnimation);
         }
 
         [AllRpc]
-        protected void AllPlayPickupAnimation()
+        protected void RpcPlayPickupAnimation()
         {
             PlayPickupAnimation();
         }
 
-        public void CallAllPlayCustomAnimation(int id)
+        public void CallRpcPlayCustomAnimation(int id)
         {
-            RPC(AllPlayCustomAnimation, id);
+            RPC(RpcPlayCustomAnimation, id);
         }
 
         [AllRpc]
-        protected virtual void AllPlayCustomAnimation(int id)
+        protected virtual void RpcPlayCustomAnimation(int id)
         {
             PlayCustomAnimation(id);
         }
 
-        public void CallAllStopCustomAnimation()
+        public void CallRpcStopCustomAnimation()
         {
-            RPC(AllStopCustomAnimation);
+            RPC(RpcStopCustomAnimation);
         }
 
         [AllRpc]
-        protected virtual void AllStopCustomAnimation()
+        protected virtual void RpcStopCustomAnimation()
         {
             StopCustomAnimation();
         }
@@ -553,5 +553,16 @@ namespace MultiplayerARPG
                 customAnimationModel.StopCustomAnimation();
         }
         #endregion
+
+        public virtual void CallCmdPerformHitRegValidation(HitRegisterData hitData)
+        {
+            RPC(CmdPerformHitRegValidation, hitData);
+        }
+
+        [ServerRpc]
+        protected virtual void CmdPerformHitRegValidation(HitRegisterData hitData)
+        {
+            CurrentGameManager.HitRegistrationManager.PerformValidation(this, hitData);
+        }
     }
 }

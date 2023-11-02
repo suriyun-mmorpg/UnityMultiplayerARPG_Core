@@ -249,7 +249,7 @@ namespace MultiplayerARPG
         {
             IWeaponItem item = GetWeaponItem();
             if (item != null)
-                return character.CountAmmos(item.WeaponType.RequireAmmoType) > 0;
+                return character.CountAllAmmos(item.WeaponType.AmmoType) > 0;
             return false;
         }
 
@@ -353,7 +353,7 @@ namespace MultiplayerARPG
                 }
                 if (tempItem.ExpireDuration > 0)
                 {
-                    newItem.expireTime = System.DateTimeOffset.Now.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
+                    newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
                 }
             }
             newItem.version = CURRENT_VERSION;

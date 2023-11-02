@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         [Tooltip("This is deprecated, might be removed in future version, set your asset to `Asset` instead.")]
         [ReadOnlyField]
         public BaseMonsterCharacterEntity monsterCharacterEntity;
+        public Faction faction;
 
         protected override void Awake()
         {
@@ -62,6 +63,7 @@ namespace MultiplayerARPG
                     return null;
                 }
                 entity.Level = level;
+                entity.Faction = faction;
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
                 entity.Teleport(spawnPosition, spawnRotation, false);
                 entity.InitStats();

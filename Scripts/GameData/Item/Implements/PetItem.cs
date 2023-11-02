@@ -38,7 +38,7 @@ namespace MultiplayerARPG
         [Category(3, "Pet Settings")]
         [SerializeField]
         private BaseMonsterCharacterEntity petEntity = null;
-        public BaseMonsterCharacterEntity PetEntity
+        public BaseMonsterCharacterEntity MonsterCharacterEntity
         {
             get { return petEntity; }
         }
@@ -94,7 +94,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddCharacterEntities(PetEntity);
+            GameInstance.AddCharacterEntities(MonsterCharacterEntity);
         }
     }
 }

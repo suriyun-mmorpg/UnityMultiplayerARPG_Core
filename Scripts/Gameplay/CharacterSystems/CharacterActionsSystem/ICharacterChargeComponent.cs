@@ -1,6 +1,4 @@
-﻿using LiteNetLib.Utils;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public interface ICharacterChargeComponent
     {
@@ -12,33 +10,5 @@ namespace MultiplayerARPG
         void ClearChargeStates();
         void StartCharge(bool isLeftHand);
         void StopCharge();
-        /// <summary>
-        /// Return `TRUE` if it have something written
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <returns></returns>
-        bool WriteClientStartChargeState(NetDataWriter writer);
-        /// <summary>
-        /// Return `TRUE` if it have something written
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <returns></returns>
-        bool WriteServerStartChargeState(NetDataWriter writer);
-        /// <summary>
-        /// Return `TRUE` if it have something written
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <returns></returns>
-        bool WriteClientStopChargeState(NetDataWriter writer);
-        /// <summary>
-        /// Return `TRUE` if it have something written
-        /// </summary>
-        /// <param name="writer"></param>
-        /// <returns></returns>
-        bool WriteServerStopChargeState(NetDataWriter writer);
-        void ReadClientStartChargeStateAtServer(NetDataReader reader);
-        void ReadServerStartChargeStateAtClient(NetDataReader reader);
-        void ReadClientStopChargeStateAtServer(NetDataReader reader);
-        void ReadServerStopChargeStateAtClient(NetDataReader reader);
     }
 }

@@ -40,8 +40,10 @@ namespace MultiplayerARPG
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
         public Buff debuff;
+        public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
+        public GameEffect[] damageHitEffects;
 
         [Category(4, "Buff")]
         public SkillBuffType skillBuffType;
@@ -66,6 +68,14 @@ namespace MultiplayerARPG
             }
         }
 
+        public override GameEffect[] DamageHitEffects
+        {
+            get
+            {
+                return damageHitEffects;
+            }
+        }
+
         protected override void ApplySkillImplement(
             BaseCharacterEntity skillUser,
             int skillLevel,
@@ -76,9 +86,7 @@ namespace MultiplayerARPG
             byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit)
+            AimPosition aimPosition)
         {
             // Craft item
             if (skillType == SkillType.CraftItem &&
@@ -125,9 +133,7 @@ namespace MultiplayerARPG
                     damageAmounts,
                     this,
                     skillLevel,
-                    aimPosition,
-                    onDamageOriginPrepared,
-                    onDamageHit);
+                    aimPosition);
             }
         }
 
@@ -223,6 +229,12 @@ namespace MultiplayerARPG
                 return;
 
             skillUser.Mount(mount.MountEntity);
+        }
+
+        public override void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        {
+            base.OnSkillAttackHit(skillLevel, instigator, weapon, target);
+            attackStatusEffects.ApplyStatusEffect(skillLevel, instigator, weapon, target);
         }
 
         public override SkillType SkillType
@@ -367,6 +379,7 @@ namespace MultiplayerARPG
             GameInstance.AddItems(itemCraft.CraftingItem);
             GameInstance.AddItems(itemCraft.RequireItems);
             GameInstance.AddCurrencies(itemCraft.RequireCurrencies);
+            GameInstance.AddStatusEffects(attackStatusEffects);
             damageInfo.PrepareRelatesData();
         }
 

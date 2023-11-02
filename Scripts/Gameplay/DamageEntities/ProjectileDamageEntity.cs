@@ -62,12 +62,12 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            DamageHitDelegate onHit,
+            HitRegisterData hitRegisterData,
             float missileDistance,
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            base.Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit, missileDistance, missileSpeed, lockingTarget);
+            base.Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, hitRegisterData, missileDistance, missileSpeed, lockingTarget);
 
             // Initial configuration
             _initialPosition = CacheTransform.position;

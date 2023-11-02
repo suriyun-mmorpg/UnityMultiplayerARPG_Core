@@ -19,12 +19,12 @@ namespace MultiplayerARPG
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             if (string.IsNullOrEmpty(selectedId))
                 return;
-            GameInstance.PlayingCharacterEntity.CallServerPickup(uint.Parse(selectedId));
+            GameInstance.PlayingCharacterEntity.CallCmdPickup(uint.Parse(selectedId));
         }
 
         public void OnClickPickupNearbyItems()
         {
-            GameInstance.PlayingCharacterEntity.CallServerPickupNearbyItems();
+            GameInstance.PlayingCharacterEntity.CallCmdPickupNearbyItems();
         }
 
         public void UpdateData(IList<CharacterItem> characterItems)

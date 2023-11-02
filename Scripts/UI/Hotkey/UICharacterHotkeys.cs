@@ -24,6 +24,10 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("hotkeyAimJoyStick")]
         public MobileMovementJoystick hotkeyAimJoyStickPrefab;
         public RectTransform hotkeyCancelArea;
+
+        [Header("Console Controls")]
+        public string consoleConfirmButtonName = "Activate";
+
         public static UICharacterHotkey UsingHotkey { get; private set; }
         public static AimPosition HotkeyAimPosition { get; private set; }
         private static UICharacterHotkey s_otherHotkey;
@@ -130,8 +134,10 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (InputManager.UseMobileInput())
+            if (GameInstance.UseMobileInput())
                 UpdateHotkeyMobileInputs();
+            else if (GameInstance.UseConsoleInput())
+                UpdateHotkeyConsoleInputs();
             else
                 UpdateHotkeyInputs();
         }
@@ -210,6 +216,20 @@ namespace MultiplayerARPG
 
             if (hotkeyCancelArea != null)
                 hotkeyCancelArea.gameObject.SetActive(isAnyHotkeyJoyStickDragging);
+        }
+
+        /// <summary>
+        /// Update hotkey input for Console devices
+        /// </summary>
+        private void UpdateHotkeyConsoleInputs()
+        {
+            if (UsingHotkey == null)
+                return;
+
+            HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
+            // Click anywhere (on the map) to use skill
+            if (InputManager.GetButtonDown(consoleConfirmButtonName) && !UsingHotkey.IsChanneledAbility() && !UIBlockController.IsBlockController())
+                FinishHotkeyAimControls(false);
         }
 
         public static void FinishHotkeyAimControls(bool isCancel)

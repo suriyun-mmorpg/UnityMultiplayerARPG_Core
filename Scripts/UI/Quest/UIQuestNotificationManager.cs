@@ -74,7 +74,7 @@ namespace MultiplayerARPG
             record.dataId = characterQuest.dataId;
             record.isComplete = characterQuest.isComplete;
             Quest questData = characterQuest.GetQuest();
-            QuestTask[] tasks = questData.tasks;
+            QuestTask[] tasks = questData.GetTasks(characterQuest.randomTasksIndex);
             for (int i = 0; i < tasks.Length; ++i)
             {
                 bool isComplete;
@@ -117,7 +117,7 @@ namespace MultiplayerARPG
                         if (tempCharacterQuest.isComplete)
                             continue;
                         tempQuestData = tempCharacterQuest.GetQuest();
-                        tempTasks = tempQuestData.tasks;
+                        tempTasks = tempQuestData.GetTasks(tempCharacterQuest.randomTasksIndex);
                         for (int j = 0; j < tempTasks.Length; ++j)
                         {
                             if (tempTasks[j].taskType != QuestTaskType.CollectItem || !tempTasks[j].itemAmount.item)
@@ -156,7 +156,7 @@ namespace MultiplayerARPG
                         if (tempCharacterQuest.isComplete)
                             continue;
                         tempQuestData = tempCharacterQuest.GetQuest();
-                        tempTasks = tempQuestData.tasks;
+                        tempTasks = tempQuestData.GetTasks(tempCharacterQuest.randomTasksIndex);
                         for (int j = 0; j < tempTasks.Length; ++j)
                         {
                             if (tempTasks[j].taskType != QuestTaskType.CollectItem || !tempTasks[j].itemAmount.item)
@@ -220,7 +220,7 @@ namespace MultiplayerARPG
                     }
                     else if (!comparingQuests[index].isComplete)
                     {
-                        QuestTask[] tasks = tempQuestData.tasks;
+                        QuestTask[] tasks = tempQuestData.GetTasks(tempCharacterQuest.randomTasksIndex);
                         for (int j = 0; j < tasks.Length; ++j)
                         {
                             string taskTitle;

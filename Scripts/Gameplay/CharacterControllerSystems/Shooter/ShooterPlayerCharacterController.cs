@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(int.MinValue + 1)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER)]
     public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController
     {
         public const byte PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD = 3;
@@ -198,6 +198,7 @@ namespace MultiplayerARPG
         public BaseCharacterModel CacheFpsModel { get; protected set; }
         public Vector2 CurrentCrosshairSize { get; protected set; }
         public CrosshairSetting CurrentCrosshairSetting { get; protected set; }
+        public int WeaponAbilityIndex { get; protected set; }
         public BaseWeaponAbility WeaponAbility { get; protected set; }
         public WeaponAbilityState WeaponAbilityState { get; protected set; }
 
@@ -516,26 +517,9 @@ namespace MultiplayerARPG
 
             _rightHandWeapon = equipWeapons.GetRightHandWeaponItem();
             _leftHandWeapon = equipWeapons.GetLeftHandWeaponItem();
-            // Weapon ability will be able to use when equip weapon at main-hand only
-            if (_rightHandWeapon != null && _leftHandWeapon == null)
-            {
-                if (_rightHandWeapon.WeaponAbility != WeaponAbility)
-                {
-                    if (WeaponAbility != null)
-                        WeaponAbility.Desetup();
-                    WeaponAbility = _rightHandWeapon.WeaponAbility;
-                    if (WeaponAbility != null)
-                        WeaponAbility.Setup(this, equipWeapons.rightHand);
-                    WeaponAbilityState = WeaponAbilityState.Deactivated;
-                }
-            }
-            else
-            {
-                if (WeaponAbility != null)
-                    WeaponAbility.Desetup();
-                WeaponAbility = null;
-                WeaponAbilityState = WeaponAbilityState.Deactivated;
-            }
+            // Clear weapon ability
+            ChangeWeaponAbility(0);
+            // Setup proper weapon data
             if (_rightHandWeapon == null)
                 _rightHandWeapon = GameInstance.Singleton.DefaultWeaponItem;
             if (_leftHandWeapon == null)
@@ -556,7 +540,7 @@ namespace MultiplayerARPG
             if (PlayingCharacterEntity.IsDead())
             {
                 // Deactivate weapon ability immediately when dead
-                if (WeaponAbility != null && WeaponAbilityState != WeaponAbilityState.Deactivated)
+                if (WeaponAbility != null && WeaponAbility.ShouldDeactivateOnDead && WeaponAbilityState != WeaponAbilityState.Deactivated)
                 {
                     WeaponAbility.ForceDeactivated();
                     WeaponAbilityState = WeaponAbilityState.Deactivated;
@@ -597,7 +581,7 @@ namespace MultiplayerARPG
             bool isBlockController = UISceneGameplay.IsBlockController();
 
             // Lock cursor when not show UIs
-            if (GameInstance.Singleton.IsMobileTestInEditor() || Application.isMobilePlatform)
+            if (GameInstance.IsMobileTestInEditor() || Application.isMobilePlatform)
             {
                 // Control camera by touch-screen
                 Cursor.lockState = CursorLockMode.None;
@@ -825,7 +809,7 @@ namespace MultiplayerARPG
             {
                 // Attack with right hand weapon
                 _tempPressAttackRight = !isBlockController && GetPrimaryAttackButton();
-                if (WeaponAbility == null && _leftHandWeapon != null)
+                if (_leftHandWeapon != null)
                 {
                     // Attack with left hand weapon if left hand weapon not empty
                     _tempPressAttackLeft = !isBlockController && GetSecondaryAttackButton();
@@ -986,7 +970,7 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.Pitch = pitch;
 
             // If mobile platforms, don't receive input raw to make it smooth
-            bool raw = !GameInstance.Singleton.IsMobileTestInEditor() && !Application.isMobilePlatform && !GameInstance.Singleton.IsConsoleTestInEditor() && !Application.isConsolePlatform;
+            bool raw = !GameInstance.IsMobileTestInEditor() && !Application.isMobilePlatform && !GameInstance.IsConsoleTestInEditor() && !Application.isConsolePlatform;
             _moveDirection = Vector3.zero;
             _inputV = InputManager.GetAxis("Vertical", raw);
             _inputH = InputManager.GetAxis("Horizontal", raw);
@@ -1208,7 +1192,7 @@ namespace MultiplayerARPG
             {
                 anyKeyPressed = true;
                 // Exit vehicle
-                PlayingCharacterEntity.CallServerExitVehicle();
+                PlayingCharacterEntity.CallCmdExitVehicle();
             }
 
             if (_switchEquipWeaponSetInput.IsPress)
@@ -1541,7 +1525,7 @@ namespace MultiplayerARPG
             }
             else if (item.IsSkill())
             {
-                SetQueueUsingSkill(aimPosition, (item as ISkillItem).UsingSkill, (item as ISkillItem).UsingSkillLevel, itemIndex);
+                SetQueueUsingSkill(aimPosition, (item as ISkillItem).SkillData, (item as ISkillItem).SkillLevel, itemIndex);
             }
             else if (item.IsBuilding())
             {
@@ -1560,7 +1544,7 @@ namespace MultiplayerARPG
             }
             else if (item.IsUsable())
             {
-                PlayingCharacterEntity.CallServerUseItem(itemIndex);
+                PlayingCharacterEntity.CallCmdUseItem(itemIndex);
             }
         }
 
@@ -1569,7 +1553,7 @@ namespace MultiplayerARPG
             if (GameInstance.JoinedGuild == null)
                 return;
             int dataId = BaseGameData.MakeDataId(id);
-            PlayingCharacterEntity.CallServerUseGuildSkill(dataId);
+            PlayingCharacterEntity.CallCmdUseGuildSkill(dataId);
         }
 
         public virtual void Attack(ref bool isLeftHand)
@@ -1592,7 +1576,7 @@ namespace MultiplayerARPG
         {
             if (!forceReload && _isAlreadyReloaded)
                 return;
-            if (WeaponAbility != null && WeaponAbility.ShouldDeactivateWhenReload)
+            if (WeaponAbility != null && WeaponAbility.ShouldDeactivateOnReload)
                 WeaponAbility.ForceDeactivated();
             // Reload ammo at server
             if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity))
@@ -1600,6 +1584,29 @@ namespace MultiplayerARPG
             else if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity))
                 PlayingCharacterEntity.Reload(true);
             _isAlreadyReloaded = true;
+        }
+
+        public virtual void ChangeWeaponAbility(int index)
+        {
+            if (WeaponAbility != null)
+            {
+                WeaponAbility.Desetup();
+            }
+            IWeaponItem rightHandWeapon = PlayingCharacterEntity.EquipWeapons.GetRightHandWeaponItem();
+            if (rightHandWeapon != null && rightHandWeapon.WeaponAbilities != null && index < rightHandWeapon.WeaponAbilities.Length)
+            {
+                WeaponAbilityIndex = index;
+                WeaponAbility = rightHandWeapon.WeaponAbilities[index];
+            }
+            else
+            {
+                WeaponAbilityIndex = 0;
+            }
+            if (WeaponAbility != null)
+            {
+                WeaponAbility.Setup(this, PlayingCharacterEntity.EquipWeapons.rightHand);
+            }
+            WeaponAbilityState = WeaponAbilityState.Deactivated;
         }
 
         public virtual void ActivateWeaponAbility()

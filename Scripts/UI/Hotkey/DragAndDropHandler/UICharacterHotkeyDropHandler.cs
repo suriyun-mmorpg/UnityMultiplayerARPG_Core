@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                 if (draggedSkillUI.Location == UICharacterSkillDragHandler.SourceLocation.Hotkey)
                 {
                     // Swap key
-                    GameInstance.PlayingCharacterEntity.CallServerAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
+                    GameInstance.PlayingCharacterEntity.CallCmdAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
                 }
             }
             // If dragged item UI
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                 if (draggedItemUI.Location == UICharacterItemDragHandler.SourceLocation.Hotkey)
                 {
                     // Swap key
-                    GameInstance.PlayingCharacterEntity.CallServerAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
+                    GameInstance.PlayingCharacterEntity.CallCmdAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
                 }
             }
             // If dragged guild skill UI
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
                 if (draggedGuildSkillUI.Location == UIGuildSkillDragHandler.SourceLocation.Hotkey)
                 {
                     // Swap key
-                    GameInstance.PlayingCharacterEntity.CallServerAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
+                    GameInstance.PlayingCharacterEntity.CallCmdAssignHotkey(swappingHotkeyId, swappingType, swappingDataId);
                 }
             }
         }

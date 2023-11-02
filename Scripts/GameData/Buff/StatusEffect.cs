@@ -14,6 +14,11 @@ namespace MultiplayerARPG
             get { return buff; }
         }
 
+        [SerializeField]
+        [Range(0f, 1f)]
+        private float maxResistanceAmount = 1f;
+        public float MaxResistanceAmount { get { return maxResistanceAmount; } }
+
         /// <summary>
         /// This will be called when the buff is applied to `target` (by `applier`)
         /// </summary>
@@ -34,6 +39,19 @@ namespace MultiplayerARPG
         public StatusEffect statusEffect;
         [Tooltip("Buff stats will be calculated by level")]
         public IncrementalInt buffLevel;
+    }
 
+    [System.Serializable]
+    public struct StatusEffectResistanceAmount
+    {
+        public StatusEffect statusEffect;
+        public float amount;
+    }
+
+    [System.Serializable]
+    public struct StatusEffectResistanceIncremental
+    {
+        public StatusEffect statusEffect;
+        public IncrementalFloat amount;
     }
 }

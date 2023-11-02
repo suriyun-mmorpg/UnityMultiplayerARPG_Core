@@ -114,7 +114,7 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingState -= UpdateAnotherDealingState;
             GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingGold -= UpdateAnotherDealingGold;
             GameInstance.PlayingCharacterEntity.Dealing.onUpdateAnotherDealingItems -= UpdateAnotherDealingItems;
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerCancelDealing();
+            GameInstance.PlayingCharacterEntity.Dealing.CallCmdCancelDealing();
         }
 
         protected void OnItemDialogHide()
@@ -315,17 +315,17 @@ namespace MultiplayerARPG
 
         private void OnDealingGoldConfirmed(int amount)
         {
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerSetDealingGold(amount);
+            GameInstance.PlayingCharacterEntity.Dealing.CallCmdSetDealingGold(amount);
         }
 
         public void OnClickLock()
         {
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerLockDealing();
+            GameInstance.PlayingCharacterEntity.Dealing.CallCmdLockDealing();
         }
 
         public void OnClickConfirm()
         {
-            GameInstance.PlayingCharacterEntity.Dealing.CallServerConfirmDealing();
+            GameInstance.PlayingCharacterEntity.Dealing.CallCmdConfirmDealing();
         }
 
         public void OnClickCancel()

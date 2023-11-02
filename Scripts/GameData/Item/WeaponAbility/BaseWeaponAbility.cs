@@ -2,11 +2,12 @@
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseWeaponAbility : ScriptableObject
+    public abstract class BaseWeaponAbility : BaseGameData
     {
         protected BasePlayerCharacterController controller;
         protected CharacterItem weapon;
-        public virtual bool ShouldDeactivateWhenReload { get { return false; } }
+        public virtual bool ShouldDeactivateOnDead { get { return true; } }
+        public virtual bool ShouldDeactivateOnReload { get { return true; } }
 
         public virtual void Setup(BasePlayerCharacterController controller, CharacterItem weapon)
         {

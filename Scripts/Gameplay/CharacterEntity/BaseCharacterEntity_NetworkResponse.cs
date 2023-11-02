@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="objectId"></param>
         [ServerRpc]
-        protected virtual void ServerPickup(uint objectId)
+        protected virtual void CmdPickup(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!CanPickup())
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
         /// <param name="objectId"></param>
         /// <param name="itemsContainerIndex"></param>
         [ServerRpc]
-        protected virtual void ServerPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
+        protected virtual void CmdPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!CanPickup())
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="objectId"></param>
         [ServerRpc]
-        protected virtual void ServerPickupAllItemsFromContainer(uint objectId)
+        protected virtual void CmdPickupAllItemsFromContainer(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!CanPickup())
@@ -145,7 +145,7 @@ namespace MultiplayerARPG
         /// This will be called at server to order character to pickup nearby items
         /// </summary>
         [ServerRpc]
-        protected virtual void ServerPickupNearbyItems()
+        protected virtual void CmdPickupNearbyItems()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!CanPickup())
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
             List<ItemDropEntity> itemDropEntities = FindGameEntitiesInDistance<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
             foreach (ItemDropEntity itemDropEntity in itemDropEntities)
             {
-                ServerPickup(itemDropEntity.ObjectId);
+                CmdPickup(itemDropEntity.ObjectId);
             }
 #endif
         }
@@ -164,7 +164,7 @@ namespace MultiplayerARPG
         /// <param name="index"></param>
         /// <param name="amount"></param>
         [ServerRpc]
-        protected virtual void ServerDropItem(int index, int amount)
+        protected virtual void CmdDropItem(int index, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (amount <= 0 || !CanDoActions() || index >= NonEquipItems.Count)
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
             if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
                 return;
 
-            if (nonEquipItem.GetItem().RestractDropping)
+            if (nonEquipItem.GetItem().RestrictDropping)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ITEM_DROPPING_RESTRICTED);
                 return;
@@ -201,7 +201,7 @@ namespace MultiplayerARPG
         }
 
         [AllRpc]
-        protected virtual void AllOnDead()
+        protected virtual void RpcOnDead()
         {
             if (IsOwnerClient)
             {
@@ -215,7 +215,7 @@ namespace MultiplayerARPG
         }
 
         [AllRpc]
-        protected virtual void AllOnRespawn()
+        protected virtual void RpcOnRespawn()
         {
             if (IsOwnerClient)
                 ClearActionStates();
@@ -224,7 +224,7 @@ namespace MultiplayerARPG
         }
 
         [AllRpc]
-        protected virtual void AllOnLevelUp()
+        protected virtual void RpcOnLevelUp()
         {
             CharacterModel.InstantiateEffect(CurrentGameInstance.LevelUpEffect);
             if (onLevelUp != null)
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected virtual void ServerUnSummon(uint objectId)
+        protected virtual void CmdUnSummon(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             int index = this.IndexOfSummon(objectId);

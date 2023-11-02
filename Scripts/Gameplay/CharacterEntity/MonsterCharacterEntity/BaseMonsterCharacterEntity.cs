@@ -24,6 +24,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected MonsterCharacteristic overrideCharacteristic;
         [SerializeField]
+        protected Faction faction;
+        [SerializeField]
         protected float destroyDelay = 2f;
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
@@ -94,6 +96,12 @@ namespace MultiplayerARPG
             set { characterDatabase = value; }
         }
 
+        public Faction Faction
+        {
+            get { return faction; }
+            set { faction = value; }
+        }
+
         public bool IsOverrideCharacteristic
         {
             get { return isOverrideCharacteristic; }
@@ -114,6 +122,17 @@ namespace MultiplayerARPG
         public override int DataId
         {
             get { return CharacterDatabase.DataId; }
+            set { }
+        }
+
+        public override int FactionId
+        {
+            get
+            {
+                if (Faction == null)
+                    return 0;
+                return Faction.DataId;
+            }
             set { }
         }
 
@@ -146,7 +165,9 @@ namespace MultiplayerARPG
                 ObjectId,
                 ObjectId.ToString(),
                 DataId,
-                0, 0, 0,
+                FactionId,
+                0 /* Party ID */,
+                0 /* Guild ID */,
                 IsInSafeArea,
                 Summoner);
         }
@@ -160,11 +181,6 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
-            if (!IsUpdateEntityComponents)
-            {
-                // Don't updates while there is no subscrubers
-                return;
-            }
             base.EntityUpdate();
             Profiler.BeginSample("BaseMonsterCharacterEntity - Update");
             if (IsServer)
@@ -192,14 +208,14 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override void SendServerState()
+        public override void SendServerState(long writeTimestamp)
         {
             if (!IsUpdateEntityComponents)
             {
                 // Don't updates while there is no subscrubers
                 return;
             }
-            base.SendServerState();
+            base.SendServerState(writeTimestamp);
         }
 
         public virtual void InitStats()
@@ -694,10 +710,13 @@ namespace MultiplayerARPG
 
         private void OnRandomDropItem(BaseItem item, int amount)
         {
-            // Drop item to the ground
-            if (amount > item.MaxStack)
-                amount = item.MaxStack;
-            _droppingItems.Add(CharacterItem.Create(item, 1, amount));
+            int maxStack = item.MaxStack;
+            while (amount > 0)
+            {
+                int stackSize = Mathf.Min(maxStack ,amount);
+                _droppingItems.Add(CharacterItem.Create(item, 1, stackSize));
+                amount -= stackSize;
+            }
         }
 
         public virtual void DestroyAndRespawn()

@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(101)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.UI_ITEM_CRAFT_FORMULAS)]
     public class UIItemCraftFormulas : UIBase
     {
         [Header("Filter")]

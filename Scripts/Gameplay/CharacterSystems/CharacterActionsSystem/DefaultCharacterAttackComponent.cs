@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
-using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
@@ -30,6 +29,8 @@ namespace MultiplayerARPG
             }
         }
         public float LastAttackEndTime { get; protected set; }
+        protected bool _skipMovementValidation;
+        public bool LastAttackSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
         public MovementRestriction MovementRestrictionWhileAttacking { get; protected set; }
         protected float _totalDuration;
@@ -43,28 +44,15 @@ namespace MultiplayerARPG
         public bool doNotRandomAnimation;
         public float animationResetDelay = 2f;
 
-        [SerializeField]
-        protected SyncFieldInt nextClientSeed = new SyncFieldInt()
-        {
-            syncMode = LiteNetLibSyncField.SyncMode.ServerToClients,
-            sendInterval = 0.01f,
-            dataChannel = BaseGameEntity.STATE_DATA_CHANNEL,
-        };
-
         protected CharacterActionComponentManager _manager;
         protected int _lastAttackAnimationIndex = 0;
         protected int _lastAttackDataId = 0;
         // Network data sending
-        protected int _clientNextSeed;
-        protected AttackState? _clientState;
-        protected AttackState? _serverState;
         protected AttackState? _simulateState;
 
         public override void EntityStart()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
-            if (IsServer)
-                nextClientSeed.Value = Random.Range(int.MinValue, int.MaxValue);
         }
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId, AttackState simulateState)
@@ -80,13 +68,14 @@ namespace MultiplayerARPG
             _simulateState = null;
         }
 
-        protected virtual async UniTaskVoid AttackRoutine(AttackState simulateState)
+        protected virtual async UniTaskVoid AttackRoutine(long peerTimestamp, AttackState simulateState)
         {
-            int simulateSeed = simulateState.SimulateSeed = nextClientSeed.Value;
+            int simulateSeed = GetSimulateSeed(peerTimestamp);
             bool isLeftHand = simulateState.IsLeftHand;
-
-            if (IsServer)
-                nextClientSeed.Value = Random.Range(int.MinValue, int.MaxValue);
+            if (simulateState.SimulateSeed == 0)
+                simulateState.SimulateSeed = simulateSeed;
+            else
+                simulateSeed = simulateState.SimulateSeed;
 
             // Prepare time
             float time = Time.unscaledTime;
@@ -126,7 +115,8 @@ namespace MultiplayerARPG
                 animationIndex,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration);
+                out _totalDuration,
+                out _skipMovementValidation);
 
             // Set doing action state at clients and server
             SetAttackActionStates(animActionType, animActionDataId, simulateState);
@@ -136,9 +126,9 @@ namespace MultiplayerARPG
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts;
             if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)
-                damageAmounts = Entity.GetCaches().LeftHandDamages;
+                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().LeftHandDamages);
             else
-                damageAmounts = Entity.GetCaches().RightHandDamages;
+                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().RightHandDamages);
 
 
             // Calculate move speed rate while doing action at clients and server
@@ -210,8 +200,7 @@ namespace MultiplayerARPG
                 }
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
-                if (IsServer && !IsOwnerClientOrOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidatation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, weapon, null, 0);
+                HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
 
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
@@ -235,6 +224,7 @@ namespace MultiplayerARPG
                             AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
 
+                    await UniTask.Yield();
                     // Get aim position by character's forward
                     AimPosition aimPosition = Entity.AimPosition;
 
@@ -251,22 +241,32 @@ namespace MultiplayerARPG
                     // Skip attack function when applied skills (buffs) will override default attack functionality
                     if (!overrideDefaultAttack)
                     {
-
                         // Trigger attack event
                         Entity.OnAttackRoutine(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
 
                         // Apply attack damages
-                        if (IsOwnerClientOrOwnedByServer)
+                        if ((IsServer && IsOwnerClient) || IsOwnedByServer)
                         {
-                            // Simulate action at non-owner clients
-                            SimulateActionTriggerData simulateData = new SimulateActionTriggerData()
+                            if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+                                break;
+                            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                             {
                                 simulateSeed = simulateSeed,
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
-                            };
-                            RPC(AllSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, simulateData);
-                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
+                            });
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
+                        }
+                        else if (IsOwnerClient)
+                        {
+                            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(weapon);
+                            RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
+                            {
+                                simulateSeed = simulateSeed,
+                                triggerIndex = triggerIndex,
+                                aimPosition = aimPosition,
+                            });
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
                         }
                     }
 
@@ -308,20 +308,40 @@ namespace MultiplayerARPG
                 attackCancellationTokenSource.Dispose();
                 _attackCancellationTokenSources.Remove(attackCancellationTokenSource);
             }
+            await UniTask.Yield();
             // Clear action states at clients and server
             ClearAttackStates();
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, AimPosition aimPosition)
+        [ServerRpc]
+        protected void CmdSimulateActionTrigger(SimulateActionTriggerData data)
+        {
+            HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
+            if (validateData == null)
+                return;
+            if (!Entity.DecreaseAmmos(validateData.Weapon, validateData.IsLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+                return;
+            HitRegistrationManager.ConfirmHitRegValidation(Entity, data.simulateSeed, data.triggerIndex, increaseDamageAmounts);
+            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.BaseDamageAmounts, increaseDamageAmounts, data.aimPosition);
+        }
+
+        [AllRpc]
+        protected void RpcSimulateActionTrigger(SimulateActionTriggerData data)
         {
             if (IsServer)
-            {
-                // Increase damage with ammo damage
-                Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts);
-                HitRegistrationManager.IncreasePreparedDamageAmounts(Entity, simulateSeed, increaseDamageAmounts);
-                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
-            }
+                return;
+            if (IsOwnerClientOrOwnedByServer)
+                return;
+            HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
+            if (validateData == null)
+                return;
+            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(validateData.Weapon);
+            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.BaseDamageAmounts, increaseDamageAmounts, data.aimPosition);
+        }
 
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, AimPosition aimPosition)
+        {
             byte fireSpread = 0;
             Vector3 fireStagger = Vector3.zero;
             if (weapon != null && weapon.GetWeaponItem() != null)
@@ -330,6 +350,12 @@ namespace MultiplayerARPG
                 fireSpread = weapon.GetWeaponItem().FireSpread;
                 fireStagger = weapon.GetWeaponItem().FireStagger;
             }
+
+            // Make sure it won't increase damage to the wrong collction
+            damageAmounts = damageAmounts == null ? new Dictionary<DamageElement, MinMaxFloat>() : new Dictionary<DamageElement, MinMaxFloat>(damageAmounts);
+            // Increase damage amounts
+            if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
 
             for (byte spreadIndex = 0; spreadIndex < fireSpread + 1; ++spreadIndex)
             {
@@ -344,44 +370,8 @@ namespace MultiplayerARPG
                     damageAmounts,
                     null,
                     0,
-                    aimPosition,
-                    OnAttackOriginPrepared,
-                    OnAttackHit);
+                    aimPosition);
             }
-        }
-
-        protected virtual void OnAttackOriginPrepared(int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 position, Vector3 direction, Quaternion rotation)
-        {
-            if (!IsServer || IsOwnerClientOrOwnedByServer)
-                return;
-            HitRegistrationManager.PrepareHitRegOrigin(Entity, simulateSeed, triggerIndex, spreadIndex, position, direction);
-        }
-
-        protected virtual void OnAttackHit(int simulateSeed, byte triggerIndex, byte spreadIndex, uint objectId, byte hitboxIndex, Vector3 hitPoint)
-        {
-            if (IsServer || !IsOwnerClient)
-                return;
-            HitRegistrationManager.PrepareToRegister(simulateSeed, triggerIndex, spreadIndex, objectId, hitboxIndex, hitPoint);
-        }
-
-        [AllRpc]
-        protected void AllSimulateActionTrigger(SimulateActionTriggerData data)
-        {
-            if (IsOwnerClientOrOwnedByServer)
-                return;
-            if (!_simulateState.HasValue)
-                return;
-            if (data.simulateSeed != _simulateState.Value.SimulateSeed)
-                return;
-            bool isLeftHand = _simulateState.Value.IsLeftHand;
-            CharacterItem weapon = Entity.GetAvailableWeapon(ref isLeftHand);
-            DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weapon.GetWeaponItem());
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts;
-            if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)
-                damageAmounts = Entity.GetCaches().LeftHandDamages;
-            else
-                damageAmounts = Entity.GetCaches().RightHandDamages;
-            ApplyAttack(isLeftHand, weapon, data.simulateSeed, data.triggerIndex, damageInfo, damageAmounts, data.aimPosition);
         }
 
         public virtual void CancelAttack()
@@ -396,87 +386,60 @@ namespace MultiplayerARPG
 
         public virtual void Attack(bool isLeftHand)
         {
+            long timestamp = Manager.Timestamp;
             if (!IsServer && IsOwnerClient)
             {
-                // Prepare state data which will be sent to server
-                _clientState = new AttackState()
-                {
-                    IsLeftHand = isLeftHand,
-                };
+                ProceedAttack(timestamp, isLeftHand);
+                RPC(CmdAttack, timestamp, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                // Attack immediately at server
-                ProceedAttackStateAtServer(isLeftHand);
+                PreceedCmdAttack(timestamp, isLeftHand);
             }
         }
 
-        protected virtual void ProceedAttackStateAtServer(bool isLeftHand)
+        [ServerRpc]
+        protected void CmdAttack(long peerTimestamp, bool isLeftHand)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+            PreceedCmdAttack(peerTimestamp, isLeftHand);
+        }
+
+        protected void PreceedCmdAttack(long peerTimestamp, bool isLeftHand)
+        {
             if (!_manager.IsAcceptNewAction())
                 return;
             // Speed hack avoidance
             if (Time.unscaledTime - LastAttackEndTime < -0.2f)
                 return;
             _manager.ActionAccepted();
-            // Prepare state data which will be sent to clients
-            _serverState = new AttackState()
-            {
-                IsLeftHand = isLeftHand,
-            };
-#endif
+            ProceedAttack(peerTimestamp, isLeftHand);
+            RPC(RpcAttack, peerTimestamp, isLeftHand);
         }
 
-        public virtual bool WriteClientAttackState(NetDataWriter writer)
+        [AllRpc]
+        protected void RpcAttack(long peerTimestamp, bool isLeftHand)
         {
-            if (_clientState.HasValue)
-            {
-                // Simulate attacking at client
-                AttackRoutine(_clientState.Value).Forget();
-                // Send input to server
-                writer.Put(_clientState.Value.IsLeftHand);
-                // Clear Input
-                _clientState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool WriteServerAttackState(NetDataWriter writer)
-        {
-            if (_serverState.HasValue)
-            {
-                // Simulate attacking at server
-                AttackRoutine(_serverState.Value).Forget();
-                // Send input to client
-                writer.Put(_serverState.Value.IsLeftHand);
-                // Clear Input
-                _serverState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual void ReadClientAttackStateAtServer(NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            ProceedAttackStateAtServer(isLeftHand);
-        }
-
-        public virtual void ReadServerAttackStateAtClient(NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
             if (IsServer || IsOwnerClient)
             {
-                // Don't play attacking animation again (it already done in `WriteServerAttackState` function)
+                // Don't play attacking animation again
                 return;
             }
+            ProceedAttack(peerTimestamp, isLeftHand);
+        }
+
+        protected void ProceedAttack(long peerTimestamp, bool isLeftHand)
+        {
             AttackState simulateState = new AttackState()
             {
+                SimulateSeed = GetSimulateSeed(peerTimestamp),
                 IsLeftHand = isLeftHand,
             };
-            AttackRoutine(simulateState).Forget();
+            AttackRoutine(peerTimestamp, simulateState).Forget();
+        }
+
+        private int GetSimulateSeed(long timestamp)
+        {
+            return (int)(timestamp % 16384);
         }
     }
 }

@@ -109,12 +109,14 @@ namespace MultiplayerARPG
         public CharacterSkillAndBuffComponent SkillAndBuffComponent { get; protected set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
+        public bool LastAttackSkipMovementValidation { get { return AttackComponent.LastAttackSkipMovementValidation; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
         public MovementRestriction MovementRestrictionWhileAttacking { get { return AttackComponent.MovementRestrictionWhileAttacking; } }
         public float AttackTotalDuration { get { return AttackComponent.AttackTotalDuration; } set { AttackComponent.AttackTotalDuration = value; } }
         public float[] AttackTriggerDurations { get { return AttackComponent.AttackTriggerDurations; } set { AttackComponent.AttackTriggerDurations = value; } }
         public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
         public float LastUseSkillEndTime { get { return UseSkillComponent.LastUseSkillEndTime; } }
+        public bool LastUseSkillSkipMovementValidation { get { return UseSkillComponent.LastUseSkillSkipMovementValidation; } }
         public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
         public MovementRestriction MovementRestrictionWhileUsingSkill { get { return UseSkillComponent.MovementRestrictionWhileUsingSkill; } }
         public float UseSkillTotalDuration { get { return UseSkillComponent.UseSkillTotalDuration; } set { UseSkillComponent.UseSkillTotalDuration = value; } }
@@ -128,6 +130,7 @@ namespace MultiplayerARPG
         public int ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
         public bool IsReloading { get { return ReloadComponent.IsReloading; } }
         public float LastReloadEndTime { get { return ReloadComponent.LastReloadEndTime; } }
+        public bool LastReloadSkipMovementValidation { get { return ReloadComponent.LastReloadSkipMovementValidation; } }
         public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
         public MovementRestriction MovementRestrictionWhileReloading { get { return ReloadComponent.MovementRestrictionWhileReloading; } }
         public float ReloadTotalDuration { get { return ReloadComponent.ReloadTotalDuration; } set { ReloadComponent.ReloadTotalDuration = value; } }
@@ -387,117 +390,42 @@ namespace MultiplayerARPG
             Profiler.EndSample();
         }
 
-        public override void SendClientState()
+        public override void SendClientState(long writeTimestamp)
         {
-            bool shouldSendReliably = false;
-            CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
-            if (ReloadComponent.WriteClientReloadState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsReloading;
-            if (ChargeComponent.WriteClientStopChargeState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsChargeStopping;
-            if (ChargeComponent.WriteClientStartChargeState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsChargeStarting;
-            if (AttackComponent.WriteClientAttackState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsAttacking;
-            if (UseSkillComponent.WriteClientUseSkillInterruptedState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            if (UseSkillComponent.WriteClientUseSkillItemState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsUsingSkillItem;
-            if (UseSkillComponent.WriteClientUseSkillState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsUsingSkill;
-            // Movement
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(s_EntityStateDataWriter, out shouldSendReliably))
-                inputState |= CharacterInputState.IsMoving;
-            // Set input state and send to clients
-            if (inputState != CharacterInputState.None)
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                s_EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
+                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
-                ClientSendMessage(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
+                ClientSendMessage(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
-            CurrentGameManager.HitRegistrationManager.SendHitRegToServer();
         }
 
-        public override void SendServerState()
+        public override void SendServerState(long writeTimestamp)
         {
-            bool shouldSendReliably = false;
-            CharacterInputState inputState = CharacterInputState.None;
             s_EntityStateDataWriter.Reset();
-            if (ReloadComponent.WriteServerReloadState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsReloading;
-            if (ChargeComponent.WriteServerStopChargeState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsChargeStopping;
-            if (ChargeComponent.WriteServerStartChargeState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsChargeStarting;
-            if (AttackComponent.WriteServerAttackState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsAttacking;
-            if (UseSkillComponent.WriteServerUseSkillInterruptedState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsUsingSkillInterrupted;
-            if (UseSkillComponent.WriteServerUseSkillItemState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsUsingSkillItem;
-            if (UseSkillComponent.WriteServerUseSkillState(s_EntityStateDataWriter))
-                inputState |= CharacterInputState.IsUsingSkill;
-            // Movement
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(s_EntityStateDataWriter, out shouldSendReliably))
-                inputState |= CharacterInputState.IsMoving;
-            // Set input state and send to clients
-            if (inputState != CharacterInputState.None)
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                s_EntityStateMessageWriter.PutPackedUShort((ushort)inputState);
+                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
-                ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, (shouldSendReliably || (ushort)inputState > 1 << 0) ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
+                ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
-        public override void ReadClientStateAtServer(NetDataReader reader)
+        public override void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
-            CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
-            // Actions
-            if (inputState.Has(CharacterInputState.IsReloading))
-                ReloadComponent.ReadClientReloadStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsChargeStopping))
-                ChargeComponent.ReadClientStopChargeStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsChargeStarting))
-                ChargeComponent.ReadClientStartChargeStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsAttacking))
-                AttackComponent.ReadClientAttackStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadClientUseSkillInterruptedStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
-                UseSkillComponent.ReadClientUseSkillItemStateAtServer(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkill))
-                UseSkillComponent.ReadClientUseSkillStateAtServer(reader);
-            // Movement
-            if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
-                Movement.ReadClientStateAtServer(reader);
+            if (Movement != null)
+                Movement.ReadClientStateAtServer(peerTimestamp, reader);
         }
 
-        public override void ReadServerStateAtClient(NetDataReader reader)
+        public override void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
-            CharacterInputState inputState = (CharacterInputState)reader.GetPackedUShort();
-            // Actions
-            if (inputState.Has(CharacterInputState.IsReloading))
-                ReloadComponent.ReadServerReloadStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsChargeStopping))
-                ChargeComponent.ReadServerStopChargeStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsChargeStarting))
-                ChargeComponent.ReadServerStartChargeStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsAttacking))
-                AttackComponent.ReadServerAttackStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillInterrupted))
-                UseSkillComponent.ReadServerUseSkillInterruptedStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkillItem))
-                UseSkillComponent.ReadServerUseSkillItemStateAtClient(reader);
-            if (inputState.Has(CharacterInputState.IsUsingSkill))
-                UseSkillComponent.ReadServerUseSkillStateAtClient(reader);
-            // Movement
-            if (inputState.Has(CharacterInputState.IsMoving) && Movement != null)
-                Movement.ReadServerStateAtClient(reader);
+            if (Movement != null)
+                Movement.ReadServerStateAtClient(peerTimestamp, reader);
         }
 
         public override void PlayJumpAnimation()
@@ -652,10 +580,7 @@ namespace MultiplayerARPG
 
         public bool ValidateUseSkillItem(int index, bool isLeftHand, uint targetObjectId)
         {
-            if (!CanDoActions())
-                return false;
-
-            if (!CanUseItem())
+            if (!CanUseSkillItem())
                 return false;
 
             if (!UpdateLastActionTime())
@@ -902,66 +827,121 @@ namespace MultiplayerARPG
                 return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.WeaponType.RequireAmmoType != null)
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
             {
-                if (weaponItem.AmmoCapacity <= 0)
+                // Ammo capacity more than 0 reduce loaded ammo
+                if (weapon.ammo < amount)
+                    return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                if (this.CountAmmos(weaponItem.WeaponType.AmmoType, out _) >= amount)
+                    return true;
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
                 {
-                    // Ammo capacity is 0 so reduce ammo from inventory
-                    if (this.CountAmmos(weaponItem.WeaponType.RequireAmmoType) < amount)
-                        return false;
+                    if (this.CountNonEquipItems(weaponItem.AmmoItems[i].DataId) >= amount)
+                        return true;
                 }
-                else
-                {
-                    // Ammo capacity more than 0 reduce loaded ammo
-                    if (weapon.ammo < amount)
-                        return false;
-                }
-                return true;
+                return false;
             }
 
             return validIfNoRequireAmmoType;
         }
 
-        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool validIfNoRequireAmmoType = true)
+        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesByAmmo(CharacterItem weapon)
         {
-            increaseDamageAmounts = null;
+            // Avoid null data
+            if (weapon == null)
+                return null;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
+            {
+                if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
+                    return tempAmmoItem.GetIncreaseDamages();
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && (hasAmmoType || hasAmmoItems))
+            {
+                return this.GetIncreaseDamagesByAmmo(weaponItem.WeaponType.AmmoType);
+            }
+
+            return null;
+        }
+
+        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
+        {
+            increaseDamages = null;
 
             // Avoid null data
             if (weapon == null)
                 return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.WeaponType.RequireAmmoType != null)
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
             {
-                if (weaponItem.AmmoCapacity <= 0)
+                // Ammo capacity >= `amount` reduce loaded ammo
+                if (weapon.ammo >= amount)
                 {
-                    // Ammo capacity is 0 so reduce ammo from inventory
-                    if (this.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, amount, out increaseDamageAmounts))
+                    if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
+                        increaseDamages = tempAmmoItem.GetIncreaseDamages();
+                    weapon.ammo -= amount;
+                    EquipWeapons equipWeapons = EquipWeapons;
+                    if (isLeftHand)
+                        equipWeapons.leftHand = weapon;
+                    else
+                        equipWeapons.rightHand = weapon;
+                    EquipWeapons = equipWeapons;
+                    return true;
+                }
+                // Not enough ammo
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                if (this.DecreaseAmmos(weaponItem.WeaponType.AmmoType, amount, out increaseDamages))
+                {
+                    this.FillEmptySlots();
+                    return true;
+                }
+                // Not enough ammo
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                BaseItem tempItemData;
+                int tempAmmoDataId;
+                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
+                {
+                    tempItemData = weaponItem.AmmoItems[i];
+                    if (tempItemData == null)
+                        continue;
+                    tempAmmoDataId = tempItemData.DataId;
+                    if (this.DecreaseItems(tempAmmoDataId, amount))
                     {
                         this.FillEmptySlots();
+                        if (tempItemData is IAmmoItem tempAmmoItem)
+                            increaseDamages = tempAmmoItem.GetIncreaseDamages();
                         return true;
                     }
-                    // Not enough ammo
-                    return false;
                 }
-                else
-                {
-                    // Ammo capacity >= `amount` reduce loaded ammo
-                    if (weapon.ammo >= amount)
-                    {
-                        weapon.ammo -= amount;
-                        EquipWeapons equipWeapons = EquipWeapons;
-                        if (isLeftHand)
-                            equipWeapons.leftHand = weapon;
-                        else
-                            equipWeapons.rightHand = weapon;
-                        EquipWeapons = equipWeapons;
-                        return true;
-                    }
-                    // Not enough ammo
-                    return false;
-                }
+                // Not enough ammo
+                return false;
             }
+
             return validIfNoRequireAmmoType;
         }
 
@@ -1090,8 +1070,7 @@ namespace MultiplayerARPG
 
         public virtual bool IsPlayingActionAnimation()
         {
-            return IsPlayingAttackOrUseSkillAnimation() ||
-                IsPlayingReloadAnimation();
+            return IsPlayingAttackOrUseSkillAnimation() || IsPlayingReloadAnimation();
         }
 
         public float GetAttackSpeed()
@@ -1279,24 +1258,26 @@ namespace MultiplayerARPG
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
             animationIndex = 0;
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
+            skipMovementValidation = false;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
             }
         }
@@ -1307,29 +1288,31 @@ namespace MultiplayerARPG
             int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration)
+            out float totalDuration,
+            out bool skipMovementValidation)
         {
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
+            skipMovementValidation = false;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.ReloadRightHand:
-                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
                 case AnimActionType.ReloadLeftHand:
-                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
                     break;
             }
         }

@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public const float GROUND_DETECTION_DISTANCE = 100f;
         protected static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[10];
         public Color gizmosColor = Color.magenta;
+        public float gizmosHeight = 16f;
         public GameAreaType type;
         [Header("Radius Area")]
         public float randomRadius = 5f;
@@ -24,7 +25,7 @@ namespace MultiplayerARPG
 
         protected IPhysicFunctions _physicFunctions;
 
-        public bool GetRandomPosition(out Vector3 randomedPosition)
+        public virtual bool GetRandomPosition(out Vector3 randomedPosition)
         {
             randomedPosition = transform.position;
 
@@ -56,7 +57,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public Quaternion GetRandomRotation()
+        public virtual Quaternion GetRandomRotation()
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
                 return Quaternion.Euler(Vector3.up * Random.Range(0, 360));
@@ -64,17 +65,20 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        private void OnDrawGizmos()
+        protected virtual void OnDrawGizmos()
         {
+            Color col = Gizmos.color;
+            Gizmos.color = gizmosColor;
             switch (type)
             {
                 case GameAreaType.Radius:
-                    GenericUtils.DrawCircleGizmos(transform, gizmosColor, randomRadius);
+                    Gizmos.DrawWireSphere(transform.position, randomRadius);
                     break;
                 case GameAreaType.Square:
-                    GenericUtils.DrawSquareGizmos(transform, gizmosColor, squareSizeX, squareSizeZ);
+                    Gizmos.DrawWireCube(transform.position + Vector3.up * gizmosHeight / 2f, new Vector3(squareSizeX, gizmosHeight, squareSizeZ));
                     break;
             }
+            Gizmos.color = col;
         }
 #endif
 

@@ -9,6 +9,12 @@ namespace MultiplayerARPG
         private CharacterRecoveryData _recoveryData;
         private bool _isClearRecoveryData;
 
+        public override void EntityAwake()
+        {
+            base.EntityAwake();
+            AlwaysUpdate = true;
+        }
+
         public override void EntityStart()
         {
             _recoveryData = new CharacterRecoveryData(Entity);

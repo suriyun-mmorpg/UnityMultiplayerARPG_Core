@@ -245,16 +245,16 @@ namespace MultiplayerARPG
             itemDropData.onChange -= OnItemDropDataChange;
         }
 
+        public void CallRpcOnPickedUp()
+        {
+            RPC(RpcOnPickedUp);
+        }
+
         [AllRpc]
-        protected virtual void AllOnPickedUp()
+        protected virtual void RpcOnPickedUp()
         {
             if (onPickedUp != null)
                 onPickedUp.Invoke();
-        }
-
-        public void CallAllOnPickedUp()
-        {
-            RPC(AllOnPickedUp);
         }
 
         protected virtual void OnItemDropDataChange(bool isInitial, ItemDropData itemDropData)
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
             // Mark as picked up
             _isPickedUp = true;
             // Tell clients that the entity is picked up
-            CallAllOnPickedUp();
+            CallRpcOnPickedUp();
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
@@ -385,7 +385,7 @@ namespace MultiplayerARPG
 
         public virtual void OnPickupActivate()
         {
-            GameInstance.PlayingCharacterEntity.CallServerPickup(ObjectId);
+            GameInstance.PlayingCharacterEntity.CallCmdPickup(ObjectId);
         }
 
         public virtual bool ProceedPickingUpAtServer(BaseCharacterEntity characterEntity, out UITextKeys message)
@@ -404,7 +404,7 @@ namespace MultiplayerARPG
 
             characterEntity.IncreaseItems(DropItems, (characterItem) =>
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, GivenType, characterItem.dataId, characterItem.amount);
+                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(characterEntity.ConnectionId, GivenType, characterItem.dataId, characterItem.amount);
             });
             characterEntity.FillEmptySlots();
             PickedUp();

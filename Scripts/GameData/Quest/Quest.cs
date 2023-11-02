@@ -4,21 +4,19 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public enum QuestTaskType : byte
-    {
-        KillMonster,
-        CollectItem,
-        TalkToNpc,
-        Custom = 254,
-    }
-
     [CreateAssetMenu(fileName = GameDataMenuConsts.QUEST_FILE, menuName = GameDataMenuConsts.QUEST_MENU, order = GameDataMenuConsts.QUEST_ORDER)]
     public partial class Quest : BaseGameData
     {
+        public static readonly QuestTask[] EmptyTasks = new QuestTask[0];
+
         [Category("Quest Settings")]
         [Tooltip("Requirement to receive quest")]
-        public QuestRequirement requirement = default(QuestRequirement);
-        public QuestTask[] tasks = new QuestTask[0];
+        public QuestRequirement requirement = default;
+        // TODO: Deprecating, use random tasks
+        [HideInInspector]
+        [SerializeField]
+        private QuestTask[] tasks = new QuestTask[0];
+        public QuestTasks[] randomTasks = new QuestTasks[0];
         [Tooltip("Quests which will be abandoned when accept this quest")]
         public Quest[] abandonQuests = new Quest[0];
         [Header("Rewarding")]
@@ -38,8 +36,8 @@ namespace MultiplayerARPG
         public ItemAmount[] selectableRewardItems = new ItemAmount[0];
         [ArrayElementTitle("item")]
         public ItemRandomByWeight[] randomRewardItems = new ItemRandomByWeight[0];
-        [Tooltip("If this is `TRUE` character will be able to do this quest repeatedly")]
-        public bool canRepeat;
+        [FormerlySerializedAs("canRepeat")]
+        public QuestRepeatType repeatType;
 
         [System.NonSerialized]
         private HashSet<int> _cacheKillMonsterIds;
@@ -72,6 +70,20 @@ namespace MultiplayerARPG
                     _cacheRewardCurrencies = GameDataHelpers.CombineCurrencies(rewardCurrencies, null);
                 return _cacheRewardCurrencies;
             }
+        }
+
+        public QuestTask[] GetTasks(int index)
+        {
+            if (randomTasks == null || randomTasks.Length == 0)
+                return EmptyTasks;
+            QuestTask[] result;
+            if (index < 0 || index >= randomTasks.Length)
+                result = randomTasks[0].tasks;
+            else
+                result = randomTasks[index].tasks;
+            if (result == null)
+                result = EmptyTasks;
+            return result;
         }
 
         public override bool Validate()
@@ -121,19 +133,37 @@ namespace MultiplayerARPG
                     randomRewardItems[i] = reward;
                 }
             }
+            if (tasks != null && tasks.Length > 0 && (randomTasks == null || randomTasks.Length <= 0))
+            {
+                List<QuestTasks> tempQuestTasks = new List<QuestTasks>() {
+                    new QuestTasks()
+                    {
+                        tasks = tasks,
+                    }
+                };
+                randomTasks = tempQuestTasks.ToArray();
+                tasks = null;
+                hasChanges = true;
+            }
             return hasChanges || base.Validate();
         }
 
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            if (tasks != null && tasks.Length > 0)
+            if (randomTasks != null && randomTasks.Length > 0)
             {
-                foreach (QuestTask task in tasks)
+                foreach (QuestTasks tasks in randomTasks)
                 {
-                    GameInstance.AddCharacters(task.monsterCharacterAmount.monster);
-                    GameInstance.AddItems(task.itemAmount.item);
-                    GameInstance.AddNpcDialogs(task.talkToNpcDialog);
+                    if (tasks.tasks == null || tasks.tasks.Length == 0)
+                        continue;
+
+                    foreach (QuestTask task in tasks.tasks)
+                    {
+                        GameInstance.AddCharacters(task.monsterCharacterAmount.monster);
+                        GameInstance.AddItems(task.itemAmount.item);
+                        GameInstance.AddNpcDialogs(task.talkToNpcDialog);
+                    }
                 }
             }
             GameInstance.AddQuests(abandonQuests);
@@ -146,8 +176,9 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(requirement.completedQuests);
         }
 
-        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, out int taskIndex, out BaseNpcDialog dialog, out bool completeAfterTalked)
+        public bool HaveToTalkToNpc(IPlayerCharacterData character, NpcEntity npcEntity, int randomTasksIndex, out int taskIndex, out BaseNpcDialog dialog, out bool completeAfterTalked)
         {
+            QuestTask[] tasks = GetTasks(randomTasksIndex);
             taskIndex = -1;
             dialog = null;
             completeAfterTalked = false;
@@ -158,8 +189,9 @@ namespace MultiplayerARPG
                 return false;
             for (int i = 0; i < tasks.Length; ++i)
             {
-                if (tasks[i].taskType != QuestTaskType.TalkToNpc ||
-                    tasks[i].npcEntity == null)
+                if (tasks[i].taskType != QuestTaskType.TalkToNpc)
+                    continue;
+                if (tasks[i].npcEntity == null)
                     continue;
                 if (tasks[i].npcEntity.EntityId == npcEntity.EntityId)
                 {
@@ -177,12 +209,36 @@ namespace MultiplayerARPG
             // Quest is completed, so don't show the menu which navigate to this dialog
             int indexOfQuest = character.IndexOfQuest(DataId);
             if (indexOfQuest >= 0 && character.Quests[indexOfQuest].isComplete)
-                return false;
+            {
+                long completeTime = character.Quests[indexOfQuest].completeTime;
+
+                System.DateTime completeDateTime = GenericUtils.GetDateTimeBySeconds(completeTime).ToLocalTime();
+                System.DateTime todayDateTime = GenericUtils.GetDateTimeBySeconds(System.DateTimeOffset.UtcNow.ToUnixTimeSeconds()).ToLocalTime();
+
+                switch (repeatType)
+                {
+                    case QuestRepeatType.AnyTime:
+                        break;
+                    case QuestRepeatType.Daily:
+                        if ((todayDateTime.Date - completeDateTime.Date).TotalDays <= 0)
+                            return false;
+                        break;
+                    case QuestRepeatType.Weekly:
+                        if ((todayDateTime.StartOfWeek(System.DayOfWeek.Sunday) - completeDateTime.StartOfWeek(System.DayOfWeek.Sunday)).TotalDays <= 0)
+                            return false;
+                        break;
+                    default:
+                        return false;
+                }
+            }
             // Character's level is lower than requirement
             if (character.Level < requirement.level)
                 return false;
             // Character's has difference class
             if (requirement.character != null && requirement.character.DataId != character.DataId)
+                return false;
+            // Character's has difference faction
+            if (requirement.faction != null && requirement.faction.DataId != character.FactionId)
                 return false;
             // Character's not complete all required quests
             if (requirement.completedQuests != null && requirement.completedQuests.Length > 0)
@@ -197,58 +253,6 @@ namespace MultiplayerARPG
                 }
             }
             return true;
-        }
-    }
-
-    [System.Serializable]
-    public struct QuestTask
-    {
-        public QuestTaskType taskType;
-
-        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.KillMonster))]
-        public MonsterCharacterAmount monsterCharacterAmount;
-
-        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
-        public ItemAmount itemAmount;
-        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.CollectItem))]
-        [Tooltip("If this is `TRUE`, it will not decrease task items when quest completed")]
-        public bool doNotDecreaseItemsOnQuestComplete;
-
-        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
-        [Tooltip("Have to talk to this NPC to complete task")]
-        public NpcEntity npcEntity;
-        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
-        [Tooltip("This dialog will be shown immediately instead of start dialog which set to the NPC")]
-        public BaseNpcDialog talkToNpcDialog;
-        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
-        [Tooltip("If this is `TRUE` quest will be completed immediately after talked to NPC and all tasks done")]
-        public bool completeAfterTalked;
-
-        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.Custom))]
-        public BaseCustomQuestTask customQuestTask;
-
-        [Header("Custom Task Description")]
-        public bool useCustomDescription;
-        [FormerlySerializedAs("defaultDescriptionOverride")]
-        public string defaultDescription;
-        [FormerlySerializedAs("languageSpecificDescriptionOverrides")]
-        public LanguageData[] languageSpecificDescriptions;
-
-        [Header("Custom Task Completed Description")]
-        public bool useCustomCompletedDescription;
-        [FormerlySerializedAs("defaultCompletedDescriptionOverride")]
-        public string defaultCompletedDescription;
-        [FormerlySerializedAs("languageSpecificCompletedDescriptionOverrides")]
-        public LanguageData[] languageSpecificCompletedDescriptions;
-
-        public string CustomDescription
-        {
-            get { return Language.GetText(languageSpecificDescriptions, defaultDescription); }
-        }
-
-        public string CustomCompletedDescription
-        {
-            get { return Language.GetText(languageSpecificCompletedDescriptions, defaultCompletedDescription); }
         }
     }
 }

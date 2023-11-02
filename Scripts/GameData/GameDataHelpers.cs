@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         /// <param name="resultDictionary"></param>
         /// <param name="newEntry"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, KeyValuePair<DamageElement, MinMaxFloat> newEntry, float rate = 1f)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -20,9 +20,9 @@ namespace MultiplayerARPG
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             if (!resultDictionary.ContainsKey(damageElement))
-                resultDictionary[damageElement] = newEntry.Value;
+                resultDictionary[damageElement] = newEntry.Value * rate;
             else
-                resultDictionary[damageElement] += newEntry.Value;
+                resultDictionary[damageElement] += newEntry.Value * rate;
             return resultDictionary;
         }
 
@@ -130,8 +130,6 @@ namespace MultiplayerARPG
                 resultDictionary[newEntry.Key] = newEntry.Value;
             else
                 resultDictionary[newEntry.Key] += newEntry.Value;
-            if (resultDictionary[newEntry.Key] > newEntry.Key.MaxResistanceAmount)
-                resultDictionary[newEntry.Key] = newEntry.Key.MaxResistanceAmount;
             return resultDictionary;
         }
 
@@ -189,6 +187,25 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Combine status effect resistance amounts dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<StatusEffect, float> CombineStatusEffectResistances(Dictionary<StatusEffect, float> resultDictionary, KeyValuePair<StatusEffect, float> newEntry)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<StatusEffect, float>();
+            if (newEntry.Key == null)
+                return resultDictionary;
+            if (!resultDictionary.ContainsKey(newEntry.Key))
+                resultDictionary[newEntry.Key] = newEntry.Value;
+            else
+                resultDictionary[newEntry.Key] += newEntry.Value;
+            return resultDictionary;
+        }
+
+        /// <summary>
         /// Combine item amounts dictionary
         /// </summary>
         /// <param name="resultDictionary"></param>
@@ -233,8 +250,9 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="resultDictionary"></param>
         /// <param name="combineDictionary"></param>
+        /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary)
+        public static Dictionary<DamageElement, MinMaxFloat> CombineDamages(Dictionary<DamageElement, MinMaxFloat> resultDictionary, Dictionary<DamageElement, MinMaxFloat> combineDictionary, float rate = 1f)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<DamageElement, MinMaxFloat>();
@@ -242,7 +260,7 @@ namespace MultiplayerARPG
                 return resultDictionary;
             foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in combineDictionary)
             {
-                CombineDamages(resultDictionary, entry);
+                CombineDamages(resultDictionary, entry, rate);
             }
             return resultDictionary;
         }
@@ -431,6 +449,25 @@ namespace MultiplayerARPG
             foreach (KeyValuePair<BaseSkill, int> entry in combineDictionary)
             {
                 CombineSkills(resultDictionary, entry);
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Combine status effect resistance amounts dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<StatusEffect, float> CombineStatusEffectResistances(Dictionary<StatusEffect, float> resultDictionary, Dictionary<StatusEffect, float> combineDictionary)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<StatusEffect, float>();
+            if (combineDictionary == null || combineDictionary.Count <= 0)
+                return resultDictionary;
+            foreach (KeyValuePair<StatusEffect, float> entry in combineDictionary)
+            {
+                CombineStatusEffectResistances(resultDictionary, entry);
             }
             return resultDictionary;
         }
@@ -641,6 +678,33 @@ namespace MultiplayerARPG
             if (source.skill == null)
                 return new KeyValuePair<BaseSkill, int>();
             return new KeyValuePair<BaseSkill, int>(source.skill, source.level);
+        }
+
+        /// <summary>
+        /// Make status effect resistance - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<StatusEffect, float> ToKeyValuePair(this StatusEffectResistanceAmount source, float rate)
+        {
+            if (source.statusEffect == null)
+                return new KeyValuePair<StatusEffect, float>();
+            return new KeyValuePair<StatusEffect, float>(source.statusEffect, source.amount * rate);
+        }
+
+        /// <summary>
+        /// Make status effect resistance - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<StatusEffect, float> ToKeyValuePair(this StatusEffectResistanceIncremental source, int level, float rate)
+        {
+            if (source.statusEffect == null)
+                return new KeyValuePair<StatusEffect, float>();
+            return new KeyValuePair<StatusEffect, float>(source.statusEffect, source.amount.GetAmount(level) * rate);
         }
 
         /// <summary>
@@ -872,7 +936,6 @@ namespace MultiplayerARPG
             return resultDictionary;
         }
 
-
         /// <summary>
         /// Combine armor amounts dictionary
         /// </summary>
@@ -985,6 +1048,51 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Combine status effect resistance amounts dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="resultDictionary"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<StatusEffect, float> CombineStatusEffectResistances(IEnumerable<StatusEffectResistanceAmount> sourceAmounts, Dictionary<StatusEffect, float> resultDictionary, float rate)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<StatusEffect, float>();
+            if (sourceAmounts == null)
+                return resultDictionary;
+            KeyValuePair<StatusEffect, float> pair;
+            foreach (StatusEffectResistanceAmount sourceAmount in sourceAmounts)
+            {
+                pair = ToKeyValuePair(sourceAmount, rate);
+                resultDictionary = CombineStatusEffectResistances(resultDictionary, pair);
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Combine status effect resistance amounts dictionary
+        /// </summary>
+        /// <param name="sourceIncrementals"></param>
+        /// <param name="resultDictionary"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<StatusEffect, float> CombineStatusEffectResistances(IEnumerable<StatusEffectResistanceIncremental> sourceIncrementals, Dictionary<StatusEffect, float> resultDictionary, int level, float rate)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<StatusEffect, float>();
+            if (sourceIncrementals == null)
+                return resultDictionary;
+            KeyValuePair<StatusEffect, float> pair;
+            foreach (StatusEffectResistanceIncremental sourceIncremental in sourceIncrementals)
+            {
+                pair = ToKeyValuePair(sourceIncremental, level, rate);
+                resultDictionary = CombineStatusEffectResistances(resultDictionary, pair);
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
         /// Combine item amounts dictionary
         /// </summary>
         /// <param name="sourceAmounts"></param>
@@ -1048,19 +1156,6 @@ namespace MultiplayerARPG
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
             return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, pureDamage.Value + damageEffectiveness);
-        }
-
-        public static CharacterStats GetStatsFromAttributes(Dictionary<Attribute, float> attributeAmounts)
-        {
-            CharacterStats stats = new CharacterStats();
-            if (attributeAmounts == null || attributeAmounts.Count <= 0)
-                return stats;
-            foreach (Attribute attribute in attributeAmounts.Keys)
-            {
-                if (attribute == null) continue;
-                stats += attribute.StatsIncreaseEachLevel * attributeAmounts[attribute];
-            }
-            return stats;
         }
 
         public static MinMaxFloat GetSumDamages(Dictionary<DamageElement, MinMaxFloat> damages)

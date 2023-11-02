@@ -6,29 +6,55 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class PlayerCharacterBuildingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
-        public bool CallServerConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
+        public bool CallCmdConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
             if (!Entity.CanDoActions())
                 return false;
-            RPC(ServerConstructBuilding, itemIndex, position, rotation, parentObjectId);
+            RPC(CmdConstructBuilding, itemIndex, position, rotation, parentObjectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
+        protected void CmdConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!Entity.CanDoActions() || itemIndex >= Entity.NonEquipItems.Count)
+            if (!Entity.CanDoActions())
             {
+                // Not allow to do it
                 return;
             }
 
-            BuildingEntity buildingEntity;
-            CharacterItem nonEquipItem = Entity.NonEquipItems[itemIndex];
-            if (nonEquipItem.IsEmptySlot() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().BuildingEntity == null ||
-                !GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.EntityId, out buildingEntity) ||
-                !Entity.DecreaseItemsByIndex(itemIndex, 1, false))
+            if (itemIndex >= Entity.NonEquipItems.Count)
             {
+                // Invalid data index
+                return;
+            }
+
+            CharacterItem nonEquipItem = Entity.NonEquipItems[itemIndex];
+            if (nonEquipItem.IsEmptySlot() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().BuildingEntity == null)
+            {
+                // Invalid data
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_DATA);
+                return;
+            }
+
+            if (!GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.EntityId, out BuildingEntity buildingEntity))
+            {
+                // Invalid entity
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_ENTITY);
+                return;
+            }
+
+            if (buildingEntity.BuildLimit > 0 && GameInstance.ServerBuildingHandlers.CountPlayerBuildings(Entity.Id, buildingEntity.EntityId) >= buildingEntity.BuildLimit)
+            {
+                // Reached limit amount
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_REACHED_BUILD_LIMIT);
+                return;
+            }
+
+            if (!Entity.DecreaseItemsByIndex(itemIndex, 1, false))
+            {
+                // Not enough items?
                 return;
             }
 
@@ -36,8 +62,7 @@ namespace MultiplayerARPG
             BuildingSaveData buildingSaveData = new BuildingSaveData();
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;
-            BuildingEntity parentBuildingEntity;
-            if (Manager.TryGetEntityByObjectId(parentObjectId, out parentBuildingEntity))
+            if (Manager.TryGetEntityByObjectId(parentObjectId, out BuildingEntity parentBuildingEntity))
                 buildingSaveData.ParentId = parentBuildingEntity.Id;
             buildingSaveData.EntityId = buildingEntity.EntityId;
             buildingSaveData.CurrentHp = buildingEntity.MaxHp;
@@ -50,19 +75,57 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerDestroyBuilding(uint objectId)
+        public bool CallCmdRepairBuilding(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerDestroyBuilding, objectId);
+            RPC(CmdRepairBuilding, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerDestroyBuilding(uint objectId)
+        protected void CmdRepairBuilding(uint objectId)
+        {
+#if UNITY_EDITOR || UNITY_SERVER
+            if (!Entity.CanDoActions())
+                return;
+
+            if (!Manager.TryGetEntityByObjectId(objectId, out BuildingEntity buildingEntity))
+            {
+                // Can't find the entity
+                return;
+            }
+
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
+
+            if (!buildingEntity.Repair(Entity, out UITextKeys errorMessage))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
+                return;
+            }
+#endif
+        }
+        
+        public bool CallCmdDestroyBuilding(uint objectId)
+        {
+            if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
+            {
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return false;
+            }
+            RPC(CmdDestroyBuilding, objectId);
+            return true;
+        }
+
+        [ServerRpc]
+        protected void CmdDestroyBuilding(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -90,19 +153,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerOpenStorage(uint objectId, string password)
+        public bool CallCmdOpenStorage(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerOpenStorage, objectId, password);
+            RPC(CmdOpenStorage, objectId, password);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerOpenStorage(uint objectId, string password)
+        protected void CmdOpenStorage(uint objectId, string password)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -137,19 +200,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerOpenDoor(uint objectId, string password)
+        public bool CallCmdOpenDoor(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerOpenDoor, objectId, password);
+            RPC(CmdOpenDoor, objectId, password);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerOpenDoor(uint objectId, string password)
+        protected void CmdOpenDoor(uint objectId, string password)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -177,19 +240,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerCloseDoor(uint objectId)
+        public bool CallCmdCloseDoor(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerCloseDoor, objectId);
+            RPC(CmdCloseDoor, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerCloseDoor(uint objectId)
+        protected void CmdCloseDoor(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -211,19 +274,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerTurnOnCampFire(uint objectId)
+        public bool CallCmdTurnOnCampFire(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerTurnOnCampFire, objectId);
+            RPC(CmdTurnOnCampFire, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerTurnOnCampFire(uint objectId)
+        protected void CmdTurnOnCampFire(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -245,19 +308,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerTurnOffCampFire(uint objectId)
+        public bool CallCmdTurnOffCampFire(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerTurnOffCampFire, objectId);
+            RPC(CmdTurnOffCampFire, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerTurnOffCampFire(uint objectId)
+        protected void CmdTurnOffCampFire(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -279,14 +342,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerCraftItemByWorkbench(uint objectId, int dataId)
+        public bool CallCmdCraftItemByWorkbench(uint objectId, int dataId)
         {
-            RPC(ServerCraftItemByWorkbench, objectId, dataId);
+            RPC(CmdCraftItemByWorkbench, objectId, dataId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerCraftItemByWorkbench(uint objectId, int dataId)
+        protected void CmdCraftItemByWorkbench(uint objectId, int dataId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -308,19 +371,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerSetBuildingPassword(uint objectId, string password)
+        public bool CallCmdSetBuildingPassword(uint objectId, string password)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerSetBuildingPassword, objectId, password);
+            RPC(CmdSetBuildingPassword, objectId, password);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSetBuildingPassword(uint objectId, string password)
+        protected void CmdSetBuildingPassword(uint objectId, string password)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -355,19 +418,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerLockBuilding(uint objectId)
+        public bool CallCmdLockBuilding(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerLockBuilding, objectId);
+            RPC(CmdLockBuilding, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerLockBuilding(uint objectId)
+        protected void CmdLockBuilding(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -401,19 +464,19 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerUnlockBuilding(uint objectId)
+        public bool CallCmdUnlockBuilding(uint objectId)
         {
             if (!CurrentGameplayRule.CanInteractEntity(Entity, objectId))
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return false;
             }
-            RPC(ServerUnlockBuilding, objectId);
+            RPC(CmdUnlockBuilding, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerUnlockBuilding(uint objectId)
+        protected void CmdUnlockBuilding(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())

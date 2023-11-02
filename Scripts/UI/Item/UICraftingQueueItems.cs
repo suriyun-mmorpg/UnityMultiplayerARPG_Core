@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(100)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.UI_CRAFTING_QUEUE_ITEMS)]
     public class UICraftingQueueItems : UIBase
     {
         [Header("UI Elements")]

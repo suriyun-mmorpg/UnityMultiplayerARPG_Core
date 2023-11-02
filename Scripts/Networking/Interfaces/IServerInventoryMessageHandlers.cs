@@ -64,5 +64,9 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestSellItems(
             RequestHandlerData requestHandler, RequestSellItemsMessage request,
             RequestProceedResultDelegate<ResponseSellItemsMessage> result);
+
+        UniTaskVoid HandleRequestSortItems(
+            RequestHandlerData requestHandler, RequestSortItemsMessage request,
+            RequestProceedResultDelegate<ResponseSortItemsMessage> result);
     }
 }

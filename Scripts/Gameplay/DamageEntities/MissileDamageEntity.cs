@@ -55,7 +55,7 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts">Calculated damage amounts</param>
         /// <param name="skill">Skill which was used to attack enemy</param>
         /// <param name="skillLevel">Level of the skill</param>
-        /// <param name="onHit">Action when hit</param>
+        /// <param name="hitRegisterData"></param>
         /// <param name="missileDistance">Calculated missile distance</param>
         /// <param name="missileSpeed">Calculated missile speed</param>
         /// <param name="lockingTarget">Locking target, if this is empty it can hit any entities</param>
@@ -68,12 +68,12 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             BaseSkill skill,
             int skillLevel,
-            DamageHitDelegate onHit,
+            HitRegisterData hitRegisterData,
             float missileDistance,
             float missileSpeed,
             IDamageableEntity lockingTarget)
         {
-            Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, onHit);
+            Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, hitRegisterData);
             _missileDistance = missileDistance;
             _missileSpeed = missileSpeed;
 

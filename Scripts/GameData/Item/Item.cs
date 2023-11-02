@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     public partial class Item : BaseItem,
         IAmmoItem, IArmorItem, IShieldItem, IWeaponItem,
         IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem,
-        ISocketEnhancerItem
+        ISocketEnhancerItem, IItemWithAttributeData
     {
         public enum LegacyItemType : byte
         {
@@ -76,9 +76,11 @@ namespace MultiplayerARPG
         public MovementRestriction movementRestrictionWhileAttacking = default;
         public ActionRestriction attackRestriction = default;
         public ActionRestriction reloadRestriction = default;
+        public BaseItem[] ammoItems;
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
         public int ammoCapacity;
         public BaseWeaponAbility weaponAbility;
+        public BaseWeaponAbility[] weaponAbilities = new BaseWeaponAbility[0];
         public CrosshairSetting crosshairSetting = new CrosshairSetting()
         {
             expandPerFrameWhileMoving = 3f,
@@ -129,10 +131,13 @@ namespace MultiplayerARPG
         public DamageIncremental[] increaseDamages;
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] increaseDamagesRate;
-        [ArrayElementTitle("skill")]
+        // TODO: This is deprecated
         [HideInInspector]
+        [ArrayElementTitle("skill")]
         public SkillLevel[] increaseSkillLevels;
         public SkillIncremental[] increaseSkills;
+        [ArrayElementTitle("statusEffect")]
+        private StatusEffectResistanceIncremental[] increaseStatusEffectResistances;
 
         [Category(2, "Ammo Settings")]
         public AmmoType ammoType;
@@ -354,6 +359,11 @@ namespace MultiplayerARPG
             get { return increaseSkills; }
         }
 
+        public StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances
+        {
+            get { return increaseStatusEffectResistances; }
+        }
+
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
         {
             get { return selfStatusEffectsWhenAttacking; }
@@ -477,14 +487,19 @@ namespace MultiplayerARPG
             get { return reloadRestriction; }
         }
 
+        public BaseItem[] AmmoItems
+        {
+            get { return ammoItems; }
+        }
+
         public int AmmoCapacity
         {
             get { return ammoCapacity; }
         }
 
-        public BaseWeaponAbility WeaponAbility
+        public BaseWeaponAbility[] WeaponAbilities
         {
-            get { return weaponAbility; }
+            get { return weaponAbilities; }
         }
 
         public CrosshairSetting CrosshairSetting
@@ -559,34 +574,84 @@ namespace MultiplayerARPG
         #endregion
 
         #region Implement IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem
-        public Buff Buff
+        public Buff? BuffData
         {
-            get { return buff; }
+            get
+            {
+                if (itemType == LegacyItemType.Potion)
+                    return buff;
+                return null;
+            }
         }
 
         public BuildingEntity BuildingEntity
         {
-            get { return buildingEntity; }
+            get
+            {
+                if (itemType == LegacyItemType.Building)
+                    return buildingEntity;
+                return null;
+            }
         }
 
-        public BaseMonsterCharacterEntity PetEntity
+        public BaseMonsterCharacterEntity MonsterCharacterEntity
         {
-            get { return petEntity; }
+            get
+            {
+                if (itemType == LegacyItemType.Pet)
+                    return petEntity;
+                return null;
+            }
         }
 
-        public VehicleEntity MountEntity
+        public VehicleEntity VehicleEntity
         {
-            get { return mountEntity; }
+            get
+            {
+                if (itemType == LegacyItemType.Mount)
+                    return mountEntity;
+                return null;
+            }
         }
 
-        public BaseSkill UsingSkill
+        public BaseSkill SkillData
         {
-            get { return skillLevel.skill; }
+            get
+            {
+                if (itemType == LegacyItemType.Skill || itemType == LegacyItemType.SkillLearn)
+                    return skillLevel.skill;
+                return null;
+            }
         }
 
-        public int UsingSkillLevel
+        public int SkillLevel
         {
-            get { return skillLevel.level; }
+            get
+            {
+                if (itemType == LegacyItemType.Skill || itemType == LegacyItemType.SkillLearn)
+                    return skillLevel.level;
+                return 0;
+            }
+        }
+
+        public Attribute AttributeData
+        {
+            get
+            {
+                if (itemType == LegacyItemType.AttributeIncrease)
+                    return attributeAmount.attribute;
+                return null;
+            }
+        }
+
+        public float AttributeAmount
+        {
+            get
+            {
+                if (itemType == LegacyItemType.AttributeIncrease)
+                    return attributeAmount.amount;
+                return 0;
+            }
         }
         #endregion
 
@@ -600,6 +665,14 @@ namespace MultiplayerARPG
         public override bool Validate()
         {
             bool hasChanges = false;
+            if (weaponAbility != null && (weaponAbilities == null || weaponAbilities.Length == 0))
+            {
+                weaponAbilities = new List<BaseWeaponAbility>()
+                {
+                    weaponAbility,
+                }.ToArray();
+                hasChanges = true;
+            }
             if (MigrateAudioClips(ref launchClip, ref launchClipSettings))
                 hasChanges = true;
             if (MigrateAudioClips(ref reloadClip, ref reloadClipSettings))
@@ -680,6 +753,7 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(damageAmount);
             GameInstance.AddSkills(increaseSkills);
             GameInstance.AddSkills(skillLevel);
+            GameInstance.AddStatusEffects(increaseStatusEffectResistances);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacked);
@@ -782,7 +856,7 @@ namespace MultiplayerARPG
             if (!character.CanUseItem() || level <= 0)
                 return;
 
-            character.Mount(MountEntity);
+            character.Mount(VehicleEntity);
         }
 
         protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)
@@ -805,11 +879,11 @@ namespace MultiplayerARPG
 
         protected void UseItemSkillLearn(BasePlayerCharacterEntity character, int itemIndex)
         {
-            if (!character.CanUseItem() || UsingSkill == null)
+            if (!character.CanUseItem() || SkillData == null)
                 return;
 
             UITextKeys gameMessage;
-            if (!character.AddSkill(out gameMessage, UsingSkill.DataId, UsingSkillLevel, itemIndex))
+            if (!character.AddSkill(out gameMessage, SkillData.DataId, SkillLevel, itemIndex))
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(character.ConnectionId, gameMessage);
         }
 
@@ -852,7 +926,7 @@ namespace MultiplayerARPG
                 case LegacyItemType.Mount:
                     return default;
                 case LegacyItemType.Skill:
-                    return UsingSkill.UpdateAimControls(aimAxes, UsingSkillLevel);
+                    return SkillData.UpdateAimControls(aimAxes, SkillLevel);
             }
             return default;
         }

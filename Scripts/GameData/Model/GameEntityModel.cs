@@ -7,7 +7,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(100)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.GAME_ENTITY_MODEL)]
     public partial class GameEntityModel : MonoBehaviour
     {
         public enum EVisibleState : byte

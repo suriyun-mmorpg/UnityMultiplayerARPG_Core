@@ -112,7 +112,7 @@ namespace MultiplayerARPG
         {
             if (Currency == null)
             {
-                message = UITextKeys.UI_ERROR_INVALID_DATA;
+                message = UITextKeys.UI_ERROR_INVALID_CURRENCY_DATA;
                 return false;
             }
             BaseCharacterEntity rewardingCharacter = characterEntity;

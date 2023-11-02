@@ -2,6 +2,7 @@
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER)]
     public partial class PlayerCharacterController : BasePlayerCharacterController
     {
         public enum PlayerCharacterControllerMode

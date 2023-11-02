@@ -37,5 +37,16 @@ namespace MultiplayerARPG
         {
             BuildingEntities.Clear();
         }
+
+        public int CountPlayerBuildings(string characterId, int entityId)
+        {
+            int amount = 0;
+            foreach (IBuildingSaveData building in GetBuildings())
+            {
+                if (characterId.Equals(building.CreatorId) && entityId == building.EntityId)
+                    amount++;
+            }
+            return amount;
+        }
     }
 }

@@ -23,7 +23,6 @@
         public const ushort NotifyGuildInvitation = 117;
         public const ushort NotifyRewardCurrency = 118;
         public const ushort EntityState = 119;
-        public const ushort HitRegistration = 120;
         public const ushort FormattedGameMessage = 121;
         // Networking requests/responses
         public const ushort CashShopInfo = 100;
@@ -112,5 +111,6 @@
         public const ushort SetIcon = 183;
         public const ushort SetFrame = 184;
         public const ushort SetTitle = 185;
+        public const ushort SortItems = 186;
     }
 }

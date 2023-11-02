@@ -127,17 +127,29 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private BaseItem[] ammoItems;
+        public BaseItem[] AmmoItems
+        {
+            get { return ammoItems; }
+        }
+
+        [SerializeField]
         private int ammoCapacity = 0;
         public int AmmoCapacity
         {
             get { return ammoCapacity; }
         }
 
+        [HideInInspector]
         [SerializeField]
         private BaseWeaponAbility weaponAbility = null;
-        public BaseWeaponAbility WeaponAbility
+
+        [SerializeField]
+        private BaseWeaponAbility[] weaponAbilities = new BaseWeaponAbility[0];
+
+        public BaseWeaponAbility[] WeaponAbilities
         {
-            get { return weaponAbility; }
+            get { return weaponAbilities; }
         }
 
         [SerializeField]
@@ -269,6 +281,14 @@ namespace MultiplayerARPG
         public override bool Validate()
         {
             bool hasChanges = false;
+            if (weaponAbility != null && (weaponAbilities == null || weaponAbilities.Length == 0))
+            {
+                weaponAbilities = new List<BaseWeaponAbility>()
+                {
+                    weaponAbility,
+                }.ToArray();
+                hasChanges = true;
+            }
             if (MigrateAudioClips(ref launchClip, ref launchClips, ref launchClipSettings))
                 hasChanges = true;
             if (MigrateAudioClips(ref reloadClip, ref reloadClips, ref reloadClipSettings))

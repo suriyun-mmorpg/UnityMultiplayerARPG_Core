@@ -67,6 +67,13 @@ namespace MultiplayerARPG
 
         public void AddItem(string id, int amount, int price)
         {
+            if (_items.Count + 1 > GameInstance.Singleton.vendingItemsLimit)
+            {
+                // Reached limit
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_REACHED_VENDING_ITEMS_LIMIT);
+                return;
+            }
+
             int indexOfData = GameInstance.PlayingCharacterEntity.NonEquipItems.IndexOf(id);
             if (indexOfData < 0)
             {
@@ -162,7 +169,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_START_VENDING_DESCRIPTION.ToString()),
                 false, true, true, false, onClickYes: () =>
                 {
-                    GameInstance.PlayingCharacterEntity.Vending.CallServerStartVending(inputTitle.text, _items);
+                    GameInstance.PlayingCharacterEntity.Vending.CallCmdStartVending(inputTitle.text, _items);
                     Hide();
                 });
         }

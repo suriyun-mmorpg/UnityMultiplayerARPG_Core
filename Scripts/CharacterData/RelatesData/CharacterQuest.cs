@@ -52,11 +52,10 @@ namespace MultiplayerARPG
             Quest quest = GetQuest();
             if (character == null || quest == null)
                 return false;
-            QuestTask[] tasks = quest.tasks;
+            QuestTask[] tasks = quest.GetTasks(randomTasksIndex);
             for (int i = 0; i < tasks.Length; ++i)
             {
-                bool isComplete;
-                GetProgress(character, i, out isComplete);
+                GetProgress(character, i, out bool isComplete);
                 if (!isComplete)
                     return false;
                 if (tasks[i].taskType == QuestTaskType.TalkToNpc && tasks[i].completeAfterTalked)
@@ -70,11 +69,10 @@ namespace MultiplayerARPG
             Quest quest = GetQuest();
             if (character == null || quest == null)
                 return false;
-            QuestTask[] tasks = quest.tasks;
+            QuestTask[] tasks = quest.GetTasks(randomTasksIndex);
             for (int i = 0; i < tasks.Length; ++i)
             {
-                bool isComplete;
-                GetProgress(character, i, out isComplete);
+                GetProgress(character, i, out bool isComplete);
                 if (!isComplete)
                     return false;
                 if (tasks[i].taskType == QuestTaskType.TalkToNpc && tasks[i].completeAfterTalked &&
@@ -92,14 +90,15 @@ namespace MultiplayerARPG
         public int GetProgress(IPlayerCharacterData character, int taskIndex, out string targetTitle, out int targetProgress, out bool isComplete)
         {
             Quest quest = GetQuest();
-            if (character == null || quest == null || taskIndex < 0 || taskIndex >= quest.tasks.Length)
+            QuestTask[] tasks = quest.GetTasks(randomTasksIndex);
+            if (character == null || quest == null || taskIndex < 0 || taskIndex >= tasks.Length)
             {
                 targetTitle = string.Empty;
                 targetProgress = 0;
                 isComplete = false;
                 return 0;
             }
-            QuestTask task = quest.tasks[taskIndex];
+            QuestTask task = tasks[taskIndex];
             int progress;
             switch (task.taskType)
             {
@@ -158,7 +157,7 @@ namespace MultiplayerARPG
 
         public static CharacterQuest Create(Quest quest)
         {
-            return Create(quest.DataId);
+            return Create(quest.DataId, (byte)GenericUtils.RandomInt(0, quest.randomTasks.Length));
         }
     }
 

@@ -38,7 +38,6 @@ namespace MultiplayerARPG
 
         [Header("Casted Effects")]
         public GameEffect[] skillActivateEffects;
-        public GameEffect[] damageHitEffects;
 
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup (Tools)")]
@@ -247,12 +246,13 @@ namespace MultiplayerARPG
             }
         }
 
+        public IHitRegistrationManager HitRegistrationManager { get { return BaseGameNetworkManager.Singleton.HitRegistrationManager; } }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
             GameInstance.AddPoolingObjects(skillCastEffects);
             GameInstance.AddPoolingObjects(skillActivateEffects);
-            GameInstance.AddPoolingObjects(damageHitEffects);
             GameInstance.AddPoolingObjects(Buff.effects);
             GameInstance.AddPoolingObjects(Debuff.effects);
             Buff.PrepareRelatesData();
@@ -276,9 +276,9 @@ namespace MultiplayerARPG
             get { return skillActivateEffects; }
         }
 
-        public GameEffect[] DamageHitEffects
+        public virtual GameEffect[] DamageHitEffects
         {
-            get { return damageHitEffects; }
+            get { return null; }
         }
 
         public int GetConsumeHp(int level)
@@ -513,6 +513,32 @@ namespace MultiplayerARPG
             return 360f;
         }
 
+        public virtual Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamageByResources(
+            BaseCharacterEntity skillUser,
+            CharacterItem weapon)
+        {
+            return skillUser.GetIncreaseDamagesByAmmo(weapon);
+        }
+
+        public virtual bool DecreaseResources(
+            BaseCharacterEntity skillUser,
+            CharacterItem weapon,
+            bool isLeftHand,
+            out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        {
+            increaseDamageAmounts = null;
+            if (skillUser is BasePlayerCharacterEntity)
+            {
+                // Not enough items
+                if (!DecreaseItems(skillUser))
+                    return false;
+                // Not enough ammos
+                if (!DecreaseAmmos(skillUser, isLeftHand, out increaseDamageAmounts))
+                    return false;
+            }
+            return true;
+        }
+
         /// <summary>
         /// Apply skill
         /// </summary>
@@ -525,8 +551,6 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
-        /// <param name="onDamageOriginPrepared">Action when origin prepared</param>
-        /// <param name="onDamageHit">Action when hit</param>
         /// <returns></returns>
         public void ApplySkill(
             BaseCharacterEntity skillUser,
@@ -537,28 +561,10 @@ namespace MultiplayerARPG
             byte triggerIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit)
+            AimPosition aimPosition)
         {
             if (skillUser == null)
                 return;
-            // Decrease player character entity's items
-            if (skillUser.IsServer && skillUser is BasePlayerCharacterEntity)
-            {
-                // Not enough items
-                if (!DecreaseItems(skillUser))
-                    return;
-                // Not enough ammos
-                if (!DecreaseAmmos(skillUser, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
-                    return;
-                // Increase damage with ammo damage
-                if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
-                {
-                    BaseGameNetworkManager.Singleton.HitRegistrationManager.IncreasePreparedDamageAmounts(skillUser, simulateSeed, increaseDamageAmounts);
-                    damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
-                }
-            }
 
             ApplySkillImplement(
                 skillUser,
@@ -570,9 +576,7 @@ namespace MultiplayerARPG
                 0,
                 damageAmounts,
                 targetObjectId,
-                aimPosition,
-                onDamageOriginPrepared,
-                onDamageHit);
+                aimPosition);
         }
 
         /// <summary>
@@ -588,8 +592,6 @@ namespace MultiplayerARPG
         /// <param name="damageAmounts"></param>
         /// <param name="targetObjectId"></param>
         /// <param name="aimPosition"></param>
-        /// <param name="onDamageOriginPrepared">Action when origin prepared</param>
-        /// <param name="onDamageHit">Action when hit</param>
         /// <returns></returns>
         protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
@@ -601,14 +603,12 @@ namespace MultiplayerARPG
             byte spreadIndex,
             Dictionary<DamageElement, MinMaxFloat> damageAmounts,
             uint targetObjectId,
-            AimPosition aimPosition,
-            DamageOriginPreparedDelegate onDamageOriginPrepared,
-            DamageHitDelegate onDamageHit);
+            AimPosition aimPosition);
 
         /// <summary>
         /// Return TRUE if this will override default attack function
         /// </summary>
-        /// <param name="skillUser"></param>
+        /// <param name="attacker"></param>
         /// <param name="skillLevel"></param>
         /// <param name="isLeftHand"></param>
         /// <param name="weapon"></param>
@@ -618,7 +618,7 @@ namespace MultiplayerARPG
         /// <param name="aimPosition"></param>
         /// <returns></returns>
         public virtual bool OnAttack(
-            BaseCharacterEntity skillUser,
+            BaseCharacterEntity attacker,
             int skillLevel,
             bool isLeftHand,
             CharacterItem weapon,
@@ -628,6 +628,19 @@ namespace MultiplayerARPG
             AimPosition aimPosition)
         {
             return false;
+        }
+
+        /// <summary>
+        /// This will be called when skill attack hit `target`, do something such as apply debuff to `target` here
+        /// </summary>
+        /// <param name="skillLevel"></param>
+        /// <param name="instigator"></param>
+        /// <param name="weapon"></param>
+        /// <param name="target"></param>
+        public virtual void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        {
+            if (IsDebuff)
+                target.ApplyBuff(DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);
         }
 
         public virtual bool CanLevelUp(IPlayerCharacterData character, int level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)
@@ -888,7 +901,7 @@ namespace MultiplayerARPG
                         return true;
                     foreach (AmmoTypeAmount requireAmmo in requireAmmos)
                     {
-                        if (character.CountAmmos(requireAmmo.ammoType) >= requireAmmo.amount)
+                        if (character.CountAllAmmos(requireAmmo.ammoType) >= requireAmmo.amount)
                         {
                             ammoType = requireAmmo.ammoType;
                             amount = requireAmmo.amount;
@@ -946,6 +959,13 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public DamageInfo GetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand)
+        {
+            if (TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
+                return damageInfo;
+            return default;
+        }
+
         public virtual bool TryGetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand, out DamageInfo damageInfo)
         {
             damageInfo = default;
@@ -954,7 +974,7 @@ namespace MultiplayerARPG
 
         public virtual Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
         {
-            return skillUser.MovementTransform;
+            return skillUser.MeleeDamageTransform;
         }
 
         public void MakeRequirementEachLevels()

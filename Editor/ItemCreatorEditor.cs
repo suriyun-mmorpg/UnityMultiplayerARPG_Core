@@ -146,7 +146,8 @@ namespace MultiplayerARPG
             {
                 var newDropModelPlaceHolder = new GameObject(fileName + "_DropModel");
                 newDropModelPlaceHolder.AddComponent<PivotHighlighter>();
-                var newDropModel = Instantiate(dropModel, newDropModelPlaceHolder.transform);
+                var newDropModel = PrefabUtility.InstantiatePrefab(dropModel) as GameObject;
+                newDropModel.transform.parent = newDropModelPlaceHolder.transform;
                 newDropModel.transform.localPosition = dropModelOffsets;
                 newDropModel.transform.localEulerAngles = dropModelRotateOffsets;
                 newDropModel.transform.localScale = Vector3.one;
@@ -169,7 +170,8 @@ namespace MultiplayerARPG
                 newMissileDamageTransform.transform.localScale = Vector3.one;
                 var newEntity = newEquipModelPlaceHolder.AddComponent<EquipmentEntity>();
                 newEntity.missileDamageTransform = newMissileDamageTransform.transform;
-                var newEquipModel = Instantiate(equipModelR, newEquipModelPlaceHolder.transform);
+                var newEquipModel = PrefabUtility.InstantiatePrefab(equipModelR) as GameObject;
+                newEquipModel.transform.parent = newEquipModelPlaceHolder.transform;
                 newEquipModel.transform.localPosition = Vector3.zero;
                 newEquipModel.transform.localEulerAngles = Vector3.zero;
                 newEquipModel.transform.localScale = Vector3.one;
@@ -192,7 +194,8 @@ namespace MultiplayerARPG
                 newMissileDamageTransform.transform.localScale = Vector3.one;
                 var newEntity = newEquipModelPlaceHolder.AddComponent<EquipmentEntity>();
                 newEntity.missileDamageTransform = newMissileDamageTransform.transform;
-                var newEquipModel = Instantiate(equipModelL, newEquipModelPlaceHolder.transform);
+                var newEquipModel = PrefabUtility.InstantiatePrefab(equipModelL) as GameObject;
+                newEquipModel.transform.parent = newEquipModelPlaceHolder.transform;
                 newEquipModel.transform.localPosition = Vector3.zero;
                 newEquipModel.transform.localEulerAngles = Vector3.zero;
                 newEquipModel.transform.localScale = Vector3.one;

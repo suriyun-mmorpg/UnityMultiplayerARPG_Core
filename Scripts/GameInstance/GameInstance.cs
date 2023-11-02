@@ -49,7 +49,7 @@ namespace MultiplayerARPG
         Console,
     }
 
-    [DefaultExecutionOrder(-999)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.GAME_INSTANCE)]
     [RequireComponent(typeof(EventSystemManager))]
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
     public partial class GameInstance : MonoBehaviour, IStoreListener
@@ -297,6 +297,8 @@ namespace MultiplayerARPG
         public float dealingRequestDuration = 5f;
         [Tooltip("If this is `TRUE`, dealing feature will be disabled, all players won't be able to deal items to each other")]
         public bool disableDealing = false;
+        [Tooltip("If this is > 0, it will limit amount of vending items")]
+        public int vendingItemsLimit = 16;
         [Tooltip("If this is `TRUE`, vending feature will be disabled, all players won't be able to deal items to each other")]
         public bool disableVending = false;
         [Tooltip("If dueling request does not accepted within this duration, the request will be cancelled")]
@@ -761,14 +763,24 @@ namespace MultiplayerARPG
             GameEntityModel.GeneratingId = 0;
         }
 
-        public bool IsMobileTestInEditor()
+        public static bool UseMobileInput()
         {
-            return (testInEditorMode == TestInEditorMode.Mobile || testInEditorMode == TestInEditorMode.MobileWithKeyInputs) && Application.isEditor;
+            return Application.isMobilePlatform || IsMobileTestInEditor();
         }
 
-        public bool IsConsoleTestInEditor()
+        public static bool UseConsoleInput()
         {
-            return testInEditorMode == TestInEditorMode.Console && Application.isEditor;
+            return Application.isConsolePlatform || IsConsoleTestInEditor();
+        }
+
+        public static bool IsMobileTestInEditor()
+        {
+            return (Singleton.testInEditorMode == TestInEditorMode.Mobile || Singleton.testInEditorMode == TestInEditorMode.MobileWithKeyInputs) && Application.isEditor;
+        }
+
+        public static bool IsConsoleTestInEditor()
+        {
+            return Singleton.testInEditorMode == TestInEditorMode.Console && Application.isEditor;
         }
 
         public void LoadedGameData()
@@ -1386,6 +1398,36 @@ namespace MultiplayerARPG
             if (statusEffects == null)
                 return;
             foreach (StatusEffectApplying statusEffect in statusEffects)
+            {
+                AddStatusEffects(statusEffect.statusEffect);
+            }
+        }
+
+        public static void AddStatusEffects(params StatusEffectResistanceAmount[] statusEffects)
+        {
+            AddStatusEffects((IEnumerable<StatusEffectResistanceAmount>)statusEffects);
+        }
+
+        public static void AddStatusEffects(IEnumerable<StatusEffectResistanceAmount> statusEffects)
+        {
+            if (statusEffects == null)
+                return;
+            foreach (StatusEffectResistanceAmount statusEffect in statusEffects)
+            {
+                AddStatusEffects(statusEffect.statusEffect);
+            }
+        }
+
+        public static void AddStatusEffects(params StatusEffectResistanceIncremental[] statusEffects)
+        {
+            AddStatusEffects((IEnumerable<StatusEffectResistanceIncremental>)statusEffects);
+        }
+
+        public static void AddStatusEffects(IEnumerable<StatusEffectResistanceIncremental> statusEffects)
+        {
+            if (statusEffects == null)
+                return;
+            foreach (StatusEffectResistanceIncremental statusEffect in statusEffects)
             {
                 AddStatusEffects(statusEffect.statusEffect);
             }

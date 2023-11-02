@@ -21,5 +21,7 @@ namespace MultiplayerARPG
         public DamageAmount[] damagesRate;
         [ArrayElementTitle("skill")]
         public SkillLevel[] skills;
+        [ArrayElementTitle("statusEffect")]
+        public StatusEffectResistanceAmount[] statusEffectResistances;
     }
 }

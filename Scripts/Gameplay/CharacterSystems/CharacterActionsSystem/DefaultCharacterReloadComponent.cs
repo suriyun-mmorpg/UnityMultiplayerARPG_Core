@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
@@ -14,16 +13,13 @@ namespace MultiplayerARPG
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
 
-        protected struct ReloadState
-        {
-            public bool IsLeftHand;
-            public int ReloadingAmmoAmount;
-        }
-
         protected readonly List<CancellationTokenSource> _reloadCancellationTokenSources = new List<CancellationTokenSource>();
+        public int ReloadingAmmoDataId { get; protected set; }
         public int ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
         public float LastReloadEndTime { get; protected set; }
+        protected bool _skipMovementValidation;
+        public bool LastReloadSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
         public float MoveSpeedRateWhileReloading { get; protected set; }
         public MovementRestriction MovementRestrictionWhileReloading { get; protected set; }
         protected float _totalDuration;
@@ -33,19 +29,17 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
 
         protected CharacterActionComponentManager _manager;
-        // Network data sending
-        protected ReloadState? _clientState;
-        protected ReloadState? _serverState;
 
         public override void EntityStart()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
         }
 
-        protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoAmount)
+        protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
             ClearReloadStates();
             AnimActionType = animActionType;
+            ReloadingAmmoDataId = reloadingAmmoDataId;
             ReloadingAmmoAmount = reloadingAmmoAmount;
             IsReloading = true;
         }
@@ -56,7 +50,7 @@ namespace MultiplayerARPG
             IsReloading = false;
         }
 
-        protected virtual async UniTaskVoid ReloadRoutine(bool isLeftHand, int reloadingAmmoAmount)
+        protected virtual async UniTaskVoid ReloadRoutine(bool isLeftHand, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
             // Prepare cancellation
             CancellationTokenSource reloadCancellationTokenSource = new CancellationTokenSource();
@@ -76,10 +70,11 @@ namespace MultiplayerARPG
                 0,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration);
+                out _totalDuration,
+                out _skipMovementValidation);
 
             // Set doing action state at clients and server
-            SetReloadActionStates(animActionType, reloadingAmmoAmount);
+            SetReloadActionStates(animActionType, reloadingAmmoDataId, reloadingAmmoAmount);
 
             // Prepare requires data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
@@ -153,6 +148,7 @@ namespace MultiplayerARPG
                     }
                 }
 
+                bool reloaded = false;
                 float tempTriggerDuration;
                 for (int i = 0; i < _triggerDurations.Length; ++i)
                 {
@@ -176,17 +172,29 @@ namespace MultiplayerARPG
                     }
 
                     // Reload / Fill ammo
-                    int triggerReloadAmmoAmount = ReloadingAmmoAmount / _triggerDurations.Length;
-                    EquipWeapons equipWeapons = Entity.EquipWeapons;
-                    if (IsServer && Entity.DecreaseAmmos(weaponItem.WeaponType.RequireAmmoType, triggerReloadAmmoAmount, out _))
+                    if (!reloaded)
                     {
-                        Entity.FillEmptySlots();
-                        weapon.ammo += triggerReloadAmmoAmount;
-                        if (isLeftHand)
-                            equipWeapons.leftHand = weapon;
-                        else
-                            equipWeapons.rightHand = weapon;
-                        Entity.EquipWeapons = equipWeapons;
+                        reloaded = true;
+                        EquipWeapons equipWeapons = Entity.EquipWeapons;
+                        if (IsServer)
+                        {
+                            if (Entity.DecreaseItems(reloadingAmmoDataId, reloadingAmmoAmount))
+                            {
+                                if (weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
+                                {
+                                    Entity.IncreaseItems(CharacterItem.Create(reloadingAmmoDataId, 1, weapon.ammo));
+                                    weapon.ammo = 0;
+                                }
+                                Entity.FillEmptySlots();
+                                weapon.ammoDataId = reloadingAmmoDataId;
+                                weapon.ammo += reloadingAmmoAmount;
+                                if (isLeftHand)
+                                    equipWeapons.leftHand = weapon;
+                                else
+                                    equipWeapons.rightHand = weapon;
+                                Entity.EquipWeapons = equipWeapons;
+                            }
+                        }
                     }
 
                     if (remainsDuration <= 0f)
@@ -235,20 +243,22 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                // Prepare state data which will be sent to server
-                _clientState = new ReloadState()
-                {
-                    IsLeftHand = isLeftHand,
-                };
+                RPC(CmdReload, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Reload immediately at server
-                ProceedReloadStateAtServer(isLeftHand);
+                ProceedCmdReload(isLeftHand);
             }
         }
 
-        protected virtual void ProceedReloadStateAtServer(bool isLeftHand)
+        [ServerRpc]
+        protected void CmdReload(bool isLeftHand)
+        {
+            ProceedCmdReload(isLeftHand);
+        }
+
+        protected void ProceedCmdReload(bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
@@ -261,77 +271,57 @@ namespace MultiplayerARPG
             if (reloadingWeapon.IsEmptySlot())
                 return;
             IWeaponItem reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
-            if (reloadingWeaponItem == null ||
-                reloadingWeaponItem.WeaponType == null ||
-                reloadingWeaponItem.WeaponType.RequireAmmoType == null ||
-                reloadingWeaponItem.AmmoCapacity <= 0 ||
-                reloadingWeapon.ammo >= reloadingWeaponItem.AmmoCapacity)
+            if (reloadingWeaponItem == null || reloadingWeaponItem.AmmoCapacity <= 0 || reloadingWeapon.ammo >= reloadingWeaponItem.AmmoCapacity)
+                return;
+            bool hasAmmoType = reloadingWeaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = reloadingWeaponItem.AmmoItems != null && reloadingWeaponItem.AmmoItems.Length > 0;
+            if (!hasAmmoType && !hasAmmoItems)
                 return;
             // Prepare reload data
-            int reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo;
-            int inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.RequireAmmoType);
+            int reloadingAmmoDataId = 0;
+            int inventoryAmount = 0;
+            if (hasAmmoType)
+            {
+                inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.AmmoType, out reloadingAmmoDataId);
+            }
+            else if (hasAmmoItems)
+            {
+                for (int indexOfAmmoItem = 0; indexOfAmmoItem < reloadingWeaponItem.AmmoItems.Length; ++indexOfAmmoItem)
+                {
+                    int tempAmmoDataId = reloadingWeaponItem.AmmoItems[indexOfAmmoItem].DataId;
+                    int tempAmmoAmount = Entity.CountNonEquipItems(tempAmmoDataId);
+                    if (tempAmmoAmount > 0)
+                    {
+                        reloadingAmmoDataId = tempAmmoDataId;
+                        inventoryAmount = tempAmmoAmount;
+                        break;
+                    }
+                }
+            }
+            int reloadingAmmoAmount = 0;
+            if (reloadingWeapon.ammoDataId != 0 && reloadingWeapon.ammoDataId == reloadingAmmoDataId)
+                reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo;
+            else
+                reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity;
             if (inventoryAmount < reloadingAmmoAmount)
                 reloadingAmmoAmount = inventoryAmount;
             if (reloadingAmmoAmount <= 0)
                 return;
             _manager.ActionAccepted();
-            // Prepare state data which will be sent to clients
-            _serverState = new ReloadState()
-            {
-                IsLeftHand = isLeftHand,
-                ReloadingAmmoAmount = reloadingAmmoAmount,
-            };
+            ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
+            RPC(RpcReload, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
 #endif
         }
 
-        public virtual bool WriteClientReloadState(NetDataWriter writer)
+        [AllRpc]
+        protected void RpcReload(bool isLeftHand, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
-            if (_clientState.HasValue)
-            {
-                // Simulate reloading at client
-                ReloadRoutine(_clientState.Value.IsLeftHand, 0).Forget();
-                // Send input to server
-                writer.Put(_clientState.Value.IsLeftHand);
-                // Clear Input
-                _clientState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool WriteServerReloadState(NetDataWriter writer)
-        {
-            if (_serverState.HasValue)
-            {
-                // Simulate reloading at server
-                ReloadRoutine(_serverState.Value.IsLeftHand, _serverState.Value.ReloadingAmmoAmount).Forget();
-                // Send input to client
-                writer.Put(_serverState.Value.IsLeftHand);
-                writer.PutPackedInt(_serverState.Value.ReloadingAmmoAmount);
-                // Clear Input
-                _serverState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual void ReadClientReloadStateAtServer(NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            ProceedReloadStateAtServer(isLeftHand);
-        }
-
-        public virtual void ReadServerReloadStateAtClient(NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            int reloadingAmmoAmount = reader.GetPackedInt();
             if (IsServer || IsOwnerClient)
             {
-                // Don't play reloading animation again (it already done in `WriteServerReloadState` function)
+                // Don't play reloading animation again
                 return;
             }
-            // Play reload animation at client
-            ReloadRoutine(isLeftHand, reloadingAmmoAmount).Forget();
+            ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
         }
     }
 }

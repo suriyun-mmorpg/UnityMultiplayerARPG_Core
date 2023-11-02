@@ -124,12 +124,12 @@ namespace MultiplayerARPG
             int amount;
             if (inputAmount == null || !int.TryParse(inputAmount.text, out amount))
                 amount = 1;
-            GameInstance.PlayingCharacterEntity.CallServerChangeCraftingQueueItem(CraftingQueueManager.Source.ObjectId, IndexOfData, amount);
+            GameInstance.PlayingCharacterEntity.CallCmdChangeCraftingQueueItem(CraftingQueueManager.Source.ObjectId, IndexOfData, amount);
         }
 
         public void OnClickCancel()
         {
-            GameInstance.PlayingCharacterEntity.CallServerCancelCraftingQueueItem(CraftingQueueManager.Source.ObjectId, IndexOfData);
+            GameInstance.PlayingCharacterEntity.CallCmdCancelCraftingQueueItem(CraftingQueueManager.Source.ObjectId, IndexOfData);
         }
     }
 }

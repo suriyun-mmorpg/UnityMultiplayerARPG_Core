@@ -61,7 +61,6 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entity.InitInput();
-            input.IsStopped = false;
             input.ExtraMovementState = entity.ValidateExtraMovementState(input.MovementState, extraMovementState);
             return input;
         }
@@ -70,7 +69,6 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entity.InitInput();
-            input.IsStopped = false;
             input.Position = position;
             return input;
         }
@@ -79,7 +77,6 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entity.InitInput();
-            input.IsStopped = false;
             Vector3 position = input.Position;
             position.y = yPosition;
             input.Position = position;
@@ -90,7 +87,6 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entity.InitInput();
-            input.IsStopped = false;
             input.Rotation = rotation;
             return input;
         }
@@ -99,7 +95,6 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entity.InitInput();
-            input.IsStopped = false;
             input.Direction2D = direction2D;
             return input;
         }
@@ -117,7 +112,6 @@ namespace MultiplayerARPG
         {
             if (input == null)
                 input = entity.InitInput();
-            input.IsStopped = false;
             input.MovementState &= ~MovementState.IsJump;
             return input;
         }
@@ -144,7 +138,6 @@ namespace MultiplayerARPG
                     state |= EntityMovementInputState.IsKeyMovement;
                 return true;
             }
-            // TODO: Send delta changes
             if (newInput.IsStopped && !oldInput.IsStopped)
                 state |= EntityMovementInputState.IsStopped;
             if (newInput.IsKeyMovement)

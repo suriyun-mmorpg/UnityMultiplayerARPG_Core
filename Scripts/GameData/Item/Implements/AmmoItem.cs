@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.AMMO_ITEM_FILE, menuName = GameDataMenuConsts.AMMO_ITEM_MENU, order = GameDataMenuConsts.AMMO_ITEM_ORDER)]
-    public class AmmoItem : BaseItem, IAmmoItem
+    public partial class AmmoItem : BaseItem, IAmmoItem
     {
         public override string TypeTitle
         {

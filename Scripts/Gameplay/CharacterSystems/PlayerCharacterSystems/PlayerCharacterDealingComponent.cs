@@ -192,19 +192,19 @@ namespace MultiplayerARPG
             DealingCharacter = null;
         }
 
-        public bool CallServerSendDealingRequest(uint objectId)
+        public bool CallCmdSendDealingRequest(uint objectId)
         {
             if (DisableDealing)
             {
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return false;
             }
-            RPC(ServerSendDealingRequest, objectId);
+            RPC(CmdSendDealingRequest, objectId);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSendDealingRequest(uint objectId)
+        protected void CmdSendDealingRequest(uint objectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DisableDealing)
@@ -236,12 +236,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerReceiveDealingRequest(uint objectId)
         {
-            RPC(TargetReceiveDealingRequest, ConnectionId, objectId);
+            RPC(TargetRpcReceiveDealingRequest, ConnectionId, objectId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetReceiveDealingRequest(uint objectId)
+        protected void TargetRpcReceiveDealingRequest(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
@@ -250,14 +250,14 @@ namespace MultiplayerARPG
                 onRequestDealing.Invoke(playerCharacterEntity);
         }
 
-        public bool CallServerAcceptDealingRequest()
+        public bool CallCmdAcceptDealingRequest()
         {
-            RPC(ServerAcceptDealingRequest);
+            RPC(CmdAcceptDealingRequest);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerAcceptDealingRequest()
+        protected void CmdAcceptDealingRequest()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingCharacter == null)
@@ -283,14 +283,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerDeclineDealingRequest()
+        public bool CallCmdDeclineDealingRequest()
         {
-            RPC(ServerDeclineDealingRequest);
+            RPC(CmdDeclineDealingRequest);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerDeclineDealingRequest()
+        protected void CmdDeclineDealingRequest()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingCharacter != null)
@@ -302,12 +302,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerAcceptedDealingRequest(uint objectId)
         {
-            RPC(TargetAcceptedDealingRequest, ConnectionId, objectId);
+            RPC(TargetRpcAcceptedDealingRequest, ConnectionId, objectId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetAcceptedDealingRequest(uint objectId)
+        protected void TargetRpcAcceptedDealingRequest(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
@@ -322,14 +322,14 @@ namespace MultiplayerARPG
                 onStartDealing.Invoke(playerCharacterEntity);
         }
 
-        public bool CallServerSetDealingItem(string id, int amount)
+        public bool CallCmdSetDealingItem(string id, int amount)
         {
-            RPC(ServerSetDealingItem, id, amount);
+            RPC(CmdSetDealingItem, id, amount);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSetDealingItem(string id, int amount)
+        protected void CmdSetDealingItem(string id, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.Dealing)
@@ -369,14 +369,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerSetDealingGold(int dealingGold)
+        public bool CallCmdSetDealingGold(int dealingGold)
         {
-            RPC(ServerSetDealingGold, dealingGold);
+            RPC(CmdSetDealingGold, dealingGold);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerSetDealingGold(int gold)
+        protected void CmdSetDealingGold(int gold)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.Dealing)
@@ -392,14 +392,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerLockDealing()
+        public bool CallCmdLockDealing()
         {
-            RPC(ServerLockDealing);
+            RPC(CmdLockDealing);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerLockDealing()
+        protected void CmdLockDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.Dealing)
@@ -411,14 +411,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerConfirmDealing()
+        public bool CallCmdConfirmDealing()
         {
-            RPC(ServerConfirmDealing);
+            RPC(CmdConfirmDealing);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerConfirmDealing()
+        protected void CmdConfirmDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingState != DealingState.LockDealing || !(DealingCharacter.Dealing.DealingState == DealingState.LockDealing || DealingCharacter.Dealing.DealingState == DealingState.ConfirmDealing))
@@ -449,14 +449,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public bool CallServerCancelDealing()
+        public bool CallCmdCancelDealing()
         {
-            RPC(ServerCancelDealing);
+            RPC(CmdCancelDealing);
             return true;
         }
 
         [ServerRpc]
-        protected void ServerCancelDealing()
+        protected void CmdCancelDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (DealingCharacter != null && DealingCharacter.Dealing.DealingState != DealingState.None)
@@ -469,12 +469,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerUpdateDealingState(DealingState state)
         {
-            RPC(TargetUpdateDealingState, ConnectionId, state);
+            RPC(TargetRpcUpdateDealingState, ConnectionId, state);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetUpdateDealingState(DealingState dealingState)
+        protected void TargetRpcUpdateDealingState(DealingState dealingState)
         {
             if (onUpdateDealingState != null)
                 onUpdateDealingState.Invoke(dealingState);
@@ -482,12 +482,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerUpdateAnotherDealingState(DealingState state)
         {
-            RPC(TargetUpdateAnotherDealingState, ConnectionId, state);
+            RPC(TargetRpcUpdateAnotherDealingState, ConnectionId, state);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetUpdateAnotherDealingState(DealingState dealingState)
+        protected void TargetRpcUpdateAnotherDealingState(DealingState dealingState)
         {
             if (onUpdateAnotherDealingState != null)
                 onUpdateAnotherDealingState.Invoke(dealingState);
@@ -495,12 +495,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerUpdateDealingGold(int gold)
         {
-            RPC(TargetUpdateDealingGold, ConnectionId, gold);
+            RPC(TargetRpcUpdateDealingGold, ConnectionId, gold);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetUpdateDealingGold(int gold)
+        protected void TargetRpcUpdateDealingGold(int gold)
         {
             if (onUpdateDealingGold != null)
                 onUpdateDealingGold.Invoke(gold);
@@ -508,12 +508,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerUpdateAnotherDealingGold(int gold)
         {
-            RPC(TargetUpdateAnotherDealingGold, ConnectionId, gold);
+            RPC(TargetRpcUpdateAnotherDealingGold, ConnectionId, gold);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetUpdateAnotherDealingGold(int gold)
+        protected void TargetRpcUpdateAnotherDealingGold(int gold)
         {
             if (onUpdateAnotherDealingGold != null)
                 onUpdateAnotherDealingGold.Invoke(gold);
@@ -521,12 +521,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerUpdateDealingItems(DealingCharacterItems dealingItems)
         {
-            RPC(TargetUpdateDealingItems, ConnectionId, dealingItems);
+            RPC(TargetRpcUpdateDealingItems, ConnectionId, dealingItems);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetUpdateDealingItems(DealingCharacterItems items)
+        protected void TargetRpcUpdateDealingItems(DealingCharacterItems items)
         {
             if (onUpdateDealingItems != null)
                 onUpdateDealingItems.Invoke(items);
@@ -534,12 +534,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerUpdateAnotherDealingItems(DealingCharacterItems dealingItems)
         {
-            RPC(TargetUpdateAnotherDealingItems, ConnectionId, dealingItems);
+            RPC(TargetRpcUpdateAnotherDealingItems, ConnectionId, dealingItems);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetUpdateAnotherDealingItems(DealingCharacterItems items)
+        protected void TargetRpcUpdateAnotherDealingItems(DealingCharacterItems items)
         {
             if (onUpdateAnotherDealingItems != null)
                 onUpdateAnotherDealingItems.Invoke(items);

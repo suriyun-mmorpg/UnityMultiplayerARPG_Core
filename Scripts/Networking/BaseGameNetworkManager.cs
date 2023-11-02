@@ -174,13 +174,12 @@ namespace MultiplayerARPG
         {
             base.OnServerUpdate(updater);
             Profiler.BeginSample("BaseGameNetworkManager - SendServerState");
+            long timestamp = Timestamp;
             for (int i = 0; i < _arrayGameEntityLength; ++i)
             {
                 if (!_arrayGameEntity[i].enabled)
                     continue;
-                if (_arrayGameEntity[i].IsOwnerClient)
-                    _arrayGameEntity[i].SendClientState();
-                _arrayGameEntity[i].SendServerState();
+                _arrayGameEntity[i].SendServerState(timestamp);
             }
             Profiler.EndSample();
         }
@@ -191,12 +190,13 @@ namespace MultiplayerARPG
             if (IsServer)
                 return;
             Profiler.BeginSample("BaseGameNetworkManager - SendClientState");
+            long timestamp = Timestamp;
             for (int i = 0; i < _arrayGameEntityLength; ++i)
             {
                 if (!_arrayGameEntity[i].enabled)
                     continue;
                 if (_arrayGameEntity[i].IsOwnerClient)
-                    _arrayGameEntity[i].SendClientState();
+                    _arrayGameEntity[i].SendClientState(timestamp);
             }
             Profiler.EndSample();
         }
@@ -251,7 +251,6 @@ namespace MultiplayerARPG
             // Server messages
             RegisterServerMessage(GameNetworkingConsts.Chat, HandleChatAtServer);
             RegisterServerMessage(GameNetworkingConsts.EntityState, HandleClientEntityStateAtServer);
-            RegisterServerMessage(GameNetworkingConsts.HitRegistration, HandleHitRegistrationAtServer);
             if (ServerCharacterHandlers != null)
             {
                 RegisterServerMessage(GameNetworkingConsts.NotifyOnlineCharacter, ServerCharacterHandlers.HandleRequestOnlineCharacter);
@@ -317,6 +316,7 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<EmptyMessage, ResponseRepairEquipItemsMessage>(GameNetworkingConsts.RepairEquipItems, ServerInventoryMessageHandlers.HandleRequestRepairEquipItems);
                 RegisterRequestToServer<RequestSellItemMessage, ResponseSellItemMessage>(GameNetworkingConsts.SellItem, ServerInventoryMessageHandlers.HandleRequestSellItem);
                 RegisterRequestToServer<RequestSellItemsMessage, ResponseSellItemsMessage>(GameNetworkingConsts.SellItems, ServerInventoryMessageHandlers.HandleRequestSellItems);
+                RegisterRequestToServer<RequestSortItemsMessage, ResponseSortItemsMessage>(GameNetworkingConsts.SortItems, ServerInventoryMessageHandlers.HandleRequestSortItems);
             }
             // Party
             if (ServerPartyMessageHandlers != null)
@@ -631,9 +631,9 @@ namespace MultiplayerARPG
         protected void HandleServerEntityStateAtClient(MessageHandlerData messageHandler)
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
-            BaseGameEntity gameEntity;
-            if (Assets.TryGetSpawnedObject(objectId, out gameEntity))
-                gameEntity.ReadServerStateAtClient(messageHandler.Reader);
+            long peerTimestamp = messageHandler.Reader.GetPackedLong();
+            if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity))
+                gameEntity.ReadServerStateAtClient(peerTimestamp, messageHandler.Reader);
         }
 
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
@@ -673,14 +673,9 @@ namespace MultiplayerARPG
         protected void HandleClientEntityStateAtServer(MessageHandlerData messageHandler)
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
+            long peerTimestamp = messageHandler.Reader.GetPackedLong();
             if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity) && gameEntity.Identity.ConnectionId == messageHandler.ConnectionId)
-                gameEntity.ReadClientStateAtServer(messageHandler.Reader);
-        }
-
-        protected void HandleHitRegistrationAtServer(MessageHandlerData messageHandler)
-        {
-            if (ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out BasePlayerCharacterEntity gameEntity))
-                HitRegistrationManager.Register(gameEntity, messageHandler.Reader.Get<HitRegisterMessage>());
+                gameEntity.ReadClientStateAtServer(peerTimestamp, messageHandler.Reader);
         }
 
         public virtual void InitPrefabs()
@@ -1025,7 +1020,7 @@ namespace MultiplayerARPG
                 buildingEntity.ExtraData = saveData.ExtraData;
                 Assets.NetworkSpawn(spawnObj);
                 ServerBuildingHandlers.AddBuilding(buildingEntity.Id, buildingEntity);
-                buildingEntity.CallAllOnBuildingConstruct();
+                buildingEntity.CallRpcOnBuildingConstruct();
                 return buildingEntity;
             }
             return null;

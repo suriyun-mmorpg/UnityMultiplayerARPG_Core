@@ -1,12 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
-    public partial interface IPotionItem : IUsableItem
+    public partial interface IPotionItem : IUsableItem, IItemWithBuffData
     {
-        /// <summary>
-        /// Buff which will be applied when use this item
-        /// </summary>
-        Buff Buff { get; }
-
         /// <summary>
         /// Key for auto use setting saving for this item
         /// </summary>

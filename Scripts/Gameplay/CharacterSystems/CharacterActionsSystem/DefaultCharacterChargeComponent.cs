@@ -1,4 +1,4 @@
-﻿using LiteNetLib.Utils;
+﻿using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -27,9 +27,6 @@ namespace MultiplayerARPG
         protected CharacterActionComponentManager _manager;
         protected float _chargeStartTime;
         protected float _chargeDuration;
-        // Network data sending
-        protected ChargeState? _clientState;
-        protected ChargeState? _serverState;
 
         public override void EntityStart()
         {
@@ -99,144 +96,74 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                // Prepare state data which will be sent to server
-                _clientState = new ChargeState()
-                {
-                    IsLeftHand = isLeftHand,
-                };
+                PlayChargeAnimation(isLeftHand);
+                RPC(CmdStartCharge, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Start charge immediately at server
-                ProceedStartChargeStateAtServer(isLeftHand);
+                ProceedCmdStartCharge(isLeftHand);
             }
+        }
+
+        [ServerRpc]
+        protected void CmdStartCharge(bool isLeftHand)
+        {
+            ProceedCmdStartCharge(isLeftHand);
+        }
+
+        protected void ProceedCmdStartCharge(bool isLeftHand)
+        {
+            if (!_manager.IsAcceptNewAction())
+                return;
+            _manager.ActionAccepted();
+            PlayChargeAnimation(isLeftHand);
+            RPC(RpcStartCharge, isLeftHand);
+        }
+
+        [AllRpc]
+        protected void RpcStartCharge(bool isLeftHand)
+        {
+            if (IsServer || IsOwnerClient)
+            {
+                // Don't stop charge again
+                return;
+            }
+            PlayChargeAnimation(isLeftHand);
         }
 
         public virtual void StopCharge()
         {
             if (!IsServer && IsOwnerClient)
             {
-                // Prepare state data which will be sent to server
-                _clientState = new ChargeState()
-                {
-                    IsStopping = true,
-                };
+                StopChargeAnimation();
+                RPC(CmdStopCharge);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
                 // Stop charge immediately at server
-                ProceedStopChargeStateAtServer();
+                ProceedCmdStopCharge();
             }
         }
 
-        protected virtual void ProceedStartChargeStateAtServer(bool isLeftHand)
+        [ServerRpc]
+        protected void CmdStopCharge()
         {
-#if UNITY_EDITOR || UNITY_SERVER
-            if (!_manager.IsAcceptNewAction())
-                return;
-            _manager.ActionAccepted();
-            // Prepare state data which will be sent to clients
-            _serverState = new ChargeState()
-            {
-                IsLeftHand = isLeftHand,
-            };
-#endif
+            ProceedCmdStopCharge();
         }
 
-        protected virtual void ProceedStopChargeStateAtServer()
+        protected void ProceedCmdStopCharge()
         {
-#if UNITY_EDITOR || UNITY_SERVER
-            // Prepare state data which will be sent to clients
-            _serverState = new ChargeState()
-            {
-                IsStopping = true,
-            };
-#endif
+            StopChargeAnimation();
+            RPC(RpcStopCharge);
         }
 
-        public virtual bool WriteClientStartChargeState(NetDataWriter writer)
-        {
-            if (_clientState.HasValue && !_clientState.Value.IsStopping)
-            {
-                // Simulate starting at client
-                PlayChargeAnimation(_clientState.Value.IsLeftHand);
-                // Send input to server
-                writer.Put(_clientState.Value.IsLeftHand);
-                // Clear Input
-                _clientState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool WriteServerStartChargeState(NetDataWriter writer)
-        {
-            if (_serverState.HasValue && !_serverState.Value.IsStopping)
-            {
-                // Simulate starting at server
-                PlayChargeAnimation(_serverState.Value.IsLeftHand);
-                // Send input to client
-                writer.Put(_serverState.Value.IsLeftHand);
-                // Clear Input
-                _serverState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool WriteClientStopChargeState(NetDataWriter writer)
-        {
-            if (_clientState.HasValue && _clientState.Value.IsStopping)
-            {
-                // Simulate stopping at client
-                StopChargeAnimation();
-                // Clear Input
-                _clientState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual bool WriteServerStopChargeState(NetDataWriter writer)
-        {
-            if (_serverState.HasValue && _serverState.Value.IsStopping)
-            {
-                // Simulate stopping at server
-                StopChargeAnimation();
-                // Clear Input
-                _serverState = null;
-                return true;
-            }
-            return false;
-        }
-
-        public virtual void ReadClientStartChargeStateAtServer(NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            ProceedStartChargeStateAtServer(isLeftHand);
-        }
-
-        public virtual void ReadServerStartChargeStateAtClient(NetDataReader reader)
-        {
-            bool isLeftHand = reader.GetBool();
-            if (IsServer || IsOwnerClient)
-            {
-                // Don't start charge again (it already done in `StartCharge` function)
-                return;
-            }
-            PlayChargeAnimation(isLeftHand);
-        }
-
-        public virtual void ReadClientStopChargeStateAtServer(NetDataReader reader)
-        {
-            ProceedStopChargeStateAtServer();
-        }
-
-        public virtual void ReadServerStopChargeStateAtClient(NetDataReader reader)
+        [AllRpc]
+        protected void RpcStopCharge()
         {
             if (IsServer || IsOwnerClient)
             {
-                // Don't stop charge again (it already done in `StopCharge` function)
+                // Don't stop charge again
                 return;
             }
             StopChargeAnimation();

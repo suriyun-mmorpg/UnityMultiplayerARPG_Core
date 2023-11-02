@@ -100,7 +100,7 @@ namespace MultiplayerARPG
                     else
                     {
                         _cachePetItem = item as IPetItem;
-                        _cachePrefab = _cachePetItem.PetEntity;
+                        _cachePrefab = _cachePetItem.MonsterCharacterEntity;
                     }
                     break;
                 case SummonType.Custom:

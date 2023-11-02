@@ -7,16 +7,36 @@ namespace MultiplayerARPG
     {
         public BasePlayerCharacterController Controller { get { return BasePlayerCharacterController.Singleton; } }
         public TextWrapper textTitle;
-        [Tooltip("These game objects will be activate if target building entity's `locakable` = `TRUE`")]
-        public GameObject[] lockableObjects;
         [Tooltip("These game objects will be activate if target building entity's `isLocked` = `TRUE`")]
-        public GameObject[] lockedObjects;
+        public GameObject[] lockedObjects = new GameObject[0];
         [Tooltip("These game objects will be activate if target building entity's `isLocked` = `FALSE`")]
-        public GameObject[] unlockedObjects;
-        public Button buttonDestroy;
-        public Button buttonSetPassword;
+        public GameObject[] unlockedObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building entity's `locakable` = `TRUE`")]
+        public GameObject[] lockableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building entity's `locakable` = `FALSE`")]
+        public GameObject[] notLockableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building can be repaired by menu")]
+        public GameObject[] repairableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building cannot be repaired by menu")]
+        public GameObject[] notRepairableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building can be destroyed")]
+        public GameObject[] destroyableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building cannot be destroyed")]
+        public GameObject[] notDestroyableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building's password can be defined")]
+        public GameObject[] passwordDefinableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building's password cannot be defined")]
+        public GameObject[] notPasswordDefinableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building can be activated")]
+        public GameObject[] activatableObjects = new GameObject[0];
+        [Tooltip("These game objects will be activate if target building cannot be activated")]
+        public GameObject[] notActivatableObjects = new GameObject[0];
+
         public Button buttonLock;
         public Button buttonUnlock;
+        public Button buttonRepair;
+        public Button buttonDestroy;
+        public Button buttonSetPassword;
         public Button buttonActivate;
 
         private BuildingEntity buildingEntity;
@@ -36,37 +56,81 @@ namespace MultiplayerARPG
         {
             if (textTitle != null)
                 textTitle.text = buildingEntity.Title;
-            if (lockableObjects != null && lockableObjects.Length > 0)
+
+            bool isCreator = buildingEntity.IsCreator(GameInstance.PlayingCharacterEntity);
+            bool lockable = !buildingEntity.IsLocked && buildingEntity.Lockable && isCreator;
+            bool unlockable = buildingEntity.IsLocked && buildingEntity.Lockable && isCreator;
+            bool repairable = buildingEntity.CanRepairByMenu() && buildingEntity.TryGetRepairAmount(GameInstance.PlayingCharacterEntity, out _, out _);
+            bool destroyable = isCreator;
+            bool passwordDefinable = buildingEntity.IsLocked && isCreator;
+            bool activatable = buildingEntity.CanActivate();
+
+            foreach (GameObject obj in lockedObjects)
             {
-                foreach (GameObject lockableObject in lockableObjects)
-                {
-                    lockableObject.SetActive(buildingEntity.Lockable);
-                }
+                obj.SetActive(buildingEntity.IsLocked);
             }
-            if (lockedObjects != null && lockedObjects.Length > 0)
+            foreach (GameObject obj in unlockedObjects)
             {
-                foreach (GameObject lockedObject in lockedObjects)
-                {
-                    lockedObject.SetActive(buildingEntity.IsLocked);
-                }
+                obj.SetActive(!buildingEntity.IsLocked);
             }
-            if (unlockedObjects != null && unlockedObjects.Length > 0)
+
+            foreach (GameObject obj in lockableObjects)
             {
-                foreach (GameObject unlockedObject in unlockedObjects)
-                {
-                    unlockedObject.SetActive(!buildingEntity.IsLocked);
-                }
+                obj.SetActive(lockable);
             }
-            if (buttonDestroy != null)
-                buttonDestroy.interactable = buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
-            if (buttonSetPassword != null)
-                buttonSetPassword.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
+            foreach (GameObject obj in notLockableObjects)
+            {
+                obj.SetActive(unlockable);
+            }
+
+            foreach (GameObject obj in repairableObjects)
+            {
+                obj.SetActive(repairable);
+            }
+            foreach (GameObject obj in notRepairableObjects)
+            {
+                obj.SetActive(!repairable);
+            }
+
+            foreach (GameObject obj in destroyableObjects)
+            {
+                obj.SetActive(destroyable);
+            }
+            foreach (GameObject obj in notDestroyableObjects)
+            {
+                obj.SetActive(!destroyable);
+            }
+
+            foreach (GameObject obj in passwordDefinableObjects)
+            {
+                obj.SetActive(passwordDefinable);
+            }
+            foreach (GameObject obj in notPasswordDefinableObjects)
+            {
+                obj.SetActive(!passwordDefinable);
+            }
+
+            foreach (GameObject obj in activatableObjects)
+            {
+                obj.SetActive(activatable);
+            }
+            foreach (GameObject obj in notActivatableObjects)
+            {
+                obj.SetActive(!activatable);
+            }
+
             if (buttonLock != null)
-                buttonLock.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
+                buttonLock.interactable = lockable;
             if (buttonUnlock != null)
-                buttonUnlock.interactable = buildingEntity.Lockable && buildingEntity.IsCreator(Controller.PlayingCharacterEntity);
+                buttonUnlock.interactable = unlockable;
+            if (buttonRepair != null)
+                buttonRepair.interactable = repairable;
+            if (buttonDestroy != null)
+                buttonDestroy.interactable = destroyable;
+            if (buttonSetPassword != null)
+                buttonSetPassword.interactable = passwordDefinable;
             if (buttonActivate != null)
-                buttonActivate.interactable = buildingEntity.CanActivate();
+                buttonActivate.interactable = activatable;
         }
 
         private void Update()
@@ -78,6 +142,12 @@ namespace MultiplayerARPG
         public void OnClickDeselect()
         {
             Controller.DeselectBuilding();
+            Hide();
+        }
+
+        public void OnClickRepair()
+        {
+            Controller.RepairBuilding(buildingEntity);
             Hide();
         }
 

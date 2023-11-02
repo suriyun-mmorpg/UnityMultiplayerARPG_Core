@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(0)]
+    [DefaultExecutionOrder(DefaultExecutionOrders.PITCH_IK)]
     public class CharacterPitchIK : MonoBehaviour
     {
         public enum Axis

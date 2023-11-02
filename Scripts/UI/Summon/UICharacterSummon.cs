@@ -167,7 +167,7 @@ namespace MultiplayerARPG
         {
             if (CharacterSummon.type == SummonType.PetItem ||
                 CharacterSummon.type == SummonType.Custom)
-                GameInstance.PlayingCharacterEntity.CallServerUnSummon(CharacterSummon.objectId);
+                GameInstance.PlayingCharacterEntity.CallCmdUnSummon(CharacterSummon.objectId);
         }
     }
 }

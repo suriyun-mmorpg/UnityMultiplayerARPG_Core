@@ -63,30 +63,30 @@ namespace MultiplayerARPG
             }
         }
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UICharacterQuestSelectionManager cacheSelectionManager;
+        private UICharacterQuestSelectionManager _cacheSelectionManager;
         public UICharacterQuestSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterQuestSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterQuestSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return _cacheSelectionManager;
             }
         }
 
