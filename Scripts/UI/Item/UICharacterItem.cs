@@ -100,8 +100,7 @@ namespace MultiplayerARPG
         public GameObject[] noLockObjects;
 
         [Header("Equipment - UI Elements")]
-        public UIEquipmentItemRequirement uiRequirement;
-        public UIUsableItemRequirement uiRequirementUsable;
+        public UIItemRequirement uiRequirement;
         [FormerlySerializedAs("uiStats")]
         public UICharacterStats uiIncreaseStats;
         public UICharacterStats uiIncreaseStatsRate;
@@ -712,35 +711,28 @@ namespace MultiplayerARPG
 
             if (uiRequirement != null)
             {
-                if (EquipmentItem == null ||
+                if ((EquipmentItem == null ||
                     (EquipmentItem.Requirement.level <= 0 &&
                     !EquipmentItem.Requirement.HasAvailableClasses() &&
                     !EquipmentItem.Requirement.HasAvailableFactions() &&
-                    EquipmentItem.RequireAttributeAmounts.Count == 0))
+                    EquipmentItem.RequireAttributeAmounts.Count == 0)) &&
+                    (UsableItem == null ||
+                    (UsableItem.Requirement.level <= 0 &&
+                    !UsableItem.Requirement.HasAvailableClasses() &&
+                    !UsableItem.Requirement.HasAvailableFactions() &&
+                    UsableItem.RequireAttributeAmounts.Count == 0)))
                 {
                     uiRequirement.Hide();
                 }
-                else
+                else if (EquipmentItem != null)
                 {
                     uiRequirement.Show();
                     uiRequirement.Data = EquipmentItem;
                 }
-            }
-
-            if (uiRequirementUsable != null)
-            {
-                if (UsableItem == null ||
-                    (UsableItem.Requirement.level <= 0 &&
-                    !UsableItem.Requirement.HasAvailableClasses() &&
-                    !UsableItem.Requirement.HasAvailableFactions() &&
-                    UsableItem.RequireAttributeAmounts.Count == 0))
+                else if (UsableItem != null)
                 {
-                    uiRequirementUsable.Hide();
-                }
-                else
-                {
-                    uiRequirementUsable.Show();
-                    uiRequirementUsable.Data = UsableItem;
+                    uiRequirement.Show();
+                    uiRequirement.Data = UsableItem;
                 }
             }
 
