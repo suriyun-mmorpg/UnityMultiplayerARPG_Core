@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct EquipmentRequirement
+    public struct ItemRequirement
     {
         [Header("Class")]
         [FormerlySerializedAs("character")]

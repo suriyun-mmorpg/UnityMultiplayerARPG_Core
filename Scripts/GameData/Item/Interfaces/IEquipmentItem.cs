@@ -2,16 +2,8 @@
 
 namespace MultiplayerARPG
 {
-    public partial interface IEquipmentItem : IItem
+    public partial interface IEquipmentItem : IItem, IItemWithRequirement
     {
-        /// <summary>
-        /// Requirement to equip the item
-        /// </summary>
-        EquipmentRequirement Requirement { get; }
-        /// <summary>
-        /// Cached required attribute amounts to equip the item
-        /// </summary>
-        Dictionary<Attribute, float> RequireAttributeAmounts { get; }
         /// <summary>
         /// Equipment set, if character equipping the same set of items, it can increase extra stats to character
         /// </summary>

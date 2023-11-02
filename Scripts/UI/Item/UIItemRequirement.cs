@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public partial class UIEquipmentItemRequirement : UISelectionEntry<IEquipmentItem>
+    public partial class UIItemRequirement : UISelectionEntry<IItemWithRequirement>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Require Level}")]

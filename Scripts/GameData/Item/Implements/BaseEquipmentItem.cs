@@ -17,8 +17,8 @@ namespace MultiplayerARPG
         [Category(2, "Equipment Settings")]
         [Header("Generic Equipment Settings")]
         [SerializeField]
-        private EquipmentRequirement requirement = default;
-        public EquipmentRequirement Requirement
+        private ItemRequirement requirement = default;
+        public ItemRequirement Requirement
         {
             get { return requirement; }
         }

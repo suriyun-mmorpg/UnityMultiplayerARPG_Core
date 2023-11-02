@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -13,6 +14,26 @@ namespace MultiplayerARPG
         public override ItemType ItemType
         {
             get { return ItemType.Potion; }
+        }
+
+        [Category(2, "Requirements")]
+        [SerializeField]
+        private ItemRequirement requirement = default;
+        public ItemRequirement Requirement
+        {
+            get { return requirement; }
+        }
+
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> _cacheRequireAttributeAmounts = null;
+        public Dictionary<Attribute, float> RequireAttributeAmounts
+        {
+            get
+            {
+                if (_cacheRequireAttributeAmounts == null)
+                    _cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
+                return _cacheRequireAttributeAmounts;
+            }
         }
 
         [Category(3, "Potion Settings")]

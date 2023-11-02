@@ -1236,6 +1236,24 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            if (character.Level < usableItem.Requirement.level)
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_LEVEL;
+                return false;
+            }
+
+            if (!usableItem.Requirement.ClassIsAvailable(character.DataId))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_MATCH_CHARACTER_CLASS;
+                return false;
+            }
+
+            if (!character.HasEnoughAttributeAmounts(usableItem.RequireAttributeAmounts, true, out gameMessage, out _))
+            {
+                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                return false;
+            }
+
             return true;
         }
     }

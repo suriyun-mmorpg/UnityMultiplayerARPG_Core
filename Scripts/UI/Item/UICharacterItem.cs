@@ -100,7 +100,7 @@ namespace MultiplayerARPG
         public GameObject[] noLockObjects;
 
         [Header("Equipment - UI Elements")]
-        public UIEquipmentItemRequirement uiRequirement;
+        public UIItemRequirement uiRequirement;
         [FormerlySerializedAs("uiStats")]
         public UICharacterStats uiIncreaseStats;
         public UICharacterStats uiIncreaseStatsRate;
@@ -711,18 +711,28 @@ namespace MultiplayerARPG
 
             if (uiRequirement != null)
             {
-                if (EquipmentItem == null ||
+                if ((EquipmentItem == null ||
                     (EquipmentItem.Requirement.level <= 0 &&
                     !EquipmentItem.Requirement.HasAvailableClasses() &&
                     !EquipmentItem.Requirement.HasAvailableFactions() &&
-                    EquipmentItem.RequireAttributeAmounts.Count == 0))
+                    EquipmentItem.RequireAttributeAmounts.Count == 0)) &&
+                    (UsableItem == null ||
+                    (UsableItem.Requirement.level <= 0 &&
+                    !UsableItem.Requirement.HasAvailableClasses() &&
+                    !UsableItem.Requirement.HasAvailableFactions() &&
+                    UsableItem.RequireAttributeAmounts.Count == 0)))
                 {
                     uiRequirement.Hide();
                 }
-                else
+                else if (EquipmentItem != null)
                 {
                     uiRequirement.Show();
                     uiRequirement.Data = EquipmentItem;
+                }
+                else if (UsableItem != null)
+                {
+                    uiRequirement.Show();
+                    uiRequirement.Data = UsableItem;
                 }
             }
 

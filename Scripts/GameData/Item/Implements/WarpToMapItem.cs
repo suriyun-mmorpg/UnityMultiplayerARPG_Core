@@ -1,10 +1,31 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.WARP_TO_MAP_ITEM_FILE, menuName = GameDataMenuConsts.WARP_TO_MAP_ITEM_MENU, order = GameDataMenuConsts.WARP_TO_MAP_ITEM_ORDER)]
     public class WarpToMapItem : BaseItem, IUsableItem
     {
+        [Category(2, "Requirements")]
+        [SerializeField]
+        private ItemRequirement requirement = default;
+        public ItemRequirement Requirement
+        {
+            get { return requirement; }
+        }
+
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> _cacheRequireAttributeAmounts = null;
+        public Dictionary<Attribute, float> RequireAttributeAmounts
+        {
+            get
+            {
+                if (_cacheRequireAttributeAmounts == null)
+                    _cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
+                return _cacheRequireAttributeAmounts;
+            }
+        }
+
         [SerializeField]
         private WarpPortalType warpPortalType = WarpPortalType.Default;
         [Tooltip("Map which character will warp to when use the item, leave this empty to warp character to other position in the same map")]
