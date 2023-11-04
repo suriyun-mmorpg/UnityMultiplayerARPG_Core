@@ -394,7 +394,7 @@ namespace MultiplayerARPG
                     // If current entry is not valid, add it to empty list, going to replacing it later
                     emptySlots[i] = item;
                 }
-                else if (item.dataId == increasingItem.dataId)
+                else if (item.dataId == increasingItem.dataId && item.level == increasingItem.level)
                 {
                     // If same item id, increase its amount
                     if (item.amount + amount <= maxStack)

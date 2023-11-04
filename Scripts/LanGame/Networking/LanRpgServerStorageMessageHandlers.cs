@@ -193,7 +193,7 @@ namespace MultiplayerARPG
             CharacterItem fromItem = storageItems[fromIndex];
             CharacterItem toItem = storageItems[toIndex];
 
-            if (fromItem.dataId.Equals(toItem.dataId) && !fromItem.IsFull() && !toItem.IsFull())
+            if (fromItem.dataId == toItem.dataId && !fromItem.IsFull() && !toItem.IsFull() && fromItem.level == toItem.level)
             {
                 // Merge if same id and not full
                 int maxStack = toItem.GetMaxStack();
