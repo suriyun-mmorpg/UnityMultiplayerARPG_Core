@@ -57,9 +57,9 @@ namespace MultiplayerARPG
             }
         }
 
-        private float _destroyTime;
+        protected float _destroyTime;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             CacheTransform = transform;
         }
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
                 gameObject.SetActive(false);
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (_destroyTime >= 0 && _destroyTime - Time.time <= 0)
             {
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void DestroyEffect()
+        public virtual void DestroyEffect()
         {
             FxCollection.SetLoop(false);
             _destroyTime = Time.time + lifeTime;
