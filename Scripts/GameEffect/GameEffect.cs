@@ -4,6 +4,14 @@ namespace MultiplayerARPG
 {
     public class GameEffect : PoolDescriptor
     {
+        public enum PlayMode
+        {
+            PlayClipAtPoint,
+            PlayClipAtAudioSource
+        }
+        public PlayMode playMode = PlayMode.PlayClipAtPoint;
+
+        private AudioSource _cacheAudioSource;
         public AudioComponentSettingType settingType = AudioComponentSettingType.Sfx;
         public string otherSettingId;
         public string SettingId
@@ -62,6 +70,17 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             CacheTransform = transform;
+
+            if (playMode == PlayMode.PlayClipAtAudioSource)
+            {
+                _cacheAudioSource = GetComponent<AudioSource>();
+                if (_cacheAudioSource == null)
+                {
+                    _cacheAudioSource = gameObject.AddComponent<AudioSource>();
+                    _cacheAudioSource.spatialBlend = 1f;
+                    _cacheAudioSource.playOnAwake = false;
+                }
+            }
         }
 
         protected override void PushBack()
@@ -125,12 +144,26 @@ namespace MultiplayerARPG
                 gameObject.SetActive(true);
             // Prepare destroy time
             _destroyTime = isLoop ? -1 : Time.time + lifeTime;
-            if (!Application.isBatchMode && !AudioListener.pause)
+
+            switch (playMode)
             {
-                // Play random audio
-                if (randomSoundEffects.Length > 0)
-                    AudioSource.PlayClipAtPoint(randomSoundEffects[Random.Range(0, randomSoundEffects.Length)], CacheTransform.position, AudioManager.Singleton.GetVolumeLevel(SettingId));
+                case PlayMode.PlayClipAtAudioSource:
+                    if (!Application.isBatchMode && !AudioListener.pause && randomSoundEffects.Length > 0)
+                    {
+                        _cacheAudioSource.clip = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
+                        _cacheAudioSource.volume = AudioManager.Singleton.GetVolumeLevel(SettingId);
+                        _cacheAudioSource.loop = isLoop;
+                        _cacheAudioSource.Play();
+                    }
+                    break;
+                case PlayMode.PlayClipAtPoint:
+                    if (!Application.isBatchMode && !AudioListener.pause && randomSoundEffects.Length > 0)
+                    {
+                        AudioSource.PlayClipAtPoint(randomSoundEffects[Random.Range(0, randomSoundEffects.Length)], CacheTransform.position, AudioManager.Singleton.GetVolumeLevel(SettingId));
+                    }
+                    break;
             }
+
             FxCollection.Play();
         }
     }
