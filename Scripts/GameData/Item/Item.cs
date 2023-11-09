@@ -142,6 +142,7 @@ namespace MultiplayerARPG
 
         [Category(2, "Ammo Settings")]
         public AmmoType ammoType;
+        public int overrideAmmoCapacity;
 
         [Category(2, "Building Settings")]
         public BuildingEntity buildingEntity;
@@ -264,6 +265,11 @@ namespace MultiplayerARPG
         public AmmoType AmmoType
         {
             get { return ammoType; }
+        }
+
+        public int OverrideAmmoCapacity
+        {
+            get { return overrideAmmoCapacity; }
         }
         #endregion
 

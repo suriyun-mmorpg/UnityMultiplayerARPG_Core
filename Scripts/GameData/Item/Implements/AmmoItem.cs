@@ -17,6 +17,7 @@ namespace MultiplayerARPG
 
         [Category(2, "Ammo Settings")]
         [SerializeField]
+        [Tooltip("Ammo type data")]
         private AmmoType ammoType = null;
         public AmmoType AmmoType
         {
@@ -24,10 +25,19 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("Increasing damages stats while attacking by weapon which put this item")]
         private DamageIncremental[] increaseDamages = new DamageIncremental[0];
         public DamageIncremental[] IncreaseDamages
         {
             get { return increaseDamages; }
+        }
+
+        [SerializeField]
+        [Tooltip("If this is > 0 it will override weapon's ammo capacity")]
+        private int overrideAmmoCapacity = 0;
+        public int OverrideAmmoCapacity
+        {
+            get { return overrideAmmoCapacity; }
         }
 
         public override void PrepareRelatesData()

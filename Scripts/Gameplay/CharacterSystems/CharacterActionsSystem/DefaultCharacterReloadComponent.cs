@@ -299,10 +299,13 @@ namespace MultiplayerARPG
                 }
             }
             int reloadingAmmoAmount = 0;
+            int ammoCapacity = reloadingWeaponItem.AmmoCapacity;
+            if (GameInstance.Items.TryGetValue(reloadingAmmoDataId, out BaseItem tempItem) && tempItem is IAmmoItem tempAmmoItem && tempAmmoItem.OverrideAmmoCapacity > 0)
+                ammoCapacity = tempAmmoItem.OverrideAmmoCapacity;
             if (reloadingWeapon.ammoDataId != 0 && reloadingWeapon.ammoDataId == reloadingAmmoDataId)
-                reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity - reloadingWeapon.ammo;
+                reloadingAmmoAmount = ammoCapacity - reloadingWeapon.ammo;
             else
-                reloadingAmmoAmount = reloadingWeaponItem.AmmoCapacity;
+                reloadingAmmoAmount = ammoCapacity;
             if (inventoryAmount < reloadingAmmoAmount)
                 reloadingAmmoAmount = inventoryAmount;
             if (reloadingAmmoAmount <= 0)
