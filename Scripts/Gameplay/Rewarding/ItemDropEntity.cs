@@ -5,6 +5,7 @@ using LiteNetLibManager;
 using LiteNetLib;
 using Cysharp.Threading.Tasks;
 using UnityEngine.Serialization;
+using System.Linq;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -395,7 +396,13 @@ namespace MultiplayerARPG
                 message = UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT;
                 return false;
             }
-
+            if (CurrentGameInstance.itemLootRandomPartyMember && Time.unscaledTime - _dropTime < CurrentGameInstance.itemLootLockDuration)
+            {
+                if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(Looters.ToArray()[Random.Range(0, Looters.Count)], out IPlayerCharacterData randomCharacter))
+                {
+                    characterEntity = randomCharacter as BaseCharacterEntity;
+                }
+            }
             if (characterEntity.IncreasingItemsWillOverwhelming(DropItems))
             {
                 message = UITextKeys.UI_ERROR_WILL_OVERWHELMING;

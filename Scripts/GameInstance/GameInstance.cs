@@ -291,6 +291,8 @@ namespace MultiplayerARPG
         public float itemAppearDuration = 60f;
         [Tooltip("If dropped items does not picked up by killer within this duration, anyone can pick up the items")]
         public float itemLootLockDuration = 5f;
+        [Tooltip("Dropped item picked up by Looters, will go to 1 random party member, Instead of only to whoever picked first if item share is on")]
+        public bool itemLootRandomPartyMember;
         [Tooltip("If this is `TRUE` anyone can pick up items which drops by players immediately")]
         public bool canPickupItemsWhichDropsByPlayersImmediately = false;
         [Tooltip("If dealing request does not accepted within this duration, the request will be cancelled")]
