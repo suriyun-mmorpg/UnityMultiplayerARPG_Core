@@ -123,6 +123,8 @@ namespace MultiplayerARPG
 
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem.RateOfFire > 0)
+                _totalDuration = 60f / weaponItem.RateOfFire;
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts;
             if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)

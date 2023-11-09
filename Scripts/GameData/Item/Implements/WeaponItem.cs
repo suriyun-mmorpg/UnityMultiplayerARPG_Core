@@ -44,6 +44,7 @@ namespace MultiplayerARPG
         [Category("Equipment Settings")]
         [Header("Weapon Settings")]
         [SerializeField]
+        [Tooltip("Weapon type data")]
         private WeaponType weaponType = null;
         public WeaponType WeaponType
         {
@@ -57,6 +58,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("Damange amount which will be used when attacking characters, buildings and so on")]
         private DamageIncremental damageAmount = default;
         public DamageIncremental DamageAmount
         {
@@ -64,6 +66,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("Damage amount which will be used when attacking harvestable entities")]
         private IncrementalMinMaxFloat harvestDamageAmount = default;
         public IncrementalMinMaxFloat HarvestDamageAmount
         {
@@ -71,6 +74,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("This will be multiplied with character's movement speed while reloading this weapon")]
         private float moveSpeedRateWhileReloading = 1f;
         public float MoveSpeedRateWhileReloading
         {
@@ -78,6 +82,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("This will be multiplied with character's movement speed while charging this weapon")]
         private float moveSpeedRateWhileCharging = 1f;
         public float MoveSpeedRateWhileCharging
         {
@@ -85,6 +90,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("This will be multiplied with character's movement speed while attacking with this weapon")]
         private float moveSpeedRateWhileAttacking = 0f;
         public float MoveSpeedRateWhileAttacking
         {
@@ -127,6 +133,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("You can set ammo items into this list to use it as weapon instead of the one which setup on weapon type's require ammo type\r\nThis setting is useful for shooter games which can have the same type of weapon (eg. machine-gun for 20 guns) but can be reloaded by differences ammo items")]
         private BaseItem[] ammoItems;
         public BaseItem[] AmmoItems
         {
@@ -134,6 +141,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("How many ammo can store in the gun's magazine")]
         private int ammoCapacity = 0;
         public int AmmoCapacity
         {
@@ -244,6 +252,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("How to fire")]
         private FireType fireType = FireType.SingleFire;
         public FireType FireType
         {
@@ -251,6 +260,23 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("If this value > 0, it will fire by duration which being calculated by this value, default duration calculation formula is `60f / rate of fire`")]
+        private float rateOfFire;
+        public float RateOfFire
+        {
+            get { return rateOfFire; }
+        }
+
+        [SerializeField]
+        [Tooltip("If this value > 0, it will reload by using this duration, NOT by animation length")]
+        private float reloadDuration;
+        public float ReloadDuration
+        {
+            get { return reloadDuration; }
+        }
+
+        [SerializeField]
+        [Tooltip("Random stagger from aiming position, then when shoot actual shot position will be {aim position} + {randomed stagger}")]
         private Vector2 fireStagger = Vector2.zero;
         public Vector2 FireStagger
         {
@@ -258,6 +284,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("Amount of bullets that will be launched when fire onnce, will be used for shotgun items")]
         private byte fireSpread = 0;
         public byte FireSpread
         {
@@ -265,6 +292,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("Minimum charge duration to attack")]
         private float chargeDuration = 0;
         public float ChargeDuration
         {
@@ -272,6 +300,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("If this is `TRUE`, character's item will be destroyed after fired, will be used for grenade items")]
         private bool destroyImmediatelyAfterFired = false;
         public bool DestroyImmediatelyAfterFired
         {

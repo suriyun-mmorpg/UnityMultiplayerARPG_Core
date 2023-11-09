@@ -83,6 +83,14 @@ namespace MultiplayerARPG
         /// </summary>
         FireType FireType { get; }
         /// <summary>
+        /// If this value > 0, it will fire by duration which being calculated by this value, default duration calculation formula is `60f / rate of fire`
+        /// </summary>
+        float RateOfFire { get; }
+        /// <summary>
+        /// If this value > 0, it will reload by using this duration, NOT by animation length
+        /// </summary>
+        float ReloadDuration { get; }
+        /// <summary>
         /// Random stagger from aiming position, then when shoot actual shot position will be {aim position} + {randomed stagger}
         /// </summary>
         Vector2 FireStagger { get; }

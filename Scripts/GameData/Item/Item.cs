@@ -109,6 +109,8 @@ namespace MultiplayerARPG
 
         [Header("Fire Configs")]
         public FireType fireType;
+        public float rateOfFire;
+        public float reloadDuration;
         public Vector2 fireStagger;
         public byte fireSpread;
         public float chargeDuration;
@@ -557,6 +559,16 @@ namespace MultiplayerARPG
         public FireType FireType
         {
             get { return fireType; }
+        }
+
+        public float RateOfFire
+        {
+            get { return rateOfFire; }
+        }
+
+        public float ReloadDuration
+        {
+            get { return reloadDuration; }
         }
 
         public Vector2 FireStagger

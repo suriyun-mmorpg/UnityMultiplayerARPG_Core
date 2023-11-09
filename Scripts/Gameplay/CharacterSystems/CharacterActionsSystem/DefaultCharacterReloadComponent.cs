@@ -78,6 +78,8 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem.ReloadDuration > 0)
+                _totalDuration = weaponItem.ReloadDuration;
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileReloading = Entity.GetMoveSpeedRateWhileReloading(weaponItem);
