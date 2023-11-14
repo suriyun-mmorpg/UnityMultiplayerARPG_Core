@@ -101,6 +101,11 @@ namespace MultiplayerARPG
                 ConstructingBuildingEntity.BuildYRotation = _buildYRotate;
             }
             ConstructingBuildingEntity.Rotation = buildingAngles;
+            //Use DefaultBulidingPlacement setting on BuildingEntity if set
+            if (prefab.useCustomBuildingPlacement)
+            {
+                aimAxes = prefab.customBuildingPlacement;
+            }
             // Find position to place building
             if (GameInstance.UseMobileInput())
                 FindAndSetBuildingAreaByAxes(aimAxes);

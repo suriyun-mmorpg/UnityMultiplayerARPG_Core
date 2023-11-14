@@ -42,6 +42,14 @@ namespace MultiplayerARPG
         [Tooltip("This is a distance that allows a player to build the building")]
         protected float buildDistance = 5f;
 
+        //Default bulding placement vector2 for mobile useitem dialog
+        [SerializeField]
+        [Tooltip("Use customBuildingPlacement coordinates below for instant placement when using Use Item Dialog on mobile")]
+        internal bool useCustomBuildingPlacement = false;
+        [SerializeField]
+        [Tooltip("A default XY position to quick-place this building")]
+        internal Vector2 customBuildingPlacement = new Vector2(0,0.5f);
+
         [SerializeField]
         [Tooltip("If this is `TRUE`, this entity will be destroyed when its parent building entity was destroyed")]
         protected bool destroyWhenParentDestroyed = false;
