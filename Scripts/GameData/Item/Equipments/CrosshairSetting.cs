@@ -1,4 +1,5 @@
-﻿using UnityEngine.Serialization;
+﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -12,8 +13,14 @@ namespace MultiplayerARPG
         public float shrinkPerFrameWhenAttacked;
         public float minSpread;
         public float maxSpread;
-        public float recoilX;
         [FormerlySerializedAs("recoil")]
-        public float recoilY;
+        [FormerlySerializedAs("recoilY")]
+        [Tooltip("X axis rotation")]
+        public float recoilPitch;
+        [FormerlySerializedAs("recoilX")]
+        [Tooltip("Y axis rotation")]
+        public float recoilYaw;
+        [Tooltip("Z axis rotation")]
+        public float recoilRoll;
     }
 }

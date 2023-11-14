@@ -1314,8 +1314,10 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateRecoil()
         {
-            float recoilX;
-            float recoilY;
+            float recoilPitch;
+            float recoilYaw;
+            float recoilRoll;
+
             if (_movementState.Has(MovementState.Forward) ||
                 _movementState.Has(MovementState.Backward) ||
                 _movementState.Has(MovementState.Left) ||
@@ -1323,43 +1325,51 @@ namespace MultiplayerARPG
             {
                 if (_movementState.Has(MovementState.IsUnderWater))
                 {
-                    recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSwimming;
-                    recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSwimming;
+                    recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileSwimming;
+                    recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileSwimming;
+                    recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileSwimming;
                 }
                 else if (_extraMovementState == ExtraMovementState.IsSprinting)
                 {
-                    recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileSprinting;
-                    recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileSprinting;
+                    recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileSprinting;
+                    recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileSprinting;
+                    recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileSprinting;
                 }
                 else if (_extraMovementState == ExtraMovementState.IsWalking)
                 {
-                    recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileWalking;
-                    recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileWalking;
+                    recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileWalking;
+                    recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileWalking;
+                    recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileWalking;
                 }
                 else
                 {
-                    recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileMoving;
-                    recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileMoving;
+                    recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileMoving;
+                    recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileMoving;
+                    recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileMoving;
                 }
             }
             else if (_extraMovementState == ExtraMovementState.IsCrouching)
             {
-                recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileCrouching;
-                recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileCrouching;
+                recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileCrouching;
+                recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileCrouching;
+                recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileCrouching;
             }
             else if (_extraMovementState == ExtraMovementState.IsCrawling)
             {
-                recoilX = CurrentCrosshairSetting.recoilX * recoilRateWhileCrawling;
-                recoilY = CurrentCrosshairSetting.recoilY * recoilRateWhileCrawling;
+                recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileCrawling;
+                recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileCrawling;
+                recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileCrawling;
             }
             else
             {
-                recoilX = CurrentCrosshairSetting.recoilX;
-                recoilY = CurrentCrosshairSetting.recoilY;
+                recoilPitch = CurrentCrosshairSetting.recoilPitch;
+                recoilYaw = CurrentCrosshairSetting.recoilYaw;
+                recoilRoll = CurrentCrosshairSetting.recoilRoll;
             }
-            if (recoilX > 0f || recoilY > 0f)
+
+            if (recoilPitch > 0f || recoilYaw > 0f || recoilRoll > 0f)
             {
-                CacheGameplayCameraController.Recoil(recoilY, Random.Range(-recoilX, recoilX));
+                CacheGameplayCameraController.Recoil(-recoilPitch, Random.Range(-recoilYaw, recoilYaw), Random.Range(-recoilRoll, recoilRoll));
             }
         }
 
