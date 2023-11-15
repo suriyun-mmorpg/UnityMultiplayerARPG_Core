@@ -37,7 +37,6 @@ namespace MultiplayerARPG
                     if (type != modelFactoryType && modelFactoryType.IsAssignableFrom(type))
                     {
                         ICharacterModelFactory modelFactory = System.Activator.CreateInstance(type) as ICharacterModelFactory;
-                        Debug.LogError(modelFactory.DimensionType);
                         if (modelFactory.DimensionType == DimensionType.Dimension3D)
                         {
                             modelFactories.Add(modelFactory);
