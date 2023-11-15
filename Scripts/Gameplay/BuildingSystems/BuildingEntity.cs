@@ -20,6 +20,10 @@ namespace MultiplayerARPG
         protected bool canBuildOnAnySurface = false;
 
         [SerializeField]
+        [Tooltip("If this is `TRUE` this building entity cannot be attacked and is marked as InSafeArea and Immune")]
+        protected bool cannotBeAttacked = false;
+
+        [SerializeField]
         [Tooltip("If this is `TRUE` this building entity will be able to build on limited surface hit normal angle (default up angle is 90)")]
         protected bool limitSurfaceHitNormalAngle = false;
 
@@ -41,6 +45,10 @@ namespace MultiplayerARPG
         [SerializeField]
         [Tooltip("This is a distance that allows a player to build the building")]
         protected float buildDistance = 5f;
+
+        [SerializeField]
+        [Tooltip("Distance to activate this building, will use GameInstance.conversationDistance if 0")]
+        protected float activateDistance = 0f;
 
         //Default bulding placement vector2 for mobile useitem dialog
         [SerializeField]
@@ -259,6 +267,12 @@ namespace MultiplayerARPG
             isStaticHitBoxes = true;
             isDestroyed = false;
             MigrateBuildingType();
+
+            if (cannotBeAttacked)
+            {
+                this.IsInSafeArea = true;
+                this.IsImmune = true;
+            }
         }
 
 #if UNITY_EDITOR
@@ -716,7 +730,11 @@ namespace MultiplayerARPG
 
         public virtual float GetActivatableDistance()
         {
-            return GameInstance.Singleton.conversationDistance;
+            if(activateDistance > 0){
+                return activateDistance;
+            } else {
+                return GameInstance.Singleton.conversationDistance;
+            }
         }
 
         public virtual bool ShouldClearTargetAfterActivated()
