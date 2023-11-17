@@ -63,8 +63,8 @@ namespace MultiplayerARPG
         public string modelSettingId;
         public string colorSettingId;
         public ModelOption[] options = new ModelOption[0];
-        private int _currentModelIndex;
-        private int _currentColorIndex;
+        protected int _currentModelIndex;
+        protected int _currentColorIndex;
         public IEnumerable<ModelOption> ModelOptions { get => options; }
         public int MaxModelOptions { get => options.Length; }
         public IEnumerable<ColorOption> ColorOptions { get => options[_currentModelIndex].colors; }
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             ApplyModelAndColorBySavedData();
         }
 
-        private void OnShowEquipmentModel(EquipmentModel model, GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
+        protected virtual void OnShowEquipmentModel(EquipmentModel model, GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
         {
             // Get mesh's material to change color
             if (model == null)
