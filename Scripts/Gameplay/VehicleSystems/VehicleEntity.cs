@@ -202,6 +202,11 @@ namespace MultiplayerARPG
             return Seats[seatIndex].canAttack;
         }
 
+        public bool CanBePassenger(byte seatIndex, BaseGameEntity gameEntity)
+        {
+            return true;
+        }
+
         public List<BaseGameEntity> GetAllPassengers()
         {
             List<BaseGameEntity> result = new List<BaseGameEntity>();

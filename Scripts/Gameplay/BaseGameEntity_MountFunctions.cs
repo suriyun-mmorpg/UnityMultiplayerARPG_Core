@@ -55,8 +55,20 @@ namespace MultiplayerARPG
 
         protected virtual bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
-            if (!IsServer || vehicle.IsNull() || !vehicle.IsSeatAvailable(seatIndex))
+            if (!IsServer || vehicle.IsNull())
                 return false;
+
+            if (!vehicle.IsSeatAvailable(seatIndex))
+            {
+                // TODO: Send error message
+                return false;
+            }
+
+            if (!vehicle.CanBePassenger(seatIndex, this))
+            {
+                // TODO: Send error message
+                return false;
+            }
 
             // Change object owner to driver
             if (vehicle.IsDriver(seatIndex))
