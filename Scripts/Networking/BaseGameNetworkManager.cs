@@ -854,12 +854,12 @@ namespace MultiplayerARPG
                                 warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
                                 Quaternion.Euler(warpPortal.rotation));
                             warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
-                            warpPortalEntity.warpPortalType = warpPortal.warpPortalType;
-                            warpPortalEntity.warpToMapInfo = warpPortal.warpToMapInfo;
-                            warpPortalEntity.warpToPosition = warpPortal.warpToPosition;
-                            warpPortalEntity.warpOverrideRotation = warpPortal.warpOverrideRotation;
-                            warpPortalEntity.warpToRotation = warpPortal.warpToRotation;
-                            warpPortalEntity.warpPointsByCondition = warpPortal.warpPointsByCondition;
+                            warpPortalEntity.WarpPortalType = warpPortal.warpPortalType;
+                            warpPortalEntity.WarpToMapInfo = warpPortal.warpToMapInfo;
+                            warpPortalEntity.WarpToPosition = warpPortal.warpToPosition;
+                            warpPortalEntity.WarpOverrideRotation = warpPortal.warpOverrideRotation;
+                            warpPortalEntity.WarpToRotation = warpPortal.warpToRotation;
+                            warpPortalEntity.WarpPointsByCondition = warpPortal.warpPointsByCondition;
                             Assets.NetworkSpawn(spawnObj);
                         }
                         await UniTask.Yield();

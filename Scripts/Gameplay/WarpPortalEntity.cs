@@ -22,27 +22,93 @@ namespace MultiplayerARPG
         [SerializeField]
         [FormerlySerializedAs("type")]
         private WarpPortalType warpPortalType;
+        public WarpPortalType WarpPortalType
+        {
+            get
+            {
+                return warpPortalType;
+            }
+            set
+            {
+                warpPortalType = value;
+            }
+        }
 
         [SerializeField]
         [Tooltip("Map which character will warp to when use the warp portal, leave this empty to warp character to other position in the same map")]
         [FormerlySerializedAs("mapInfo")]
         private BaseMapInfo warpToMapInfo;
+        public BaseMapInfo WarpToMapInfo
+        {
+            get
+            {
+                return warpToMapInfo;
+            }
+            set
+            {
+                warpToMapInfo = value;
+            }
+        }
 
         [SerializeField]
         [Tooltip("Position which character will warp to when use the warp portal")]
         [FormerlySerializedAs("position")]
         private Vector3 warpToPosition;
+        public Vector3 WarpToPosition
+        {
+            get
+            {
+                return warpToPosition;
+            }
+            set
+            {
+                warpToPosition = value;
+            }
+        }
 
         [SerializeField]
         [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
         private bool warpOverrideRotation;
+        public bool WarpOverrideRotation
+        {
+            get
+            {
+                return warpOverrideRotation;
+            }
+            set
+            {
+                warpOverrideRotation = value;
+            }
+        }
 
         [SerializeField]
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         private Vector3 warpToRotation;
+        public Vector3 WarpToRotation
+        {
+            get
+            {
+                return warpToRotation;
+            }
+            set
+            {
+                warpToRotation = value;
+            }
+        }
 
         [SerializeField]
         private WarpPointByCondition[] warpPointsByCondition = new WarpPointByCondition[0];
+        public WarpPointByCondition[] WarpPointsByCondition
+        {
+            get
+            {
+                return warpPointsByCondition;
+            }
+            set
+            {
+                warpPointsByCondition = value;
+            }
+        }
 
         [System.NonSerialized]
         private Dictionary<int, List<WarpPointByCondition>> _cacheWarpPointsByCondition;
