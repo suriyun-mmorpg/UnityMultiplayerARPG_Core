@@ -20,6 +20,10 @@ namespace MultiplayerARPG
         protected float activatableDistance = 0f;
 
         [SerializeField]
+        [Tooltip("If this is `TRUE` this entity will be able to be attacked")]
+        protected bool canBeAttacked = true;
+
+        [SerializeField]
         [Tooltip("If this is `TRUE` this building entity will be able to build on any surface. But when constructing, if player aimming on building area it will place on building area")]
         protected bool canBuildOnAnySurface = false;
 
@@ -99,6 +103,7 @@ namespace MultiplayerARPG
         public List<string> BuildingTypes { get { return buildingTypes; } }
         public float BuildDistance { get { return buildDistance; } }
         public float BuildYRotation { get; set; }
+        public override bool IsImmune { get { return base.IsImmune || !canBeAttacked; } set { base.IsImmune = value; } }
         public override int MaxHp { get { return maxHp; } }
         public float LifeTime { get { return lifeTime; } }
         public int BuildLimit { get { return buildLimit; } }

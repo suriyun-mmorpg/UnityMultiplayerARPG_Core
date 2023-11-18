@@ -34,7 +34,8 @@ namespace MultiplayerARPG
         public List<VehicleSeat> Seats { get { return seats; } }
 
         [SerializeField]
-        protected bool canBeAttacked;
+        [Tooltip("If this is `TRUE` this entity will be able to be attacked")]
+        protected bool canBeAttacked = true;
 
         // TODO: Vehicle can level up?
         [SerializeField]
