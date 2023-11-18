@@ -213,7 +213,7 @@ namespace MultiplayerARPG
         public bool IsBuildMode { get; private set; }
         public BasePlayerCharacterEntity Builder { get; private set; }
 
-        private BuildingRepairData? repairDataForMenu;
+        private BuildingRepairData? _repairDataForMenu;
         private Dictionary<BaseItem, BuildingRepairData> _cacheRepairs;
         public Dictionary<BaseItem, BuildingRepairData> CacheRepairs
         {
@@ -226,9 +226,9 @@ namespace MultiplayerARPG
                     {
                         for (int i = 0; i < repairs.Count; ++i)
                         {
-                            if (repairs[i].canRepairFromMenu && !repairDataForMenu.HasValue)
+                            if (repairs[i].canRepairFromMenu && !_repairDataForMenu.HasValue)
                             {
-                                repairDataForMenu = repairs[i];
+                                _repairDataForMenu = repairs[i];
                                 continue;
                             }
                             BaseItem weaponItem = repairs[i].weaponItem;
@@ -246,11 +246,11 @@ namespace MultiplayerARPG
             }
         }
 
-        protected readonly HashSet<GameObject> triggerObjects = new HashSet<GameObject>();
-        protected readonly HashSet<BuildingEntity> children = new HashSet<BuildingEntity>();
-        protected readonly HashSet<BuildingMaterial> buildingMaterials = new HashSet<BuildingMaterial>();
-        protected bool parentFound;
-        protected bool isDestroyed;
+        protected readonly HashSet<GameObject> _triggerObjects = new HashSet<GameObject>();
+        protected readonly HashSet<BuildingEntity> _children = new HashSet<BuildingEntity>();
+        protected readonly HashSet<BuildingMaterial> _buildingMaterials = new HashSet<BuildingMaterial>();
+        protected bool _parentFound;
+        protected bool _isDestroyed;
 
         protected override void EntityAwake()
         {
@@ -258,7 +258,7 @@ namespace MultiplayerARPG
             gameObject.tag = CurrentGameInstance.buildingTag;
             gameObject.layer = CurrentGameInstance.buildingLayer;
             isStaticHitBoxes = true;
-            isDestroyed = false;
+            _isDestroyed = false;
             MigrateBuildingType();
         }
 
@@ -323,19 +323,19 @@ namespace MultiplayerARPG
             {
                 UpdateBuildingAreaSnapping();
                 bool canBuild = CanBuild();
-                foreach (BuildingMaterial buildingMaterial in buildingMaterials)
+                foreach (BuildingMaterial buildingMaterial in _buildingMaterials)
                 {
                     if (!buildingMaterial) continue;
                     buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
                 }
             }
             // Setup parent which when it's destroying it will destroy children (chain destroy)
-            if (IsServer && !parentFound)
+            if (IsServer && !_parentFound)
             {
                 BuildingEntity parent;
                 if (GameInstance.ServerBuildingHandlers.TryGetBuilding(ParentId, out parent))
                 {
-                    parentFound = true;
+                    _parentFound = true;
                     parent.AddChildren(this);
                 }
             }
@@ -343,7 +343,7 @@ namespace MultiplayerARPG
 
         public void RegisterMaterial(BuildingMaterial material)
         {
-            buildingMaterials.Add(material);
+            _buildingMaterials.Add(material);
         }
 
         public override void OnSetup()
@@ -384,12 +384,12 @@ namespace MultiplayerARPG
 
         private void OnParentIdChange(bool isInitial, string parentId)
         {
-            parentFound = false;
+            _parentFound = false;
         }
 
         public void AddChildren(BuildingEntity buildingEntity)
         {
-            children.Add(buildingEntity);
+            _children.Add(buildingEntity);
         }
 
         public bool IsPositionInBuildDistance(Vector3 builderPosition, Vector3 placePosition)
@@ -409,7 +409,7 @@ namespace MultiplayerARPG
                 // Too far from builder?
                 return false;
             }
-            if (triggerObjects.Count > 0)
+            if (_triggerObjects.Count > 0)
             {
                 // Triggered something?
                 return false;
@@ -434,7 +434,7 @@ namespace MultiplayerARPG
 
         public bool CanRepairByMenu()
         {
-            return repairDataForMenu.HasValue;
+            return _repairDataForMenu.HasValue;
         }
 
         public bool TryGetRepairAmount(BasePlayerCharacterEntity repairPlayer, out int repairAmount, out UITextKeys errorMessage)
@@ -443,7 +443,7 @@ namespace MultiplayerARPG
             errorMessage = UITextKeys.NONE;
             if (!CanRepairByMenu())
                 return false;
-            return TryGetRepairAmount(repairPlayer, repairDataForMenu.Value, out repairAmount, out errorMessage);
+            return TryGetRepairAmount(repairPlayer, _repairDataForMenu.Value, out repairAmount, out errorMessage);
         }
 
         public bool Repair(BasePlayerCharacterEntity repairPlayer, out UITextKeys errorMessage)
@@ -576,9 +576,9 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
             CurrentHp = 0;
-            if (isDestroyed)
+            if (_isDestroyed)
                 return;
-            isDestroyed = true;
+            _isDestroyed = true;
             // Tell clients that the building destroy to play animation at client
             CallRpcOnBuildingDestroy();
             // Drop items
@@ -623,12 +623,12 @@ namespace MultiplayerARPG
 
         public void AddTriggerObject(GameObject obj)
         {
-            triggerObjects.Add(obj);
+            _triggerObjects.Add(obj);
         }
 
         public bool RemoveTriggerObject(GameObject obj)
         {
-            return triggerObjects.Remove(obj);
+            return _triggerObjects.Remove(obj);
         }
 
         public bool TriggerEnterEntity(BaseGameEntity entity)
@@ -685,12 +685,12 @@ namespace MultiplayerARPG
             if (reasons == DestroyObjectReasons.RequestedToDestroy)
             {
                 // Chain destroy
-                foreach (BuildingEntity child in children)
+                foreach (BuildingEntity child in _children)
                 {
                     if (child == null || !child.destroyWhenParentDestroyed) continue;
                     child.Destroy();
                 }
-                children.Clear();
+                _children.Clear();
                 CurrentGameManager.DestroyBuildingEntity(Id, IsSceneObject);
             }
         }
