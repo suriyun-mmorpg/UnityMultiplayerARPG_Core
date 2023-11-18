@@ -65,6 +65,7 @@ namespace MultiplayerARPG
         protected bool _defaultReceiveShadows;
         protected Color _defaultColor;
 
+        protected Color[] _defaultColorForExtraRenderers;
         protected ShadowCastingMode[] _defaultShadowCastingModeForExtraRenderers;
         protected bool[] _defaultReceiveShadowsForExtraRenderers;
 
@@ -100,6 +101,7 @@ namespace MultiplayerARPG
             else if (tilemap != null)
             {
                 _defaultColor = tilemap.color;
+                PrepareDefaultExtraTilemapsValues();
             }
 
             CurrentState = State.Unknow;
@@ -137,14 +139,29 @@ namespace MultiplayerARPG
         {
             if (extraSpriteRenderers == null || extraSpriteRenderers.Length == 0)
                 return;
+            _defaultColorForExtraRenderers = new Color[0];
             _defaultShadowCastingModeForExtraRenderers = new ShadowCastingMode[extraSpriteRenderers.Length];
             _defaultReceiveShadowsForExtraRenderers = new bool[extraSpriteRenderers.Length];
             for (int i = 0; i < extraSpriteRenderers.Length; ++i)
             {
                 if (extraSpriteRenderers[i] == null)
                     continue;
+                _defaultColorForExtraRenderers[i] = extraSpriteRenderers[i].color;
                 _defaultShadowCastingModeForExtraRenderers[i] = extraSpriteRenderers[i].shadowCastingMode;
                 _defaultReceiveShadowsForExtraRenderers[i] = extraSpriteRenderers[i].receiveShadows;
+            }
+        }
+
+        private void PrepareDefaultExtraTilemapsValues()
+        {
+            if (extraTilemaps == null || extraTilemaps.Length == 0)
+                return;
+            _defaultColorForExtraRenderers = new Color[0];
+            for (int i = 0; i < extraTilemaps.Length; ++i)
+            {
+                if (extraTilemaps[i] == null)
+                    continue;
+                _defaultColorForExtraRenderers[i] = extraTilemaps[i].color;
             }
         }
 
@@ -256,7 +273,7 @@ namespace MultiplayerARPG
                 switch (state)
                 {
                     case State.Default:
-                        comp.color = _defaultColor;
+                        comp.color = _defaultColorForExtraRenderers[i];
                         comp.shadowCastingMode = _defaultShadowCastingModeForExtraRenderers[i];
                         comp.receiveShadows = _defaultReceiveShadowsForExtraRenderers[i];
                         break;
@@ -287,7 +304,7 @@ namespace MultiplayerARPG
                 switch (state)
                 {
                     case State.Default:
-                        comp.color = _defaultColor;
+                        comp.color = _defaultColorForExtraRenderers[i];
                         break;
                     case State.CanBuild:
                         comp.color = canBuildColor;
