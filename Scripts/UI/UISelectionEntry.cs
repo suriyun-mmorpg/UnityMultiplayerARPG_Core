@@ -76,7 +76,7 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
         if (selectionManager != null)
         {
             UISelectionMode selectionMode = selectionManager.selectionMode;
-            if (selectionMode != UISelectionMode.Toggle && IsSelected)
+            if (selectionMode == UISelectionMode.Toggle && IsSelected)
                 selectionManager.Deselect(this);
             else if (!IsSelected)
                 selectionManager.Select(this);
