@@ -14,46 +14,46 @@ namespace MultiplayerARPG
             CanBuild,
             CannotBuild,
         }
-        private Material[] defaultMaterials;
-        private ShadowCastingMode defaultShadowCastingMode;
-        private bool defaultReceiveShadows;
-        private Color defaultColor;
 
-        [Header("Materials Settings (for 3D)")]
+        [Header("3D Settings")]
         public Material[] canBuildMaterials;
         public Material[] cannotBuildMaterials;
+        public Renderer meshRenderer;
 
-        [Header("Color Settings (for 2D)")]
+        private Material[] _defaultMaterials;
+        private ShadowCastingMode _defaultShadowCastingMode;
+        private bool _defaultReceiveShadows;
+
+        [Header("2D Settings")]
         public Color canBuildColor = Color.green;
         public Color cannotBuildColor = Color.red;
-
-        [Header("Renderer Components")]
-        public Renderer meshRenderer;
         public SpriteRenderer spriteRenderer;
         public Tilemap tilemap;
+
+        private Color _defaultColor;
 
         [Header("Build Mode Settings")]
         [Range(0.1f, 1f)]
         [Tooltip("It will be used to reduce collider's bounds when find other intersecting building materials")]
         public float boundsSizeRateWhilePlacing = 0.9f;
 
-        private State currentState;
+        private State _currentState;
         public State CurrentState
         {
-            get { return currentState; }
+            get { return _currentState; }
             set
             {
-                if (currentState == value)
+                if (_currentState == value)
                     return;
-                currentState = value;
+                _currentState = value;
                 if (meshRenderer != null)
                 {
-                    switch (currentState)
+                    switch (_currentState)
                     {
                         case State.Default:
-                            meshRenderer.sharedMaterials = defaultMaterials;
-                            meshRenderer.shadowCastingMode = defaultShadowCastingMode;
-                            meshRenderer.receiveShadows = defaultReceiveShadows;
+                            meshRenderer.sharedMaterials = _defaultMaterials;
+                            meshRenderer.shadowCastingMode = _defaultShadowCastingMode;
+                            meshRenderer.receiveShadows = _defaultReceiveShadows;
                             break;
                         case State.CanBuild:
                             meshRenderer.sharedMaterials = canBuildMaterials;
@@ -70,12 +70,12 @@ namespace MultiplayerARPG
 
                 if (spriteRenderer != null)
                 {
-                    switch (currentState)
+                    switch (_currentState)
                     {
                         case State.Default:
-                            spriteRenderer.color = defaultColor;
-                            spriteRenderer.shadowCastingMode = defaultShadowCastingMode;
-                            spriteRenderer.receiveShadows = defaultReceiveShadows;
+                            spriteRenderer.color = _defaultColor;
+                            spriteRenderer.shadowCastingMode = _defaultShadowCastingMode;
+                            spriteRenderer.receiveShadows = _defaultReceiveShadows;
                             break;
                         case State.CanBuild:
                             spriteRenderer.color = canBuildColor;
@@ -92,10 +92,10 @@ namespace MultiplayerARPG
 
                 if (tilemap != null)
                 {
-                    switch (currentState)
+                    switch (_currentState)
                     {
                         case State.Default:
-                            tilemap.color = defaultColor;
+                            tilemap.color = _defaultColor;
                             break;
                         case State.CanBuild:
                             tilemap.color = canBuildColor;
@@ -124,24 +124,24 @@ namespace MultiplayerARPG
                 meshRenderer = GetComponent<MeshRenderer>();
             if (meshRenderer != null)
             {
-                defaultMaterials = meshRenderer.sharedMaterials;
-                defaultShadowCastingMode = meshRenderer.shadowCastingMode;
-                defaultReceiveShadows = meshRenderer.receiveShadows;
+                _defaultMaterials = meshRenderer.sharedMaterials;
+                _defaultShadowCastingMode = meshRenderer.shadowCastingMode;
+                _defaultReceiveShadows = meshRenderer.receiveShadows;
             }
 
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
             if (spriteRenderer != null)
             {
-                defaultColor = spriteRenderer.color;
-                defaultShadowCastingMode = spriteRenderer.shadowCastingMode;
-                defaultReceiveShadows = spriteRenderer.receiveShadows;
+                _defaultColor = spriteRenderer.color;
+                _defaultShadowCastingMode = spriteRenderer.shadowCastingMode;
+                _defaultReceiveShadows = spriteRenderer.receiveShadows;
             }
 
             if (tilemap == null)
                 tilemap = GetComponent<Tilemap>();
             if (tilemap != null)
-                defaultColor = tilemap.color;
+                _defaultColor = tilemap.color;
 
             CurrentState = State.Unknow;
             CurrentState = State.Default;
