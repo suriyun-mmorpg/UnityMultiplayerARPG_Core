@@ -16,6 +16,10 @@ namespace MultiplayerARPG
 
         [Category(5, "Building Settings")]
         [SerializeField]
+        [Tooltip("Set it more than `0` to make it uses this value instead of `GameInstance` -> `conversationDistance` as its activatable distance")]
+        protected float activatableDistance = 0f;
+
+        [SerializeField]
         [Tooltip("If this is `TRUE` this building entity will be able to build on any surface. But when constructing, if player aimming on building area it will place on building area")]
         protected bool canBuildOnAnySurface = false;
 
@@ -708,7 +712,10 @@ namespace MultiplayerARPG
 
         public virtual float GetActivatableDistance()
         {
-            return GameInstance.Singleton.conversationDistance;
+            if (activatableDistance > 0f)
+                return activatableDistance;
+            else
+                return GameInstance.Singleton.conversationDistance;
         }
 
         public virtual bool ShouldClearTargetAfterActivated()

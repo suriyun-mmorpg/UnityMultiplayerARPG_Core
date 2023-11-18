@@ -7,23 +7,42 @@ namespace MultiplayerARPG
     public class WarpPortalEntity : BaseGameEntity, IActivatableEntity
     {
         [Category(5, "Warp Portal Settings")]
+        [SerializeField]
+        [Tooltip("Set it more than `0` to make it uses this value instead of `GameInstance` -> `conversationDistance` as its activatable distance")]
+        private float activatableDistance = 0f;
+
+        [SerializeField]
         [Tooltip("Signal to tell players that their character can enter the portal")]
-        public GameObject[] warpSignals;
+        private GameObject[] warpSignals;
+
+        [SerializeField]
         [Tooltip("If this is `TRUE`, character will warp immediately when enter this warp portal")]
-        public bool warpImmediatelyWhenEnter;
+        private bool warpImmediatelyWhenEnter;
+
+        [SerializeField]
         [FormerlySerializedAs("type")]
-        public WarpPortalType warpPortalType;
+        private WarpPortalType warpPortalType;
+
+        [SerializeField]
         [Tooltip("Map which character will warp to when use the warp portal, leave this empty to warp character to other position in the same map")]
         [FormerlySerializedAs("mapInfo")]
-        public BaseMapInfo warpToMapInfo;
+        private BaseMapInfo warpToMapInfo;
+
+        [SerializeField]
         [Tooltip("Position which character will warp to when use the warp portal")]
         [FormerlySerializedAs("position")]
-        public Vector3 warpToPosition;
+        private Vector3 warpToPosition;
+
+        [SerializeField]
         [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
-        public bool warpOverrideRotation;
+        private bool warpOverrideRotation;
+
+        [SerializeField]
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
-        public Vector3 warpToRotation;
-        public WarpPointByCondition[] warpPointsByCondition = new WarpPointByCondition[0];
+        private Vector3 warpToRotation;
+
+        [SerializeField]
+        private WarpPointByCondition[] warpPointsByCondition = new WarpPointByCondition[0];
 
         [System.NonSerialized]
         private Dictionary<int, List<WarpPointByCondition>> _cacheWarpPointsByCondition;

@@ -10,6 +10,10 @@ namespace MultiplayerARPG
     {
         [Category(5, "Vehicle Settings")]
         [SerializeField]
+        [Tooltip("Set it more than `0` to make it uses this value instead of `GameInstance` -> `conversationDistance` as its activatable distance")]
+        private float activatableDistance = 0f;
+
+        [SerializeField]
         protected VehicleType vehicleType = null;
         public VehicleType VehicleType { get { return vehicleType; } }
 
@@ -357,7 +361,10 @@ namespace MultiplayerARPG
 
         public virtual float GetActivatableDistance()
         {
-            return GameInstance.Singleton.conversationDistance;
+            if (activatableDistance > 0f)
+                return activatableDistance;
+            else
+                return GameInstance.Singleton.conversationDistance;
         }
 
         public virtual bool ShouldClearTargetAfterActivated()

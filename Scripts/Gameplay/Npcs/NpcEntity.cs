@@ -9,6 +9,10 @@ namespace MultiplayerARPG
     {
         [Category(5, "NPC Settings")]
         [SerializeField]
+        [Tooltip("Set it more than `0` to make it uses this value instead of `GameInstance` -> `conversationDistance` as its activatable distance")]
+        private float activatableDistance = 0f;
+
+        [SerializeField]
         [Tooltip("It will use `startDialog` if `graph` is empty")]
         private BaseNpcDialog startDialog;
         [SerializeField]
@@ -19,9 +23,11 @@ namespace MultiplayerARPG
         [SerializeField]
         [FormerlySerializedAs("uiElementTransform")]
         private Transform characterUiTransform = null;
+
         [SerializeField]
         [FormerlySerializedAs("miniMapElementContainer")]
         private Transform miniMapUiTransform = null;
+
         [SerializeField]
         private Transform questIndicatorContainer = null;
 
@@ -299,7 +305,10 @@ namespace MultiplayerARPG
 
         public virtual float GetActivatableDistance()
         {
-            return GameInstance.Singleton.conversationDistance;
+            if (activatableDistance > 0f)
+                return activatableDistance;
+            else
+                return GameInstance.Singleton.conversationDistance;
         }
 
         public virtual bool ShouldClearTargetAfterActivated()
