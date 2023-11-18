@@ -212,7 +212,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetupExtraMeshRenderersByState(State state)
+        protected void SetupExtraMeshRenderersByState(State state)
         {
             if (extraMeshRenderers == null || extraMeshRenderers.Length == 0)
                 return;
@@ -243,7 +243,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetupExtraSpriteRenderersByState(State state)
+        protected void SetupExtraSpriteRenderersByState(State state)
         {
             if (extraSpriteRenderers == null || extraSpriteRenderers.Length == 0)
                 return;
@@ -274,7 +274,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void SetupExtraTilemapsByState(State state)
+        protected void SetupExtraTilemapsByState(State state)
         {
             if (extraTilemaps == null || extraTilemaps.Length == 0)
                 return;
