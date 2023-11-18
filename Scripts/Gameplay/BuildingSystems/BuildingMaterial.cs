@@ -111,7 +111,7 @@ namespace MultiplayerARPG
         public BuildingEntity BuildingEntity { get; private set; }
         public NavMeshObstacle CacheNavMeshObstacle { get; private set; }
 
-        private BuildingMaterialBuildModeHandler buildModeHandler;
+        private BuildingMaterialBuildModeHandler _buildModeHandler;
 
         public override void Setup(byte index)
         {
@@ -151,10 +151,10 @@ namespace MultiplayerARPG
                 if (CacheNavMeshObstacle != null)
                     CacheNavMeshObstacle.enabled = false;
 
-                if (buildModeHandler == null)
+                if (_buildModeHandler == null)
                 {
-                    buildModeHandler = gameObject.AddComponent<BuildingMaterialBuildModeHandler>();
-                    buildModeHandler.Setup(this);
+                    _buildModeHandler = gameObject.AddComponent<BuildingMaterialBuildModeHandler>();
+                    _buildModeHandler.Setup(this);
                 }
             }
         }
