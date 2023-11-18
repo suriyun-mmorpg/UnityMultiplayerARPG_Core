@@ -15,9 +15,34 @@ namespace MultiplayerARPG
         [SerializeField]
         [Tooltip("It will use `startDialog` if `graph` is empty")]
         private BaseNpcDialog startDialog;
+        public BaseNpcDialog StartDialog
+        {
+            get
+            {
+                if (graph != null && graph.nodes != null && graph.nodes.Count > 0)
+                    return graph.nodes[0] as BaseNpcDialog;
+                return startDialog;
+            }
+            set
+            {
+                startDialog = value;
+            }
+        }
+
         [SerializeField]
         [Tooltip("It will use `graph` start dialog if this is not empty")]
         private NpcDialogGraph graph;
+        public NpcDialogGraph Graph
+        {
+            get
+            {
+                return graph;
+            }
+            set
+            {
+                graph = value;
+            }
+        }
 
         [Category("Relative GameObjects/Transforms")]
         [SerializeField]
@@ -34,31 +59,7 @@ namespace MultiplayerARPG
         private UINpcEntity _uiNpcEntity;
         private NpcQuestIndicator _questIndicator;
 
-        public BaseNpcDialog StartDialog
-        {
-            get
-            {
-                if (graph != null && graph.nodes != null && graph.nodes.Count > 0)
-                    return graph.nodes[0] as BaseNpcDialog;
-                return startDialog;
-            }
-            set
-            {
-                startDialog = value;
-            }
-        }
 
-        public NpcDialogGraph Graph
-        {
-            get
-            {
-                return graph;
-            }
-            set
-            {
-                graph = value;
-            }
-        }
 
         public Transform CharacterUiTransform
         {
