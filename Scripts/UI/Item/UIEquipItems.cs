@@ -26,14 +26,14 @@ namespace MultiplayerARPG
             }
         }
 
-        private Dictionary<string, UICharacterItem> cacheEquipItemSlots;
+        private Dictionary<string, UICharacterItem> _cacheEquipItemSlots;
         public Dictionary<string, UICharacterItem> CacheEquipItemSlots
         {
             get
             {
-                if (cacheEquipItemSlots == null)
+                if (_cacheEquipItemSlots == null)
                 {
-                    cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
+                    _cacheEquipItemSlots = new Dictionary<string, UICharacterItem>();
                     CacheSelectionManager.Clear();
                     // Weapons
                     foreach (UIEquipWeaponsPair currentEquipWeaponSlots in equipWeaponSlots)
@@ -49,31 +49,31 @@ namespace MultiplayerARPG
                         tempEquipPosition = GetEquipPosition(otherEquipSlot.armorType.EquipPosition, tempEquipSlotIndex);
                         if (!string.IsNullOrEmpty(tempEquipPosition) &&
                             otherEquipSlot.ui != null &&
-                            !cacheEquipItemSlots.ContainsKey(tempEquipPosition))
+                            !_cacheEquipItemSlots.ContainsKey(tempEquipPosition))
                         {
                             otherEquipSlot.ui.Setup(CreateEmptyUIData(InventoryType.EquipItems), Character, -1);
                             otherEquipSlot.ui.SetupAsEquipSlot(otherEquipSlot.armorType.EquipPosition, tempEquipSlotIndex);
                             UICharacterItemDragHandler dragHandler = otherEquipSlot.ui.GetComponentInChildren<UICharacterItemDragHandler>();
                             if (dragHandler != null)
                                 dragHandler.SetupForEquipItems(otherEquipSlot.ui);
-                            cacheEquipItemSlots.Add(tempEquipPosition, otherEquipSlot.ui);
+                            _cacheEquipItemSlots.Add(tempEquipPosition, otherEquipSlot.ui);
                             CacheSelectionManager.Add(otherEquipSlot.ui);
                         }
                     }
                 }
-                return cacheEquipItemSlots;
+                return _cacheEquipItemSlots;
             }
         }
 
-        private UICharacterItemSelectionManager cacheSelectionManager;
+        private UICharacterItemSelectionManager _cacheSelectionManager;
         public UICharacterItemSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(ICharacterData character)
         {
-            this.Character = character;
+            Character = character;
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
             // Clear slots data
             UICharacterItem equipSlot;
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             UICharacterItemDragHandler dragHandler = slot.GetComponentInChildren<UICharacterItemDragHandler>();
             if (dragHandler != null)
                 dragHandler.SetupForEquipItems(slot);
-            cacheEquipItemSlots.Add(GetEquipPosition(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeaponSet), slot);
+            _cacheEquipItemSlots.Add(GetEquipPosition(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeaponSet), slot);
             CacheSelectionManager.Add(slot);
         }
 
