@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.Rendering;
+using UnityEngine.Serialization;
 using UnityEngine.Tilemaps;
 
 namespace MultiplayerARPG
@@ -18,19 +19,24 @@ namespace MultiplayerARPG
         [Header("3D Settings")]
         public Material[] canBuildMaterials;
         public Material[] cannotBuildMaterials;
-        public Renderer meshRenderer;
-
-        private Material[] _defaultMaterials;
-        private ShadowCastingMode _defaultShadowCastingMode;
-        private bool _defaultReceiveShadows;
 
         [Header("2D Settings")]
         public Color canBuildColor = Color.green;
         public Color cannotBuildColor = Color.red;
+
+        [Header("Render Components, Only 1 kind will being used.")]
+        public MeshRenderer meshRenderer;
         public SpriteRenderer spriteRenderer;
         public Tilemap tilemap;
 
-        private Color _defaultColor;
+        [Header("Extra Renderers")]
+        [Tooltip("This will being used if `meshRenderer` is set, these mesh renderers must uses the same set of materials with `meshRenderer` to make it works properly")]
+        [FormerlySerializedAs("meshRendererList")]
+        public MeshRenderer[] extraMeshRenderers = new MeshRenderer[0];
+        [Tooltip("This will being used if `spriteRenderer` is set")]
+        public SpriteRenderer[] extraSpriteRenderers = new SpriteRenderer[0];
+        [Tooltip("This will being used if `tilemap` is set")]
+        public Tilemap[] extraTilemaps = new Tilemap[0];
 
         [Header("Build Mode Settings")]
         [Range(0.1f, 1f)]
@@ -46,72 +52,21 @@ namespace MultiplayerARPG
                 if (_currentState == value)
                     return;
                 _currentState = value;
-                if (meshRenderer != null)
-                {
-                    switch (_currentState)
-                    {
-                        case State.Default:
-                            meshRenderer.sharedMaterials = _defaultMaterials;
-                            meshRenderer.shadowCastingMode = _defaultShadowCastingMode;
-                            meshRenderer.receiveShadows = _defaultReceiveShadows;
-                            break;
-                        case State.CanBuild:
-                            meshRenderer.sharedMaterials = canBuildMaterials;
-                            meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
-                            meshRenderer.receiveShadows = false;
-                            break;
-                        case State.CannotBuild:
-                            meshRenderer.sharedMaterials = cannotBuildMaterials;
-                            meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
-                            meshRenderer.receiveShadows = false;
-                            break;
-                    }
-                }
-
-                if (spriteRenderer != null)
-                {
-                    switch (_currentState)
-                    {
-                        case State.Default:
-                            spriteRenderer.color = _defaultColor;
-                            spriteRenderer.shadowCastingMode = _defaultShadowCastingMode;
-                            spriteRenderer.receiveShadows = _defaultReceiveShadows;
-                            break;
-                        case State.CanBuild:
-                            spriteRenderer.color = canBuildColor;
-                            spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
-                            spriteRenderer.receiveShadows = false;
-                            break;
-                        case State.CannotBuild:
-                            spriteRenderer.color = cannotBuildColor;
-                            spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
-                            spriteRenderer.receiveShadows = false;
-                            break;
-                    }
-                }
-
-                if (tilemap != null)
-                {
-                    switch (_currentState)
-                    {
-                        case State.Default:
-                            tilemap.color = _defaultColor;
-                            break;
-                        case State.CanBuild:
-                            tilemap.color = canBuildColor;
-                            break;
-                        case State.CannotBuild:
-                            tilemap.color = cannotBuildColor;
-                            break;
-                    }
-                }
+                SetupRenderersByState(_currentState);
             }
         }
 
         public BuildingEntity BuildingEntity { get; private set; }
         public NavMeshObstacle CacheNavMeshObstacle { get; private set; }
 
-        private BuildingMaterialBuildModeHandler _buildModeHandler;
+        protected BuildingMaterialBuildModeHandler _buildModeHandler;
+        protected Material[] _defaultMaterials;
+        protected ShadowCastingMode _defaultShadowCastingMode;
+        protected bool _defaultReceiveShadows;
+        protected Color _defaultColor;
+
+        protected ShadowCastingMode[] _defaultShadowCastingModeForExtraRenderers;
+        protected bool[] _defaultReceiveShadowsForExtraRenderers;
 
         public override void Setup(byte index)
         {
@@ -120,28 +75,32 @@ namespace MultiplayerARPG
             BuildingEntity.RegisterMaterial(this);
             CacheNavMeshObstacle = GetComponent<NavMeshObstacle>();
 
+            // Find target renderer
             if (meshRenderer == null)
                 meshRenderer = GetComponent<MeshRenderer>();
+            if (spriteRenderer == null)
+                spriteRenderer = GetComponent<SpriteRenderer>();
+            if (tilemap == null)
+                tilemap = GetComponent<Tilemap>();
+
             if (meshRenderer != null)
             {
                 _defaultMaterials = meshRenderer.sharedMaterials;
                 _defaultShadowCastingMode = meshRenderer.shadowCastingMode;
                 _defaultReceiveShadows = meshRenderer.receiveShadows;
+                PrepareDefaultExtraMeshRenderersValues();
             }
-
-            if (spriteRenderer == null)
-                spriteRenderer = GetComponent<SpriteRenderer>();
-            if (spriteRenderer != null)
+            else if (spriteRenderer != null)
             {
                 _defaultColor = spriteRenderer.color;
                 _defaultShadowCastingMode = spriteRenderer.shadowCastingMode;
                 _defaultReceiveShadows = spriteRenderer.receiveShadows;
+                PrepareDefaultExtraSpriteRenderersValues();
             }
-
-            if (tilemap == null)
-                tilemap = GetComponent<Tilemap>();
-            if (tilemap != null)
+            else if (tilemap != null)
+            {
                 _defaultColor = tilemap.color;
+            }
 
             CurrentState = State.Unknow;
             CurrentState = State.Default;
@@ -155,6 +114,187 @@ namespace MultiplayerARPG
                 {
                     _buildModeHandler = gameObject.AddComponent<BuildingMaterialBuildModeHandler>();
                     _buildModeHandler.Setup(this);
+                }
+            }
+        }
+
+        private void PrepareDefaultExtraMeshRenderersValues()
+        {
+            if (extraMeshRenderers == null || extraMeshRenderers.Length == 0)
+                return;
+            _defaultShadowCastingModeForExtraRenderers = new ShadowCastingMode[extraMeshRenderers.Length];
+            _defaultReceiveShadowsForExtraRenderers = new bool[extraMeshRenderers.Length];
+            for (int i = 0; i < extraMeshRenderers.Length; ++i)
+            {
+                if (extraMeshRenderers[i] == null)
+                    continue;
+                _defaultShadowCastingModeForExtraRenderers[i] = extraMeshRenderers[i].shadowCastingMode;
+                _defaultReceiveShadowsForExtraRenderers[i] = extraMeshRenderers[i].receiveShadows;
+            }
+        }
+
+        private void PrepareDefaultExtraSpriteRenderersValues()
+        {
+            if (extraSpriteRenderers == null || extraSpriteRenderers.Length == 0)
+                return;
+            _defaultShadowCastingModeForExtraRenderers = new ShadowCastingMode[extraSpriteRenderers.Length];
+            _defaultReceiveShadowsForExtraRenderers = new bool[extraSpriteRenderers.Length];
+            for (int i = 0; i < extraSpriteRenderers.Length; ++i)
+            {
+                if (extraSpriteRenderers[i] == null)
+                    continue;
+                _defaultShadowCastingModeForExtraRenderers[i] = extraSpriteRenderers[i].shadowCastingMode;
+                _defaultReceiveShadowsForExtraRenderers[i] = extraSpriteRenderers[i].receiveShadows;
+            }
+        }
+
+        public virtual void SetupRenderersByState(State state)
+        {
+            if (meshRenderer != null)
+            {
+                switch (state)
+                {
+                    case State.Default:
+                        meshRenderer.sharedMaterials = _defaultMaterials;
+                        meshRenderer.shadowCastingMode = _defaultShadowCastingMode;
+                        meshRenderer.receiveShadows = _defaultReceiveShadows;
+                        break;
+                    case State.CanBuild:
+                        meshRenderer.sharedMaterials = canBuildMaterials;
+                        meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+                        meshRenderer.receiveShadows = false;
+                        break;
+                    case State.CannotBuild:
+                        meshRenderer.sharedMaterials = cannotBuildMaterials;
+                        meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
+                        meshRenderer.receiveShadows = false;
+                        break;
+                }
+                SetupExtraMeshRenderersByState(state);
+            }
+            else if (spriteRenderer != null)
+            {
+                switch (state)
+                {
+                    case State.Default:
+                        spriteRenderer.color = _defaultColor;
+                        spriteRenderer.shadowCastingMode = _defaultShadowCastingMode;
+                        spriteRenderer.receiveShadows = _defaultReceiveShadows;
+                        break;
+                    case State.CanBuild:
+                        spriteRenderer.color = canBuildColor;
+                        spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
+                        spriteRenderer.receiveShadows = false;
+                        break;
+                    case State.CannotBuild:
+                        spriteRenderer.color = cannotBuildColor;
+                        spriteRenderer.shadowCastingMode = ShadowCastingMode.Off;
+                        spriteRenderer.receiveShadows = false;
+                        break;
+                }
+                SetupExtraSpriteRenderersByState(state);
+            }
+            else if (tilemap != null)
+            {
+                switch (state)
+                {
+                    case State.Default:
+                        tilemap.color = _defaultColor;
+                        break;
+                    case State.CanBuild:
+                        tilemap.color = canBuildColor;
+                        break;
+                    case State.CannotBuild:
+                        tilemap.color = cannotBuildColor;
+                        break;
+                }
+                SetupExtraTilemapsByState(state);
+            }
+        }
+
+        private void SetupExtraMeshRenderersByState(State state)
+        {
+            if (extraMeshRenderers == null || extraMeshRenderers.Length == 0)
+                return;
+            for (int i = 0; i < extraMeshRenderers.Length; ++i)
+            {
+                MeshRenderer comp = extraMeshRenderers[i];
+                if (comp == null)
+                    continue;
+
+                switch (state)
+                {
+                    case State.Default:
+                        comp.sharedMaterials = _defaultMaterials;
+                        comp.shadowCastingMode = _defaultShadowCastingModeForExtraRenderers[i];
+                        comp.receiveShadows = _defaultReceiveShadowsForExtraRenderers[i];
+                        break;
+                    case State.CanBuild:
+                        comp.sharedMaterials = canBuildMaterials;
+                        comp.shadowCastingMode = ShadowCastingMode.Off;
+                        comp.receiveShadows = false;
+                        break;
+                    case State.CannotBuild:
+                        comp.sharedMaterials = cannotBuildMaterials;
+                        comp.shadowCastingMode = ShadowCastingMode.Off;
+                        comp.receiveShadows = false;
+                        break;
+                }
+            }
+        }
+
+        private void SetupExtraSpriteRenderersByState(State state)
+        {
+            if (extraSpriteRenderers == null || extraSpriteRenderers.Length == 0)
+                return;
+            for (int i = 0; i < extraSpriteRenderers.Length; ++i)
+            {
+                SpriteRenderer comp = extraSpriteRenderers[i];
+                if (comp == null)
+                    continue;
+
+                switch (state)
+                {
+                    case State.Default:
+                        comp.color = _defaultColor;
+                        comp.shadowCastingMode = _defaultShadowCastingModeForExtraRenderers[i];
+                        comp.receiveShadows = _defaultReceiveShadowsForExtraRenderers[i];
+                        break;
+                    case State.CanBuild:
+                        comp.color = canBuildColor;
+                        comp.shadowCastingMode = ShadowCastingMode.Off;
+                        comp.receiveShadows = false;
+                        break;
+                    case State.CannotBuild:
+                        comp.color = cannotBuildColor;
+                        comp.shadowCastingMode = ShadowCastingMode.Off;
+                        comp.receiveShadows = false;
+                        break;
+                }
+            }
+        }
+
+        private void SetupExtraTilemapsByState(State state)
+        {
+            if (extraTilemaps == null || extraTilemaps.Length == 0)
+                return;
+            for (int i = 0; i < extraTilemaps.Length; ++i)
+            {
+                Tilemap comp = extraTilemaps[i];
+                if (comp == null)
+                    continue;
+
+                switch (state)
+                {
+                    case State.Default:
+                        comp.color = _defaultColor;
+                        break;
+                    case State.CanBuild:
+                        comp.color = canBuildColor;
+                        break;
+                    case State.CannotBuild:
+                        comp.color = cannotBuildColor;
+                        break;
                 }
             }
         }
