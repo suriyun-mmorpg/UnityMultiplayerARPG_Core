@@ -11,6 +11,7 @@ namespace MultiplayerARPG
             HotkeyJoystickEventHandler = GetComponent<IHotkeyJoystickEventHandler>();
             if (HotkeyJoystickEventHandler != null)
                 UICharacterHotkeys.s_hotkeyJoystickForDialogControlling = HotkeyJoystickEventHandler;
+            gameObject.SetActive(false);
         }
     }
 }

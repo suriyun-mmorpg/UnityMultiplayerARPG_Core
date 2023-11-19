@@ -126,6 +126,8 @@ namespace MultiplayerARPG
             // but now it is a variable for a prefab.
             if (hotkeyAimJoyStickPrefab != null)
                 hotkeyAimJoyStickPrefab.gameObject.SetActive(false);
+            if (hotkeyCancelArea != null)
+                hotkeyCancelArea.gameObject.SetActive(false);
         }
 
         protected virtual void OnEnable()
