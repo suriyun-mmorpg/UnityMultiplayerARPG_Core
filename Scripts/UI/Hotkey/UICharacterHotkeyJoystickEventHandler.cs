@@ -19,9 +19,13 @@ namespace MultiplayerARPG
         private Vector2 _hotkeyAxes;
         private bool _hotkeyCancel;
 
-        private void Start()
+        private void Awake()
         {
             UICharacterHotkey = GetComponent<UICharacterHotkey>();
+        }
+
+        private void Start()
+        {
             _joystick = Instantiate(UICharacterHotkey.UICharacterHotkeys.hotkeyAimJoyStickPrefab, UICharacterHotkey.transform.parent);
             _joystick.gameObject.SetActive(true);
             _joystick.transform.localPosition = UICharacterHotkey.transform.localPosition;
@@ -30,8 +34,20 @@ namespace MultiplayerARPG
             _joystick.SetAsLastSiblingOnDrag = true;
             _joystick.HideWhileIdle = true;
             _joystick.Interactable = true;
-            UICharacterHotkey.UICharacterHotkeys.RegisterHotkeyJoystick(this);
+            UICharacterHotkeys.RegisterHotkeyJoystick(this);
             _hotkeyCancelArea = UICharacterHotkey.UICharacterHotkeys.hotkeyCancelArea;
+        }
+
+        private void OnEnable()
+        {
+            if (_joystick != null)
+                _joystick.gameObject.SetActive(true);
+        }
+
+        private void OnDisable()
+        {
+            if (_joystick != null)
+                _joystick.gameObject.SetActive(false);
         }
 
         public void UpdateEvent()

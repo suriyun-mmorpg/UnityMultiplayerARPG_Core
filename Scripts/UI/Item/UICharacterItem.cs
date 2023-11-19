@@ -1728,7 +1728,7 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
 
             // Controlling by hotkey controller
-            UICharacterHotkeys.SetupAndUseOtherHotkey(HotkeyType.Item, CharacterItem.id);
+            UICharacterHotkeys.SetupHotkeyForDialogControlling(HotkeyType.Item, CharacterItem.id);
         }
 
         #region Drop Item Functions

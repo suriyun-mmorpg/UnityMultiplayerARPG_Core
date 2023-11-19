@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         private void Start()
         {
             UICharacterHotkey = GetComponent<UICharacterHotkey>();
-            UICharacterHotkey.UICharacterHotkeys.RegisterHotkeyJoystick(this);
+            UICharacterHotkeys.RegisterHotkeyJoystick(this);
         }
 
         public void UpdateEvent()

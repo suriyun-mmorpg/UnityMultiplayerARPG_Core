@@ -30,20 +30,36 @@ namespace MultiplayerARPG
 
         public static UICharacterHotkey UsingHotkey { get; private set; }
         public static AimPosition HotkeyAimPosition { get; private set; }
-        private static UICharacterHotkey s_otherHotkey;
+        private static UICharacterHotkey s_hotkeyForDialogControlling;
         /// <summary>
         /// The hotkey which will be used by other components
         /// </summary>
-        public static UICharacterHotkey OtherHotkey
+        public static UICharacterHotkey HotkeyForDialogControlling
         {
             get
             {
-                if (s_otherHotkey == null)
+                if (GameInstance.UseMobileInput())
+                    return MobileHotkeyForDialogControlling.UICharacterHotkey;
+
+                if (s_hotkeyForDialogControlling == null)
                 {
-                    s_otherHotkey = new GameObject("_OtherHotkey").AddComponent<UICharacterHotkey>();
-                    s_otherHotkey.transform.localScale = Vector3.zero;
+                    s_hotkeyForDialogControlling = new GameObject("_HotkeyForDialogControlling").AddComponent<UICharacterHotkey>();
+                    s_hotkeyForDialogControlling.transform.localScale = Vector3.zero;
                 }
-                return s_otherHotkey;
+                return s_hotkeyForDialogControlling;
+            }
+        }
+        private static IHotkeyJoystickEventHandler s_mobileHotkeyForDialogControlling;
+        public static IHotkeyJoystickEventHandler MobileHotkeyForDialogControlling
+        {
+            get
+            {
+                if (s_mobileHotkeyForDialogControlling == null && hotkeyJoysticks.Count > 0)
+                {
+                    s_mobileHotkeyForDialogControlling = Instantiate(hotkeyJoysticks[0].gameObject, hotkeyJoysticks[0].transform.parent).GetComponent<IHotkeyJoystickEventHandler>();
+                    s_mobileHotkeyForDialogControlling.UICharacterHotkey.Setup(hotkeyJoysticks[0].UICharacterHotkey.UICharacterHotkeys, null, new CharacterHotkey(), -1);
+                }
+                return s_mobileHotkeyForDialogControlling;
             }
         }
         private static readonly List<IHotkeyJoystickEventHandler> hotkeyJoysticks = new List<IHotkeyJoystickEventHandler>();
@@ -225,7 +241,6 @@ namespace MultiplayerARPG
         {
             if (UsingHotkey == null)
                 return;
-
             HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
             // Click anywhere (on the map) to use skill
             if (InputManager.GetButtonDown(consoleConfirmButtonName) && !UsingHotkey.IsChanneledAbility() && !UIBlockController.IsBlockController())
@@ -237,11 +252,13 @@ namespace MultiplayerARPG
             if (UsingHotkey == null)
                 return;
             UsingHotkey.FinishAimControls(isCancel, HotkeyAimPosition);
+            if (MobileHotkeyForDialogControlling != null && MobileHotkeyForDialogControlling.UICharacterHotkey == UsingHotkey)
+                MobileHotkeyForDialogControlling.gameObject.SetActive(false);
             UsingHotkey = null;
             HotkeyAimPosition = default;
         }
 
-        public void RegisterHotkeyJoystick(IHotkeyJoystickEventHandler hotkeyJoystick)
+        public static void RegisterHotkeyJoystick(IHotkeyJoystickEventHandler hotkeyJoystick)
         {
             if (!hotkeyJoysticks.Contains(hotkeyJoystick))
                 hotkeyJoysticks.Add(hotkeyJoystick);
@@ -260,13 +277,15 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public static void SetupAndUseOtherHotkey(HotkeyType type, string relateId)
+        public static void SetupHotkeyForDialogControlling(HotkeyType type, string relateId)
         {
             CharacterHotkey hotkey = new CharacterHotkey();
             hotkey.type = type;
             hotkey.relateId = relateId;
-            OtherHotkey.Data = hotkey;
-            OtherHotkey.OnClickUse();
+            if (MobileHotkeyForDialogControlling != null)
+                MobileHotkeyForDialogControlling.gameObject.SetActive(true);
+            HotkeyForDialogControlling.Data = hotkey;
+            HotkeyForDialogControlling.OnClickUse();
         }
     }
 }
