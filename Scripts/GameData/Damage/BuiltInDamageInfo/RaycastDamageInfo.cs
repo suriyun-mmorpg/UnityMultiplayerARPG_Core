@@ -186,7 +186,7 @@ namespace MultiplayerARPG
                 hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
                 hitRegData.HitObjectId = tempDamageableHitBox.GetObjectId();
                 hitRegData.HitBoxIndex = tempDamageableHitBox.Index;
-                hitRegData.Destination = tempHitPoint;
+                hitRegData.HitOrigin = tempHitPoint;
                 attacker.CallCmdPerformHitRegValidation(hitRegData);
 
                 // Prepare data to instantiate impact effects

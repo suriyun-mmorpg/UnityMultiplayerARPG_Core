@@ -189,15 +189,9 @@ namespace MultiplayerARPG
             DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(timestamp, targetTime);
             _hitBoxTransform.position = transformHistory.Bounds.center;
             _hitBoxTransform.rotation = transformHistory.Rotation;
-            Vector3 alignedHitPoint = _hitBoxTransform.InverseTransformPoint(hitData.Destination);
+            Vector3 alignedHitPoint = _hitBoxTransform.InverseTransformPoint(hitData.HitOrigin);
             float maxExtents = Mathf.Max(transformHistory.Bounds.extents.x, transformHistory.Bounds.extents.y, transformHistory.Bounds.extents.z);
-            bool isHit = Vector3.Distance(Vector3.zero, alignedHitPoint) <= maxExtents + hitValidationBuffer;
-            if (Vector3.Distance(hitData.Origin, hitData.Destination) > maxExtents + hitValidateData.DamageInfo.GetDistance())
-            {
-                // Too far, it should not hit
-                return false;
-            }
-            return isHit;
+            return Vector3.Distance(Vector3.zero, alignedHitPoint) <= maxExtents + hitValidationBuffer;
         }
 
         private static string MakeValidateId(uint attackerId, int simulateSeed)

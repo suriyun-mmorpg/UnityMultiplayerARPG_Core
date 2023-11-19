@@ -16,7 +16,8 @@ namespace MultiplayerARPG
         public long HitTimestamp { get; set; }
         public uint HitObjectId { get; set; }
         public byte HitBoxIndex { get; set; }
-        public Vector3 Destination { get; set; }
+        public Vector3 HitOrigin { get; set; }
+        public Vector3? HitDestination { get; set; }
 
         public void Serialize(NetDataWriter writer)
         {
@@ -29,7 +30,10 @@ namespace MultiplayerARPG
             writer.PutPackedLong(HitTimestamp);
             writer.PutPackedUInt(HitObjectId);
             writer.Put(HitBoxIndex);
-            writer.PutVector3(Destination);
+            writer.PutVector3(HitOrigin);
+            writer.Put(HitDestination.HasValue);
+            if (HitDestination.HasValue)
+                writer.PutVector3(HitDestination.Value);
         }
 
         public void Deserialize(NetDataReader reader)
@@ -43,7 +47,9 @@ namespace MultiplayerARPG
             HitTimestamp = reader.GetPackedLong();
             HitObjectId = reader.GetPackedUInt();
             HitBoxIndex = reader.GetByte();
-            Destination = reader.GetVector3();
+            HitOrigin = reader.GetVector3();
+            if (reader.GetBool())
+                HitDestination = reader.GetVector3();
         }
 
         public string GetHitId()
