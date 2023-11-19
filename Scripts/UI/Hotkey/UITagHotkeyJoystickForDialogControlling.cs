@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class TagHotkeyJoystickForDialogControlling : MonoBehaviour
+    public class UITagHotkeyJoystickForDialogControlling : MonoBehaviour
     {
         public IHotkeyJoystickEventHandler HotkeyJoystickEventHandler { get; private set; }
 
