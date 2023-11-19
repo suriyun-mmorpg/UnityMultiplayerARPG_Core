@@ -52,9 +52,13 @@ namespace MultiplayerARPG
             {
                 if (s_hotkeyJoystickForDialogControlling == null && hotkeyJoysticks.Count > 0)
                 {
-                    s_hotkeyJoystickForDialogControlling = Instantiate(hotkeyJoysticks[0].gameObject, hotkeyJoysticks[0].transform.parent).GetComponent<IHotkeyJoystickEventHandler>();
+                    IHotkeyJoystickEventHandler prefab = hotkeyJoysticks[0];
+                    s_hotkeyJoystickForDialogControlling = Instantiate(prefab.gameObject, prefab.transform.parent).GetComponent<IHotkeyJoystickEventHandler>();
                     s_hotkeyJoystickForDialogControlling.gameObject.name = "_HotkeyJoystickForDialogControlling";
-                    s_hotkeyJoystickForDialogControlling.UICharacterHotkey.Setup(hotkeyJoysticks[0].UICharacterHotkey.UICharacterHotkeys, null, new CharacterHotkey(), -1);
+                    s_hotkeyJoystickForDialogControlling.transform.localPosition = prefab.transform.localPosition;
+                    s_hotkeyJoystickForDialogControlling.transform.localRotation = prefab.transform.localRotation;
+                    s_hotkeyJoystickForDialogControlling.transform.localScale = prefab.transform.localScale;
+                    s_hotkeyJoystickForDialogControlling.UICharacterHotkey.Setup(prefab.UICharacterHotkey.UICharacterHotkeys, null, new CharacterHotkey(), -1);
                 }
                 return s_hotkeyJoystickForDialogControlling;
             }
