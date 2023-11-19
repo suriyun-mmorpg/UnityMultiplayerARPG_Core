@@ -39,27 +39,23 @@ namespace MultiplayerARPG
             get
             {
                 if (GameInstance.UseMobileInput())
-                    return MobileHotkeyForDialogControlling.UICharacterHotkey;
-
+                    return HotkeyJoystickForDialogControlling.UICharacterHotkey;
                 if (s_hotkeyForDialogControlling == null)
-                {
                     s_hotkeyForDialogControlling = new GameObject("_HotkeyForDialogControlling").AddComponent<UICharacterHotkey>();
-                    s_hotkeyForDialogControlling.transform.localScale = Vector3.zero;
-                }
                 return s_hotkeyForDialogControlling;
             }
         }
-        private static IHotkeyJoystickEventHandler s_mobileHotkeyForDialogControlling;
-        public static IHotkeyJoystickEventHandler MobileHotkeyForDialogControlling
+        private static IHotkeyJoystickEventHandler s_hotkeyJoystickForDialogControlling;
+        public static IHotkeyJoystickEventHandler HotkeyJoystickForDialogControlling
         {
             get
             {
-                if (s_mobileHotkeyForDialogControlling == null && hotkeyJoysticks.Count > 0)
+                if (s_hotkeyJoystickForDialogControlling == null && hotkeyJoysticks.Count > 0)
                 {
-                    s_mobileHotkeyForDialogControlling = Instantiate(hotkeyJoysticks[0].gameObject, hotkeyJoysticks[0].transform.parent).GetComponent<IHotkeyJoystickEventHandler>();
-                    s_mobileHotkeyForDialogControlling.UICharacterHotkey.Setup(hotkeyJoysticks[0].UICharacterHotkey.UICharacterHotkeys, null, new CharacterHotkey(), -1);
+                    s_hotkeyJoystickForDialogControlling = Instantiate(hotkeyJoysticks[0].gameObject, hotkeyJoysticks[0].transform.parent).GetComponent<IHotkeyJoystickEventHandler>();
+                    s_hotkeyJoystickForDialogControlling.UICharacterHotkey.Setup(hotkeyJoysticks[0].UICharacterHotkey.UICharacterHotkeys, null, new CharacterHotkey(), -1);
                 }
-                return s_mobileHotkeyForDialogControlling;
+                return s_hotkeyJoystickForDialogControlling;
             }
         }
         private static readonly List<IHotkeyJoystickEventHandler> hotkeyJoysticks = new List<IHotkeyJoystickEventHandler>();
@@ -252,8 +248,8 @@ namespace MultiplayerARPG
             if (UsingHotkey == null)
                 return;
             UsingHotkey.FinishAimControls(isCancel, HotkeyAimPosition);
-            if (MobileHotkeyForDialogControlling != null && MobileHotkeyForDialogControlling.UICharacterHotkey == UsingHotkey)
-                MobileHotkeyForDialogControlling.gameObject.SetActive(false);
+            if (HotkeyJoystickForDialogControlling != null && HotkeyJoystickForDialogControlling.UICharacterHotkey == UsingHotkey)
+                HotkeyJoystickForDialogControlling.gameObject.SetActive(false);
             UsingHotkey = null;
             HotkeyAimPosition = default;
         }
@@ -282,8 +278,8 @@ namespace MultiplayerARPG
             CharacterHotkey hotkey = new CharacterHotkey();
             hotkey.type = type;
             hotkey.relateId = relateId;
-            if (MobileHotkeyForDialogControlling != null)
-                MobileHotkeyForDialogControlling.gameObject.SetActive(true);
+            if (HotkeyJoystickForDialogControlling != null)
+                HotkeyJoystickForDialogControlling.gameObject.SetActive(true);
             HotkeyForDialogControlling.Data = hotkey;
             HotkeyForDialogControlling.OnClickUse();
         }
