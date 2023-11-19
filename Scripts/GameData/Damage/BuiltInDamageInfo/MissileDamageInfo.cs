@@ -55,13 +55,38 @@ namespace MultiplayerARPG
         {
             float dist = Vector3.Distance(hitData.Origin, hitData.Destination);
             float maxExtents = Mathf.Max(hitBox.Bounds.extents.x, hitBox.Bounds.extents.y, hitBox.Bounds.extents.z);
+            float missileHitDist = 0f;
+            switch (missileDamageEntity.hitDetectionMode)
+            {
+                case MissileDamageEntity.HitDetectionMode.SphereCast:
+                    missileHitDist = missileDamageEntity.sphereCastRadius;
+                    break;
+                case MissileDamageEntity.HitDetectionMode.BoxCast:
+                    missileHitDist = Mathf.Max(missileDamageEntity.boxCastSize.x * 0.5f, missileDamageEntity.boxCastSize.y * 0.5f, missileDamageEntity.boxCastSize.z * 0.5f);
+                    break;
+            }
             // Too far
-            if (dist > missileDistance + maxExtents)
+            if (dist > missileDistance + maxExtents + missileHitDist)
                 return false;
-            
-            float duration = (float)(hitData.HitTimestamp - hitData.LaunchTimestamp) * 0.001f;
-            // Take too short time to hit
-            if (Mathf.Abs((dist / duration) / missileSpeed) < 0.8f)
+            // TODO: how about exploding?
+            // Both hit timestamp and launch timestamp are timestamp which synced from server to client, and both can be drifted
+            // So calculated speed can be drifted too, so we have to find accpetable drifted rate for each range of missile speed
+            if (missileSpeed >= 150)
+                return true;
+            else if (missileSpeed >= 100)
+                return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 0.4);
+            else if (missileSpeed >= 50)
+                return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 0.6);
+            else
+                return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 0.8);
+        }
+
+        private bool IsAcceptHitBetweenTime(float dist, long launchTimestamp, long hitTimestamp, double acceptableRate = 0.8)
+        {
+            double duration = hitTimestamp - launchTimestamp;
+            double distInProperTimeUnit = dist * 1000;
+            double calculatedSpeed = distInProperTimeUnit / duration;
+            if (calculatedSpeed / missileSpeed < acceptableRate)
                 return false;
             return true;
         }
