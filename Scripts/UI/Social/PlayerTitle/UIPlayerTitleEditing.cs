@@ -118,7 +118,7 @@ namespace MultiplayerARPG
                 if ((selectedDataId == 0 && availableTitleIds.Contains(data.DataId)) || selectedDataId == data.DataId)
                 {
                     selectedDataId = data.DataId;
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
                 }
             });
         }

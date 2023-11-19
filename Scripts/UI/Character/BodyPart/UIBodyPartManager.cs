@@ -155,7 +155,7 @@ namespace MultiplayerARPG
                 ModelSelectionManager.Add(uiComp);
                 if (index == 0)
                 {
-                    uiComp.OnClickSelect();
+                    uiComp.SelectByManager();
                     SetupColorList();
                 }
             });
@@ -185,7 +185,7 @@ namespace MultiplayerARPG
                 ColorSelectionManager.Add(uiComp);
                 if (index == 0)
                 {
-                    uiComp.OnClickSelect();
+                    uiComp.SelectByManager();
                     OnSelectColorUI(uiComp);
                 }
             });

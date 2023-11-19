@@ -133,7 +133,7 @@ namespace MultiplayerARPG
                     }
                     CacheSelectionManager.Add(tempUI);
                     if (selectedSummonObjectId == data.objectId)
-                        tempUI.OnClickSelect();
+                        tempUI.SelectByManager();
                 }
             });
         }

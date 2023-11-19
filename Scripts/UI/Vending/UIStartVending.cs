@@ -144,7 +144,7 @@ namespace MultiplayerARPG
                     price = data.price,
                 }, GameInstance.PlayingCharacterEntity, index);
                 if (index == 0)
-                    uiComp.OnClickSelect();
+                    uiComp.SelectByManager();
             });
         }
 

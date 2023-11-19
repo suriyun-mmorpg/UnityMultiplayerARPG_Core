@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 MemberSelectionManager.Add(tempUI);
                 if (selectedId.Equals(data.id))
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
         }
 

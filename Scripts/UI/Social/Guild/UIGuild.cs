@@ -400,7 +400,7 @@ namespace MultiplayerARPG
                 uiGuildMember.Show();
                 MemberSelectionManager.Add(uiGuildMember);
                 if (selectedId.Equals(data.id))
-                    uiGuildMember.OnClickSelect();
+                    uiGuildMember.SelectByManager();
             });
 
             // Roles
@@ -415,7 +415,7 @@ namespace MultiplayerARPG
                 uiGuildRole.Show();
                 RoleSelectionManager.Add(uiGuildRole);
                 if (selectedIdx == index)
-                    uiGuildRole.OnClickSelect();
+                    uiGuildRole.SelectByManager();
             });
 
             // Skills
@@ -433,7 +433,7 @@ namespace MultiplayerARPG
                     dragHandler.SetupForSkills(uiGuildSkill);
                 SkillSelectionManager.Add(uiGuildSkill);
                 if (selectedDataId == guildSkill.DataId)
-                    uiGuildSkill.OnClickSelect();
+                    uiGuildSkill.SelectByManager();
             });
         }
 

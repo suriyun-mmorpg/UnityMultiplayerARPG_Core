@@ -95,7 +95,7 @@ namespace MultiplayerARPG
                 UIVendingItem uiComp = ui.GetComponent<UIVendingItem>();
                 uiComp.Setup(data, Data, index);
                 if (index == 0)
-                    uiComp.OnClickSelect();
+                    uiComp.SelectByManager();
             });
         }
 

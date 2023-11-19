@@ -112,7 +112,7 @@ namespace MultiplayerARPG
                         CacheSelectionManager.Add(ui);
                         // Select first UI
                         if (j == 0)
-                            ui.OnClickSelect();
+                            ui.SelectByManager();
                         ++j;
                     }
                 }

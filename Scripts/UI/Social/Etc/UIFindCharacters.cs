@@ -44,7 +44,7 @@ namespace MultiplayerARPG
                 tempUI.onFriendAdded.AddListener(OnClickFindCharacters);
                 MemberSelectionManager.Add(tempUI);
                 if (selectedId.Equals(data.id))
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
             if (memberListEmptyObject != null)
                 memberListEmptyObject.SetActive(foundCharacters.Count == 0);

@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                 bool defaultDontShowComparingEquipments = uiDialog != null ? uiDialog.dontShowComparingEquipments : false;
                 if (uiDialog != null)
                     uiDialog.dontShowComparingEquipments = true;
-                selectedUI.OnClickSelect();
+                selectedUI.SelectByManager();
                 if (uiDialog != null)
                     uiDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
             }

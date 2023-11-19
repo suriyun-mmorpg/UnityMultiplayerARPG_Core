@@ -146,15 +146,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            UICharacterCurrency tempUiCharacterCurrency;
+            UICharacterCurrency tempUI;
             CacheList.Generate(characterCurrencies, (index, data, ui) =>
             {
-                tempUiCharacterCurrency = ui.GetComponent<UICharacterCurrency>();
-                tempUiCharacterCurrency.Setup(new UICharacterCurrencyData(data, data.amount), Character, index);
-                tempUiCharacterCurrency.Show();
-                CacheSelectionManager.Add(tempUiCharacterCurrency);
-                if (selectedDataId != 0 && selectedDataId == data.dataId)
-                    tempUiCharacterCurrency.OnClickSelect();
+                tempUI = ui.GetComponent<UICharacterCurrency>();
+                tempUI.Setup(new UICharacterCurrencyData(data, data.amount), Character, index);
+                tempUI.Show();
+                CacheSelectionManager.Add(tempUI);
+                if (selectedDataId == data.dataId)
+                    tempUI.SelectByManager();
             });
         }
     }

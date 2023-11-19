@@ -58,7 +58,7 @@ namespace MultiplayerARPG
                 tempUI.onGuildRequestDeclined.AddListener(Refresh);
                 MemberSelectionManager.Add(tempUI);
                 if (selectedId.Equals(data.id))
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
             if (memberListEmptyObject != null)
                 memberListEmptyObject.SetActive(friends.Count == 0);

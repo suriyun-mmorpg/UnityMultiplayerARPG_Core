@@ -127,7 +127,7 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.CraftingItem.DataId)
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(itemCrafts.Count == 0);
