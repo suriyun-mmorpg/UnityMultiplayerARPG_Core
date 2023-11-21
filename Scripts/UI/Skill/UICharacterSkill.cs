@@ -68,6 +68,7 @@ namespace MultiplayerARPG
         public UIDamageElementAmount uiDamageAmount;
         public UIDamageElementInflictions uiDamageInflictions;
         public UIDamageElementAmounts uiAdditionalDamageAmounts;
+        public UIStatusEffectApplyings uiAttackStatusEffects;
 
         [Header("Buff/Debuff")]
         public UIBuff uiSkillBuff;
@@ -432,6 +433,19 @@ namespace MultiplayerARPG
                     uiAdditionalDamageAmounts.isBonus = false;
                     uiAdditionalDamageAmounts.Show();
                     uiAdditionalDamageAmounts.Data = additionalDamageAmounts;
+                }
+            }
+
+            if (uiAttackStatusEffects != null)
+            {
+                if (Skill == null || !Skill.TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] attackStatusEffects) || attackStatusEffects == null || attackStatusEffects.Length == 0)
+                {
+                    uiAttackStatusEffects.Hide();
+                }
+                else
+                {
+                    uiAttackStatusEffects.UpdateData(attackStatusEffects, Level, UIStatusEffectApplyingTarget.Enemy);
+                    uiAttackStatusEffects.Show();
                 }
             }
 
