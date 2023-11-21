@@ -1083,6 +1083,11 @@ namespace MultiplayerARPG
             return skillUser.MeleeDamageTransform;
         }
 
+        public virtual Vector3 GetDefaultAttackAimPosition(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, IDamageableEntity target)
+        {
+            return target.OpponentAimTransform.position;
+        }
+
         public void MakeRequirementEachLevels()
         {
             requirementEachLevels.Clear();

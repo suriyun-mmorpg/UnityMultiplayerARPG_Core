@@ -315,7 +315,7 @@ namespace MultiplayerARPG
                     Entity.UseSkill(_queueSkill.DataId, false, 0, new AimPosition()
                     {
                         type = AimPositionType.Position,
-                        position = targetEnemy.OpponentAimTransform.position,
+                        position = _queueSkill.GetDefaultAttackAimPosition(Entity, _queueSkillLevel, _isLeftHandAttacking, targetEnemy),
                     });
                 }
                 else

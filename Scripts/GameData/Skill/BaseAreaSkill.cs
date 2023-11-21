@@ -41,5 +41,10 @@ namespace MultiplayerARPG
         {
             BasePlayerCharacterController.Singleton.AreaSkillAimController.FinishAimControls(isCancel);
         }
+
+        public override Vector3 GetDefaultAttackAimPosition(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, IDamageableEntity target)
+        {
+            return target.Entity.MovementTransform.position;
+        }
     }
 }
