@@ -144,6 +144,7 @@ namespace MultiplayerARPG
                 uiModelRoot.SetActive(true);
 
             // Setup model list
+            ModelSelectionManager.DeselectSelectedUI();
             ModelSelectionManager.Clear();
             ModelList.HideAll();
             ModelList.Generate(_component.ModelOptions, (index, data, ui) =>
@@ -174,6 +175,7 @@ namespace MultiplayerARPG
                 uiColorRoot.SetActive(true);
 
             // Setup color list
+            ColorSelectionManager.DeselectSelectedUI();
             ColorSelectionManager.Clear();
             ColorList.HideAll();
             ColorList.Generate(_component.ColorOptions, (index, data, ui) =>

@@ -124,6 +124,7 @@ namespace MultiplayerARPG
 
         public void UpdateItemList()
         {
+            ItemSelectionManager.DeselectSelectedUI();
             ItemSelectionManager.Clear();
             ItemList.HideAll();
             ItemList.Generate(_items, (index, data, ui) =>

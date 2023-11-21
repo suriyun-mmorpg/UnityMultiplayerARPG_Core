@@ -88,6 +88,7 @@ namespace MultiplayerARPG
 
         public void UpdateItemList(VendingItems items)
         {
+            ItemSelectionManager.DeselectSelectedUI();
             ItemSelectionManager.Clear();
             ItemList.HideAll();
             ItemList.Generate(items, (index, data, ui) =>
