@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [Min(0f)]
-        [Tooltip("If status effect resistance is `1`, it will `100%` resist status effect level `1`. If status effect resistance is `1.5`, it will `50%` resist status effect level `2` (`100%` resist status effect level `1`).")]
+        [Tooltip("If status effect resistance is `1.5`, it will `100%` resist status effect level `1` and `50%` resist status effect level `2`.")]
         private float maxResistanceAmount = 1f;
         public float MaxResistanceAmount { get { return maxResistanceAmount; } }
 
