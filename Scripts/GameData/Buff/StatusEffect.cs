@@ -15,9 +15,16 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        [Range(0f, 1f)]
+        [Min(0f)]
+        [Tooltip("If status effect resistance is `1`, it will `100%` resist status effect level `1`. If status effect resistance is `1.5`, it will `50%` resist status effect level `2` (`100%` resist status effect level `1`).")]
         private float maxResistanceAmount = 1f;
         public float MaxResistanceAmount { get { return maxResistanceAmount; } }
+
+        [SerializeField]
+        [Range(0f, 1f)]
+        [Tooltip("If value is `[0.8, 0.5, 0.25]`, and your character's status effect resistance is `2.15`, it will have chance `80%` to resist status effect level `1`, `50%` to resist level `2`, and `15%` to resist level `3`.")]
+        private float[] maxResistanceAmountEachLevels = new float[0];
+        public float[] MaxResistanceAmountEachLevels { get { return maxResistanceAmountEachLevels; } }
 
         /// <summary>
         /// This will be called when the buff is applied to `target` (by `applier`)
