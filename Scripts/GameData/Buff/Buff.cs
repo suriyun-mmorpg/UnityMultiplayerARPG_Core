@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] increaseDamagesRate;
         [Tooltip("Increase character's status effect resistance.")]
-        [ArrayElementTitle("damageElement")]
+        [ArrayElementTitle("statusEffect")]
         public StatusEffectResistanceIncremental[] increaseStatusEffectResistances;
         [Header("Settings for Active Skills only")]
         [Tooltip("If duration less than or equals to 0, buff stats won't applied only recovery will be applied. This won't be applied to monster's summoner.")]
