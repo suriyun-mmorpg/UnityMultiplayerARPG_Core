@@ -292,9 +292,9 @@ namespace MultiplayerARPG
                 int skillLevel = Skills[tempSkill];
                 tempTotalBattlePoint += tempSkill.battlePointScore * skillLevel;
                 // Apply ailments by passive buff only
-                if (!allAilmentsWereApplied && !tempSkill.IsActive && tempSkill.IsBuff)
+                if (!allAilmentsWereApplied && !tempSkill.IsActive && tempSkill.TryGetBuff(out Buff tempBuff))
                 {
-                    UpdateAppliedAilments(new CalculatedBuff(tempSkill.Buff, skillLevel));
+                    UpdateAppliedAilments(new CalculatedBuff(tempBuff, skillLevel));
                     allAilmentsWereApplied = AllAilmentsWereApplied();
                 }
             }

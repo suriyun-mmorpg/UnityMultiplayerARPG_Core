@@ -136,33 +136,31 @@ namespace MultiplayerARPG
             get { return true; }
         }
 
-        public override bool IsDebuff
-        {
-            get { return isDebuff; }
-        }
-
-        public override Buff Debuff
-        {
-            get
-            {
-                if (!IsDebuff)
-                    return Buff.Empty;
-                return debuff;
-            }
-        }
-
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddStatusEffects(attackStatusEffects);
             areaDamageEntity.InitPrefab();
             GameInstance.AddOtherNetworkObjects(areaDamageEntity.Identity);
         }
 
-        public override void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        public override bool TryGetDebuff(out Buff debuff)
         {
-            base.OnSkillAttackHit(skillLevel, instigator, weapon, target);
-            attackStatusEffects.ApplyStatusEffect(skillLevel, instigator, weapon, target);
+            if (IsAttack && isDebuff)
+            {
+                debuff = this.debuff;
+                return true;
+            }
+            return base.TryGetDebuff(out debuff);
+        }
+
+        public override bool TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] statusEffectApplyings)
+        {
+            if (IsAttack)
+            {
+                statusEffectApplyings = attackStatusEffects;
+                return true;
+            }
+            return base.TryGetAttackStatusEffectApplyings(out statusEffectApplyings);
         }
     }
 }

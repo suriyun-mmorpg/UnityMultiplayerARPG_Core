@@ -726,8 +726,11 @@ namespace MultiplayerARPG
                         tempSkill = characterSkill.Key;
                         if (!tempSkill.IsPassive)
                             continue;
-                        tempSkill.Buff.ApplySelfStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, attacker);
-                        tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, damageReceiver);
+                        if (tempSkill.TryGetBuff(out tempBuff))
+                        {
+                            tempBuff.ApplySelfStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, attacker);
+                            tempBuff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, damageReceiver);
+                        }
                         if (attacker.IsDead())
                             break;
                     }
@@ -784,8 +787,11 @@ namespace MultiplayerARPG
                         tempSkill = characterSkill.Key;
                         if (!tempSkill.IsPassive)
                             continue;
-                        tempSkill.Buff.ApplySelfStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, damageReceiver);
-                        tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, attacker);
+                        if (tempSkill.TryGetBuff(out tempBuff))
+                        {
+                            tempBuff.ApplySelfStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, damageReceiver);
+                            tempBuff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, attacker);
+                        }
                         if (damageReceiver.IsDead())
                             break;
                     }

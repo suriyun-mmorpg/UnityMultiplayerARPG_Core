@@ -57,19 +57,9 @@ namespace MultiplayerARPG
             get { return SkillType.Active; }
         }
 
-        public override bool IsBuff
-        {
-            get { return true; }
-        }
-
         public override bool RequiredTarget
         {
             get { return true; }
-        }
-
-        public override Buff Buff
-        {
-            get { return buff; }
         }
 
         public override bool CanUse(BaseCharacterEntity character, int level, bool isLeftHand, uint targetObjectId, out UITextKeys gameMessage, bool isItem = false)
@@ -81,6 +71,12 @@ namespace MultiplayerARPG
             if (!character.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) || !targetEntity.IsDead())
                 return false;
 
+            return true;
+        }
+
+        public override bool TryGetBuff(out Buff buff)
+        {
+            buff = this.buff;
             return true;
         }
     }

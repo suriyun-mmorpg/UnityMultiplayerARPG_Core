@@ -88,35 +88,11 @@ namespace MultiplayerARPG
             uint targetObjectId,
             AimPosition aimPosition)
         {
-            // Craft item
-            if (skillType == SkillType.CraftItem &&
-                skillUser is BasePlayerCharacterEntity)
-            {
-                // Apply craft skill at server only
-                if (!skillUser.IsServer)
-                    return;
-                BasePlayerCharacterEntity castedCharacter = skillUser as BasePlayerCharacterEntity;
-                UITextKeys gameMessage;
-                if (!itemCraft.CanCraft(castedCharacter, out gameMessage))
-                {
-                    GameInstance.ServerGameMessageHandlers.SendGameMessage(skillUser.ConnectionId, gameMessage);
-                    return;
-                }
-                itemCraft.CraftItem(castedCharacter);
-                return;
-            }
-
             // Apply skills only when it's active skill
             if (skillType != SkillType.Active)
                 return;
 
-            // Apply buff, summons at server only
-            if (skillUser.IsServer)
-            {
-                ApplySkillBuff(skillUser, skillLevel, weapon, targetObjectId);
-                ApplySkillSummon(skillUser, skillLevel);
-                ApplySkillMount(skillUser, skillLevel);
-            }
+            ApplySkillBuff(skillUser, skillLevel, weapon, targetObjectId);
 
             // Apply attack skill
             if (IsAttack && TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
@@ -190,53 +166,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void ApplySkillSummon(BaseCharacterEntity skillUser, int skillLevel)
-        {
-            if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
-                return;
-            int i;
-            int amountEachTime = summon.AmountEachTime.GetAmount(skillLevel);
-            for (i = 0; i < amountEachTime; ++i)
-            {
-                CharacterSummon newSummon = CharacterSummon.Create(SummonType.Skill, DataId);
-                newSummon.Summon(skillUser, summon.Level.GetAmount(skillLevel), summon.Duration.GetAmount(skillLevel));
-                skillUser.Summons.Add(newSummon);
-            }
-            int count = 0;
-            for (i = 0; i < skillUser.Summons.Count; ++i)
-            {
-                if (skillUser.Summons[i].dataId == DataId)
-                    ++count;
-            }
-            int maxStack = summon.MaxStack.GetAmount(skillLevel);
-            int unSummonAmount = count > maxStack ? count - maxStack : 0;
-            CharacterSummon tempSummon;
-            for (i = unSummonAmount; i > 0; --i)
-            {
-                int summonIndex = skillUser.IndexOfSummon(SummonType.Skill, DataId);
-                tempSummon = skillUser.Summons[summonIndex];
-                if (summonIndex >= 0)
-                {
-                    skillUser.Summons.RemoveAt(summonIndex);
-                    tempSummon.UnSummon(skillUser);
-                }
-            }
-        }
-
-        protected void ApplySkillMount(BaseCharacterEntity skillUser, int skillLevel)
-        {
-            if (skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
-                return;
-
-            skillUser.Mount(mount.MountEntity);
-        }
-
-        public override void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
-        {
-            base.OnSkillAttackHit(skillLevel, instigator, weapon, target);
-            attackStatusEffects.ApplyStatusEffect(skillLevel, instigator, weapon, target);
-        }
-
         public override SkillType SkillType
         {
             get { return skillType; }
@@ -245,16 +174,6 @@ namespace MultiplayerARPG
         public override bool IsAttack
         {
             get { return skillAttackType != SkillAttackType.None; }
-        }
-
-        public override bool IsBuff
-        {
-            get { return skillType == SkillType.Passive || skillBuffType != SkillBuffType.None; }
-        }
-
-        public override bool IsDebuff
-        {
-            get { return IsAttack && isDebuff; }
         }
 
         public override float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
@@ -304,6 +223,66 @@ namespace MultiplayerARPG
             return increaseDamageAmountsWithBuffs;
         }
 
+        public override bool TryGetBuff(out Buff buff)
+        {
+            if (skillType == SkillType.Passive || skillBuffType != SkillBuffType.None)
+            {
+                buff = this.buff;
+                return true;
+            }
+            return base.TryGetBuff(out buff);
+        }
+
+        public override bool TryGetDebuff(out Buff debuff)
+        {
+            if (IsAttack && isDebuff)
+            {
+                debuff = this.debuff;
+                return true;
+            }
+            return base.TryGetDebuff(out debuff);
+        }
+
+        public override bool TryGetSummon(out SkillSummon summon)
+        {
+            if (this.summon.MonsterEntity != null)
+            {
+                summon = this.summon;
+                return true;
+            }
+            return base.TryGetSummon(out summon);
+        }
+
+        public override bool TryGetMount(out SkillMount mount)
+        {
+            if (this.mount.MountEntity != null)
+            {
+                mount = this.mount;
+                return true;
+            }
+            return base.TryGetMount(out mount);
+        }
+
+        public override bool TryGetItemCraft(out ItemCraft itemCraft)
+        {
+            if (this.itemCraft.CraftingItem != null)
+            {
+                itemCraft = this.itemCraft;
+                return true;
+            }
+            return base.TryGetItemCraft(out itemCraft);
+        }
+
+        public override bool TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] statusEffectApplyings)
+        {
+            if (IsAttack)
+            {
+                statusEffectApplyings = attackStatusEffects;
+                return true;
+            }
+            return base.TryGetAttackStatusEffectApplyings(out statusEffectApplyings);
+        }
+
         public override HarvestType HarvestType
         {
             get { return harvestType; }
@@ -312,41 +291,6 @@ namespace MultiplayerARPG
         public override IncrementalMinMaxFloat HarvestDamageAmount
         {
             get { return harvestDamageAmount; }
-        }
-
-        public override Buff Buff
-        {
-            get
-            {
-                if (!IsBuff)
-                    return Buff.Empty;
-                return buff;
-            }
-        }
-
-        public override Buff Debuff
-        {
-            get
-            {
-                if (!IsDebuff)
-                    return Buff.Empty;
-                return debuff;
-            }
-        }
-
-        public override SkillSummon Summon
-        {
-            get { return summon; }
-        }
-
-        public override SkillMount Mount
-        {
-            get { return mount; }
-        }
-
-        public override ItemCraft ItemCraft
-        {
-            get { return itemCraft; }
         }
 
         public override bool RequiredTarget
@@ -374,13 +318,20 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddCharacterEntities(summon.MonsterEntity);
-            GameInstance.AddVehicleEntities(mount.MountEntity);
-            GameInstance.AddItems(itemCraft.CraftingItem);
-            GameInstance.AddItems(itemCraft.RequireItems);
-            GameInstance.AddCurrencies(itemCraft.RequireCurrencies);
-            GameInstance.AddStatusEffects(attackStatusEffects);
             damageInfo.PrepareRelatesData();
+        }
+
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+#pragma warning disable CS0612 // Type or member is obsolete
+            if (skillType == SkillType.CraftItem)
+            {
+                skillType = SkillType.Active;
+                hasChanges = true;
+            }
+#pragma warning restore CS0612 // Type or member is obsolete
+            return hasChanges || base.Validate();
         }
 
         public override Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)

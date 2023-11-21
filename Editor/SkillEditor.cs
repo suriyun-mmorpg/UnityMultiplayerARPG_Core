@@ -32,25 +32,6 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmoType));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmoAmount));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmos));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeHp));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeHpRate));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeMp));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeMpRate));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeStamina));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeStaminaRate));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.coolDownDuration));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.moveSpeedRateWhileUsingSkill));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.skillCastEffects));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.castDuration));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.canBeInterruptedWhileCasting));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireShield));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableWeapons));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableArmors));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableVehicles));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireItems));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmoType));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmoAmount));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmos));
             // Normal Attack skill
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageHitEffects));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageInfo));
@@ -90,7 +71,7 @@ namespace MultiplayerARPG
             // Mount
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.mount));
             // Craft
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.itemCraft));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.itemCraft));
         }
     }
 }

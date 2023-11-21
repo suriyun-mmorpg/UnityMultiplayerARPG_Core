@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     {
         public List<string> filterCategories = new List<string>();
         public bool doNotIncludeSkills;
-        public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active, SkillType.CraftItem };
+        public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active };
         public bool doNotIncludeItems;
         public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Building, ItemType.Pet, ItemType.Mount, ItemType.Skill };
         public bool doNotIncludeGuildSkills;

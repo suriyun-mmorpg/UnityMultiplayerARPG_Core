@@ -18,16 +18,14 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case BuffType.SkillBuff:
-                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].IsBuff)
+                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].TryGetBuff(out tempBuff))
                         return;
-                    tempBuff = GameInstance.Skills[dataId].Buff;
                     isExtendDuration = tempBuff.isExtendDuration;
                     maxStack = tempBuff.GetMaxStack(level);
                     break;
                 case BuffType.SkillDebuff:
-                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].IsDebuff)
+                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].TryGetDebuff(out tempBuff))
                         return;
-                    tempBuff = GameInstance.Skills[dataId].Debuff;
                     isExtendDuration = tempBuff.isExtendDuration;
                     maxStack = tempBuff.GetMaxStack(level);
                     break;
