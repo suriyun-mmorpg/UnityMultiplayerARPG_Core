@@ -40,6 +40,10 @@ namespace MultiplayerARPG
         public UIDamageElementAmounts uiBuffDamages;
         public UIDamageElementAmounts uiBuffDamagesRate;
         public UIDamageElementAmounts uiDamageOverTimes;
+        public UIStatusEffectApplyings uiStatusEffectApplyingsSelfWhenAttacking;
+        public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacking;
+        public UIStatusEffectApplyings uiStatusEffectApplyingsSelfWhenAttacked;
+        public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacked;
         [Tooltip("This will activate if buff's disallow move is `TRUE`, developer may set text or icon here")]
         public GameObject disallowMoveObject;
         [Tooltip("This will activate if buff's disallow sprint is `TRUE`, developer may set text or icon here")]
@@ -262,6 +266,58 @@ namespace MultiplayerARPG
                     uiDamageOverTimes.isBonus = false;
                     uiDamageOverTimes.Show();
                     uiDamageOverTimes.Data = GameDataHelpers.CombineDamages(Buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+                }
+            }
+
+            if (uiStatusEffectApplyingsSelfWhenAttacking != null)
+            {
+                if (Buff.selfStatusEffectsWhenAttacking == null || Buff.selfStatusEffectsWhenAttacking.Length == 0)
+                {
+                    uiStatusEffectApplyingsSelfWhenAttacking.Hide();
+                }
+                else
+                {
+                    uiStatusEffectApplyingsSelfWhenAttacking.UpdateData(Buff.selfStatusEffectsWhenAttacking, Level, UIStatusEffectApplyingTarget.SelfWhenAttacking);
+                    uiStatusEffectApplyingsSelfWhenAttacking.Show();
+                }
+            }
+
+            if (uiStatusEffectApplyingsEnemyWhenAttacking != null)
+            {
+                if (Buff.enemyStatusEffectsWhenAttacking == null || Buff.enemyStatusEffectsWhenAttacking.Length == 0)
+                {
+                    uiStatusEffectApplyingsEnemyWhenAttacking.Hide();
+                }
+                else
+                {
+                    uiStatusEffectApplyingsEnemyWhenAttacking.UpdateData(Buff.enemyStatusEffectsWhenAttacking, Level, UIStatusEffectApplyingTarget.EnemyWhenAttacking);
+                    uiStatusEffectApplyingsEnemyWhenAttacking.Show();
+                }
+            }
+
+            if (uiStatusEffectApplyingsSelfWhenAttacked != null)
+            {
+                if (Buff.selfStatusEffectsWhenAttacked == null || Buff.selfStatusEffectsWhenAttacked.Length == 0)
+                {
+                    uiStatusEffectApplyingsSelfWhenAttacked.Hide();
+                }
+                else
+                {
+                    uiStatusEffectApplyingsSelfWhenAttacked.UpdateData(Buff.selfStatusEffectsWhenAttacked, Level, UIStatusEffectApplyingTarget.SelfWhenAttacked);
+                    uiStatusEffectApplyingsSelfWhenAttacked.Show();
+                }
+            }
+
+            if (uiStatusEffectApplyingsEnemyWhenAttacked != null)
+            {
+                if (Buff.enemyStatusEffectsWhenAttacked == null || Buff.enemyStatusEffectsWhenAttacked.Length == 0)
+                {
+                    uiStatusEffectApplyingsEnemyWhenAttacked.Hide();
+                }
+                else
+                {
+                    uiStatusEffectApplyingsEnemyWhenAttacked.UpdateData(Buff.enemyStatusEffectsWhenAttacked, Level, UIStatusEffectApplyingTarget.EnemyWhenAttacked);
+                    uiStatusEffectApplyingsEnemyWhenAttacked.Show();
                 }
             }
 

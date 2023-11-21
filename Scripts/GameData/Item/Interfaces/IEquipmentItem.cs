@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial interface IEquipmentItem : IItem, IItemWithRequirement
+    public partial interface IEquipmentItem : IItem, IItemWithRequirement, IItemWithStatusEffectApplyings
     {
         /// <summary>
         /// Equipment set, if character equipping the same set of items, it can increase extra stats to character
@@ -68,22 +68,6 @@ namespace MultiplayerARPG
         /// Increasing status effect resistances while equipping this item
         /// </summary>
         StatusEffectResistanceIncremental[] IncreaseStatusEffectResistances { get; }
-        /// <summary>
-        /// Status effects that can be applied to the attacker when attacking
-        /// </summary>
-        StatusEffectApplying[] SelfStatusEffectsWhenAttacking { get; }
-        /// <summary>
-        /// Status effects that can be applied to the enemy when attacking
-        /// </summary>
-        StatusEffectApplying[] EnemyStatusEffectsWhenAttacking { get; }
-        /// <summary>
-        /// Status effects that can be applied to the attacker when attacked
-        /// </summary>
-        StatusEffectApplying[] SelfStatusEffectsWhenAttacked { get; }
-        /// <summary>
-        /// Status effects that can be applied to the enemy when attacked
-        /// </summary>
-        StatusEffectApplying[] EnemyStatusEffectsWhenAttacked { get; }
         /// <summary>
         /// Random bonus
         /// </summary>
