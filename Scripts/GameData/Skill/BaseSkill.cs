@@ -462,11 +462,11 @@ namespace MultiplayerARPG
                 return damageAmounts;
 
             // Base attack damage amount will sum with other variables later
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand));
+            if (TryGetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand, out KeyValuePair<DamageElement, MinMaxFloat> baseDamageAmount))
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, baseDamageAmount);
 
             // Sum damage with weapon damage inflictions
-            Dictionary<DamageElement, float> damageInflictions = GetAttackWeaponDamageInflictions(skillUser, skillLevel);
-            if (damageInflictions != null && damageInflictions.Count > 0)
+            if (TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out Dictionary<DamageElement, float> damageInflictions))
             {
                 // Prepare weapon damage amount
                 KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount;
@@ -484,7 +484,8 @@ namespace MultiplayerARPG
             }
 
             // Sum damage with additional damage amounts
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GetAttackAdditionalDamageAmounts(skillUser, skillLevel));
+            if (TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, additionalDamageAmounts);
 
             // Sum damage with buffs
             if (IsIncreaseAttackDamageAmountsWithBuffs(skillUser, skillLevel))
@@ -501,19 +502,22 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)
+        public virtual bool TryGetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand, out KeyValuePair<DamageElement, MinMaxFloat> baseDamageAmount)
         {
-            return default;
+            baseDamageAmount = default;
+            return false;
         }
 
-        public virtual Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel)
+        public virtual bool TryGetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel, out Dictionary<DamageElement, float> weaponDamageInflictions)
         {
-            return default;
+            weaponDamageInflictions = null;
+            return false;
         }
 
-        public virtual Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel)
+        public virtual bool TryGetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts)
         {
-            return default;
+            additionalDamageAmounts = null;
+            return false;
         }
 
         public virtual bool TryGetBuff(out Buff buff)

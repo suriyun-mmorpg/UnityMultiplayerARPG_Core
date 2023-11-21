@@ -392,11 +392,9 @@ namespace MultiplayerARPG
                 }
             }
 
-            bool isAttack = Skill != null && Skill.IsAttack;
             if (uiDamageAmount != null)
             {
-                KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount = Skill.GetBaseAttackDamageAmount(Character, Level, false);
-                if (!isAttack)
+                if (Skill == null || !Skill.TryGetBaseAttackDamageAmount(Character, Level, false, out KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount))
                 {
                     uiDamageAmount.Hide();
                 }
@@ -409,8 +407,7 @@ namespace MultiplayerARPG
 
             if (uiDamageInflictions != null)
             {
-                Dictionary<DamageElement, float> damageInflictionRates = Skill.GetAttackWeaponDamageInflictions(Character, Level);
-                if (!isAttack || damageInflictionRates == null || damageInflictionRates.Count == 0)
+                if (Skill == null || Skill.TryGetAttackWeaponDamageInflictions(Character, Level, out Dictionary<DamageElement, float> damageInflictionRates))
                 {
                     uiDamageInflictions.Hide();
                 }
@@ -423,8 +420,7 @@ namespace MultiplayerARPG
 
             if (uiAdditionalDamageAmounts != null)
             {
-                Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts = Skill.GetAttackAdditionalDamageAmounts(Character, Level);
-                if (!isAttack || additionalDamageAmounts == null || additionalDamageAmounts.Count == 0)
+                if (Skill == null || Skill.TryGetAttackAdditionalDamageAmounts(Character, Level, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
                 {
                     uiAdditionalDamageAmounts.Hide();
                 }
