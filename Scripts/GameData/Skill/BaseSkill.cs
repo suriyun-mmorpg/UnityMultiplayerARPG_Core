@@ -546,9 +546,9 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual bool TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] statusEffectApplyings)
+        public virtual bool TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] attackStatusEffects)
         {
-            statusEffectApplyings = null;
+            attackStatusEffects = null;
             return false;
         }
 
