@@ -1087,6 +1087,12 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            if (nonEquipItem.GetItem().RestrictSelling)
+            {
+                gameMessage = UITextKeys.UI_ERROR_ITEM_SELLING_RESTRICTED;
+                return false;
+            }
+
             // Remove item from inventory
             character.DecreaseItemsByIndex(index, amount, true);
             character.FillEmptySlots();
