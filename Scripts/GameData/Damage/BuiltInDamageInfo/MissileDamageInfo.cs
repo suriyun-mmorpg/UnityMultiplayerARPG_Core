@@ -98,18 +98,8 @@ namespace MultiplayerARPG
                     return false;
                 }
             }
-            // Missile speed validation
-            // Both hit timestamp and launch timestamp are timestamp which synced from server to client, and both can be drifted
-            // So calculated speed can be drifted too, so we have to find accpetable drifted rate for each range of missile speed
-            // If it is very near or missile speed is very high
-            if (dist <= 1f || missileSpeed >= 150)
-                return true;
-            else if (missileSpeed >= 100)
-                return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 0.4);
-            else if (missileSpeed >= 50)
-                return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 0.6);
-            else
-                return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 0.8);
+            // Missile speed validation, accept if speed <= 105% (5% for lagging)
+            return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 1.05);
         }
 
         private bool IsAcceptHitBetweenTime(float dist, long launchTimestamp, long hitTimestamp, double acceptableRate)
@@ -117,10 +107,8 @@ namespace MultiplayerARPG
             double duration = hitTimestamp - launchTimestamp;
             double distInProperTimeUnit = dist * 1000;
             double calculatedSpeed = distInProperTimeUnit / duration;
-            if (calculatedSpeed / missileSpeed < acceptableRate)
-            {
+            if (calculatedSpeed / missileSpeed > acceptableRate)
                 return false;
-            }
             return true;
         }
 
