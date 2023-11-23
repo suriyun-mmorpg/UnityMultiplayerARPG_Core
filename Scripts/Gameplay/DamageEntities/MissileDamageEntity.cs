@@ -111,47 +111,47 @@ namespace MultiplayerARPG
         /// </summary>
         public virtual void HitDetect()
         {
-            if (!_destroying)
+            if (_destroying)
+                return;
+
+            if (!_previousPosition.HasValue)
+                return;
+
+            int hitCount = 0;
+            int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
+            Vector3 dir = (CacheTransform.position - _previousPosition.Value).normalized;
+            float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
+            // Raycast to previous position to check is it hitting something or not
+            // If hit, explode
+            switch (hitDetectionMode)
             {
-                if (_previousPosition.HasValue)
-                {
-                    int hitCount = 0;
-                    int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
-                    Vector3 dir = (CacheTransform.position - _previousPosition.Value).normalized;
-                    float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
-                    // Raycast to previous position to check is it hitting something or not
-                    // If hit, explode
-                    switch (hitDetectionMode)
-                    {
-                        case HitDetectionMode.Raycast:
-                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.RaycastNonAlloc(_previousPosition.Value, dir, _hits2D, dist, layerMask);
-                            else
-                                hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, layerMask);
-                            break;
-                        case HitDetectionMode.SphereCast:
-                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.CircleCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits2D, dist, layerMask);
-                            else
-                                hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, layerMask);
-                            break;
-                        case HitDetectionMode.BoxCast:
-                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.BoxCastNonAlloc(_previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, _hits2D, dist, layerMask);
-                            else
-                                hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, layerMask);
-                            break;
-                    }
-                    for (int i = 0; i < hitCount; ++i)
-                    {
-                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && _hits2D[i].transform != null)
-                            TriggerEnter(_hits2D[i].transform.gameObject);
-                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D && _hits3D[i].transform != null)
-                            TriggerEnter(_hits3D[i].transform.gameObject);
-                    }
-                }
-                _previousPosition = CacheTransform.position;
+                case HitDetectionMode.Raycast:
+                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                        hitCount = Physics2D.RaycastNonAlloc(_previousPosition.Value, dir, _hits2D, dist, layerMask);
+                    else
+                        hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, layerMask);
+                    break;
+                case HitDetectionMode.SphereCast:
+                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                        hitCount = Physics2D.CircleCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits2D, dist, layerMask);
+                    else
+                        hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, layerMask);
+                    break;
+                case HitDetectionMode.BoxCast:
+                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                        hitCount = Physics2D.BoxCastNonAlloc(_previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, _hits2D, dist, layerMask);
+                    else
+                        hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, layerMask);
+                    break;
             }
+            for (int i = 0; i < hitCount; ++i)
+            {
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && _hits2D[i].transform != null)
+                    TriggerEnter(_hits2D[i].transform.gameObject);
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D && _hits3D[i].transform != null)
+                    TriggerEnter(_hits3D[i].transform.gameObject);
+            }
+            _previousPosition = CacheTransform.position;
         }
 
         protected virtual void Update()
