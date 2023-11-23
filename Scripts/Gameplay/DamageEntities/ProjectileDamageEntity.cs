@@ -166,17 +166,21 @@ namespace MultiplayerARPG
 
                     // Already hit something
                     if (_destroying)
-                        return;
-                }
-
-                // Moved too far from `initialPosition`
-                if (Vector3.Distance(_initialPosition, point2) > _missileDistance)
-                {
-                    NoImpact();
-                    return;
+                        break;
                 }
 
                 point1 = point2;
+
+                // Already hit something
+                if (_destroying)
+                    break;
+
+                // Moved too far from `_initialPosition`
+                if (Vector3.Distance(_initialPosition, point1) > _missileDistance)
+                {
+                    NoImpact();
+                    break;
+                }
             }
             CacheTransform.rotation = Quaternion.LookRotation(_bulletVelocity);
             CacheTransform.position = point1;
