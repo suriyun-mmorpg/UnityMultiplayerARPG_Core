@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             int overlapMask = GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.playingLayer.Mask | GameInstance.Singleton.monsterLayer.Mask;
             EntityInfo instigator = skillUser.GetInfo();
             List<BaseCharacterEntity> tempCharacters;
-            bool foundTarget = skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out BaseCharacterEntity targetEntity) && !targetEntity.IsDead();
+            BaseCharacterEntity targetEntity = null;
             switch (skillBuffType)
             {
                 case SkillBuffType.BuffToUser:
@@ -143,9 +143,9 @@ namespace MultiplayerARPG
                     skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.BuffToTarget:
-                    if (buffToUserIfNoTarget && !foundTarget)
+                    if (buffToUserIfNoTarget && !skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity))
                         targetEntity = skillUser;
-                    if (foundTarget)
+                    if (targetEntity != null && !targetEntity.IsDead())
                         targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.Toggle:
@@ -156,11 +156,13 @@ namespace MultiplayerARPG
                         skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.BuffToAlly:
-                    if (foundTarget)
+                    if (buffToUserIfNoTarget && !skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity))
+                        targetEntity = skillUser;
+                    if (targetEntity != null && !targetEntity.IsDead())
                         targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
                 case SkillBuffType.BuffToEnemy:
-                    if (foundTarget)
+                    if (skillUser.CurrentGameManager.TryGetEntityByObjectId(targetObjectId, out targetEntity) && !targetEntity.IsDead())
                         targetEntity.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, instigator, weapon);
                     break;
             }
@@ -366,7 +368,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case SkillBuffType.BuffToAlly:
-                    if (!foundTarget || !targetEntity.IsAlly(skillUser.GetInfo()))
+                    if ((!foundTarget && !buffToUserIfNoTarget) || (foundTarget && !targetEntity.IsAlly(skillUser.GetInfo())))
                     {
                         // Cannot buff enemy
                         gameMessage = UITextKeys.UI_ERROR_NO_SKILL_TARGET;
