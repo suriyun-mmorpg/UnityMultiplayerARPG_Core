@@ -21,9 +21,6 @@ namespace MultiplayerARPG
         [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
         public float explodeDistance;
 
-        public Rigidbody CacheRigidbody { get; private set; }
-        public Rigidbody2D CacheRigidbody2D { get; private set; }
-
         protected bool _isExploded;
         protected float _missileDistance;
         protected float _missileSpeed;
@@ -31,18 +28,10 @@ namespace MultiplayerARPG
         protected float _launchTime;
         protected float _missileDuration;
         protected bool _destroying;
-        protected float? _lagMoveSpeedRate;
         protected Vector3? _previousPosition;
         protected RaycastHit2D[] _hits2D = new RaycastHit2D[8];
         protected RaycastHit[] _hits3D = new RaycastHit[8];
         protected readonly HashSet<uint> _alreadyHitObjects = new HashSet<uint>();
-
-        protected override void Awake()
-        {
-            base.Awake();
-            CacheRigidbody = GetComponent<Rigidbody>();
-            CacheRigidbody2D = GetComponent<Rigidbody2D>();
-        }
 
         /// <summary>
         /// Setup this component data
@@ -117,21 +106,6 @@ namespace MultiplayerARPG
         }
 #endif
 
-        protected virtual void Update()
-        {
-            if (_destroying)
-                return;
-
-            if (Time.unscaledTime - _launchTime >= _missileDuration)
-            {
-                Explode();
-                PushBack(destroyDelay);
-                _destroying = true;
-            }
-
-            HitDetect();
-        }
-
         /// <summary>
         /// RayCast/SphereCast/BoxCast from current position back to previous frame position to detect hit target
         /// </summary>
@@ -180,68 +154,31 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void FixedUpdate()
+        protected virtual void Update()
         {
-            // Don't move if exploded
-            if (_isExploded)
-            {
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                {
-                    if (CacheRigidbody2D != null)
-                        CacheRigidbody2D.velocity = Vector2.zero;
-                }
-                else
-                {
-                    if (CacheRigidbody != null)
-                        CacheRigidbody.velocity = Vector3.zero;
-                }
+            if (_destroying)
                 return;
+
+            if (Time.unscaledTime - _launchTime >= _missileDuration)
+            {
+                Explode();
+                PushBack(destroyDelay);
+                _destroying = true;
             }
 
-            float currentMissileSpeed = CalculateCurrentMoveSpeed(_missileSpeed, Time.fixedDeltaTime);
+            HitDetect();
+
+            if (_destroying || _isExploded)
+                return;
+
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                if (CacheRigidbody2D != null)
-                    CacheRigidbody2D.velocity = -CacheTransform.up * currentMissileSpeed;
-            }
+                CacheTransform.position += -CacheTransform.up * _missileSpeed * Time.deltaTime;
             else
-            {
-                if (CacheRigidbody != null)
-                    CacheRigidbody.velocity = CacheTransform.forward * currentMissileSpeed;
-            }
-        }
-
-        protected float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
-        {
-            // Adjust speed by rtt
-            if (!IsServer && _instigator.TryGetEntity(out BaseGameEntity entity) && entity.IsOwnerClient)
-            {
-                float rtt = 0.001f * CurrentGameManager.Rtt;
-                float acc = 1f / rtt * deltaTime * 0.5f;
-                if (!_lagMoveSpeedRate.HasValue)
-                    _lagMoveSpeedRate = 0f;
-                if (_lagMoveSpeedRate < 1f)
-                    _lagMoveSpeedRate += acc;
-                if (_lagMoveSpeedRate > 1f)
-                    _lagMoveSpeedRate = 1f;
-                return maxMoveSpeed * _lagMoveSpeedRate.Value;
-            }
-            // TODO: Adjust other's client move speed by rtt
-            return maxMoveSpeed;
+                CacheTransform.position += CacheTransform.forward * _missileSpeed * Time.deltaTime;
         }
 
         protected override void OnPushBack()
         {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                if (CacheRigidbody2D != null)
-                    CacheRigidbody2D.velocity = Vector2.zero;
-            }
-            else
-            {
-                if (CacheRigidbody != null)
-                    CacheRigidbody.velocity = Vector3.zero;
-            }
             _previousPosition = null;
             if (onDestroy != null)
                 onDestroy.Invoke();

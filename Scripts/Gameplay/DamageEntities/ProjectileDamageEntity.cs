@@ -111,11 +111,6 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
-            /* clear up Missile Duration */
-        }
-
-        protected override void FixedUpdate()
-        {
             // Don't move if exploded or collided
             if (_isExploded || _impacted) 
                 return;
