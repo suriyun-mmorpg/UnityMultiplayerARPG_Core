@@ -21,17 +21,42 @@ namespace MultiplayerARPG
         [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
         public float explodeDistance;
 
-        protected bool _isExploded;
         protected float _missileDistance;
         protected float _missileSpeed;
         protected IDamageableEntity _lockingTarget;
         protected float _launchTime;
         protected float _missileDuration;
-        protected bool _destroying;
+
         protected Vector3? _previousPosition;
         protected RaycastHit2D[] _hits2D = new RaycastHit2D[8];
         protected RaycastHit[] _hits3D = new RaycastHit[8];
         protected readonly HashSet<uint> _alreadyHitObjects = new HashSet<uint>();
+
+        protected bool _isExploded;
+        protected bool IsExploded
+        {
+            get
+            {
+                return _isExploded;
+            }
+            set
+            {
+                _isExploded = value;
+            }
+        }
+
+        protected bool _destroying;
+        protected bool Destroying
+        {
+            get
+            {
+                return _destroying;
+            }
+            set
+            {
+                _destroying = value;
+            }
+        }
 
         /// <summary>
         /// Setup this component data
@@ -71,12 +96,12 @@ namespace MultiplayerARPG
                 // Explode immediately when distance and speed is 0
                 Explode();
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
                 return;
             }
             _lockingTarget = lockingTarget;
-            _isExploded = false;
-            _destroying = false;
+            IsExploded = false;
+            Destroying = false;
             _launchTime = Time.unscaledTime;
             _missileDuration = (missileDistance / missileSpeed) + 0.1f;
             _alreadyHitObjects.Clear();
@@ -111,7 +136,7 @@ namespace MultiplayerARPG
         /// </summary>
         public virtual void HitDetect()
         {
-            if (_destroying)
+            if (Destroying)
                 return;
 
             if (!_previousPosition.HasValue)
@@ -150,25 +175,27 @@ namespace MultiplayerARPG
                     TriggerEnter(_hits2D[i].transform.gameObject);
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D && _hits3D[i].transform != null)
                     TriggerEnter(_hits3D[i].transform.gameObject);
+                if (Destroying)
+                    break;
             }
             _previousPosition = CacheTransform.position;
         }
 
         protected virtual void Update()
         {
-            if (_destroying)
+            if (Destroying)
                 return;
 
             if (Time.unscaledTime - _launchTime >= _missileDuration)
             {
                 Explode();
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
             }
 
             HitDetect();
 
-            if (_destroying || _isExploded)
+            if (Destroying)
                 return;
 
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
@@ -187,7 +214,7 @@ namespace MultiplayerARPG
 
         protected virtual void TriggerEnter(GameObject other)
         {
-            if (_destroying)
+            if (Destroying)
                 return;
 
             if (!other.GetComponent<IUnHittable>().IsNull())
@@ -211,7 +238,7 @@ namespace MultiplayerARPG
                     Explode();
                 }
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
                 return;
             }
 
@@ -226,7 +253,7 @@ namespace MultiplayerARPG
                     Explode();
                 }
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
                 return;
             }
         }
@@ -268,10 +295,10 @@ namespace MultiplayerARPG
 
         protected virtual void Explode()
         {
-            if (_isExploded)
+            if (IsExploded)
                 return;
 
-            _isExploded = true;
+            IsExploded = true;
 
             // Explode when distance > 0
             if (explodeDistance <= 0f)
