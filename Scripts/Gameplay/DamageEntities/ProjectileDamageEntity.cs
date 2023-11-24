@@ -27,10 +27,6 @@ namespace MultiplayerARPG
         [Tooltip("Calculate the speed needed for the arc. Perfect for lock on targets.")]
         public bool recalculateSpeed = false;
 
-        [Header("Prediction Steps")]
-        [Tooltip("How many ray casts per frame to detect collisions.")]
-        public int predictionStepPerFrame = 6;
-
         [Header("Extra Effects")]
         [Tooltip("If you want to activate an effect that is child or instantiate it on client. For 'child' effect, use destroy delay.")]
         public bool instantiateImpact = false;
@@ -92,8 +88,16 @@ namespace MultiplayerARPG
             float dist = Vector3.Distance(_initialPosition, targetPos);
             float yOffset = -transform.forward.y;
 
+            Vector3 gravity = Vector3.zero;
+            if (hasGravity)
+            {
+                gravity = Physics.gravity;
+                if (customGravity != Vector3.zero)
+                    gravity = customGravity;
+            }
+
             if (recalculateSpeed)
-                missileSpeed = LaunchSpeed(dist, yOffset, Physics.gravity.magnitude, angle * Mathf.Deg2Rad);
+                missileSpeed = LaunchSpeed(dist, yOffset, gravity.magnitude, angle * Mathf.Deg2Rad);
 
             if (useAngle)
                 CacheTransform.eulerAngles = new Vector3(CacheTransform.eulerAngles.x - angle, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
