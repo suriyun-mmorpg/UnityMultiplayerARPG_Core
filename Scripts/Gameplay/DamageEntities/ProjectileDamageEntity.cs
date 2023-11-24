@@ -48,7 +48,6 @@ namespace MultiplayerARPG
 
         private Vector3 _initialPosition;
         private Vector3 _defaultImpactEffectPosition;
-        private bool _impacted;
         private Vector3 _bulletVelocity;
         private Vector3 _normal;
         private Vector3 _hitPos;
@@ -71,7 +70,6 @@ namespace MultiplayerARPG
 
             // Initial configuration
             _initialPosition = CacheTransform.position;
-            _impacted = false;
 
             // Configuration bullet and effects
             if (projectileObject)
@@ -109,86 +107,84 @@ namespace MultiplayerARPG
             return speed;
         }
 
-        protected override void Update()
+        public override void HitDetect()
         {
-            // Don't move if exploded or collided
-            if (_isExploded || _impacted) 
+            if (Destroying)
                 return;
 
-            Vector3 point1 = CacheTransform.position;
-            float stepSize = 1.0f / predictionStepPerFrame;
-            // Find hitting objects by future positions
-            for (float step = 0; step < 1; step += stepSize)
+            if (!_previousPosition.HasValue)
+                return;
+
+            int hitCount = 0;
+            Vector3 dir = (CacheTransform.position - _previousPosition.Value).normalized;
+            float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
+            // Raycast to previous position to check is it hitting something or not
+            // If hit, explode
+            switch (hitDetectionMode)
             {
-                if (hasGravity)
-                {
-                    Vector3 gravity = Physics.gravity;
-                    if (customGravity != Vector3.zero)
-                        gravity = customGravity;
-                    _bulletVelocity += gravity * stepSize * Time.deltaTime;
-                }
+                case HitDetectionMode.Raycast:
+                    hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, hitLayers);
+                    break;
+                case HitDetectionMode.SphereCast:
+                    hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, hitLayers);
+                    break;
+                case HitDetectionMode.BoxCast:
+                    hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, hitLayers);
+                    break;
+            }
 
-                Vector3 point2 = point1 + _bulletVelocity * stepSize * Time.deltaTime;
+            RaycastHit hit;
+            for (int i = 0; i < hitCount; ++i)
+            {
+                hit = _hits3D[i];
+                if (!hit.transform.gameObject.GetComponent<IUnHittable>().IsNull())
+                    continue;
 
-                int hitCount = 0;
-                RaycastHit hit;
-                Vector3 origin = point1;
-                Vector3 dir = (point2 - point1).normalized;
-                float dist = Vector3.Distance(point2, point1);
-                switch (hitDetectionMode)
-                {
-                    case HitDetectionMode.Raycast:
-                        hitCount = Physics.RaycastNonAlloc(origin, dir, _hits3D, dist, hitLayers);
-                        break;
-                    case HitDetectionMode.SphereCast:
-                        hitCount = Physics.SphereCastNonAlloc(origin, sphereCastRadius, dir, _hits3D, dist, hitLayers);
-                        break;
-                    case HitDetectionMode.BoxCast:
-                        hitCount = Physics.BoxCastNonAlloc(origin, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, hitLayers);
-                        break;
-                }
+                if (useNormal)
+                    _normal = hit.normal;
+                _hitPos = hit.point;
 
-                for (int i = 0; i < hitCount; ++i)
-                {
-                    hit = _hits3D[i];
-                    if (!hit.transform.gameObject.GetComponent<IUnHittable>().IsNull())
-                        continue;
+                // Hit itself, no impact
+                if (_instigator.Id != null && _instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
+                    continue;
 
-                    if (useNormal)
-                        _normal = hit.normal;
-                    _hitPos = hit.point;
-
-                    // Hit itself, no impact
-                    if (_instigator.Id != null && _instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
-                        continue;
-
-                    Impact(hit.collider.transform.gameObject);
-
-                    // Already hit something
-                    if (_destroying)
-                        break;
-                }
-
-                point1 = point2;
+                Impact(hit.collider.gameObject);
 
                 // Already hit something
-                if (_destroying)
+                if (Destroying)
                     break;
-
-                // Moved too far from `_initialPosition`
-                if (Vector3.Distance(_initialPosition, point1) > _missileDistance)
-                {
-                    NoImpact();
-                    break;
-                }
             }
+        }
+
+        protected override void Update()
+        {
+            if (Destroying)
+                return;
+
+            if (hasGravity)
+            {
+                Vector3 gravity = Physics.gravity;
+                if (customGravity != Vector3.zero)
+                    gravity = customGravity;
+                _bulletVelocity += gravity * Time.deltaTime;
+            }
+
+            HitDetect();
+
+            if (Destroying)
+                return;
+
             CacheTransform.rotation = Quaternion.LookRotation(_bulletVelocity);
-            CacheTransform.position = point1;
+            CacheTransform.position += _bulletVelocity * Time.deltaTime;
+
+            // Moved too far from `_initialPosition`
+            if (Vector3.Distance(_initialPosition, CacheTransform.position) > _missileDistance && Time.unscaledTime - _launchTime >= _missileDuration)
+                NoImpact();
         }
 
         protected void NoImpact()
         {
-            if (_destroying)
+            if (Destroying)
                 return;
 
             if (disappearEffect && IsClient)
@@ -205,11 +201,11 @@ namespace MultiplayerARPG
                     disappearEffect.SetActive(true);
 
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
                 return;
             }
             PushBack();
-            _destroying = true;
+            Destroying = true;
         }
 
         protected void Impact(GameObject hitted)
@@ -272,9 +268,8 @@ namespace MultiplayerARPG
                 Explode();
             }
 
-            _impacted = true;
             PushBack(destroyDelay);
-            _destroying = true;
+            Destroying = true;
         }
 
         protected override void OnPushBack()
