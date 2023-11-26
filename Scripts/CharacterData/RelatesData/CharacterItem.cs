@@ -353,7 +353,21 @@ namespace MultiplayerARPG
                 }
                 if (tempItem.ExpireDuration > 0)
                 {
-                    newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
+                    switch (tempItem.ExpireDurationUnit)
+                    {
+                        case ETimeUnits.Days:
+                            newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60 * 24);
+                            break;
+                        case ETimeUnits.Hours:
+                            newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60 * 60);
+                            break;
+                        case ETimeUnits.Minutes:
+                            newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (tempItem.ExpireDuration * 60);
+                            break;
+                        case ETimeUnits.Seconds:
+                            newItem.expireTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + tempItem.ExpireDuration;
+                            break;
+                    }
                 }
             }
             newItem.version = CURRENT_VERSION;
