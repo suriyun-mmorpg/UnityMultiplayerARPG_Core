@@ -627,7 +627,7 @@ namespace MultiplayerARPG
             if (!CanPredictMovement())
                 return;
 
-            if (_isUnderWater)
+            if (!_isGrounded && _isUnderWater)
             {
                 Vector3 tempTargetPosition = Vector3.up * (_waterCollider.bounds.max.y - (EntityMovement.GetBounds().size.y * underWaterThreshold));
                 if (CacheTransform.position.y > tempTargetPosition.y)
