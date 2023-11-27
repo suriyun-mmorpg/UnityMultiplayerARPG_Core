@@ -166,7 +166,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.Clear();
 
             UICraftingQueueItem tempUI;
-            CacheList.Generate(Source.QueueItems, (index, data, ui) =>
+            CacheList.Generate(CraftingQueueItems, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICraftingQueueItem>();
                 tempUI.CraftingQueueManager = this;
@@ -177,7 +177,7 @@ namespace MultiplayerARPG
                     tempUI.SelectByManager();
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(Source.QueueItems.Count == 0);
+                listEmptyObject.SetActive(CraftingQueueItems.Count == 0);
         }
     }
 }
