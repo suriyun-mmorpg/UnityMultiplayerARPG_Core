@@ -14,7 +14,8 @@ namespace MultiplayerARPG
         public UIItemCraftFormulas uiFormulas;
         public bool selectFirstEntryByDefault;
 
-        public ICraftingQueueSource Source { get; set; }
+        public ICraftingQueueSource Source { get; private set; }
+        public SyncListCraftingQueueItem CraftingQueueItems { get; private set; }
 
         private UIList _cacheList;
         public UIList CacheList
@@ -81,16 +82,22 @@ namespace MultiplayerARPG
 
         public void RegisterSourceEvents()
         {
-            if (Source == null && GameInstance.PlayingCharacterEntity)
+            if (Source == null && GameInstance.PlayingCharacterEntity != null)
                 Source = GameInstance.PlayingCharacterEntity.Crafting;
             if (Source != null)
-                Source.QueueItems.onOperation += OnCraftingQueueItemsOperation;
+            {
+                if (Source.PublicQueue)
+                    CraftingQueueItems = Source.QueueItems;
+                else
+                    CraftingQueueItems = GameInstance.PlayingCharacterEntity.Crafting.QueueItems;
+                CraftingQueueItems.onOperation += OnCraftingQueueItemsOperation;
+            }
         }
 
         public void UnregisterSourceEvents()
         {
-            if (Source != null)
-                Source.QueueItems.onOperation -= OnCraftingQueueItemsOperation;
+            if (CraftingQueueItems != null)
+                CraftingQueueItems.onOperation -= OnCraftingQueueItemsOperation;
         }
 
         protected virtual void OnEnable()

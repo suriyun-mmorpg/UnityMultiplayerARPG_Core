@@ -24,6 +24,11 @@ namespace MultiplayerARPG
             get { return 0; }
         }
 
+        public bool PublicQueue
+        {
+            get { return false; }
+        }
+
         public bool CanCraft
         {
             get { return !Entity.IsDead(); }
@@ -44,5 +49,7 @@ namespace MultiplayerARPG
                 return;
             this.UpdateQueue();
         }
+
+        public ICraftingQueueSource ExternalSource { get; private set; }
     }
 }

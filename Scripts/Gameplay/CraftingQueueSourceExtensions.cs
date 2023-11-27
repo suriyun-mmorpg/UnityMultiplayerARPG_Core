@@ -26,10 +26,17 @@ namespace MultiplayerARPG
 
             CraftingQueueItem craftingItem = source.QueueItems[0];
             ItemCraftFormula formula = GameInstance.ItemCraftFormulas[craftingItem.dataId];
-            BasePlayerCharacterEntity crafter;
-            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.crafterId, out crafter))
+            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.crafterId, out BasePlayerCharacterEntity crafter))
             {
                 // Crafter may left the game
+                source.QueueItems.RemoveAt(0);
+                return;
+            }
+
+            BaseGameEntity sourceEntity;
+            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.sourceObjectId, out sourceEntity))
+            {
+                // Crafting source might be destroyed
                 source.QueueItems.RemoveAt(0);
                 return;
             }
@@ -41,8 +48,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            UITextKeys errorMessage;
-            if (!formula.ItemCraft.CanCraft(crafter, out errorMessage))
+            if (!formula.ItemCraft.CanCraft(crafter, out UITextKeys errorMessage))
             {
                 source.TimeCounter = 0f;
                 source.QueueItems.RemoveAt(0);
@@ -79,8 +85,13 @@ namespace MultiplayerARPG
             }
         }
 
-        public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, IPlayerCharacterData crafter, uint crafterId, int dataId, int amount, out UITextKeys errorMessage)
+        public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, BasePlayerCharacterEntity crafter, int dataId, int amount, out UITextKeys errorMessage)
         {
+            if (source.ObjectId != crafter.ObjectId && !source.PublicQueue)
+            {
+                // Not public, so it will be updated by player's source
+                return crafter.Crafting.AppendCraftingQueueItem(crafter, dataId, amount, out errorMessage);
+            }
             errorMessage = UITextKeys.NONE;
             if (!source.CanCraft)
                 return false;
@@ -93,10 +104,11 @@ namespace MultiplayerARPG
                 return false;
             source.QueueItems.Add(new CraftingQueueItem()
             {
-                crafterId = crafterId,
+                crafterId = crafter.ObjectId,
                 dataId = dataId,
                 amount = amount,
                 craftRemainsDuration = itemCraftFormula.CraftDuration,
+                sourceObjectId = source.ObjectId,
             });
             return true;
         }

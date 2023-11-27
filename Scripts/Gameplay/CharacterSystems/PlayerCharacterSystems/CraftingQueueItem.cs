@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public int dataId;
         public int amount;
         public float craftRemainsDuration;
+        public uint sourceObjectId;
 
         public void Serialize(NetDataWriter writer)
         {

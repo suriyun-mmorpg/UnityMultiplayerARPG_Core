@@ -99,12 +99,12 @@ namespace MultiplayerARPG
             UITextKeys errorMessage;
             if (sourceObjectId == ObjectId)
             {
-                if (!Crafting.AppendCraftingQueueItem(this, ObjectId, dataId, amount, out errorMessage))
+                if (!Crafting.AppendCraftingQueueItem(this, dataId, amount, out errorMessage))
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
             }
             else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
             {
-                if (!source.AppendCraftingQueueItem(this, ObjectId, dataId, amount, out errorMessage))
+                if (!source.AppendCraftingQueueItem(this, dataId, amount, out errorMessage))
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
             }
         }
