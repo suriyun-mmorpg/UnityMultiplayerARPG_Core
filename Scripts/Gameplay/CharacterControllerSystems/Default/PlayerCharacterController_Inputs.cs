@@ -132,7 +132,7 @@ namespace MultiplayerARPG
                     if (EnemyEntityDetector.characters.Count > 0)
                     {
                         SetTarget(null, TargetActionType.Attack);
-                        if (!EnemyEntityDetector.characters[_findingEnemyIndex].IsHideOrDead())
+                        if (!EnemyEntityDetector.characters[_findingEnemyIndex].IsDeadOrHideFrom(PlayingCharacterEntity))
                         {
                             SetTarget(EnemyEntityDetector.characters[_findingEnemyIndex], TargetActionType.Attack);
                             if (SelectedGameEntity != null)
@@ -286,7 +286,7 @@ namespace MultiplayerARPG
                                 tempHasMapPosition = false;
                                 break;
                             }
-                            else if (damageable != null && !damageable.IsHideOrDead())
+                            else if (damageable != null && !damageable.IsDeadOrHideFrom(PlayingCharacterEntity))
                             {
                                 SetTarget(damageable, TargetActionType.Attack);
                                 _isFollowingTarget = true;
@@ -443,7 +443,7 @@ namespace MultiplayerARPG
             int overlapMask = CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask;
             if (wasdLockAttackTarget)
             {
-                if (!TryGetAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead())
+                if (!TryGetAttackingEntity(out targetEntity) || targetEntity.IsDeadOrHideFrom(PlayingCharacterEntity))
                 {
                     // Find nearest target and move to the target
                     targetEntity = PlayingCharacterEntity
@@ -454,7 +454,7 @@ namespace MultiplayerARPG
                         false,
                         overlapMask);
                 }
-                if (targetEntity != null && !targetEntity.IsHideOrDead())
+                if (targetEntity != null && !targetEntity.IsDeadOrHideFrom(PlayingCharacterEntity))
                 {
                     // Set target, then attack later when moved nearby target
                     SelectedEntity = targetEntity;
@@ -521,7 +521,7 @@ namespace MultiplayerARPG
                 int overlapMask = CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.monsterLayer.Mask;
                 if (wasdLockAttackTarget)
                 {
-                    if (!TryGetSelectedTargetAsAttackingEntity(out targetEntity) || targetEntity.IsHideOrDead())
+                    if (!TryGetSelectedTargetAsAttackingEntity(out targetEntity) || targetEntity.IsDeadOrHideFrom(PlayingCharacterEntity))
                     {
                         // Try find nearby enemy if no selected target or selected taget is not enemy or target is hide or dead
                         targetEntity = PlayingCharacterEntity
@@ -532,7 +532,7 @@ namespace MultiplayerARPG
                             false,
                             overlapMask);
                     }
-                    if (targetEntity != null && !targetEntity.IsHideOrDead())
+                    if (targetEntity != null && !targetEntity.IsDeadOrHideFrom(PlayingCharacterEntity))
                     {
                         // Set target, then use skill later when moved nearby target
                         SelectedEntity = targetEntity;
@@ -631,7 +631,7 @@ namespace MultiplayerARPG
             IPickupActivatableEntity pickupActivatableEntity;
             if (TryGetAttackingEntity(out targetDamageable))
             {
-                if (targetDamageable.IsHideOrDead())
+                if (targetDamageable.IsDeadOrHideFrom(PlayingCharacterEntity))
                 {
                     ClearQueueUsingSkill();
                     PlayingCharacterEntity.StopMove();
@@ -645,7 +645,7 @@ namespace MultiplayerARPG
             }
             else if (TryGetUsingSkillEntity(out targetDamageable))
             {
-                if (_queueUsingSkill.skill.IsAttack && targetDamageable.IsHideOrDead())
+                if (_queueUsingSkill.skill.IsAttack && targetDamageable.IsDeadOrHideFrom(PlayingCharacterEntity))
                 {
                     ClearQueueUsingSkill();
                     PlayingCharacterEntity.StopMove();
@@ -786,7 +786,7 @@ namespace MultiplayerARPG
                 Transform applyTransform = _queueUsingSkill.skill.GetApplyTransform(PlayingCharacterEntity, _isLeftHandAttacking);
                 Vector3 sourcePosition = applyTransform.position;
                 Vector3 targetPosition = entity.OpponentAimTransform.position;
-                if (entity.GetObjectId() == PlayingCharacterEntity.GetObjectId() /* Applying skill to user? */ ||
+                if (entity.GetObjectId() == PlayingCharacterEntity.ObjectId /* Applying skill to user? */ ||
                     OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
                 {
                     // Set next frame target action type

@@ -48,6 +48,8 @@ namespace MultiplayerARPG
         public bool DisallowUseItem { get; private set; }
         public bool FreezeAnimation { get; private set; }
         public bool IsHide { get; private set; }
+        public bool IsRevealsHide { get; private set; }
+        public bool IsBlind { get; private set; }
         public bool MuteFootstepSound { get; private set; }
         public bool IsOverweight { get; private set; }
         public bool HavingChanceToRemoveBuffWhenAttack { get; private set; }
@@ -239,6 +241,8 @@ namespace MultiplayerARPG
             DisallowUseItem = false;
             FreezeAnimation = false;
             IsHide = false;
+            IsRevealsHide = false;
+            IsBlind = false;
             MuteFootstepSound = false;
             HavingChanceToRemoveBuffWhenAttack = false;
             HavingChanceToRemoveBuffWhenAttacked = false;
@@ -585,6 +589,10 @@ namespace MultiplayerARPG
             }
             if (tempBuff.isHide)
                 IsHide = true;
+            if (tempBuff.isRevealsHide)
+                IsRevealsHide = true;
+            if (tempBuff.isBlind)
+                IsBlind = true;
             if (tempBuff.muteFootstepSound)
                 MuteFootstepSound = true;
             if (buff.GetRemoveBuffWhenAttackChance() > 0f)
@@ -612,6 +620,8 @@ namespace MultiplayerARPG
                 DisallowUseItem &&
                 FreezeAnimation &&
                 IsHide &&
+                IsRevealsHide &&
+                IsBlind &&
                 MuteFootstepSound &&
                 HavingChanceToRemoveBuffWhenAttack &&
                 HavingChanceToRemoveBuffWhenAttacked &&

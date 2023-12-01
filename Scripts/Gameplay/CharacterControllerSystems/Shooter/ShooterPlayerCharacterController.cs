@@ -875,7 +875,7 @@ namespace MultiplayerARPG
                 // Get damageable hit box component from hit target
                 tempHitBox = tempHitInfo.collider.GetComponent<DamageableHitBox>();
 
-                if (tempHitBox == null || !tempHitBox.Entity || tempHitBox.IsHide() ||
+                if (tempHitBox == null || !tempHitBox.Entity || tempHitBox.IsHideFrom(PlayingCharacterEntity) ||
                     tempHitBox.GetObjectId() == PlayingCharacterEntity.ObjectId)
                 {
                     // Skip empty game entity / hidding entity / controlling player's entity
@@ -917,7 +917,7 @@ namespace MultiplayerARPG
                     // Get distance between character and raycast hit point
                     tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
 
-                    if (tempGameEntity.IsNull() || tempGameEntity.IsHide() ||
+                    if (tempGameEntity.IsNull() || tempGameEntity.IsHideFrom(PlayingCharacterEntity) ||
                         tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
                     {
                         // Skip empty game entity / hiddeing entity / controlling player's entity

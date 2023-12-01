@@ -122,11 +122,6 @@ namespace MultiplayerARPG
                 sliderSkillCastGage.value = _castingSkillDuration <= 0 ? 0 : 1 - (_castingSkillCountDown / _castingSkillDuration);
         }
 
-        protected override bool ValidateToUpdateUI()
-        {
-            return base.ValidateToUpdateUI() && (Data.IsOwnerClient || !Data.IsHide());
-        }
-
         protected override void UpdateData()
         {
             base.UpdateData();

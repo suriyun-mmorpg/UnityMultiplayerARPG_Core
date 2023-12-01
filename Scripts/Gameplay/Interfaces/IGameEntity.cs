@@ -9,5 +9,7 @@ namespace MultiplayerARPG
         void PrepareRelatesData();
         EntityInfo GetInfo();
         bool IsHide();
+        bool IsRevealsHide();
+        bool IsBlind();
     }
 }

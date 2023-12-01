@@ -245,7 +245,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (targetEnemy.Entity == Entity.Entity || targetEnemy.IsHideOrDead() || !targetEnemy.CanReceiveDamageFrom(Entity.GetInfo()))
+            if (targetEnemy.GetObjectId() == Entity.ObjectId || targetEnemy.IsDeadOrHideFrom(Entity) || !targetEnemy.CanReceiveDamageFrom(Entity.GetInfo()))
             {
                 // If target is dead or in safe area stop attacking
                 Entity.SetTargetEntity(null);
@@ -427,8 +427,9 @@ namespace MultiplayerARPG
             if (!isAggressive && Entity.Summoner == null)
                 return false;
 
-            if (!Entity.TryGetTargetEntity(out IDamageableEntity targetEntity) || targetEntity.Entity == Entity.Entity ||
-                 targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
+            if (!Entity.TryGetTargetEntity(out IDamageableEntity targetEntity) ||
+                targetEntity.GetObjectId() == Entity.ObjectId || targetEntity.IsDead() ||
+                !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
             {
                 bool isSummonedAndSummonerExisted = Entity.IsSummonedAndSummonerExisted;
                 DamageableEntity enemy;
@@ -485,7 +486,7 @@ namespace MultiplayerARPG
             {
                 tempEntity = _enemies[i];
                 _enemies.RemoveAt(i);
-                if (tempEntity == null || tempEntity.Entity == Entity || tempEntity.IsDead() || !tempEntity.CanReceiveDamageFrom(Entity.GetInfo()))
+                if (tempEntity.GetObjectId() == Entity.ObjectId || tempEntity.IsDead() || !tempEntity.CanReceiveDamageFrom(Entity.GetInfo()))
                 {
                     // If enemy is null or cannot receive damage from monster, skip it
                     continue;

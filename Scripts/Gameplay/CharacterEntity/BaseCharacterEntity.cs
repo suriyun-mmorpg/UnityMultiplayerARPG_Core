@@ -767,7 +767,7 @@ namespace MultiplayerARPG
                 {
                     if (targetEntity is DamageableEntity damageableEntity)
                     {
-                        if (!damageableEntity.IsHideOrDead())
+                        if (!damageableEntity.IsDeadOrHideFrom(this))
                             return GetAttackAimPosition(position, damageableEntity.OpponentAimTransform.position);
                     }
                     else
@@ -1085,6 +1085,16 @@ namespace MultiplayerARPG
         public override bool IsHide()
         {
             return CachedData.IsHide;
+        }
+
+        public override bool IsRevealsHide()
+        {
+            return CachedData.IsRevealsHide;
+        }
+
+        public override bool IsBlind()
+        {
+            return CachedData.IsBlind;
         }
         #endregion
 

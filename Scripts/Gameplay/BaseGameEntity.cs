@@ -153,7 +153,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected bool _dirtyIsHide;
         protected bool _isTeleporting;
         protected bool _stillMoveAfterTeleport;
         protected Vector3 _teleportingPosition;
@@ -307,13 +306,6 @@ namespace MultiplayerARPG
             if (onUpdate != null)
                 onUpdate.Invoke();
             Profiler.EndSample();
-            // Update identity's hide status
-            bool isHide = IsHide();
-            if (_dirtyIsHide != isHide)
-            {
-                _dirtyIsHide = isHide;
-                Identity.IsHide = _dirtyIsHide;
-            }
         }
 
         protected virtual void EntityUpdate()
@@ -470,6 +462,16 @@ namespace MultiplayerARPG
         }
 
         public virtual bool IsHide()
+        {
+            return false;
+        }
+
+        public virtual bool IsRevealsHide()
+        {
+            return false;
+        }
+
+        public virtual bool IsBlind()
         {
             return false;
         }

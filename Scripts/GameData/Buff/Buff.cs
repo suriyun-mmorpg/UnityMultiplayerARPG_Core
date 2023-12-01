@@ -89,6 +89,10 @@ namespace MultiplayerARPG
         public IncrementalFloat removeBuffWhenPickupItemChance;
         [Tooltip("Hide character. This won't be applied to monster's summoner.")]
         public bool isHide;
+        [Tooltip("Reveals hidding characters")]
+        public bool isRevealsHide;
+        [Tooltip("Can't see other characters")]
+        public bool isBlind;
         [Tooltip("Mute character movement sound while applied. This won't be applied to monster's summoner.")]
         public bool muteFootstepSound;
         [Tooltip("Status effects that can be applied to the attacker when attacking.")]

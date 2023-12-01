@@ -286,6 +286,16 @@ namespace MultiplayerARPG
             return DamageableEntity.IsHide();
         }
 
+        public bool IsRevealsHide()
+        {
+            return DamageableEntity.IsRevealsHide();
+        }
+
+        public bool IsBlind()
+        {
+            return DamageableEntity.IsBlind();
+        }
+
         public TransformHistory GetTransformHistory(long currentTime, long rewindTime)
         {
             if (_histories.Count == 0)
