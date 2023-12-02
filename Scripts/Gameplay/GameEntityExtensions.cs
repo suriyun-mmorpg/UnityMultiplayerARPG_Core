@@ -118,7 +118,7 @@ namespace MultiplayerARPG
 
         public static bool IsHideFrom(this IGameEntity entity, IGameEntity watcherEntity)
         {
-            return watcherEntity.IsBlind() || (entity.IsHide() && !watcherEntity.IsRevealsHide());
+            return entity.Entity.ForceHide || watcherEntity.IsBlind() || (entity.IsHide() && !watcherEntity.IsRevealsHide());
         }
     }
 }

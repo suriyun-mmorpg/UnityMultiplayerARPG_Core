@@ -21,6 +21,8 @@ namespace MultiplayerARPG
             set { }
         }
 
+        public bool ForceHide { get; set; }
+
         [Category(0, "Title Settings")]
         [Tooltip("This title will be used while `syncTitle` is empty.")]
         [FormerlySerializedAs("characterTitle")]
