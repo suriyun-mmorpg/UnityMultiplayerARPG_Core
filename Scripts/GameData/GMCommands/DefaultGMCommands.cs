@@ -94,6 +94,14 @@ namespace MultiplayerARPG
         /// Kick specific character
         /// </summary>
         public const string Kick = "/kick";
+        /// <summary>
+        /// Disable force hide
+        /// </summary>
+        public const string Visible = "/visible";
+        /// <summary>
+        /// Enable force hide
+        /// </summary>
+        public const string Invisible = "/invisible";
 
         public const string HelpResponse = "/level {level} = Set character's level to {level} value.\n" +
             "/statpoint {amount} = Set character's stat point to {amount} value.\n" +
@@ -115,7 +123,9 @@ namespace MultiplayerARPG
             "/unmute {name} = Unmute character which its name is {name}.\n" +
             "/ban {name} {duration} = Ban character's account which its name is {name} for {duration} days.\n" +
             "/unban {name} = Unban character's account which its name is {name}.\n" +
-            "/kick {name} = Kick character which its name is {name}.\n";
+            "/kick {name} = Kick character which its name is {name}.\n" +
+            "/visible = Show user character to other players.\n" +
+            "/invisible = Hide user character from other players.\n";
 #endif
 
         public virtual bool IsDataLengthValid(string command, int dataLength)
@@ -167,6 +177,10 @@ namespace MultiplayerARPG
                 return true;
             if (command.ToLower().Equals(Kick.ToLower()) && dataLength == 2)
                 return true;
+            if (command.ToLower().Equals(Visible.ToLower()))
+                return true;
+            if (command.ToLower().Equals(Invisible.ToLower()))
+                return true;
 #endif
             return false;
         }
@@ -200,7 +214,9 @@ namespace MultiplayerARPG
                 command.ToLower().Equals(Unmute.ToLower()) ||
                 command.ToLower().Equals(Ban.ToLower()) ||
                 command.ToLower().Equals(Unban.ToLower()) ||
-                command.ToLower().Equals(Kick.ToLower()))
+                command.ToLower().Equals(Kick.ToLower()) ||
+                command.ToLower().Equals(Visible.ToLower()) ||
+                command.ToLower().Equals(Invisible.ToLower()))
             {
                 return true;
             }
@@ -580,6 +596,18 @@ namespace MultiplayerARPG
                         BaseGameNetworkManager.Singleton.KickClient(targetCharacter.ConnectionId, UITextKeys.UI_ERROR_KICKED_FROM_SERVER);
                         response = $"Kick character: {data[1]}";
                     }
+                }
+                if (commandKey.ToLower().Equals(Visible.ToLower()))
+                {
+                    if (characterEntity != null)
+                        characterEntity.ForceHide = false;
+                    response = "Your character is shown to other players";
+                }
+                if (commandKey.ToLower().Equals(Invisible.ToLower()))
+                {
+                    if (characterEntity != null)
+                        characterEntity.ForceHide = true;
+                    response = "Your character is hidden from other players";
                 }
             }
 #endif
