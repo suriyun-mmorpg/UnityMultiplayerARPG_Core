@@ -112,7 +112,24 @@ namespace MultiplayerARPG
             // Force change physic auto sync transforms mode to manual
             Physics.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
             Physics2D.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
+            // Setup character hidding condition
+            LiteNetLibIdentity.ForceHideFunctions.Add(IsHideEntity);
             base.Awake();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            // Remove character hidding condition
+            LiteNetLibIdentity.ForceHideFunctions.Remove(IsHideEntity);
+        }
+
+        protected static bool IsHideEntity(LiteNetLibIdentity mustHideThis, LiteNetLibIdentity fromThis)
+        {
+            if (!mustHideThis.TryGetComponent(out BaseGameEntity mustHideThisEntity) ||
+                !fromThis.TryGetComponent(out BaseGameEntity fromThisEntity))
+                return false;
+            return mustHideThisEntity.IsHideFrom(fromThisEntity);
         }
 
         protected override void Update()
