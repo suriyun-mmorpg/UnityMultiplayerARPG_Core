@@ -1,4 +1,3 @@
-
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
@@ -39,11 +38,11 @@ namespace MultiplayerARPG
         public bool autoSwimToSurface;
 
         [Header("Root Motion Settings")]
+        public bool alwaysUseRootMotion;
         public bool useRootMotionForMovement;
         public bool useRootMotionForAirMovement;
         public bool useRootMotionForJump;
         public bool useRootMotionForFall;
-        public bool useRootMotionWhileNotMoving;
         public bool useRootMotionUnderWater;
 
         [Header("Networking Settings")]
@@ -173,12 +172,7 @@ namespace MultiplayerARPG
             if (!Animator)
                 return;
 
-            if (useRootMotionWhileNotMoving &&
-                !MovementState.Has(MovementState.Forward) &&
-                !MovementState.Has(MovementState.Backward) &&
-                !MovementState.Has(MovementState.Left) &&
-                !MovementState.Has(MovementState.Right) &&
-                !MovementState.Has(MovementState.IsJump))
+            if (alwaysUseRootMotion)
             {
                 // No movement, apply root motion position / rotation
                 Animator.ApplyBuiltinRootMotion();
@@ -1092,7 +1086,7 @@ namespace MultiplayerARPG
 
         public bool UseRootMotion()
         {
-            return useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionWhileNotMoving || useRootMotionUnderWater;
+            return useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || alwaysUseRootMotion || useRootMotionUnderWater;
         }
 
         public void RemoteTurnSimulation(bool isKeyMovement, float yAngle, float deltaTime)
