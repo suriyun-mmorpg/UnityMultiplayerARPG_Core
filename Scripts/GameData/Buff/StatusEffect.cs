@@ -46,9 +46,16 @@ namespace MultiplayerARPG
             if (totalResistance > MaxResistanceAmount)
                 totalResistance = MaxResistanceAmount;
             float resistance = totalResistance / level;
+            if (MaxResistanceAmountEachLevels == null || MaxResistanceAmountEachLevels.Length == 0)
+                return resistance;
             int resistIndex = Mathf.FloorToInt(totalResistance);
-            if (resistIndex >= 0 && MaxResistanceAmountEachLevels != null && resistIndex < MaxResistanceAmountEachLevels.Length)
-                resistance = Mathf.Max(resistance, MaxResistanceAmountEachLevels[resistIndex]);
+            if (resistIndex >= 0)
+            {
+                if (resistIndex < MaxResistanceAmountEachLevels.Length)
+                    resistance = Mathf.Min(resistance, MaxResistanceAmountEachLevels[resistIndex]);
+                else
+                    resistance = Mathf.Min(resistance, MaxResistanceAmountEachLevels[MaxResistanceAmountEachLevels.Length - 1]);
+            }
             return resistance;
         }
 
