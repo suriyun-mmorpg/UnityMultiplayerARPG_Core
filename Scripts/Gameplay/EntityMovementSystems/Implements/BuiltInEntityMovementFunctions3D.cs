@@ -174,7 +174,7 @@ namespace MultiplayerARPG
 
             if (alwaysUseRootMotion)
             {
-                // No movement, apply root motion position / rotation
+                // Always use root motion
                 Animator.ApplyBuiltinRootMotion();
                 return;
             }
