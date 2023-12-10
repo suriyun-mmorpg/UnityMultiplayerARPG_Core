@@ -113,6 +113,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiIncreaseDamageAmounts")]
         public UIDamageElementAmounts uiIncreaseDamages;
         public UIDamageElementAmounts uiIncreaseDamagesRate;
+        public UIStatusEffectResistanceAmounts uiStatusEffectResistanceAmounts;
         public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
         public UIEquipmentSockets uiEquipmentSockets;
@@ -1009,6 +1010,31 @@ namespace MultiplayerARPG
                     uiIncreaseDamagesRate.isBonus = true;
                     uiIncreaseDamagesRate.Show();
                     uiIncreaseDamagesRate.Data = damageAmountsRate;
+                }
+            }
+
+            if (uiStatusEffectResistanceAmounts != null)
+            {
+                Dictionary<StatusEffect, float> statusEffectResistances = null;
+                if (EquipmentItem != null)
+                {
+                    statusEffectResistances = EquipmentItem.GetIncreaseStatusEffectResistances(Level);
+                }
+                else if (SocketEnhancerItem != null)
+                {
+                    statusEffectResistances = GameDataHelpers.CombineStatusEffectResistances(SocketEnhancerItem.SocketEnhanceEffect.statusEffectResistances, statusEffectResistances, 1f);
+                }
+
+                if (statusEffectResistances == null || statusEffectResistances.Count == 0)
+                {
+                    // Hide ui if armors is empty
+                    uiStatusEffectResistanceAmounts.Hide();
+                }
+                else
+                {
+                    uiStatusEffectResistanceAmounts.isBonus = true;
+                    uiStatusEffectResistanceAmounts.Show();
+                    uiStatusEffectResistanceAmounts.Data = statusEffectResistances;
                 }
             }
 
