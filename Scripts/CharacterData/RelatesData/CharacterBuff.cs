@@ -69,7 +69,7 @@ namespace MultiplayerARPG
             MakeAsCached();
             ClearCachedData();
             _recachingBuff = true;
-            _cacheKey = ZString.Concat(type, '_', dataId);
+            _cacheKey = ZString.Concat((byte)type, '_', dataId);
             switch (type)
             {
                 case BuffType.SkillBuff:

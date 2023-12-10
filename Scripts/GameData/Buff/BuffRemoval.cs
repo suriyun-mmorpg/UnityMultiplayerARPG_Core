@@ -46,18 +46,20 @@ namespace MultiplayerARPG
         {
             if (totalChance > maxChance)
                 totalChance = maxChance;
-            float resistance = totalChance / level;
+            float chance = totalChance / level;
+            if (chance > 1f)
+                chance = 1f;
             if (maxChanceEachLevels == null || maxChanceEachLevels.Length == 0)
-                return resistance;
-            int resistIndex = Mathf.FloorToInt(totalChance);
-            if (resistIndex >= 0)
+                return chance;
+            int index = level - 1;
+            if (index >= 0)
             {
-                if (resistIndex < maxChanceEachLevels.Length)
-                    resistance = Mathf.Min(resistance, maxChanceEachLevels[resistIndex]);
+                if (index < maxChanceEachLevels.Length)
+                    chance = Mathf.Min(chance, maxChanceEachLevels[index]);
                 else
-                    resistance = Mathf.Min(resistance, maxChanceEachLevels[maxChanceEachLevels.Length - 1]);
+                    chance = Mathf.Min(chance, maxChanceEachLevels[maxChanceEachLevels.Length - 1]);
             }
-            return resistance;
+            return chance;
         }
 
         public string GetChanceEntriesText(float totalChance, string format, string separator = ",")
