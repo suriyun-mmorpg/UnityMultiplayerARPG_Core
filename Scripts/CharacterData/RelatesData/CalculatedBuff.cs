@@ -22,6 +22,7 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
+        private Dictionary<BuffRemoval, float> _cacheBuffRemovals = new Dictionary<BuffRemoval, float>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
         private float _cacheRemoveBuffWhenAttackChance;
         private float _cacheRemoveBuffWhenAttackedChance;
@@ -58,6 +59,8 @@ namespace MultiplayerARPG
             _cacheIncreaseDamagesRate = null;
             _cacheIncreaseStatusEffectResistances.Clear();
             _cacheIncreaseStatusEffectResistances = null;
+            _cacheBuffRemovals.Clear();
+            _cacheBuffRemovals = null;
             _cacheDamageOverTimes.Clear();
             _cacheDamageOverTimes = null;
         }
@@ -72,6 +75,7 @@ namespace MultiplayerARPG
             _cacheIncreaseDamages.Clear();
             _cacheIncreaseDamagesRate.Clear();
             _cacheIncreaseStatusEffectResistances.Clear();
+            _cacheBuffRemovals.Clear();
             _cacheDamageOverTimes.Clear();
         }
 
@@ -98,6 +102,7 @@ namespace MultiplayerARPG
             _cacheIncreaseDamages = buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
             _cacheIncreaseDamagesRate = buff.GetIncreaseDamagesRate(level, _cacheIncreaseDamagesRate);
             _cacheIncreaseStatusEffectResistances = buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
+            _cacheBuffRemovals = buff.GetBuffRemovals(level, _cacheBuffRemovals);
             _cacheDamageOverTimes = buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
             _cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
             _cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
@@ -198,6 +203,11 @@ namespace MultiplayerARPG
         public Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances()
         {
             return _cacheIncreaseStatusEffectResistances;
+        }
+
+        public Dictionary<BuffRemoval, float> GetBuffRemovals()
+        {
+            return _cacheBuffRemovals;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes()

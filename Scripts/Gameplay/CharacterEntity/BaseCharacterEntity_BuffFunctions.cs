@@ -109,15 +109,43 @@ namespace MultiplayerARPG
             }
 
             CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);
+            CalculatedBuff calculatedBuff = newBuff.GetBuff();
+
+            Dictionary<BuffRemoval, float> buffRemovals = calculatedBuff.GetBuffRemovals();
+            if (Buffs.Count > 0 && buffRemovals != null && buffRemovals.Count > 0)
+            {
+                foreach (KeyValuePair<BuffRemoval, float> buffRemoval in buffRemovals)
+                {
+                    if (!buffRemoval.Key.IsValid()) continue;
+                    for (int i = Buffs.Count - 1; i >= 0; --i)
+                    {
+                        CharacterBuff characterBuff = Buffs[i];
+                        if (!string.Equals(buffRemoval.Key.GetId(), characterBuff.GetKey()))
+                        {
+                            // This is not a removing buff
+                            continue;
+                        }
+                        float chance = buffRemoval.Key.GetChanceByLevel(buffRemoval.Value, characterBuff.level);
+                        if (chance <= 0 || Random.value > chance)
+                        {
+                            // Buff removal is not occurring
+                            continue;
+                        }
+                        // Buff removed
+                        Buffs.RemoveAt(i);
+                    }
+                    if (Buffs.Count == 0)
+                        break;
+                }
+            }
+
             newBuff.Apply(buffApplier, buffApplierWeapon);
             buffs.Add(newBuff);
-            if (newBuff.GetBuff().GetBuff().disallowMove)
-                StopMove();
 
-            if (newBuff.GetBuff().GetDuration() <= 0f)
+            if (calculatedBuff.GetDuration() <= 0f)
             {
                 CharacterRecoveryData recoveryData = new CharacterRecoveryData(this);
-                recoveryData.SetupByBuff(newBuff, newBuff.GetBuff());
+                recoveryData.SetupByBuff(newBuff, calculatedBuff);
                 recoveryData.Apply(1f);
             }
 

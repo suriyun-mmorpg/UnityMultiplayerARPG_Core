@@ -101,6 +101,13 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineStatusEffectResistances(buff.increaseStatusEffectResistances, result, level, 1f);
         }
 
+        public static Dictionary<BuffRemoval, float> GetBuffRemovals(this Buff buff, int level, Dictionary<BuffRemoval, float> result = null)
+        {
+            if (result == null)
+                result = new Dictionary<BuffRemoval, float>();
+            return GameDataHelpers.CombineBuffRemovals(buff.buffRemovals, result, level, 1f);
+        }
+
         public static Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes(this Buff buff, int level, Dictionary<DamageElement, MinMaxFloat> result = null)
         {
             if (result == null)

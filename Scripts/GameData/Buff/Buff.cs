@@ -57,6 +57,8 @@ namespace MultiplayerARPG
         public IncrementalInt recoveryFood;
         [Tooltip("Recover character's current water. This won't be applied to monster's summoner.")]
         public IncrementalInt recoveryWater;
+        [Tooltip("Set buffs that you want to remove when this buff is appied here.")]
+        public BuffRemoval[] buffRemovals;
         [Tooltip("Applies damage within duration to character. This won't be applied to monster's summoner.")]
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] damageOverTimes;
@@ -75,17 +77,17 @@ namespace MultiplayerARPG
         public bool disallowUseSkill;
         [Tooltip("Disallow character to use item while applied. This won't be applied to monster's summoner.")]
         public bool disallowUseItem;
-        [Tooltip("Freeze animation while the buff is applied")]
+        [Tooltip("Freeze animation while this buff is applied")]
         public bool freezeAnimation;
-        [Tooltip("1 = 100% chance to remove the buff when attacking")]
+        [Tooltip("1 = 100% chance to remove this buff when attacking")]
         public IncrementalFloat removeBuffWhenAttackChance;
-        [Tooltip("1 = 100% chance to remove the buff when attacked")]
+        [Tooltip("1 = 100% chance to remove this buff when attacked")]
         public IncrementalFloat removeBuffWhenAttackedChance;
-        [Tooltip("1 = 100% chance to remove the buff when using skill")]
+        [Tooltip("1 = 100% chance to remove this buff when using skill")]
         public IncrementalFloat removeBuffWhenUseSkillChance;
-        [Tooltip("1 = 100% chance to remove the buff when using item")]
+        [Tooltip("1 = 100% chance to remove this buff when using item")]
         public IncrementalFloat removeBuffWhenUseItemChance;
-        [Tooltip("1 = 100% chance to remove the buff when picking item up")]
+        [Tooltip("1 = 100% chance to remove this buff when picking item up")]
         public IncrementalFloat removeBuffWhenPickupItemChance;
         [Tooltip("Hide character. This won't be applied to monster's summoner.")]
         public bool isHide;

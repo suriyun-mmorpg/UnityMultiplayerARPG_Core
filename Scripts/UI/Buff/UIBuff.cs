@@ -63,6 +63,7 @@ namespace MultiplayerARPG
         public UIStatusEffectApplyings uiStatusEffectApplyingsSelfWhenAttacked;
         public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacked;
         public UIStatusEffectResistanceAmounts uiStatusEffectResistanceAmounts;
+        public UIBuffRemovalAmounts uiBuffRemovalAmounts;
         [Tooltip("This will activate if buff's disallow move is `TRUE`, developer may set text or icon here")]
         public GameObject disallowMoveObject;
         [Tooltip("This will activate if buff's disallow sprint is `TRUE`, developer may set text or icon here")]
@@ -529,6 +530,19 @@ namespace MultiplayerARPG
                     uiStatusEffectResistanceAmounts.isBonus = true;
                     uiStatusEffectResistanceAmounts.Show();
                     uiStatusEffectResistanceAmounts.Data = GameDataHelpers.CombineStatusEffectResistances(Buff.increaseStatusEffectResistances, new Dictionary<StatusEffect, float>(), Level, 1f);
+                }
+            }
+
+            if (uiBuffRemovalAmounts != null)
+            {
+                if (Buff.buffRemovals == null || Buff.buffRemovals.Length == 0)
+                {
+                    uiBuffRemovalAmounts.Hide();
+                }
+                else
+                {
+                    uiBuffRemovalAmounts.Show();
+                    uiBuffRemovalAmounts.Data = GameDataHelpers.CombineBuffRemovals(Buff.buffRemovals, new Dictionary<BuffRemoval, float>(), Level, 1f);
                 }
             }
 
