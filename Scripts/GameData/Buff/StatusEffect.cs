@@ -41,18 +41,26 @@ namespace MultiplayerARPG
 
         }
 
+        public float GetResistanceByLevel(float totalResistance, int level)
+        {
+            if (totalResistance > MaxResistanceAmount)
+                totalResistance = MaxResistanceAmount;
+            float resistance = totalResistance / level;
+            int resistIndex = Mathf.FloorToInt(totalResistance);
+            if (resistIndex >= 0 && MaxResistanceAmountEachLevels != null && resistIndex < MaxResistanceAmountEachLevels.Length)
+                resistance = Mathf.Max(resistance, MaxResistanceAmountEachLevels[resistIndex]);
+            return resistance;
+        }
+
         public string GetResistanceEntriesText(float totalResistance, string format, bool isBonus, string separator = ",")
         {
-            if (totalResistance > maxResistanceAmount)
-                totalResistance = maxResistanceAmount;
+            if (totalResistance > MaxResistanceAmount)
+                totalResistance = MaxResistanceAmount;
             List<string> entry = new List<string>();
             for (int i = 0; i < totalResistance; ++i)
             {
-                if (i >= maxResistanceAmountEachLevels.Length)
-                    break;
                 int level = i + 1;
-                float resistance = totalResistance / level;
-                resistance = Mathf.Max(resistance, maxResistanceAmountEachLevels[i]);
+                float resistance = GetResistanceByLevel(totalResistance, level);
                 entry.Add(ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(format),
                         level.ToString("N0"),

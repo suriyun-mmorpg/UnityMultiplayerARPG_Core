@@ -1117,11 +1117,8 @@ namespace MultiplayerARPG
             {
                 if (effect.statusEffect == null) continue;
                 float totalResistance = target.GetCaches().GetStatusEffectResistance(effect.statusEffect.DataId);
-                float resistance = totalResistance / level;
-                int resistIndex = Mathf.FloorToInt(totalResistance);
-                if (resistIndex >= 0 && effect.statusEffect.MaxResistanceAmountEachLevels != null && resistIndex < effect.statusEffect.MaxResistanceAmountEachLevels.Length)
-                    resistance = Mathf.Max(resistance, effect.statusEffect.MaxResistanceAmountEachLevels[resistIndex]);
-                if (resistance > 0 && Random.value > resistance)
+                float resistance = effect.statusEffect.GetResistanceByLevel(totalResistance, level);
+                if (resistance > 0 && Random.value <= resistance)
                 {
                     // Resisted, no status effect being applied
                     continue;
