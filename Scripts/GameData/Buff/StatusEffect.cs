@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Cysharp.Text;
+using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -37,6 +39,26 @@ namespace MultiplayerARPG
         public virtual void OnApply(BaseCharacterEntity target, EntityInfo applier, CharacterItem weapon, int sourceLevel, int applyBuffLevel)
         {
 
+        }
+
+        public string GetResistanceEntriesText(float totalResistance, string format, bool isBonus, string separator = ",")
+        {
+            if (totalResistance > maxResistanceAmount)
+                totalResistance = maxResistanceAmount;
+            List<string> entry = new List<string>();
+            for (int i = 0; i < totalResistance; ++i)
+            {
+                if (i >= maxResistanceAmountEachLevels.Length)
+                    break;
+                int level = i + 1;
+                float resistance = totalResistance / level;
+                resistance = Mathf.Max(resistance, maxResistanceAmountEachLevels[i]);
+                entry.Add(ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
+                        LanguageManager.GetText(format),
+                        level.ToString("N0"),
+                        (resistance * 100f).ToString("N2"))));
+            }
+            return string.Join(separator, entry);
         }
     }
 
