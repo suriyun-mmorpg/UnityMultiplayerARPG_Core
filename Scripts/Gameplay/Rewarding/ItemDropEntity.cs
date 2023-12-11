@@ -14,7 +14,6 @@ namespace MultiplayerARPG
 {
     public class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity
     {
-        public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
 
         [Category("Relative GameObjects/Transforms")]
@@ -332,7 +331,7 @@ namespace MultiplayerARPG
             {
                 case DimensionType.Dimension3D:
                     // Random position around dropper with its height
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, 0f, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
                     // Random rotation
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
                     break;
