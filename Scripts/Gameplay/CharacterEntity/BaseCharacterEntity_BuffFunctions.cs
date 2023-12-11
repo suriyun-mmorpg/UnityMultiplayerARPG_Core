@@ -116,7 +116,11 @@ namespace MultiplayerARPG
             {
                 foreach (KeyValuePair<BuffRemoval, float> buffRemoval in buffRemovals)
                 {
-                    if (!buffRemoval.Key.IsValid()) continue;
+                    if (!buffRemoval.Key.IsValid())
+                    {
+                        // Invalid buff data
+                        continue;
+                    }
                     for (int i = Buffs.Count - 1; i >= 0; --i)
                     {
                         CharacterBuff characterBuff = Buffs[i];
@@ -125,8 +129,7 @@ namespace MultiplayerARPG
                             // This is not a removing buff
                             continue;
                         }
-                        float chance = buffRemoval.Key.GetChanceByLevel(buffRemoval.Value, characterBuff.level);
-                        if (chance <= 0 || Random.value > chance)
+                        if (!buffRemoval.Key.RandomRemoveOccurs(buffRemoval.Value, characterBuff.level))
                         {
                             // Buff removal is not occurring
                             continue;

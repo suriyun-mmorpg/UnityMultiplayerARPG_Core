@@ -7,12 +7,12 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class BuffRemoval
     {
-        [Tooltip("Source of buff (item level, skill level, status effect level and so on)")]
+        [Tooltip("Source of buff (item level, skill level, status effect level and so on).")]
         public BuffSourceData source;
-        [Tooltip("Chance to remove buff will be calculated by buff's source level (item level, skill level, status effect level and so on)")]
+        [Tooltip("Chance to remove buff will be calculated by buff's source level (item level, skill level, status effect level and so on).")]
         public IncrementalFloat removalChance;
         [Min(0f)]
-        [Tooltip("If removal chance is `1.5`, it will `100%` resist remove level `1` and `50%` resist remove level `2`.")]
+        [Tooltip("If removal chance is `1.5`, it will `100%` resist remove level `1` and `50%` resist remove level `2`. Set it to `0` to no limit.")]
         public float maxChance = 1f;
         [Range(0f, 1f)]
         [Tooltip("If value is `[0.8, 0.5, 0.25]`, and your removal chance is `2.15`, it will have chance `80%` to remove buff level `1`, `50%` to remove level `2`, and `15%` to remove level `3`.")]
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
 
         public float GetChanceByLevel(float totalChance, int level)
         {
-            if (totalChance > maxChance)
+            if (maxChance > 0f && totalChance > maxChance)
                 totalChance = maxChance;
             float chance = totalChance / level;
             if (chance > 1f)
@@ -60,6 +60,12 @@ namespace MultiplayerARPG
                     chance = Mathf.Min(chance, maxChanceEachLevels[maxChanceEachLevels.Length - 1]);
             }
             return chance;
+        }
+
+        public bool RandomRemoveOccurs(float totalChance, int level)
+        {
+            float chance = GetChanceByLevel(totalChance, level);
+            return chance > 0f && Random.value <= chance;
         }
 
         public string GetChanceEntriesText(float totalChance, string format, string separator = ",")

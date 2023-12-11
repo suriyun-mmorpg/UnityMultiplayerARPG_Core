@@ -18,7 +18,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [Min(0f)]
-        [Tooltip("If status effect resistance is `1.5`, it will `100%` resist status effect level `1` and `50%` resist status effect level `2`.")]
+        [Tooltip("If status effect resistance is `1.5`, it will `100%` resist status effect level `1` and `50%` resist status effect level `2`. Set it to `0` to no limit.")]
         private float maxResistanceAmount = 1f;
         public float MaxResistanceAmount { get { return maxResistanceAmount; } }
 
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
 
         public float GetResistanceByLevel(float totalResistance, int level)
         {
-            if (totalResistance > MaxResistanceAmount)
+            if (MaxResistanceAmount > 0f && totalResistance > MaxResistanceAmount)
                 totalResistance = MaxResistanceAmount;
             float resistance = totalResistance / level;
             if (resistance > 1f)
@@ -59,6 +59,12 @@ namespace MultiplayerARPG
                     resistance = Mathf.Min(resistance, MaxResistanceAmountEachLevels[MaxResistanceAmountEachLevels.Length - 1]);
             }
             return resistance;
+        }
+
+        public bool RandomResistOccurs(float totalResistance, int level)
+        {
+            float resistance = GetResistanceByLevel(totalResistance, level);
+            return resistance > 0f && Random.value <= resistance;
         }
 
         public string GetResistanceEntriesText(float totalResistance, string format, bool isBonus, string separator = ",")

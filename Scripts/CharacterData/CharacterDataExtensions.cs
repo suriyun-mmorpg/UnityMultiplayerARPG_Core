@@ -1115,10 +1115,12 @@ namespace MultiplayerARPG
                 return;
             foreach (StatusEffectApplying effect in statusEffects)
             {
-                if (effect.statusEffect == null) continue;
-                float totalResistance = target.GetCaches().GetStatusEffectResistance(effect.statusEffect.DataId);
-                float resistance = effect.statusEffect.GetResistanceByLevel(totalResistance, level);
-                if (resistance > 0 && Random.value <= resistance)
+                if (effect.statusEffect == null)
+                {
+                    // Invalid status effect data
+                    continue;
+                }
+                if (effect.statusEffect.RandomResistOccurs(target.GetCaches().GetStatusEffectResistance(effect.statusEffect.DataId), level))
                 {
                     // Resisted, no status effect being applied
                     continue;
