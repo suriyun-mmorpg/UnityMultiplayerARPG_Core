@@ -389,7 +389,7 @@ namespace MultiplayerARPG
             // Calculate vertical velocity by gravity
             if (!_isGrounded && !_isUnderWater)
             {
-                if (!useRootMotionForFall)
+                if (!useRootMotionForFall && !alwaysUseRootMotion)
                 {
                     _verticalVelocity -= CalculateGravity() * deltaTime;
                     _verticalVelocity = Mathf.Max(_verticalVelocity, -CalculateMaxFallVelocity());
@@ -434,7 +434,7 @@ namespace MultiplayerARPG
                     _isGrounded = false;
                     _applyingJumpForce = false;
                     float jumpForceVerticalVelocity = CalculateJumpVerticalSpeed();
-                    if (!useRootMotionForJump)
+                    if (!useRootMotionForJump && !alwaysUseRootMotion)
                     {
                         _verticalVelocity = jumpForceVerticalVelocity;
                     }
@@ -558,10 +558,10 @@ namespace MultiplayerARPG
             }
 
             // Don't applies velocity while using root motion
-            if ((_isGrounded && useRootMotionForMovement) ||
-                (isAirborne && useRootMotionForAirMovement) ||
-                (!_isGrounded && !isAirborne && useRootMotionForMovement) ||
-                (_isUnderWater && useRootMotionUnderWater))
+            if ((_isGrounded && (useRootMotionForMovement || alwaysUseRootMotion)) ||
+                (isAirborne && (useRootMotionForAirMovement || alwaysUseRootMotion)) ||
+                (!_isGrounded && !isAirborne && (useRootMotionForMovement || alwaysUseRootMotion)) ||
+                (_isUnderWater && (useRootMotionUnderWater || alwaysUseRootMotion)))
             {
                 tempMoveVelocity.x = 0;
                 tempMoveVelocity.z = 0;
@@ -1086,7 +1086,7 @@ namespace MultiplayerARPG
 
         public bool UseRootMotion()
         {
-            return useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || alwaysUseRootMotion || useRootMotionUnderWater;
+            return alwaysUseRootMotion || useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionUnderWater;
         }
 
         public void RemoteTurnSimulation(bool isKeyMovement, float yAngle, float deltaTime)
