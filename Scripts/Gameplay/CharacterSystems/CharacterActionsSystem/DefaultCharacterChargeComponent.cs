@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     public class DefaultCharacterChargeComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterChargeComponent
     {
         public bool IsCharging { get; protected set; }
+        public bool IsUseRootMotionWhileCharging { get; protected set; }
 
         protected struct ChargeState
         {

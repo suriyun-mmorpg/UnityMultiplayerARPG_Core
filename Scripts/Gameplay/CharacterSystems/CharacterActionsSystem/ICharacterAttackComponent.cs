@@ -3,6 +3,7 @@
     public interface ICharacterAttackComponent
     {
         bool IsAttacking { get; }
+        bool IsUseRootMotionWhileAttacking { get; }
         float LastAttackEndTime { get; }
         bool LastAttackSkipMovementValidation { get; }
         float MoveSpeedRateWhileAttacking { get; }

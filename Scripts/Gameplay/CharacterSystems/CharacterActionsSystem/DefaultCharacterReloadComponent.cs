@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public int ReloadingAmmoDataId { get; protected set; }
         public int ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
+        public bool IsUseRootMotionWhileReloading { get; protected set; }
         public float LastReloadEndTime { get; protected set; }
         protected bool _skipMovementValidation;
         public bool LastReloadSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }

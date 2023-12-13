@@ -108,6 +108,7 @@ namespace MultiplayerARPG
         public CharacterRecoveryComponent RecoveryComponent { get; protected set; }
         public CharacterSkillAndBuffComponent SkillAndBuffComponent { get; protected set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
+        public bool IsUseRootMotionWhileAttacking { get { return AttackComponent.IsUseRootMotionWhileAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
         public bool LastAttackSkipMovementValidation { get { return AttackComponent.LastAttackSkipMovementValidation; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
@@ -115,6 +116,7 @@ namespace MultiplayerARPG
         public float AttackTotalDuration { get { return AttackComponent.AttackTotalDuration; } set { AttackComponent.AttackTotalDuration = value; } }
         public float[] AttackTriggerDurations { get { return AttackComponent.AttackTriggerDurations; } set { AttackComponent.AttackTriggerDurations = value; } }
         public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
+        public bool IsUseRootMotionWhileUsingSkill { get { return UseSkillComponent.IsUseRootMotionWhileUsingSkill; } }
         public float LastUseSkillEndTime { get { return UseSkillComponent.LastUseSkillEndTime; } }
         public bool LastUseSkillSkipMovementValidation { get { return UseSkillComponent.LastUseSkillSkipMovementValidation; } }
         public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
@@ -129,6 +131,7 @@ namespace MultiplayerARPG
         public float CastingSkillCountDown { get { return UseSkillComponent.CastingSkillCountDown; } }
         public int ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
         public bool IsReloading { get { return ReloadComponent.IsReloading; } }
+        public bool IsUseRootMotionWhileReloading { get { return ReloadComponent.IsUseRootMotionWhileReloading; } }
         public float LastReloadEndTime { get { return ReloadComponent.LastReloadEndTime; } }
         public bool LastReloadSkipMovementValidation { get { return ReloadComponent.LastReloadSkipMovementValidation; } }
         public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
@@ -136,9 +139,20 @@ namespace MultiplayerARPG
         public float ReloadTotalDuration { get { return ReloadComponent.ReloadTotalDuration; } set { ReloadComponent.ReloadTotalDuration = value; } }
         public float[] ReloadTriggerDurations { get { return ReloadComponent.ReloadTriggerDurations; } set { ReloadComponent.ReloadTriggerDurations = value; } }
         public bool IsCharging { get { return ChargeComponent.IsCharging; } }
+        public bool IsUseRootMotionWhileCharging { get { return ChargeComponent.IsUseRootMotionWhileCharging; } }
         public bool WillDoActionWhenStopCharging { get { return ChargeComponent.WillDoActionWhenStopCharging; } }
         public float MoveSpeedRateWhileCharging { get { return ChargeComponent.MoveSpeedRateWhileCharging; } }
         public MovementRestriction MovementRestrictionWhileCharging { get { return ChargeComponent.MovementRestrictionWhileCharging; } }
+        public bool ShouldUseRootMotion
+        {
+            get
+            {
+                return (IsAttacking && IsUseRootMotionWhileAttacking) ||
+                    (IsUsingSkill && IsUseRootMotionWhileUsingSkill) ||
+                    (IsReloading && IsUseRootMotionWhileReloading) ||
+                    (IsCharging && IsUseRootMotionWhileCharging);
+            }
+        }
         public float RespawnGroundedCheckCountDown { get; protected set; }
         public float RespawnInvincibleCountDown { get; protected set; }
         public float LastUseItemTime { get; set; }
@@ -333,12 +347,16 @@ namespace MultiplayerARPG
 
             Profiler.BeginSample("BaseCharacterEntity - MovementEnablingUpdate");
             // Enable movement or not
-            if (!Movement.IsNull() && Movement.Enabled != tempEnableMovement)
+            if (!Movement.IsNull())
             {
-                if (!tempEnableMovement)
-                    Movement.StopMove();
-                // Enable movement while not passenging any vehicle
-                Movement.Enabled = tempEnableMovement;
+                if (Movement.Enabled != tempEnableMovement)
+                {
+                    if (!tempEnableMovement)
+                        Movement.StopMove();
+                    // Enable movement while not passenging any vehicle
+                    Movement.Enabled = tempEnableMovement;
+                }
+                Movement.SetShouldUseRootMotion(tempEnableMovement && ShouldUseRootMotion);
             }
             Profiler.EndSample();
 

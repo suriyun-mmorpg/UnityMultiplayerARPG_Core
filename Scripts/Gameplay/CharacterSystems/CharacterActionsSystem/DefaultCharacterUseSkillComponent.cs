@@ -54,6 +54,7 @@ namespace MultiplayerARPG
                 return _simulateState.HasValue;
             }
         }
+        public bool IsUseRootMotionWhileUsingSkill { get; protected set; }
         public float LastUseSkillEndTime { get; protected set; }
         protected bool _skipMovementValidation;
         public bool LastUseSkillSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }

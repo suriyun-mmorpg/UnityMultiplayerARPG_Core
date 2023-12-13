@@ -137,6 +137,9 @@ namespace MultiplayerARPG
         // Client confirm codes
         private bool _isClientConfirmingTeleport;
 
+        // Root motion
+        private bool _shouldUseRootMotion;
+
         public BuiltInEntityMovementFunctions3D(BaseGameEntity entity, Animator animator, IBuiltInEntityMovement3D entityMovement)
         {
             Entity = entity;
@@ -172,7 +175,7 @@ namespace MultiplayerARPG
             if (!Animator)
                 return;
 
-            if (alwaysUseRootMotion)
+            if (alwaysUseRootMotion || _shouldUseRootMotion)
             {
                 // Always use root motion
                 Animator.ApplyBuiltinRootMotion();
@@ -268,6 +271,16 @@ namespace MultiplayerARPG
             return _yTurnSpeed;
         }
 
+        public void SetShouldUseRootMotion(bool should)
+        {
+            _shouldUseRootMotion = should;
+        }
+
+        public bool GetShouldUseRootMotion()
+        {
+            return _shouldUseRootMotion;
+        }
+
         public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             if (!IsServer)
@@ -317,6 +330,7 @@ namespace MultiplayerARPG
             _isUnderWater = WaterCheck(_waterCollider);
             _isGrounded = EntityMovement.GroundCheck();
 
+            bool forceUseRootMotion = alwaysUseRootMotion || _shouldUseRootMotion;
             bool isAirborne = !_isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
 
             // Update airborne elasped
@@ -389,7 +403,7 @@ namespace MultiplayerARPG
             // Calculate vertical velocity by gravity
             if (!_isGrounded && !_isUnderWater)
             {
-                if (!useRootMotionForFall && !alwaysUseRootMotion)
+                if (!useRootMotionForFall && !forceUseRootMotion)
                 {
                     _verticalVelocity -= CalculateGravity() * deltaTime;
                     _verticalVelocity = Mathf.Max(_verticalVelocity, -CalculateMaxFallVelocity());
@@ -434,7 +448,7 @@ namespace MultiplayerARPG
                     _isGrounded = false;
                     _applyingJumpForce = false;
                     float jumpForceVerticalVelocity = CalculateJumpVerticalSpeed();
-                    if (!useRootMotionForJump && !alwaysUseRootMotion)
+                    if (!useRootMotionForJump && !forceUseRootMotion)
                     {
                         _verticalVelocity = jumpForceVerticalVelocity;
                     }
@@ -558,10 +572,10 @@ namespace MultiplayerARPG
             }
 
             // Don't applies velocity while using root motion
-            if ((_isGrounded && (useRootMotionForMovement || alwaysUseRootMotion)) ||
-                (isAirborne && (useRootMotionForAirMovement || alwaysUseRootMotion)) ||
-                (!_isGrounded && !isAirborne && (useRootMotionForMovement || alwaysUseRootMotion)) ||
-                (_isUnderWater && (useRootMotionUnderWater || alwaysUseRootMotion)))
+            if ((_isGrounded && (forceUseRootMotion || useRootMotionForMovement)) ||
+                (isAirborne && (forceUseRootMotion || useRootMotionForAirMovement)) ||
+                (!_isGrounded && !isAirborne && (forceUseRootMotion || useRootMotionForMovement)) ||
+                (_isUnderWater && (forceUseRootMotion || useRootMotionUnderWater)))
             {
                 tempMoveVelocity.x = 0;
                 tempMoveVelocity.z = 0;

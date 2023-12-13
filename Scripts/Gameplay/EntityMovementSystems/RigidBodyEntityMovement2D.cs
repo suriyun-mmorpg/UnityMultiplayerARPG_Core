@@ -183,6 +183,17 @@ namespace MultiplayerARPG
             return 0f;
         }
 
+        public void SetShouldUseRootMotion(bool should)
+        {
+            // 2D, do nothing
+        }
+
+        public bool GetShouldUseRootMotion()
+        {
+            // 2D, do nothing
+            return false;
+        }
+
         public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             if (!IsServer)
