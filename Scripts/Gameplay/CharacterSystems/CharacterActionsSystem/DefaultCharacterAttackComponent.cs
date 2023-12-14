@@ -211,7 +211,7 @@ namespace MultiplayerARPG
                     // Wait until triggger before play special effects
                     tempTriggerDuration = _triggerDurations[triggerIndex];
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, attackCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
