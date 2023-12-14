@@ -28,10 +28,11 @@ namespace MultiplayerARPG
                 return _simulateState.HasValue;
             }
         }
-        public bool IsUseRootMotionWhileAttacking { get; protected set; }
         public float LastAttackEndTime { get; protected set; }
         protected bool _skipMovementValidation;
-        public bool LastAttackSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        public bool IsSkipMovementValidationWhileAttacking { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        protected bool _shouldUseRootMotion;
+        public bool IsUseRootMotionWhileAttacking { get { return _shouldUseRootMotion; } protected set { _shouldUseRootMotion = value; } }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
         public MovementRestriction MovementRestrictionWhileAttacking { get; protected set; }
         protected float _totalDuration;
@@ -116,8 +117,7 @@ namespace MultiplayerARPG
                 animationIndex,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration,
-                out _skipMovementValidation);
+                out _totalDuration);
 
             // Set doing action state at clients and server
             SetAttackActionStates(animActionType, animActionDataId, simulateState);
@@ -169,11 +169,11 @@ namespace MultiplayerARPG
 
                 // Play action animation
                 if (tpsModelAvailable)
-                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                 if (vehicleModelAvailable)
-                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                 if (fpsModelAvailable)
-                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 if (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f)

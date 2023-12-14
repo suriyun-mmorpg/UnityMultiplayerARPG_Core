@@ -54,10 +54,11 @@ namespace MultiplayerARPG
                 return _simulateState.HasValue;
             }
         }
-        public bool IsUseRootMotionWhileUsingSkill { get; protected set; }
         public float LastUseSkillEndTime { get; protected set; }
         protected bool _skipMovementValidation;
-        public bool LastUseSkillSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        public bool IsSkipMovementValidationWhileUsingSkill { get { return _skipMovementValidation; } protected set { _skipMovementValidation = value; } }
+        protected bool _shouldUseRootMotion;
+        public bool IsUseRootMotionWhileUsingSkill { get { return _shouldUseRootMotion; } protected set { _shouldUseRootMotion = value; } }
         public bool IsCastingSkillCanBeInterrupted { get; protected set; }
         public bool IsCastingSkillInterrupted { get; protected set; }
         public float CastingSkillDuration { get; protected set; }
@@ -149,8 +150,7 @@ namespace MultiplayerARPG
                 out int animationIndex,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration,
-                out _skipMovementValidation);
+                out _totalDuration);
 
             // Set doing action state at clients and server
             SetUseSkillActionStates(animActionType, animActionDataId, simulateState);
@@ -221,11 +221,11 @@ namespace MultiplayerARPG
                 {
                     // Play cast animation
                     if (tpsModelAvailable)
-                        Entity.CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        Entity.CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _skipMovementValidation, out _shouldUseRootMotion);
                     if (vehicleModelAvailable)
-                        vehicleModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        vehicleModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _skipMovementValidation, out _shouldUseRootMotion);
                     if (fpsModelAvailable)
-                        Entity.FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration);
+                        Entity.FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _, out _);
                     // Wait until end of cast duration
                     await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.Update, skillCancellationTokenSource.Token);
                 }
@@ -241,11 +241,11 @@ namespace MultiplayerARPG
 
                 // Play action animation
                 if (tpsModelAvailable)
-                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                 if (vehicleModelAvailable)
-                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                 if (fpsModelAvailable)
-                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 if (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f)

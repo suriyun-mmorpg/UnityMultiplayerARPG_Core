@@ -194,17 +194,6 @@ namespace MultiplayerARPG
             return _yTurnSpeed;
         }
 
-        public void SetShouldUseRootMotion(bool should)
-        {
-            // It won't be implemented, don't ask for it.
-        }
-
-        public bool GetShouldUseRootMotion()
-        {
-            // It won't be implemented, don't ask for it.
-            return false;
-        }
-
         public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             if (!IsServer)

@@ -7,13 +7,25 @@ namespace MultiplayerARPG
         protected bool _lastGrounded;
         protected Vector3 _lastGroundedPosition;
 
+        public override bool ShouldUseRootMotion
+        {
+            get
+            {
+                return (IsAttacking && IsUseRootMotionWhileAttacking) ||
+                    (IsUsingSkill && IsUseRootMotionWhileUsingSkill) ||
+                    (IsReloading && IsUseRootMotionWhileReloading) ||
+                    (IsCharging && IsUseRootMotionWhileCharging);
+            }
+        }
+
         public override bool SkipMovementValidation
         {
             get
             {
-                return (IsAttacking && LastAttackSkipMovementValidation) ||
-                    (IsUsingSkill && LastUseSkillSkipMovementValidation) ||
-                    (IsReloading && LastReloadSkipMovementValidation);
+                return (IsAttacking && IsSkipMovementValidationWhileAttacking) ||
+                    (IsUsingSkill && IsSkipMovementValidationWhileUsingSkill) ||
+                    (IsReloading && IsSkipMovementValidationWhileReloading) ||
+                    (IsCharging && IsSkipMovementValidationWhileCharging);
             }
         }
 

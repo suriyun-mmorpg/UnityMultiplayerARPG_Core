@@ -17,10 +17,11 @@ namespace MultiplayerARPG
         public int ReloadingAmmoDataId { get; protected set; }
         public int ReloadingAmmoAmount { get; protected set; }
         public bool IsReloading { get; protected set; }
-        public bool IsUseRootMotionWhileReloading { get; protected set; }
         public float LastReloadEndTime { get; protected set; }
         protected bool _skipMovementValidation;
-        public bool LastReloadSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        public bool IsSkipMovementValidationWhileReloading { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        protected bool _shouldUseRootMotion;
+        public bool IsUseRootMotionWhileReloading { get { return _shouldUseRootMotion; } protected set { _shouldUseRootMotion = value; } }
         public float MoveSpeedRateWhileReloading { get; protected set; }
         public MovementRestriction MovementRestrictionWhileReloading { get; protected set; }
         protected float _totalDuration;
@@ -71,8 +72,7 @@ namespace MultiplayerARPG
                 0,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration,
-                out _skipMovementValidation);
+                out _totalDuration);
 
             // Set doing action state at clients and server
             SetReloadActionStates(animActionType, reloadingAmmoDataId, reloadingAmmoAmount);
@@ -104,11 +104,11 @@ namespace MultiplayerARPG
 
                 // Play animation
                 if (tpsModelAvailable)
-                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
                 if (vehicleModelAvailable)
-                    vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                    vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
                 if (fpsModelAvailable)
-                    Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                    Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _);
 
                 // Special effects will plays on clients only
                 if (IsClient)

@@ -4,9 +4,9 @@
     {
         int ReloadingAmmoAmount { get; }
         bool IsReloading { get; }
-        bool IsUseRootMotionWhileReloading { get; }
         float LastReloadEndTime { get; }
-        bool LastReloadSkipMovementValidation { get; }
+        bool IsSkipMovementValidationWhileReloading { get; }
+        bool IsUseRootMotionWhileReloading { get; }
         float MoveSpeedRateWhileReloading { get; }
         MovementRestriction MovementRestrictionWhileReloading { get; }
         float ReloadTotalDuration { get; set; }

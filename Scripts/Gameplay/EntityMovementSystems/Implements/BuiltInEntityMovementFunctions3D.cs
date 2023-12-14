@@ -137,9 +137,6 @@ namespace MultiplayerARPG
         // Client confirm codes
         private bool _isClientConfirmingTeleport;
 
-        // Root motion
-        private bool _shouldUseRootMotion;
-
         public BuiltInEntityMovementFunctions3D(BaseGameEntity entity, Animator animator, IBuiltInEntityMovement3D entityMovement)
         {
             Entity = entity;
@@ -175,7 +172,7 @@ namespace MultiplayerARPG
             if (!Animator)
                 return;
 
-            if (alwaysUseRootMotion || _shouldUseRootMotion)
+            if (alwaysUseRootMotion || Entity.ShouldUseRootMotion)
             {
                 // Always use root motion
                 Animator.ApplyBuiltinRootMotion();
@@ -271,16 +268,6 @@ namespace MultiplayerARPG
             return _yTurnSpeed;
         }
 
-        public void SetShouldUseRootMotion(bool should)
-        {
-            _shouldUseRootMotion = should;
-        }
-
-        public bool GetShouldUseRootMotion()
-        {
-            return _shouldUseRootMotion;
-        }
-
         public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             if (!IsServer)
@@ -330,7 +317,7 @@ namespace MultiplayerARPG
             _isUnderWater = WaterCheck(_waterCollider);
             _isGrounded = EntityMovement.GroundCheck();
 
-            bool forceUseRootMotion = alwaysUseRootMotion || _shouldUseRootMotion;
+            bool forceUseRootMotion = alwaysUseRootMotion || Entity.ShouldUseRootMotion;
             bool isAirborne = !_isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
 
             // Update airborne elasped

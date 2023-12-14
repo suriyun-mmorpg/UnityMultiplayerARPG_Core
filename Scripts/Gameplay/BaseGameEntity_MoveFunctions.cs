@@ -85,6 +85,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual bool ShouldUseRootMotion
+        {
+            get { return false; }
+        }
+
         public virtual bool SkipMovementValidation
         {
             get { return false; }
@@ -259,19 +264,6 @@ namespace MultiplayerARPG
             if (!ActiveMovement.IsNull())
                 return ActiveMovement.GetSmoothTurnSpeed();
             return 0f;
-        }
-
-        public void SetShouldUseRootMotion(bool should)
-        {
-            if (!ActiveMovement.IsNull())
-                ActiveMovement.SetShouldUseRootMotion(should);
-        }
-
-        public bool GetShouldUseRootMotion()
-        {
-            if (!ActiveMovement.IsNull())
-                return ActiveMovement.GetShouldUseRootMotion();
-            return false;
         }
 
         public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)

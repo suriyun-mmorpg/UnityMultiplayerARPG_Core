@@ -9,9 +9,9 @@
         float CastingSkillDuration { get; }
         float CastingSkillCountDown { get; }
         bool IsUsingSkill { get; }
-        bool IsUseRootMotionWhileUsingSkill { get; }
         float LastUseSkillEndTime { get; }
-        bool LastUseSkillSkipMovementValidation { get; }
+        bool IsSkipMovementValidationWhileUsingSkill { get; }
+        bool IsUseRootMotionWhileUsingSkill { get; }
         float MoveSpeedRateWhileUsingSkill { get; }
         MovementRestriction MovementRestrictionWhileUsingSkill { get; }
         float UseSkillTotalDuration { get; set; }

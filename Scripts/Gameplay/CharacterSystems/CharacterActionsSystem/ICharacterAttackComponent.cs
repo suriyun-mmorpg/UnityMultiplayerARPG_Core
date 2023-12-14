@@ -3,9 +3,9 @@
     public interface ICharacterAttackComponent
     {
         bool IsAttacking { get; }
-        bool IsUseRootMotionWhileAttacking { get; }
         float LastAttackEndTime { get; }
-        bool LastAttackSkipMovementValidation { get; }
+        bool IsSkipMovementValidationWhileAttacking { get; }
+        bool IsUseRootMotionWhileAttacking { get; }
         float MoveSpeedRateWhileAttacking { get; }
         MovementRestriction MovementRestrictionWhileAttacking { get; }
         float AttackTotalDuration { get; set; }

@@ -305,16 +305,6 @@ namespace MultiplayerARPG
             return Functions.GetSmoothTurnSpeed();
         }
 
-        public void SetShouldUseRootMotion(bool should)
-        {
-            Functions.SetShouldUseRootMotion(should);
-        }
-
-        public bool GetShouldUseRootMotion()
-        {
-            return Functions.GetShouldUseRootMotion();
-        }
-
         public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             Functions.Teleport(position, rotation, stillMoveAfterTeleport);

@@ -401,35 +401,32 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return defaultAnimations.rightHandReloadAnimation;
         }
 
-        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidation)
+        public override bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation[] tempActionAnimations = GetRightHandAttackAnimations(dataId);
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
-            skipMovementValidation = false;
             if (tempActionAnimations.Length == 0 || animationIndex >= tempActionAnimations.Length) return false;
             animSpeedRate = tempActionAnimations[animationIndex].GetAnimSpeedRate();
             triggerDurations = tempActionAnimations[animationIndex].GetTriggerDurations();
             totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
-            skipMovementValidation = tempActionAnimations[animationIndex].skipMovementValidation;
             return true;
         }
 
-        public override bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidation)
+        public override bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation tempActionAnimation = GetRightHandReloadAnimation(dataId);
             animSpeedRate = tempActionAnimation.GetAnimSpeedRate();
             triggerDurations = tempActionAnimation.GetTriggerDurations();
             totalDuration = tempActionAnimation.GetTotalDuration();
-            skipMovementValidation = tempActionAnimation.skipMovementValidation;
             return true;
         }
 
-        public override bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidation)
+        public override bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             animationIndex = GenericUtils.RandomInt(randomSeed, 0, GetRightHandAttackAnimations(dataId).Length);
-            return GetRightHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+            return GetRightHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public override int GetRightHandAttackRandomMax(int dataId)
@@ -455,35 +452,32 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return defaultAnimations.leftHandReloadAnimation;
         }
 
-        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidation)
+        public override bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation[] tempActionAnimations = GetLeftHandAttackAnimations(dataId);
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
-            skipMovementValidation = false;
             if (tempActionAnimations.Length == 0 || animationIndex >= tempActionAnimations.Length) return false;
             animSpeedRate = tempActionAnimations[animationIndex].GetAnimSpeedRate();
             triggerDurations = tempActionAnimations[animationIndex].GetTriggerDurations();
             totalDuration = tempActionAnimations[animationIndex].GetTotalDuration();
-            skipMovementValidation = tempActionAnimations[animationIndex].skipMovementValidation;
             return true;
         }
 
-        public override bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidation)
+        public override bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation tempActionAnimation = GetLeftHandReloadAnimation(dataId);
             animSpeedRate = tempActionAnimation.GetAnimSpeedRate();
             triggerDurations = tempActionAnimation.GetTriggerDurations();
             totalDuration = tempActionAnimation.GetTotalDuration();
-            skipMovementValidation = tempActionAnimation.skipMovementValidation;
             return true;
         }
 
-        public override bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidation)
+        public override bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             animationIndex = GenericUtils.RandomInt(randomSeed, 0, GetLeftHandAttackAnimations(dataId).Length);
-            return GetLeftHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+            return GetLeftHandAttackAnimation(dataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public override int GetLeftHandAttackRandomMax(int dataId)
@@ -509,13 +503,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return defaultAnimations.skillCastState;
         }
 
-        public override bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidation)
+        public override bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration)
         {
             ActionAnimation tempActionAnimation = GetSkillActivateAnimation(dataId);
             animSpeedRate = tempActionAnimation.GetAnimSpeedRate();
             triggerDurations = tempActionAnimation.GetTriggerDurations();
             totalDuration = tempActionAnimation.GetTotalDuration();
-            skipMovementValidation = tempActionAnimation.skipMovementValidation;
             return true;
         }
 
@@ -527,9 +520,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return anims.activateAnimationType;
         }
 
-        public override void PlaySkillCastClip(int dataId, float duration)
+        public override void PlaySkillCastClip(int dataId, float duration, out bool skipMovementValidation, out bool shouldUseRootMotion)
         {
-            StartActionCoroutine(PlaySkillCastClipRoutine(GetSkillCastState(dataId), duration));
+            ActionState state = GetSkillCastState(dataId);
+            skipMovementValidation = state.skipMovementValidation;
+            shouldUseRootMotion = state.shouldUseRootMotion;
+            StartActionCoroutine(PlaySkillCastClipRoutine(state, duration));
         }
 
         private IEnumerator PlaySkillCastClipRoutine(ActionState castState, float duration)
@@ -548,9 +544,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #endregion
 
         #region Action animations
-        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier = 1)
         {
-            StartActionCoroutine(PlayActionAnimationRoutine(GetActionAnimation(animActionType, dataId, index), playSpeedMultiplier));
+            ActionAnimation anim = GetActionAnimation(animActionType, dataId, index);
+            skipMovementValidation = anim.state.skipMovementValidation;
+            shouldUseRootMotion = anim.state.shouldUseRootMotion;
+            StartActionCoroutine(PlayActionAnimationRoutine(anim, playSpeedMultiplier));
         }
 
         private IEnumerator PlayActionAnimationRoutine(ActionAnimation actionAnimation, float playSpeedMultiplier)
@@ -572,27 +571,38 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #endregion
 
         #region Weapon charge animations
-        public override void PlayWeaponChargeClip(int dataId, bool isLeftHand)
+        public override void PlayWeaponChargeClip(int dataId, bool isLeftHand, out bool skipMovementValidation, out bool shouldUseRootMotion)
         {
             _isDoingAction = true;
-            WeaponAnimations weaponAnimations;
-            if (TryGetWeaponAnimations(dataId, out weaponAnimations))
+            if (TryGetWeaponAnimations(dataId, out WeaponAnimations weaponAnimations))
             {
                 if (isLeftHand && weaponAnimations.leftHandChargeState.clip != null)
                 {
+                    skipMovementValidation = weaponAnimations.leftHandChargeState.skipMovementValidation;
+                    shouldUseRootMotion = weaponAnimations.leftHandChargeState.shouldUseRootMotion;
                     Behaviour.PlayAction(weaponAnimations.leftHandChargeState, 1f, loop: true);
                     return;
                 }
                 if (!isLeftHand && weaponAnimations.rightHandChargeState.clip != null)
                 {
+                    skipMovementValidation = weaponAnimations.rightHandChargeState.skipMovementValidation;
+                    shouldUseRootMotion = weaponAnimations.rightHandChargeState.shouldUseRootMotion;
                     Behaviour.PlayAction(weaponAnimations.rightHandChargeState, 1f, loop: true);
                     return;
                 }
             }
             if (isLeftHand)
+            {
+                skipMovementValidation = defaultAnimations.leftHandChargeState.skipMovementValidation;
+                shouldUseRootMotion = defaultAnimations.leftHandChargeState.shouldUseRootMotion;
                 Behaviour.PlayAction(defaultAnimations.leftHandChargeState, 1f, loop: true);
+            }
             else
+            {
+                skipMovementValidation = defaultAnimations.rightHandChargeState.skipMovementValidation;
+                shouldUseRootMotion = defaultAnimations.rightHandChargeState.shouldUseRootMotion;
                 Behaviour.PlayAction(defaultAnimations.rightHandChargeState, 1f, loop: true);
+            }
         }
 
         public override void StopWeaponChargeAnimation()
