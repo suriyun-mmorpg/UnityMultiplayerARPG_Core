@@ -21,7 +21,7 @@ namespace MultiplayerARPG
                     spawnPosition, spawnRotation);
                 ItemDropEntity entity = spawnObj.GetComponent<ItemDropEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
-                entity.InitDropItems();
+                entity.Init();
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
                 return entity;
             }

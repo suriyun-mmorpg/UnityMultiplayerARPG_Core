@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         public RewardGivenType GivenType { get; protected set; }
         public int GiverLevel { get; protected set; }
         public int SourceLevel { get; protected set; }
-        public HashSet<string> Looters { get; protected set; }
+        public HashSet<string> Looters { get; protected set; } = new HashSet<string>();
         public GameSpawnArea<BaseRewardDropEntity> SpawnArea { get; protected set; }
         public BaseRewardDropEntity SpawnPrefab { get; protected set; }
         public int SpawnLevel { get; protected set; }
@@ -93,6 +93,16 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void EntityStart()
+        {
+            base.EntityStart();
+            if (IsServer && IsSceneObject)
+            {
+                // Init just once when started, if this entity is scene object
+                Init();
+            }
+        }
+
         public virtual void Init()
         {
             _isPickedUp = false;
@@ -118,8 +128,6 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             amount.onChange += OnAmountChange;
-            if (IsServer)
-                Init();
         }
 
         protected override void EntityOnDestroy()
@@ -183,7 +191,7 @@ namespace MultiplayerARPG
 
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
-            if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
+            if ((Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
                 Time.unscaledTime - _dropTime > CurrentGameInstance.itemLootLockDuration) && !_isPickedUp)
                 return true;
             return false;
@@ -216,6 +224,7 @@ namespace MultiplayerARPG
         protected async UniTaskVoid RespawnRoutine(float delay)
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
+            Looters.Clear();
             Init();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
