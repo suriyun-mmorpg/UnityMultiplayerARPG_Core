@@ -6,19 +6,49 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public class PlayerCharacterDuelingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
-        public float DuelingStartTime { get; private set; } = -1f;
+        [SerializeField]
+        private SyncFieldByte duelingState = new SyncFieldByte();
+
+        protected float _duelingStartTime = -1f;
+        public float DuelingStartTime
+        {
+            get
+            {
+                return _duelingStartTime;
+            }
+            set
+            {
+                _duelingStartTime = value;
+                if (IsServer && _duelingStartTime <= 0f)
+                    duelingState.Value = (byte)DuelingState.None;
+            }
+        }
+        public bool DuelingStarting
+        {
+            get
+            {
+                return (DuelingState)duelingState.Value == DuelingState.Starting;
+            }
+        }
         public bool DuelingStarted
         {
             get
             {
-                return DuelingStartTime > 0 && Time.unscaledTime - DuelingStartTime > _countDownDuration;
+                return (DuelingState)duelingState.Value == DuelingState.Started;
             }
         }
-        public bool DuelingTimeOut
+        public bool DuelingTimeout
         {
             get
             {
-                return DuelingStartTime > 0 && Time.unscaledTime - DuelingStartTime > _countDownDuration + _duelDuration;
+                return (DuelingState)duelingState.Value == DuelingState.Timeout;
+            }
+        }
+        public bool DuelingStartingOrStarted
+        {
+            get
+            {
+                return DuelingStarting || DuelingStarted;
             }
         }
 
@@ -75,14 +105,31 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            if (!IsOwnerClient)
-                return;
-            if (DuelingStarted && !DuelingTimeOut && DuelingCharacterObjectId > 0 && _duelingCharacter == null && Manager.TryGetEntityByObjectId(DuelingCharacterObjectId, out _duelingCharacter))
+            if (IsServer && DuelingStartTime > 0)
             {
-                _duelingCharacter.Dueling.DuelingCharacter = Entity;
-                _duelingCharacter.Dueling.DuelingStartTime = DuelingStartTime;
-                _duelingCharacter.Dueling._countDownDuration = _countDownDuration;
-                _duelingCharacter.Dueling._duelDuration = _duelDuration;
+                float time = Time.unscaledTime;
+                if (time - DuelingStartTime > _countDownDuration + _duelDuration)
+                {
+                    duelingState.Value = (byte)DuelingState.Timeout;
+                }
+                else if (time - DuelingStartTime > _countDownDuration)
+                {
+                    duelingState.Value = (byte)DuelingState.Started;
+                }
+                else
+                {
+                    duelingState.Value = (byte)DuelingState.Starting;
+                }
+            }
+            if (IsOwnerClient)
+            {
+                if (DuelingStartingOrStarted && !DuelingTimeout && DuelingCharacterObjectId > 0 && _duelingCharacter == null && Manager.TryGetEntityByObjectId(DuelingCharacterObjectId, out _duelingCharacter))
+                {
+                    _duelingCharacter.Dueling.DuelingCharacter = Entity;
+                    _duelingCharacter.Dueling.DuelingStartTime = DuelingStartTime;
+                    _duelingCharacter.Dueling._countDownDuration = _countDownDuration;
+                    _duelingCharacter.Dueling._duelDuration = _duelDuration;
+                }
             }
         }
 
@@ -287,7 +334,7 @@ namespace MultiplayerARPG
 
         protected void UpdateDueling()
         {
-            if (DuelingTimeOut)
+            if (DuelingTimeout)
             {
                 EndDueling(null);
                 return;

@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         [Tooltip("If this length is more than 1 it will find respawn points which its condition is match with the character")]
         [FormerlySerializedAs("overrideRespawnPoints")]
         public WarpPointByCondition[] respawnPointsByCondition;
+        [Tooltip("If this is `TRUE`, only duelers can attacks each other, other characters cannot do it, duelers also cannot attacks other")]
+        public bool duelersCanAttackEachOtherOnly;
 
         [System.NonSerialized]
         private Dictionary<int, List<WarpPointByCondition>> _cacheRespawnPointsByCondition;
@@ -65,11 +67,25 @@ namespace MultiplayerARPG
             if (string.IsNullOrEmpty(targetEntity.Id))
                 return false;
 
-            if (targetEntity.Type == EntityTypes.Player)
+            if (targetEntity.Type == EntityTypes.Player && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer))
             {
-                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacterObjectId > 0)
-                    return playerCharacter.Dueling.DuelingCharacterObjectId != targetEntity.ObjectId;
+                // Cannot attack duelers because they're invulnerable to other
+                if (duelersCanAttackEachOtherOnly && targetPlayer.Dueling.DuelingStartingOrStarted && targetPlayer.Dueling.DuelingCharacterObjectId != playerCharacter.ObjectId)
+                    return true;
 
+                // Cannot attack other because dueler invulnerable to other
+                if (duelersCanAttackEachOtherOnly && playerCharacter.Dueling.DuelingStartingOrStarted && playerCharacter.Dueling.DuelingCharacterObjectId != targetPlayer.ObjectId)
+                    return true;
+
+                // Cannot attack another dueler because dueling not started yet
+                if (playerCharacter.Dueling.DuelingStarting && playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId)
+                    return true;
+
+                // Can attack another dueler because dueling started
+                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId)
+                    return false;
+
+                // Cannot attack party member
                 if (targetEntity.PartyId != 0 && targetEntity.PartyId == playerCharacter.PartyId)
                     return true;
 
@@ -82,7 +98,7 @@ namespace MultiplayerARPG
                     case PvpMode.GuildPvp:
                         return targetEntity.GuildId != 0 && targetEntity.GuildId == playerCharacter.GuildId;
                     default:
-                        return !EnablePkRules || !playerCharacter.IsPkOn || !targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer) || !targetPlayer.IsPkOn;
+                        return !EnablePkRules || !playerCharacter.IsPkOn || !targetPlayer.IsPkOn;
                 }
             }
 
@@ -117,12 +133,17 @@ namespace MultiplayerARPG
                 // If summoned by someone, will have same allies with summoner
                 return targetEntity.Id.Equals(monsterCharacter.Summoner.Id) || monsterCharacter.Summoner.IsAlly(targetEntity);
             }
-            
-            if (targetEntity.Type == EntityTypes.Player)
+
+            if (targetEntity.Type == EntityTypes.Player && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer))
             {
+                // Cannot attack duelers
+                if (duelersCanAttackEachOtherOnly && targetPlayer.Dueling.DuelingStartingOrStarted && targetPlayer.Dueling.DuelingCharacterObjectId > 0)
+                    return true;
+
                 // If it has faction set, then check the faction between two characters
                 if (targetEntity.FactionId != 0 && monsterCharacter.FactionId == targetEntity.FactionId)
                     return true;
+
                 // Players are not monster's ally by default
                 return false;
             }
@@ -150,11 +171,25 @@ namespace MultiplayerARPG
             if (string.IsNullOrEmpty(targetEntity.Id))
                 return false;
 
-            if (targetEntity.Type == EntityTypes.Player)
+            if (targetEntity.Type == EntityTypes.Player && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer))
             {
-                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacterObjectId > 0)
-                    return playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId;
+                // Cannot attack duelers because they're invulnerable to other
+                if (duelersCanAttackEachOtherOnly && targetPlayer.Dueling.DuelingStartingOrStarted && targetPlayer.Dueling.DuelingCharacterObjectId != playerCharacter.ObjectId)
+                    return false;
 
+                // Cannot attack other because dueler invulnerable to other
+                if (duelersCanAttackEachOtherOnly && playerCharacter.Dueling.DuelingStartingOrStarted && playerCharacter.Dueling.DuelingCharacterObjectId != targetPlayer.ObjectId)
+                    return false;
+
+                // Cannot attack another dueler because dueling not started yet
+                if (playerCharacter.Dueling.DuelingStarting && playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId)
+                    return false;
+
+                // Can attack another dueler because dueling started
+                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId)
+                    return true;
+
+                // Cannot attack party member
                 if (targetEntity.PartyId != 0 && targetEntity.PartyId == playerCharacter.PartyId)
                     return false;
 
@@ -167,7 +202,7 @@ namespace MultiplayerARPG
                     case PvpMode.GuildPvp:
                         return targetEntity.GuildId == 0 || targetEntity.GuildId != playerCharacter.GuildId;
                     default:
-                        return EnablePkRules && playerCharacter.IsPkOn && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer) && targetPlayer.IsPkOn;
+                        return EnablePkRules && playerCharacter.IsPkOn && targetPlayer.IsPkOn;
                 }
             }
 
@@ -203,11 +238,16 @@ namespace MultiplayerARPG
                 return monsterCharacter.Summoner.IsEnemy(targetEntity);
             }
 
-            if (targetEntity.Type == EntityTypes.Player)
+            if (targetEntity.Type == EntityTypes.Player && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer))
             {
+                // Cannot attack duelers
+                if (duelersCanAttackEachOtherOnly && targetPlayer.Dueling.DuelingStartingOrStarted && targetPlayer.Dueling.DuelingCharacterObjectId > 0)
+                    return false;
+
                 // If it has faction set, then check the faction between two characters
                 if (targetEntity.FactionId != 0 && monsterCharacter.FactionId == targetEntity.FactionId)
                     return false;
+
                 // Players are monster's enemy by default
                 return true;
             }
@@ -225,12 +265,14 @@ namespace MultiplayerARPG
         {
             base.Serialize(writer);
             writer.Put((byte)pvpMode);
+            writer.Put(duelersCanAttackEachOtherOnly);
         }
 
         public override void Deserialize(NetDataReader reader)
         {
             base.Deserialize(reader);
             pvpMode = (PvpMode)reader.GetByte();
+            duelersCanAttackEachOtherOnly = reader.GetBool();
         }
     }
 }
