@@ -113,7 +113,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiIncreaseDamageAmounts")]
         public UIDamageElementAmounts uiIncreaseDamages;
         public UIDamageElementAmounts uiIncreaseDamagesRate;
-        public UIStatusEffectResistanceAmounts uiStatusEffectResistanceAmounts;
+        public UIStatusEffectResistances uiStatusEffectResistances;
         public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
         public UIEquipmentSockets uiEquipmentSockets;
@@ -1013,7 +1013,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiStatusEffectResistanceAmounts != null)
+            if (uiStatusEffectResistances != null)
             {
                 Dictionary<StatusEffect, float> statusEffectResistances = null;
                 if (EquipmentItem != null)
@@ -1028,13 +1028,13 @@ namespace MultiplayerARPG
                 if (statusEffectResistances == null || statusEffectResistances.Count == 0)
                 {
                     // Hide ui if armors is empty
-                    uiStatusEffectResistanceAmounts.Hide();
+                    uiStatusEffectResistances.Hide();
                 }
                 else
                 {
-                    uiStatusEffectResistanceAmounts.isBonus = true;
-                    uiStatusEffectResistanceAmounts.Show();
-                    uiStatusEffectResistanceAmounts.Data = statusEffectResistances;
+                    uiStatusEffectResistances.isBonus = true;
+                    uiStatusEffectResistances.Show();
+                    uiStatusEffectResistances.UpdateData(statusEffectResistances);
                 }
             }
 

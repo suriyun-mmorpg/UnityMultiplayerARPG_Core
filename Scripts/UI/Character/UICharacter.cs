@@ -55,7 +55,7 @@ namespace MultiplayerARPG
         public UICharacterBuffs uiCharacterBuffs;
         public UIResistanceAmounts uiCharacterResistances;
         public UIArmorAmounts uiCharacterArmors;
-        public UIStatusEffectResistanceAmounts uiCharacterStatusEffectResistances;
+        public UIStatusEffectResistances uiCharacterStatusEffectResistances;
         public UICharacterAttributePair[] uiCharacterAttributes = new UICharacterAttributePair[0];
         public UICharacterCurrencyPair[] uiCharacterCurrencies = new UICharacterCurrencyPair[0];
         public UICharacterClass uiCharacterClass;
@@ -461,7 +461,7 @@ namespace MultiplayerARPG
             if (uiCharacterStatusEffectResistances != null)
             {
                 uiCharacterStatusEffectResistances.isBonus = false;
-                uiCharacterStatusEffectResistances.Data = _cacheStatusEffects;
+                uiCharacterStatusEffectResistances.UpdateData(_cacheStatusEffects);
             }
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)

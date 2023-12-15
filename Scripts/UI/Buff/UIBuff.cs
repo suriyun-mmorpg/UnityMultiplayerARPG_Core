@@ -12,6 +12,8 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Buff Duration}")]
         public UILocaleKeySetting formatKeyDuration = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_DURATION);
+        [Tooltip("Format => {0} = {Max Stack}")]
+        public UILocaleKeySetting formatKeyMaxStack = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_MAX_STACK);
         [Tooltip("Format => {0} = {Buff Recovery Hp}")]
         public UILocaleKeySetting formatKeyRecoveryHp = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_HP);
         [Tooltip("Format => {0} = {Buff Recovery Mp}")]
@@ -22,8 +24,6 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRecoveryFood = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_FOOD);
         [Tooltip("Format => {0} = {Buff Recovery Water}")]
         public UILocaleKeySetting formatKeyRecoveryWater = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_RECOVERY_WATER);
-        [Tooltip("Format => {0} = {Max Stack}")]
-        public UILocaleKeySetting formatKeyMaxStack = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_MAX_STACK);
         [Tooltip("Format => {0} = {Chance * 100}")]
         public UILocaleKeySetting formatKeyRemoveBuffWhenAttackChance = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_REMOVE_BUFF_WHEN_ATTACK_CHANCE);
         [Tooltip("Format => {0} = {Chance * 100}")]
@@ -37,12 +37,12 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public TextWrapper uiTextDuration;
+        public TextWrapper uiTextMaxStack;
         public TextWrapper uiTextRecoveryHp;
         public TextWrapper uiTextRecoveryMp;
         public TextWrapper uiTextRecoveryStamina;
         public TextWrapper uiTextRecoveryFood;
         public TextWrapper uiTextRecoveryWater;
-        public TextWrapper uiTextMaxStack;
         public TextWrapper uiTextRemoveBuffWhenAttackChance;
         public TextWrapper uiTextRemoveBuffWhenAttackedChance;
         public TextWrapper uiTextRemoveBuffWhenUseSkillChance;
@@ -62,8 +62,9 @@ namespace MultiplayerARPG
         public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacking;
         public UIStatusEffectApplyings uiStatusEffectApplyingsSelfWhenAttacked;
         public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacked;
-        public UIStatusEffectResistanceAmounts uiStatusEffectResistanceAmounts;
-        public UIBuffRemovalAmounts uiBuffRemovalAmounts;
+        public UIStatusEffectResistances uiStatusEffectResistances;
+        public UIBuffRemovals uiBuffRemovals;
+        [Header("Extras")]
         [Tooltip("This will activate if buff's disallow move is `TRUE`, developer may set text or icon here")]
         public GameObject disallowMoveObject;
         [Tooltip("This will activate if buff's disallow sprint is `TRUE`, developer may set text or icon here")]
@@ -96,10 +97,10 @@ namespace MultiplayerARPG
         public GameObject muteFootstepSoundObject;
         [Tooltip("This will activate if buff's is extend duration is `TRUE`, developer may set text or icon here")]
         public GameObject isExtendDurationObject;
-        [Tooltip("Text of all ailments will be written here")]
-        public TextWrapper uiTextAilments;
+        [Tooltip("Text of all extras will be written here")]
+        public TextWrapper uiTextExtras;
         [Tooltip("Seperator for ailments")]
-        public string ailmentsSeparator = ", ";
+        public string extrasSeparator = ", ";
 
         protected override void UpdateData()
         {
@@ -112,6 +113,19 @@ namespace MultiplayerARPG
                 {
                     uiTextDuration.text = ZString.Format(
                         LanguageManager.GetText(formatKeyDuration),
+                        value.ToString("N0"));
+                }
+            }
+
+            if (uiTextMaxStack != null)
+            {
+                int value = Buff.GetMaxStack(Level);
+                bool activated = value != 0;
+                uiTextMaxStack.SetGameObjectActive(activated);
+                if (activated)
+                {
+                    uiTextMaxStack.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyMaxStack),
                         value.ToString("N0"));
                 }
             }
@@ -181,19 +195,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiTextMaxStack != null)
-            {
-                int value = Buff.GetMaxStack(Level);
-                bool activated = value != 0;
-                uiTextMaxStack.SetGameObjectActive(activated);
-                if (activated)
-                {
-                    uiTextMaxStack.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyMaxStack),
-                        value.ToString("N0"));
-                }
-            }
-
             if (uiTextRemoveBuffWhenAttackChance != null)
             {
                 float value = Buff.GetRemoveBuffWhenAttackChance(Level);
@@ -259,7 +260,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiTextAilments != null)
+            if (uiTextExtras != null)
             {
                 bool activated = Data.buff.disallowMove ||
                     Data.buff.disallowSprint ||
@@ -277,7 +278,7 @@ namespace MultiplayerARPG
                     Data.buff.doNotRemoveOnDead ||
                     Data.buff.muteFootstepSound ||
                     Data.buff.isExtendDuration;
-                uiTextAilments.SetGameObjectActive(activated);
+                uiTextExtras.SetGameObjectActive(activated);
                 if (activated)
                 {
                     List<string> ailments = new List<string>();
@@ -313,7 +314,7 @@ namespace MultiplayerARPG
                         ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_MUTE_FOOTSTEP_SOUND.ToString(), "Mute Footstep Sound"));
                     if (Data.buff.isExtendDuration)
                         ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_IS_EXTEND_DURATION.ToString(), "Extend Duration"));
-                    uiTextAilments.text = string.Join(ailmentsSeparator, ailments);
+                    uiTextExtras.text = string.Join(extrasSeparator, ailments);
                 }
             }
 
@@ -519,30 +520,30 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiStatusEffectResistanceAmounts != null)
+            if (uiStatusEffectResistances != null)
             {
                 if (Buff.increaseStatusEffectResistances == null || Buff.increaseStatusEffectResistances.Length == 0)
                 {
-                    uiStatusEffectResistanceAmounts.Hide();
+                    uiStatusEffectResistances.Hide();
                 }
                 else
                 {
-                    uiStatusEffectResistanceAmounts.isBonus = true;
-                    uiStatusEffectResistanceAmounts.Show();
-                    uiStatusEffectResistanceAmounts.Data = GameDataHelpers.CombineStatusEffectResistances(Buff.increaseStatusEffectResistances, new Dictionary<StatusEffect, float>(), Level, 1f);
+                    uiStatusEffectResistances.isBonus = true;
+                    uiStatusEffectResistances.Show();
+                    uiStatusEffectResistances.UpdateData(GameDataHelpers.CombineStatusEffectResistances(Buff.increaseStatusEffectResistances, new Dictionary<StatusEffect, float>(), Level, 1f));
                 }
             }
 
-            if (uiBuffRemovalAmounts != null)
+            if (uiBuffRemovals != null)
             {
                 if (Buff.buffRemovals == null || Buff.buffRemovals.Length == 0)
                 {
-                    uiBuffRemovalAmounts.Hide();
+                    uiBuffRemovals.Hide();
                 }
                 else
                 {
-                    uiBuffRemovalAmounts.Show();
-                    uiBuffRemovalAmounts.Data = GameDataHelpers.CombineBuffRemovals(Buff.buffRemovals, new Dictionary<BuffRemoval, float>(), Level, 1f);
+                    uiBuffRemovals.Show();
+                    uiBuffRemovals.UpdateData(GameDataHelpers.CombineBuffRemovals(Buff.buffRemovals, new Dictionary<BuffRemoval, float>(), Level, 1f));
                 }
             }
 

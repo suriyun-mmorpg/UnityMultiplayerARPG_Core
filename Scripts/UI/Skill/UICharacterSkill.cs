@@ -501,5 +501,17 @@ namespace MultiplayerARPG
                 dataId = Skill.DataId
             }, ClientCharacterActions.ResponseIncreaseSkillLevel);
         }
+
+        public void OnClickUse()
+        {
+            if (!IsOwningCharacter())
+                return;
+
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+
+            // Controlling by hotkey controller
+            UICharacterHotkeys.SetupHotkeyForDialogControlling(HotkeyType.Skill, Skill.Id);
+        }
     }
 }

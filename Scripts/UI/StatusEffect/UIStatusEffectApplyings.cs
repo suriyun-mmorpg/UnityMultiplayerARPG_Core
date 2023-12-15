@@ -1,13 +1,29 @@
+using Cysharp.Text;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIStatusEffectApplyings : UIBase
+    public partial class UIStatusEffectApplyings : UIBase
     {
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Level}")]
+        public UILocaleKeySetting formatApplyingTargetSelf = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STATUS_EFFECT_APPLYING_TARGET_SELF);
+        [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Level}")]
+        public UILocaleKeySetting formatApplyingTargetEnemy = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STATUS_EFFECT_APPLYING_TARGET_ENEMY);
+        [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Level}")]
+        public UILocaleKeySetting formatApplyingTargetSelfWhenAttacking = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STATUS_EFFECT_APPLYING_TARGET_SELF_WHEN_ATTACKING);
+        [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Level}")]
+        public UILocaleKeySetting formatApplyingTargetEnemyWhenAttacking = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STATUS_EFFECT_APPLYING_TARGET_ENEMY_WHEN_ATTACKING);
+        [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Level}")]
+        public UILocaleKeySetting formatApplyingTargetSelfWhenAttacked = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STATUS_EFFECT_APPLYING_TARGET_SELF_WHEN_ATTACKED);
+        [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Level}")]
+        public UILocaleKeySetting formatApplyingTargetEnemyWhenAttacked = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STATUS_EFFECT_APPLYING_TARGET_ENEMY_WHEN_ATTACKED);
+
         public UIStatusEffectApplying uiDialog;
         public UIStatusEffectApplying uiPrefab;
         public Transform uiContainer;
+        public TextWrapper uiTextAllEntries;
 
         private UIList _cacheList;
         public UIList CacheList
@@ -36,7 +52,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public UIStatusEffectApplyingTarget target;
         private UISelectionManagerShowOnSelectEventManager<UIStatusEffectApplyingData, UIStatusEffectApplying> _listEventSetupManager = new UISelectionManagerShowOnSelectEventManager<UIStatusEffectApplyingData, UIStatusEffectApplying>();
 
         protected virtual void OnEnable()
@@ -49,7 +64,7 @@ namespace MultiplayerARPG
             _listEventSetupManager.OnDisable();
         }
 
-        public virtual void UpdateData(IEnumerable<StatusEffectApplying> statusEffectApplyings, int level, UIStatusEffectApplyingTarget target)
+        public virtual void UpdateData(IList<StatusEffectApplying> statusEffectApplyings, int level, UIStatusEffectApplyingTarget target)
         {
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
@@ -63,6 +78,77 @@ namespace MultiplayerARPG
                 if (index == 0)
                     uiComp.SelectByManager();
             });
+
+            if (statusEffectApplyings.Count == 0)
+            {
+                if (uiTextAllEntries != null)
+                    uiTextAllEntries.SetGameObjectActive(false);
+            }
+            else
+            {
+                using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
+                {
+                    string tempAmountText;
+                    foreach (StatusEffectApplying dataEntry in statusEffectApplyings)
+                    {
+                        if (dataEntry.statusEffect == null)
+                            continue;
+                        tempAmountText = null;
+                        switch (target)
+                        {
+                            case UIStatusEffectApplyingTarget.Self:
+                                tempAmountText = ZString.Format(
+                                    LanguageManager.GetText(formatApplyingTargetSelf),
+                                    dataEntry.statusEffect.Title,
+                                    level.ToString("N0"));
+                                break;
+                            case UIStatusEffectApplyingTarget.Enemy:
+                                tempAmountText = ZString.Format(
+                                    LanguageManager.GetText(formatApplyingTargetEnemy),
+                                    dataEntry.statusEffect.Title,
+                                    level.ToString("N0"));
+                                break;
+                            case UIStatusEffectApplyingTarget.SelfWhenAttacking:
+                                tempAmountText = ZString.Format(
+                                    LanguageManager.GetText(formatApplyingTargetSelfWhenAttacking),
+                                    dataEntry.statusEffect.Title,
+                                    level.ToString("N0"));
+                                break;
+                            case UIStatusEffectApplyingTarget.EnemyWhenAttacking:
+                                tempAmountText = ZString.Format(
+                                    LanguageManager.GetText(formatApplyingTargetEnemyWhenAttacking),
+                                    dataEntry.statusEffect.Title,
+                                    level.ToString("N0"));
+                                break;
+                            case UIStatusEffectApplyingTarget.SelfWhenAttacked:
+                                tempAmountText = ZString.Format(
+                                    LanguageManager.GetText(formatApplyingTargetSelfWhenAttacked),
+                                    dataEntry.statusEffect.Title,
+                                    level.ToString("N0"));
+                                break;
+                            case UIStatusEffectApplyingTarget.EnemyWhenAttacked:
+                                tempAmountText = ZString.Format(
+                                    LanguageManager.GetText(formatApplyingTargetEnemyWhenAttacked),
+                                    dataEntry.statusEffect.Title,
+                                    level.ToString("N0"));
+                                break;
+                        }
+                        if (!string.IsNullOrEmpty(tempAmountText))
+                        {
+                            // Add new line if text is not empty
+                            if (tempAllText.Length > 0)
+                                tempAllText.Append('\n');
+                            tempAllText.Append(tempAmountText);
+                        }
+                    }
+
+                    if (uiTextAllEntries != null)
+                    {
+                        uiTextAllEntries.SetGameObjectActive(tempAllText.Length > 0);
+                        uiTextAllEntries.text = tempAllText.ToString();
+                    }
+                }
+            }
         }
     }
 }

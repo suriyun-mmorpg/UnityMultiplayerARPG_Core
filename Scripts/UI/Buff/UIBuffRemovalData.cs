@@ -1,10 +1,10 @@
 ﻿namespace MultiplayerARPG
 {
-    public struct UIBuffRemovalAmountData
+    public struct UIBuffRemovalData
     {
         public BuffRemoval removal;
         public float amount;
-        public UIBuffRemovalAmountData(BuffRemoval removal, float amount)
+        public UIBuffRemovalData(BuffRemoval removal, float amount)
         {
             this.removal = removal;
             this.amount = amount;

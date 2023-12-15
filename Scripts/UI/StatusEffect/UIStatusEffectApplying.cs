@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIStatusEffectApplying : UISelectionEntry<UIStatusEffectApplyingData>
+    public partial class UIStatusEffectApplying : UISelectionEntry<UIStatusEffectApplyingData>
     {
         public StatusEffectApplying StatusEffectApplying { get { return Data.statusEffectApplying; } }
         public StatusEffect StatusEffect { get { return StatusEffectApplying.statusEffect; } }
