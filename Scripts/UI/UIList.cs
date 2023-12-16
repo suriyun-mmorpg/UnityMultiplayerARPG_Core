@@ -39,6 +39,7 @@ public class UIList : MonoBehaviour
             {
                 ui = _uis[i];
                 ui.transform.SetSiblingIndex(ChildPrefabsCount.Value + i);
+                ui.SetActive(true);
             }
             else
             {
@@ -51,14 +52,13 @@ public class UIList : MonoBehaviour
                     ui.transform.localScale = Vector3.one;
                     ui.transform.SetSiblingIndex(ChildPrefabsCount.Value + i);
                     _uis.Add(ui);
+                    ui.SetActive(true);
                 }
             }
             if (this.onGenerateEntry != null)
                 this.onGenerateEntry.Invoke(i, entry, ui);
             if (onGenerateEntry != null)
                 onGenerateEntry.Invoke(i, entry, ui);
-            if (ui != null)
-                ui.SetActive(true);
             ++i;
         }
         ListCount = i;
