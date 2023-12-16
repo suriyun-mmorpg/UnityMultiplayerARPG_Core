@@ -78,7 +78,7 @@ namespace MultiplayerARPG
                 int level = i + 1;
                 float chance = GetChanceByLevel(totalChance, level);
                 entry.Add(ZString.Format(
-                        LanguageManager.GetText(format),
+                        format,
                         level.ToString("N0"),
                         (chance * 100f).ToString("N2")));
             }

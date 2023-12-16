@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             return resistance > 0f && Random.value <= resistance;
         }
 
-        public string GetResistanceEntriesText(float totalResistance, string format, bool isBonus, string separator = ",")
+        public string GetResistanceEntriesText(float totalResistance, string format, string separator = ",")
         {
             if (totalResistance > MaxResistanceAmount)
                 totalResistance = MaxResistanceAmount;
@@ -76,8 +76,8 @@ namespace MultiplayerARPG
             {
                 int level = i + 1;
                 float resistance = GetResistanceByLevel(totalResistance, level);
-                entry.Add(ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
-                        LanguageManager.GetText(format),
+                entry.Add(ZString.Concat(ZString.Format(
+                        format,
                         level.ToString("N0"),
                         (resistance * 100f).ToString("N2"))));
             }
