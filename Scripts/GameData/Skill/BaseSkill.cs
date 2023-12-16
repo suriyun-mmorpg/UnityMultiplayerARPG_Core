@@ -613,7 +613,7 @@ namespace MultiplayerARPG
             uint targetObjectId,
             AimPosition aimPosition)
         {
-            if (skillUser == null || skillUser.IsDead() || !skillUser.IsServer || skillLevel <= 0)
+            if (skillUser == null || skillUser.IsDead() || skillLevel <= 0)
                 return;
             ApplySkillItemCraft(skillUser);
             ApplySkillSummon(skillUser, skillLevel);
@@ -633,6 +633,9 @@ namespace MultiplayerARPG
 
         protected virtual void ApplySkillItemCraft(BaseCharacterEntity skillUser)
         {
+            if (!skillUser.IsServer)
+                return;
+
             if (!(skillUser is BasePlayerCharacterEntity playerCharacterEntity))
                 return;
 
@@ -645,6 +648,9 @@ namespace MultiplayerARPG
 
         protected virtual void ApplySkillSummon(BaseCharacterEntity skillUser, int skillLevel)
         {
+            if (!skillUser.IsServer)
+                return;
+
             if (!TryGetSummon(out SkillSummon summon) || summon.MonsterEntity == null)
                 return;
 
@@ -679,6 +685,9 @@ namespace MultiplayerARPG
 
         protected virtual void ApplySkillMount(BaseCharacterEntity skillUser, int skillLevel)
         {
+            if (!skillUser.IsServer)
+                return;
+
             if (!TryGetMount(out SkillMount mount) || mount.MountEntity == null)
                 return;
 
