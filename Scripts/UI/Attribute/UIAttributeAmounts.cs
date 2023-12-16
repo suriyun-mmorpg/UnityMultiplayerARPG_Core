@@ -107,7 +107,7 @@ namespace MultiplayerARPG
                     float tempTargetAmount;
                     bool tempAmountEnough;
                     string tempCurrentValue;
-                    string tempTargetValue;
+                    string tempValue;
                     string tempFormat;
                     string tempAmountText;
                     UIAttributeTextPair tempComponentPair;
@@ -126,36 +126,29 @@ namespace MultiplayerARPG
                         {
                             case DisplayType.Rate:
                                 // This will show only target amount, so current character attribute amount will not be shown
-                                if (isBonus)
-                                    tempTargetValue = (tempTargetAmount * 100).ToBonusString(numberFormatRate);
-                                else
-                                    tempTargetValue = (tempTargetAmount * 100).ToString(numberFormatRate);
-                                tempAmountText = ZString.Format(
+                                tempValue = (tempTargetAmount * 100).ToString(numberFormatRate);
+                                tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeyRateAmount),
                                     tempData.Title,
-                                    tempTargetValue);
+                                    tempValue));
                                 break;
                             case DisplayType.Requirement:
                                 // This will show both current character attribute amount and target amount
                                 tempAmountEnough = tempCurrentAmount >= tempTargetAmount;
                                 tempFormat = LanguageManager.GetText(tempAmountEnough ? formatKeyAmount : formatKeyAmountNotEnough);
                                 tempCurrentValue = tempCurrentAmount.ToString(numberFormatSimple);
-                                tempTargetValue = tempTargetAmount.ToString(numberFormatSimple);
+                                tempValue = tempTargetAmount.ToString(numberFormatSimple);
                                 if (useSimpleFormatIfAmountEnough && tempAmountEnough)
-                                    tempAmountText = ZString.Format(LanguageManager.GetText(formatKeySimpleAmount), tempData.Title, tempTargetValue);
+                                    tempAmountText = ZString.Format(LanguageManager.GetText(formatKeySimpleAmount), tempData.Title, tempValue);
                                 else
-                                    tempAmountText = ZString.Format(tempFormat, tempData.Title, tempCurrentValue, tempTargetValue);
+                                    tempAmountText = ZString.Format(tempFormat, tempData.Title, tempCurrentValue, tempValue);
                                 break;
                             default:
-                                // This will show only target amount, so current character attribute amount will not be shown
-                                if (isBonus)
-                                    tempTargetValue = tempTargetAmount.ToBonusString(numberFormatSimple);
-                                else
-                                    tempTargetValue = tempTargetAmount.ToString(numberFormatSimple);
-                                tempAmountText = ZString.Format(
+                                tempValue = tempTargetAmount.ToString(numberFormatSimple);
+                                tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeySimpleAmount),
                                     tempData.Title,
-                                    tempTargetValue);
+                                    tempValue));
                                 break;
                         }
                         // Append current attribute amount text
@@ -187,13 +180,15 @@ namespace MultiplayerARPG
 
         private void SetDefaultValue(UIAttributeTextPair componentPair)
         {
+            string zeroFormatRate = 0f.ToString(numberFormatRate);
+            string zeroFormatSimple = 0f.ToString(numberFormatSimple);
             switch (displayType)
             {
                 case DisplayType.Rate:
-                    componentPair.uiText.text = ZString.Format(
+                    componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(formatKeyRateAmount),
                         componentPair.attribute.Title,
-                        isBonus ? 0f.ToBonusString(numberFormatRate) : 0f.ToString(numberFormatRate));
+                        zeroFormatRate));
                     break;
                 case DisplayType.Requirement:
                     if (useSimpleFormatIfAmountEnough)
@@ -201,21 +196,21 @@ namespace MultiplayerARPG
                         componentPair.uiText.text = ZString.Format(
                             LanguageManager.GetText(formatKeySimpleAmount),
                             componentPair.attribute.Title,
-                            "0");
+                            zeroFormatSimple);
                     }
                     else
                     {
                         componentPair.uiText.text = ZString.Format(
                             LanguageManager.GetText(formatKeyAmount),
                             componentPair.attribute.Title,
-                            "0", "0");
+                            zeroFormatSimple, zeroFormatSimple);
                     }
                     break;
                 case DisplayType.Simple:
-                    componentPair.uiText.text = ZString.Format(
+                    componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
                         componentPair.attribute.Title,
-                        isBonus ? 0f.ToBonusString(numberFormatSimple) : "0");
+                        zeroFormatSimple));
                     break;
             }
             if (componentPair.imageIcon != null)

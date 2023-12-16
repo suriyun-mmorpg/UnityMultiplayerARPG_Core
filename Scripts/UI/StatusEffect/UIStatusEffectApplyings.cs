@@ -66,18 +66,21 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(IList<StatusEffectApplying> statusEffectApplyings, int level, UIStatusEffectApplyingTarget target)
         {
-            CacheSelectionManager.DeselectSelectedUI();
-            CacheSelectionManager.Clear();
-            CacheList.HideAll();
-            CacheList.Generate(statusEffectApplyings, (index, data, ui) =>
+            if (uiPrefab != null && uiContainer != null)
             {
-                UIStatusEffectApplying uiComp = ui.GetComponent<UIStatusEffectApplying>();
-                uiComp.Data = new UIStatusEffectApplyingData(data, level, target);
-                uiComp.Show();
-                CacheSelectionManager.Add(uiComp);
-                if (index == 0)
-                    uiComp.SelectByManager();
-            });
+                CacheSelectionManager.DeselectSelectedUI();
+                CacheSelectionManager.Clear();
+                CacheList.HideAll();
+                CacheList.Generate(statusEffectApplyings, (index, data, ui) =>
+                {
+                    UIStatusEffectApplying uiComp = ui.GetComponent<UIStatusEffectApplying>();
+                    uiComp.Data = new UIStatusEffectApplyingData(data, level, target);
+                    uiComp.Show();
+                    CacheSelectionManager.Add(uiComp);
+                    if (index == 0)
+                        uiComp.SelectByManager();
+                });
+            }
 
             if (statusEffectApplyings.Count == 0)
             {

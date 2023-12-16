@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyEntriesOnly = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Entries}")]
         public UILocaleKeySetting formatKeyTitleWithEntries = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_STATUS_EFFECT_RESISTANCE_ENTRIES);
-        public string entriesSeparator = ",";
+        public string entriesSeparator = ", ";
 
         [Header("UI Elements")]
         public UIGameDataElements uiGameDataElements;
@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             {
                 uiTextEntriesOnly.text = ZString.Format(
                     LanguageManager.GetText(formatKeyEntriesOnly),
-                    Data.statusEffect.GetResistanceEntriesText(Data.amount, LanguageManager.GetText(formatKeyEntry), false, entriesSeparator));
+                    Data.statusEffect.GetResistanceEntriesText(Data.amount, LanguageManager.GetText(formatKeyEntry), entriesSeparator));
             }
 
             if (uiTextTitleWithEntries != null)
@@ -38,7 +38,7 @@ namespace MultiplayerARPG
                 uiTextTitleWithEntries.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitleWithEntries),
                     Data.statusEffect.Title,
-                    Data.statusEffect.GetResistanceEntriesText(Data.amount, LanguageManager.GetText(formatKeyEntry), false, entriesSeparator));
+                    Data.statusEffect.GetResistanceEntriesText(Data.amount, LanguageManager.GetText(formatKeyEntry), entriesSeparator));
             }
         }
     }

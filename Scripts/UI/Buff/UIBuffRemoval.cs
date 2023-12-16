@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyEntriesOnly = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Entries}")]
         public UILocaleKeySetting formatKeyTitleWithEntries = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_REMOVAL_ENTRIES);
-        public string entriesSeparator = ",";
+        public string entriesSeparator = ", ";
 
         [Header("UI Elements")]
         public UIGameDataElements uiGameDataElements;

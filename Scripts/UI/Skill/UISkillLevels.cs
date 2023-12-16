@@ -26,6 +26,7 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         public DisplayType displayType;
+        public string numberFormatSimple = "N0";
         public bool includeEquipmentsForCurrentLevels;
         public bool isBonus;
         public bool inactiveIfLevelZero;
@@ -82,7 +83,7 @@ namespace MultiplayerARPG
                     int tempTargetLevel;
                     bool tempLevelEnough;
                     string tempCurrentValue;
-                    string tempTargetValue;
+                    string tempValue;
                     string tempFormat;
                     string tempLevelText;
                     UISkillTextPair tempComponentPair;
@@ -103,23 +104,20 @@ namespace MultiplayerARPG
                                 // This will show both current character skill level and target level
                                 tempLevelEnough = tempCurrentLevel >= tempTargetLevel;
                                 tempFormat = LanguageManager.GetText(tempLevelEnough ? formatKeyLevel : formatKeyLevelNotEnough);
-                                tempCurrentValue = tempCurrentLevel.ToString("N0");
-                                tempTargetValue = tempTargetLevel.ToString("N0");
+                                tempCurrentValue = tempCurrentLevel.ToString(numberFormatSimple);
+                                tempValue = tempTargetLevel.ToString(numberFormatSimple);
                                 if (useSimpleFormatIfLevelEnough && tempLevelEnough)
-                                    tempLevelText = ZString.Format(LanguageManager.GetText(formatKeySimpleLevel), tempData.Title, tempTargetValue);
+                                    tempLevelText = ZString.Format(LanguageManager.GetText(formatKeySimpleLevel), tempData.Title, tempValue);
                                 else
-                                    tempLevelText = ZString.Format(tempFormat, tempData.Title, tempCurrentValue, tempTargetValue);
+                                    tempLevelText = ZString.Format(tempFormat, tempData.Title, tempCurrentValue, tempValue);
                                 break;
                             default:
                                 // This will show only target level, so current character skill level will not be shown
-                                if (isBonus)
-                                    tempTargetValue = tempTargetLevel.ToBonusString("N0");
-                                else
-                                    tempTargetValue = tempTargetLevel.ToString("N0");
-                                tempLevelText = ZString.Format(
+                                tempValue = tempTargetLevel.ToString(numberFormatSimple);
+                                tempLevelText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeySimpleLevel),
                                     tempData.Title,
-                                    tempTargetValue);
+                                    tempValue));
                                 break;
                         }
                         // Append current skill level text
@@ -150,6 +148,7 @@ namespace MultiplayerARPG
 
         private void SetDefaultValue(UISkillTextPair componentPair)
         {
+            string zeroFormatSimple = 0f.ToString(numberFormatSimple);
             switch (displayType)
             {
                 case DisplayType.Requirement:
@@ -158,21 +157,21 @@ namespace MultiplayerARPG
                         componentPair.uiText.text = ZString.Format(
                             LanguageManager.GetText(formatKeySimpleLevel),
                             componentPair.skill.Title,
-                            "0");
+                            zeroFormatSimple);
                     }
                     else
                     {
                         componentPair.uiText.text = ZString.Format(
                             LanguageManager.GetText(formatKeyLevel),
                             componentPair.skill.Title,
-                            "0", "0");
+                            zeroFormatSimple, zeroFormatSimple);
                     }
                     break;
                 case DisplayType.Simple:
-                    componentPair.uiText.text = ZString.Format(
+                    componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(formatKeySimpleLevel),
                         componentPair.skill.Title,
-                        isBonus ? 0.ToBonusString("N0") : "0");
+                        zeroFormatSimple));
                     break;
             }
             if (componentPair.imageIcon != null)

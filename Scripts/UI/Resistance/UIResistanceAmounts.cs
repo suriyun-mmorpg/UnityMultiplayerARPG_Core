@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         public Transform uiListContainer;
 
         [Header("Options")]
+        public string numberFormatRate = "N2";
         public bool isBonus;
 
         private Dictionary<DamageElement, UIResistanceTextPair> _cacheTextAmounts;
@@ -76,7 +77,7 @@ namespace MultiplayerARPG
             {
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
-                    DamageElement tempElement;
+                    DamageElement tempData;
                     float tempAmount;
                     string tempValue;
                     string tempAmountText;
@@ -86,17 +87,14 @@ namespace MultiplayerARPG
                         if (dataEntry.Key == null)
                             continue;
                         // Set temp data
-                        tempElement = dataEntry.Key;
+                        tempData = dataEntry.Key;
                         tempAmount = dataEntry.Value;
                         // Set current elemental resistance text
-                        if (isBonus)
-                            tempValue = (tempAmount * 100).ToBonusString("N2");
-                        else
-                            tempValue = (tempAmount * 100).ToString("N2");
-                        tempAmountText = ZString.Format(
+                        tempValue = (tempAmount * 100).ToString(numberFormatRate);
+                        tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                             LanguageManager.GetText(formatKeyAmount),
-                            tempElement.Title,
-                            tempValue);
+                            tempData.Title,
+                            tempValue));
                         // Append current elemental resistance text
                         if (dataEntry.Value != 0)
                         {
@@ -123,10 +121,11 @@ namespace MultiplayerARPG
         private void SetDefaultValue(UIResistanceTextPair componentPair)
         {
             DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
-            componentPair.uiText.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyAmount),
-                    tempElement.Title,
-                    isBonus ? 0f.ToBonusString("N2") : 0f.ToString("N2"));
+            string zeroFormatRate = 0f.ToString(numberFormatRate);
+            componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
+                LanguageManager.GetText(formatKeyAmount),
+                tempElement.Title,
+                zeroFormatRate));
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.Icon;
         }

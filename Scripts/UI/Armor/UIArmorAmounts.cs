@@ -103,24 +103,18 @@ namespace MultiplayerARPG
                         switch (displayType)
                         {
                             case DisplayType.Rate:
-                                if (isBonus)
-                                    tempValue = (tempAmount * 100).ToBonusString(numberFormatRate);
-                                else
-                                    tempValue = (tempAmount * 100).ToString(numberFormatRate);
-                                tempAmountText = ZString.Format(
+                                tempValue = (tempAmount * 100).ToString(numberFormatRate);
+                                tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeyRateAmount),
                                     tempData.Title,
-                                    tempValue);
+                                    tempValue));
                                 break;
                             default:
-                                if (isBonus)
-                                    tempValue = tempAmount.ToBonusString(numberFormatSimple);
-                                else
-                                    tempValue = tempAmount.ToString(numberFormatSimple);
-                                tempAmountText = ZString.Format(
+                                tempValue = tempAmount.ToString(numberFormatSimple);
+                                tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeySimpleAmount),
                                     tempData.Title,
-                                    tempValue);
+                                    tempValue));
                                 break;
                         }
                         // Append current elemental armor text
@@ -153,19 +147,21 @@ namespace MultiplayerARPG
         private void SetDefaultValue(UIArmorTextPair componentPair)
         {
             DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
+            string zeroFormatRate = 0f.ToString(numberFormatRate);
+            string zeroFormatSimple = 0f.ToString(numberFormatSimple);
             switch (displayType)
             {
                 case DisplayType.Rate:
-                    componentPair.uiText.text = ZString.Format(
+                    componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(formatKeyRateAmount),
                         tempElement.Title,
-                        isBonus ? 0f.ToBonusString(numberFormatRate) : 0f.ToString(numberFormatRate));
+                        zeroFormatRate));
                     break;
                 case DisplayType.Simple:
-                    componentPair.uiText.text = ZString.Format(
+                    componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
                         tempElement.Title,
-                        isBonus ? 0f.ToBonusString(numberFormatSimple) : "0");
+                        zeroFormatSimple));
                     break;
             }
             if (componentPair.imageIcon != null)

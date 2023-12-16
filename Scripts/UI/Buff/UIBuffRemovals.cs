@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyEntry = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_REMOVAL_ENTRY);
         [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Entries}")]
         public UILocaleKeySetting formatKeyEntries = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_REMOVAL_ENTRIES);
-        public string entriesSeparator = ",";
+        public string entriesSeparator = ", ";
 
         [Header("UI Elements")]
         public UIBuffRemoval uiDialog;
@@ -63,18 +63,21 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(Dictionary<BuffRemoval, float> statusEffectResistanceAmounts)
         {
-            CacheSelectionManager.DeselectSelectedUI();
-            CacheSelectionManager.Clear();
-            CacheList.HideAll();
-            CacheList.Generate(statusEffectResistanceAmounts, (index, data, ui) =>
+            if (uiPrefab != null && uiContainer != null)
             {
-                UIBuffRemoval uiComp = ui.GetComponent<UIBuffRemoval>();
-                uiComp.Data = new UIBuffRemovalData(data.Key, data.Value);
-                uiComp.Show();
-                CacheSelectionManager.Add(uiComp);
-                if (index == 0)
-                    uiComp.SelectByManager();
-            });
+                CacheSelectionManager.DeselectSelectedUI();
+                CacheSelectionManager.Clear();
+                CacheList.HideAll();
+                CacheList.Generate(statusEffectResistanceAmounts, (index, data, ui) =>
+                {
+                    UIBuffRemoval uiComp = ui.GetComponent<UIBuffRemoval>();
+                    uiComp.Data = new UIBuffRemovalData(data.Key, data.Value);
+                    uiComp.Show();
+                    CacheSelectionManager.Add(uiComp);
+                    if (index == 0)
+                        uiComp.SelectByManager();
+                });
+            }
 
             if (statusEffectResistanceAmounts.Count == 0)
             {
@@ -90,10 +93,10 @@ namespace MultiplayerARPG
                     {
                         if (dataEntry.Key == null)
                             continue;
-                        tempAmountText = ZString.Format(
+                        tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                             LanguageManager.GetText(formatKeyEntries),
                             dataEntry.Key.Title,
-                            dataEntry.Key.GetChanceEntriesText(dataEntry.Value, LanguageManager.GetText(formatKeyEntry), entriesSeparator));
+                            dataEntry.Key.GetChanceEntriesText(dataEntry.Value, LanguageManager.GetText(formatKeyEntry), entriesSeparator)));
                         if (!string.IsNullOrEmpty(tempAmountText))
                         {
                             // Add new line if text is not empty
