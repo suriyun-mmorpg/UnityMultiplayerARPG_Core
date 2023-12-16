@@ -182,7 +182,7 @@ namespace MultiplayerARPG
                     float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
                     do
                     {
-                        await UniTask.Yield();
+                        await UniTask.Yield(attackCancellationTokenSource.Token);
                         setupDelayCountDown -= deltaTime;
                     } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
@@ -227,7 +227,7 @@ namespace MultiplayerARPG
                             AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
 
-                    await UniTask.Yield();
+                    await UniTask.Yield(attackCancellationTokenSource.Token);
                     // Get aim position by character's forward
                     AimPosition aimPosition = Entity.AimPosition;
 
@@ -293,7 +293,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, attackCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)

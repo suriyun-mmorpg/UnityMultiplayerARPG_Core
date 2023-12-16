@@ -254,7 +254,7 @@ namespace MultiplayerARPG
                     float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
                     do
                     {
-                        await UniTask.Yield();
+                        await UniTask.Yield(skillCancellationTokenSource.Token);
                         setupDelayCountDown -= Time.unscaledDeltaTime;
                     } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
@@ -299,7 +299,8 @@ namespace MultiplayerARPG
                             AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
 
-                    await UniTask.Yield();
+                    await UniTask.Yield(skillCancellationTokenSource.Token);
+
                     // Get aim position by character's forward
                     AimPosition aimPosition;
                     if (skill.HasCustomAimControls() && skillAimPosition.type == AimPositionType.Position)

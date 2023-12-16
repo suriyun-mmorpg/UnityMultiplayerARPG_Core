@@ -131,7 +131,7 @@ namespace MultiplayerARPG
                     float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
                     do
                     {
-                        await UniTask.Yield();
+                        await UniTask.Yield(reloadCancellationTokenSource.Token);
                         setupDelayCountDown -= Time.unscaledDeltaTime;
                     } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
@@ -168,11 +168,14 @@ namespace MultiplayerARPG
                             Entity.CharacterModel.PlayEquippedWeaponReloaded(isLeftHand);
                         if (fpsModelAvailable)
                             Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
+
                         // Play reload sfx
                         AudioClipWithVolumeSettings audioClip = weaponItem.ReloadedClip;
                         if (audioClip != null)
                             AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
+
+                    await UniTask.Yield(reloadCancellationTokenSource.Token);
 
                     // Reload / Fill ammo
                     if (!reloaded)
