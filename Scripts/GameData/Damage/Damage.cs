@@ -141,7 +141,12 @@ namespace MultiplayerARPG
             int skillLevel,
             AimPosition aimPosition)
         {
+            // No attacker
             if (attacker == null)
+                return;
+
+            // Don't launch if character dead
+            if (attacker.IsServer && attacker.IsDead())
                 return;
 
             GetDamageInfo().LaunchDamageEntity(
