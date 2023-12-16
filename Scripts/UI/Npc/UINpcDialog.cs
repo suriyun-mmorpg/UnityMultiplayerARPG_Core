@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             ForceUpdate();
         }
 
-        protected override void UpdateData()
+        protected override async void UpdateData()
         {
             if (_lastData != null)
                 _lastData.UnrenderUI(this);
@@ -112,7 +112,7 @@ namespace MultiplayerARPG
                     voiceSource.Play();
             }
 
-            Data.RenderUI(this).Forget();
+            await Data.RenderUI(this);
             _lastData = Data;
         }
     }

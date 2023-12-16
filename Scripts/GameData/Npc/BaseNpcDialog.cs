@@ -138,7 +138,7 @@ namespace MultiplayerARPG
         /// This will be called to render current dialog
         /// </summary>
         /// <param name="uiNpcDialog"></param>
-        public abstract UniTaskVoid RenderUI(UINpcDialog uiNpcDialog);
+        public abstract UniTask RenderUI(UINpcDialog uiNpcDialog);
         /// <summary>
         /// This will be called to un-render previous dialog
         /// </summary>

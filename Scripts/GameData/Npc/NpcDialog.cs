@@ -163,7 +163,7 @@ namespace MultiplayerARPG
             return UniTask.FromResult(true);
         }
 
-        public override async UniTaskVoid RenderUI(UINpcDialog uiNpcDialog)
+        public override async UniTask RenderUI(UINpcDialog uiNpcDialog)
         {
             BasePlayerCharacterEntity playingCharacter = GameInstance.PlayingCharacterEntity;
             BaseItem craftingItem = null;
