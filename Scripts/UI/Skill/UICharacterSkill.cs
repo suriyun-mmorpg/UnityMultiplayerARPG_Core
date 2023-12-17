@@ -407,7 +407,7 @@ namespace MultiplayerARPG
 
             if (uiDamageInflictions != null)
             {
-                if (Skill == null || Skill.TryGetAttackWeaponDamageInflictions(Character, Level, out Dictionary<DamageElement, float> damageInflictionRates))
+                if (Skill == null || !Skill.TryGetAttackWeaponDamageInflictions(Character, Level, out Dictionary<DamageElement, float> damageInflictionRates))
                 {
                     uiDamageInflictions.Hide();
                 }
@@ -420,7 +420,7 @@ namespace MultiplayerARPG
 
             if (uiAdditionalDamageAmounts != null)
             {
-                if (Skill == null || Skill.TryGetAttackAdditionalDamageAmounts(Character, Level, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
+                if (Skill == null || !Skill.TryGetAttackAdditionalDamageAmounts(Character, Level, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
                 {
                     uiAdditionalDamageAmounts.Hide();
                 }
