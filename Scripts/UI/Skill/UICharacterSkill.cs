@@ -488,7 +488,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiNextLevelSkill.Setup(new UICharacterSkillData(CharacterSkill, (Level + 1)), Character, IndexOfData);
+                    uiNextLevelSkill.Setup(new UICharacterSkillData(CharacterSkill, Level + 1), Character, IndexOfData);
                     uiNextLevelSkill.Show();
                 }
             }
