@@ -176,7 +176,7 @@ namespace MultiplayerARPG
             hitValidateData.HitsCount[hitId] = ++hitCount;
 
             // Yes, it is hit
-            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), hitValidateData.BaseDamageAmounts, hitValidateData.Weapon, hitValidateData.Skill, hitValidateData.SkillLevel, hitData.SimulateSeed);
+            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), hitValidateData.ConfirmedDamageAmounts[hitData.TriggerIndex], hitValidateData.Weapon, hitValidateData.Skill, hitValidateData.SkillLevel, hitData.SimulateSeed);
             hitValidateData.HitObjects.Add(hitObjectId);
             return true;
         }
