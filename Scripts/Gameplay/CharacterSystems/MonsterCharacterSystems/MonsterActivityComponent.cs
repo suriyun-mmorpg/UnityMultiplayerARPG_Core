@@ -433,7 +433,11 @@ namespace MultiplayerARPG
                 //Find BuildingEntity as attack target at first priority
                 if (isAttackBuilding && isBuildingPriority)
                 {
-                    return FindBuildingAttackTarget();
+                    bool res = findBuildingAttackTarget();
+                    if (res)
+                    {
+                        return true;
+                    }
                 }
 
                 bool isSummonedAndSummonerExisted = Entity.IsSummonedAndSummonerExisted;
@@ -473,7 +477,7 @@ namespace MultiplayerARPG
                 //Else try to find a building as target
                 if (isAttackBuilding)
                 {
-                    return FindBuildingAttackTarget();
+                    return findBuildingAttackTarget();
                 }                   
             }
 
@@ -508,7 +512,7 @@ namespace MultiplayerARPG
         /// Find only BuldingEntities as attack targets
         /// </summary>
         /// <returns></returns>
-        protected virtual bool FindBuildingAttackTarget()
+        protected virtual bool findBuildingAttackTarget()
         {
             // Find building entities to attack
             List<BuildingEntity> buildingEntities = Entity.FindAliveEntities<BuildingEntity>(CharacterDatabase.VisualRange,

@@ -5,6 +5,15 @@ namespace MultiplayerARPG
 {
     public class WorkbenchEntity : BuildingEntity
     {
+        [Category(5, "Building Settings")]
+        [SerializeField]
+        [Tooltip("If this is `TRUE` this building entity cannot be attacked and is marked as InSafeArea and Immune")]
+        protected bool cannotBeAttacked = false;
+        [SerializeField]
+        [Tooltip("Distance to activate this building")]
+        protected float activateDistance = 5.0f;
+
+
         [Category(6, "Workbench Settings")]
         [SerializeField]
         protected ItemCraft[] itemCrafts = new ItemCraft[0];
@@ -27,6 +36,17 @@ namespace MultiplayerARPG
                     }
                 }
                 return _cacheItemCrafts;
+            }
+        }
+
+
+        protected override void EntityAwake()
+        {
+            base.EntityAwake();
+            if (cannotBeAttacked)
+            {
+                this.IsInSafeArea = true;
+                this.IsImmune = true;
             }
         }
 
@@ -68,5 +88,11 @@ namespace MultiplayerARPG
         {
             BaseUISceneGameplay.Singleton.ShowWorkbenchDialog(this);
         }
+
+        public override float GetActivatableDistance()
+        {
+            return activateDistance;
+        }
+
     }
 }

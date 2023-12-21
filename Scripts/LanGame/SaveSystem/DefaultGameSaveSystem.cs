@@ -26,7 +26,7 @@ namespace MultiplayerARPG
             if (hostPlayerCharacterData != null && !string.IsNullOrEmpty(hostPlayerCharacterData.Id))
             {
                 // Load and Spawn buildings
-                BuildingEntity[] inSceneBuildings = FindObjectsByType<BuildingEntity>(FindObjectsSortMode.None);
+                BuildingEntity[] inSceneBuildings = FindObjectsOfType<BuildingEntity>();
                 Dictionary<string, BuildingEntity> inSceneBuildingDicts = new Dictionary<string, BuildingEntity>();
                 for (int i = 0; i < inSceneBuildings.Length; ++i)
                 {
