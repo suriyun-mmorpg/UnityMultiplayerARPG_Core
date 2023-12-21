@@ -48,12 +48,23 @@ namespace MultiplayerARPG
                 if (_cacheKillMonsterIds == null)
                 {
                     _cacheKillMonsterIds = new HashSet<int>();
-                    foreach (QuestTask task in tasks)
+                    if (randomTasks != null && randomTasks.Length > 0)
                     {
-                        if (task.taskType == QuestTaskType.KillMonster &&
-                            task.monsterCharacterAmount.monster != null &&
-                            task.monsterCharacterAmount.amount > 0)
-                            _cacheKillMonsterIds.Add(task.monsterCharacterAmount.monster.DataId);
+                        foreach (QuestTasks tasks in randomTasks)
+                        {
+                            if (tasks.tasks == null || tasks.tasks.Length == 0)
+                                continue;
+
+                            foreach (QuestTask task in tasks.tasks)
+                            {
+                                if (task.taskType == QuestTaskType.KillMonster &&
+                                    task.monsterCharacterAmount.monster != null &&
+                                    task.monsterCharacterAmount.amount > 0)
+                                {
+                                    _cacheKillMonsterIds.Add(task.monsterCharacterAmount.monster.DataId);
+                                }
+                            }
+                        }
                     }
                 }
                 return _cacheKillMonsterIds;
