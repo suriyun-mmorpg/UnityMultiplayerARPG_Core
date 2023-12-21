@@ -29,9 +29,6 @@ namespace MultiplayerARPG
         public float miniStunDuration = 0f;
         [Tooltip("If this is TRUE, monster will attacks buildings")]
         public bool isAttackBuilding = false;
-        //Prioritize building over enemy player
-        [Tooltip("If this is TRUE, monster will prioritize targetting buildings first")]
-        public bool isBuildingPriority = false;
         [Tooltip("If this is TRUE, monster will attacks targets while its summoner still idle")]
         [FormerlySerializedAs("isAggressiveWhileSummonerIdle")]
         public bool aggressiveWhileSummoned = false;
@@ -430,16 +427,6 @@ namespace MultiplayerARPG
             if (!Entity.TryGetTargetEntity(out IDamageableEntity targetEntity) || targetEntity.Entity == Entity.Entity ||
                  targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
             {
-                //Find BuildingEntity as attack target at first priority
-                if (isAttackBuilding && isBuildingPriority)
-                {
-                    bool res = findBuildingAttackTarget();
-                    if (res)
-                    {
-                        return true;
-                    }
-                }
-
                 bool isSummonedAndSummonerExisted = Entity.IsSummonedAndSummonerExisted;
                 // Find one enemy from previously found list
                 if (FindOneEnemyFromList(isSummonedAndSummonerExisted))
@@ -474,11 +461,6 @@ namespace MultiplayerARPG
                 // Find one enemy from a found list
                 if (FindOneEnemyFromList(isSummonedAndSummonerExisted))
                     return true;
-                //Else try to find a building as target
-                if (isAttackBuilding)
-                {
-                    return findBuildingAttackTarget();
-                }                   
             }
 
             return false;
@@ -503,42 +485,6 @@ namespace MultiplayerARPG
                 }
                 // Found target, attack it
                 Entity.SetAttackTarget(enemy);
-                return true;
-            }
-            return false;
-        }
-
-        /// <summary>
-        /// Find only BuldingEntities as attack targets
-        /// </summary>
-        /// <returns></returns>
-        protected virtual bool findBuildingAttackTarget()
-        {
-            // Find building entities to attack
-            List<BuildingEntity> buildingEntities = Entity.FindAliveEntities<BuildingEntity>(CharacterDatabase.VisualRange,
-                        false, /* Don't find an allies */
-                        true,  /* Find an enemies */
-                        false, /* Don't find an neutral */
-                        CurrentGameInstance.buildingLayer.Mask);
-            foreach (BuildingEntity buildingEntity in buildingEntities)
-            {
-                // Attack target settings
-                if (buildingEntity == null || buildingEntity.Entity == Entity.Entity ||
-                    buildingEntity.IsDead() || !buildingEntity.CanReceiveDamageFrom(Entity.GetInfo()))
-                {
-                    // If building is null or cannot receive damage from monster, skip it
-                    continue;
-                }
-                if (Entity.Summoner != null)
-                {
-                    if (Entity.Summoner.Id.Equals(buildingEntity.CreatorId))
-                    {
-                        // If building was built by summoner, skip it
-                        continue;
-                    }
-                }
-                // Found target, attack it
-                Entity.SetAttackTarget(buildingEntity);
                 return true;
             }
             return false;
