@@ -214,17 +214,6 @@ namespace MultiplayerARPG
                     isAnyHotkeyJoyStickDragging = true;
             }
 
-            //Hotpatch to allow using BuildingItems via Use Item dialog on mobile input
-            if (UsingHotkey != null && !isAnyHotkeyJoyStickDragging)
-            {
-                HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
-                // Click anywhere (on the map) to use skill
-                if (Input.touchCount == 1 && !UsingHotkey.IsChanneledAbility())
-                {
-                    FinishHotkeyAimControls(false);
-                }
-            }
-
             if (hotkeyCancelArea != null)
                 hotkeyCancelArea.gameObject.SetActive(isAnyHotkeyJoyStickDragging);
         }
@@ -273,7 +262,6 @@ namespace MultiplayerARPG
 
         public static void SetupAndUseOtherHotkey(HotkeyType type, string relateId)
         {
-            OtherHotkey.buttonName = "";
             CharacterHotkey hotkey = new CharacterHotkey();
             hotkey.type = type;
             hotkey.relateId = relateId;

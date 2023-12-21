@@ -2,7 +2,6 @@
 using UnityEngine.AI;
 using UnityEngine.Rendering;
 using UnityEngine.Tilemaps;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -15,16 +14,6 @@ namespace MultiplayerARPG
             CanBuild,
             CannotBuild,
         }
-
-        //Support For Multiple MeshRenderers e.g. one parent having multiple child objects
-        public class RendererData
-        {
-            public Material[] defaultMaterials;
-            public ShadowCastingMode defaultShadowCastingMode;
-            public bool defaultReceiveShadows;
-            public Color defaultColor;
-        }
-
         private Material[] defaultMaterials;
         private ShadowCastingMode defaultShadowCastingMode;
         private bool defaultReceiveShadows;
@@ -42,13 +31,6 @@ namespace MultiplayerARPG
         public Renderer meshRenderer;
         public SpriteRenderer spriteRenderer;
         public Tilemap tilemap;
-
-        
-        /// <summary>
-        /// Optional list of extra mesh renderers to change material of
-        /// </summary>        
-        public Renderer[] meshRendererList;
-        Dictionary<Renderer, RendererData> meshRendererListData = new Dictionary<Renderer, RendererData>();
 
         [Header("Build Mode Settings")]
         [Range(0.1f, 1f)]
@@ -85,33 +67,6 @@ namespace MultiplayerARPG
                             break;
                     }
                 }
-
-                //Handle the multiple meshrenderers
-                foreach (MeshRenderer meshRenderer in meshRendererList)
-                {
-                    if (meshRenderer != null)
-                    {
-                        switch (currentState)
-                        {
-                            case State.Default:
-                                meshRenderer.sharedMaterials = meshRendererListData[meshRenderer].defaultMaterials;
-                                meshRenderer.shadowCastingMode = meshRendererListData[meshRenderer].defaultShadowCastingMode;
-                                meshRenderer.receiveShadows = meshRendererListData[meshRenderer].defaultReceiveShadows;
-                                break;
-                            case State.CanBuild:
-                                meshRenderer.sharedMaterials = canBuildMaterials;
-                                meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
-                                meshRenderer.receiveShadows = false;
-                                break;
-                            case State.CannotBuild:
-                                meshRenderer.sharedMaterials = cannotBuildMaterials;
-                                meshRenderer.shadowCastingMode = ShadowCastingMode.Off;
-                                meshRenderer.receiveShadows = false;
-                                break;
-                        }
-                    }
-                }
-
 
                 if (spriteRenderer != null)
                 {
@@ -173,23 +128,6 @@ namespace MultiplayerARPG
                 defaultShadowCastingMode = meshRenderer.shadowCastingMode;
                 defaultReceiveShadows = meshRenderer.receiveShadows;
             }
-
-            //Handle Multiple Meshrenderers
-            foreach (MeshRenderer meshRenderer in meshRendererList)
-            {
-                if (meshRenderer != null)
-                {
-                    if (!meshRendererListData.ContainsKey(meshRenderer))
-                    {
-                        RendererData _data = new RendererData();
-                        _data.defaultMaterials = meshRenderer.sharedMaterials;
-                        _data.defaultShadowCastingMode = meshRenderer.shadowCastingMode;
-                        _data.defaultReceiveShadows = meshRenderer.receiveShadows;
-                        meshRendererListData[meshRenderer] = _data;
-                    }
-                }
-            }
-
 
             if (spriteRenderer == null)
                 spriteRenderer = GetComponent<SpriteRenderer>();
