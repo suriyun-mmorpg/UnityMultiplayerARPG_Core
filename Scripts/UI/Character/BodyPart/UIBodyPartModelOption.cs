@@ -14,6 +14,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextTitle;
         public Image imageIcon;
 
+        public UIBodyPartManager Manager { get; set; }
+        public PlayerCharacterBodyPartComponent Component { get; set; }
         public int HashedSettingId { get; set; }
         public int Index { get; set; }
 

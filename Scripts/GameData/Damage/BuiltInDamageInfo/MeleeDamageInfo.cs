@@ -137,7 +137,7 @@ namespace MultiplayerARPG
                     hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
                     hitRegData.HitObjectId = tempDamageableHitBox.GetObjectId();
                     hitRegData.HitBoxIndex = tempDamageableHitBox.Index;
-                    hitRegData.Destination = tempDamageableHitBox.CacheTransform.position;
+                    hitRegData.HitOrigin = tempDamageableHitBox.CacheTransform.position;
                     attacker.CallCmdPerformHitRegValidation(hitRegData);
                 }
 
@@ -162,7 +162,7 @@ namespace MultiplayerARPG
                     hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
                     hitRegData.HitObjectId = tempDamageTakenTarget.GetObjectId();
                     hitRegData.HitBoxIndex = tempDamageTakenTarget.Index;
-                    hitRegData.Destination = tempDamageTakenTarget.CacheTransform.position;
+                    hitRegData.HitOrigin = tempDamageTakenTarget.CacheTransform.position;
                     attacker.CallCmdPerformHitRegValidation(hitRegData);
                 }
 

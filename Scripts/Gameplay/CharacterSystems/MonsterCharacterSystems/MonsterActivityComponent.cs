@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class MonsterActivityComponent : BaseMonsterActivityComponent
+    public partial class MonsterActivityComponent : BaseMonsterActivityComponent
     {
         [SerializeField]
         protected float turnSmoothSpeed = 10f;
@@ -29,6 +29,9 @@ namespace MultiplayerARPG
         public float miniStunDuration = 0f;
         [Tooltip("If this is TRUE, monster will attacks buildings")]
         public bool isAttackBuilding = false;
+        [Tooltip("If this is TRUE, monster will prioritize targetting buildings first")]
+        [FormerlySerializedAs("isBuildingPriority")]
+        public bool isAttackBuildingFirst = false;
         [Tooltip("If this is TRUE, monster will attacks targets while its summoner still idle")]
         [FormerlySerializedAs("isAggressiveWhileSummonerIdle")]
         public bool aggressiveWhileSummoned = false;
@@ -242,7 +245,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (targetEnemy.Entity == Entity.Entity || targetEnemy.IsHideOrDead() || !targetEnemy.CanReceiveDamageFrom(Entity.GetInfo()))
+            if (targetEnemy.GetObjectId() == Entity.ObjectId || targetEnemy.IsDeadOrHideFrom(Entity) || !targetEnemy.CanReceiveDamageFrom(Entity.GetInfo()))
             {
                 // If target is dead or in safe area stop attacking
                 Entity.SetTargetEntity(null);
@@ -312,7 +315,7 @@ namespace MultiplayerARPG
                     Entity.UseSkill(_queueSkill.DataId, false, 0, new AimPosition()
                     {
                         type = AimPositionType.Position,
-                        position = targetEnemy.OpponentAimTransform.position,
+                        position = _queueSkill.GetDefaultAttackAimPosition(Entity, _queueSkillLevel, _isLeftHandAttacking, targetEnemy),
                     });
                 }
                 else
@@ -424,13 +427,18 @@ namespace MultiplayerARPG
             if (!isAggressive && Entity.Summoner == null)
                 return false;
 
-            if (!Entity.TryGetTargetEntity(out IDamageableEntity targetEntity) || targetEntity.Entity == Entity.Entity ||
-                 targetEntity.IsDead() || !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
+            if (!Entity.TryGetTargetEntity(out IDamageableEntity targetEntity) ||
+                targetEntity.GetObjectId() == Entity.ObjectId || targetEntity.IsDead() ||
+                !targetEntity.CanReceiveDamageFrom(Entity.GetInfo()))
             {
                 bool isSummonedAndSummonerExisted = Entity.IsSummonedAndSummonerExisted;
+                DamageableEntity enemy;
                 // Find one enemy from previously found list
-                if (FindOneEnemyFromList(isSummonedAndSummonerExisted))
+                if (FindOneEnemyFromList(isSummonedAndSummonerExisted, out enemy))
+                {
+                    Entity.SetAttackTarget(enemy);
                     return true;
+                }
 
                 // If no target enemy or target enemy is dead, Find nearby character by layer mask
                 _enemies.Clear();
@@ -459,35 +467,47 @@ namespace MultiplayerARPG
                         overlapMask));
                 }
                 // Find one enemy from a found list
-                if (FindOneEnemyFromList(isSummonedAndSummonerExisted))
+                if (FindOneEnemyFromList(isSummonedAndSummonerExisted, out enemy))
+                {
+                    Entity.SetAttackTarget(enemy);
                     return true;
+                }
             }
 
             return false;
         }
 
-        private bool FindOneEnemyFromList(bool isSummonedAndSummonerExisted)
+        protected virtual bool FindOneEnemyFromList(bool isSummonedAndSummonerExisted, out DamageableEntity enemy)
         {
-            DamageableEntity enemy;
+            enemy = null;
+            DamageableEntity tempEntity;
+            BuildingEntity tempBuildingEntity;
             for (int i = _enemies.Count - 1; i >= 0; --i)
             {
-                enemy = _enemies[i];
+                tempEntity = _enemies[i];
                 _enemies.RemoveAt(i);
-                if (enemy == null || enemy.Entity == Entity || enemy.IsDead() || !enemy.CanReceiveDamageFrom(Entity.GetInfo()))
+                if (tempEntity.GetObjectId() == Entity.ObjectId || tempEntity.IsDead() || !tempEntity.CanReceiveDamageFrom(Entity.GetInfo()))
                 {
                     // If enemy is null or cannot receive damage from monster, skip it
                     continue;
                 }
-                if (isAttackBuilding && isSummonedAndSummonerExisted && enemy is BuildingEntity buildingEntity && Entity.Summoner.Id == buildingEntity.CreatorId)
+                tempBuildingEntity = tempEntity as BuildingEntity;
+                if (isAttackBuilding && isSummonedAndSummonerExisted && tempBuildingEntity != null && Entity.Summoner.Id == tempBuildingEntity.CreatorId)
                 {
                     // If building was built by summoner, skip it
                     continue;
                 }
-                // Found target, attack it
-                Entity.SetAttackTarget(enemy);
-                return true;
+                // This entity can be enemy
+                enemy = tempEntity;
+                if (isAttackBuilding && isAttackBuildingFirst && tempBuildingEntity == null)
+                {
+                    // Trying to find building, if it is not building then try to find it next time
+                    continue;
+                }
+                // Found target, break the loop
+                break;
             }
-            return false;
+            return enemy != null;
         }
 
         protected virtual void ClearActionState()

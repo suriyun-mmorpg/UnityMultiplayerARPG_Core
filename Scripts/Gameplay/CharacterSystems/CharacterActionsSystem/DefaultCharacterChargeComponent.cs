@@ -7,6 +7,10 @@ namespace MultiplayerARPG
     public class DefaultCharacterChargeComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterChargeComponent
     {
         public bool IsCharging { get; protected set; }
+        protected bool _skipMovementValidation;
+        public bool IsSkipMovementValidationWhileCharging { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        protected bool _shouldUseRootMotion;
+        public bool IsUseRootMotionWhileCharging { get { return _shouldUseRootMotion; } protected set { _shouldUseRootMotion = value; } }
 
         protected struct ChargeState
         {
@@ -47,19 +51,19 @@ namespace MultiplayerARPG
             if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
             {
                 // TPS model
-                Entity.CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+                Entity.CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand, out _skipMovementValidation, out _shouldUseRootMotion);
                 Entity.CharacterModel.PlayEquippedWeaponCharge(isLeftHand);
             }
             if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel vehicleModel)
             {
                 // Vehicle model
-                vehicleModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+                vehicleModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand, out _skipMovementValidation, out _shouldUseRootMotion);
                 vehicleModel.PlayEquippedWeaponCharge(isLeftHand);
             }
             if (IsClient && Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
             {
                 // FPS model
-                Entity.FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand);
+                Entity.FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand, out _, out _);
                 Entity.FpsModel.PlayEquippedWeaponCharge(isLeftHand);
             }
             // Set weapon charging state

@@ -206,6 +206,25 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Combine buff removals dictionary
+        /// </summary>
+        /// <param name="resultDictionary"></param>
+        /// <param name="newEntry"></param>
+        /// <returns></returns>
+        public static Dictionary<BuffRemoval, float> CombineBuffRemovals(Dictionary<BuffRemoval, float> resultDictionary, KeyValuePair<BuffRemoval, float> newEntry)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<BuffRemoval, float>();
+            if (newEntry.Key == null)
+                return resultDictionary;
+            if (!resultDictionary.ContainsKey(newEntry.Key))
+                resultDictionary[newEntry.Key] = newEntry.Value;
+            else
+                resultDictionary[newEntry.Key] += newEntry.Value;
+            return resultDictionary;
+        }
+
+        /// <summary>
         /// Combine item amounts dictionary
         /// </summary>
         /// <param name="resultDictionary"></param>
@@ -708,6 +727,20 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Make buff removal - amount key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="level"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static KeyValuePair<BuffRemoval, float> ToKeyValuePair(this BuffRemoval source, int level, float rate)
+        {
+            if (source == null)
+                return new KeyValuePair<BuffRemoval, float>();
+            return new KeyValuePair<BuffRemoval, float>(source, source.removalChance.GetAmount(level) * rate);
+        }
+
+        /// <summary>
         /// Make item - amount key-value pair
         /// </summary>
         /// <param name="source"></param>
@@ -1088,6 +1121,28 @@ namespace MultiplayerARPG
             {
                 pair = ToKeyValuePair(sourceIncremental, level, rate);
                 resultDictionary = CombineStatusEffectResistances(resultDictionary, pair);
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Combine buff removals dictionary
+        /// </summary>
+        /// <param name="sourceAmounts"></param>
+        /// <param name="resultDictionary"></param>
+        /// <param name="rate"></param>
+        /// <returns></returns>
+        public static Dictionary<BuffRemoval, float> CombineBuffRemovals(IEnumerable<BuffRemoval> sourceAmounts, Dictionary<BuffRemoval, float> resultDictionary, int level, float rate)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<BuffRemoval, float>();
+            if (sourceAmounts == null)
+                return resultDictionary;
+            KeyValuePair<BuffRemoval, float> pair;
+            foreach (BuffRemoval sourceAmount in sourceAmounts)
+            {
+                pair = ToKeyValuePair(sourceAmount, level, rate);
+                resultDictionary = CombineBuffRemovals(resultDictionary, pair);
             }
             return resultDictionary;
         }

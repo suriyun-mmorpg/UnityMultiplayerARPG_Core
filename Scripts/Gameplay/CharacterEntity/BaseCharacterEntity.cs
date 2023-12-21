@@ -109,14 +109,16 @@ namespace MultiplayerARPG
         public CharacterSkillAndBuffComponent SkillAndBuffComponent { get; protected set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
-        public bool LastAttackSkipMovementValidation { get { return AttackComponent.LastAttackSkipMovementValidation; } }
+        public bool IsUseRootMotionWhileAttacking { get { return AttackComponent.IsUseRootMotionWhileAttacking; } }
+        public bool IsSkipMovementValidationWhileAttacking { get { return AttackComponent.IsSkipMovementValidationWhileAttacking; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
         public MovementRestriction MovementRestrictionWhileAttacking { get { return AttackComponent.MovementRestrictionWhileAttacking; } }
         public float AttackTotalDuration { get { return AttackComponent.AttackTotalDuration; } set { AttackComponent.AttackTotalDuration = value; } }
         public float[] AttackTriggerDurations { get { return AttackComponent.AttackTriggerDurations; } set { AttackComponent.AttackTriggerDurations = value; } }
         public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
         public float LastUseSkillEndTime { get { return UseSkillComponent.LastUseSkillEndTime; } }
-        public bool LastUseSkillSkipMovementValidation { get { return UseSkillComponent.LastUseSkillSkipMovementValidation; } }
+        public bool IsUseRootMotionWhileUsingSkill { get { return UseSkillComponent.IsUseRootMotionWhileUsingSkill; } }
+        public bool IsSkipMovementValidationWhileUsingSkill { get { return UseSkillComponent.IsSkipMovementValidationWhileUsingSkill; } }
         public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
         public MovementRestriction MovementRestrictionWhileUsingSkill { get { return UseSkillComponent.MovementRestrictionWhileUsingSkill; } }
         public float UseSkillTotalDuration { get { return UseSkillComponent.UseSkillTotalDuration; } set { UseSkillComponent.UseSkillTotalDuration = value; } }
@@ -130,12 +132,15 @@ namespace MultiplayerARPG
         public int ReloadingAmmoAmount { get { return ReloadComponent.ReloadingAmmoAmount; } }
         public bool IsReloading { get { return ReloadComponent.IsReloading; } }
         public float LastReloadEndTime { get { return ReloadComponent.LastReloadEndTime; } }
-        public bool LastReloadSkipMovementValidation { get { return ReloadComponent.LastReloadSkipMovementValidation; } }
+        public bool IsUseRootMotionWhileReloading { get { return ReloadComponent.IsUseRootMotionWhileReloading; } }
+        public bool IsSkipMovementValidationWhileReloading { get { return ReloadComponent.IsSkipMovementValidationWhileReloading; } }
         public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
         public MovementRestriction MovementRestrictionWhileReloading { get { return ReloadComponent.MovementRestrictionWhileReloading; } }
         public float ReloadTotalDuration { get { return ReloadComponent.ReloadTotalDuration; } set { ReloadComponent.ReloadTotalDuration = value; } }
         public float[] ReloadTriggerDurations { get { return ReloadComponent.ReloadTriggerDurations; } set { ReloadComponent.ReloadTriggerDurations = value; } }
         public bool IsCharging { get { return ChargeComponent.IsCharging; } }
+        public bool IsUseRootMotionWhileCharging { get { return ChargeComponent.IsUseRootMotionWhileCharging; } }
+        public bool IsSkipMovementValidationWhileCharging { get { return ChargeComponent.IsSkipMovementValidationWhileCharging; } }
         public bool WillDoActionWhenStopCharging { get { return ChargeComponent.WillDoActionWhenStopCharging; } }
         public float MoveSpeedRateWhileCharging { get { return ChargeComponent.MoveSpeedRateWhileCharging; } }
         public MovementRestriction MovementRestrictionWhileCharging { get { return ChargeComponent.MovementRestrictionWhileCharging; } }
@@ -333,12 +338,15 @@ namespace MultiplayerARPG
 
             Profiler.BeginSample("BaseCharacterEntity - MovementEnablingUpdate");
             // Enable movement or not
-            if (!Movement.IsNull() && Movement.Enabled != tempEnableMovement)
+            if (!Movement.IsNull())
             {
-                if (!tempEnableMovement)
-                    Movement.StopMove();
-                // Enable movement while not passenging any vehicle
-                Movement.Enabled = tempEnableMovement;
+                if (Movement.Enabled != tempEnableMovement)
+                {
+                    if (!tempEnableMovement)
+                        Movement.StopMove();
+                    // Enable movement while not passenging any vehicle
+                    Movement.Enabled = tempEnableMovement;
+                }
             }
             Profiler.EndSample();
 
@@ -346,7 +354,7 @@ namespace MultiplayerARPG
             // Update character model handler based on passenging vehicle
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicleSeatIndex);
             // Set character model hide state
-            ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, IsHide());
+            ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, GameInstance.PlayingCharacterEntity != null ? this.IsHideFrom(GameInstance.PlayingCharacterEntity) : false);
             Profiler.EndSample();
 
 
@@ -767,7 +775,7 @@ namespace MultiplayerARPG
                 {
                     if (targetEntity is DamageableEntity damageableEntity)
                     {
-                        if (!damageableEntity.IsHideOrDead())
+                        if (!damageableEntity.IsDeadOrHideFrom(this))
                             return GetAttackAimPosition(position, damageableEntity.OpponentAimTransform.position);
                     }
                     else
@@ -1086,6 +1094,16 @@ namespace MultiplayerARPG
         {
             return CachedData.IsHide;
         }
+
+        public override bool IsRevealsHide()
+        {
+            return CachedData.IsRevealsHide;
+        }
+
+        public override bool IsBlind()
+        {
+            return CachedData.IsBlind;
+        }
         #endregion
 
         #region Data helpers
@@ -1258,26 +1276,24 @@ namespace MultiplayerARPG
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration,
-            out bool skipMovementValidation)
+            out float totalDuration)
         {
             animationIndex = 0;
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
-            skipMovementValidation = false;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
             }
         }
@@ -1288,31 +1304,29 @@ namespace MultiplayerARPG
             int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration,
-            out bool skipMovementValidation)
+            out float totalDuration)
         {
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
-            skipMovementValidation = false;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.ReloadRightHand:
-                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.ReloadLeftHand:
-                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
             }
         }

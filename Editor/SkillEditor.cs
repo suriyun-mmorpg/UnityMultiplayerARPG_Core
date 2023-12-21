@@ -32,25 +32,6 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmoType));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmoAmount));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmos));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeHp));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeHpRate));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeMp));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeMpRate));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeStamina));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.consumeStaminaRate));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.coolDownDuration));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.moveSpeedRateWhileUsingSkill));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.skillCastEffects));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.castDuration));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.canBeInterruptedWhileCasting));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireShield));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableWeapons));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableArmors));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.availableVehicles));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireItems));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmoType));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmoAmount));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.requireAmmos));
             // Normal Attack skill
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageHitEffects));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageInfo));
@@ -74,23 +55,35 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.harvestType), nameof(HarvestType.BasedOnSkill), nameof(skill.harvestDamageAmount));
             // Debuff
             ShowOnBool(nameof(skill.isDebuff), true, nameof(skill.debuff));
-            // Buff
+            // Buff distance
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(skill.buffDistance));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(skill.buffDistance));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(skill.buffDistance));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToAlly), nameof(skill.buffDistance));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToEnemy), nameof(skill.buffDistance));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyPartyMembers), nameof(skill.buffDistance));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToPartyMember), nameof(skill.buffDistance));
+            // Buff to user if no target
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(skill.buffToUserIfNoTarget));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToAlly), nameof(skill.buffToUserIfNoTarget));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToPartyMember), nameof(skill.buffToUserIfNoTarget));
+            // Buff
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToUser), nameof(skill.buff));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyAllies), nameof(skill.buff));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyCharacters), nameof(skill.buff));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToTarget), nameof(skill.buff));
             ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.Toggle), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToAlly), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToEnemy), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToNearbyPartyMembers), nameof(skill.buff));
+            ShowOnEnum(nameof(skill.skillBuffType), nameof(Skill.SkillBuffType.BuffToPartyMember), nameof(skill.buff));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Passive), nameof(skill.buff));
             // Summon
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.summon));
             // Mount
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.mount));
             // Craft
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.CraftItem), nameof(skill.itemCraft));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.itemCraft));
         }
     }
 }

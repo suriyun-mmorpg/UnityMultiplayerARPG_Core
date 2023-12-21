@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ namespace MultiplayerARPG
         public CharacterAttribute CharacterAttribute { get { return Data.characterAttribute; } }
         public float Amount { get { return Data.targetAmount; } }
         public Attribute Attribute { get { return CharacterAttribute != null ? CharacterAttribute.GetAttribute() : null; } }
-        
+
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
         public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
@@ -24,6 +25,13 @@ namespace MultiplayerARPG
         public TextWrapper uiTextDescription;
         public TextWrapper uiTextAmount;
         public Image imageIcon;
+
+        [Header("Bonus Stats")]
+        public UICharacterStats uiIncreaseStats;
+        public UIResistanceAmounts uiIncreaseResistances;
+        public UIArmorAmounts uiIncreaseArmors;
+        public UIDamageElementAmounts uiIncreaseDamages;
+        public UIStatusEffectResistances uiStatusEffectResistances;
 
         [Header("Events")]
         public UnityEvent onAbleToIncrease;
@@ -66,6 +74,114 @@ namespace MultiplayerARPG
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
+            }
+
+            if (uiIncreaseStats != null)
+            {
+                CharacterStats stats = new CharacterStats();
+                if (Attribute != null)
+                {
+                    stats += Attribute.GetStats(Amount);
+                }
+
+                if (stats.IsEmpty())
+                {
+                    // Hide ui if stats is empty
+                    uiIncreaseStats.Hide();
+                }
+                else
+                {
+                    uiIncreaseStats.displayType = UICharacterStats.DisplayType.Simple;
+                    uiIncreaseStats.isBonus = true;
+                    uiIncreaseStats.Show();
+                    uiIncreaseStats.Data = stats;
+                }
+            }
+
+            if (uiIncreaseResistances != null)
+            {
+                Dictionary<DamageElement, float> resistances = null;
+                if (Attribute != null)
+                {
+                    resistances = Attribute.GetIncreaseResistances(Amount);
+                }
+
+                if (resistances == null || resistances.Count == 0)
+                {
+                    // Hide ui if resistances is empty
+                    uiIncreaseResistances.Hide();
+                }
+                else
+                {
+                    uiIncreaseResistances.isBonus = true;
+                    uiIncreaseResistances.Show();
+                    uiIncreaseResistances.Data = resistances;
+                }
+            }
+
+            if (uiIncreaseArmors != null)
+            {
+                Dictionary<DamageElement, float> armors = null;
+                if (Attribute != null)
+                {
+                    armors = Attribute.GetIncreaseArmors(Amount);
+                }
+
+                if (armors == null || armors.Count == 0)
+                {
+                    // Hide ui if armors is empty
+                    uiIncreaseArmors.Hide();
+                }
+                else
+                {
+                    uiIncreaseArmors.displayType = UIArmorAmounts.DisplayType.Simple;
+                    uiIncreaseArmors.isBonus = true;
+                    uiIncreaseArmors.Show();
+                    uiIncreaseArmors.Data = armors;
+                }
+            }
+
+            if (uiIncreaseDamages != null)
+            {
+                Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
+                if (Attribute != null)
+                {
+                    damageAmounts = Attribute.GetIncreaseDamages(Amount);
+                }
+
+                if (damageAmounts == null || damageAmounts.Count == 0)
+                {
+                    // Hide ui if damage amounts is empty
+                    uiIncreaseDamages.Hide();
+                }
+                else
+                {
+                    uiIncreaseDamages.displayType = UIDamageElementAmounts.DisplayType.Simple;
+                    uiIncreaseDamages.isBonus = true;
+                    uiIncreaseDamages.Show();
+                    uiIncreaseDamages.Data = damageAmounts;
+                }
+            }
+
+            if (uiStatusEffectResistances != null)
+            {
+                Dictionary<StatusEffect, float> statusEffectResistances = null;
+                if (Attribute != null)
+                {
+                    statusEffectResistances = Attribute.GetIncreaseStatusEffectResistances(Amount);
+                }
+
+                if (statusEffectResistances == null || statusEffectResistances.Count == 0)
+                {
+                    // Hide ui if armors is empty
+                    uiStatusEffectResistances.Hide();
+                }
+                else
+                {
+                    uiStatusEffectResistances.isBonus = true;
+                    uiStatusEffectResistances.Show();
+                    uiStatusEffectResistances.UpdateData(statusEffectResistances);
+                }
             }
         }
 

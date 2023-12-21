@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if (index == 0 || selectedId.Equals(data.Id))
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(response.mails.Count == 0);

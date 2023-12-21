@@ -287,9 +287,11 @@ namespace MultiplayerARPG
 
         public void SetAttackTarget(IDamageableEntity target)
         {
-            if (target == null || target.Entity == Entity ||
-                target.IsDead() || !target.CanReceiveDamageFrom(GetInfo()))
+            if (target.GetObjectId() == Entity.ObjectId || target.IsDead() || !target.CanReceiveDamageFrom(GetInfo()))
+            {
+                // Can't attack
                 return;
+            }
             SetTargetEntity(target.Entity);
         }
 

@@ -130,7 +130,7 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.DataId)
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
         }
     }

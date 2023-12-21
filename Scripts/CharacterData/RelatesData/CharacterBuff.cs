@@ -69,7 +69,7 @@ namespace MultiplayerARPG
             MakeAsCached();
             ClearCachedData();
             _recachingBuff = true;
-            _cacheKey = ZString.Concat(type, "_", dataId);
+            _cacheKey = ZString.Concat((byte)type, '_', dataId);
             switch (type)
             {
                 case BuffType.SkillBuff:
@@ -126,9 +126,12 @@ namespace MultiplayerARPG
                 switch (type)
                 {
                     case BuffType.SkillBuff:
+                        if (_cacheSkill != null && _cacheSkill.TryGetBuff(out Buff buff))
+                            tempBuff = buff;
+                        break;
                     case BuffType.SkillDebuff:
-                        if (_cacheSkill != null)
-                            tempBuff = type == BuffType.SkillBuff ? _cacheSkill.Buff : _cacheSkill.Debuff;
+                        if (_cacheSkill != null && _cacheSkill.TryGetDebuff(out Buff debuff))
+                            tempBuff = debuff;
                         break;
                     case BuffType.PotionBuff:
                         if (_cacheItem != null && _cacheItem.IsPotion())

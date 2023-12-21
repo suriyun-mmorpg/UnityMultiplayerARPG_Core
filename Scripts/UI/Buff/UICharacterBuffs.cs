@@ -13,30 +13,30 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiCharacterBuffContainer")]
         public Transform uiContainer;
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UICharacterBuffSelectionManager cacheSelectionManager;
+        private UICharacterBuffSelectionManager _cacheSelectionManager;
         public UICharacterBuffSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterBuffSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterBuffSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if (selectedId.Equals(data.id))
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
         }
     }

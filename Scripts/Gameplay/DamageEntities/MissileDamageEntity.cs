@@ -21,27 +21,41 @@ namespace MultiplayerARPG
         [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
         public float explodeDistance;
 
-        public Rigidbody CacheRigidbody { get; private set; }
-        public Rigidbody2D CacheRigidbody2D { get; private set; }
-
-        protected bool _isExploded;
         protected float _missileDistance;
         protected float _missileSpeed;
         protected IDamageableEntity _lockingTarget;
         protected float _launchTime;
         protected float _missileDuration;
-        protected bool _destroying;
-        protected float? _lagMoveSpeedRate;
+
         protected Vector3? _previousPosition;
         protected RaycastHit2D[] _hits2D = new RaycastHit2D[8];
         protected RaycastHit[] _hits3D = new RaycastHit[8];
         protected readonly HashSet<uint> _alreadyHitObjects = new HashSet<uint>();
 
-        protected override void Awake()
+        protected bool _isExploded;
+        protected bool IsExploded
         {
-            base.Awake();
-            CacheRigidbody = GetComponent<Rigidbody>();
-            CacheRigidbody2D = GetComponent<Rigidbody2D>();
+            get
+            {
+                return _isExploded;
+            }
+            set
+            {
+                _isExploded = value;
+            }
+        }
+
+        protected bool _destroying;
+        protected bool Destroying
+        {
+            get
+            {
+                return _destroying;
+            }
+            set
+            {
+                _destroying = value;
+            }
         }
 
         /// <summary>
@@ -82,12 +96,12 @@ namespace MultiplayerARPG
                 // Explode immediately when distance and speed is 0
                 Explode();
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
                 return;
             }
             _lockingTarget = lockingTarget;
-            _isExploded = false;
-            _destroying = false;
+            IsExploded = false;
+            Destroying = false;
             _launchTime = Time.unscaledTime;
             _missileDuration = (missileDistance / missileSpeed) + 0.1f;
             _alreadyHitObjects.Clear();
@@ -117,131 +131,81 @@ namespace MultiplayerARPG
         }
 #endif
 
+        /// <summary>
+        /// RayCast/SphereCast/BoxCast from current position back to previous frame position to detect hit target
+        /// </summary>
+        public virtual void HitDetect()
+        {
+            if (Destroying)
+                return;
+
+            if (!_previousPosition.HasValue)
+                return;
+
+            int hitCount = 0;
+            int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
+            Vector3 dir = (CacheTransform.position - _previousPosition.Value).normalized;
+            float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
+            // Raycast to previous position to check is it hitting something or not
+            // If hit, explode
+            switch (hitDetectionMode)
+            {
+                case HitDetectionMode.Raycast:
+                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                        hitCount = Physics2D.RaycastNonAlloc(_previousPosition.Value, dir, _hits2D, dist, layerMask);
+                    else
+                        hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, layerMask);
+                    break;
+                case HitDetectionMode.SphereCast:
+                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                        hitCount = Physics2D.CircleCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits2D, dist, layerMask);
+                    else
+                        hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, layerMask);
+                    break;
+                case HitDetectionMode.BoxCast:
+                    if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                        hitCount = Physics2D.BoxCastNonAlloc(_previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, _hits2D, dist, layerMask);
+                    else
+                        hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, layerMask);
+                    break;
+            }
+            for (int i = 0; i < hitCount; ++i)
+            {
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && _hits2D[i].transform != null)
+                    TriggerEnter(_hits2D[i].transform.gameObject);
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D && _hits3D[i].transform != null)
+                    TriggerEnter(_hits3D[i].transform.gameObject);
+                if (Destroying)
+                    break;
+            }
+            _previousPosition = CacheTransform.position;
+        }
+
         protected virtual void Update()
         {
-            if (_destroying)
+            if (Destroying)
                 return;
 
             if (Time.unscaledTime - _launchTime >= _missileDuration)
             {
                 Explode();
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
             }
 
             HitDetect();
-        }
 
-        /// <summary>
-        /// RayCast/SphereCast/BoxCast from current position back to previous frame position to detect hit target
-        /// </summary>
-        public virtual void HitDetect()
-        {
-            if (!_destroying)
-            {
-                if (_previousPosition.HasValue)
-                {
-                    int hitCount = 0;
-                    int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
-                    Vector3 dir = (CacheTransform.position - _previousPosition.Value).normalized;
-                    float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
-                    // Raycast to previous position to check is it hitting something or not
-                    // If hit, explode
-                    switch (hitDetectionMode)
-                    {
-                        case HitDetectionMode.Raycast:
-                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.RaycastNonAlloc(_previousPosition.Value, dir, _hits2D, dist, layerMask);
-                            else
-                                hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, layerMask);
-                            break;
-                        case HitDetectionMode.SphereCast:
-                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.CircleCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits2D, dist, layerMask);
-                            else
-                                hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, layerMask);
-                            break;
-                        case HitDetectionMode.BoxCast:
-                            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                                hitCount = Physics2D.BoxCastNonAlloc(_previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, _hits2D, dist, layerMask);
-                            else
-                                hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, layerMask);
-                            break;
-                    }
-                    for (int i = 0; i < hitCount; ++i)
-                    {
-                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && _hits2D[i].transform != null)
-                            TriggerEnter(_hits2D[i].transform.gameObject);
-                        if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D && _hits3D[i].transform != null)
-                            TriggerEnter(_hits3D[i].transform.gameObject);
-                    }
-                }
-                _previousPosition = CacheTransform.position;
-            }
-        }
-
-        protected virtual void FixedUpdate()
-        {
-            // Don't move if exploded
-            if (_isExploded)
-            {
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                {
-                    if (CacheRigidbody2D != null)
-                        CacheRigidbody2D.velocity = Vector2.zero;
-                }
-                else
-                {
-                    if (CacheRigidbody != null)
-                        CacheRigidbody.velocity = Vector3.zero;
-                }
+            if (Destroying)
                 return;
-            }
 
-            float currentMissileSpeed = CalculateCurrentMoveSpeed(_missileSpeed, Time.fixedDeltaTime);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                if (CacheRigidbody2D != null)
-                    CacheRigidbody2D.velocity = -CacheTransform.up * currentMissileSpeed;
-            }
+                CacheTransform.position += -CacheTransform.up * _missileSpeed * Time.deltaTime;
             else
-            {
-                if (CacheRigidbody != null)
-                    CacheRigidbody.velocity = CacheTransform.forward * currentMissileSpeed;
-            }
-        }
-
-        protected float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
-        {
-            // Adjust speed by rtt
-            if (!IsServer && _instigator.TryGetEntity(out BaseGameEntity entity) && entity.IsOwnerClient)
-            {
-                float rtt = 0.001f * CurrentGameManager.Rtt;
-                float acc = 1f / rtt * deltaTime * 0.5f;
-                if (!_lagMoveSpeedRate.HasValue)
-                    _lagMoveSpeedRate = 0f;
-                if (_lagMoveSpeedRate < 1f)
-                    _lagMoveSpeedRate += acc;
-                if (_lagMoveSpeedRate > 1f)
-                    _lagMoveSpeedRate = 1f;
-                return maxMoveSpeed * _lagMoveSpeedRate.Value;
-            }
-            // TODO: Adjust other's client move speed by rtt
-            return maxMoveSpeed;
+                CacheTransform.position += CacheTransform.forward * _missileSpeed * Time.deltaTime;
         }
 
         protected override void OnPushBack()
         {
-            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-            {
-                if (CacheRigidbody2D != null)
-                    CacheRigidbody2D.velocity = Vector2.zero;
-            }
-            else
-            {
-                if (CacheRigidbody != null)
-                    CacheRigidbody.velocity = Vector3.zero;
-            }
             _previousPosition = null;
             if (onDestroy != null)
                 onDestroy.Invoke();
@@ -250,7 +214,7 @@ namespace MultiplayerARPG
 
         protected virtual void TriggerEnter(GameObject other)
         {
-            if (_destroying)
+            if (Destroying)
                 return;
 
             if (!other.GetComponent<IUnHittable>().IsNull())
@@ -274,7 +238,7 @@ namespace MultiplayerARPG
                     Explode();
                 }
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
                 return;
             }
 
@@ -289,7 +253,7 @@ namespace MultiplayerARPG
                     Explode();
                 }
                 PushBack(destroyDelay);
-                _destroying = true;
+                Destroying = true;
                 return;
             }
         }
@@ -331,10 +295,10 @@ namespace MultiplayerARPG
 
         protected virtual void Explode()
         {
-            if (_isExploded)
+            if (IsExploded)
                 return;
 
-            _isExploded = true;
+            IsExploded = true;
 
             // Explode when distance > 0
             if (explodeDistance <= 0f)

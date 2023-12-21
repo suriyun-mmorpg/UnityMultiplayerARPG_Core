@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public InputFieldWrapper uiInputCharacterName;
         public Button buttonCreate;
         public UIBodyPartManager[] uiBodyPartManagers = new UIBodyPartManager[0];
+        public UIBlendshapeManager uiBlendshapeManager;
 
         [Header("Event")]
         public UnityEvent eventOnCreateCharacter = new UnityEvent();
@@ -352,11 +353,14 @@ namespace MultiplayerARPG
                 eventOnShowInstantiatedCharacter.Invoke(SelectedModel);
                 for (int i = 0; i < uiBodyPartManagers.Length; ++i)
                 {
-                    uiBodyPartManagers[i].ModelSelectionManager.eventOnSelect.RemoveListener(OnBodyPartModelUISelected);
-                    uiBodyPartManagers[i].ModelSelectionManager.eventOnSelect.AddListener(OnBodyPartModelUISelected);
-                    uiBodyPartManagers[i].ColorSelectionManager.eventOnSelect.RemoveListener(OnBodyPartColorUISelected);
-                    uiBodyPartManagers[i].ColorSelectionManager.eventOnSelect.AddListener(OnBodyPartColorUISelected);
+                    uiBodyPartManagers[i].onSetModelValue = PublicInts.SetValue;
+                    uiBodyPartManagers[i].onSetColorValue = PublicInts.SetValue;
                     uiBodyPartManagers[i].SetCharacterModel(SelectedModel);
+                }
+                if (uiBlendshapeManager != null)
+                {
+                    uiBlendshapeManager.onSetBlendshapeValue = PublicFloats.SetValue;
+                    uiBlendshapeManager.SetCharacterModel(SelectedModel);
                 }
             }
             // Run event
@@ -385,16 +389,6 @@ namespace MultiplayerARPG
                 CharacterClassSelectionManager.Select(0);
             else
                 OnSelectCharacterClass(firstData);
-        }
-
-        private void OnBodyPartModelUISelected(UIBodyPartModelOption ui)
-        {
-            PublicInts.SetValue(ui.HashedSettingId, ui.Index);
-        }
-
-        private void OnBodyPartColorUISelected(UIBodyPartColorOption ui)
-        {
-            PublicInts.SetValue(ui.HashedSettingId, ui.Index);
         }
 
         protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)

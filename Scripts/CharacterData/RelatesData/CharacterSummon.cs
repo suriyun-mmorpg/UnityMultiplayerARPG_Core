@@ -81,14 +81,14 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case SummonType.Skill:
-                    if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill))
+                    if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill) || !_cacheSkill.TryGetSummon(out SkillSummon skillSummon))
                     {
                         _cacheSkill = null;
                         _cachePrefab = null;
                     }
                     else
                     {
-                        _cachePrefab = _cacheSkill.Summon.MonsterEntity;
+                        _cachePrefab = skillSummon.MonsterEntity;
                     }
                     break;
                 case SummonType.PetItem:

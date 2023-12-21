@@ -7,23 +7,108 @@ namespace MultiplayerARPG
     public class WarpPortalEntity : BaseGameEntity, IActivatableEntity
     {
         [Category(5, "Warp Portal Settings")]
+        [SerializeField]
+        [Tooltip("Set it more than `0` to make it uses this value instead of `GameInstance` -> `conversationDistance` as its activatable distance")]
+        private float activatableDistance = 0f;
+
+        [SerializeField]
         [Tooltip("Signal to tell players that their character can enter the portal")]
-        public GameObject[] warpSignals;
+        private GameObject[] warpSignals;
+
+        [SerializeField]
         [Tooltip("If this is `TRUE`, character will warp immediately when enter this warp portal")]
-        public bool warpImmediatelyWhenEnter;
+        private bool warpImmediatelyWhenEnter;
+
+        [SerializeField]
         [FormerlySerializedAs("type")]
-        public WarpPortalType warpPortalType;
+        private WarpPortalType warpPortalType;
+        public WarpPortalType WarpPortalType
+        {
+            get
+            {
+                return warpPortalType;
+            }
+            set
+            {
+                warpPortalType = value;
+            }
+        }
+
+        [SerializeField]
         [Tooltip("Map which character will warp to when use the warp portal, leave this empty to warp character to other position in the same map")]
         [FormerlySerializedAs("mapInfo")]
-        public BaseMapInfo warpToMapInfo;
+        private BaseMapInfo warpToMapInfo;
+        public BaseMapInfo WarpToMapInfo
+        {
+            get
+            {
+                return warpToMapInfo;
+            }
+            set
+            {
+                warpToMapInfo = value;
+            }
+        }
+
+        [SerializeField]
         [Tooltip("Position which character will warp to when use the warp portal")]
         [FormerlySerializedAs("position")]
-        public Vector3 warpToPosition;
+        private Vector3 warpToPosition;
+        public Vector3 WarpToPosition
+        {
+            get
+            {
+                return warpToPosition;
+            }
+            set
+            {
+                warpToPosition = value;
+            }
+        }
+
+        [SerializeField]
         [Tooltip("If this is `TRUE` it will change character's rotation when warp")]
-        public bool warpOverrideRotation;
+        private bool warpOverrideRotation;
+        public bool WarpOverrideRotation
+        {
+            get
+            {
+                return warpOverrideRotation;
+            }
+            set
+            {
+                warpOverrideRotation = value;
+            }
+        }
+
+        [SerializeField]
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
-        public Vector3 warpToRotation;
-        public WarpPointByCondition[] warpPointsByCondition = new WarpPointByCondition[0];
+        private Vector3 warpToRotation;
+        public Vector3 WarpToRotation
+        {
+            get
+            {
+                return warpToRotation;
+            }
+            set
+            {
+                warpToRotation = value;
+            }
+        }
+
+        [SerializeField]
+        private WarpPointByCondition[] warpPointsByCondition = new WarpPointByCondition[0];
+        public WarpPointByCondition[] WarpPointsByCondition
+        {
+            get
+            {
+                return warpPointsByCondition;
+            }
+            set
+            {
+                warpPointsByCondition = value;
+            }
+        }
 
         [System.NonSerialized]
         private Dictionary<int, List<WarpPointByCondition>> _cacheWarpPointsByCondition;

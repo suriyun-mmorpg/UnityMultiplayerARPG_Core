@@ -7,16 +7,30 @@ namespace MultiplayerARPG
     public class PlayerCharacterBlendshapeComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
         [System.Serializable]
-        public struct BlendshapeOption
+        public class BlendshapeOption
         {
+            [Header("Settings for UIs")]
+            public string defaultTitle = string.Empty;
+            public LanguageData[] languageSpecificTitles = new LanguageData[0];
+            [PreviewSprite(50)]
+            public Sprite icon;
+
+            [Header("Settings for In-Game Appearances")]
             public string blendshapeName;
-            [Range(0f, 100f)]
-            public float defaultValue;
+            public float defaultValue = 0f;
+            public float minValue = -1f;
+            public float maxValue = 1f;
+
+            public string Title
+            {
+                get { return Language.GetText(languageSpecificTitles, defaultTitle); }
+            }
         }
 
         public string settingIdPrefix;
         public SkinnedMeshRenderer skinnedMeshRenderer;
         public BlendshapeOption[] options = new BlendshapeOption[0];
+
         private bool _setupProperly;
         private bool _applying;
         private float[] _currentValues;

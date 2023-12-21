@@ -16,6 +16,10 @@ namespace MultiplayerARPG
         [Tooltip("If this is > 0 it will limit distance to craft an items with this workbench entity by its value")]
         protected float craftingDistance = 5f;
         public float CraftingDistance { get { return craftingDistance; } }
+        [SerializeField]
+        [Tooltip("If it is public queue, it will be queued publically, shared with other players")]
+        protected bool publicQueue = true;
+        public bool PublicQueue { get { return publicQueue; } }
 
         [Category("Sync Fields")]
         [SerializeField]
@@ -67,7 +71,7 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            if (IsServer)
+            if (IsServer && PublicQueue)
                 this.UpdateQueue();
         }
 

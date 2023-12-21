@@ -27,6 +27,7 @@ namespace MultiplayerARPG
         public IItemWithVehicleEntity ItemWithVehicleEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithVehicleEntity : null; } }
         public IItemWithSkillData ItemWithSkillData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithSkillData : null; } }
         public IItemWithAttributeData ItemWithAttributeData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithAttributeData : null; } }
+        public IItemWithStatusEffectApplyings ItemWithStatusEffectApplyings { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithStatusEffectApplyings : null; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -112,6 +113,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiIncreaseDamageAmounts")]
         public UIDamageElementAmounts uiIncreaseDamages;
         public UIDamageElementAmounts uiIncreaseDamagesRate;
+        public UIStatusEffectResistances uiStatusEffectResistances;
         public UISkillLevels uiIncreaseSkillLevels;
         public UIEquipmentSet uiEquipmentSet;
         public UIEquipmentSockets uiEquipmentSockets;
@@ -160,6 +162,12 @@ namespace MultiplayerARPG
         [Header("Item with Attribute - UI Elements")]
         public TextWrapper uiTextAttribute;
         public UICharacterAttribute uiAttribute;
+
+        [Header("Item with Status Effect Applyings - UI Elements")]
+        public UIStatusEffectApplyings uiStatusEffectApplyingsSelfWhenAttacking;
+        public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacking;
+        public UIStatusEffectApplyings uiStatusEffectApplyingsSelfWhenAttacked;
+        public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacked;
 
         [Header("Cooldown")]
         public TextWrapper uiTextCoolDownDuration;
@@ -1005,6 +1013,31 @@ namespace MultiplayerARPG
                 }
             }
 
+            if (uiStatusEffectResistances != null)
+            {
+                Dictionary<StatusEffect, float> statusEffectResistances = null;
+                if (EquipmentItem != null)
+                {
+                    statusEffectResistances = EquipmentItem.GetIncreaseStatusEffectResistances(Level);
+                }
+                else if (SocketEnhancerItem != null)
+                {
+                    statusEffectResistances = GameDataHelpers.CombineStatusEffectResistances(SocketEnhancerItem.SocketEnhanceEffect.statusEffectResistances, statusEffectResistances, 1f);
+                }
+
+                if (statusEffectResistances == null || statusEffectResistances.Count == 0)
+                {
+                    // Hide ui if armors is empty
+                    uiStatusEffectResistances.Hide();
+                }
+                else
+                {
+                    uiStatusEffectResistances.isBonus = true;
+                    uiStatusEffectResistances.Show();
+                    uiStatusEffectResistances.UpdateData(statusEffectResistances);
+                }
+            }
+
             if (uiIncreaseSkillLevels != null)
             {
                 Dictionary<BaseSkill, int> skillLevels = null;
@@ -1298,6 +1331,58 @@ namespace MultiplayerARPG
                         LanguageManager.GetText(formatKeyAttribute),
                         ItemWithAttributeData.AttributeData.Title,
                         ItemWithAttributeData.AttributeAmount);
+                }
+            }
+
+            if (uiStatusEffectApplyingsSelfWhenAttacking != null)
+            {
+                if (ItemWithStatusEffectApplyings == null || ItemWithStatusEffectApplyings.SelfStatusEffectsWhenAttacking == null || ItemWithStatusEffectApplyings.SelfStatusEffectsWhenAttacking.Length == 0)
+                {
+                    uiStatusEffectApplyingsSelfWhenAttacking.Hide();
+                }
+                else
+                {
+                    uiStatusEffectApplyingsSelfWhenAttacking.UpdateData(ItemWithStatusEffectApplyings.SelfStatusEffectsWhenAttacking, Level, UIStatusEffectApplyingTarget.SelfWhenAttacking);
+                    uiStatusEffectApplyingsSelfWhenAttacking.Show();
+                }
+            }
+
+            if (uiStatusEffectApplyingsEnemyWhenAttacking != null)
+            {
+                if (ItemWithStatusEffectApplyings == null || ItemWithStatusEffectApplyings.EnemyStatusEffectsWhenAttacking == null || ItemWithStatusEffectApplyings.EnemyStatusEffectsWhenAttacking.Length == 0)
+                {
+                    uiStatusEffectApplyingsEnemyWhenAttacking.Hide();
+                }
+                else
+                {
+                    uiStatusEffectApplyingsEnemyWhenAttacking.UpdateData(ItemWithStatusEffectApplyings.EnemyStatusEffectsWhenAttacking, Level, UIStatusEffectApplyingTarget.EnemyWhenAttacking);
+                    uiStatusEffectApplyingsEnemyWhenAttacking.Show();
+                }
+            }
+
+            if (uiStatusEffectApplyingsSelfWhenAttacked != null)
+            {
+                if (ItemWithStatusEffectApplyings == null || ItemWithStatusEffectApplyings.SelfStatusEffectsWhenAttacked == null || ItemWithStatusEffectApplyings.SelfStatusEffectsWhenAttacked.Length == 0)
+                {
+                    uiStatusEffectApplyingsSelfWhenAttacked.Hide();
+                }
+                else
+                {
+                    uiStatusEffectApplyingsSelfWhenAttacked.UpdateData(ItemWithStatusEffectApplyings.SelfStatusEffectsWhenAttacked, Level, UIStatusEffectApplyingTarget.SelfWhenAttacked);
+                    uiStatusEffectApplyingsSelfWhenAttacked.Show();
+                }
+            }
+
+            if (uiStatusEffectApplyingsEnemyWhenAttacked != null)
+            {
+                if (ItemWithStatusEffectApplyings == null || ItemWithStatusEffectApplyings.EnemyStatusEffectsWhenAttacked == null || ItemWithStatusEffectApplyings.EnemyStatusEffectsWhenAttacked.Length == 0)
+                {
+                    uiStatusEffectApplyingsEnemyWhenAttacked.Hide();
+                }
+                else
+                {
+                    uiStatusEffectApplyingsEnemyWhenAttacked.UpdateData(ItemWithStatusEffectApplyings.EnemyStatusEffectsWhenAttacked, Level, UIStatusEffectApplyingTarget.EnemyWhenAttacked);
+                    uiStatusEffectApplyingsEnemyWhenAttacked.Show();
                 }
             }
 
@@ -1728,7 +1813,7 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
 
             // Controlling by hotkey controller
-            UICharacterHotkeys.SetupAndUseOtherHotkey(HotkeyType.Item, CharacterItem.id);
+            UICharacterHotkeys.SetupHotkeyForDialogControlling(HotkeyType.Item, CharacterItem.id);
         }
 
         #region Drop Item Functions

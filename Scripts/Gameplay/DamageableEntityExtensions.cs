@@ -7,9 +7,9 @@
             return damageableEntity.IsNull() || damageableEntity.CurrentHp <= 0;
         }
 
-        public static bool IsHideOrDead(this IDamageableEntity damageableEntity)
+        public static bool IsDeadOrHideFrom(this IDamageableEntity damageableEntity, IGameEntity watcherEntity)
         {
-            return damageableEntity.IsDead() || damageableEntity.IsHide();
+            return damageableEntity.IsDead() || damageableEntity.IsHideFrom(watcherEntity);
         }
     }
 }

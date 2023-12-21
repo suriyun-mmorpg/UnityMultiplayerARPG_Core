@@ -57,9 +57,9 @@ namespace MultiplayerARPG
                     List<ItemCraft> itemCrafts = new List<ItemCraft>();
                     foreach (CharacterSkill characterSkill in owningCharacter.Skills)
                     {
-                        if (characterSkill == null || characterSkill.GetSkill() == null || !characterSkill.GetSkill().IsCraftItem)
+                        if (characterSkill == null || characterSkill.GetSkill() == null || !characterSkill.GetSkill().TryGetItemCraft(out ItemCraft itemCraft))
                             continue;
-                        itemCrafts.Add(characterSkill.GetSkill().ItemCraft);
+                        itemCrafts.Add(itemCraft);
                     }
                     UpdateData(itemCrafts);
                     break;
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.CraftingItem.DataId)
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(itemCrafts.Count == 0);

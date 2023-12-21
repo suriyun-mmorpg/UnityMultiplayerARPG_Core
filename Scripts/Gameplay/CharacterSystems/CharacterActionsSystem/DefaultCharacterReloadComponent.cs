@@ -19,7 +19,9 @@ namespace MultiplayerARPG
         public bool IsReloading { get; protected set; }
         public float LastReloadEndTime { get; protected set; }
         protected bool _skipMovementValidation;
-        public bool LastReloadSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        public bool IsSkipMovementValidationWhileReloading { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        protected bool _shouldUseRootMotion;
+        public bool IsUseRootMotionWhileReloading { get { return _shouldUseRootMotion; } protected set { _shouldUseRootMotion = value; } }
         public float MoveSpeedRateWhileReloading { get; protected set; }
         public MovementRestriction MovementRestrictionWhileReloading { get; protected set; }
         protected float _totalDuration;
@@ -70,8 +72,7 @@ namespace MultiplayerARPG
                 0,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration,
-                out _skipMovementValidation);
+                out _totalDuration);
 
             // Set doing action state at clients and server
             SetReloadActionStates(animActionType, reloadingAmmoDataId, reloadingAmmoAmount);
@@ -103,11 +104,11 @@ namespace MultiplayerARPG
 
                 // Play animation
                 if (tpsModelAvailable)
-                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
                 if (vehicleModelAvailable)
-                    vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                    vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
                 if (fpsModelAvailable)
-                    Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0);
+                    Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _);
 
                 // Special effects will plays on clients only
                 if (IsClient)
@@ -130,7 +131,7 @@ namespace MultiplayerARPG
                     float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
                     do
                     {
-                        await UniTask.Yield();
+                        await UniTask.Yield(reloadCancellationTokenSource.Token);
                         setupDelayCountDown -= Time.unscaledDeltaTime;
                     } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
@@ -157,7 +158,7 @@ namespace MultiplayerARPG
                     // Wait until triggger before reload ammo
                     tempTriggerDuration = _triggerDurations[i];
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, reloadCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -167,11 +168,14 @@ namespace MultiplayerARPG
                             Entity.CharacterModel.PlayEquippedWeaponReloaded(isLeftHand);
                         if (fpsModelAvailable)
                             Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
+
                         // Play reload sfx
                         AudioClipWithVolumeSettings audioClip = weaponItem.ReloadedClip;
                         if (audioClip != null)
                             AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
+
+                    await UniTask.Yield(reloadCancellationTokenSource.Token);
 
                     // Reload / Fill ammo
                     if (!reloaded)
@@ -209,7 +213,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, reloadCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)

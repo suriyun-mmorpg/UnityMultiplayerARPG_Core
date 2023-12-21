@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     {
         public List<string> filterCategories = new List<string>();
         public bool doNotIncludeSkills;
-        public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active, SkillType.CraftItem };
+        public List<SkillType> filterSkillTypes = new List<SkillType>() { SkillType.Active };
         public bool doNotIncludeItems;
         public List<ItemType> filterItemTypes = new List<ItemType>() { ItemType.Armor, ItemType.Shield, ItemType.Weapon, ItemType.Potion, ItemType.Building, ItemType.Pet, ItemType.Mount, ItemType.Skill };
         public bool doNotIncludeGuildSkills;
@@ -30,23 +30,39 @@ namespace MultiplayerARPG
 
         public static UICharacterHotkey UsingHotkey { get; private set; }
         public static AimPosition HotkeyAimPosition { get; private set; }
-        private static UICharacterHotkey s_otherHotkey;
-        /// <summary>
-        /// The hotkey which will be used by other components
-        /// </summary>
-        public static UICharacterHotkey OtherHotkey
+
+        internal static UICharacterHotkey s_hotkeyForDialogControlling;
+        public static UICharacterHotkey HotkeyForDialogControlling
         {
             get
             {
-                if (s_otherHotkey == null)
-                {
-                    s_otherHotkey = new GameObject("_OtherHotkey").AddComponent<UICharacterHotkey>();
-                    s_otherHotkey.transform.localScale = Vector3.zero;
-                }
-                return s_otherHotkey;
+                if (GameInstance.UseMobileInput())
+                    return HotkeyJoystickForDialogControlling.UICharacterHotkey;
+                if (s_hotkeyForDialogControlling == null)
+                    s_hotkeyForDialogControlling = new GameObject("_HotkeyForDialogControlling").AddComponent<UICharacterHotkey>();
+                return s_hotkeyForDialogControlling;
             }
         }
-        private static readonly List<IHotkeyJoystickEventHandler> hotkeyJoysticks = new List<IHotkeyJoystickEventHandler>();
+
+        internal static IHotkeyJoystickEventHandler s_hotkeyJoystickForDialogControlling;
+        public static IHotkeyJoystickEventHandler HotkeyJoystickForDialogControlling
+        {
+            get
+            {
+                if (s_hotkeyJoystickForDialogControlling == null && s_hotkeyJoysticks.Count > 0)
+                {
+                    IHotkeyJoystickEventHandler prefab = s_hotkeyJoysticks[0];
+                    s_hotkeyJoystickForDialogControlling = Instantiate(prefab.gameObject, prefab.transform.parent).GetComponent<IHotkeyJoystickEventHandler>();
+                    s_hotkeyJoystickForDialogControlling.gameObject.name = "_HotkeyJoystickForDialogControlling";
+                    s_hotkeyJoystickForDialogControlling.transform.localPosition = prefab.transform.localPosition;
+                    s_hotkeyJoystickForDialogControlling.transform.localRotation = prefab.transform.localRotation;
+                    s_hotkeyJoystickForDialogControlling.transform.localScale = prefab.transform.localScale;
+                    s_hotkeyJoystickForDialogControlling.UICharacterHotkey.Setup(prefab.UICharacterHotkey.UICharacterHotkeys, null, new CharacterHotkey(), -1);
+                }
+                return s_hotkeyJoystickForDialogControlling;
+            }
+        }
+        private static readonly List<IHotkeyJoystickEventHandler> s_hotkeyJoysticks = new List<IHotkeyJoystickEventHandler>();
 
         private Dictionary<string, List<UICharacterHotkey>> _cacheUICharacterHotkeys;
         public Dictionary<string, List<UICharacterHotkey>> CacheUICharacterHotkeys
@@ -96,7 +112,7 @@ namespace MultiplayerARPG
                         CacheSelectionManager.Add(ui);
                         // Select first UI
                         if (j == 0)
-                            ui.OnClickSelect();
+                            ui.SelectByManager();
                         ++j;
                     }
                 }
@@ -110,6 +126,8 @@ namespace MultiplayerARPG
             // but now it is a variable for a prefab.
             if (hotkeyAimJoyStickPrefab != null)
                 hotkeyAimJoyStickPrefab.gameObject.SetActive(false);
+            if (hotkeyCancelArea != null)
+                hotkeyCancelArea.gameObject.SetActive(false);
         }
 
         protected virtual void OnEnable()
@@ -203,14 +221,14 @@ namespace MultiplayerARPG
         private void UpdateHotkeyMobileInputs()
         {
             bool isAnyHotkeyJoyStickDragging = false;
-            for (int i = 0; i < hotkeyJoysticks.Count; ++i)
+            for (int i = 0; i < s_hotkeyJoysticks.Count; ++i)
             {
-                if (hotkeyJoysticks[i] == null)
+                if (s_hotkeyJoysticks[i] == null)
                     continue;
-                hotkeyJoysticks[i].UpdateEvent();
-                if (UsingHotkey == hotkeyJoysticks[i].UICharacterHotkey)
-                    HotkeyAimPosition = hotkeyJoysticks[i].AimPosition;
-                if (hotkeyJoysticks[i].IsDragging)
+                s_hotkeyJoysticks[i].UpdateEvent();
+                if (UsingHotkey == s_hotkeyJoysticks[i].UICharacterHotkey)
+                    HotkeyAimPosition = s_hotkeyJoysticks[i].AimPosition;
+                if (s_hotkeyJoysticks[i].IsDragging)
                     isAnyHotkeyJoyStickDragging = true;
             }
 
@@ -225,7 +243,6 @@ namespace MultiplayerARPG
         {
             if (UsingHotkey == null)
                 return;
-
             HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
             // Click anywhere (on the map) to use skill
             if (InputManager.GetButtonDown(consoleConfirmButtonName) && !UsingHotkey.IsChanneledAbility() && !UIBlockController.IsBlockController())
@@ -237,19 +254,21 @@ namespace MultiplayerARPG
             if (UsingHotkey == null)
                 return;
             UsingHotkey.FinishAimControls(isCancel, HotkeyAimPosition);
+            if (HotkeyJoystickForDialogControlling != null && HotkeyJoystickForDialogControlling.UICharacterHotkey == UsingHotkey)
+                HotkeyJoystickForDialogControlling.gameObject.SetActive(false);
             UsingHotkey = null;
             HotkeyAimPosition = default;
         }
 
-        public void RegisterHotkeyJoystick(IHotkeyJoystickEventHandler hotkeyJoystick)
+        public static void RegisterHotkeyJoystick(IHotkeyJoystickEventHandler hotkeyJoystick)
         {
-            if (!hotkeyJoysticks.Contains(hotkeyJoystick))
-                hotkeyJoysticks.Add(hotkeyJoystick);
+            if (!s_hotkeyJoysticks.Contains(hotkeyJoystick))
+                s_hotkeyJoysticks.Add(hotkeyJoystick);
         }
 
         public static bool IsAnyHotkeyJoyStickDragging()
         {
-            foreach (IHotkeyJoystickEventHandler hotkeyJoystick in hotkeyJoysticks)
+            foreach (IHotkeyJoystickEventHandler hotkeyJoystick in s_hotkeyJoysticks)
             {
                 if (hotkeyJoystick == null)
                     continue;
@@ -260,13 +279,15 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public static void SetupAndUseOtherHotkey(HotkeyType type, string relateId)
+        public static void SetupHotkeyForDialogControlling(HotkeyType type, string relateId)
         {
             CharacterHotkey hotkey = new CharacterHotkey();
             hotkey.type = type;
             hotkey.relateId = relateId;
-            OtherHotkey.Data = hotkey;
-            OtherHotkey.OnClickUse();
+            if (HotkeyJoystickForDialogControlling != null)
+                HotkeyJoystickForDialogControlling.gameObject.SetActive(true);
+            HotkeyForDialogControlling.Data = hotkey;
+            HotkeyForDialogControlling.OnClickUse();
         }
     }
 }

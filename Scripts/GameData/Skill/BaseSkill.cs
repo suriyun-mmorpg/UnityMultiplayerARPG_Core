@@ -89,12 +89,8 @@ namespace MultiplayerARPG
                 {
                     case SkillType.Active:
                         return LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_ACTIVE.ToString());
-                    case SkillType.Passive:
-                        return LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_PASSIVE.ToString());
-                    case SkillType.CraftItem:
-                        return LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_CRAFT_ITEM.ToString());
                     default:
-                        return LanguageManager.GetUnknowTitle();
+                        return LanguageManager.GetText(UISkillTypeKeys.UI_SKILL_TYPE_PASSIVE.ToString());
                 }
             }
         }
@@ -253,12 +249,38 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             GameInstance.AddPoolingObjects(skillCastEffects);
             GameInstance.AddPoolingObjects(skillActivateEffects);
-            GameInstance.AddPoolingObjects(Buff.effects);
-            GameInstance.AddPoolingObjects(Debuff.effects);
-            Buff.PrepareRelatesData();
-            Debuff.PrepareRelatesData();
+            if (TryGetBuff(out Buff buff))
+            {
+                GameInstance.AddPoolingObjects(buff.effects);
+                buff.PrepareRelatesData();
+            }
+            if (TryGetDebuff(out Buff debuff))
+            {
+                GameInstance.AddPoolingObjects(debuff.effects);
+                debuff.PrepareRelatesData();
+            }
+            if (TryGetSummon(out SkillSummon summon))
+            {
+                GameInstance.AddCharacterEntities(summon.MonsterEntity);
+            }
+            if (TryGetMount(out SkillMount mount))
+            {
+                GameInstance.AddVehicleEntities(mount.MountEntity);
+            }
+            if (TryGetItemCraft(out ItemCraft itemCraft))
+            {
+                GameInstance.AddItems(itemCraft.CraftingItem);
+                GameInstance.AddItems(itemCraft.RequireItems);
+                GameInstance.AddCurrencies(itemCraft.RequireCurrencies);
+            }
+            if (TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] attackStatusEffectApplyings))
+            {
+                GameInstance.AddStatusEffects(attackStatusEffectApplyings);
+            }
             if (requirementEachLevels.Count <= 0)
+            {
                 MakeRequirementEachLevels();
+            }
         }
 
         public GameEffect[] SkillCastEffects
@@ -397,16 +419,9 @@ namespace MultiplayerARPG
 
         public abstract SkillType SkillType { get; }
         public virtual bool IsAttack { get { return false; } }
-        public virtual bool IsBuff { get { return false; } }
-        public virtual bool IsDebuff { get { return false; } }
         public virtual bool RequiredTarget { get { return false; } }
         public virtual HarvestType HarvestType { get { return HarvestType.None; } }
         public virtual IncrementalMinMaxFloat HarvestDamageAmount { get { return new IncrementalMinMaxFloat(); } }
-        public virtual Buff Buff { get { return Buff.Empty; } }
-        public virtual Buff Debuff { get { return Buff.Empty; } }
-        public virtual SkillSummon Summon { get { return SkillSummon.Empty; } }
-        public virtual SkillMount Mount { get { return SkillMount.Empty; } }
-        public virtual ItemCraft ItemCraft { get { return ItemCraft.Empty; } }
 
         #region ICustomAimController implements
         public virtual bool HasCustomAimControls()
@@ -439,11 +454,6 @@ namespace MultiplayerARPG
             get { return SkillType == SkillType.Passive; }
         }
 
-        public bool IsCraftItem
-        {
-            get { return SkillType == SkillType.CraftItem; }
-        }
-
         public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, int skillLevel, bool isLeftHand)
         {
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
@@ -452,11 +462,11 @@ namespace MultiplayerARPG
                 return damageAmounts;
 
             // Base attack damage amount will sum with other variables later
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand));
+            if (TryGetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand, out KeyValuePair<DamageElement, MinMaxFloat> baseDamageAmount))
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, baseDamageAmount);
 
             // Sum damage with weapon damage inflictions
-            Dictionary<DamageElement, float> damageInflictions = GetAttackWeaponDamageInflictions(skillUser, skillLevel);
-            if (damageInflictions != null && damageInflictions.Count > 0)
+            if (TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out Dictionary<DamageElement, float> damageInflictions))
             {
                 // Prepare weapon damage amount
                 KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount;
@@ -474,7 +484,8 @@ namespace MultiplayerARPG
             }
 
             // Sum damage with additional damage amounts
-            damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GetAttackAdditionalDamageAmounts(skillUser, skillLevel));
+            if (TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, additionalDamageAmounts);
 
             // Sum damage with buffs
             if (IsIncreaseAttackDamageAmountsWithBuffs(skillUser, skillLevel))
@@ -491,19 +502,58 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public virtual KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)
+        public virtual bool TryGetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand, out KeyValuePair<DamageElement, MinMaxFloat> baseDamageAmount)
         {
-            return default;
+            baseDamageAmount = default;
+            return false;
         }
 
-        public virtual Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel)
+        public virtual bool TryGetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel, out Dictionary<DamageElement, float> weaponDamageInflictions)
         {
-            return default;
+            weaponDamageInflictions = null;
+            return false;
         }
 
-        public virtual Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel)
+        public virtual bool TryGetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts)
         {
-            return default;
+            additionalDamageAmounts = null;
+            return false;
+        }
+
+        public virtual bool TryGetBuff(out Buff buff)
+        {
+            buff = Buff.Empty;
+            return false;
+        }
+
+        public virtual bool TryGetDebuff(out Buff debuff)
+        {
+            debuff = Buff.Empty;
+            return false;
+        }
+
+        public virtual bool TryGetSummon(out SkillSummon summon)
+        {
+            summon = SkillSummon.Empty;
+            return false;
+        }
+
+        public virtual bool TryGetMount(out SkillMount mount)
+        {
+            mount = SkillMount.Empty;
+            return false;
+        }
+
+        public virtual bool TryGetItemCraft(out ItemCraft itemCraft)
+        {
+            itemCraft = ItemCraft.Empty;
+            return false;
+        }
+
+        public virtual bool TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] attackStatusEffects)
+        {
+            attackStatusEffects = null;
+            return false;
         }
 
         public abstract float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand);
@@ -563,9 +613,11 @@ namespace MultiplayerARPG
             uint targetObjectId,
             AimPosition aimPosition)
         {
-            if (skillUser == null)
+            if (skillUser == null || skillUser.IsDead() || skillLevel <= 0)
                 return;
-
+            ApplySkillItemCraft(skillUser);
+            ApplySkillSummon(skillUser, skillLevel);
+            ApplySkillMount(skillUser, skillLevel);
             ApplySkillImplement(
                 skillUser,
                 skillLevel,
@@ -577,6 +629,69 @@ namespace MultiplayerARPG
                 damageAmounts,
                 targetObjectId,
                 aimPosition);
+        }
+
+        protected virtual void ApplySkillItemCraft(BaseCharacterEntity skillUser)
+        {
+            if (!skillUser.IsServer)
+                return;
+
+            if (!(skillUser is BasePlayerCharacterEntity playerCharacterEntity))
+                return;
+
+            if (!TryGetItemCraft(out ItemCraft itemCraft) || itemCraft.CraftingItem == null)
+                return;
+
+            // Item crafted
+            itemCraft.CraftItem(playerCharacterEntity);
+        }
+
+        protected virtual void ApplySkillSummon(BaseCharacterEntity skillUser, int skillLevel)
+        {
+            if (!skillUser.IsServer)
+                return;
+
+            if (!TryGetSummon(out SkillSummon summon) || summon.MonsterEntity == null)
+                return;
+
+            int i;
+            int amountEachTime = summon.AmountEachTime.GetAmount(skillLevel);
+            for (i = 0; i < amountEachTime; ++i)
+            {
+                CharacterSummon newSummon = CharacterSummon.Create(SummonType.Skill, DataId);
+                newSummon.Summon(skillUser, summon.Level.GetAmount(skillLevel), summon.Duration.GetAmount(skillLevel));
+                skillUser.Summons.Add(newSummon);
+            }
+            int count = 0;
+            for (i = 0; i < skillUser.Summons.Count; ++i)
+            {
+                if (skillUser.Summons[i].dataId == DataId)
+                    ++count;
+            }
+            int maxStack = summon.MaxStack.GetAmount(skillLevel);
+            int unSummonAmount = count > maxStack ? count - maxStack : 0;
+            CharacterSummon tempSummon;
+            for (i = unSummonAmount; i > 0; --i)
+            {
+                int summonIndex = skillUser.IndexOfSummon(SummonType.Skill, DataId);
+                tempSummon = skillUser.Summons[summonIndex];
+                if (summonIndex >= 0)
+                {
+                    skillUser.Summons.RemoveAt(summonIndex);
+                    tempSummon.UnSummon(skillUser);
+                }
+            }
+        }
+
+        protected virtual void ApplySkillMount(BaseCharacterEntity skillUser, int skillLevel)
+        {
+            if (!skillUser.IsServer)
+                return;
+
+            if (!TryGetMount(out SkillMount mount) || mount.MountEntity == null)
+                return;
+
+            skillUser.Mount(mount.MountEntity);
         }
 
         /// <summary>
@@ -639,8 +754,10 @@ namespace MultiplayerARPG
         /// <param name="target"></param>
         public virtual void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
         {
-            if (IsDebuff)
+            if (TryGetDebuff(out _))
                 target.ApplyBuff(DataId, BuffType.SkillDebuff, skillLevel, instigator, weapon);
+            if (TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] statusEffectApplyings))
+                statusEffectApplyings.ApplyStatusEffect(skillLevel, instigator, weapon, target);
         }
 
         public virtual bool CanLevelUp(IPlayerCharacterData character, int level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)
@@ -722,79 +839,77 @@ namespace MultiplayerARPG
                     return false;
                 }
 
-                // Only player character will check for available weapons
-                switch (SkillType)
+                if (TryGetItemCraft(out ItemCraft itemCraft) && !itemCraft.CanCraft(playerCharacter, out gameMessage))
                 {
-                    case SkillType.Active:
-                        if (requireShield)
-                        {
-                            IShieldItem leftShieldItem = character.EquipWeapons.GetLeftHandShieldItem();
-                            if (leftShieldItem == null)
-                            {
-                                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_WITHOUT_SHIELD;
-                                return false;
-                            }
-                        }
-                        if (CacheAvailableWeapons.Count > 0)
-                        {
-                            bool available = false;
-                            IWeaponItem rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
-                            IWeaponItem leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
-                            if (rightWeaponItem != null && CacheAvailableWeapons.Contains(rightWeaponItem.WeaponType))
-                            {
-                                available = true;
-                            }
-                            else if (leftWeaponItem != null && CacheAvailableWeapons.Contains(leftWeaponItem.WeaponType))
-                            {
-                                available = true;
-                            }
-                            else if (rightWeaponItem == null && leftWeaponItem == null &&
-                                CacheAvailableWeapons.Contains(GameInstance.Singleton.DefaultWeaponItem.WeaponType))
-                            {
-                                available = true;
-                            }
-                            if (!available)
-                            {
-                                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON;
-                                return false;
-                            }
-                        }
-                        if (CacheAvailableArmors.Count > 0)
-                        {
-                            bool available = false;
-                            IArmorItem armorItem;
-                            foreach (CharacterItem characterItem in character.EquipItems)
-                            {
-                                armorItem = characterItem.GetArmorItem();
-                                if (armorItem != null && CacheAvailableArmors.Contains(armorItem.ArmorType))
-                                {
-                                    available = true;
-                                    break;
-                                }
-                            }
-                            if (!available)
-                            {
-                                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_ARMOR;
-                                return false;
-                            }
-                        }
-                        if (CacheAvailableVehicles.Count > 0)
-                        {
-                            if (character.PassengingVehicleType == null ||
-                                !character.PassengingVehicleEntity.IsDriver(character.PassengingVehicleSeatIndex) ||
-                                !CacheAvailableVehicles.Contains(character.PassengingVehicleType))
-                            {
-                                gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_VEHICLE;
-                                return false;
-                            }
-                        }
-                        break;
-                    case SkillType.CraftItem:
-                        if (playerCharacter == null || !ItemCraft.CanCraft(playerCharacter, out gameMessage))
-                            return false;
-                        break;
-                    default:
+                    // Cannot craft the item
+                    return false;
+                }
+
+                // Only player character will be checked for available weapons
+                if (requireShield)
+                {
+                    IShieldItem leftShieldItem = character.EquipWeapons.GetLeftHandShieldItem();
+                    if (leftShieldItem == null)
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_WITHOUT_SHIELD;
                         return false;
+                    }
+                }
+
+                if (CacheAvailableWeapons.Count > 0)
+                {
+                    bool available = false;
+                    IWeaponItem rightWeaponItem = character.EquipWeapons.GetRightHandWeaponItem();
+                    IWeaponItem leftWeaponItem = character.EquipWeapons.GetLeftHandWeaponItem();
+                    if (rightWeaponItem != null && CacheAvailableWeapons.Contains(rightWeaponItem.WeaponType))
+                    {
+                        available = true;
+                    }
+                    else if (leftWeaponItem != null && CacheAvailableWeapons.Contains(leftWeaponItem.WeaponType))
+                    {
+                        available = true;
+                    }
+                    else if (rightWeaponItem == null && leftWeaponItem == null &&
+                        CacheAvailableWeapons.Contains(GameInstance.Singleton.DefaultWeaponItem.WeaponType))
+                    {
+                        available = true;
+                    }
+                    if (!available)
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_WEAPON;
+                        return false;
+                    }
+                }
+
+                if (CacheAvailableArmors.Count > 0)
+                {
+                    bool available = false;
+                    IArmorItem armorItem;
+                    foreach (CharacterItem characterItem in character.EquipItems)
+                    {
+                        armorItem = characterItem.GetArmorItem();
+                        if (armorItem != null && CacheAvailableArmors.Contains(armorItem.ArmorType))
+                        {
+                            available = true;
+                            break;
+                        }
+                    }
+                    if (!available)
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_ARMOR;
+                        return false;
+                    }
+                }
+
+                if (CacheAvailableVehicles.Count > 0)
+                {
+                    if (character.PassengingVehicleType == null ||
+                        !character.PassengingVehicleEntity.IsDriver(character.PassengingVehicleSeatIndex) ||
+                        !CacheAvailableVehicles.Contains(character.PassengingVehicleType))
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_CANNOT_USE_SKILL_BY_CURRENT_VEHICLE;
+                        return false;
+                    }
                 }
 
                 if (!HasEnoughItems(character, out _, out _))
@@ -975,6 +1090,11 @@ namespace MultiplayerARPG
         public virtual Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
         {
             return skillUser.MeleeDamageTransform;
+        }
+
+        public virtual Vector3 GetDefaultAttackAimPosition(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand, IDamageableEntity target)
+        {
+            return target.OpponentAimTransform.position;
         }
 
         public void MakeRequirementEachLevels()

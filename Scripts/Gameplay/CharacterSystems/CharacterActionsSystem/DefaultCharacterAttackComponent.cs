@@ -30,7 +30,9 @@ namespace MultiplayerARPG
         }
         public float LastAttackEndTime { get; protected set; }
         protected bool _skipMovementValidation;
-        public bool LastAttackSkipMovementValidation { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        public bool IsSkipMovementValidationWhileAttacking { get { return _skipMovementValidation; } set { _skipMovementValidation = value; } }
+        protected bool _shouldUseRootMotion;
+        public bool IsUseRootMotionWhileAttacking { get { return _shouldUseRootMotion; } protected set { _shouldUseRootMotion = value; } }
         public float MoveSpeedRateWhileAttacking { get; protected set; }
         public MovementRestriction MovementRestrictionWhileAttacking { get; protected set; }
         protected float _totalDuration;
@@ -115,8 +117,7 @@ namespace MultiplayerARPG
                 animationIndex,
                 out float animSpeedRate,
                 out _triggerDurations,
-                out _totalDuration,
-                out _skipMovementValidation);
+                out _totalDuration);
 
             // Set doing action state at clients and server
             SetAttackActionStates(animActionType, animActionDataId, simulateState);
@@ -168,11 +169,11 @@ namespace MultiplayerARPG
 
                 // Play action animation
                 if (tpsModelAvailable)
-                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                 if (vehicleModelAvailable)
-                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                 if (fpsModelAvailable)
-                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, animSpeedRate);
+                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 if (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f)
@@ -181,7 +182,7 @@ namespace MultiplayerARPG
                     float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
                     do
                     {
-                        await UniTask.Yield();
+                        await UniTask.Yield(attackCancellationTokenSource.Token);
                         setupDelayCountDown -= deltaTime;
                     } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
                     if (setupDelayCountDown <= 0f)
@@ -210,7 +211,7 @@ namespace MultiplayerARPG
                     // Wait until triggger before play special effects
                     tempTriggerDuration = _triggerDurations[triggerIndex];
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, attackCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -226,7 +227,7 @@ namespace MultiplayerARPG
                             AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
                     }
 
-                    await UniTask.Yield();
+                    await UniTask.Yield(attackCancellationTokenSource.Token);
                     // Get aim position by character's forward
                     AimPosition aimPosition = Entity.AimPosition;
 
@@ -292,7 +293,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.Update, attackCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)

@@ -18,16 +18,14 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case BuffType.SkillBuff:
-                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].IsBuff)
+                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].TryGetBuff(out tempBuff))
                         return;
-                    tempBuff = GameInstance.Skills[dataId].Buff;
                     isExtendDuration = tempBuff.isExtendDuration;
                     maxStack = tempBuff.GetMaxStack(level);
                     break;
                 case BuffType.SkillDebuff:
-                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].IsDebuff)
+                    if (!GameInstance.Skills.ContainsKey(dataId) || !GameInstance.Skills[dataId].TryGetDebuff(out tempBuff))
                         return;
-                    tempBuff = GameInstance.Skills[dataId].Debuff;
                     isExtendDuration = tempBuff.isExtendDuration;
                     maxStack = tempBuff.GetMaxStack(level);
                     break;
@@ -111,15 +109,46 @@ namespace MultiplayerARPG
             }
 
             CharacterBuff newBuff = CharacterBuff.Create(type, dataId, level);
+            CalculatedBuff calculatedBuff = newBuff.GetBuff();
+
+            Dictionary<BuffRemoval, float> buffRemovals = calculatedBuff.GetBuffRemovals();
+            if (Buffs.Count > 0 && buffRemovals != null && buffRemovals.Count > 0)
+            {
+                foreach (KeyValuePair<BuffRemoval, float> buffRemoval in buffRemovals)
+                {
+                    if (!buffRemoval.Key.IsValid())
+                    {
+                        // Invalid buff data
+                        continue;
+                    }
+                    for (int i = Buffs.Count - 1; i >= 0; --i)
+                    {
+                        CharacterBuff characterBuff = Buffs[i];
+                        if (!string.Equals(buffRemoval.Key.GetId(), characterBuff.GetKey()))
+                        {
+                            // This is not a removing buff
+                            continue;
+                        }
+                        if (!buffRemoval.Key.RandomRemoveOccurs(buffRemoval.Value, characterBuff.level))
+                        {
+                            // Buff removal is not occurring
+                            continue;
+                        }
+                        // Buff removed
+                        Buffs.RemoveAt(i);
+                    }
+                    if (Buffs.Count == 0)
+                        break;
+                }
+            }
+
             newBuff.Apply(buffApplier, buffApplierWeapon);
             buffs.Add(newBuff);
-            if (newBuff.GetBuff().GetBuff().disallowMove)
-                StopMove();
 
-            if (newBuff.GetBuff().GetDuration() <= 0f)
+            if (calculatedBuff.GetDuration() <= 0f)
             {
                 CharacterRecoveryData recoveryData = new CharacterRecoveryData(this);
-                recoveryData.SetupByBuff(newBuff, newBuff.GetBuff());
+                recoveryData.SetupByBuff(newBuff, calculatedBuff);
                 recoveryData.Apply(1f);
             }
 

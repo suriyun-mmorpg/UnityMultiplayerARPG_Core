@@ -41,6 +41,12 @@ namespace MultiplayerARPG
                 tempCharacterItem = selectedUI.Data.characterItem;
                 if (tempCharacterItem.IsEmptySlot() || selectedUI.InventoryType != InventoryType.NonEquipItems)
                     continue;
+                if (tempCharacterItem.GetItem().RestrictSelling)
+                {
+                    selectedUI.DeselectByManager();
+                    ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_ITEM_SELLING_RESTRICTED);
+                    continue;
+                }
                 returnGold += tempCharacterItem.GetItem().SellPrice * tempCharacterItem.amount;
             }
 

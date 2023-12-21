@@ -14,7 +14,6 @@ namespace MultiplayerARPG
 {
     public class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity
     {
-        public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
 
         [Category("Relative GameObjects/Transforms")]
@@ -56,8 +55,8 @@ namespace MultiplayerARPG
 
         public bool PutOnPlaceholder { get; protected set; }
         public RewardGivenType GivenType { get; protected set; }
-        public List<CharacterItem> DropItems { get; protected set; }
-        public HashSet<string> Looters { get; protected set; }
+        public List<CharacterItem> DropItems { get; protected set; } = new List<CharacterItem>();
+        public HashSet<string> Looters { get; protected set; } = new HashSet<string>();
         public GameSpawnArea<ItemDropEntity> SpawnArea { get; protected set; }
         public ItemDropEntity SpawnPrefab { get; protected set; }
         public int SpawnLevel { get; protected set; }
@@ -110,7 +109,6 @@ namespace MultiplayerARPG
         // Private variables
         protected bool _isPickedUp;
         protected float _dropTime;
-        protected float _appearDuration;
 
         public override void PrepareRelatesData()
         {
@@ -168,39 +166,37 @@ namespace MultiplayerARPG
             ModelContainer.gameObject.SetActive(false);
         }
 
+        protected override void EntityStart()
+        {
+            base.EntityStart();
+            if (IsServer && IsSceneObject)
+            {
+                // Init just once when started, if this entity is scene object
+                Init();
+            }
+        }
+
         protected override void EntityOnDisable()
         {
             base.EntityOnDisable();
             ModelContainer.gameObject.SetActive(false);
         }
 
-        public virtual void InitPutOnPlaceholder(CharacterItem dropItem, IEnumerable<string> looters, float appearDuration)
-        {
-            _appearDuration = appearDuration;
-            DropItems = new List<CharacterItem> { dropItem };
-            Looters = new HashSet<string>(looters);
-            PutOnPlaceholder = true;
-            InitDropItems();
-        }
-
-        public virtual void InitDropItems()
+        public virtual void Init()
         {
             _isPickedUp = false;
             _dropTime = Time.unscaledTime;
             if (!PutOnPlaceholder)
             {
-                // Random drop items
-                DropItems = new List<CharacterItem>();
-                Looters = new HashSet<string>();
-                List<ItemAmount> increasingItems = new List<ItemAmount>();
+                DropItems.Clear();
                 ItemDropManager.RandomItems((item, amount) =>
                 {
                     DropItems.Add(CharacterItem.Create(item.DataId, 1, amount));
                 });
             }
-            if (DropItems == null || DropItems.Count == 0)
+            if (DropItems.Count == 0)
             {
-                NetworkDestroy(1f);
+                // No drop items data, it may not setup properly
                 return;
             }
             ItemDropData = new ItemDropData()
@@ -210,11 +206,6 @@ namespace MultiplayerARPG
                 level = DropItems[0].level,
                 amount = DropItems[0].amount,
             };
-            if (PutOnPlaceholder)
-            {
-                // Destroy later by duration value
-                NetworkDestroy(_appearDuration);
-            }
         }
 
         protected override void SetupNetElements()
@@ -236,8 +227,6 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             itemDropData.onChange += OnItemDropDataChange;
-            if (IsServer)
-                InitDropItems();
         }
 
         protected override void EntityOnDestroy()
@@ -279,7 +268,7 @@ namespace MultiplayerARPG
 
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
-            if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
+            if ((Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
                 Time.unscaledTime - _dropTime > CurrentGameInstance.itemLootLockDuration) && !_isPickedUp)
                 return true;
             return false;
@@ -312,7 +301,8 @@ namespace MultiplayerARPG
         protected async UniTaskVoid RespawnRoutine(float delay)
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
-            InitDropItems();
+            Looters.Clear();
+            Init();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 EntityTransform.position,
@@ -332,7 +322,7 @@ namespace MultiplayerARPG
             {
                 case DimensionType.Dimension3D:
                     // Random position around dropper with its height
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, 0f, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
                     // Random rotation
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
                     break;
@@ -357,11 +347,15 @@ namespace MultiplayerARPG
             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                 prefab.Identity.HashAssetId,
                 dropPosition, dropRotation);
-            ItemDropEntity itemDropEntity = spawnObj.GetComponent<ItemDropEntity>();
-            itemDropEntity.GivenType = givenType;
-            itemDropEntity.InitPutOnPlaceholder(dropItem, looters, appearDuration);
+            ItemDropEntity entity = spawnObj.GetComponent<ItemDropEntity>();
+            entity.GivenType = givenType;
+            entity.PutOnPlaceholder = true;
+            entity.DropItems = new List<CharacterItem> { dropItem };
+            entity.Looters = new HashSet<string>(looters);
+            entity.Init();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
-            return itemDropEntity;
+            entity.NetworkDestroy(appearDuration);
+            return entity;
         }
 
         public override bool SetAsTargetInOneClick()

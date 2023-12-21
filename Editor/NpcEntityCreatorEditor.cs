@@ -118,6 +118,8 @@ namespace MultiplayerARPG
                 DestroyImmediate(newObject);
                 return;
             }
+            //Add Character Model Type
+            modelFactory.Setup(newObject);
 
             NpcEntity npcEntity = newObject.AddComponent<NpcEntity>();
             if (npcEntity != null)
@@ -135,6 +137,35 @@ namespace MultiplayerARPG
                 fpsCamTarget.transform.localRotation = Quaternion.identity;
                 fpsCamTarget.transform.localScale = Vector3.one;
                 npcEntity.FpsCameraTargetTransform = fpsCamTarget.transform;
+
+                //Add Collider
+                Bounds bounds = default;
+                MeshRenderer[] meshes = newObject.GetComponentsInChildren<MeshRenderer>();
+                for (int i = 0; i < meshes.Length; ++i)
+                {
+                    if (i > 0)
+                        bounds.Encapsulate(meshes[i].bounds);
+                    else
+                        bounds = meshes[i].bounds;
+                }
+
+                SkinnedMeshRenderer[] skinnedMeshes = newObject.GetComponentsInChildren<SkinnedMeshRenderer>();
+                for (int i = 0; i < skinnedMeshes.Length; ++i)
+                {
+                    if (i > 0)
+                        bounds.Encapsulate(skinnedMeshes[i].bounds);
+                    else
+                        bounds = skinnedMeshes[i].bounds;
+                }
+
+                float scale = Mathf.Max(newObject.transform.localScale.x, newObject.transform.localScale.y, newObject.transform.localScale.z);
+                bounds.size = bounds.size / scale;
+                bounds.center = bounds.center / scale;
+
+                CapsuleCollider capsuleCollider = newObject.AddComponent<CapsuleCollider>();
+                capsuleCollider.height = bounds.size.y;
+                capsuleCollider.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
+                capsuleCollider.center = Vector3.zero + (Vector3.up * capsuleCollider.height * 0.5f);
 
                 var savePath = path + "\\" + fileName + ".prefab";
                 Debug.Log("Saving Npc entity to " + savePath);

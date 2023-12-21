@@ -112,7 +112,24 @@ namespace MultiplayerARPG
             // Force change physic auto sync transforms mode to manual
             Physics.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
             Physics2D.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
+            // Setup character hidding condition
+            LiteNetLibIdentity.ForceHideFunctions.Add(IsHideEntity);
             base.Awake();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            // Remove character hidding condition
+            LiteNetLibIdentity.ForceHideFunctions.Remove(IsHideEntity);
+        }
+
+        protected static bool IsHideEntity(LiteNetLibIdentity mustHideThis, LiteNetLibIdentity fromThis)
+        {
+            if (!mustHideThis.TryGetComponent(out BaseGameEntity mustHideThisEntity) ||
+                !fromThis.TryGetComponent(out BaseGameEntity fromThisEntity))
+                return false;
+            return mustHideThisEntity.IsHideFrom(fromThisEntity);
         }
 
         protected override void Update()
@@ -854,12 +871,12 @@ namespace MultiplayerARPG
                                 warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
                                 Quaternion.Euler(warpPortal.rotation));
                             warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
-                            warpPortalEntity.warpPortalType = warpPortal.warpPortalType;
-                            warpPortalEntity.warpToMapInfo = warpPortal.warpToMapInfo;
-                            warpPortalEntity.warpToPosition = warpPortal.warpToPosition;
-                            warpPortalEntity.warpOverrideRotation = warpPortal.warpOverrideRotation;
-                            warpPortalEntity.warpToRotation = warpPortal.warpToRotation;
-                            warpPortalEntity.warpPointsByCondition = warpPortal.warpPointsByCondition;
+                            warpPortalEntity.WarpPortalType = warpPortal.warpPortalType;
+                            warpPortalEntity.WarpToMapInfo = warpPortal.warpToMapInfo;
+                            warpPortalEntity.WarpToPosition = warpPortal.warpToPosition;
+                            warpPortalEntity.WarpOverrideRotation = warpPortal.warpOverrideRotation;
+                            warpPortalEntity.WarpToRotation = warpPortal.warpToRotation;
+                            warpPortalEntity.WarpPointsByCondition = warpPortal.warpPointsByCondition;
                             Assets.NetworkSpawn(spawnObj);
                         }
                         await UniTask.Yield();

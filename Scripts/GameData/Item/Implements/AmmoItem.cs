@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        [Tooltip("If this is > 0 it will override weapon's ammo capacity")]
+        [Tooltip("If this value > 0 it will override weapon's ammo capacity when reload")]
         private int overrideAmmoCapacity = 0;
         public int OverrideAmmoCapacity
         {

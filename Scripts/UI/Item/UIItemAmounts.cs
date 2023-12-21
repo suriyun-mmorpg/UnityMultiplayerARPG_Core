@@ -30,6 +30,7 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         public DisplayType displayType;
+        public string numberFormatSimple = "N0";
         public bool isBonus;
         public bool inactiveIfAmountZero;
         public bool useSimpleFormatIfAmountEnough = true;
@@ -116,8 +117,8 @@ namespace MultiplayerARPG
                                 // This will show both current character item amount and target amount
                                 tempAmountEnough = tempCurrentAmount >= tempTargetAmount;
                                 tempFormat = LanguageManager.GetText(tempAmountEnough ? formatKeyAmount : formatKeyAmountNotEnough);
-                                tempCurrentValue = tempCurrentAmount.ToString("N0");
-                                tempTargetValue = tempTargetAmount.ToString("N0");
+                                tempCurrentValue = tempCurrentAmount.ToString(numberFormatSimple);
+                                tempTargetValue = tempTargetAmount.ToString(numberFormatSimple);
                                 if (useSimpleFormatIfAmountEnough && tempAmountEnough)
                                     tempAmountText = ZString.Format(LanguageManager.GetText(formatKeySimpleAmount), tempData.Title, tempTargetValue);
                                 else
@@ -125,14 +126,11 @@ namespace MultiplayerARPG
                                 break;
                             default:
                                 // This will show only target amount, so current character item amount will not be shown
-                                if (isBonus)
-                                    tempTargetValue = tempTargetAmount.ToBonusString("N0");
-                                else
-                                    tempTargetValue = tempTargetAmount.ToString("N0");
-                                tempAmountText = ZString.Format(
+                                tempTargetValue = tempTargetAmount.ToString(numberFormatSimple);
+                                tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeySimpleAmount),
                                     tempData.Title,
-                                    tempTargetValue);
+                                    tempTargetValue));
                                 break;
                         }
                         // Append current item amount text
@@ -164,6 +162,7 @@ namespace MultiplayerARPG
 
         private void SetDefaultValue(UIItemTextPair componentPair)
         {
+            string zeroFormatSimple = 0f.ToString(numberFormatSimple);
             switch (displayType)
             {
                 case DisplayType.Requirement:
@@ -172,21 +171,21 @@ namespace MultiplayerARPG
                         componentPair.uiText.text = ZString.Format(
                             LanguageManager.GetText(formatKeySimpleAmount),
                             componentPair.item.Title,
-                            "0");
+                            zeroFormatSimple);
                     }
                     else
                     {
                         componentPair.uiText.text = ZString.Format(
                             LanguageManager.GetText(formatKeyAmount),
                             componentPair.item.Title,
-                            "0", "0");
+                            zeroFormatSimple, zeroFormatSimple);
                     }
                     break;
                 case DisplayType.Simple:
-                    componentPair.uiText.text = ZString.Format(
+                    componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(formatKeySimpleAmount),
                         componentPair.item.Title,
-                        isBonus ? 0f.ToBonusString("N0") : "0");
+                        zeroFormatSimple));
                     break;
             }
             if (componentPair.imageIcon != null)

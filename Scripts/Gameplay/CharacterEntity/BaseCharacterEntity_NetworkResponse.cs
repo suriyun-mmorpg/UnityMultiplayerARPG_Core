@@ -205,9 +205,9 @@ namespace MultiplayerARPG
         {
             if (IsOwnerClient)
             {
-                ReloadComponent.CancelReload();
                 AttackComponent.CancelAttack();
                 UseSkillComponent.CancelSkill();
+                ReloadComponent.CancelReload();
                 ClearActionStates();
             }
             if (onDead != null)

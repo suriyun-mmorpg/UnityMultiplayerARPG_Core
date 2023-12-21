@@ -176,7 +176,7 @@ namespace MultiplayerARPG
 
         public virtual void GenerateList()
         {
-            int selectedSkillId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Skill.DataId : 0;
+            int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Skill.DataId : 0;
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
@@ -210,8 +210,8 @@ namespace MultiplayerARPG
                 if (dragHandler != null)
                     dragHandler.SetupForSkills(tempUI);
                 CacheSelectionManager.Add(tempUI);
-                if (selectedSkillId == data.Key.DataId)
-                    tempUI.OnClickSelect();
+                if (selectedDataId == data.Key.DataId)
+                    tempUI.SelectByManager();
             });
         }
     }

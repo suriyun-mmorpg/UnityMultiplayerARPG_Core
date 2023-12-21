@@ -14,32 +14,33 @@ namespace MultiplayerARPG
         public UIItemCraftFormulas uiFormulas;
         public bool selectFirstEntryByDefault;
 
-        public ICraftingQueueSource Source { get; set; }
+        public ICraftingQueueSource Source { get; private set; }
+        public SyncListCraftingQueueItem CraftingQueueItems { get; private set; }
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UICraftingQueueItemSelectionManager cacheSelectionManager;
+        private UICraftingQueueItemSelectionManager _cacheSelectionManager;
         public UICraftingQueueItemSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UICraftingQueueItemSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICraftingQueueItemSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
@@ -81,16 +82,22 @@ namespace MultiplayerARPG
 
         public void RegisterSourceEvents()
         {
-            if (Source == null && GameInstance.PlayingCharacterEntity)
+            if (Source == null && GameInstance.PlayingCharacterEntity != null)
                 Source = GameInstance.PlayingCharacterEntity.Crafting;
             if (Source != null)
-                Source.QueueItems.onOperation += OnCraftingQueueItemsOperation;
+            {
+                if (Source.PublicQueue)
+                    CraftingQueueItems = Source.QueueItems;
+                else
+                    CraftingQueueItems = GameInstance.PlayingCharacterEntity.Crafting.QueueItems;
+                CraftingQueueItems.onOperation += OnCraftingQueueItemsOperation;
+            }
         }
 
         public void UnregisterSourceEvents()
         {
-            if (Source != null)
-                Source.QueueItems.onOperation -= OnCraftingQueueItemsOperation;
+            if (CraftingQueueItems != null)
+                CraftingQueueItems.onOperation -= OnCraftingQueueItemsOperation;
         }
 
         protected virtual void OnEnable()
@@ -159,7 +166,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.Clear();
 
             UICraftingQueueItem tempUI;
-            CacheList.Generate(Source.QueueItems, (index, data, ui) =>
+            CacheList.Generate(CraftingQueueItems, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICraftingQueueItem>();
                 tempUI.CraftingQueueManager = this;
@@ -167,10 +174,10 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.dataId)
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(Source.QueueItems.Count == 0);
+                listEmptyObject.SetActive(CraftingQueueItems.Count == 0);
         }
     }
 }

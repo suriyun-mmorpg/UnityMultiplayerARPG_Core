@@ -41,6 +41,14 @@ namespace MultiplayerARPG
         /// </summary>
         float LockDuration { get; }
         /// <summary>
+        /// Time unit for `ExpireDuration`
+        /// </summary>
+        ETimeUnits ExpireDurationUnit { get; }
+        /// <summary>
+        /// This is duration to make item to be expired and destroyed from inventory
+        /// </summary>
+        int ExpireDuration { get; }
+        /// <summary>
         /// Returning gold after this item was dismantled
         /// </summary>
         int DismantleReturnGold { get; }

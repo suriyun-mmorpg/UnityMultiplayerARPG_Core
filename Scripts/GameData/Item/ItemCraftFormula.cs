@@ -21,6 +21,13 @@ namespace MultiplayerARPG
             get { return craftDuration; }
         }
 
+        [SerializeField]
+        private bool canBeCraftedWithoutSource;
+        public bool CanBeCraftedWithoutSource
+        {
+            get { return canBeCraftedWithoutSource; }
+        }
+
         public HashSet<int> SourceIds { get; private set; } = new HashSet<int>();
 
         public override void PrepareRelatesData()

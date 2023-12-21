@@ -78,22 +78,24 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            string zeroFormatRate = 0f.ToString(numberFormatRate);
+            string zeroFormatSimple = 0f.ToString(numberFormatSimple);
             // Reset number
             if (uiTextSumDamage != null)
             {
                 switch (displayType)
                 {
                     case DisplayType.Rate:
-                        uiTextSumDamage.text = ZString.Format(
+                        uiTextSumDamage.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                             LanguageManager.GetText(formatKeySumDamageRate),
-                            isBonus ? 0.ToBonusString(numberFormatRate) : 0f.ToString(numberFormatRate),
-                            0f.ToString(numberFormatRate));
+                            zeroFormatRate,
+                            zeroFormatRate));
                         break;
-                    default:
-                        uiTextSumDamage.text = ZString.Format(
+                    case DisplayType.Simple:
+                        uiTextSumDamage.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                             LanguageManager.GetText(formatKeySumDamage),
-                            isBonus ? 0.ToBonusString(numberFormatSimple) : "0",
-                            "0");
+                            zeroFormatSimple,
+                            zeroFormatSimple));
                         break;
                 }
             }
@@ -129,28 +131,22 @@ namespace MultiplayerARPG
                         switch (displayType)
                         {
                             case DisplayType.Rate:
-                                if (isBonus)
-                                    tempMinValue = (tempAmount.min * 100).ToBonusString(numberFormatRate);
-                                else
-                                    tempMinValue = (tempAmount.min * 100).ToString(numberFormatRate);
+                                tempMinValue = (tempAmount.min * 100).ToString(numberFormatRate);
                                 tempMaxValue = (tempAmount.max * 100).ToString(numberFormatRate);
-                                tempAmountText = ZString.Format(
+                                tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeyDamageRate),
                                     tempElement.Title,
                                     tempMinValue,
-                                    tempMaxValue);
+                                    tempMaxValue));
                                 break;
                             default:
-                                if (isBonus)
-                                    tempMinValue = tempAmount.min.ToBonusString(numberFormatSimple);
-                                else
-                                    tempMinValue = tempAmount.min.ToString(numberFormatSimple);
+                                tempMinValue = tempAmount.min.ToString(numberFormatSimple);
                                 tempMaxValue = tempAmount.max.ToString(numberFormatSimple);
-                                tempAmountText = ZString.Format(
+                                tempAmountText = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeyDamage),
                                     tempElement.Title,
                                     tempMinValue,
-                                    tempMaxValue);
+                                    tempMaxValue));
                                 break;
                         }
                         // Append current elemental damage text
@@ -182,26 +178,20 @@ namespace MultiplayerARPG
                         switch (displayType)
                         {
                             case DisplayType.Rate:
-                                if (isBonus)
-                                    tempMinValue = sumDamage.min.ToBonusString(numberFormatRate);
-                                else
-                                    tempMinValue = sumDamage.min.ToString(numberFormatRate);
+                                tempMinValue = sumDamage.min.ToString(numberFormatRate);
                                 tempMaxValue = sumDamage.max.ToString(numberFormatRate);
-                                uiTextSumDamage.text = ZString.Format(
+                                uiTextSumDamage.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeySumDamageRate),
                                     tempMinValue,
-                                    tempMaxValue);
+                                    tempMaxValue));
                                 break;
                             default:
-                                if (isBonus)
-                                    tempMinValue = sumDamage.min.ToBonusString(numberFormatSimple);
-                                else
-                                    tempMinValue = sumDamage.min.ToString(numberFormatSimple);
+                                tempMinValue = sumDamage.min.ToString(numberFormatSimple);
                                 tempMaxValue = sumDamage.max.ToString(numberFormatSimple);
-                                uiTextSumDamage.text = ZString.Format(
+                                uiTextSumDamage.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                                     LanguageManager.GetText(formatKeySumDamage),
                                     tempMinValue,
-                                    tempMaxValue);
+                                    tempMaxValue));
                                 break;
                         }
                     }
@@ -212,22 +202,24 @@ namespace MultiplayerARPG
 
         private void SetDefaultValue(UIDamageElementTextPair componentPair)
         {
+            string zeroFormatRate = 0f.ToString(numberFormatRate);
+            string zeroFormatSimple = 0f.ToString(numberFormatSimple);
             DamageElement tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
             switch (displayType)
             {
                 case DisplayType.Rate:
-                    componentPair.uiText.text = ZString.Format(
+                    componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(formatKeyDamageRate),
                         tempElement.Title,
-                        isBonus ? 0.ToBonusString(numberFormatRate) : 0f.ToString(numberFormatRate),
-                        0f.ToString(numberFormatRate));
+                        zeroFormatRate,
+                        zeroFormatRate));
                     break;
                 case DisplayType.Simple:
-                    componentPair.uiText.text = ZString.Format(
+                    componentPair.uiText.text = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                         LanguageManager.GetText(formatKeyDamage),
                         tempElement.Title,
-                        isBonus ? 0.ToBonusString(numberFormatSimple) : "0",
-                        "0");
+                        zeroFormatSimple,
+                        zeroFormatSimple));
                     break;
             }
             if (componentPair.imageIcon != null)

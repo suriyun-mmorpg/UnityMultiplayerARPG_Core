@@ -55,6 +55,7 @@ namespace MultiplayerARPG
         public UICharacterBuffs uiCharacterBuffs;
         public UIResistanceAmounts uiCharacterResistances;
         public UIArmorAmounts uiCharacterArmors;
+        public UIStatusEffectResistances uiCharacterStatusEffectResistances;
         public UICharacterAttributePair[] uiCharacterAttributes = new UICharacterAttributePair[0];
         public UICharacterCurrencyPair[] uiCharacterCurrencies = new UICharacterCurrencyPair[0];
         public UICharacterClass uiCharacterClass;
@@ -74,6 +75,8 @@ namespace MultiplayerARPG
         public bool showResistanceWithBuffs;
         [Tooltip("If this is `TRUE` it will show armors which sum with buffs")]
         public bool showArmorWithBuffs;
+        [Tooltip("If this is `TRUE` it will show status effects resistances which sum with buffs")]
+        public bool showStatusEffectResistanceWithBuffs;
         [Tooltip("If this is `TRUE` it will show damages which sum with buffs")]
         public bool showDamageWithBuffs;
 
@@ -82,6 +85,7 @@ namespace MultiplayerARPG
         private Dictionary<Attribute, float> _cacheAttributes;
         private Dictionary<DamageElement, float> _cacheResistances;
         private Dictionary<DamageElement, float> _cacheArmors;
+        private Dictionary<StatusEffect, float> _cacheStatusEffects;
         private Dictionary<DamageElement, MinMaxFloat> _cacheRightHandDamages;
         private Dictionary<DamageElement, MinMaxFloat> _cacheLeftHandDamages;
 
@@ -352,6 +356,7 @@ namespace MultiplayerARPG
             _cacheAttributes = null;
             _cacheResistances = null;
             _cacheArmors = null;
+            _cacheStatusEffects = null;
             _cacheRightHandDamages = null;
             _cacheLeftHandDamages = null;
 
@@ -359,6 +364,7 @@ namespace MultiplayerARPG
             Data.GetAllStats(true, showAttributeWithBuffs, true, onGetAttributes: stats => _cacheAttributes = stats);
             Data.GetAllStats(true, showResistanceWithBuffs, true, onGetResistances: stats => _cacheResistances = stats);
             Data.GetAllStats(true, showArmorWithBuffs, true, onGetArmors: stats => _cacheArmors = stats);
+            Data.GetAllStats(true, showStatusEffectResistanceWithBuffs, true, onGetStatusEffectResistances: stats => _cacheStatusEffects = stats);
             Data.GetAllStats(true, showDamageWithBuffs, true, onGetRightHandDamages: stats => _cacheRightHandDamages = stats, onGetLeftHandDamages: stats => _cacheLeftHandDamages = stats);
 
             if (uiTextWeightLimit != null)
@@ -450,6 +456,12 @@ namespace MultiplayerARPG
             {
                 uiCharacterArmors.isBonus = false;
                 uiCharacterArmors.Data = _cacheArmors;
+            }
+
+            if (uiCharacterStatusEffectResistances != null)
+            {
+                uiCharacterStatusEffectResistances.isBonus = false;
+                uiCharacterStatusEffectResistances.UpdateData(_cacheStatusEffects);
             }
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)

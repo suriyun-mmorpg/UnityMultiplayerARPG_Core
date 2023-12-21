@@ -47,21 +47,17 @@ namespace MultiplayerARPG
                 skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation, false);
         }
 
-        public override bool IsBuff
-        {
-            get { return true; }
-        }
-
-        public override Buff Buff
-        {
-            get { return buff; }
-        }
-
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
             areaBuffEntity.InitPrefab();
             GameInstance.AddOtherNetworkObjects(areaBuffEntity.Identity);
+        }
+
+        public override bool TryGetBuff(out Buff buff)
+        {
+            buff = this.buff;
+            return true;
         }
     }
 }

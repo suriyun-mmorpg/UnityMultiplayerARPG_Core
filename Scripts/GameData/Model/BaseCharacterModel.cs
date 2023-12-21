@@ -747,10 +747,9 @@ namespace MultiplayerARPG
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration,
-            out bool skipMovementValidation)
+            out float totalDuration)
         {
-            return GetRandomRightHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+            return GetRandomRightHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public bool GetRandomLeftHandAttackAnimation(
@@ -759,40 +758,36 @@ namespace MultiplayerARPG
             out int animationIndex,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration,
-            out bool skipMovementValidation)
+            out float totalDuration)
         {
-            return GetRandomLeftHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+            return GetRandomLeftHandAttackAnimation(weaponType.DataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public bool GetSkillActivateAnimation(
             BaseSkill skill,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration,
-            out bool skipMovementValidation)
+            out float totalDuration)
         {
-            return GetSkillActivateAnimation(skill.DataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+            return GetSkillActivateAnimation(skill.DataId, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public bool GetRightHandReloadAnimation(
             WeaponType weaponType,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration,
-            out bool skipMovementValidation)
+            out float totalDuration)
         {
-            return GetRightHandReloadAnimation(weaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+            return GetRightHandReloadAnimation(weaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public bool GetLeftHandReloadAnimation(
             WeaponType weaponType,
             out float animSpeedRate,
             out float[] triggerDurations,
-            out float totalDuration,
-            out bool skipMovementValidation)
+            out float totalDuration)
         {
-            return GetLeftHandReloadAnimation(weaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration, out skipMovementValidation);
+            return GetLeftHandReloadAnimation(weaponType.DataId, out animSpeedRate, out triggerDurations, out totalDuration);
         }
 
         public SkillActivateAnimationType UseSkillActivateAnimationType(BaseSkill skill)
@@ -919,9 +914,9 @@ namespace MultiplayerARPG
         public virtual void PlayPickupAnimation() { }
 
         public abstract void PlayMoveAnimation();
-        public abstract void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier = 1f);
-        public abstract void PlaySkillCastClip(int dataId, float duration);
-        public abstract void PlayWeaponChargeClip(int dataId, bool isLeftHand);
+        public abstract void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier = 1f);
+        public abstract void PlaySkillCastClip(int dataId, float duration, out bool skipMovementValidation, out bool shouldUseRootMotion);
+        public abstract void PlayWeaponChargeClip(int dataId, bool isLeftHand, out bool skipMovementValidation, out bool shouldUseRootMotion);
         public abstract void StopActionAnimation();
         public abstract void StopSkillCastAnimation();
         public abstract void StopWeaponChargeAnimation();
@@ -937,7 +932,7 @@ namespace MultiplayerARPG
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <returns></returns>
-        public abstract bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
+        public abstract bool GetRandomRightHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         /// <summary>
         /// Get random left-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -947,8 +942,9 @@ namespace MultiplayerARPG
         /// <param name="animSpeedRate"></param>
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
+        /// 
         /// <returns></returns>
-        public abstract bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
+        public abstract bool GetRandomLeftHandAttackAnimation(int dataId, int randomSeed, out int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         /// <summary>
         /// Get right-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -957,8 +953,9 @@ namespace MultiplayerARPG
         /// <param name="animSpeedRate"></param>
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
+        /// 
         /// <returns></returns>
-        public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
+        public abstract bool GetRightHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         /// <summary>
         /// Get left-hand attack animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -967,8 +964,9 @@ namespace MultiplayerARPG
         /// <param name="animSpeedRate"></param>
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
+        /// 
         /// <returns></returns>
-        public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
+        public abstract bool GetLeftHandAttackAnimation(int dataId, int animationIndex, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         /// <summary>
         /// Get skill activate animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -976,8 +974,9 @@ namespace MultiplayerARPG
         /// <param name="animSpeedRate"></param>
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
+        /// 
         /// <returns></returns>
-        public abstract bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
+        public abstract bool GetSkillActivateAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         /// <summary>
         /// Get right-hand reload animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -985,8 +984,9 @@ namespace MultiplayerARPG
         /// <param name="animSpeedRate"></param>
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
+        /// 
         /// <returns></returns>
-        public abstract bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
+        public abstract bool GetRightHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         /// <summary>
         /// Get left-hand reload animation, if `triggerDurations`'s length is 0/`totalDuration` <= 0, it will wait other methods to use as `triggerDurations`/`totalDuration` (such as animtion clip event, state machine behaviour).
         /// </summary>
@@ -994,8 +994,9 @@ namespace MultiplayerARPG
         /// <param name="animSpeedRate"></param>
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
+        /// 
         /// <returns></returns>
-        public abstract bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration, out bool skipMovementValidating);
+        public abstract bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract SkillActivateAnimationType GetSkillActivateAnimationType(int dataId);
     }
 }

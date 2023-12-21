@@ -17,8 +17,8 @@ namespace MultiplayerARPG
         public UICharacterItem uiCharacterItem;
         public UIGuildSkill uiGuildSkill;
         public GameObject[] placeHolders;
-        public KeyCode key;
-        public string buttonName;
+        public KeyCode key = KeyCode.None;
+        public string buttonName = string.Empty;
 
         [Header("Options")]
         public bool autoAssignItem;

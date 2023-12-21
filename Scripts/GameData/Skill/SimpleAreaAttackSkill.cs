@@ -92,28 +92,43 @@ namespace MultiplayerARPG
                 skillUser.Teleport(aimPosition.position, skillUser.MovementTransform.rotation, false);
         }
 
-        public override KeyValuePair<DamageElement, MinMaxFloat> GetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand)
+        public override bool TryGetBaseAttackDamageAmount(ICharacterData skillUser, int skillLevel, bool isLeftHand, out KeyValuePair<DamageElement, MinMaxFloat> result)
         {
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    return GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().Attributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
+                    result = GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().Attributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
+                    return true;
                 case SkillAttackType.BasedOnWeapon:
                     if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)
-                        return skillUser.GetCaches().LeftHandWeaponDamage.Value;
-                    return skillUser.GetCaches().RightHandWeaponDamage.Value;
+                    {
+                        result = skillUser.GetCaches().LeftHandWeaponDamage.Value;
+                        return true;
+                    }
+                    result = skillUser.GetCaches().RightHandWeaponDamage.Value;
+                    return true;
             }
-            return new KeyValuePair<DamageElement, MinMaxFloat>();
+            return base.TryGetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand, out result);
         }
 
-        public override Dictionary<DamageElement, float> GetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel)
+        public override bool TryGetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel, out Dictionary<DamageElement, float> result)
         {
-            return GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, new Dictionary<DamageElement, float>(), skillLevel);
+            if (IsAttack)
+            {
+                result = GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, new Dictionary<DamageElement, float>(), skillLevel);
+                return true;
+            }
+            return base.TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
         }
 
-        public override Dictionary<DamageElement, MinMaxFloat> GetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel)
+        public override bool TryGetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel, out Dictionary<DamageElement, MinMaxFloat> result)
         {
-            return GameDataHelpers.CombineDamages(additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), skillLevel, 1f);
+            if (IsAttack)
+            {
+                result = GameDataHelpers.CombineDamages(additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), skillLevel, 1f);
+                return true;
+            }
+            return base.TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);
         }
 
         public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel)
@@ -136,33 +151,31 @@ namespace MultiplayerARPG
             get { return true; }
         }
 
-        public override bool IsDebuff
-        {
-            get { return isDebuff; }
-        }
-
-        public override Buff Debuff
-        {
-            get
-            {
-                if (!IsDebuff)
-                    return Buff.Empty;
-                return debuff;
-            }
-        }
-
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddStatusEffects(attackStatusEffects);
             areaDamageEntity.InitPrefab();
             GameInstance.AddOtherNetworkObjects(areaDamageEntity.Identity);
         }
 
-        public override void OnSkillAttackHit(int skillLevel, EntityInfo instigator, CharacterItem weapon, BaseCharacterEntity target)
+        public override bool TryGetDebuff(out Buff debuff)
         {
-            base.OnSkillAttackHit(skillLevel, instigator, weapon, target);
-            attackStatusEffects.ApplyStatusEffect(skillLevel, instigator, weapon, target);
+            if (IsAttack && isDebuff)
+            {
+                debuff = this.debuff;
+                return true;
+            }
+            return base.TryGetDebuff(out debuff);
+        }
+
+        public override bool TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] statusEffectApplyings)
+        {
+            if (IsAttack)
+            {
+                statusEffectApplyings = attackStatusEffects;
+                return true;
+            }
+            return base.TryGetAttackStatusEffectApplyings(out statusEffectApplyings);
         }
     }
 }

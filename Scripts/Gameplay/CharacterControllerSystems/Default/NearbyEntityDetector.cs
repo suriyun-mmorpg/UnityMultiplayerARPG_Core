@@ -363,21 +363,21 @@ namespace MultiplayerARPG
             if (findActivatableEntity)
             {
                 activatableEntity = other.GetComponent<IActivatableEntity>();
-                if (!activatableEntity.IsNull() && activatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                if (!activatableEntity.IsNull() && GameInstance.PlayingCharacterEntity != null && activatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                     activatableEntity = null;
             }
 
             if (findHoldActivatableEntity)
             {
                 holdActivatableEntity = other.GetComponent<IHoldActivatableEntity>();
-                if (!holdActivatableEntity.IsNull() && holdActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                if (!holdActivatableEntity.IsNull() && GameInstance.PlayingCharacterEntity != null && holdActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                     holdActivatableEntity = null;
             }
 
             if (findPickupActivatableEntity)
             {
                 pickupActivatableEntity = other.GetComponent<IPickupActivatableEntity>();
-                if (!pickupActivatableEntity.IsNull() && pickupActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                if (!pickupActivatableEntity.IsNull() && GameInstance.PlayingCharacterEntity != null && pickupActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                     pickupActivatableEntity = null;
             }
         }

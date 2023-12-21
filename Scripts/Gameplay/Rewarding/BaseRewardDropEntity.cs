@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         public RewardGivenType GivenType { get; protected set; }
         public int GiverLevel { get; protected set; }
         public int SourceLevel { get; protected set; }
-        public HashSet<string> Looters { get; protected set; }
+        public HashSet<string> Looters { get; protected set; } = new HashSet<string>();
         public GameSpawnArea<BaseRewardDropEntity> SpawnArea { get; protected set; }
         public BaseRewardDropEntity SpawnPrefab { get; protected set; }
         public int SpawnLevel { get; protected set; }
@@ -70,7 +70,6 @@ namespace MultiplayerARPG
         // Private variables
         protected bool _isPickedUp;
         protected float _dropTime;
-        protected float _appearDuration;
         private List<GameObject> _allActivatingObjects = new List<GameObject>();
 
         protected override void EntityAwake()
@@ -92,6 +91,22 @@ namespace MultiplayerARPG
                     }
                 }
             }
+        }
+
+        protected override void EntityStart()
+        {
+            base.EntityStart();
+            if (IsServer && IsSceneObject)
+            {
+                // Init just once when started, if this entity is scene object
+                Init();
+            }
+        }
+
+        public virtual void Init()
+        {
+            _isPickedUp = false;
+            _dropTime = Time.unscaledTime;
         }
 
         protected override void SetupNetElements()
@@ -176,7 +191,7 @@ namespace MultiplayerARPG
 
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)
         {
-            if ((Looters == null || Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
+            if ((Looters.Count == 0 || Looters.Contains(baseCharacterEntity.Id) ||
                 Time.unscaledTime - _dropTime > CurrentGameInstance.itemLootLockDuration) && !_isPickedUp)
                 return true;
             return false;
@@ -209,6 +224,8 @@ namespace MultiplayerARPG
         protected async UniTaskVoid RespawnRoutine(float delay)
         {
             await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
+            Looters.Clear();
+            Init();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
                 EntityTransform.position,
@@ -248,15 +265,17 @@ namespace MultiplayerARPG
             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                 prefab.Identity.HashAssetId,
                 dropPosition, dropRotation);
-            BaseRewardDropEntity itemDropEntity = spawnObj.GetComponent<BaseRewardDropEntity>();
-            itemDropEntity.Multiplier = multiplier;
-            itemDropEntity.GivenType = givenType;
-            itemDropEntity.GiverLevel = giverLevel;
-            itemDropEntity.SourceLevel = sourceLevel;
-            itemDropEntity.Amount = amount;
-            itemDropEntity.Looters = new HashSet<string>(looters);
+            BaseRewardDropEntity entity = spawnObj.GetComponent<BaseRewardDropEntity>();
+            entity.Multiplier = multiplier;
+            entity.GivenType = givenType;
+            entity.GiverLevel = giverLevel;
+            entity.SourceLevel = sourceLevel;
+            entity.Amount = amount;
+            entity.Looters = new HashSet<string>(looters);
+            entity.Init();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
-            return itemDropEntity;
+            entity.NetworkDestroy(appearDuration);
+            return entity;
         }
 
         public override bool SetAsTargetInOneClick()
@@ -286,6 +305,11 @@ namespace MultiplayerARPG
 
         public virtual bool ProceedPickingUpAtServer(BaseCharacterEntity characterEntity, out UITextKeys message)
         {
+            if (!IsAbleToLoot(characterEntity))
+            {
+                message = UITextKeys.UI_ERROR_NOT_ABLE_TO_LOOT;
+                return false;
+            }
             if (!ProceedPickingUpAtServer_Implementation(characterEntity, out message))
                 return false;
             PickedUp();

@@ -7,6 +7,7 @@ namespace MultiplayerARPG
         SyncListCraftingQueueItem QueueItems { get; }
         int MaxQueueSize { get; }
         float CraftingDistance { get; }
+        bool PublicQueue { get; }
         bool CanCraft { get; }
         float TimeCounter { get; set; }
         int SourceId { get; }

@@ -109,7 +109,7 @@ namespace MultiplayerARPG
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
             if (buttonDrop)
-                buttonDrop.gameObject.SetActive(true);
+                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDropping);
         }
 
         public void OnSetUnEquippableData()
@@ -118,7 +118,7 @@ namespace MultiplayerARPG
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
             if (buttonDrop)
-                buttonDrop.gameObject.SetActive(true);
+                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDropping);
         }
 
         public void OnSetUsableData()
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
             if (buttonDismantle)
                 buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
             if (buttonDrop)
-                buttonDrop.gameObject.SetActive(true);
+                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDropping);
         }
 
         public void OnSetStorageItemData()
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
         public void OnNpcSellItemDialogAppear()
         {
             if (buttonSell)
-                buttonSell.gameObject.SetActive(true);
+                buttonDrop.gameObject.SetActive(!ui.Item.RestrictSelling);
         }
 
         public void OnNpcSellItemDialogDisappear()
@@ -231,7 +231,7 @@ namespace MultiplayerARPG
         public void OnEnterDealingState()
         {
             if (buttonOffer)
-                buttonOffer.gameObject.SetActive(true);
+                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDealing);
         }
 
         public void OnExitDealingState()

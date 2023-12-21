@@ -124,6 +124,7 @@ namespace MultiplayerARPG
 
         public void UpdateItemList()
         {
+            ItemSelectionManager.DeselectSelectedUI();
             ItemSelectionManager.Clear();
             ItemList.HideAll();
             ItemList.Generate(_items, (index, data, ui) =>
@@ -144,7 +145,7 @@ namespace MultiplayerARPG
                     price = data.price,
                 }, GameInstance.PlayingCharacterEntity, index);
                 if (index == 0)
-                    uiComp.OnClickSelect();
+                    uiComp.SelectByManager();
             });
         }
 

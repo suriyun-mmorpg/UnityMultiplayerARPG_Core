@@ -115,5 +115,10 @@ namespace MultiplayerARPG
                 return unityObj == null;
             return obj == null;
         }
+
+        public static bool IsHideFrom(this IGameEntity entity, IGameEntity watcherEntity)
+        {
+            return entity.Entity.ForceHide || watcherEntity.IsBlind() || (entity.IsHide() && !watcherEntity.IsRevealsHide());
+        }
     }
 }

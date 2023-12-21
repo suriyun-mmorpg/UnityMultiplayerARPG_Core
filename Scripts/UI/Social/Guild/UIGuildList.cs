@@ -106,7 +106,7 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if (selectedId == data.Id)
-                    tempUI.OnClickSelect();
+                    tempUI.SelectByManager();
             });
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(foundGuilds.Count == 0);

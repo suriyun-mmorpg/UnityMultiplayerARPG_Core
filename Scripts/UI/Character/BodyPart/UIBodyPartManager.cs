@@ -4,6 +4,8 @@ namespace MultiplayerARPG
 {
     public class UIBodyPartManager : MonoBehaviour
     {
+        public delegate void SetModelValueDelegate(int hashedSettingId, int value);
+        public delegate void SetColorValueDelegate(int hashedSettingId, int value);
         public string modelSettingId;
 
         [Header("Model Option Settings")]
@@ -17,6 +19,9 @@ namespace MultiplayerARPG
         public UIBodyPartColorOption uiSelectedColor;
         public UIBodyPartColorOption uiColorPrefab;
         public Transform uiColorContainer;
+
+        public SetModelValueDelegate onSetModelValue;
+        public SetColorValueDelegate onSetColorValue;
 
         private UIList _modelList;
         public UIList ModelList
@@ -103,6 +108,7 @@ namespace MultiplayerARPG
             _component.SetModel(ui.Index);
             _model.UpdateEquipmentModels();
             SetupColorList();
+            onSetModelValue?.Invoke(ui.HashedSettingId, ui.Index);
         }
 
         private void OnSelectColorUI(UIBodyPartColorOption ui)
@@ -111,6 +117,7 @@ namespace MultiplayerARPG
                 return;
             _component.SetColor(ui.Index);
             _model.UpdateEquipmentModels();
+            onSetColorValue?.Invoke(ui.HashedSettingId, ui.Index);
         }
 
         public void SetCharacterModel(BaseCharacterModel model)
@@ -144,18 +151,21 @@ namespace MultiplayerARPG
                 uiModelRoot.SetActive(true);
 
             // Setup model list
+            ModelSelectionManager.DeselectSelectedUI();
             ModelSelectionManager.Clear();
             ModelList.HideAll();
             ModelList.Generate(_component.ModelOptions, (index, data, ui) =>
             {
                 UIBodyPartModelOption uiComp = ui.GetComponent<UIBodyPartModelOption>();
-                uiComp.Data = data;
+                uiComp.Manager = this;
+                uiComp.Component = _component;
                 uiComp.HashedSettingId = _component.GetHashedModelSettingId();
                 uiComp.Index = index;
+                uiComp.Data = data;
                 ModelSelectionManager.Add(uiComp);
                 if (index == 0)
                 {
-                    uiComp.OnClickSelect();
+                    uiComp.SelectByManager();
                     SetupColorList();
                 }
             });
@@ -174,18 +184,21 @@ namespace MultiplayerARPG
                 uiColorRoot.SetActive(true);
 
             // Setup color list
+            ColorSelectionManager.DeselectSelectedUI();
             ColorSelectionManager.Clear();
             ColorList.HideAll();
             ColorList.Generate(_component.ColorOptions, (index, data, ui) =>
             {
                 UIBodyPartColorOption uiComp = ui.GetComponent<UIBodyPartColorOption>();
-                uiComp.Data = data;
+                uiComp.Manager = this;
+                uiComp.Component = _component;
                 uiComp.HashedSettingId = _component.GetHashedColorSettingId();
                 uiComp.Index = index;
+                uiComp.Data = data;
                 ColorSelectionManager.Add(uiComp);
                 if (index == 0)
                 {
-                    uiComp.OnClickSelect();
+                    uiComp.SelectByManager();
                     OnSelectColorUI(uiComp);
                 }
             });

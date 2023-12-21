@@ -409,7 +409,7 @@ namespace MultiplayerARPG
         protected byte _pauseFireInputFrames;
         protected bool _isAimming;
         protected bool _isCharging;
-        protected bool _isAlreadyReloaded;
+        protected bool _isReloading;
 
         protected override void Awake()
         {
@@ -875,7 +875,7 @@ namespace MultiplayerARPG
                 // Get damageable hit box component from hit target
                 tempHitBox = tempHitInfo.collider.GetComponent<DamageableHitBox>();
 
-                if (tempHitBox == null || !tempHitBox.Entity || tempHitBox.IsHide() ||
+                if (tempHitBox == null || !tempHitBox.Entity || tempHitBox.IsHideFrom(PlayingCharacterEntity) ||
                     tempHitBox.GetObjectId() == PlayingCharacterEntity.ObjectId)
                 {
                     // Skip empty game entity / hidding entity / controlling player's entity
@@ -917,7 +917,7 @@ namespace MultiplayerARPG
                     // Get distance between character and raycast hit point
                     tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
 
-                    if (tempGameEntity.IsNull() || tempGameEntity.IsHide() ||
+                    if (tempGameEntity.IsNull() || tempGameEntity.IsHideFrom(PlayingCharacterEntity) ||
                         tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
                     {
                         // Skip empty game entity / hiddeing entity / controlling player's entity
@@ -1185,7 +1185,7 @@ namespace MultiplayerARPG
             {
                 anyKeyPressed = true;
                 // Reload ammo when press the button
-                Reload(true);
+                Reload();
             }
 
             if (_exitVehicleInput.IsPress)
@@ -1235,11 +1235,6 @@ namespace MultiplayerARPG
                         }
                         break;
                 }
-            }
-            else
-            {
-                // Ammo filled, set reloaded state to `FALSE` to make it reload auto-reload later again
-                _isAlreadyReloaded = false;
             }
 
             // Update look direction
@@ -1582,18 +1577,33 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.StartCharge(ref isLeftHand);
         }
 
-        public virtual void Reload(bool forceReload = false)
+        public virtual async void Reload()
         {
-            if (!forceReload && _isAlreadyReloaded)
+            if (_isReloading)
                 return;
+            _isReloading = true;
             if (WeaponAbility != null && WeaponAbility.ShouldDeactivateOnReload)
                 WeaponAbility.ForceDeactivated();
             // Reload ammo at server
-            if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity))
-                PlayingCharacterEntity.Reload(false);
-            else if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity))
-                PlayingCharacterEntity.Reload(true);
-            _isAlreadyReloaded = true;
+            bool allReload;
+            do
+            {
+                allReload = true;
+                await UniTask.Yield();
+                // Reload right-hand weapon
+                if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity))
+                {
+                    if (!PlayingCharacterEntity.Reload(false))
+                        allReload = false;
+                }
+                // Reload left-hand weapon
+                if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity))
+                {
+                    if (!PlayingCharacterEntity.Reload(true))
+                        allReload = false;
+                }
+            } while (!allReload);
+            _isReloading = false;
         }
 
         public virtual void ChangeWeaponAbility(int index)

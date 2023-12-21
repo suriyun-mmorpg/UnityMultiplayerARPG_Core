@@ -68,6 +68,7 @@ namespace MultiplayerARPG
         public UIDamageElementAmount uiDamageAmount;
         public UIDamageElementInflictions uiDamageInflictions;
         public UIDamageElementAmounts uiAdditionalDamageAmounts;
+        public UIStatusEffectApplyings uiAttackStatusEffects;
 
         [Header("Buff/Debuff")]
         public UIBuff uiSkillBuff;
@@ -346,7 +347,7 @@ namespace MultiplayerARPG
 
             if (uiTextSummon != null)
             {
-                if (Skill == null || !Skill.IsActive || Skill.Summon.MonsterEntity == null)
+                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || skillSummon.MonsterEntity == null)
                 {
                     uiTextSummon.SetGameObjectActive(false);
                 }
@@ -355,17 +356,17 @@ namespace MultiplayerARPG
                     uiTextSummon.SetGameObjectActive(true);
                     uiTextSummon.text = ZString.Format(
                         LanguageManager.GetText(formatKeySummon),
-                        Skill.Summon.MonsterEntity.Title,
-                        Skill.Summon.Level.GetAmount(Level),
-                        Skill.Summon.AmountEachTime.GetAmount(Level),
-                        Skill.Summon.MaxStack.GetAmount(Level),
-                        Skill.Summon.Duration.GetAmount(Level));
+                        skillSummon.MonsterEntity.Title,
+                        skillSummon.Level.GetAmount(Level),
+                        skillSummon.AmountEachTime.GetAmount(Level),
+                        skillSummon.MaxStack.GetAmount(Level),
+                        skillSummon.Duration.GetAmount(Level));
                 }
             }
 
             if (uiTextMount != null)
             {
-                if (Skill == null || !Skill.IsActive || Skill.Mount.MountEntity == null)
+                if (Skill == null || !Skill.TryGetMount(out SkillMount skillMount) || skillMount.MountEntity == null)
                 {
                     uiTextMount.SetGameObjectActive(false);
                 }
@@ -374,28 +375,26 @@ namespace MultiplayerARPG
                     uiTextMount.SetGameObjectActive(true);
                     uiTextMount.text = ZString.Format(
                         LanguageManager.GetText(formatKeyMount),
-                        Skill.Mount.MountEntity.Title);
+                        skillMount.MountEntity.Title);
                 }
             }
 
             if (uiCraftItem != null)
             {
-                if (Skill == null || !Skill.IsCraftItem)
+                if (Skill == null || !Skill.TryGetItemCraft(out ItemCraft itemCraft) || itemCraft.CraftingItem == null)
                 {
                     uiCraftItem.Hide();
                 }
                 else
                 {
-                    uiCraftItem.Setup(CrafterType.Character, null, Skill.ItemCraft);
+                    uiCraftItem.Setup(CrafterType.Character, null, itemCraft);
                     uiCraftItem.Show();
                 }
             }
 
-            bool isAttack = Skill != null && Skill.IsAttack;
             if (uiDamageAmount != null)
             {
-                KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount = Skill.GetBaseAttackDamageAmount(Character, Level, false);
-                if (!isAttack)
+                if (Skill == null || !Skill.TryGetBaseAttackDamageAmount(Character, Level, false, out KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount))
                 {
                     uiDamageAmount.Hide();
                 }
@@ -408,8 +407,7 @@ namespace MultiplayerARPG
 
             if (uiDamageInflictions != null)
             {
-                Dictionary<DamageElement, float> damageInflictionRates = Skill.GetAttackWeaponDamageInflictions(Character, Level);
-                if (!isAttack || damageInflictionRates == null || damageInflictionRates.Count == 0)
+                if (Skill == null || !Skill.TryGetAttackWeaponDamageInflictions(Character, Level, out Dictionary<DamageElement, float> damageInflictionRates))
                 {
                     uiDamageInflictions.Hide();
                 }
@@ -422,8 +420,7 @@ namespace MultiplayerARPG
 
             if (uiAdditionalDamageAmounts != null)
             {
-                Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts = Skill.GetAttackAdditionalDamageAmounts(Character, Level);
-                if (!isAttack || additionalDamageAmounts == null || additionalDamageAmounts.Count == 0)
+                if (Skill == null || !Skill.TryGetAttackAdditionalDamageAmounts(Character, Level, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
                 {
                     uiAdditionalDamageAmounts.Hide();
                 }
@@ -435,29 +432,42 @@ namespace MultiplayerARPG
                 }
             }
 
+            if (uiAttackStatusEffects != null)
+            {
+                if (Skill == null || !Skill.TryGetAttackStatusEffectApplyings(out StatusEffectApplying[] attackStatusEffects) || attackStatusEffects == null || attackStatusEffects.Length == 0)
+                {
+                    uiAttackStatusEffects.Hide();
+                }
+                else
+                {
+                    uiAttackStatusEffects.UpdateData(attackStatusEffects, Level, UIStatusEffectApplyingTarget.Enemy);
+                    uiAttackStatusEffects.Show();
+                }
+            }
+
             if (uiSkillBuff != null)
             {
-                if (!Skill.IsBuff)
+                if (Skill == null || !Skill.TryGetBuff(out Buff buff))
                 {
                     uiSkillBuff.Hide();
                 }
                 else
                 {
                     uiSkillBuff.Show();
-                    uiSkillBuff.Data = new UIBuffData(Skill.Buff, Level);
+                    uiSkillBuff.Data = new UIBuffData(buff, Level);
                 }
             }
 
             if (uiSkillDebuff != null)
             {
-                if (!Skill.IsDebuff)
+                if (Skill == null || !Skill.TryGetDebuff(out Buff debuff))
                 {
                     uiSkillDebuff.Hide();
                 }
                 else
                 {
                     uiSkillDebuff.Show();
-                    uiSkillDebuff.Data = new UIBuffData(Skill.Debuff, Level);
+                    uiSkillDebuff.Data = new UIBuffData(debuff, Level);
                 }
             }
 
@@ -478,7 +488,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiNextLevelSkill.Setup(new UICharacterSkillData(CharacterSkill, (Level + 1)), Character, IndexOfData);
+                    uiNextLevelSkill.Setup(new UICharacterSkillData(CharacterSkill, Level + 1), Character, IndexOfData);
                     uiNextLevelSkill.Show();
                 }
             }
@@ -490,6 +500,18 @@ namespace MultiplayerARPG
             {
                 dataId = Skill.DataId
             }, ClientCharacterActions.ResponseIncreaseSkillLevel);
+        }
+
+        public void OnClickUse()
+        {
+            if (!IsOwningCharacter())
+                return;
+
+            if (selectionManager != null)
+                selectionManager.DeselectSelectedUI();
+
+            // Controlling by hotkey controller
+            UICharacterHotkeys.SetupHotkeyForDialogControlling(HotkeyType.Skill, Skill.Id);
         }
     }
 }

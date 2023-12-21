@@ -21,7 +21,10 @@ namespace MultiplayerARPG
         [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
         protected float lockDuration = 0;
         [SerializeField]
-        [Tooltip("This is duration to make item to be expired and destroyed from inventory, set it to 0 to not apply expiring duration, set it to 7 to make it expire in next 7 hours")]
+        [Tooltip("Time unit for `ExpireDuration`")]
+        protected ETimeUnits expireDurationUnit = ETimeUnits.Hours;
+        [SerializeField]
+        [Tooltip("This is duration to make item to be expired and destroyed from inventory, set it to 0 to not apply expiring duration, set it to 7 to make it expire in next 7 hours (if `ExpireDurationUnit` is `Hours)")]
         protected int expireDuration = 0;
 
         [Category(10, "In-Scene Objects/Appearance")]
@@ -85,6 +88,8 @@ namespace MultiplayerARPG
         public ItemRefine ItemRefine { get { return itemRefine; } }
 
         public float LockDuration { get { return lockDuration; } }
+
+        public ETimeUnits ExpireDurationUnit { get { return expireDurationUnit; } }
 
         public int ExpireDuration { get { return expireDuration; } }
 

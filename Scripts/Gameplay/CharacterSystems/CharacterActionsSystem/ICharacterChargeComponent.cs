@@ -4,6 +4,8 @@
     {
         bool IsCharging { get; }
         bool WillDoActionWhenStopCharging { get; }
+        bool IsSkipMovementValidationWhileCharging { get; }
+        bool IsUseRootMotionWhileCharging { get; }
         float MoveSpeedRateWhileCharging { get; }
         MovementRestriction MovementRestrictionWhileCharging { get; }
 

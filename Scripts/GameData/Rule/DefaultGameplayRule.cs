@@ -726,8 +726,11 @@ namespace MultiplayerARPG
                         tempSkill = characterSkill.Key;
                         if (!tempSkill.IsPassive)
                             continue;
-                        tempSkill.Buff.ApplySelfStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, attacker);
-                        tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, damageReceiver);
+                        if (tempSkill.TryGetBuff(out tempBuff))
+                        {
+                            tempBuff.ApplySelfStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, attacker);
+                            tempBuff.ApplyEnemyStatusEffectsWhenAttacking(characterSkill.Value, attackerInfo, damageReceiver);
+                        }
                         if (attacker.IsDead())
                             break;
                     }
@@ -784,8 +787,11 @@ namespace MultiplayerARPG
                         tempSkill = characterSkill.Key;
                         if (!tempSkill.IsPassive)
                             continue;
-                        tempSkill.Buff.ApplySelfStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, damageReceiver);
-                        tempSkill.Buff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, attacker);
+                        if (tempSkill.TryGetBuff(out tempBuff))
+                        {
+                            tempBuff.ApplySelfStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, damageReceiver);
+                            tempBuff.ApplyEnemyStatusEffectsWhenAttacked(characterSkill.Value, damageReceiverInfo, attacker);
+                        }
                         if (damageReceiver.IsDead())
                             break;
                     }
@@ -997,11 +1003,6 @@ namespace MultiplayerARPG
             // This function will sort: near to far, so loop from 0
             float dist = Vector3.Distance(character.EntityTransform.position, interactingEntity.EntityTransform.position);
             Vector3 dir = (interactingEntity.EntityTransform.position - character.EntityTransform.position).normalized;
-            if (interactingEntity is ICraftingQueueSource craftingQueueSource)
-            {
-                if (!craftingQueueSource.IsInCraftDistance(character.EntityTransform.position))
-                    return false;
-            }
             // Find that the entity is behind the wall or not
             int count = character.FindPhysicFunctions.Raycast(character.MeleeDamageTransform.position, dir, dist, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
             IGameEntity gameEntity;

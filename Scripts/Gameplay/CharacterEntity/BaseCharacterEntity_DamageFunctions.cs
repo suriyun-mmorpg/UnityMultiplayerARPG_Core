@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -107,6 +108,14 @@ namespace MultiplayerARPG
 
         protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
+            if (damageAmounts == null)
+            {
+                Logging.LogWarning($"{name}({nameof(BaseCharacterEntity)}) damage amounts dictionary is null, this should not occurring.");
+                combatAmountType = CombatAmountType.Miss;
+                totalDamage = 0;
+                return;
+            }
+
             if (instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter))
             {
                 // Notify enemy spotted when received damage from enemy

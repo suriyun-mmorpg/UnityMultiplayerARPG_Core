@@ -430,17 +430,17 @@ public static partial class GenericUtils
 
     public static string ToBonusString(this short value, string format = "N0")
     {
-        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+        return value >= 0 ? ZString.Concat("+", value.ToString(format)) : value.ToString(format);
     }
 
     public static string ToBonusString(this int value, string format = "N0")
     {
-        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+        return value >= 0 ? ZString.Concat("+", value.ToString(format)) : value.ToString(format);
     }
 
     public static string ToBonusString(this float value, string format = "N0")
     {
-        return value >= 0 ? "+" + value.ToString(format) : value.ToString(format);
+        return value >= 0 ? ZString.Concat("+", value.ToString(format)) : value.ToString(format);
     }
 
     public static string GetPrettyDate(this System.TimeSpan dateTimeDiff, bool future = false)

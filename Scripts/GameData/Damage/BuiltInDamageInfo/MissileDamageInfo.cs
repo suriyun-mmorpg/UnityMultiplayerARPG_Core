@@ -53,15 +53,61 @@ namespace MultiplayerARPG
 
         public override bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox)
         {
-            float dist = Vector3.Distance(hitData.Origin, hitData.Destination);
-            float maxExtents = Mathf.Max(hitBox.Bounds.extents.x, hitBox.Bounds.extents.y, hitBox.Bounds.extents.z);
-            // Too far
-            if (dist > missileDistance + maxExtents)
+            float hitBoxMaxExtents = Mathf.Max(hitBox.Bounds.extents.x, hitBox.Bounds.extents.y, hitBox.Bounds.extents.z);
+            float missileHitDist = 0f;
+            switch (missileDamageEntity.hitDetectionMode)
+            {
+                case MissileDamageEntity.HitDetectionMode.SphereCast:
+                    missileHitDist = missileDamageEntity.sphereCastRadius;
+                    break;
+                case MissileDamageEntity.HitDetectionMode.BoxCast:
+                    missileHitDist = Mathf.Max(missileDamageEntity.boxCastSize.x * 0.5f, missileDamageEntity.boxCastSize.y * 0.5f, missileDamageEntity.boxCastSize.z * 0.5f);
+                    break;
+            }
+            // Not in hit distance?
+            float dist = Vector3.Distance(hitData.Origin, hitData.HitOrigin);
+            Vector3 dir = hitData.Direction;
+            if (hitData.HitDestination.HasValue)
+            {
+                float distFromDest = Vector3.Distance(hitData.Origin, hitData.HitDestination.Value);
+                Vector3 dirFromDest = (hitData.HitDestination.Value - hitData.Origin).normalized;
+                // If it almost in the same direction then use `distFromDest` instead of `dist`
+                if (distFromDest < dist && Vector3.Dot(dir, dirFromDest) > 0.75f)
+                {
+                    dist = distFromDest;
+                    if (distFromDest > missileDistance + hitBoxMaxExtents + missileHitDist)
+                    {
+                        return false;
+                    }
+                }
+                else if (dist > missileDistance + hitBoxMaxExtents + missileHitDist)
+                {
+                    return false;
+                }
+            }
+            else if (dist > missileDistance + hitBoxMaxExtents + missileHitDist)
+            {
                 return false;
-            
-            float duration = (float)(hitData.HitTimestamp - hitData.LaunchTimestamp) * 0.001f;
-            // Take too short time to hit
-            if (Mathf.Abs((dist / duration) / missileSpeed) < 0.8f)
+            }
+            float explodeDistance = missileDamageEntity.explodeDistance;
+            if (explodeDistance > 0f && hitData.HitDestination.HasValue)
+            {
+                float distHitPoints = Vector3.Distance(hitData.HitOrigin, hitData.HitDestination.Value);
+                if (distHitPoints > explodeDistance + hitBoxMaxExtents)
+                {
+                    return false;
+                }
+            }
+            // Missile speed validation, accept if speed <= 105% (5% for lagging)
+            return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 1.05);
+        }
+
+        private bool IsAcceptHitBetweenTime(float dist, long launchTimestamp, long hitTimestamp, double acceptableRate)
+        {
+            double duration = hitTimestamp - launchTimestamp;
+            double distInProperTimeUnit = dist * 1000;
+            double calculatedSpeed = distInProperTimeUnit / duration;
+            if (calculatedSpeed / missileSpeed > acceptableRate)
                 return false;
             return true;
         }

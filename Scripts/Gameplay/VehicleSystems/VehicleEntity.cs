@@ -10,6 +10,10 @@ namespace MultiplayerARPG
     {
         [Category(5, "Vehicle Settings")]
         [SerializeField]
+        [Tooltip("Set it more than `0` to make it uses this value instead of `GameInstance` -> `conversationDistance` as its activatable distance")]
+        private float activatableDistance = 0f;
+
+        [SerializeField]
         protected VehicleType vehicleType = null;
         public VehicleType VehicleType { get { return vehicleType; } }
 
@@ -30,7 +34,8 @@ namespace MultiplayerARPG
         public List<VehicleSeat> Seats { get { return seats; } }
 
         [SerializeField]
-        protected bool canBeAttacked;
+        [Tooltip("If this is `TRUE` this entity will be able to be attacked")]
+        protected bool canBeAttacked = true;
 
         // TODO: Vehicle can level up?
         [SerializeField]
@@ -197,6 +202,11 @@ namespace MultiplayerARPG
             return Seats[seatIndex].canAttack;
         }
 
+        public bool CanBePassenger(byte seatIndex, BaseGameEntity gameEntity)
+        {
+            return true;
+        }
+
         public List<BaseGameEntity> GetAllPassengers()
         {
             List<BaseGameEntity> result = new List<BaseGameEntity>();
@@ -357,7 +367,10 @@ namespace MultiplayerARPG
 
         public virtual float GetActivatableDistance()
         {
-            return GameInstance.Singleton.conversationDistance;
+            if (activatableDistance > 0f)
+                return activatableDistance;
+            else
+                return GameInstance.Singleton.conversationDistance;
         }
 
         public virtual bool ShouldClearTargetAfterActivated()

@@ -83,6 +83,18 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
         }
     }
 
+    public void SelectByManager()
+    {
+        if (selectionManager != null)
+            selectionManager.Select(this);
+    }
+
+    public void DeselectByManager()
+    {
+        if (selectionManager != null)
+            selectionManager.Deselect(this);
+    }
+
     public void Select()
     {
         IsSelected = true;

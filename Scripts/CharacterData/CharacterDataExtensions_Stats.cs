@@ -453,26 +453,28 @@ namespace MultiplayerARPG
                 return;
             if (level <= 0)
                 return;
+            if (!skill.TryGetBuff(out Buff buff))
+                return;
             if (onIncreasingStats != null)
-                onIncreasingStats.Invoke(skill.Buff.GetIncreaseStats(level));
+                onIncreasingStats.Invoke(buff.GetIncreaseStats(level));
             if (onIncreasingStatsRate != null)
-                onIncreasingStatsRate.Invoke(skill.Buff.GetIncreaseStatsRate(level));
+                onIncreasingStatsRate.Invoke(buff.GetIncreaseStatsRate(level));
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(skill.Buff.GetIncreaseAttributes(level));
+                onIncreasingAttributes.Invoke(buff.GetIncreaseAttributes(level));
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(skill.Buff.GetIncreaseAttributesRate(level));
+                onIncreasingAttributesRate.Invoke(buff.GetIncreaseAttributesRate(level));
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(skill.Buff.GetIncreaseResistances(level));
+                onIncreasingResistances.Invoke(buff.GetIncreaseResistances(level));
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(skill.Buff.GetIncreaseArmors(level));
+                onIncreasingArmors.Invoke(buff.GetIncreaseArmors(level));
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(skill.Buff.GetIncreaseArmorsRate(level));
+                onIncreasingArmorsRate.Invoke(buff.GetIncreaseArmorsRate(level));
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(skill.Buff.GetIncreaseDamages(level));
+                onIncreasingDamages.Invoke(buff.GetIncreaseDamages(level));
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(skill.Buff.GetIncreaseDamagesRate(level));
+                onIncreasingDamagesRate.Invoke(buff.GetIncreaseDamagesRate(level));
             if (onIncreasingStatusEffectResistances != null)
-                onIncreasingStatusEffectResistances.Invoke(skill.Buff.GetIncreaseStatusEffectResistances(level));
+                onIncreasingStatusEffectResistances.Invoke(buff.GetIncreaseStatusEffectResistances(level));
         }
 
         public static void GetAllStats(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, bool sumWithSkills,

@@ -88,6 +88,7 @@ namespace MultiplayerARPG
 
         public void UpdateItemList(VendingItems items)
         {
+            ItemSelectionManager.DeselectSelectedUI();
             ItemSelectionManager.Clear();
             ItemList.HideAll();
             ItemList.Generate(items, (index, data, ui) =>
@@ -95,7 +96,7 @@ namespace MultiplayerARPG
                 UIVendingItem uiComp = ui.GetComponent<UIVendingItem>();
                 uiComp.Setup(data, Data, index);
                 if (index == 0)
-                    uiComp.OnClickSelect();
+                    uiComp.SelectByManager();
             });
         }
 

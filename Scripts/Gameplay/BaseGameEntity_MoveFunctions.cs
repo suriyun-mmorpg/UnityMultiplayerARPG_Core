@@ -85,6 +85,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual bool ShouldUseRootMotion
+        {
+            get { return false; }
+        }
+
         public virtual bool SkipMovementValidation
         {
             get { return false; }
