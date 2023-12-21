@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
-    public class BuiltInEntityMovementFunctions3D
+    public partial class BuiltInEntityMovementFunctions3D
     {
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
         private static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
