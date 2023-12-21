@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public partial class MonsterActivityComponent : BaseMonsterActivityComponent
+    public class MonsterActivityComponent : BaseMonsterActivityComponent
     {
         [SerializeField]
         protected float turnSmoothSpeed = 10f;
