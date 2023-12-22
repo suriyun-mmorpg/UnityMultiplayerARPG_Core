@@ -508,7 +508,7 @@ namespace MultiplayerARPG
             if (indexOfCurrency >= 0)
             {
                 CharacterCurrency characterCurrency = character.Currencies[indexOfCurrency];
-                characterCurrency.amount += amount;
+                characterCurrency.amount = characterCurrency.amount.Increase(amount);
                 character.Currencies[indexOfCurrency] = characterCurrency;
             }
             else
