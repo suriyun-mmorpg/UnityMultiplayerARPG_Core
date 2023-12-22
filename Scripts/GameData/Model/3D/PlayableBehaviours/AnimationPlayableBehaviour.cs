@@ -732,7 +732,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (CharacterModel.IsDead && Time.unscaledTime - CharacterModel.SwitchedTime < 1f)
             {
                 // Play dead animation at end frame immediately
-                mixer.GetInput(stateUpdateData.inputPort).SetTime(Cache.BaseStates[stateUpdateData.playingStateId].State.clip.length);
+                mixer.GetInput(stateUpdateData.inputPort).SetTime(stateUpdateData.clipLength);
                 for (int i = 0; i < inputCount; ++i)
                 {
                     if (i != stateUpdateData.inputPort)
