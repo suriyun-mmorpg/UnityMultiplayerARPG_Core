@@ -207,7 +207,7 @@ namespace MultiplayerARPG
         public void OnNpcSellItemDialogAppear()
         {
             if (buttonSell)
-                buttonDrop.gameObject.SetActive(!ui.Item.RestrictSelling);
+                buttonSell.gameObject.SetActive(!ui.Item.RestrictSelling);
         }
 
         public void OnNpcSellItemDialogDisappear()
@@ -231,7 +231,7 @@ namespace MultiplayerARPG
         public void OnEnterDealingState()
         {
             if (buttonOffer)
-                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDealing);
+                buttonOffer.gameObject.SetActive(!ui.Item.RestrictDealing);
         }
 
         public void OnExitDealingState()
