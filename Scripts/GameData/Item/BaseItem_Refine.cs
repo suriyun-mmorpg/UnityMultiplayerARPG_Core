@@ -173,6 +173,20 @@ namespace MultiplayerARPG
                         onRefine.Invoke(refiningItem);
                     }
                 }
+                // Return items/currencies
+                if (refineLevel.FailReturnings != null && refineLevel.FailReturnings.Length > 0)
+                {
+                    Dictionary<ItemRefineFailReturning, int> randomItems = new Dictionary<ItemRefineFailReturning, int>();
+                    foreach (ItemRefineFailReturning item in refineLevel.FailReturnings)
+                    {
+                        randomItems[item] = item.randomWeight;
+                    }
+                    ItemRefineFailReturning returning = WeightedRandomizer.From(randomItems).TakeOne();
+                    character.Gold.Increase(returning.returnGold);
+                    character.IncreaseItems(returning.returnItems, dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
+                    character.IncreaseCurrencies(returning.returnCurrencies);
+                    inventoryChanged = true;
+                }
             }
             if (refineLevel.RequireItems != null)
             {

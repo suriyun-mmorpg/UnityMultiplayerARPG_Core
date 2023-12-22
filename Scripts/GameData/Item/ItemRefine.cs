@@ -57,6 +57,15 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
+    public partial struct ItemRefineFailReturning
+    {
+        public int randomWeight;
+        public ItemAmount[] returnItems;
+        public CurrencyAmount[] returnCurrencies;
+        public int returnGold;
+    }
+
+    [System.Serializable]
     public partial struct ItemRefineLevel
     {
         [Range(0.01f, 1f)]
@@ -93,6 +102,11 @@ namespace MultiplayerARPG
         private ItemRefineEnhancer[] availableEnhancers;
         public ItemRefineEnhancer[] AvailableEnhancers { get { return availableEnhancers; } }
 
+        [Tooltip("Items/currencies which will be returned when refining failed")]
+        [SerializeField]
+        private ItemRefineFailReturning[] failReturnings;
+        public ItemRefineFailReturning[] FailReturnings { get { return failReturnings; } }
+
         public ItemRefineLevel(
             float successRate,
             ItemAmount[] requireItems,
@@ -100,7 +114,8 @@ namespace MultiplayerARPG
             int requireGold,
             int refineFailDecreaseLevels,
             bool refineFailDestroyItem,
-            ItemRefineEnhancer[] availableMaterials)
+            ItemRefineEnhancer[] availableEnhancers,
+            ItemRefineFailReturning[] failReturnings)
         {
             this.successRate = successRate;
             this.requireItems = requireItems;
@@ -108,7 +123,8 @@ namespace MultiplayerARPG
             this.requireGold = requireGold;
             this.refineFailDecreaseLevels = refineFailDecreaseLevels;
             this.refineFailDestroyItem = refineFailDestroyItem;
-            this.availableEnhancers = availableMaterials;
+            this.availableEnhancers = availableEnhancers;
+            this.failReturnings = failReturnings;
         }
 
         public bool CanRefine(IPlayerCharacterData character, int[] materialDataIds)
