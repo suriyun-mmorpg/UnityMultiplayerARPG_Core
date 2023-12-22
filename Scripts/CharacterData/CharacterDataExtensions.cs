@@ -468,46 +468,67 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, System.Action<CharacterItem> onIncrease = null)
+        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
         {
             CharacterItem increasedItem;
             foreach (ItemAmount increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount);
-                itemList.IncreaseItems(increasedItem);
-                if (onIncrease != null)
-                    onIncrease.Invoke(increasedItem);
+                if (itemList.IncreaseItems(increasedItem))
+                {
+                    if (onIncrease != null)
+                        onIncrease.Invoke(increasedItem);
+                }
+                else
+                {
+                    if (onFail != null)
+                        onFail.Invoke(increasedItem);
+                }
             }
         }
 
-        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<RewardedItem> increasingItems, System.Action<CharacterItem> onIncrease = null)
+        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<RewardedItem> increasingItems, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
         {
             CharacterItem increasedItem;
             foreach (RewardedItem increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 increasedItem = CharacterItem.Create(increasingItem.item.DataId, increasingItem.level, increasingItem.amount, increasingItem.randomSeed);
-                itemList.IncreaseItems(increasedItem);
-                if (onIncrease != null)
-                    onIncrease.Invoke(increasedItem);
+                if (itemList.IncreaseItems(increasedItem))
+                {
+                    if (onIncrease != null)
+                        onIncrease.Invoke(increasedItem);
+                }
+                else
+                {
+                    if (onFail != null)
+                        onFail.Invoke(increasedItem);
+                }
             }
         }
 
-        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> increasingItems, System.Action<CharacterItem> onIncrease = null)
+        public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> increasingItems, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
         {
             CharacterItem increasedItem;
             foreach (CharacterItem increasingItem in increasingItems)
             {
                 if (increasingItem.IsEmptySlot()) continue;
                 increasedItem = increasingItem.Clone();
-                itemList.IncreaseItems(increasedItem);
-                if (onIncrease != null)
-                    onIncrease.Invoke(increasedItem);
+                if (itemList.IncreaseItems(increasedItem))
+                {
+                    if (onIncrease != null)
+                        onIncrease.Invoke(increasedItem);
+                }
+                else
+                {
+                    if (onFail != null)
+                        onFail.Invoke(increasedItem);
+                }
             }
         }
 
-        public static bool IncreaseItems(this ICharacterData data, CharacterItem increasingItem, System.Action<CharacterItem> onIncrease = null)
+        public static bool IncreaseItems(this ICharacterData data, CharacterItem increasingItem, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
         {
             if (data.NonEquipItems.IncreaseItems(increasingItem))
             {
@@ -515,43 +536,66 @@ namespace MultiplayerARPG
                     onIncrease.Invoke(increasingItem);
                 return true;
             }
+            if (onFail != null)
+                onFail.Invoke(increasingItem);
             return false;
         }
 
-        public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, System.Action<CharacterItem> onIncrease = null)
+        public static void IncreaseItems(this ICharacterData data, IEnumerable<ItemAmount> increasingItems, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
         {
             CharacterItem increasedItem;
             foreach (ItemAmount increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount);
-                data.NonEquipItems.IncreaseItems(increasedItem);
-                if (onIncrease != null)
-                    onIncrease.Invoke(increasedItem);
+                if (data.NonEquipItems.IncreaseItems(increasedItem))
+                {
+                    if (onIncrease != null)
+                        onIncrease.Invoke(increasedItem);
+                }
+                else
+                {
+                    if (onFail != null)
+                        onFail.Invoke(increasedItem);
+                }
             }
         }
 
-        public static void IncreaseItems(this ICharacterData data, IEnumerable<RewardedItem> increasingItems, System.Action<CharacterItem> onIncrease = null)
+        public static void IncreaseItems(this ICharacterData data, IEnumerable<RewardedItem> increasingItems, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
         {
             CharacterItem increasedItem;
             foreach (RewardedItem increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed);
-                data.NonEquipItems.IncreaseItems(increasedItem);
-                if (onIncrease != null)
-                    onIncrease.Invoke(increasedItem);
+                if (data.NonEquipItems.IncreaseItems(increasedItem))
+                {
+                    if (onIncrease != null)
+                        onIncrease.Invoke(increasedItem);
+                }
+                else
+                {
+                    if (onFail != null)
+                        onFail.Invoke(increasedItem);
+                }
             }
         }
 
-        public static void IncreaseItems(this ICharacterData data, IEnumerable<CharacterItem> increasingItems, System.Action<CharacterItem> onIncrease = null)
+        public static void IncreaseItems(this ICharacterData data, IEnumerable<CharacterItem> increasingItems, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
         {
             foreach (CharacterItem increasingItem in increasingItems)
             {
                 if (increasingItem.IsEmptySlot()) continue;
-                data.NonEquipItems.IncreaseItems(increasingItem.Clone());
-                if (onIncrease != null)
-                    onIncrease.Invoke(increasingItem);
+                if (data.NonEquipItems.IncreaseItems(increasingItem))
+                {
+                    if (onIncrease != null)
+                        onIncrease.Invoke(increasingItem);
+                }
+                else
+                {
+                    if (onFail != null)
+                        onFail.Invoke(increasingItem);
+                }
             }
         }
         #endregion
