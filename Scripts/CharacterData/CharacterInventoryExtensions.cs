@@ -894,7 +894,7 @@ namespace MultiplayerARPG
 
             character.Gold = character.Gold.Increase(returningGold);
             character.DecreaseItemsByIndex(index, amount, true);
-            character.IncreaseItems(returningItems);
+            character.IncreaseItems(returningItems, dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
             return true;
@@ -943,7 +943,7 @@ namespace MultiplayerARPG
             {
                 character.DecreaseItemsByIndex(indexes[i], indexAmountPairs[indexes[i]], true);
             }
-            character.IncreaseItems(returningItems);
+            character.IncreaseItems(returningItems, dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
             return true;
