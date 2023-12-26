@@ -52,14 +52,14 @@ namespace MultiplayerARPG
             _previousEntity = playerCharacterEntity;
             AddEvents(_previousEntity);
             if (_previousEntity != null)
-                ForceUpdate();
+                ReRenderUI();
         }
 
         private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
         {
             if (PlayingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onRecached += ForceUpdate;
+            PlayingCharacterEntity.onRecached += ReRenderUI;
             PlayingCharacterEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
         }
 
@@ -67,13 +67,19 @@ namespace MultiplayerARPG
         {
             if (PlayingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onRecached -= ForceUpdate;
+            PlayingCharacterEntity.onRecached -= ReRenderUI;
             PlayingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
         }
 
         private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
         {
-            ForceUpdate();
+            ReRenderUI();
+        }
+
+        protected async void ReRenderUI()
+        {
+            if (_lastData != null)
+                await _lastData.RenderUI(this);
         }
 
         protected override async void UpdateData()
@@ -112,8 +118,9 @@ namespace MultiplayerARPG
                     voiceSource.Play();
             }
 
-            await Data.RenderUI(this);
             _lastData = Data;
+            if (_lastData != null)
+                await _lastData.RenderUI(this);
         }
     }
 }
