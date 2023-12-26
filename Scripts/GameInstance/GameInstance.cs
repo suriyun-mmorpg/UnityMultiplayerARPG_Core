@@ -297,6 +297,8 @@ namespace MultiplayerARPG
         public bool canPickupItemsWhichDropsByPlayersImmediately = false;
         [Tooltip("If dealing request does not accepted within this duration, the request will be cancelled")]
         public float dealingRequestDuration = 5f;
+        [Tooltip("If this is > 0, it will limit amount of dealing items")]
+        public int dealingItemsLimit = 16;
         [Tooltip("If this is `TRUE`, dealing feature will be disabled, all players won't be able to deal items to each other")]
         public bool disableDealing = false;
         [Tooltip("If this is > 0, it will limit amount of vending items")]
@@ -364,6 +366,8 @@ namespace MultiplayerARPG
         };
         [Tooltip("If this is `TRUE`, player will be able to refine an items by themself, doesn't have to talk to NPCs")]
         public bool canRefineItemByPlayer = false;
+        [Tooltip("If this is > 0, it will limit amount of refine enhancer items")]
+        public int refineEnhancerItemsLimit = 16;
         [Tooltip("If this is `TRUE`, player will be able to dismantle an items by themself, doesn't have to talk to NPCs")]
         public bool canDismantleItemByPlayer = false;
         [Tooltip("If this is `TRUE`, player will be able to repair an items by themself, doesn't have to talk to NPCs")]

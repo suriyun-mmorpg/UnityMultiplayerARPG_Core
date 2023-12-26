@@ -295,6 +295,11 @@ namespace MultiplayerARPG
                 return;
             foreach (UICharacterItem selectedUI in selectedUIs)
             {
+                if (GameInstance.Singleton.refineEnhancerItemsLimit > 0 && enhancerDataIds.Count + 1 > GameInstance.Singleton.refineEnhancerItemsLimit)
+                {
+                    ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_REACHED_REFINE_ENHANCER_ITEMS_LIMIT);
+                    break;
+                }
                 enhancerDataIds.Add(selectedUI.CharacterItem.dataId);
             }
             OnUpdateCharacterItems();

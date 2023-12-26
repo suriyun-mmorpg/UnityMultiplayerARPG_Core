@@ -41,6 +41,12 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_REFINE_ITEM_REACHED_MAX_LEVEL;
                 return false;
             }
+            if (GameInstance.Singleton.refineEnhancerItemsLimit > 0 && enhancerDataIds.Length > GameInstance.Singleton.refineEnhancerItemsLimit)
+            {
+                // Cannot refine because enhancer items reached level
+                gameMessage = UITextKeys.UI_ERROR_REACHED_REFINE_ENHANCER_ITEMS_LIMIT;
+                return false;
+            }
             return ItemRefine.Levels[level - 1].CanRefine(character, enhancerDataIds, out gameMessage);
         }
 

@@ -353,6 +353,13 @@ namespace MultiplayerARPG
             }
 
             DealingCharacterItems dealingItems = DealingItems;
+            if (GameInstance.Singleton.dealingItemsLimit > 0 && dealingItems.Count + 1 > GameInstance.Singleton.dealingItemsLimit)
+            {
+                // Reached limit
+                ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_REACHED_DEALING_ITEMS_LIMIT);
+                return;
+            }
+
             for (int i = dealingItems.Count - 1; i >= 0; --i)
             {
                 if (id == dealingItems[i].id)
