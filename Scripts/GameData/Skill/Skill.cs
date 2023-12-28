@@ -181,7 +181,7 @@ namespace MultiplayerARPG
                         tempCharacters = skillUser.FindAliveEntities<BaseCharacterEntity>(buffDistance.GetAmount(skillLevel), true, false, false, overlapMask);
                         foreach (BaseCharacterEntity applyBuffCharacter in tempCharacters)
                         {
-                            if (skillUserInfo.PartyId != targetEntity.GetInfo().PartyId)
+                            if (skillUserInfo.PartyId != applyBuffCharacter.GetInfo().PartyId)
                                 continue;
                             applyBuffCharacter.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUserInfo, weapon);
                         }
