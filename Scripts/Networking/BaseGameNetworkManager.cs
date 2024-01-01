@@ -34,6 +34,7 @@ namespace MultiplayerARPG
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
         protected IServerGuildHandlers ServerGuildHandlers { get; set; }
         protected IServerChatHandlers ServerChatHandlers { get; set; }
+        protected IServerLogHandlers ServerLogHandlers { get; set; }
         // Server Message Handlers
         protected IServerCashShopMessageHandlers ServerCashShopMessageHandlers { get; set; }
         protected IServerMailMessageHandlers ServerMailMessageHandlers { get; set; }
@@ -470,6 +471,7 @@ namespace MultiplayerARPG
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;
             GameInstance.ServerChatHandlers = ServerChatHandlers;
+            GameInstance.ServerLogHandlers = ServerLogHandlers;
             CurrentGameInstance.DayNightTimeUpdater.InitTimeOfDay(this);
             base.OnStartServer();
         }
