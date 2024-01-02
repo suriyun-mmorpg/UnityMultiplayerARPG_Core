@@ -1,3 +1,6 @@
+using System.Collections.Generic;
+using UnityEngine;
+
 namespace MultiplayerARPG
 {
     public partial interface IServerLogHandlers
@@ -32,5 +35,8 @@ namespace MultiplayerARPG
 
         void LogBuffApply(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff);
         void LogBuffRemove(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff, BuffRemoveReasons reason);
+
+        void LogDamageReceived(IPlayerCharacterData playerCharacter, HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime);
+        void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker);
     }
 }

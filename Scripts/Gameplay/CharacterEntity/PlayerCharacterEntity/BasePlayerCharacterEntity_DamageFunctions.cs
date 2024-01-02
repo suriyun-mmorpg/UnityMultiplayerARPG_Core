@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -86,6 +87,9 @@ namespace MultiplayerARPG
             KilledDropItems(lastAttacker, deadPunishmentType, decreaseItems);
 
             base.Killed(lastAttacker);
+
+            if (IsServer)
+                GameInstance.ServerLogHandlers.LogKilled(this, lastAttacker);
 
 #if UNITY_EDITOR || UNITY_SERVER
             if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
@@ -260,6 +264,13 @@ namespace MultiplayerARPG
                     }
                 }
             }
+        }
+
+        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
+        {
+            base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
+            if (IsServer)
+                GameInstance.ServerLogHandlers.LogDamageReceived(this, position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
         }
     }
 }

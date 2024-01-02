@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -54,6 +55,11 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogDamageReceived(IPlayerCharacterData playerCharacter, HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogEnterGame(IPlayerCharacterData playerCharacter)
         {
             throw new System.NotImplementedException();
@@ -65,6 +71,11 @@ namespace MultiplayerARPG
         }
 
         public void LogItemGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, CharacterItem item)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker)
         {
             throw new System.NotImplementedException();
         }
