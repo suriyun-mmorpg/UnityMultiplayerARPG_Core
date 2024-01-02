@@ -25,12 +25,7 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
-        public void LogAttackTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void LogAttackTriggerFailNoValidateData(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
+        public void LogAttackTriggerFail(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex, ActionTriggerFailReasons reason)
         {
             throw new System.NotImplementedException();
         }
@@ -100,7 +95,7 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
-        public void LogReloadTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, byte triggerIndex)
+        public void LogReloadTriggerFail(IPlayerCharacterData playerCharacter, byte triggerIndex, ActionTriggerFailReasons reason)
         {
             throw new System.NotImplementedException();
         }
@@ -130,12 +125,7 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
-        public void LogUseSkillTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public void LogUseSkillTriggerFailNoValidateData(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
+        public void LogUseSkillTriggerFail(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex, ActionTriggerFailReasons reason)
         {
             throw new System.NotImplementedException();
         }

@@ -337,13 +337,13 @@ namespace MultiplayerARPG
             if (validateData == null)
             {
                 if (_entityIsPlayer && IsServer)
-                    GameInstance.ServerLogHandlers.LogAttackTriggerFailNoValidateData(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
+                    GameInstance.ServerLogHandlers.LogAttackTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NoValidateData);
                 return;
             }
             if (!Entity.DecreaseAmmos(validateData.Weapon, validateData.IsLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
             {
                 if (_entityIsPlayer && IsServer)
-                    GameInstance.ServerLogHandlers.LogAttackTriggerFailNotEnoughResources(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
+                    GameInstance.ServerLogHandlers.LogAttackTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NotEnoughResources);
                 return;
             }
             HitRegistrationManager.ConfirmHitRegValidation(Entity, data.simulateSeed, data.triggerIndex, increaseDamageAmounts);

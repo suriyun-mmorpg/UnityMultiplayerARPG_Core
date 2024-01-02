@@ -12,21 +12,19 @@ namespace MultiplayerARPG
 
         void LogAttackStart(IPlayerCharacterData playerCharacter, int simulateSeed, float[] triggerDurations, byte fireSpread, bool isLeftHand, CharacterItem weapon);
         void LogAttackTrigger(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex);
-        void LogAttackTriggerFailNoValidateData(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex);
-        void LogAttackTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex);
+        void LogAttackTriggerFail(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex, ActionTriggerFailReasons reason);
         void LogAttackInterrupt(IPlayerCharacterData playerCharacter, int simulateSeed);
         void LogAttackEnd(IPlayerCharacterData playerCharacter, int simulateSeed);
 
         void LogUseSkillStart(IPlayerCharacterData playerCharacter, int simulateSeed, float[] triggerDurations, byte fireSpread, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel);
         void LogUseSkillTrigger(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex);
-        void LogUseSkillTriggerFailNoValidateData(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex);
-        void LogUseSkillTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex);
+        void LogUseSkillTriggerFail(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex, ActionTriggerFailReasons reason);
         void LogUseSkillInterrupt(IPlayerCharacterData playerCharacter, int simulateSeed);
         void LogUseSkillEnd(IPlayerCharacterData playerCharacter, int simulateSeed);
 
         void LogReloadStart(IPlayerCharacterData playerCharacter, float[] triggerDurations);
         void LogReloadTrigger(IPlayerCharacterData playerCharacter, byte triggerIndex);
-        void LogReloadTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, byte triggerIndex);
+        void LogReloadTriggerFail(IPlayerCharacterData playerCharacter, byte triggerIndex, ActionTriggerFailReasons reason);
         void LogReloadInterrupt(IPlayerCharacterData playerCharacter);
         void LogReloadEnd(IPlayerCharacterData playerCharacter);
 

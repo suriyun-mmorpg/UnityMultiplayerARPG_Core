@@ -238,7 +238,7 @@ namespace MultiplayerARPG
             if (!Entity.DecreaseItems(reloadingAmmoDataId, reloadingAmmoAmount))
             {
                 if (_entityIsPlayer && IsServer)
-                    GameInstance.ServerLogHandlers.LogReloadTriggerFailNotEnoughResources(_playerCharacterEntity, triggerIndex);
+                    GameInstance.ServerLogHandlers.LogReloadTriggerFail(_playerCharacterEntity, triggerIndex, ActionTriggerFailReasons.NotEnoughResources);
                 return;
             }
             if (weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
