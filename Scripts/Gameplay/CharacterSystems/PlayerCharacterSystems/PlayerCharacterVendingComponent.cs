@@ -274,6 +274,9 @@ namespace MultiplayerARPG
                 // Update items to customer
                 NotifyItems();
             }
+
+            GameInstance.ServerLogHandlers.LogBuyVendingItem(buyer.Entity, Entity, sellingItem, price);
+            GameInstance.ServerLogHandlers.LogSellVendingItem(Entity, buyer.Entity, sellingItem, price);
         }
     }
 }

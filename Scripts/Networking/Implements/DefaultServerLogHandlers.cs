@@ -40,6 +40,11 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogBuyVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData sellerCharacter, CharacterItem buyItem, int price)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogChargeEnd(IPlayerCharacterData playerCharacter, bool willDoActionWhenStopCharging)
         {
             throw new System.NotImplementedException();
@@ -66,6 +71,11 @@ namespace MultiplayerARPG
         }
 
         public void LogEnterGame(IPlayerCharacterData playerCharacter)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogExchangeDealingItemsAndGold(IPlayerCharacterData playerCharacter, IPlayerCharacterData dealingCharacter, int dealingGold, IList<CharacterItem> dealingItems)
         {
             throw new System.NotImplementedException();
         }
@@ -116,6 +126,11 @@ namespace MultiplayerARPG
         }
 
         public void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, int requireGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogSellVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData buyerCharacter, CharacterItem buyItem, int price)
         {
             throw new System.NotImplementedException();
         }
