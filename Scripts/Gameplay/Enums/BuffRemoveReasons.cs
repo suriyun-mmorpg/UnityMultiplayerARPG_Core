@@ -2,9 +2,9 @@ namespace MultiplayerARPG
 {
     public enum BuffRemoveReasons
     {
-        Unset,
         Timeout,
         CharacterDead,
+        FullStack,
         RemoveByOtherBuffs,
         RemoveByAttackRemoveChance,
         RemoveByAttackedRemoveChance,

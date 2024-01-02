@@ -96,7 +96,7 @@ namespace MultiplayerARPG
                         int buffIndex = indexesOfBuff[0];
                         if (buffIndex >= 0)
                         {
-                            OnRemoveBuff(Buffs[buffIndex], BuffRemoveReasons.Unset);
+                            OnRemoveBuff(Buffs[buffIndex], BuffRemoveReasons.FullStack);
                             Buffs.RemoveAt(buffIndex);
                         }
                         indexesOfBuff.RemoveAt(0);
@@ -108,7 +108,7 @@ namespace MultiplayerARPG
                     int buffIndex = this.IndexOfBuff(type, dataId);
                     if (buffIndex >= 0)
                     {
-                        OnRemoveBuff(Buffs[buffIndex], BuffRemoveReasons.Unset);
+                        OnRemoveBuff(Buffs[buffIndex], BuffRemoveReasons.FullStack);
                         Buffs.RemoveAt(buffIndex);
                     }
                 }
