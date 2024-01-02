@@ -103,6 +103,7 @@ namespace MultiplayerARPG
                         if (buff.ShouldRemove())
                         {
                             _recoveryBuffs.Remove(buff.id);
+                            Entity.OnRemoveBuff(buff, BuffRemoveReasons.Timeout);
                             Entity.Buffs.RemoveAt(i);
                         }
                         else
@@ -169,6 +170,7 @@ namespace MultiplayerARPG
                         stillHavingChance = true;
                         continue;
                     }
+                    Entity.OnRemoveBuff(buff, BuffRemoveReasons.RemoveByAttackRemoveChance);
                     Entity.Buffs.RemoveAt(i);
                 }
             }
@@ -195,6 +197,7 @@ namespace MultiplayerARPG
                         stillHavingChance = true;
                         continue;
                     }
+                    Entity.OnRemoveBuff(buff, BuffRemoveReasons.RemoveByAttackedRemoveChance);
                     Entity.Buffs.RemoveAt(i);
                 }
             }
@@ -221,6 +224,7 @@ namespace MultiplayerARPG
                         stillHavingChance = true;
                         continue;
                     }
+                    Entity.OnRemoveBuff(buff, BuffRemoveReasons.RemoveByUseSkillRemoveChance);
                     Entity.Buffs.RemoveAt(i);
                 }
             }
@@ -247,6 +251,7 @@ namespace MultiplayerARPG
                         stillHavingChance = true;
                         continue;
                     }
+                    Entity.OnRemoveBuff(buff, BuffRemoveReasons.RemoveByUseItemRemoveChance);
                     Entity.Buffs.RemoveAt(i);
                 }
             }
@@ -273,6 +278,7 @@ namespace MultiplayerARPG
                         stillHavingChance = true;
                         continue;
                     }
+                    Entity.OnRemoveBuff(buff, BuffRemoveReasons.RemoveByPickupChance);
                     Entity.Buffs.RemoveAt(i);
                 }
             }

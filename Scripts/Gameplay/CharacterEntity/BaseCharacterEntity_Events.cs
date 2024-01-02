@@ -43,6 +43,7 @@ namespace MultiplayerARPG
         public event LaunchDamageEntityDelegate onLaunchDamageEntity;
         // Buff events
         public event ApplyBuffDelegate onApplyBuff;
+        public event RemoveBuffDelegate onRemoveBuff;
         public event AppliedRecoveryAmountDelegate onBuffHpRecovery;
         public event AppliedRecoveryAmountDelegate onBuffHpDecrease;
         public event AppliedRecoveryAmountDelegate onBuffMpRecovery;

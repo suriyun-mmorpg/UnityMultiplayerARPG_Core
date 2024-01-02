@@ -78,11 +78,11 @@ namespace MultiplayerARPG
                 int buffIndex = this.IndexOfBuff(type, dataId);
                 if (buffIndex >= 0)
                 {
-                    CharacterBuff characterBuff = buffs[buffIndex];
+                    CharacterBuff characterBuff = Buffs[buffIndex];
                     characterBuff.level = level;
-                    characterBuff.buffRemainsDuration += buffs[buffIndex].GetBuff().GetDuration();
+                    characterBuff.buffRemainsDuration += Buffs[buffIndex].GetBuff().GetDuration();
                     characterBuff.SetApplier(buffApplier, buffApplierWeapon);
-                    buffs[buffIndex] = characterBuff;
+                    Buffs[buffIndex] = characterBuff;
                     return;
                 }
             }
@@ -95,7 +95,10 @@ namespace MultiplayerARPG
                     {
                         int buffIndex = indexesOfBuff[0];
                         if (buffIndex >= 0)
-                            buffs.RemoveAt(buffIndex);
+                        {
+                            OnRemoveBuff(Buffs[buffIndex], BuffRemoveReasons.Unset);
+                            Buffs.RemoveAt(buffIndex);
+                        }
                         indexesOfBuff.RemoveAt(0);
                     }
                 }
@@ -104,7 +107,10 @@ namespace MultiplayerARPG
                     // `maxStack` <= 0, assume that it's = `1`
                     int buffIndex = this.IndexOfBuff(type, dataId);
                     if (buffIndex >= 0)
-                        buffs.RemoveAt(buffIndex);
+                    {
+                        OnRemoveBuff(Buffs[buffIndex], BuffRemoveReasons.Unset);
+                        Buffs.RemoveAt(buffIndex);
+                    }
                 }
             }
 
@@ -135,6 +141,7 @@ namespace MultiplayerARPG
                             continue;
                         }
                         // Buff removed
+                        OnRemoveBuff(Buffs[i], BuffRemoveReasons.RemoveByOtherBuffs);
                         Buffs.RemoveAt(i);
                     }
                     if (Buffs.Count == 0)
@@ -143,7 +150,8 @@ namespace MultiplayerARPG
             }
 
             newBuff.Apply(buffApplier, buffApplierWeapon);
-            buffs.Add(newBuff);
+            OnApplyBuff(newBuff);
+            Buffs.Add(newBuff);
 
             if (calculatedBuff.GetDuration() <= 0f)
             {
@@ -151,9 +159,18 @@ namespace MultiplayerARPG
                 recoveryData.SetupByBuff(newBuff, calculatedBuff);
                 recoveryData.Apply(1f);
             }
+        }
 
+        public virtual void OnApplyBuff(CharacterBuff characterBuff)
+        {
             if (onApplyBuff != null)
-                onApplyBuff.Invoke(type, dataId, level, buffApplier);
+                onApplyBuff.Invoke(characterBuff);
+        }
+
+        public virtual void OnRemoveBuff(CharacterBuff characterBuff, BuffRemoveReasons reason)
+        {
+            if (onRemoveBuff != null)
+                onRemoveBuff.Invoke(characterBuff, reason);
         }
 
         public virtual void OnBuffHpRecovery(EntityInfo causer, int amount)

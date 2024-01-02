@@ -30,6 +30,7 @@ namespace MultiplayerARPG
         void LogChargeStart(IPlayerCharacterData playerCharacter);
         void LogChargeEnd(IPlayerCharacterData playerCharacter, bool willDoActionWhenStopCharging);
 
-        void LogBuffApplied(IPlayerCharacterData playerCharacter, CharacterBuff buff);
+        void LogBuffApply(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff);
+        void LogBuffRemove(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff, BuffRemoveReasons reason);
     }
 }

@@ -73,10 +73,11 @@ namespace MultiplayerARPG
         AimPosition aimPosition);
 
     public delegate void ApplyBuffDelegate(
-        BuffType type,
-        int dataId,
-        int level,
-        EntityInfo buffApplier);
+        CharacterBuff buff);
+
+    public delegate void RemoveBuffDelegate(
+        CharacterBuff buff,
+        BuffRemoveReasons reason);
 
     public delegate void CharacterStatsDelegate(
         ref CharacterStats a,

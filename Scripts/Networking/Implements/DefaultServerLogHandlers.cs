@@ -34,7 +34,12 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
-        public void LogBuffApplied(IPlayerCharacterData playerCharacter, CharacterBuff buff)
+        public void LogBuffApply(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogBuffRemove(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff, BuffRemoveReasons reason)
         {
             throw new System.NotImplementedException();
         }

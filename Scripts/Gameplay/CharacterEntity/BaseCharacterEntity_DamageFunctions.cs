@@ -46,8 +46,10 @@ namespace MultiplayerARPG
             StopAllCoroutines();
             for (int i = buffs.Count - 1; i >= 0; --i)
             {
-                if (!buffs[i].GetBuff().GetBuff().doNotRemoveOnDead)
-                    buffs.RemoveAt(i);
+                if (buffs[i].GetBuff().GetBuff().doNotRemoveOnDead)
+                    continue;
+                OnRemoveBuff(buffs[i], BuffRemoveReasons.CharacterDead);
+                buffs.RemoveAt(i);
             }
             for (int i = summons.Count - 1; i >= 0; --i)
             {
