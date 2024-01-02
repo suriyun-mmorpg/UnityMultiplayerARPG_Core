@@ -828,9 +828,10 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool VerifyDismantleItem(this IPlayerCharacterData character, int index, int amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
+        public static bool VerifyDismantleItem(this IPlayerCharacterData character, int index, int amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out ItemAmount dismentleItem, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
         {
             gameMessage = UITextKeys.NONE;
+            dismentleItem = new ItemAmount();
             returningGold = 0;
             returningItems = null;
             returningCurrencies = null;
@@ -876,27 +877,36 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 return false;
             }
-
+            BaseItem item = nonEquipItem.GetItem();
+            dismentleItem = new ItemAmount()
+            {
+                item = item,
+                amount = amount,
+            };
             simulatingNonEquipItems.IncreaseItems(returningItems);
-            returningGold = nonEquipItem.GetItem().DismantleReturnGold * amount;
+            returningGold = item.DismantleReturnGold * amount;
             return true;
         }
 
         public static bool DismantleItem(this IPlayerCharacterData character, int index, int amount, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
+            ItemAmount dismentleItem;
             int returningGold;
             List<ItemAmount> returningItems;
             List<CurrencyAmount> returningCurrencies;
             List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
-            if (!character.VerifyDismantleItem(index, amount, simulatingNonEquipItems, out gameMessage, out returningGold, out returningItems, out returningCurrencies))
+            if (!character.VerifyDismantleItem(index, amount, simulatingNonEquipItems, out gameMessage, out dismentleItem, out returningGold, out returningItems, out returningCurrencies))
                 return false;
-
+            List<ItemAmount> dismentleItems = new List<ItemAmount>() { dismentleItem };
+            List<CharacterItem> increasedItems = new List<CharacterItem>();
+            List<CharacterItem> droppedItems = new List<CharacterItem>();
             character.Gold = character.Gold.Increase(returningGold);
             character.DecreaseItemsByIndex(index, amount, true);
-            character.IncreaseItems(returningItems, dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
+            character.IncreaseItems(returningItems);
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
+            GameInstance.ServerLogHandlers.LogDismentleItems(character, dismentleItems, returningGold, returningItems, returningCurrencies);
             return true;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
@@ -912,11 +922,13 @@ namespace MultiplayerARPG
             indexes.Sort();
             Dictionary<int, int> indexAmountPairs = new Dictionary<int, int>();
             List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
+            List<ItemAmount> dismentleItems = new List<ItemAmount>();
             int returningGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
             List<CurrencyAmount> returningCurrencies = new List<CurrencyAmount>();
             int tempIndex;
             int tempAmount;
+            ItemAmount tempDismentleItem;
             int tempReturningGold;
             List<ItemAmount> tempReturningItems;
             List<CurrencyAmount> tempReturningCurrencies;
@@ -928,8 +940,9 @@ namespace MultiplayerARPG
                 if (tempIndex >= character.NonEquipItems.Count)
                     continue;
                 tempAmount = character.NonEquipItems[tempIndex].amount;
-                if (!character.VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out gameMessage, out tempReturningGold, out tempReturningItems, out tempReturningCurrencies))
+                if (!character.VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out gameMessage, out tempDismentleItem, out tempReturningGold, out tempReturningItems, out tempReturningCurrencies))
                     return false;
+                dismentleItems.Add(tempDismentleItem);
                 returningGold += tempReturningGold;
                 returningItems.AddRange(tempReturningItems);
                 returningCurrencies.AddRange(tempReturningCurrencies);
@@ -943,9 +956,10 @@ namespace MultiplayerARPG
             {
                 character.DecreaseItemsByIndex(indexes[i], indexAmountPairs[indexes[i]], true);
             }
-            character.IncreaseItems(returningItems, dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
+            character.IncreaseItems(returningItems);
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
+            GameInstance.ServerLogHandlers.LogDismentleItems(character, dismentleItems, returningGold, returningItems, returningCurrencies);
             return true;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
@@ -1000,8 +1014,6 @@ namespace MultiplayerARPG
         public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int socketIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER
-            if (!GameInstance.Singleton.enhancerRemoval.CanRemove(character, out gameMessage))
-                return false;
             bool returnEnhancer = GameInstance.Singleton.enhancerRemoval.ReturnEnhancerItem;
             switch (inventoryType)
             {

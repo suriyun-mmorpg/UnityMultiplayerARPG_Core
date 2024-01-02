@@ -126,6 +126,7 @@ namespace MultiplayerARPG
             }
             ItemRefineLevel refineLevel = equipmentItem.ItemRefine.Levels[refiningItem.level - 1];
             bool inventoryChanged = false;
+            List<BaseItem> enhancerItems = new List<BaseItem>();
             float increaseSuccessRate = 0f;
             float decreaseRequireGoldRate = 0f;
             float chanceToNotDecreaseLevels = 0f;
@@ -134,26 +135,40 @@ namespace MultiplayerARPG
             {
                 int materialDataId = enhancerDataIds[i];
                 int indexOfMaterial = character.IndexOfNonEquipItem(materialDataId);
-                if (indexOfMaterial >= 0 && character.NonEquipItems[indexOfMaterial].NotEmptySlot())
+                if (indexOfMaterial < 0 || character.NonEquipItems[indexOfMaterial].IsEmptySlot())
                 {
-                    for (int j = 0; j < refineLevel.AvailableEnhancers.Length; ++j)
-                    {
-                        if (refineLevel.AvailableEnhancers[j].item != null && refineLevel.AvailableEnhancers[j].item.DataId == materialDataId)
-                        {
-                            increaseSuccessRate += refineLevel.AvailableEnhancers[j].increaseSuccessRate;
-                            decreaseRequireGoldRate += refineLevel.AvailableEnhancers[j].decreaseRequireGoldRate;
-                            chanceToNotDecreaseLevels += refineLevel.AvailableEnhancers[j].chanceToNotDecreaseLevels;
-                            chanceToNotDestroyItem += refineLevel.AvailableEnhancers[j].chanceToNotDestroyItem;
-                            break;
-                        }
-                    }
-                    character.DecreaseItems(materialDataId, 1);
-                    inventoryChanged = true;
+                    // Material not found
+                    continue;
                 }
+                for (int j = 0; j < refineLevel.AvailableEnhancers.Length; ++j)
+                {
+                    if (refineLevel.AvailableEnhancers[j].item == null || refineLevel.AvailableEnhancers[j].item.DataId != materialDataId)
+                    {
+                        // Not a material we're looking for
+                        continue;
+                    }
+                    // Found the material, enhance
+                    increaseSuccessRate += refineLevel.AvailableEnhancers[j].increaseSuccessRate;
+                    decreaseRequireGoldRate += refineLevel.AvailableEnhancers[j].decreaseRequireGoldRate;
+                    chanceToNotDecreaseLevels += refineLevel.AvailableEnhancers[j].chanceToNotDecreaseLevels;
+                    chanceToNotDestroyItem += refineLevel.AvailableEnhancers[j].chanceToNotDestroyItem;
+                    break;
+                }
+                enhancerItems.Add(character.NonEquipItems[indexOfMaterial].GetItem());
+                character.DecreaseItems(materialDataId, 1);
+                inventoryChanged = true;
             }
+            bool isSuccess = false;
+            bool isDestroy = false;
+            int decreaseLevels = 0;
+            bool isReturning = false;
+            int returningGold = 0;
+            ItemAmount[] returningItems = null;
+            CurrencyAmount[] returningCurrencies = null;
             if (Random.value <= refineLevel.SuccessRate + increaseSuccessRate)
             {
                 // If success, increase item level
+                isSuccess = true;
                 gameMessage = UITextKeys.UI_REFINE_SUCCESS;
                 ++refiningItem.level;
                 onRefine.Invoke(refiningItem);
@@ -166,16 +181,20 @@ namespace MultiplayerARPG
                 {
                     // If condition when fail is it has to be destroyed
                     if (Random.value > chanceToNotDestroyItem)
+                    {
+                        isDestroy = true;
                         onDestroy.Invoke();
+                    }
                 }
                 else
                 {
                     // If condition when fail is reduce its level
                     if (Random.value > chanceToNotDecreaseLevels)
                     {
-                        refiningItem.level -= refineLevel.RefineFailDecreaseLevels;
-                        if (refiningItem.level < 1)
-                            refiningItem.level = 1;
+                        decreaseLevels = refineLevel.RefineFailDecreaseLevels;
+                        while (refiningItem.level - decreaseLevels < 0)
+                            --decreaseLevels;
+                        refiningItem.level -= decreaseLevels;
                         onRefine.Invoke(refiningItem);
                     }
                 }
@@ -188,9 +207,13 @@ namespace MultiplayerARPG
                         randomItems[item] = item.randomWeight;
                     }
                     ItemRefineFailReturning returning = WeightedRandomizer.From(randomItems).TakeOne();
-                    character.Gold.Increase(returning.returnGold);
-                    character.IncreaseItems(returning.returnItems, dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
-                    character.IncreaseCurrencies(returning.returnCurrencies);
+                    isReturning = true;
+                    returningGold = returning.returnGold;
+                    returningItems = returning.returnItems;
+                    returningCurrencies = returning.returnCurrencies;
+                    character.Gold.Increase(returningGold);
+                    character.IncreaseItems(returningItems, onFail: dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
+                    character.IncreaseCurrencies(returningCurrencies);
                     inventoryChanged = true;
                 }
             }
@@ -205,6 +228,7 @@ namespace MultiplayerARPG
                 character.FillEmptySlots();
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRefineItem(character, refineLevel, decreaseRequireGoldRate);
+            GameInstance.ServerLogHandlers.LogRefine(character, refiningItem, enhancerItems, increaseSuccessRate, decreaseRequireGoldRate, chanceToNotDecreaseLevels, chanceToNotDestroyItem, isSuccess, isDestroy, refineLevel.RequireGold, refineLevel.RequireItems, refineLevel.RequireCurrencies, isReturning, returningGold, returningItems, returningCurrencies);
             return true;
         }
     }

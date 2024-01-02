@@ -7,8 +7,6 @@ namespace MultiplayerARPG
     {
         void LogEnterGame(IPlayerCharacterData playerCharacter);
         void LogExitGame(IPlayerCharacterData playerCharacter);
-        void LogRewardGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, Reward reward);
-        void LogItemGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, CharacterItem item);
 
         void LogAttackStart(IPlayerCharacterData playerCharacter, int simulateSeed, float[] triggerDurations, byte fireSpread, bool isLeftHand, CharacterItem weapon);
         void LogAttackTrigger(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex);
@@ -36,5 +34,11 @@ namespace MultiplayerARPG
 
         void LogDamageReceived(IPlayerCharacterData playerCharacter, HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime);
         void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker);
+
+        void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies);
+        void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, bool isReturning, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies);
+        void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, int requireGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies);
+        void LogEnhanceSocketItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem enhancerItem);
+        void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, BaseItem returnEnhancerItem);
     }
 }

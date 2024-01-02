@@ -113,6 +113,7 @@ namespace MultiplayerARPG
             character.FillEmptySlots();
             enhancingItem.Sockets[socketIndex] = enhancerId;
             onEnhanceSocket.Invoke(enhancingItem);
+            GameInstance.ServerLogHandlers.LogEnhanceSocketItem(character, enhancingItem, enhancerItem);
             return true;
         }
 
@@ -172,7 +173,16 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_NO_ENHANCER;
                 return false;
             }
+            if (!GameInstance.Singleton.enhancerRemoval.CanRemove(character, out gameMessage))
+                return false;
             int enhancerId = enhancedItem.Sockets[socketIndex];
+            BaseItem enhancerItem;
+            if (!GameInstance.Items.TryGetValue(enhancerId, out enhancerItem))
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                return false;
+            }
+            bool inventoryChanged = false;
             if (returnEnhancer)
             {
                 if (character.IncreasingItemsWillOverwhelming(enhancerId, 1))
@@ -181,12 +191,22 @@ namespace MultiplayerARPG
                     return false;
                 }
                 character.IncreaseItems(CharacterItem.Create(enhancerId));
-                character.FillEmptySlots();
+                enhancedItem.Sockets[socketIndex] = 0;
+                onRemoveEnhancer.Invoke(enhancedItem);
+                inventoryChanged = true;
             }
-            enhancedItem.Sockets[socketIndex] = 0;
-            onRemoveEnhancer.Invoke(enhancedItem);
+            if (GameInstance.Singleton.enhancerRemoval.RequireItems != null)
+            {
+                // Decrease required items
+                character.DecreaseItems(GameInstance.Singleton.enhancerRemoval.RequireItems);
+                inventoryChanged = true;
+            }
+            // Fill empty slots
+            if (inventoryChanged)
+                character.FillEmptySlots();
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRemoveEnhancer(character);
+            GameInstance.ServerLogHandlers.LogRemoveEnhancerFromItem(character, enhancedItem, GameInstance.Singleton.enhancerRemoval.RequireGold, GameInstance.Singleton.enhancerRemoval.RequireItems, GameInstance.Singleton.enhancerRemoval.RequireCurrencies, enhancerItem);
             return true;
         }
     }

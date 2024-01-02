@@ -55,6 +55,16 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogEnhanceSocketItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem enhancerItem)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogEnterGame(IPlayerCharacterData playerCharacter)
         {
             throw new System.NotImplementedException();
@@ -65,12 +75,12 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
-        public void LogItemGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, CharacterItem item)
+        public void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker)
         {
             throw new System.NotImplementedException();
         }
 
-        public void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker)
+        public void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, bool isReturning, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies)
         {
             throw new System.NotImplementedException();
         }
@@ -100,7 +110,12 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
-        public void LogRewardGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, Reward reward)
+        public void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, BaseItem returnEnhancerItem)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, int requireGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies)
         {
             throw new System.NotImplementedException();
         }
