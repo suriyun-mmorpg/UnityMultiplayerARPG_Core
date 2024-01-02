@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                return IsCharging && (Time.unscaledTime - _chargeStartTime >= _chargeDuration);
+                return IsCharging && (Time.unscaledTime - _chargeStartTime >= _chargeDuration) && !Entity.IsDead();
             }
         }
         public float MoveSpeedRateWhileCharging { get; protected set; }
@@ -31,10 +31,18 @@ namespace MultiplayerARPG
         protected CharacterActionComponentManager _manager;
         protected float _chargeStartTime;
         protected float _chargeDuration;
+        // Logging data
+        bool _entityIsPlayer = false;
+        BasePlayerCharacterEntity _playerCharacterEntity = null;
 
         public override void EntityStart()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
+            if (Entity is BasePlayerCharacterEntity)
+            {
+                _entityIsPlayer = true;
+                _playerCharacterEntity = Entity as BasePlayerCharacterEntity;
+            }
         }
 
         public virtual void ClearChargeStates()
@@ -72,10 +80,13 @@ namespace MultiplayerARPG
             IsCharging = true;
             _chargeStartTime = Time.unscaledTime;
             _chargeDuration = weaponItem.ChargeDuration;
+            if (_entityIsPlayer && IsServer)
+                GameInstance.ServerLogHandlers.LogChargeStart(_playerCharacterEntity);
         }
 
         protected virtual void StopChargeAnimation()
         {
+            bool doActionWhenStopCharging = WillDoActionWhenStopCharging;
             // Play animation
             if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
             {
@@ -94,6 +105,8 @@ namespace MultiplayerARPG
             }
             // Set weapon charging state
             IsCharging = false;
+            if (_entityIsPlayer && IsServer)
+                GameInstance.ServerLogHandlers.LogChargeEnd(_playerCharacterEntity, doActionWhenStopCharging);
         }
 
         public virtual void StartCharge(bool isLeftHand)

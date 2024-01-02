@@ -4,107 +4,122 @@ namespace MultiplayerARPG
 {
     public class DefaultServerLogHandlers : MonoBehaviour, IServerLogHandlers
     {
-        void IServerLogHandlers.LogAttackEnd(IPlayerCharacterData playerCharacter)
+        public void LogAttackEnd(IPlayerCharacterData playerCharacter, int simulateSeed)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogAttackInterrupt(IPlayerCharacterData playerCharacter)
+        public void LogAttackInterrupt(IPlayerCharacterData playerCharacter, int simulateSeed)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogAttackStart(IPlayerCharacterData playerCharacter)
+        public void LogAttackStart(IPlayerCharacterData playerCharacter, int simulateSeed, float[] triggerDurations, byte fireSpread, bool isLeftHand, CharacterItem weapon)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogAttackTrigger(IPlayerCharacterData playerCharacter)
+        public void LogAttackTrigger(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogBuffApplied(IPlayerCharacterData playerCharacter, CharacterBuff buff)
+        public void LogAttackTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogEnterGame(IPlayerCharacterData playerCharacter)
+        public void LogAttackTriggerFailNoValidateData(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogExitGame(IPlayerCharacterData playerCharacter)
+        public void LogBuffApplied(IPlayerCharacterData playerCharacter, CharacterBuff buff)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogItemGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, CharacterItem item)
+        public void LogChargeEnd(IPlayerCharacterData playerCharacter, bool willDoActionWhenStopCharging)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogRewardGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, Reward reward)
+        public void LogChargeStart(IPlayerCharacterData playerCharacter)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseChargeEnd(IPlayerCharacterData playerCharacter)
+        public void LogEnterGame(IPlayerCharacterData playerCharacter)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseChargeInterrupt(IPlayerCharacterData playerCharacter)
+        public void LogExitGame(IPlayerCharacterData playerCharacter)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseChargeStart(IPlayerCharacterData playerCharacter)
+        public void LogItemGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, CharacterItem item)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseChargeTrigger(IPlayerCharacterData playerCharacter)
+        public void LogReloadEnd(IPlayerCharacterData playerCharacter)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseReloadEnd(IPlayerCharacterData playerCharacter)
+        public void LogReloadInterrupt(IPlayerCharacterData playerCharacter)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseReloadInterrupt(IPlayerCharacterData playerCharacter)
+        public void LogReloadStart(IPlayerCharacterData playerCharacter, float[] triggerDurations)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseReloadStart(IPlayerCharacterData playerCharacter)
+        public void LogReloadTrigger(IPlayerCharacterData playerCharacter, byte triggerIndex)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseReloadTrigger(IPlayerCharacterData playerCharacter)
+        public void LogReloadTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, byte triggerIndex)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseSkillEnd(IPlayerCharacterData playerCharacter)
+        public void LogRewardGiven(IPlayerCharacterData playerCharacter, RewardGivenType givenType, Reward reward)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseSkillInterrupt(IPlayerCharacterData playerCharacter)
+        public void LogUseSkillEnd(IPlayerCharacterData playerCharacter, int simulateSeed)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseSkillStart(IPlayerCharacterData playerCharacter)
+        public void LogUseSkillInterrupt(IPlayerCharacterData playerCharacter, int simulateSeed)
         {
             throw new System.NotImplementedException();
         }
 
-        void IServerLogHandlers.LogUseSkillTrigger(IPlayerCharacterData playerCharacter)
+        public void LogUseSkillStart(IPlayerCharacterData playerCharacter, int simulateSeed, float[] triggerDurations, byte fireSpread, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogUseSkillTrigger(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogUseSkillTriggerFailNotEnoughResources(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogUseSkillTriggerFailNoValidateData(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
         {
             throw new System.NotImplementedException();
         }

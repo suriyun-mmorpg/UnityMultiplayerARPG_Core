@@ -77,10 +77,18 @@ namespace MultiplayerARPG
         protected float _lastAcceptedTime;
         // Network data sending
         protected UseSkillState? _simulateState;
+        // Logging data
+        bool _entityIsPlayer = false;
+        BasePlayerCharacterEntity _playerCharacterEntity = null;
 
         public override void EntityStart()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
+            if (Entity is BasePlayerCharacterEntity)
+            {
+                _entityIsPlayer = true;
+                _playerCharacterEntity = Entity as BasePlayerCharacterEntity;
+            }
         }
 
         public override void EntityUpdate()
@@ -276,6 +284,8 @@ namespace MultiplayerARPG
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, 0, skill.GetDamageInfo(Entity, isLeftHand), damageAmounts, isLeftHand, weapon, skill, skillLevel);
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogUseSkillStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpread, isLeftHand, weapon, skill, skillLevel);
 
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
@@ -359,6 +369,8 @@ namespace MultiplayerARPG
             {
                 // Catch the cancellation
                 LastUseSkillEndTime = Time.unscaledTime;
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogUseSkillInterrupt(_playerCharacterEntity, simulateSeed);
             }
             catch (System.Exception ex)
             {
@@ -369,6 +381,8 @@ namespace MultiplayerARPG
             {
                 skillCancellationTokenSource.Dispose();
                 _skillCancellationTokenSources.Remove(skillCancellationTokenSource);
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogUseSkillEnd(_playerCharacterEntity, simulateSeed);
             }
             await UniTask.Yield();
             // Clear action states at clients and server
@@ -380,12 +394,22 @@ namespace MultiplayerARPG
         {
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
             if (validateData == null || validateData.Skill == null)
+            {
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogUseSkillTriggerFailNoValidateData(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
                 return;
+            }
             if (!validateData.Skill.DecreaseResources(Entity, validateData.Weapon, validateData.IsLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+            {
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogUseSkillTriggerFailNotEnoughResources(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
                 return;
+            }
             HitRegistrationManager.ConfirmHitRegValidation(Entity, data.simulateSeed, data.triggerIndex, increaseDamageAmounts);
             RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.BaseDamageAmounts, increaseDamageAmounts, data.targetObjectId, data.aimPosition);
+            if (_entityIsPlayer && IsServer)
+                GameInstance.ServerLogHandlers.LogUseSkillTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
         }
 
         [AllRpc]

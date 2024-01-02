@@ -31,10 +31,18 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
 
         protected CharacterActionComponentManager _manager;
+        // Logging data
+        bool _entityIsPlayer = false;
+        BasePlayerCharacterEntity _playerCharacterEntity = null;
 
         public override void EntityStart()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
+            if (Entity is BasePlayerCharacterEntity)
+            {
+                _entityIsPlayer = true;
+                _playerCharacterEntity = Entity as BasePlayerCharacterEntity;
+            }
         }
 
         protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoDataId, int reloadingAmmoAmount)
@@ -151,12 +159,15 @@ namespace MultiplayerARPG
                     }
                 }
 
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogReloadStart(_playerCharacterEntity, _triggerDurations);
+
                 bool reloaded = false;
                 float tempTriggerDuration;
-                for (int i = 0; i < _triggerDurations.Length; ++i)
+                for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
                 {
                     // Wait until triggger before reload ammo
-                    tempTriggerDuration = _triggerDurations[i];
+                    tempTriggerDuration = _triggerDurations[triggerIndex];
                     remainsDuration -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
 
@@ -181,26 +192,7 @@ namespace MultiplayerARPG
                     if (!reloaded)
                     {
                         reloaded = true;
-                        EquipWeapons equipWeapons = Entity.EquipWeapons;
-                        if (IsServer)
-                        {
-                            if (Entity.DecreaseItems(reloadingAmmoDataId, reloadingAmmoAmount))
-                            {
-                                if (weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
-                                {
-                                    Entity.IncreaseItems(CharacterItem.Create(reloadingAmmoDataId, 1, weapon.ammo));
-                                    weapon.ammo = 0;
-                                }
-                                Entity.FillEmptySlots();
-                                weapon.ammoDataId = reloadingAmmoDataId;
-                                weapon.ammo += reloadingAmmoAmount;
-                                if (isLeftHand)
-                                    equipWeapons.leftHand = weapon;
-                                else
-                                    equipWeapons.rightHand = weapon;
-                                Entity.EquipWeapons = equipWeapons;
-                            }
-                        }
+                        ActionTrigger(reloadingAmmoDataId, reloadingAmmoAmount, triggerIndex, isLeftHand, weapon);
                     }
 
                     if (remainsDuration <= 0f)
@@ -220,6 +212,8 @@ namespace MultiplayerARPG
             {
                 // Catch the cancellation
                 LastReloadEndTime = Time.unscaledTime;
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogReloadInterrupt(_playerCharacterEntity);
             }
             catch (System.Exception ex)
             {
@@ -230,9 +224,39 @@ namespace MultiplayerARPG
             {
                 reloadCancellationTokenSource.Dispose();
                 _reloadCancellationTokenSources.Remove(reloadCancellationTokenSource);
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogReloadEnd(_playerCharacterEntity);
             }
             // Clear action states at clients and server
             ClearReloadStates();
+        }
+
+        protected virtual void ActionTrigger(int reloadingAmmoDataId, int reloadingAmmoAmount, byte triggerIndex, bool isLeftHand, CharacterItem weapon)
+        {
+            if (!IsServer)
+                return;
+            if (!Entity.DecreaseItems(reloadingAmmoDataId, reloadingAmmoAmount))
+            {
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogReloadTriggerFailNotEnoughResources(_playerCharacterEntity, triggerIndex);
+                return;
+            }
+            if (weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
+            {
+                Entity.IncreaseItems(CharacterItem.Create(reloadingAmmoDataId, 1, weapon.ammo));
+                weapon.ammo = 0;
+            }
+            Entity.FillEmptySlots();
+            weapon.ammoDataId = reloadingAmmoDataId;
+            weapon.ammo += reloadingAmmoAmount;
+            EquipWeapons equipWeapons = Entity.EquipWeapons;
+            if (isLeftHand)
+                equipWeapons.leftHand = weapon;
+            else
+                equipWeapons.rightHand = weapon;
+            Entity.EquipWeapons = equipWeapons;
+            if (_entityIsPlayer && IsServer)
+                GameInstance.ServerLogHandlers.LogReloadTrigger(_playerCharacterEntity, triggerIndex);
         }
 
         public virtual void CancelReload()

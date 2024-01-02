@@ -51,10 +51,18 @@ namespace MultiplayerARPG
         protected int _lastAttackDataId = 0;
         // Network data sending
         protected AttackState? _simulateState;
+        // Logging data
+        bool _entityIsPlayer = false;
+        BasePlayerCharacterEntity _playerCharacterEntity = null;
 
         public override void EntityStart()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
+            if (Entity is BasePlayerCharacterEntity)
+            {
+                _entityIsPlayer = true;
+                _playerCharacterEntity = Entity as BasePlayerCharacterEntity;
+            }
         }
 
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId, AttackState simulateState)
@@ -204,6 +212,8 @@ namespace MultiplayerARPG
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogAttackStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpread, isLeftHand, weapon);
 
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
@@ -300,6 +310,8 @@ namespace MultiplayerARPG
             {
                 // Catch the cancellation
                 LastAttackEndTime = Time.unscaledTime;
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogAttackInterrupt(_playerCharacterEntity, simulateSeed);
             }
             catch (System.Exception ex)
             {
@@ -310,6 +322,8 @@ namespace MultiplayerARPG
             {
                 attackCancellationTokenSource.Dispose();
                 _attackCancellationTokenSources.Remove(attackCancellationTokenSource);
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogAttackEnd(_playerCharacterEntity, simulateSeed);
             }
             await UniTask.Yield();
             // Clear action states at clients and server
@@ -321,12 +335,22 @@ namespace MultiplayerARPG
         {
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
             if (validateData == null)
+            {
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogAttackTriggerFailNoValidateData(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
                 return;
+            }
             if (!Entity.DecreaseAmmos(validateData.Weapon, validateData.IsLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+            {
+                if (_entityIsPlayer && IsServer)
+                    GameInstance.ServerLogHandlers.LogAttackTriggerFailNotEnoughResources(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
                 return;
+            }
             HitRegistrationManager.ConfirmHitRegValidation(Entity, data.simulateSeed, data.triggerIndex, increaseDamageAmounts);
             RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
             ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.BaseDamageAmounts, increaseDamageAmounts, data.aimPosition);
+            if (_entityIsPlayer && IsServer)
+                GameInstance.ServerLogHandlers.LogAttackTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
         }
 
         [AllRpc]
