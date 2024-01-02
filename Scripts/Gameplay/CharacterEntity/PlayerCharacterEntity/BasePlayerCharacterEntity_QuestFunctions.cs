@@ -141,11 +141,9 @@ namespace MultiplayerARPG
             {
                 foreach (ItemAmount rewardItem in rewardItems)
                 {
-                    if (rewardItem.item != null && rewardItem.amount > 0)
-                    {
-                        this.IncreaseItems(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount));
-                        GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, RewardGivenType.Quest, rewardItem.item.DataId, rewardItem.amount);
-                    }
+                    if (rewardItem.item == null || rewardItem.amount <= 0)
+                        continue;
+                    this.IncreaseItems(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount), characterItem => OnRewardItem(RewardGivenType.Quest, characterItem));
                 }
             }
             this.FillEmptySlots();

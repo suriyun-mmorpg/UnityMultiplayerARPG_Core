@@ -336,9 +336,8 @@ namespace MultiplayerARPG
             CurrentGameplayRule.DecreaseCurrenciesWhenBuyItem(Entity, sellItem, amount);
 
             // Add item to inventory
-            Entity.IncreaseItems(CharacterItem.Create(dataId, 1, amount));
+            Entity.IncreaseItems(CharacterItem.Create(dataId, 1, amount), characterItem => Entity.OnRewardItem(RewardGivenType.NpcShop, characterItem));
             Entity.FillEmptySlots();
-            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, RewardGivenType.NpcShop, dataId, amount);
 #endif
         }
 

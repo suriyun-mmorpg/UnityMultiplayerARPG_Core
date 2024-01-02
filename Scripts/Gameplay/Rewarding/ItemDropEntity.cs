@@ -403,13 +403,9 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            characterEntity.IncreaseItems(DropItems, (characterItem) =>
-            {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(characterEntity.ConnectionId, GivenType, characterItem.dataId, characterItem.amount);
-            });
+            characterEntity.IncreaseItems(DropItems, characterItem => characterEntity.OnRewardItem(GivenType, characterItem));
             characterEntity.FillEmptySlots();
             PickedUp();
-
             message = UITextKeys.NONE;
             return true;
         }

@@ -32,5 +32,41 @@ namespace MultiplayerARPG
         public event System.Action<LiteNetLibSyncList.Operation, int> onPublicBoolsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPublicIntsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPublicFloatsOperation;
+
+        public override void OnRewardItem(RewardGivenType givenType, BaseItem item, int amount)
+        {
+            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, givenType, item.DataId, amount);
+            GameInstance.ServerLogHandlers.LogRewardItem(this, givenType, item, amount);
+        }
+
+        public override void OnRewardItem(RewardGivenType givenType, CharacterItem item)
+        {
+            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, givenType, item.dataId, item.amount);
+            GameInstance.ServerLogHandlers.LogRewardItem(this, givenType, item);
+        }
+
+        public override void OnRewardGold(RewardGivenType givenType, int gold)
+        {
+            GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, givenType, gold);
+            GameInstance.ServerLogHandlers.LogRewardGold(this, givenType, gold);
+        }
+
+        public override void OnRewardExp(RewardGivenType givenType, int exp, bool isLevelUp)
+        {
+            GameInstance.ServerGameMessageHandlers.NotifyRewardExp(ConnectionId, givenType, exp);
+            GameInstance.ServerLogHandlers.LogRewardExp(this, givenType, exp, isLevelUp);
+        }
+
+        public override void OnRewardCurrency(RewardGivenType givenType, Currency currency, int amount)
+        {
+            GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, givenType, currency.DataId, amount);
+            GameInstance.ServerLogHandlers.LogRewardCurrency(this, givenType, currency, amount);
+        }
+
+        public override void OnRewardCurrency(RewardGivenType givenType, CharacterCurrency currency)
+        {
+            GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, givenType, currency.dataId, currency.amount);
+            GameInstance.ServerLogHandlers.LogRewardCurrency(this, givenType, currency);
+        }
     }
 }

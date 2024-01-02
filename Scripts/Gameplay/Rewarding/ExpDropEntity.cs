@@ -17,11 +17,11 @@ namespace MultiplayerARPG
                 rewardingCharacter = summonerCharacterEntity;
             if (!CurrentGameplayRule.RewardExp(rewardingCharacter, Amount, Multiplier, GivenType, GiverLevel, SourceLevel, out int rewardedExp))
             {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardExp(rewardingCharacter.ConnectionId, GivenType, rewardedExp);
+                rewardingCharacter.OnRewardExp(GivenType, rewardedExp, false);
                 message = UITextKeys.NONE;
                 return true;
             }
-            GameInstance.ServerGameMessageHandlers.NotifyRewardExp(rewardingCharacter.ConnectionId, GivenType, rewardedExp);
+            rewardingCharacter.OnRewardExp(GivenType, rewardedExp, true);
             rewardingCharacter.CallRpcOnLevelUp();
             message = UITextKeys.NONE;
             return true;

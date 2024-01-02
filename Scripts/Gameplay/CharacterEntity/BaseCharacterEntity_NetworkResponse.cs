@@ -82,10 +82,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            this.IncreaseItems(pickingItem, (characterItem) =>
-            {
-                GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, itemsContainerEntity.GivenType, characterItem.dataId, characterItem.amount);
-            });
+            this.IncreaseItems(pickingItem, characterItem => OnRewardItem(itemsContainerEntity.GivenType, characterItem));
             itemsContainerEntity.Items.DecreaseItemsByIndex(itemsContainerIndex, amount, false, true);
             itemsContainerEntity.PickedUp();
             this.FillEmptySlots();
@@ -130,10 +127,7 @@ namespace MultiplayerARPG
                     break;
                 }
 
-                this.IncreaseItems(pickingItem, (characterItem) =>
-                {
-                    GameInstance.ServerGameMessageHandlers.NotifyRewardItem(ConnectionId, itemsContainerEntity.GivenType, characterItem.dataId, characterItem.amount);
-                });
+                this.IncreaseItems(pickingItem, characterItem => OnRewardItem(itemsContainerEntity.GivenType, characterItem));
                 itemsContainerEntity.Items.RemoveAt(0);
             }
             itemsContainerEntity.PickedUp();

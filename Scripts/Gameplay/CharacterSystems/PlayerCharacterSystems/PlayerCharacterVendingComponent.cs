@@ -257,12 +257,11 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS);
                 return;
             }
-            buyer.Entity.IncreaseItems(sellingItem);
-            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(buyer.ConnectionId, RewardGivenType.Vending, sellingItem.dataId, sellingItem.amount);
+            buyer.Entity.IncreaseItems(sellingItem, characterItem => buyer.Entity.OnRewardItem(RewardGivenType.Vending, characterItem));
 
             buyer.Entity.Gold -= price;
             Entity.Gold = Entity.Gold.Increase(price);
-            GameInstance.ServerGameMessageHandlers.NotifyRewardGold(ConnectionId, RewardGivenType.Vending, price);
+            Entity.OnRewardGold(RewardGivenType.Vending, price);
             _items.RemoveAt(index);
             if (_items.Count <= 0)
             {

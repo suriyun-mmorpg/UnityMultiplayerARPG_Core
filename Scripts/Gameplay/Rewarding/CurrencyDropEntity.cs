@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                     amount = Amount,
                 },
             }, Multiplier, GivenType, GiverLevel, SourceLevel);
-            GameInstance.ServerGameMessageHandlers.NotifyRewardCurrency(ConnectionId, GivenType, Currency.DataId, Amount);
+            rewardingCharacter.OnRewardCurrency(GivenType, Currency, Amount);
             message = UITextKeys.NONE;
             return true;
         }

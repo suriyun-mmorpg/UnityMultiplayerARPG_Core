@@ -58,7 +58,7 @@ namespace MultiplayerARPG
         public event NotifyEnemySpottedDelegate onNotifyEnemySpotted;
         public event NotifyEnemySpottedByAllyDelegate onNotifyEnemySpottedByAlly;
 
-        public void OnAttackRoutine(
+        public virtual void OnAttackRoutine(
             bool isLeftHand,
             CharacterItem weapon,
             int simulateSeed,
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
                 onAttackRoutine.Invoke(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
         }
 
-        public void OnUseSkillRoutine(
+        public virtual void OnUseSkillRoutine(
             BaseSkill skill,
             int level,
             bool isLeftHand,
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                 onUseSkillRoutine.Invoke(skill, level, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
         }
 
-        public void OnLaunchDamageEntity(
+        public virtual void OnLaunchDamageEntity(
             bool isLeftHand,
             CharacterItem weapon,
             int simulateSeed,
@@ -99,6 +99,36 @@ namespace MultiplayerARPG
         {
             if (onLaunchDamageEntity != null)
                 onLaunchDamageEntity.Invoke(isLeftHand, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, aimPosition);
+        }
+
+        public virtual void OnRewardItem(RewardGivenType givenType, BaseItem item, int amount)
+        {
+
+        }
+
+        public virtual void OnRewardItem(RewardGivenType givenType, CharacterItem item)
+        {
+
+        }
+
+        public virtual void OnRewardGold(RewardGivenType givenType, int amount)
+        {
+
+        }
+
+        public virtual void OnRewardExp(RewardGivenType givenType, int exp, bool isLevelUp)
+        {
+
+        }
+
+        public virtual void OnRewardCurrency(RewardGivenType givenType, Currency currency, int amount)
+        {
+
+        }
+
+        public virtual void OnRewardCurrency(RewardGivenType givenType, CharacterCurrency currency)
+        {
+
         }
     }
 }

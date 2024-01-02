@@ -130,6 +130,36 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, Currency currency, int amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, CharacterCurrency currency)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogRewardExp(IPlayerCharacterData character, RewardGivenType givenType, int exp, bool isLevelUp)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogRewardGold(IPlayerCharacterData character, RewardGivenType givenType, int gold)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogRewardItem(IPlayerCharacterData character, RewardGivenType givenType, BaseItem item, int amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogRewardItem(IPlayerCharacterData character, RewardGivenType givenType, CharacterItem item)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogSellVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData buyerCharacter, CharacterItem buyItem, int price)
         {
             throw new System.NotImplementedException();

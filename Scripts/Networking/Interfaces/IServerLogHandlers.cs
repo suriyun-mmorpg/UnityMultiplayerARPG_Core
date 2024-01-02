@@ -45,5 +45,12 @@ namespace MultiplayerARPG
         void LogSellVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData buyerCharacter, CharacterItem buyItem, int price);
 
         void LogExchangeDealingItemsAndGold(IPlayerCharacterData playerCharacter, IPlayerCharacterData dealingCharacter, int dealingGold, IList<CharacterItem> dealingItems);
+
+        void LogRewardItem(IPlayerCharacterData character, RewardGivenType givenType, BaseItem item, int amount);
+        void LogRewardItem(IPlayerCharacterData character, RewardGivenType givenType, CharacterItem item);
+        void LogRewardGold(IPlayerCharacterData character, RewardGivenType givenType, int gold);
+        void LogRewardExp(IPlayerCharacterData character, RewardGivenType givenType, int exp, bool isLevelUp);
+        void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, Currency currency, int amount);
+        void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, CharacterCurrency currency);
     }
 }

@@ -154,8 +154,7 @@ namespace MultiplayerARPG
                         droppingToGround = true;
                     if (!droppingToGround)
                     {
-                        GameInstance.ServerGameMessageHandlers.NotifyRewardItem(attackerCharacter.ConnectionId, RewardGivenType.Harvestable, itemDataId, itemAmount);
-                        attackerCharacter.IncreaseItems(CharacterItem.Create(itemDataId, 1, itemAmount));
+                        attackerCharacter.IncreaseItems(CharacterItem.Create(itemDataId, 1, itemAmount), characterItem => attackerCharacter.OnRewardItem(RewardGivenType.Harvestable, characterItem));
                         attackerCharacter.FillEmptySlots();
                     }
                     attackerCharacter.RewardExp((int)(harvestable.expPerDamage * calculatingTotalDamage), 1, RewardGivenType.Harvestable, 1, 1);
