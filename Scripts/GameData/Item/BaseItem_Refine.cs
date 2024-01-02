@@ -192,7 +192,7 @@ namespace MultiplayerARPG
                     if (Random.value > chanceToNotDecreaseLevels)
                     {
                         decreaseLevels = refineLevel.RefineFailDecreaseLevels;
-                        while (refiningItem.level - decreaseLevels < 0)
+                        while (refiningItem.level - decreaseLevels < 1)
                             --decreaseLevels;
                         refiningItem.level -= decreaseLevels;
                         onRefine.Invoke(refiningItem);
