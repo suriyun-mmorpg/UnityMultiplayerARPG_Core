@@ -245,7 +245,7 @@ namespace MultiplayerARPG
         protected CalculatedItemRandomBonus GetRandomBonus()
         {
             if (EquipmentItem != null && !dontCalculateRandomBonus && _randomBonus == null)
-                _randomBonus = new CalculatedItemRandomBonus(EquipmentItem, CharacterItem.randomSeed, CharacterItem.version);
+                _randomBonus = new CalculatedItemRandomBonus(EquipmentItem, CharacterItem.level, CharacterItem.randomSeed, CharacterItem.version);
             return _randomBonus;
         }
 

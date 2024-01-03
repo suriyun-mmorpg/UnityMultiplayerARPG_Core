@@ -80,7 +80,7 @@ namespace MultiplayerARPG
             if (item == null || !item.IsEquipment())
                 return;
 
-            _cacheRandomBonus.Build(item, randomSeed, version);
+            _cacheRandomBonus.Build(item, level, randomSeed, version);
 
             _cacheIncreaseStats = item.GetIncreaseStats(_level) + _cacheRandomBonus.GetIncreaseStats();
             _cacheIncreaseStatsRate = item.GetIncreaseStatsRate(_level) + _cacheRandomBonus.GetIncreaseStatsRate();

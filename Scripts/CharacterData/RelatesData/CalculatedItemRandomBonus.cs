@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     public class CalculatedItemRandomBonus
     {
         private IEquipmentItem _item;
+        private int _level;
         private int _randomSeed;
         private byte _version;
         private CharacterStats _cacheIncreaseStats = CharacterStats.Empty;
@@ -26,9 +27,9 @@ namespace MultiplayerARPG
 
         }
 
-        public CalculatedItemRandomBonus(IEquipmentItem item, int randomSeed, byte version)
+        public CalculatedItemRandomBonus(IEquipmentItem item, int level, int randomSeed, byte version)
         {
-            Build(item, randomSeed, version);
+            Build(item, level, randomSeed, version);
         }
 
         ~CalculatedItemRandomBonus()
@@ -65,9 +66,10 @@ namespace MultiplayerARPG
             _cacheIncreaseSkills.Clear();
         }
 
-        public void Build(IEquipmentItem item, int randomSeed, byte version)
+        public void Build(IEquipmentItem item, int level, int randomSeed, byte version)
         {
             _item = item;
+            _level = level;
             _randomSeed = randomSeed;
             _version = version;
 
