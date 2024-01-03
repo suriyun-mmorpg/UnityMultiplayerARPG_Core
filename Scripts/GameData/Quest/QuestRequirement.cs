@@ -1,7 +1,10 @@
-﻿namespace MultiplayerARPG
+﻿using System.Runtime.InteropServices;
+
+namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct QuestRequirement
+    [StructLayout(LayoutKind.Auto)]
+    public partial struct QuestRequirement
     {
         public PlayerCharacter character;
         public Faction faction;
