@@ -1,7 +1,10 @@
-﻿namespace MultiplayerARPG
+﻿using System.Runtime.InteropServices;
+
+namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial class SkillRequirement
+    [StructLayout(LayoutKind.Auto)]
+    public partial struct SkillRequirement
     {
         public bool disallow;
         public IncrementalInt characterLevel;
