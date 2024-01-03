@@ -1,11 +1,11 @@
-﻿using UnityEngine;
+﻿using System.Runtime.InteropServices;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
-#pragma warning disable CS0282 // There is no defined ordering between fields in multiple declarations of partial struct
+    [StructLayout(LayoutKind.Auto)]
     public partial struct CharacterStats
-#pragma warning restore CS0282 // There is no defined ordering between fields in multiple declarations of partial struct
     {
         public static readonly CharacterStats Empty = new CharacterStats();
         public float hp;
