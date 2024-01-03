@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public partial class CharacterItem
     {
-        public const byte CURRENT_VERSION = 1;
+        public const byte CURRENT_VERSION = 2;
 
         [System.NonSerialized]
         private int _dirtyDataId;

@@ -4,6 +4,7 @@ namespace MultiplayerARPG
 {
     public class CalculatedItemRandomBonus
     {
+        private static readonly List<int> s_randomIndexes = new List<int>();
         private IEquipmentItem _item;
         private int _level;
         private int _randomSeed;
@@ -111,14 +112,30 @@ namespace MultiplayerARPG
             return _randomBonus.maxRandomStatsAmount > 0 && _appliedAmount >= _randomBonus.maxRandomStatsAmount;
         }
 
+        private void PrepareRandomingIndexes(int length, System.Random random)
+        {
+            s_randomIndexes.Clear();
+            for (int i = 0; i < length; ++i)
+            {
+                s_randomIndexes.Add(i);
+            }
+            s_randomIndexes.Shuffle(random);
+        }
+
         public void RandomAttributeAmounts(System.Random random)
         {
             if (_randomBonus.randomAttributeAmounts != null && _randomBonus.randomAttributeAmounts.Length > 0)
             {
-                for (int i = 0; i < _randomBonus.randomAttributeAmounts.Length; ++i)
+                int length = _randomBonus.randomAttributeAmounts.Length;
+                if (_version > 1)
+                    PrepareRandomingIndexes(length, random);
+                for (int i = 0; i < length; ++i)
                 {
-                    if (!_randomBonus.randomAttributeAmounts[i].Apply(random)) continue;
-                    _cacheIncreaseAttributes = GameDataHelpers.CombineAttributes(_cacheIncreaseAttributes, _randomBonus.randomAttributeAmounts[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    int index = i;
+                    if (_version > 1)
+                        index = s_randomIndexes[i];
+                    if (!_randomBonus.randomAttributeAmounts[index].Apply(random)) continue;
+                    _cacheIncreaseAttributes = GameDataHelpers.CombineAttributes(_cacheIncreaseAttributes, _randomBonus.randomAttributeAmounts[index].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -130,10 +147,16 @@ namespace MultiplayerARPG
         {
             if (_randomBonus.randomAttributeAmountRates != null && _randomBonus.randomAttributeAmountRates.Length > 0)
             {
-                for (int i = 0; i < _randomBonus.randomAttributeAmountRates.Length; ++i)
+                int length = _randomBonus.randomAttributeAmountRates.Length;
+                if (_version > 1)
+                    PrepareRandomingIndexes(length, random);
+                for (int i = 0; i < length; ++i)
                 {
-                    if (!_randomBonus.randomAttributeAmountRates[i].Apply(random)) continue;
-                    _cacheIncreaseAttributesRate = GameDataHelpers.CombineAttributes(_cacheIncreaseAttributesRate, _randomBonus.randomAttributeAmountRates[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    int index = i;
+                    if (_version > 1)
+                        index = s_randomIndexes[i];
+                    if (!_randomBonus.randomAttributeAmountRates[index].Apply(random)) continue;
+                    _cacheIncreaseAttributesRate = GameDataHelpers.CombineAttributes(_cacheIncreaseAttributesRate, _randomBonus.randomAttributeAmountRates[index].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -145,10 +168,16 @@ namespace MultiplayerARPG
         {
             if (_randomBonus.randomResistanceAmounts != null && _randomBonus.randomResistanceAmounts.Length > 0)
             {
-                for (int i = 0; i < _randomBonus.randomResistanceAmounts.Length; ++i)
+                int length = _randomBonus.randomResistanceAmounts.Length;
+                if (_version > 1)
+                    PrepareRandomingIndexes(length, random);
+                for (int i = 0; i < length; ++i)
                 {
-                    if (!_randomBonus.randomResistanceAmounts[i].Apply(random)) continue;
-                    _cacheIncreaseResistances = GameDataHelpers.CombineResistances(_cacheIncreaseResistances, _randomBonus.randomResistanceAmounts[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    int index = i;
+                    if (_version > 1)
+                        index = s_randomIndexes[i];
+                    if (!_randomBonus.randomResistanceAmounts[index].Apply(random)) continue;
+                    _cacheIncreaseResistances = GameDataHelpers.CombineResistances(_cacheIncreaseResistances, _randomBonus.randomResistanceAmounts[index].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -160,10 +189,16 @@ namespace MultiplayerARPG
         {
             if (_randomBonus.randomArmorAmounts != null && _randomBonus.randomArmorAmounts.Length > 0)
             {
-                for (int i = 0; i < _randomBonus.randomArmorAmounts.Length; ++i)
+                int length = _randomBonus.randomArmorAmounts.Length;
+                if (_version > 1)
+                    PrepareRandomingIndexes(length, random);
+                for (int i = 0; i < length; ++i)
                 {
-                    if (!_randomBonus.randomArmorAmounts[i].Apply(random)) continue;
-                    _cacheIncreaseArmors = GameDataHelpers.CombineArmors(_cacheIncreaseArmors, _randomBonus.randomArmorAmounts[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    int index = i;
+                    if (_version > 1)
+                        index = s_randomIndexes[i];
+                    if (!_randomBonus.randomArmorAmounts[index].Apply(random)) continue;
+                    _cacheIncreaseArmors = GameDataHelpers.CombineArmors(_cacheIncreaseArmors, _randomBonus.randomArmorAmounts[index].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -175,10 +210,16 @@ namespace MultiplayerARPG
         {
             if (_randomBonus.randomArmorAmountRates != null && _randomBonus.randomArmorAmountRates.Length > 0)
             {
-                for (int i = 0; i < _randomBonus.randomArmorAmountRates.Length; ++i)
+                int length = _randomBonus.randomArmorAmountRates.Length;
+                if (_version > 1)
+                    PrepareRandomingIndexes(length, random);
+                for (int i = 0; i < length; ++i)
                 {
-                    if (!_randomBonus.randomArmorAmountRates[i].Apply(random)) continue;
-                    _cacheIncreaseArmorsRate = GameDataHelpers.CombineArmors(_cacheIncreaseArmorsRate, _randomBonus.randomArmorAmountRates[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    int index = i;
+                    if (_version > 1)
+                        index = s_randomIndexes[i];
+                    if (!_randomBonus.randomArmorAmountRates[index].Apply(random)) continue;
+                    _cacheIncreaseArmorsRate = GameDataHelpers.CombineArmors(_cacheIncreaseArmorsRate, _randomBonus.randomArmorAmountRates[index].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -190,10 +231,16 @@ namespace MultiplayerARPG
         {
             if (_randomBonus.randomDamageAmounts != null && _randomBonus.randomDamageAmounts.Length > 0)
             {
-                for (int i = 0; i < _randomBonus.randomDamageAmounts.Length; ++i)
+                int length = _randomBonus.randomDamageAmounts.Length;
+                if (_version > 1)
+                    PrepareRandomingIndexes(length, random);
+                for (int i = 0; i < length; ++i)
                 {
-                    if (!_randomBonus.randomDamageAmounts[i].Apply(random)) continue;
-                    _cacheIncreaseDamages = GameDataHelpers.CombineDamages(_cacheIncreaseDamages, _randomBonus.randomDamageAmounts[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    int index = i;
+                    if (_version > 1)
+                        index = s_randomIndexes[i];
+                    if (!_randomBonus.randomDamageAmounts[index].Apply(random)) continue;
+                    _cacheIncreaseDamages = GameDataHelpers.CombineDamages(_cacheIncreaseDamages, _randomBonus.randomDamageAmounts[index].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -205,10 +252,16 @@ namespace MultiplayerARPG
         {
             if (_randomBonus.randomDamageAmountRates != null && _randomBonus.randomDamageAmountRates.Length > 0)
             {
-                for (int i = 0; i < _randomBonus.randomDamageAmountRates.Length; ++i)
+                int length = _randomBonus.randomDamageAmountRates.Length;
+                if (_version > 1)
+                    PrepareRandomingIndexes(length, random);
+                for (int i = 0; i < length; ++i)
                 {
-                    if (!_randomBonus.randomDamageAmountRates[i].Apply(random)) continue;
-                    _cacheIncreaseDamagesRate = GameDataHelpers.CombineDamages(_cacheIncreaseDamagesRate, _randomBonus.randomDamageAmountRates[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    int index = i;
+                    if (_version > 1)
+                        index = s_randomIndexes[i];
+                    if (!_randomBonus.randomDamageAmountRates[index].Apply(random)) continue;
+                    _cacheIncreaseDamagesRate = GameDataHelpers.CombineDamages(_cacheIncreaseDamagesRate, _randomBonus.randomDamageAmountRates[index].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -220,10 +273,16 @@ namespace MultiplayerARPG
         {
             if (_randomBonus.randomSkillLevels != null && _randomBonus.randomSkillLevels.Length > 0)
             {
-                for (int i = 0; i < _randomBonus.randomSkillLevels.Length; ++i)
+                int length = _randomBonus.randomSkillLevels.Length;
+                if (_version > 1)
+                    PrepareRandomingIndexes(length, random);
+                for (int i = 0; i < length; ++i)
                 {
-                    if (!_randomBonus.randomSkillLevels[i].Apply(random)) continue;
-                    _cacheIncreaseSkills = GameDataHelpers.CombineSkills(_cacheIncreaseSkills, _randomBonus.randomSkillLevels[i].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    int index = i;
+                    if (_version > 1)
+                        index = s_randomIndexes[i];
+                    if (!_randomBonus.randomSkillLevels[index].Apply(random)) continue;
+                    _cacheIncreaseSkills = GameDataHelpers.CombineSkills(_cacheIncreaseSkills, _randomBonus.randomSkillLevels[index].GetRandomedAmount(random).ToKeyValuePair(1f));
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
