@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct ItemRequirement
+    [StructLayout(LayoutKind.Auto)]
+    public partial struct ItemRequirement
     {
         [Header("Class")]
         [FormerlySerializedAs("character")]
