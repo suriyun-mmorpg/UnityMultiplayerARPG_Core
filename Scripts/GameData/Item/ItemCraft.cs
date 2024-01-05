@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -101,6 +100,7 @@ namespace MultiplayerARPG
                 character.FillEmptySlots();
                 // Decrease required gold
                 GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenCraftItem(character, this);
+                GameInstance.ServerLogHandlers.LogCraftItem(character, craftingItem, amount, requireGold, requireItems, requireCurrencies);
             }
         }
     }
