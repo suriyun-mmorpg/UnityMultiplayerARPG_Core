@@ -115,6 +115,21 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogQuestAbandon(IPlayerCharacterData character, Quest quest)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogQuestAccept(IPlayerCharacterData character, Quest quest)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogQuestComplete(IPlayerCharacterData character, Quest quest, byte selectedRewardIndex)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, ItemRefineLevel itemRefineLevel, bool isReturning, ItemRefineFailReturning itemRefineFailReturning)
         {
             throw new System.NotImplementedException();

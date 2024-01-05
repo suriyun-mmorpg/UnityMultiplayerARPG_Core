@@ -41,11 +41,12 @@ namespace MultiplayerARPG
                 quests[indexOfQuest] = characterQuest;
             else
                 quests.Add(characterQuest);
+            GameInstance.ServerLogHandlers.LogQuestAccept(this, quest);
         }
 
         public virtual void AbandonQuest(int questDataId)
         {
-            if (!GameInstance.Quests.TryGetValue(questDataId, out _))
+            if (!GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
                 return;
             int indexOfQuest = this.IndexOfQuest(questDataId);
             if (indexOfQuest < 0)
@@ -54,6 +55,7 @@ namespace MultiplayerARPG
             if (characterQuest.isComplete)
                 return;
             quests.RemoveAt(indexOfQuest);
+            GameInstance.ServerLogHandlers.LogQuestAbandon(this, quest);
         }
 
         public virtual bool CompleteQuest(int questDataId, byte selectedRewardIndex)
@@ -179,6 +181,7 @@ namespace MultiplayerARPG
             characterQuest.isComplete = true;
             characterQuest.completeTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             quests[indexOfQuest] = characterQuest;
+            GameInstance.ServerLogHandlers.LogQuestComplete(this, quest, selectedRewardIndex);
             return true;
         }
     }

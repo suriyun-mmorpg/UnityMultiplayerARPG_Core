@@ -56,5 +56,9 @@ namespace MultiplayerARPG
 
         void LogBuyNpcItem(IPlayerCharacterData character, NpcSellItem npcSellItem, int amount);
         void LogSellNpcItem(IPlayerCharacterData character, CharacterItem characterItem, int amount);
+
+        void LogQuestAccept(IPlayerCharacterData character, Quest quest);
+        void LogQuestAbandon(IPlayerCharacterData character, Quest quest);
+        void LogQuestComplete(IPlayerCharacterData character, Quest quest, byte selectedRewardIndex);
     }
 }
