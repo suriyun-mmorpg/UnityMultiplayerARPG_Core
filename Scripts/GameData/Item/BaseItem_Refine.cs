@@ -162,9 +162,7 @@ namespace MultiplayerARPG
             bool isDestroy = false;
             int decreaseLevels = 0;
             bool isReturning = false;
-            int returningGold = 0;
-            ItemAmount[] returningItems = null;
-            CurrencyAmount[] returningCurrencies = null;
+            ItemRefineFailReturning returning = default;
             if (Random.value <= refineLevel.SuccessRate + increaseSuccessRate)
             {
                 // If success, increase item level
@@ -206,14 +204,11 @@ namespace MultiplayerARPG
                     {
                         randomItems[item] = item.randomWeight;
                     }
-                    ItemRefineFailReturning returning = WeightedRandomizer.From(randomItems).TakeOne();
+                    returning = WeightedRandomizer.From(randomItems).TakeOne();
                     isReturning = true;
-                    returningGold = returning.returnGold;
-                    returningItems = returning.returnItems;
-                    returningCurrencies = returning.returnCurrencies;
-                    character.Gold.Increase(returningGold);
-                    character.IncreaseItems(returningItems, onFail: dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
-                    character.IncreaseCurrencies(returningCurrencies);
+                    character.Gold.Increase(returning.returnGold);
+                    character.IncreaseItems(returning.returnItems, onFail: dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
+                    character.IncreaseCurrencies(returning.returnCurrencies);
                     inventoryChanged = true;
                 }
             }
@@ -228,7 +223,7 @@ namespace MultiplayerARPG
                 character.FillEmptySlots();
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRefineItem(character, refineLevel, decreaseRequireGoldRate);
-            GameInstance.ServerLogHandlers.LogRefine(character, refiningItem, enhancerItems, increaseSuccessRate, decreaseRequireGoldRate, chanceToNotDecreaseLevels, chanceToNotDestroyItem, isSuccess, isDestroy, refineLevel.RequireGold, refineLevel.RequireItems, refineLevel.RequireCurrencies, isReturning, returningGold, returningItems, returningCurrencies);
+            GameInstance.ServerLogHandlers.LogRefine(character, refiningItem, enhancerItems, increaseSuccessRate, decreaseRequireGoldRate, chanceToNotDecreaseLevels, chanceToNotDestroyItem, isSuccess, isDestroy, refineLevel, isReturning, returning);
             return true;
         }
     }

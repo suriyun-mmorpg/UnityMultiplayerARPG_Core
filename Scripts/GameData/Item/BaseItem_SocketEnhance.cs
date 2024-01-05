@@ -206,7 +206,7 @@ namespace MultiplayerARPG
                 character.FillEmptySlots();
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRemoveEnhancer(character);
-            GameInstance.ServerLogHandlers.LogRemoveEnhancerFromItem(character, enhancedItem, GameInstance.Singleton.enhancerRemoval.RequireGold, GameInstance.Singleton.enhancerRemoval.RequireItems, GameInstance.Singleton.enhancerRemoval.RequireCurrencies, enhancerItem);
+            GameInstance.ServerLogHandlers.LogRemoveEnhancerFromItem(character, enhancedItem, enhancerItem);
             return true;
         }
     }

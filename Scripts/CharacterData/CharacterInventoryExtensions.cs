@@ -906,7 +906,7 @@ namespace MultiplayerARPG
             character.IncreaseItems(returningItems);
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
-            GameInstance.ServerLogHandlers.LogDismentleItems(character, dismentleItems, returningGold, returningItems, returningCurrencies);
+            GameInstance.ServerLogHandlers.LogDismentleItems(character, dismentleItems);
             return true;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
@@ -959,7 +959,7 @@ namespace MultiplayerARPG
             character.IncreaseItems(returningItems);
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
-            GameInstance.ServerLogHandlers.LogDismentleItems(character, dismentleItems, returningGold, returningItems, returningCurrencies);
+            GameInstance.ServerLogHandlers.LogDismentleItems(character, dismentleItems);
             return true;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
@@ -1105,6 +1105,9 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            // Prepare data for logging
+            nonEquipItem = character.NonEquipItems[index].Clone(false);
+
             // Remove item from inventory
             character.DecreaseItemsByIndex(index, amount, true);
             character.FillEmptySlots();
@@ -1113,6 +1116,8 @@ namespace MultiplayerARPG
             BaseItem item = nonEquipItem.GetItem();
             GameInstance.Singleton.GameplayRule.IncreaseCurrenciesWhenSellItem(character, item, amount);
             gameMessage = UITextKeys.NONE;
+
+            GameInstance.ServerLogHandlers.LogSellNpcItem(character, nonEquipItem, amount);
             return true;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;

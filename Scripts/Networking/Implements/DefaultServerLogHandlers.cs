@@ -40,6 +40,16 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogBuyNpcItem(IPlayerCharacterData character, NpcSellItem npcSellItem, int amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogBuyNpcItem(IPlayerCharacterData character, BaseItem item, int requireGold, IList<CurrencyAmount> requiredCurrencies)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogBuyVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData sellerCharacter, CharacterItem buyItem, int price)
         {
             throw new System.NotImplementedException();
@@ -55,7 +65,22 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogCraftItem(IPlayerCharacterData playerCharacter, ItemCraft itemCraft)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogCraftItem(IPlayerCharacterData playerCharacter, BaseItem craftedItem, int amount, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogDamageReceived(IPlayerCharacterData playerCharacter, HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems)
         {
             throw new System.NotImplementedException();
         }
@@ -90,6 +115,11 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, ItemRefineLevel itemRefineLevel, bool isReturning, ItemRefineFailReturning itemRefineFailReturning)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, bool isReturning, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies)
         {
             throw new System.NotImplementedException();
@@ -120,7 +150,17 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
+        public void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem returnEnhancerItem)
+        {
+            throw new System.NotImplementedException();
+        }
+
         public void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, BaseItem returnEnhancerItem)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, ItemRepairPrice itemRepairPrice)
         {
             throw new System.NotImplementedException();
         }
@@ -156,6 +196,16 @@ namespace MultiplayerARPG
         }
 
         public void LogRewardItem(IPlayerCharacterData character, RewardGivenType givenType, CharacterItem item)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogSellNpcItem(IPlayerCharacterData character, NpcSellItem npcSellItem, int amount)
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void LogSellNpcItem(IPlayerCharacterData character, CharacterItem characterItem, int amount)
         {
             throw new System.NotImplementedException();
         }

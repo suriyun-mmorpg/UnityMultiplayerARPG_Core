@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             }
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRepairItem(character, repairPrice);
-            GameInstance.ServerLogHandlers.LogRepair(character, repairingItem, repairPrice.RequireGold, repairPrice.RequireItems, repairPrice.RequireCurrencies);
+            GameInstance.ServerLogHandlers.LogRepair(character, repairingItem, repairPrice);
             return true;
         }
     }

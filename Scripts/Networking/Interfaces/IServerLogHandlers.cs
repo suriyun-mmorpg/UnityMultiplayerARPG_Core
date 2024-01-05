@@ -35,12 +35,12 @@ namespace MultiplayerARPG
         void LogDamageReceived(IPlayerCharacterData playerCharacter, HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime);
         void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker);
 
-        void LogCraftItem(IPlayerCharacterData playerCharacter, BaseItem craftedItem, int amount, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies);
-        void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies);
-        void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, bool isReturning, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies);
-        void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, int requireGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies);
+        void LogCraftItem(IPlayerCharacterData playerCharacter, ItemCraft itemCraft);
+        void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems);
+        void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, ItemRefineLevel itemRefineLevel, bool isReturning, ItemRefineFailReturning itemRefineFailReturning);
+        void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, ItemRepairPrice itemRepairPrice);
         void LogEnhanceSocketItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem enhancerItem);
-        void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, BaseItem returnEnhancerItem);
+        void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem returnEnhancerItem);
 
         void LogBuyVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData sellerCharacter, CharacterItem buyItem, int price);
         void LogSellVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData buyerCharacter, CharacterItem buyItem, int price);
@@ -53,5 +53,8 @@ namespace MultiplayerARPG
         void LogRewardExp(IPlayerCharacterData character, RewardGivenType givenType, int exp, bool isLevelUp);
         void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, Currency currency, int amount);
         void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, CharacterCurrency currency);
+
+        void LogBuyNpcItem(IPlayerCharacterData character, NpcSellItem npcSellItem, int amount);
+        void LogSellNpcItem(IPlayerCharacterData character, CharacterItem characterItem, int amount);
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -320,7 +321,7 @@ namespace MultiplayerARPG
             NpcSellItem sellItem = sellItems[index];
             if (!CurrentGameplayRule.CurrenciesEnoughToBuyItem(Entity, sellItem, amount))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS);
                 return;
             }
 
@@ -338,6 +339,8 @@ namespace MultiplayerARPG
             // Add item to inventory
             Entity.IncreaseItems(CharacterItem.Create(dataId, 1, amount), characterItem => Entity.OnRewardItem(RewardGivenType.NpcShop, characterItem));
             Entity.FillEmptySlots();
+
+            GameInstance.ServerLogHandlers.LogBuyNpcItem(Entity, sellItem, amount);
 #endif
         }
 
