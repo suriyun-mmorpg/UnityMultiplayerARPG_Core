@@ -112,7 +112,7 @@ namespace MultiplayerARPG
 
         public float GetDistance()
         {
-            float dist = GetDamageInfo().GetDistance();
+            float dist = GetDamageInfo()?.GetDistance() ?? 0f;
             if (startAttackDistance > 0 && startAttackDistance < dist)
                 dist = startAttackDistance;
             return dist;
@@ -120,12 +120,12 @@ namespace MultiplayerARPG
 
         public float GetFov()
         {
-            return GetDamageInfo().GetFov();
+            return GetDamageInfo()?.GetFov() ?? 0f;
         }
 
         public Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
-            return GetDamageInfo().GetDamageTransform(attacker, isLeftHand);
+            return GetDamageInfo()?.GetDamageTransform(attacker, isLeftHand) ?? null;
         }
 
         public void LaunchDamageEntity(
@@ -149,7 +149,7 @@ namespace MultiplayerARPG
             if (attacker.IsServer && attacker.IsDead())
                 return;
 
-            GetDamageInfo().LaunchDamageEntity(
+            GetDamageInfo()?.LaunchDamageEntity(
                 attacker,
                 isLeftHand,
                 weapon,
@@ -177,12 +177,12 @@ namespace MultiplayerARPG
 
         public void PrepareRelatesData()
         {
-            GetDamageInfo().PrepareRelatesData();
+            GetDamageInfo()?.PrepareRelatesData();
         }
 
         public bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox)
         {
-            return GetDamageInfo().IsHitValid(hitValidateData, hitData, hitBox);
+            return GetDamageInfo()?.IsHitValid(hitValidateData, hitData, hitBox) ?? false;
         }
     }
 
