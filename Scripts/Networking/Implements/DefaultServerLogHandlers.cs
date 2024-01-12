@@ -7,252 +7,252 @@ namespace MultiplayerARPG
     {
         public void LogAttackEnd(IPlayerCharacterData playerCharacter, int simulateSeed)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogAttackInterrupt(IPlayerCharacterData playerCharacter, int simulateSeed)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogAttackStart(IPlayerCharacterData playerCharacter, int simulateSeed, float[] triggerDurations, byte fireSpread, bool isLeftHand, CharacterItem weapon)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogAttackTrigger(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogAttackTriggerFail(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex, ActionTriggerFailReasons reason)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogBuffApply(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogBuffRemove(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff, BuffRemoveReasons reason)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogBuyNpcItem(IPlayerCharacterData character, NpcSellItem npcSellItem, int amount)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogBuyNpcItem(IPlayerCharacterData character, BaseItem item, int requireGold, IList<CurrencyAmount> requiredCurrencies)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogBuyVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData sellerCharacter, CharacterItem buyItem, int price)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogChargeEnd(IPlayerCharacterData playerCharacter, bool willDoActionWhenStopCharging)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogChargeStart(IPlayerCharacterData playerCharacter)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogCraftItem(IPlayerCharacterData playerCharacter, ItemCraft itemCraft)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogCraftItem(IPlayerCharacterData playerCharacter, BaseItem craftedItem, int amount, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogDamageReceived(IPlayerCharacterData playerCharacter, HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogEnhanceSocketItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem enhancerItem)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogEnterGame(IPlayerCharacterData playerCharacter)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogExchangeDealingItemsAndGold(IPlayerCharacterData playerCharacter, IPlayerCharacterData dealingCharacter, int dealingGold, IList<CharacterItem> dealingItems)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogExitGame(IPlayerCharacterData playerCharacter)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogQuestAbandon(IPlayerCharacterData character, Quest quest)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogQuestAccept(IPlayerCharacterData character, Quest quest)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogQuestComplete(IPlayerCharacterData character, Quest quest, byte selectedRewardIndex)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, ItemRefineLevel itemRefineLevel, bool isReturning, ItemRefineFailReturning itemRefineFailReturning)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, bool isReturning, int returnGold, IList<ItemAmount> returnItems, IList<CurrencyAmount> returnCurrencies)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogReloadEnd(IPlayerCharacterData playerCharacter)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogReloadInterrupt(IPlayerCharacterData playerCharacter)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogReloadStart(IPlayerCharacterData playerCharacter, float[] triggerDurations)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogReloadTrigger(IPlayerCharacterData playerCharacter, byte triggerIndex)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogReloadTriggerFail(IPlayerCharacterData playerCharacter, byte triggerIndex, ActionTriggerFailReasons reason)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem returnEnhancerItem)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, int requiredGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies, BaseItem returnEnhancerItem)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, ItemRepairPrice itemRepairPrice)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, int requireGold, IList<ItemAmount> requiredItems, IList<CurrencyAmount> requiredCurrencies)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, Currency currency, int amount)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, CharacterCurrency currency)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRewardExp(IPlayerCharacterData character, RewardGivenType givenType, int exp, bool isLevelUp)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRewardGold(IPlayerCharacterData character, RewardGivenType givenType, int gold)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRewardItem(IPlayerCharacterData character, RewardGivenType givenType, BaseItem item, int amount)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogRewardItem(IPlayerCharacterData character, RewardGivenType givenType, CharacterItem item)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogSellNpcItem(IPlayerCharacterData character, NpcSellItem npcSellItem, int amount)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogSellNpcItem(IPlayerCharacterData character, CharacterItem characterItem, int amount)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogSellVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData buyerCharacter, CharacterItem buyItem, int price)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogUseSkillEnd(IPlayerCharacterData playerCharacter, int simulateSeed)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogUseSkillInterrupt(IPlayerCharacterData playerCharacter, int simulateSeed)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogUseSkillStart(IPlayerCharacterData playerCharacter, int simulateSeed, float[] triggerDurations, byte fireSpread, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogUseSkillTrigger(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
 
         public void LogUseSkillTriggerFail(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex, ActionTriggerFailReasons reason)
         {
-            throw new System.NotImplementedException();
+            // NOTE: Intended to do nothing
         }
     }
 }
