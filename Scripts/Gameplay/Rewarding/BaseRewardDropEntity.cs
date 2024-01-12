@@ -93,20 +93,21 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void EntityStart()
+        public virtual void Init()
         {
-            base.EntityStart();
+            _isPickedUp = false;
+            _dropTime = Time.unscaledTime;
+        }
+
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            amount.onChange += OnAmountChange;
             if (IsServer && IsSceneObject)
             {
                 // Init just once when started, if this entity is scene object
                 Init();
             }
-        }
-
-        public virtual void Init()
-        {
-            _isPickedUp = false;
-            _dropTime = Time.unscaledTime;
         }
 
         protected override void SetupNetElements()
@@ -122,12 +123,6 @@ namespace MultiplayerARPG
             SpawnPrefab = spawnPrefab;
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
-        }
-
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            amount.onChange += OnAmountChange;
         }
 
         protected override void EntityOnDestroy()

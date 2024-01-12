@@ -166,16 +166,6 @@ namespace MultiplayerARPG
             ModelContainer.gameObject.SetActive(false);
         }
 
-        protected override void EntityStart()
-        {
-            base.EntityStart();
-            if (IsServer && IsSceneObject)
-            {
-                // Init just once when started, if this entity is scene object
-                Init();
-            }
-        }
-
         protected override void EntityOnDisable()
         {
             base.EntityOnDisable();
@@ -208,6 +198,17 @@ namespace MultiplayerARPG
             };
         }
 
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            itemDropData.onChange += OnItemDropDataChange;
+            if (IsServer && IsSceneObject)
+            {
+                // Init just once when started, if this entity is scene object
+                Init();
+            }
+        }
+
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
@@ -221,12 +222,6 @@ namespace MultiplayerARPG
             SpawnPrefab = spawnPrefab;
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
-        }
-
-        public override void OnSetup()
-        {
-            base.OnSetup();
-            itemDropData.onChange += OnItemDropDataChange;
         }
 
         protected override void EntityOnDestroy()
@@ -402,7 +397,6 @@ namespace MultiplayerARPG
                 message = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 return false;
             }
-
             characterEntity.IncreaseItems(DropItems, characterItem => characterEntity.OnRewardItem(GivenType, characterItem));
             characterEntity.FillEmptySlots();
             PickedUp();
