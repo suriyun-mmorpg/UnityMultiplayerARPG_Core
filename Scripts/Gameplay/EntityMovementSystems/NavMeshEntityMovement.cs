@@ -217,12 +217,28 @@ namespace MultiplayerARPG
             return false;
         }
 
+        protected float GetPathRemainingDistance()
+        {
+            if (CacheNavMeshAgent.pathPending ||
+                CacheNavMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid ||
+                CacheNavMeshAgent.path.corners.Length == 0)
+                return -1f;
+
+            float distance = 0.0f;
+            for (int i = 0; i < CacheNavMeshAgent.path.corners.Length - 1; ++i)
+            {
+                distance += Vector3.Distance(CacheNavMeshAgent.path.corners[i], CacheNavMeshAgent.path.corners[i + 1]);
+            }
+
+            return distance;
+        }
+
         public override void EntityUpdate()
         {
             Profiler.BeginSample("NavMeshEntityMovement - Update");
             CacheNavMeshAgent.speed = Entity.GetMoveSpeed();
             float deltaTime = Time.deltaTime;
-            bool isStationary = !CacheNavMeshAgent.isOnNavMesh || CacheNavMeshAgent.isStopped || CacheNavMeshAgent.remainingDistance <= CacheNavMeshAgent.stoppingDistance;
+            bool isStationary = !CacheNavMeshAgent.isOnNavMesh || CacheNavMeshAgent.isStopped || GetPathRemainingDistance() <= CacheNavMeshAgent.stoppingDistance;
             if (CanPredictMovement())
             {
                 CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
@@ -302,7 +318,10 @@ namespace MultiplayerARPG
             if (CacheNavMeshAgent.isOnNavMesh)
             {
                 CacheNavMeshAgent.isStopped = false;
-                CacheNavMeshAgent.SetDestination(position);
+
+                NavMeshPath path = new NavMeshPath();
+                NavMesh.CalculatePath(transform.position, position, CacheNavMeshAgent.areaMask, path);
+                CacheNavMeshAgent.SetPath(path);
             }
         }
 
