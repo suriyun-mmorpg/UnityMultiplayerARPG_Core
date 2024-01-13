@@ -31,8 +31,8 @@ namespace MultiplayerARPG
             _joystick.transform.localPosition = UICharacterHotkey.transform.localPosition;
             _joystick.axisXName = _hotkeyAxisNameX = HOTKEY_AXIS_X + "_" + UICharacterHotkey.hotkeyId;
             _joystick.axisYName = _hotkeyAxisNameY = HOTKEY_AXIS_Y + "_" + UICharacterHotkey.hotkeyId;
-            _joystick.SetAsLastSiblingOnDrag = true;
-            _joystick.HideWhileIdle = true;
+            _joystick.setAsLastSiblingOnDrag = true;
+            _joystick.hideWhileIdle = true;
             _joystick.Interactable = true;
             UICharacterHotkeys.RegisterHotkeyJoystick(this);
             _hotkeyCancelArea = UICharacterHotkey.UICharacterHotkeys.hotkeyCancelArea;
