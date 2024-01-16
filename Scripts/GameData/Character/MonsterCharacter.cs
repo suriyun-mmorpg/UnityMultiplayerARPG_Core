@@ -59,7 +59,7 @@ namespace MultiplayerARPG
 
         [Category(4, "Attacking")]
         [SerializeField]
-        private DamageInfo damageInfo = default;
+        private DamageInfo damageInfo = new DamageInfo();
         public DamageInfo DamageInfo { get { return damageInfo; } }
         [SerializeField]
         private DamageIncremental damageAmount = default;

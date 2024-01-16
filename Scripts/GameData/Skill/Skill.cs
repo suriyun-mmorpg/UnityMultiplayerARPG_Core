@@ -33,7 +33,7 @@ namespace MultiplayerARPG
 
         [Category(3, "Attacking")]
         public SkillAttackType skillAttackType;
-        public DamageInfo damageInfo;
+        public DamageInfo damageInfo = new DamageInfo();
         public DamageIncremental damageAmount;
         public DamageEffectivenessAttribute[] effectivenessAttributes;
         public DamageInflictionIncremental[] weaponDamageInflictions;

@@ -13,7 +13,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public struct DamageInfo : IDamageInfo
+    public class DamageInfo : IDamageInfo
     {
         public DamageType damageType;
 
