@@ -105,6 +105,7 @@ namespace MultiplayerARPG
                     break;
                 actions[i].Invoke();
             }
+            System.Array.Clear(actions, 0, actions.Length);
         }
 
         public bool IsReachedMaxRandomStatsAmount()
@@ -593,6 +594,7 @@ namespace MultiplayerARPG
                     break;
                 actions[i].Invoke();
             }
+            System.Array.Clear(actions, 0, actions.Length);
             if (GameExtensionInstance.onRandomCharacterStats != null)
                 GameExtensionInstance.onRandomCharacterStats(random, _randomBonus, isRate, ref tempStats, ref _appliedAmount);
             if (isRate)
