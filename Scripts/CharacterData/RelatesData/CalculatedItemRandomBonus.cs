@@ -4,6 +4,7 @@ namespace MultiplayerARPG
 {
     public class CalculatedItemRandomBonus
     {
+        private static readonly List<System.Action> s_randomActions = new List<System.Action>(32);
         private static readonly List<int> s_randomIndexes = new List<int>();
         private IEquipmentItem _item;
         private int _level;
@@ -81,31 +82,28 @@ namespace MultiplayerARPG
 
             _randomBonus = item.RandomBonus;
             System.Random random = new System.Random(_randomSeed);
-            int size = 8;
-            if (version > 0)
-                size = 10;
-            System.Action[] actions = new System.Action[size];
-            actions[0] = () => RandomAttributeAmounts(random);
-            actions[1] = () => RandomAttributeAmountRates(random);
-            actions[2] = () => RandomResistanceAmounts(random);
-            actions[3] = () => RandomArmorAmounts(random);
-            actions[4] = () => RandomDamageAmounts(random);
-            actions[5] = () => RandomSkillLevels(random);
-            actions[6] = () => RandomCharacterStats(random, false);
-            actions[7] = () => RandomCharacterStats(random, true);
+            s_randomActions.Clear();
+            s_randomActions.Add(() => RandomAttributeAmounts(random));
+            s_randomActions.Add(() => RandomAttributeAmountRates(random));
+            s_randomActions.Add(() => RandomResistanceAmounts(random));
+            s_randomActions.Add(() => RandomArmorAmounts(random));
+            s_randomActions.Add(() => RandomDamageAmounts(random));
+            s_randomActions.Add(() => RandomSkillLevels(random));
+            s_randomActions.Add(() => RandomCharacterStats(random, false));
+            s_randomActions.Add(() => RandomCharacterStats(random, true));
             if (version > 0)
             {
-                actions[8] = () => RandomArmorAmountRates(random);
-                actions[9] = () => RandomDamageAmountRates(random);
+                s_randomActions.Add(() => RandomArmorAmountRates(random));
+                s_randomActions.Add(() => RandomDamageAmountRates(random));
             }
-            actions.Shuffle(random);
-            for (int i = 0; i < actions.Length; ++i)
+            s_randomActions.Shuffle(random);
+            for (int i = 0; i < s_randomActions.Count; ++i)
             {
                 if (IsReachedMaxRandomStatsAmount())
                     break;
-                actions[i].Invoke();
+                s_randomActions[i].Invoke();
             }
-            System.Array.Clear(actions, 0, actions.Length);
+            s_randomActions.Clear();
         }
 
         public bool IsReachedMaxRandomStatsAmount()
@@ -556,45 +554,45 @@ namespace MultiplayerARPG
         {
             CharacterStats tempStats = isRate ? _cacheIncreaseStatsRate : _cacheIncreaseStats;
             RandomCharacterStats randomStats = isRate ? _randomBonus.randomCharacterStatsRate : _randomBonus.randomCharacterStats;
-            System.Action[] actions = new System.Action[29];
-            actions[0] = () => RandomCharacterStatsHp(random, randomStats, ref tempStats);
-            actions[1] = () => RandomCharacterStatsHpRecovery(random, randomStats, ref tempStats);
-            actions[2] = () => RandomCharacterStatsHpLeechRate(random, randomStats, ref tempStats);
-            actions[3] = () => RandomCharacterStatsMp(random, randomStats, ref tempStats);
-            actions[4] = () => RandomCharacterStatsMpRecovery(random, randomStats, ref tempStats);
-            actions[5] = () => RandomCharacterStatsMpLeechRate(random, randomStats, ref tempStats);
-            actions[6] = () => RandomCharacterStatsStamina(random, randomStats, ref tempStats);
-            actions[7] = () => RandomCharacterStatsStaminaRecovery(random, randomStats, ref tempStats);
-            actions[8] = () => RandomCharacterStatsStaminaLeechRate(random, randomStats, ref tempStats);
-            actions[9] = () => RandomCharacterStatsFood(random, randomStats, ref tempStats);
-            actions[10] = () => RandomCharacterStatsWater(random, randomStats, ref tempStats);
-            actions[11] = () => RandomCharacterStatsAccuracy(random, randomStats, ref tempStats);
-            actions[12] = () => RandomCharacterStatsEvasion(random, randomStats, ref tempStats);
-            actions[13] = () => RandomCharacterStatsCriRate(random, randomStats, ref tempStats);
-            actions[14] = () => RandomCharacterStatsCriDmgRate(random, randomStats, ref tempStats);
-            actions[15] = () => RandomCharacterStatsBlockRate(random, randomStats, ref tempStats);
-            actions[16] = () => RandomCharacterStatsBlockDmgRate(random, randomStats, ref tempStats);
-            actions[17] = () => RandomCharacterStatsMoveSpeed(random, randomStats, ref tempStats);
-            actions[18] = () => RandomCharacterStatsAtkSpeed(random, randomStats, ref tempStats);
-            actions[19] = () => RandomCharacterStatsWeightLimit(random, randomStats, ref tempStats);
-            actions[20] = () => RandomCharacterStatsSlotLimit(random, randomStats, ref tempStats);
-            actions[21] = () => RandomCharacterStatsGoldRate(random, randomStats, ref tempStats);
-            actions[22] = () => RandomCharacterStatsExpRate(random, randomStats, ref tempStats);
-            actions[23] = () => RandomCharacterStatsItemDropRate(random, randomStats, ref tempStats);
-            actions[24] = () => RandomCharacterStatsJumpHeight(random, randomStats, ref tempStats);
-            actions[25] = () => RandomCharacterStatsHeadDamageAbsorbs(random, randomStats, ref tempStats);
-            actions[26] = () => RandomCharacterStatsBodyDamageAbsorbs(random, randomStats, ref tempStats);
-            actions[27] = () => RandomCharacterStatsFallDamageAbsorbs(random, randomStats, ref tempStats);
-            actions[28] = () => RandomCharacterStatsGravityRate(random, randomStats, ref tempStats);
+            s_randomActions.Clear();
+            s_randomActions.Add(() => RandomCharacterStatsHp(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsHpRecovery(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsHpLeechRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsMp(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsMpRecovery(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsMpLeechRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsStamina(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsStaminaRecovery(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsStaminaLeechRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsFood(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsWater(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsAccuracy(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsEvasion(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsCriRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsCriDmgRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsBlockRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsBlockDmgRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsMoveSpeed(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsAtkSpeed(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsWeightLimit(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsSlotLimit(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsGoldRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsExpRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsItemDropRate(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsJumpHeight(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsHeadDamageAbsorbs(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsBodyDamageAbsorbs(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsFallDamageAbsorbs(random, randomStats, ref tempStats));
+            s_randomActions.Add(() => RandomCharacterStatsGravityRate(random, randomStats, ref tempStats));
             if (_version > 0)
-                actions.Shuffle(random);
-            for (int i = 0; i < actions.Length; ++i)
+                s_randomActions.Shuffle(random);
+            for (int i = 0; i < s_randomActions.Count; ++i)
             {
                 if (IsReachedMaxRandomStatsAmount())
                     break;
-                actions[i].Invoke();
+                s_randomActions[i].Invoke();
             }
-            System.Array.Clear(actions, 0, actions.Length);
+            s_randomActions.Clear();
             if (GameExtensionInstance.onRandomCharacterStats != null)
                 GameExtensionInstance.onRandomCharacterStats(random, _randomBonus, isRate, ref tempStats, ref _appliedAmount);
             if (isRate)
