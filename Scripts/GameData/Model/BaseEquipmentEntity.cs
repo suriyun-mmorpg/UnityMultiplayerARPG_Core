@@ -13,23 +13,23 @@ namespace MultiplayerARPG
         public BaseCharacterModel CharacterModel { get; set; }
         public string EquipPosition { get; set; }
 
-        private int level;
+        private int _level;
         public int Level
         {
-            get { return level; }
+            get { return _level; }
             set
             {
-                if (level != value)
+                if (_level != value)
                 {
-                    level = value;
-                    OnLevelChanged(level);
+                    _level = value;
+                    OnLevelChanged(_level);
                 }
             }
         }
 
         [Header("Effects")]
         [Tooltip("These game effects must placed as this children, it will be activated when launch (can place muzzle effects here)")]
-        public GameEffect[] weaponLaunchEffects;
+        public GameEffect[] weaponLaunchEffects = new GameEffect[0];
         [Tooltip("These game effects prefabs will instantiates to container when launch (can place muzzle effects here)")]
         public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
@@ -95,11 +95,15 @@ namespace MultiplayerARPG
             if (!gameObject.activeInHierarchy)
                 return;
 
-            if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
-                weaponLaunchEffects[Random.Range(0, weaponLaunchEffects.Length)].Play();
+            // Play effects at clients only
+            if (BaseGameNetworkManager.Singleton.IsClientConnected)
+            {
+                if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
+                    weaponLaunchEffects[Random.Range(0, weaponLaunchEffects.Length)].Play();
 
-            if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
-                poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
+                if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
+                    poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
+            }
 
             onPlayLaunch.Invoke();
         }
