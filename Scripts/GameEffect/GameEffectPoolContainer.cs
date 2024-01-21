@@ -10,6 +10,8 @@ namespace MultiplayerARPG
 
         public void GetInstance()
         {
+            if (Application.isBatchMode)
+                return;
             PoolSystem.GetInstance(prefab, container.position, container.rotation).FollowingTarget = container;
         }
     }

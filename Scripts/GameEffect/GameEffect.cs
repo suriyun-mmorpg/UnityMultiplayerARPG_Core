@@ -141,7 +141,11 @@ namespace MultiplayerARPG
         public virtual void Play()
         {
             if (!BaseGameNetworkManager.Singleton.IsClientConnected)
+            {
+                // Will be destroyed in next frame
+                _destroyTime = Time.time;
                 return;
+            }
 
             if (!gameObject.activeSelf)
                 gameObject.SetActive(true);

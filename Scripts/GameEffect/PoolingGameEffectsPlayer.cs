@@ -25,6 +25,8 @@ namespace MultiplayerARPG
 
         public void PlayRandomEffect()
         {
+            if (Application.isBatchMode)
+                return;
             if (poolingGameEffects != null && poolingGameEffects.Length > 0)
                 poolingGameEffects[Random.Range(0, poolingGameEffects.Length)].GetInstance();
         }

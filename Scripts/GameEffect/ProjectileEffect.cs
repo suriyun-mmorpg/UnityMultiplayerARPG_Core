@@ -61,7 +61,7 @@ namespace MultiplayerARPG
         {
             this.speed = speed;
             lifeTime = distance / speed;
-            if (lifeTime <= 0f)
+            if (!BaseGameNetworkManager.Singleton.IsClientConnected || lifeTime <= 0f)
             {
                 PushBack();
                 return;
@@ -102,11 +102,15 @@ namespace MultiplayerARPG
 
         public virtual void PlayFx()
         {
+            if (Application.isBatchMode)
+                return;
+
             if (!gameObject.activeInHierarchy)
             {
                 _playFxOnEnable = true;
                 return;
             }
+
             FxCollection.Play();
             _playFxOnEnable = false;
         }
