@@ -155,7 +155,7 @@ namespace MultiplayerARPG
             }
 
             DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
-            if (!hitValidateData.DamageInfo.IsHitValid(hitValidateData, hitData, hitBox))
+            if (hitValidateData.DamageInfo != null && !hitValidateData.DamageInfo.IsHitValid(hitValidateData, hitData, hitBox))
             {
                 // Not valid
                 return false;
