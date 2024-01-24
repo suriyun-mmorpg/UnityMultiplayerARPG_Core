@@ -82,8 +82,9 @@ namespace MultiplayerARPG
                 for (int i = 0; i < playerCharacter.EquipItems.Count; ++i)
                 {
                     equippedItem = playerCharacter.EquipItems[i];
+                    IArmorItem armorItem = equippedItem.GetArmorItem();
                     // If equipped item is same armor type, find which slot it is equipped
-                    if (equippedItem.GetArmorItem().ArmorType == equippingArmorItem.ArmorType)
+                    if (armorItem != null && armorItem.ArmorType == equippingArmorItem.ArmorType)
                         equippedSlots[equippedItem.equipSlotIndex] = true;
                 }
                 // Find free slot
