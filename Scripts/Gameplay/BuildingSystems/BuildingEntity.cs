@@ -434,6 +434,8 @@ namespace MultiplayerARPG
 
         public bool CanRepairByMenu()
         {
+            if (CacheRepairs.Count <= 0)
+                return false;
             return _repairDataForMenu.HasValue;
         }
 
