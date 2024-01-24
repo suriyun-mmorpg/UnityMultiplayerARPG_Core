@@ -56,8 +56,7 @@ namespace MultiplayerARPG
         public UnityEvent onPartyMemberKicked = new UnityEvent();
         public UnityEvent onGuildMemberKicked = new UnityEvent();
 
-        private string dirtyCharacterId;
-        private IPlayerCharacterData characterEntity;
+        private IPlayerCharacterData _characterEntity;
 
         protected override void OnDisable()
         {
@@ -123,18 +122,18 @@ namespace MultiplayerARPG
             if (uiPlayerTitle != null)
                 uiPlayerTitle.SetDataByDataId(Data.titleDataId);
 
-            if (dirtyCharacterId != Data.id)
+            if (_characterEntity == null || _characterEntity.Id != Data.id)
             {
-                dirtyCharacterId = Data.id;
-                GameInstance.ClientCharacterHandlers.TryGetSubscribedPlayerCharacterById(Data.id, out characterEntity);
+                // Try looking for the character entity
+                GameInstance.ClientCharacterHandlers.TryGetSubscribedPlayerCharacterById(Data.id, out _characterEntity);
             }
 
             // Buffs
             if (uiCharacterBuffs != null)
             {
-                if (characterEntity != null)
+                if (_characterEntity != null)
                 {
-                    uiCharacterBuffs.UpdateData(characterEntity);
+                    uiCharacterBuffs.UpdateData(_characterEntity);
                     uiCharacterBuffs.Show();
                 }
                 else
