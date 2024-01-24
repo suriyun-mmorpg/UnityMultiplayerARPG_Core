@@ -95,6 +95,11 @@ namespace MultiplayerARPG
             // NOTE: Intended to do nothing
         }
 
+        public void LogEnterChat(ChatMessage chatMessage)
+        {
+            // NOTE: Intended to do nothing
+        }
+
         public void LogEnterGame(IPlayerCharacterData playerCharacter)
         {
             // NOTE: Intended to do nothing
@@ -105,7 +110,7 @@ namespace MultiplayerARPG
             // NOTE: Intended to do nothing
         }
 
-        public void LogExitGame(IPlayerCharacterData playerCharacter)
+        public void LogExitGame(string characterId, string userId)
         {
             // NOTE: Intended to do nothing
         }

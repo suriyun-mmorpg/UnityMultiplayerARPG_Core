@@ -6,7 +6,9 @@ namespace MultiplayerARPG
     public partial interface IServerLogHandlers
     {
         void LogEnterGame(IPlayerCharacterData playerCharacter);
-        void LogExitGame(IPlayerCharacterData playerCharacter);
+        void LogExitGame(string characterId, string userId);
+
+        void LogEnterChat(ChatMessage chatMessage);
 
         void LogAttackStart(IPlayerCharacterData playerCharacter, int simulateSeed, float[] triggerDurations, byte fireSpread, bool isLeftHand, CharacterItem weapon);
         void LogAttackTrigger(IPlayerCharacterData playerCharacter, int simulateSeed, byte triggerIndex);

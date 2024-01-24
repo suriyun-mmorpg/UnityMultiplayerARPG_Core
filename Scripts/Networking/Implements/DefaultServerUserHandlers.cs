@@ -68,17 +68,21 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool RemovePlayerCharacter(long connectionId)
+        public bool RemovePlayerCharacter(long connectionId, out string characterId, out string userId)
         {
             IPlayerCharacterData playerCharacter;
             if (PlayerCharacters.TryRemove(connectionId, out playerCharacter))
             {
-                PlayerCharactersById.TryRemove(playerCharacter.Id, out _);
-                PlayerCharactersByUserId.TryRemove(playerCharacter.UserId, out _);
+                characterId = playerCharacter.Id;
+                userId = playerCharacter.UserId;
+                PlayerCharactersById.TryRemove(characterId, out _);
+                PlayerCharactersByUserId.TryRemove(userId, out _);
                 PlayerCharactersByName.TryRemove(playerCharacter.CharacterName, out _);
-                PlayerCharacterConnectionIds.TryRemove(playerCharacter.Id, out _);
+                PlayerCharacterConnectionIds.TryRemove(characterId, out _);
                 return true;
             }
+            characterId = null;
+            userId = null;
             return false;
         }
 
@@ -107,9 +111,9 @@ namespace MultiplayerARPG
             return UserIds.TryAdd(connectionId, userId);
         }
 
-        public bool RemoveUserId(long connectionId)
+        public bool RemoveUserId(long connectionId, out string userId)
         {
-            return UserIds.TryRemove(connectionId, out _);
+            return UserIds.TryRemove(connectionId, out userId);
         }
 
         public virtual void BanUserByCharacterName(string characterName, int days)

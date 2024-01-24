@@ -76,10 +76,22 @@ namespace MultiplayerARPG
         public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
         public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish;
         // Other events
+        /// <summary>
+        /// ConnectionID, PlayerCharacterEntity
+        /// </summary>
         public System.Action<long, BasePlayerCharacterEntity> onRegisterCharacter;
-        public System.Action<long> onUnregisterCharacter;
+        /// <summary>
+        /// ConnectionID, CharacterID, UserID
+        /// </summary>
+        public System.Action<long, string, string> onUnregisterCharacter;
+        /// <summary>
+        /// ConnectionID, UserID
+        /// </summary>
         public System.Action<long, string> onRegisterUser;
-        public System.Action<long> onUnregisterUser;
+        /// <summary>
+        /// ConnectionID, UserID
+        /// </summary>
+        public System.Action<long, string> onUnregisterUser;
         // Private variables
         protected float _updateOnlineCharactersCountDown;
         protected float _updateTimeOfDayCountDown;
@@ -686,7 +698,10 @@ namespace MultiplayerARPG
                 return;
             }
             if (message.channel != ChatChannel.System || ServerChatHandlers.CanSendSystemAnnounce(message.senderName))
+            {
                 ServerChatHandlers.OnChatMessage(message);
+                ServerLogHandlers.LogEnterChat(message);
+            }
         }
 
         protected void HandleClientEntityStateAtServer(MessageHandlerData messageHandler)
@@ -994,30 +1009,37 @@ namespace MultiplayerARPG
         public virtual void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacter)
         {
             bool success = ServerUserHandlers.AddPlayerCharacter(connectionId, playerCharacter);
-            if (success && onRegisterCharacter != null)
-                onRegisterCharacter.Invoke(connectionId, playerCharacter);
+            if (success)
+            {
+                ServerLogHandlers.LogEnterGame(playerCharacter);
+                onRegisterCharacter?.Invoke(connectionId, playerCharacter);
+            }
         }
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
         {
             ServerStorageHandlers.CloseStorage(connectionId).Forget();
-            bool success = ServerUserHandlers.RemovePlayerCharacter(connectionId);
-            if (success && onUnregisterCharacter != null)
-                onUnregisterCharacter.Invoke(connectionId);
+            bool success = ServerUserHandlers.RemovePlayerCharacter(connectionId, out string characterId, out string userId);
+            if (success)
+            {
+                if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out IPlayerCharacterData playerCharacter))
+                    ServerLogHandlers.LogExitGame(characterId, userId);
+                onUnregisterCharacter?.Invoke(connectionId, characterId, userId);
+            }
         }
 
         public virtual void RegisterUserId(long connectionId, string userId)
         {
             bool success = ServerUserHandlers.AddUserId(connectionId, userId);
-            if (success && onRegisterUser != null)
-                onRegisterUser.Invoke(connectionId, userId);
+            if (success)
+                onRegisterUser?.Invoke(connectionId, userId);
         }
 
         public virtual void UnregisterUserId(long connectionId)
         {
-            bool success = ServerUserHandlers.RemoveUserId(connectionId);
-            if (success && onUnregisterUser != null)
-                onUnregisterUser.Invoke(connectionId);
+            bool success = ServerUserHandlers.RemoveUserId(connectionId, out string userId);
+            if (success)
+                onUnregisterUser?.Invoke(connectionId, userId);
         }
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)

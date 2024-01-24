@@ -70,8 +70,10 @@ namespace MultiplayerARPG
         /// Remove character from server's collection
         /// </summary>
         /// <param name="connectionId"></param>
+        /// <param name="characterId"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        bool RemovePlayerCharacter(long connectionId);
+        bool RemovePlayerCharacter(long connectionId, out string characterId, out string userId);
 
         /// <summary>
         /// Clear server's collection (and other relates variables)
@@ -109,8 +111,9 @@ namespace MultiplayerARPG
         /// Remove user id from server's collection
         /// </summary>
         /// <param name="connectionId"></param>
+        /// <param name="userId"></param>
         /// <returns></returns>
-        bool RemoveUserId(long connectionId);
+        bool RemoveUserId(long connectionId, out string userId);
 
         /// <summary>
         /// Ban user who own character which its name = `characterName`
