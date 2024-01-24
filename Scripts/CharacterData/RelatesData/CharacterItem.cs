@@ -214,6 +214,11 @@ namespace MultiplayerARPG
             return GetEquipmentItem() == null ? 0f : GetEquipmentItem().MaxDurability;
         }
 
+        public bool GetDestroyIfBroken()
+        {
+            return GetEquipmentItem() == null ? false : GetEquipmentItem().DestroyIfBroken;
+        }
+
         public bool IsFull()
         {
             return amount == GetMaxStack();
@@ -320,6 +325,27 @@ namespace MultiplayerARPG
                 _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed, version);
             }
             return _cacheBuff;
+        }
+
+        public void UpdateDurability(ICharacterData characterData, float amount)
+        {
+            float oldDurability = durability;
+            float max = GetMaxDurability();
+            bool destroying = false;
+            durability += amount;
+            if (durability > max)
+                durability = max;
+            if (durability <= 0)
+            {
+                durability = 0;
+                if (GetDestroyIfBroken())
+                    destroying = true;
+            }
+            if (characterData is IPlayerCharacterData playerCharacterData)
+            {
+                // Will write log messages only if character is player character
+                GameInstance.ServerLogHandlers.LogItemDurabilityChanged(playerCharacterData, this, oldDurability, durability, destroying);
+            }
         }
 
         public static CharacterItem Create(BaseItem item, int level = 1, int amount = 1, int? randomSeed = null)

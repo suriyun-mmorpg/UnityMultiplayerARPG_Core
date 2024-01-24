@@ -350,6 +350,7 @@ namespace MultiplayerARPG
                 characterAtttribute.amount += amount;
                 characterData.Attributes[index] = characterAtttribute;
             }
+            GameInstance.ServerLogHandlers.LogAddAttribute(characterData, attribute, amount, characterAtttribute);
             return true;
         }
 
@@ -376,6 +377,7 @@ namespace MultiplayerARPG
                 characterData.Attributes.RemoveAt(i);
             }
             characterData.StatPoint += countStatPoint;
+            GameInstance.ServerLogHandlers.LogResetAttributes(characterData);
             return true;
         }
 
@@ -419,6 +421,7 @@ namespace MultiplayerARPG
                 characterSkill.level += level;
                 characterData.Skills[index] = characterSkill;
             }
+            GameInstance.ServerLogHandlers.LogAddSkill(characterData, skill, level, characterSkill);
             return true;
         }
 
@@ -448,6 +451,7 @@ namespace MultiplayerARPG
                 characterData.Skills.RemoveAt(i);
             }
             characterData.SkillPoint += countSkillPoint;
+            GameInstance.ServerLogHandlers.LogResetSkills(characterData);
             return true;
         }
 

@@ -43,6 +43,7 @@ namespace MultiplayerARPG
         void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, ItemRepairPrice itemRepairPrice);
         void LogEnhanceSocketItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem enhancerItem);
         void LogRemoveEnhancerFromItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem returnEnhancerItem);
+        void LogItemDurabilityChanged(IPlayerCharacterData playerCharacter, CharacterItem item, float oldDurability, float newDurability, bool destroyed);
 
         void LogBuyVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData sellerCharacter, CharacterItem buyItem, int price);
         void LogSellVendingItem(IPlayerCharacterData playerCharacter, IPlayerCharacterData buyerCharacter, CharacterItem buyItem, int price);
@@ -55,6 +56,10 @@ namespace MultiplayerARPG
         void LogRewardExp(IPlayerCharacterData character, RewardGivenType givenType, int exp, bool isLevelUp);
         void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, Currency currency, int amount);
         void LogRewardCurrency(IPlayerCharacterData character, RewardGivenType givenType, CharacterCurrency currency);
+        void LogAddAttribute(IPlayerCharacterData character, Attribute which, int howMuch, CharacterAttribute result);
+        void LogResetAttributes(IPlayerCharacterData character);
+        void LogAddSkill(IPlayerCharacterData character, BaseSkill which, int howMuch, CharacterSkill result);
+        void LogResetSkills(IPlayerCharacterData character);
 
         void LogBuyNpcItem(IPlayerCharacterData character, NpcSellItem npcSellItem, int amount);
         void LogSellNpcItem(IPlayerCharacterData character, CharacterItem characterItem, int amount);

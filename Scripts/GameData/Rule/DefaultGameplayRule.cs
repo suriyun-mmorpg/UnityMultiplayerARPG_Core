@@ -893,7 +893,7 @@ namespace MultiplayerARPG
             CharacterItem leftHand = equipWeapons.leftHand;
             if (rightHand.GetWeaponItem() != null && rightHand.GetMaxDurability() > 0)
             {
-                rightHand = DecreaseDurability(rightHand, decreaseDurability, out tempDestroy);
+                rightHand = DecreaseDurability(entity, rightHand, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     equipWeapons.rightHand = CharacterItem.Empty;
                 else
@@ -901,7 +901,7 @@ namespace MultiplayerARPG
             }
             if (leftHand.GetWeaponItem() != null && leftHand.GetMaxDurability() > 0)
             {
-                leftHand = DecreaseDurability(leftHand, decreaseDurability, out tempDestroy);
+                leftHand = DecreaseDurability(entity, leftHand, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     equipWeapons.leftHand = CharacterItem.Empty;
                 else
@@ -918,7 +918,7 @@ namespace MultiplayerARPG
             CharacterItem leftHand = equipWeapons.leftHand;
             if (rightHand.GetShieldItem() != null && rightHand.GetMaxDurability() > 0)
             {
-                rightHand = DecreaseDurability(rightHand, decreaseDurability, out tempDestroy);
+                rightHand = DecreaseDurability(entity, rightHand, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     equipWeapons.rightHand = CharacterItem.Empty;
                 else
@@ -926,7 +926,7 @@ namespace MultiplayerARPG
             }
             if (leftHand.GetShieldItem() != null && leftHand.GetMaxDurability() > 0)
             {
-                leftHand = DecreaseDurability(leftHand, decreaseDurability, out tempDestroy);
+                leftHand = DecreaseDurability(entity, leftHand, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     equipWeapons.leftHand = CharacterItem.Empty;
                 else
@@ -944,7 +944,7 @@ namespace MultiplayerARPG
                 CharacterItem equipItem = entity.EquipItems[i];
                 if (equipItem.GetMaxDurability() <= 0)
                     continue;
-                equipItem = DecreaseDurability(equipItem, decreaseDurability, out tempDestroy);
+                equipItem = DecreaseDurability(entity, equipItem, decreaseDurability, out tempDestroy);
                 if (tempDestroy)
                     entity.EquipItems.RemoveAt(i);
                 else
@@ -952,7 +952,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private CharacterItem DecreaseDurability(CharacterItem characterItem, float decreaseDurability, out bool destroy)
+        private CharacterItem DecreaseDurability(BaseCharacterEntity entity, CharacterItem characterItem, float decreaseDurability, out bool destroy)
         {
             destroy = false;
             IEquipmentItem item = characterItem.GetEquipmentItem();
@@ -960,9 +960,7 @@ namespace MultiplayerARPG
             {
                 if (characterItem.durability - decreaseDurability <= 0 && item.DestroyIfBroken)
                     destroy = true;
-                characterItem.durability -= decreaseDurability;
-                if (characterItem.durability < 0)
-                    characterItem.durability = 0;
+                characterItem.UpdateDurability(entity, -decreaseDurability);
             }
             return characterItem;
         }
