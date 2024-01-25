@@ -1,5 +1,4 @@
-﻿using LiteNetLibManager;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -26,18 +25,13 @@ namespace MultiplayerARPG
         {
             UpdateOwningCharacterData();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onRecached += UpdateOwningCharacterData;
         }
 
         protected virtual void OnDisable()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-        }
-
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            UpdateOwningCharacterData();
+            GameInstance.PlayingCharacterEntity.onRecached -= UpdateOwningCharacterData;
         }
 
         public void UpdateOwningCharacterData()
