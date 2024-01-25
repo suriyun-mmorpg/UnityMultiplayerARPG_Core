@@ -162,8 +162,7 @@ namespace MultiplayerARPG
             if (CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
-                if (!HasNavPaths)
-                    Direction2D = (Vector2)(rotation * Vector3.forward);
+                Direction2D = (Vector2)(rotation * Vector3.forward);
             }
         }
 
