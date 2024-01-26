@@ -326,6 +326,10 @@ namespace MultiplayerARPG
             else
                 _airborneElapsed += deltaTime;
 
+            // Underwater state, movement state must be setup here to make it able to calculate move speed properly
+            if (_isUnderWater)
+                _tempMovementState |= MovementState.IsUnderWater;
+
             if (HasNavPaths)
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
@@ -365,6 +369,7 @@ namespace MultiplayerARPG
                 StopMove();
                 ApplyRemoteTurnAngle();
             }
+
             if ((IsOwnerClientOrOwnedByServer || (HasNavPaths && !_simulatingKeyMovement)) && _lookRotationApplied && _moveDirection.sqrMagnitude > 0f)
             {
                 // Turn character by move direction
@@ -603,14 +608,12 @@ namespace MultiplayerARPG
             if (CanPredictMovement())
             {
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
-                if (_isUnderWater)
-                    _tempMovementState |= MovementState.IsUnderWater;
                 if (_isGrounded || _airborneElapsed < airborneDelay || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
                     _tempMovementState |= MovementState.IsGrounded;
                 // Update movement state
                 MovementState = _tempMovementState;
                 // Update extra movement state
-                ExtraMovementState = Entity.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
+                ExtraMovementState = _tempExtraMovementState;
                 if (_sendingJump)
                     ExtraMovementState = _extraMovementStateWhenJump;
             }
