@@ -1763,9 +1763,9 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.ModelManager.SetIsFps(viewMode == ShooterControllerViewMode.Fps);
         }
 
-        public virtual bool IsInFront(Vector3 position)
+        public virtual bool IsInFront(Vector3 target)
         {
-            return Vector3.Angle(_cameraForward, position - EntityTransform.position) < 115f;
+            return Vector3.Dot(_cameraForward, target - EntityTransform.position) > 0.5f;
         }
 
         public override void ConfirmBuild()
