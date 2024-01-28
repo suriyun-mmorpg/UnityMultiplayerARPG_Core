@@ -24,17 +24,22 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponRight:
                 case InventoryType.EquipItems:
                     if (!playerCharacter.SwapStorageItemWithEquipmentItem(storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, equipSlotIndexOrWeaponSet, out gameMessage))
+                    {
+                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
+                    }
                     break;
                 default:
                     if (storageItems[storageItemIndex].IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     if (storageItems[storageItemIndex].amount < storageItemAmount)
                     {
                         gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     CharacterItem movingItem = storageItems[storageItemIndex];
@@ -48,6 +53,7 @@ namespace MultiplayerARPG
                         if (isOverwhelming || !playerCharacter.IncreaseItems(movingItem))
                         {
                             gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
+                            GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                             return false;
                         }
                         // Remove from storage
@@ -74,6 +80,7 @@ namespace MultiplayerARPG
                                 if (nonEquipItem.GetItem().RestrictDealing)
                                 {
                                     gameMessage = UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED;
+                                    GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                                     return false;
                                 }
                             }
@@ -89,6 +96,7 @@ namespace MultiplayerARPG
             storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
             playerCharacter.FillEmptySlots();
             gameMessage = UITextKeys.NONE;
+            GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, true, gameMessage);
             return true;
         }
 
@@ -121,6 +129,7 @@ namespace MultiplayerARPG
                     if (equipWeapons.leftHand.IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     movingItem = equipWeapons.leftHand.Clone(true);
@@ -129,6 +138,7 @@ namespace MultiplayerARPG
                     if (equipWeapons.rightHand.IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     movingItem = equipWeapons.rightHand.Clone(true);
@@ -137,11 +147,13 @@ namespace MultiplayerARPG
                     if (inventoryItemIndex < 0 || inventoryItemIndex >= playerCharacter.EquipItems.Count)
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     if (playerCharacter.EquipItems[inventoryItemIndex].IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     movingItem = playerCharacter.EquipItems[inventoryItemIndex].Clone(true);
@@ -150,16 +162,19 @@ namespace MultiplayerARPG
                     if (inventoryItemIndex < 0 || inventoryItemIndex >= playerCharacter.NonEquipItems.Count)
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     if (playerCharacter.NonEquipItems[inventoryItemIndex].IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                        GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     if (playerCharacter.NonEquipItems[inventoryItemIndex].amount < inventoryItemAmount)
                     {
                         gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                        GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     movingItem = playerCharacter.NonEquipItems[inventoryItemIndex].Clone(true);
@@ -173,6 +188,7 @@ namespace MultiplayerARPG
                 if (movingItem.GetItem().RestrictDealing)
                 {
                     gameMessage = UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED;
+                    GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                     return false;
                 }
             }
@@ -192,6 +208,7 @@ namespace MultiplayerARPG
                         if (isOverwhelming || !storageItems.IncreaseItems(movingItem))
                         {
                             gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
+                            GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                             return false;
                         }
                         // Remove from inventory
@@ -214,7 +231,10 @@ namespace MultiplayerARPG
                     {
                         // Swapping
                         if (!playerCharacter.SwapStorageItemWithEquipmentItem(storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, equipSlotIndexOrWeaponSet, out gameMessage))
+                        {
+                            GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                             return false;
+                        }
                     }
                     break;
                 default:
@@ -228,6 +248,7 @@ namespace MultiplayerARPG
                         if (isOverwhelming || !storageItems.IncreaseItems(movingItem))
                         {
                             gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
+                            GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                             return false;
                         }
                         // Remove from inventory
@@ -257,6 +278,7 @@ namespace MultiplayerARPG
             storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
             playerCharacter.FillEmptySlots();
             gameMessage = UITextKeys.NONE;
+            GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, true, gameMessage);
             return true;
         }
 
@@ -411,6 +433,57 @@ namespace MultiplayerARPG
                     gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
                     return false;
             }
+        }
+
+        public static bool SwapOrMergeStorageItem(
+            this IPlayerCharacterData playerCharacter,
+            StorageId storageId,
+            bool storageIsLimitSlot,
+            int storageSlotLimit,
+            IList<CharacterItem> storageItems,
+            int fromIndex,
+            int toIndex,
+            out UITextKeys gameMessage)
+        {
+            CharacterItem fromItem = storageItems[fromIndex];
+            CharacterItem toItem = storageItems[toIndex];
+            if (fromIndex < 0 || fromIndex >= storageItems.Count ||
+                toIndex < 0 || toIndex >= storageItems.Count)
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+                GameInstance.ServerLogHandlers.LogSwapOrMergeStorageItem(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, fromIndex, toIndex, false, gameMessage);
+                return false;
+            }
+
+            if (fromItem.dataId == toItem.dataId && !fromItem.IsFull() && !toItem.IsFull() && fromItem.level == toItem.level)
+            {
+                // Merge if same id and not full
+                int maxStack = toItem.GetMaxStack();
+                if (toItem.amount + fromItem.amount <= maxStack)
+                {
+                    toItem.amount += fromItem.amount;
+                    storageItems[fromIndex] = CharacterItem.Empty;
+                    storageItems[toIndex] = toItem;
+                }
+                else
+                {
+                    int remains = toItem.amount + fromItem.amount - maxStack;
+                    toItem.amount = maxStack;
+                    fromItem.amount = remains;
+                    storageItems[fromIndex] = fromItem;
+                    storageItems[toIndex] = toItem;
+                }
+            }
+            else
+            {
+                // Swap
+                storageItems[fromIndex] = toItem;
+                storageItems[toIndex] = fromItem;
+            }
+            storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
+            gameMessage = UITextKeys.NONE;
+            GameInstance.ServerLogHandlers.LogSwapOrMergeStorageItem(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, fromIndex, toIndex, true, gameMessage);
+            return true;
         }
 
         public static bool CanEquipWeapon(this ICharacterData character, CharacterItem equippingItem, byte equipWeaponSet, bool isLeftHand, out UITextKeys gameMessage, out bool shouldUnequipRightHand, out bool shouldUnequipLeftHand)
