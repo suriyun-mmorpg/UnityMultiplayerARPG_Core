@@ -220,7 +220,7 @@ namespace MultiplayerARPG
             syncPassengerIds[seatIndex] = gameEntity.ObjectId;
         }
 
-        public bool RemovePassenger(byte seatIndex)
+        public virtual bool RemovePassenger(byte seatIndex)
         {
             if (!IsServer)
                 return false;
