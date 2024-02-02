@@ -49,30 +49,15 @@ namespace MultiplayerARPG
         }
         public IBaseActivatableEntity BaseActivatableEntity
         {
-            get
-            {
-                if (DamageableEntity is IBaseActivatableEntity)
-                    return DamageableEntity as IBaseActivatableEntity;
-                return null;
-            }
+            get { return DamageableEntity as IBaseActivatableEntity; }
         }
         public IActivatableEntity ActivatableEntity
         {
-            get
-            {
-                if (DamageableEntity is IActivatableEntity)
-                    return DamageableEntity as IActivatableEntity;
-                return null;
-            }
+            get { return DamageableEntity as IActivatableEntity; }
         }
         public IHoldActivatableEntity HoldActivatableEntity
         {
-            get
-            {
-                if (DamageableEntity is IHoldActivatableEntity)
-                    return DamageableEntity as IHoldActivatableEntity;
-                return null;
-            }
+            get { return DamageableEntity as IHoldActivatableEntity; }
         }
         public bool IsImmune
         {
