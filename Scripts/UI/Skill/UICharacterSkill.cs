@@ -75,10 +75,12 @@ namespace MultiplayerARPG
         public UIBuff uiSkillDebuff;
 
         [Header("Events")]
-        public UnityEvent onSetLevelZeroData;
-        public UnityEvent onSetNonLevelZeroData;
-        public UnityEvent onAbleToLevelUp;
-        public UnityEvent onUnableToLevelUp;
+        public UnityEvent onSetLevelZeroData = new UnityEvent();
+        public UnityEvent onSetNonLevelZeroData = new UnityEvent();
+        public UnityEvent onAbleToLevelUp = new UnityEvent();
+        public UnityEvent onUnableToLevelUp = new UnityEvent();
+        public UnityEvent onAbleToUse = new UnityEvent();
+        public UnityEvent onUnableToUse = new UnityEvent();
 
         [Header("Options")]
         [Tooltip("UIs set here will be cloned by this UI")]
@@ -87,6 +89,8 @@ namespace MultiplayerARPG
 
         protected float _coolDownRemainsDuration;
         protected bool _dirtyIsCountDown;
+        protected bool _dirtyAbleToLevelUp;
+        protected bool _dirtyAbleToUse;
 
         protected override void OnDisable()
         {
@@ -174,10 +178,26 @@ namespace MultiplayerARPG
             IPlayerCharacterData targetPlayer = Character as IPlayerCharacterData;
             if (targetPlayer == null)
                 targetPlayer = GameInstance.PlayingCharacter;
-            if (targetPlayer != null && Skill != null && Skill.CanLevelUp(targetPlayer, CharacterSkill.level, out _))
-                onAbleToLevelUp.Invoke();
-            else
-                onUnableToLevelUp.Invoke();
+
+            bool ableToLevelUp = targetPlayer != null && Skill != null && Skill.CanLevelUp(targetPlayer, CharacterSkill.level, out _);
+            if (_dirtyAbleToLevelUp != ableToLevelUp)
+            {
+                _dirtyAbleToLevelUp = ableToLevelUp;
+                if (ableToLevelUp)
+                    onAbleToLevelUp.Invoke();
+                else
+                    onUnableToLevelUp.Invoke();
+            }
+
+            bool ableToUse = targetPlayer != null && Skill != null && Skill.IsActive && CharacterSkill.level > 0;
+            if (_dirtyAbleToUse != ableToUse)
+            {
+                _dirtyAbleToUse = ableToUse;
+                if (ableToUse)
+                    onAbleToUse.Invoke();
+                else
+                    onUnableToUse.Invoke();
+            }
         }
 
         protected override void UpdateData()
