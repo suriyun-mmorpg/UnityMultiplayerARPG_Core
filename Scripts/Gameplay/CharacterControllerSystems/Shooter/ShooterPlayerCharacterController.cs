@@ -1763,9 +1763,18 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.ModelManager.SetIsFps(viewMode == ShooterControllerViewMode.Fps);
         }
 
-        public virtual bool IsInFront(Vector3 position)
+        public virtual bool IsInFront(Vector3 target)
         {
-            return Vector3.Angle(_cameraForward, position - EntityTransform.position) < 115f;
+            // Get aim position direction
+            AimPosition aimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref _isLeftHandAttacking, target);
+            switch (aimPosition.type)
+            {
+                case AimPositionType.Direction:
+                    // Check that the direction is in front of character or not
+                    return Vector3.Angle(aimPosition.direction, EntityTransform.forward) < 115f;
+            }
+            // 2D mode?
+            return true;
         }
 
         public override void ConfirmBuild()
