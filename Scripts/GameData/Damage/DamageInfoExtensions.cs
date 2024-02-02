@@ -28,7 +28,7 @@ namespace MultiplayerARPG
                 // NOTE: Allow aim position type `None` here, may change it later
                 Transform damageTransform = damageInfo.GetDamageTransform(attacker, isLeftHand);
                 position = damageTransform.position;
-                GetDamageRotation3D(attacker.transform.forward, position, aimPosition.position, stagger, out rotation);
+                GetDamageRotation3D(position, aimPosition.position, stagger, out rotation);
                 direction = rotation * Vector3.forward;
             }
 #if UNITY_EDITOR
@@ -41,15 +41,9 @@ namespace MultiplayerARPG
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(aimDirection.y, aimDirection.x) * (180 / Mathf.PI)) + 90);
         }
 
-        public static void GetDamageRotation3D(Vector3 entityForward, Vector3 origin, Vector3 target, Vector3 stagger, out Quaternion rotation)
+        public static void GetDamageRotation3D(Vector3 damagePosition, Vector3 aimPosition, Vector3 stagger, out Quaternion rotation)
         {
-            Vector3 direction = target - origin;
-            if (Vector3.Dot(entityForward, direction) < 0.5f)
-            {
-                // Not in front of character, so set direction to character forward
-                direction = entityForward;
-            }
-            rotation = Quaternion.Euler(Quaternion.LookRotation(direction).eulerAngles + stagger);
+            rotation = Quaternion.Euler(Quaternion.LookRotation(aimPosition - damagePosition).eulerAngles + stagger);
         }
     }
 }
