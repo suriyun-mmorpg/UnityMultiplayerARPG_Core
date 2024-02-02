@@ -607,13 +607,16 @@ namespace MultiplayerARPG
         {
             if (CanPredictMovement())
             {
+                // Re-setup movement state here to make sure it is correct
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
+                if (_isUnderWater)
+                    _tempMovementState |= MovementState.IsUnderWater;
                 if (_isGrounded || _airborneElapsed < airborneDelay || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
                     _tempMovementState |= MovementState.IsGrounded;
                 // Update movement state
                 MovementState = _tempMovementState;
                 // Update extra movement state
-                ExtraMovementState = _tempExtraMovementState;
+                ExtraMovementState = Entity.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
                 if (_sendingJump)
                     ExtraMovementState = _extraMovementStateWhenJump;
             }
