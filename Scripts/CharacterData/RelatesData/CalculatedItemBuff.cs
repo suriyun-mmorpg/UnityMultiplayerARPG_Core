@@ -51,6 +51,7 @@ namespace MultiplayerARPG
             _cacheIncreaseSkills = null;
             _cacheIncreaseStatusEffectResistances.Clear();
             _cacheIncreaseStatusEffectResistances = null;
+            _cacheRandomBonus = null;
         }
 
         public void Clear()
