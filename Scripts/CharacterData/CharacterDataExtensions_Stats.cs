@@ -507,9 +507,9 @@ namespace MultiplayerARPG
             bool isCalculateStats = onGetStats != null || onGetIncreasingStats != null || onGetIncreasingStatsRate != null;
             bool isCalculateResistances = onGetResistances != null || onGetIncreasingResistances != null;
             bool isCalculateArmors = onGetArmors != null || onGetIncreasingArmors != null || onGetIncreasingArmorsRate != null;
-            bool isCalculateSkills = onGetSkills != null || onGetIncreasingSkills != null || isCalculateDamages;
             bool isCalculateAttributes = onGetAttributes != null || onGetIncreasingAttributes != null || onGetIncreasingAttributesRate != null || isCalculateDamages || isCalculateStats || isCalculateResistances || isCalculateArmors;
             bool isCalculateStatusEffectResistances = onGetStatusEffectResistances != null || onGetIncreasingStatusEffectResistances != null;
+            bool isCalculateSkills = onGetSkills != null || onGetIncreasingSkills != null || isCalculateDamages || isCalculateStats || isCalculateResistances || isCalculateArmors || isCalculateAttributes || isCalculateStatusEffectResistances;
 
             // Prepare result stats, by using character's base stats
             // For weapons it will be based on equipped weapons
