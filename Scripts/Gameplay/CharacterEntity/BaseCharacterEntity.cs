@@ -161,7 +161,7 @@ namespace MultiplayerARPG
         public int MaxStamina { get { return CachedData.MaxStamina; } }
         public int MaxFood { get { return CachedData.MaxFood; } }
         public int MaxWater { get { return CachedData.MaxWater; } }
-        public override float MoveAnimationSpeedMultiplier { get { return CachedData.BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState, ExtraMovementState.None) / CachedData.BaseMoveSpeed : 1f; } }
+        public override float MoveAnimationSpeedMultiplier { get { return CachedData.BaseMoveSpeed > 0f ? GetMoveSpeed(MovementState & ~MovementState.IsUnderWater, ExtraMovementState.None) / CachedData.BaseMoveSpeed : 1f; } }
         public override bool MuteFootstepSound { get { return CachedData.MuteFootstepSound; } }
         public abstract int DataId { get; set; }
 
