@@ -209,7 +209,7 @@ namespace MultiplayerARPG
             Dictionary<string, EquipmentModel> storingModels,
             HashSet<string> unequippingSockets)
         {
-            characterModel.SetupEquippingModels(showingModels, storingModels, unequippingSockets, options[_currentModelIndex].models, CreateFakeItemDataId(), 1, CreateFakeEquipPosition(), false, 0, OnShowEquipmentModel);
+            characterModel.SetupEquippingModels(showingModels, storingModels, unequippingSockets, options[_currentModelIndex].models, CreateFakeEquipPosition(), CreateFakeCharacterItem(), false, 0, OnShowEquipmentModel);
         }
 
         private void OnPublicIntsOperation(LiteNetLibSyncList.Operation op, int index)
@@ -259,6 +259,15 @@ namespace MultiplayerARPG
         public string CreateFakeEquipPosition()
         {
             return string.Concat("_BODY_PART_", modelSettingId);
+        }
+
+        public CharacterItem CreateFakeCharacterItem()
+        {
+            return new CharacterItem()
+            {
+                dataId = CreateFakeItemDataId(),
+                level = 1,
+            };
         }
 
         public int GetHashedModelSettingId()

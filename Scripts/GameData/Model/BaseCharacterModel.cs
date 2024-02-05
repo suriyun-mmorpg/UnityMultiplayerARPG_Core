@@ -414,7 +414,7 @@ namespace MultiplayerARPG
                     IArmorItem armorItem = equipItem.GetArmorItem();
                     if (armorItem == null)
                         continue;
-                    SetupEquippingModels(showingModels, storingModels, unequippingSockets, armorItem.EquipmentModels, equipItem.dataId, equipItem.level, armorItem.GetEquipPosition());
+                    SetupEquippingModels(showingModels, storingModels, unequippingSockets, armorItem.EquipmentModels, armorItem.GetEquipPosition(), equipItem);
                 }
             }
 
@@ -441,11 +441,11 @@ namespace MultiplayerARPG
             IEquipmentItem rightHandItem = equipWeapons.GetRightHandEquipmentItem();
             IEquipmentItem leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
             if (rightHandItem != null && rightHandItem.IsWeapon())
-                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).EquipmentModels, equipWeapons.rightHand.dataId, equipWeapons.rightHand.level, GameDataConst.EQUIP_POSITION_RIGHT_HAND);
+                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).EquipmentModels, GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeapons.rightHand);
             if (leftHandItem != null && leftHandItem.IsWeapon())
-                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandEquipmentModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandEquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
             if (leftHandItem != null && leftHandItem.IsShield())
-                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, GameDataConst.EQUIP_POSITION_LEFT_HAND);
+                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
 
             if (SelectableWeaponSets != null && SelectableWeaponSets.Count > 0)
             {
@@ -457,11 +457,11 @@ namespace MultiplayerARPG
                         rightHandItem = equipWeapons.GetRightHandEquipmentItem();
                         leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
                         if (rightHandItem != null && rightHandItem.IsWeapon())
-                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).SheathModels, equipWeapons.rightHand.dataId, equipWeapons.rightHand.level, ZString.Concat(GameDataConst.EQUIP_POSITION_RIGHT_HAND, "_", i), true, i);
+                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_RIGHT_HAND, "_", i), equipWeapons.rightHand, true, i);
                         if (leftHandItem != null && leftHandItem.IsWeapon())
-                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandSheathModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), true, i);
+                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandSheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
                         if (leftHandItem != null && leftHandItem.IsShield())
-                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).SheathModels, equipWeapons.leftHand.dataId, equipWeapons.leftHand.level, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), true, i);
+                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
                     }
                 }
             }
@@ -549,7 +549,7 @@ namespace MultiplayerARPG
                 {
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     if (tempEquipmentEntity != null)
-                        tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.itemLevel);
+                        tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.item);
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
                         CacheRightHandEquipmentEntity = tempEquipmentEntity;
                     if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
@@ -579,7 +579,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, int itemDataId, int itemLevel, string equipPosition, bool isSheathModels = false, byte equipWeaponSet = 0, EquipmentModelDelegate onInstantiated = null)
+        public void SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, string equipPosition, CharacterItem item, bool isSheathModels = false, byte equipWeaponSet = 0, EquipmentModelDelegate onInstantiated = null)
         {
             if (equipmentModels == null || equipmentModels.Length == 0 || string.IsNullOrWhiteSpace(equipPosition))
                 return;
@@ -605,7 +605,7 @@ namespace MultiplayerARPG
                         CacheEquipmentModelContainers[equipSocket] = CacheEquipmentModelContainers[tempModel.equipSocket];
                 }
 
-                if (!storingModels.TryGetValue(equipSocket, out EquipmentModel storedModel) || storedModel.priority < tempModel.priority || (storedModel.equipPosition == equipPosition && storedModel.itemLevel < itemLevel))
+                if (!storingModels.TryGetValue(equipSocket, out EquipmentModel storedModel) || storedModel.priority < tempModel.priority || (storedModel.equipPosition == equipPosition && storedModel.item.level < item.level))
                 {
                     if (isSheathModels && tempModel.useSpecificSheathEquipWeaponSet && tempModel.specificSheathEquipWeaponSet != equipWeaponSet)
                     {
@@ -614,8 +614,8 @@ namespace MultiplayerARPG
                     }
 
                     if (EquippedModels.TryGetValue(equipSocket, out EquipmentModel equippedModel)
-                        && equippedModel.itemDataId == itemDataId
-                        && equippedModel.itemLevel == itemLevel
+                        && equippedModel.item.dataId == item.dataId
+                        && equippedModel.item.level == item.level
                         && equippedModel.priority == tempModel.priority)
                     {
                         // Same view data, so don't destroy and don't instantiates this model object
@@ -627,9 +627,8 @@ namespace MultiplayerARPG
 
                     EquipmentModel clonedModel = tempModel.Clone();
                     clonedModel.indexOfModel = i;
-                    clonedModel.itemDataId = itemDataId;
-                    clonedModel.itemLevel = itemLevel;
                     clonedModel.equipPosition = equipPosition;
+                    clonedModel.item = item;
                     clonedModel.onInstantiated = onInstantiated;
                     showingModels[equipSocket] = clonedModel;
                     storingModels[equipSocket] = clonedModel;

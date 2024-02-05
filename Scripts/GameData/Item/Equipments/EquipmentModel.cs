@@ -44,11 +44,9 @@ namespace MultiplayerARPG
         [HideInInspector]
         public int indexOfModel = -1;
         [HideInInspector]
-        public int itemDataId;
-        [HideInInspector]
-        public int itemLevel;
-        [HideInInspector]
         public string equipPosition;
+        [HideInInspector]
+        public CharacterItem item;
         [HideInInspector]
         public EquipmentModelDelegate onInstantiated;
         #endregion
@@ -77,9 +75,8 @@ namespace MultiplayerARPG
                 specificSheathEquipWeaponSet = specificSheathEquipWeaponSet,
                 // Runtime only data
                 indexOfModel = indexOfModel,
-                itemDataId = itemDataId,
-                itemLevel = itemLevel,
                 equipPosition = equipPosition,
+                item = item,
                 onInstantiated = onInstantiated,
             };
         }

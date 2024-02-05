@@ -13,16 +13,16 @@ namespace MultiplayerARPG
         public BaseCharacterModel CharacterModel { get; set; }
         public string EquipPosition { get; set; }
 
-        private int _level;
-        public int Level
+        private CharacterItem _item;
+        public CharacterItem Item
         {
-            get { return _level; }
+            get { return _item; }
             set
             {
-                if (_level != value)
+                if (_item != value)
                 {
-                    _level = value;
-                    OnLevelChanged(_level);
+                    _item = value;
+                    OnItemChanged(_item);
                 }
             }
         }
@@ -64,11 +64,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void Setup(BaseCharacterModel characterModel, string equipPosition, int level)
+        public virtual void Setup(BaseCharacterModel characterModel, string equipPosition, CharacterItem item)
         {
             CharacterModel = characterModel;
             EquipPosition = equipPosition;
-            Level = level;
+            Item = item;
             onSetup.Invoke();
         }
 
@@ -153,6 +153,6 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public abstract void OnLevelChanged(int level);
+        public abstract void OnItemChanged(CharacterItem item);
     }
 }
