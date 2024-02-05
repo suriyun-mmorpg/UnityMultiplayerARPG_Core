@@ -96,18 +96,37 @@ namespace MultiplayerARPG
         protected float _updateOnlineCharactersCountDown;
         protected float _updateTimeOfDayCountDown;
         protected float _serverSceneLoadedTime;
+        protected float _clientSceneLoadedTime;
         protected HashSet<BaseGameEntity> _setOfGameEntity = new HashSet<BaseGameEntity>();
         protected BaseGameEntity[] _arrayGameEntity = new BaseGameEntity[4096];
         protected int _arrayGameEntityLength = 0;
+
         // Instantiate object allowing status
-        protected Dictionary<string, bool> _readyToInstantiateObjectsStates = new Dictionary<string, bool>();
-        protected bool _isReadyToInstantiateObjects;
-        protected bool _isReadyToInstantiatePlayers;
+        /// <summary>
+        /// For backward compatibility, should use `_serverReadyToInstantiateObjectsStates` instead.
+        /// </summary>
+        protected Dictionary<string, bool> _readyToInstantiateObjectsStates { get { return _serverReadyToInstantiateObjectsStates; } set { _serverReadyToInstantiateObjectsStates = value; } }
+        protected Dictionary<string, bool> _serverReadyToInstantiateObjectsStates = new Dictionary<string, bool>();
+        protected Dictionary<string, bool> _clientReadyToInstantiateObjectsStates = new Dictionary<string, bool>();
+
+        /// <summary>
+        /// For backward compatibility, should use `_isServerReadyToInstantiateObjects` instead.
+        /// </summary>
+        protected bool _isReadyToInstantiateObjects { get { return _isServerReadyToInstantiateObjects; } set { _isServerReadyToInstantiateObjects = value; } }
+        protected bool _isServerReadyToInstantiateObjects;
+        protected bool _isClientReadyToInstantiateObjects;
+
+        /// <summary>
+        /// For backward compatibility, should use `_isServerReadyToInstantiatePlayers` instead.
+        /// </summary>
+        protected bool _isReadyToInstantiatePlayers { get { return _isServerReadyToInstantiatePlayers; } set { _isServerReadyToInstantiatePlayers = value; } }
+        protected bool _isServerReadyToInstantiatePlayers;
 
         protected override void Awake()
         {
             Singleton = this;
             doNotEnterGameOnConnect = false;
+            doNotReadyOnSceneLoaded = true;
             doNotDestroyOnSceneChanges = true;
             LagCompensationManager = gameObject.GetOrAddComponent<ILagCompensationManager, DefaultLagCompensationManager>();
             HitRegistrationManager = gameObject.GetOrAddComponent<IHitRegistrationManager, DefaultHitRegistrationManager>();
@@ -450,7 +469,9 @@ namespace MultiplayerARPG
             // Other components
             HitRegistrationManager.ClearData();
             CurrentMapInfo = null;
-            _isReadyToInstantiatePlayers = false;
+            _isServerReadyToInstantiateObjects = false;
+            _isClientReadyToInstantiateObjects = false;
+            _isServerReadyToInstantiatePlayers = false;
             _setOfGameEntity.Clear();
             _arrayGameEntityLength = 0;
             // Extensions
@@ -825,9 +846,11 @@ namespace MultiplayerARPG
             {
                 component.OnClientOnlineSceneLoaded(this);
             }
+            _clientSceneLoadedTime = Time.unscaledTime;
             // Server will register entities later, so don't register entities now
             if (!IsServer)
                 RegisterEntities();
+            ProceedUntilClientReady().Forget();
         }
 
         public override void OnServerOnlineSceneLoaded()
@@ -837,10 +860,10 @@ namespace MultiplayerARPG
             {
                 component.OnServerOnlineSceneLoaded(this);
             }
-            _readyToInstantiateObjectsStates.Clear();
-            _isReadyToInstantiateObjects = false;
-            _isReadyToInstantiatePlayers = false;
             _serverSceneLoadedTime = Time.unscaledTime;
+            _serverReadyToInstantiateObjectsStates.Clear();
+            _isServerReadyToInstantiateObjects = false;
+            _isServerReadyToInstantiatePlayers = false;
             SpawnEntities().Forget();
         }
 
@@ -848,15 +871,15 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            _readyToInstantiateObjectsStates.Clear();
-            _isReadyToInstantiateObjects = false;
-            _isReadyToInstantiatePlayers = false;
+            _serverReadyToInstantiateObjectsStates.Clear();
+            _isServerReadyToInstantiateObjects = false;
+            _isServerReadyToInstantiatePlayers = false;
             base.ServerSceneChange(sceneName);
         }
 
         protected virtual async UniTaskVoid SpawnEntities()
         {
-            while (!IsReadyToInstantiateObjects())
+            while (!IsServerReadyToInstantiateObjects())
             {
                 await UniTask.Yield();
             }
@@ -993,7 +1016,7 @@ namespace MultiplayerARPG
             progress = 1f;
             onSpawnEntitiesFinish.Invoke(sceneName, true, progress);
             await PostSpawnEntities();
-            _isReadyToInstantiatePlayers = true;
+            _isServerReadyToInstantiatePlayers = true;
         }
 
         protected virtual async UniTask PreSpawnEntities()
@@ -1004,6 +1027,58 @@ namespace MultiplayerARPG
         protected virtual async UniTask PostSpawnEntities()
         {
             await UniTask.Yield();
+        }
+
+        public bool IsServerReadyToInstantiateObjects()
+        {
+            if (!_isServerReadyToInstantiateObjects)
+            {
+                _serverReadyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - _serverSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;
+                // NOTE: Make it works with old version 
+                this.InvokeInstanceDevExtMethods("UpdateReadyToInstantiateObjectsStates", _serverReadyToInstantiateObjectsStates);
+                this.InvokeInstanceDevExtMethods("UpdateServerReadyToInstantiateObjectsStates", _serverReadyToInstantiateObjectsStates);
+                foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+                {
+                    component.UpdateReadyToInstantiateObjectsStates(this, _serverReadyToInstantiateObjectsStates);
+                    component.UpdateServerReadyToInstantiateObjectsStates(this, _serverReadyToInstantiateObjectsStates);
+                }
+                foreach (bool value in _serverReadyToInstantiateObjectsStates.Values)
+                {
+                    if (!value)
+                        return false;
+                }
+                _isServerReadyToInstantiateObjects = true;
+            }
+            return true;
+        }
+
+        protected virtual async UniTaskVoid ProceedUntilClientReady()
+        {
+            while (!IsClientReadyToInstantiateObjects())
+            {
+                await UniTask.Yield();
+            }
+            SendClientReady();
+        }
+
+        public bool IsClientReadyToInstantiateObjects()
+        {
+            if (!_isClientReadyToInstantiateObjects)
+            {
+                _clientReadyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - _clientSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;
+                this.InvokeInstanceDevExtMethods("UpdateClientReadyToInstantiateObjectsStates", _clientReadyToInstantiateObjectsStates);
+                foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+                {
+                    component.UpdateClientReadyToInstantiateObjectsStates(this, _clientReadyToInstantiateObjectsStates);
+                }
+                foreach (bool value in _clientReadyToInstantiateObjectsStates.Values)
+                {
+                    if (!value)
+                        return false;
+                }
+                _isClientReadyToInstantiateObjects = true;
+            }
+            return true;
         }
 
         public virtual void RegisterPlayerCharacter(long connectionId, BasePlayerCharacterEntity playerCharacter)
@@ -1138,26 +1213,6 @@ namespace MultiplayerARPG
             {
                 timeOfDay = CurrentGameInstance.DayNightTimeUpdater.TimeOfDay,
             });
-        }
-
-        public bool IsReadyToInstantiateObjects()
-        {
-            if (!_isReadyToInstantiateObjects)
-            {
-                _readyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - _serverSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;
-                this.InvokeInstanceDevExtMethods("UpdateReadyToInstantiateObjectsStates", _readyToInstantiateObjectsStates);
-                foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
-                {
-                    component.UpdateReadyToInstantiateObjectsStates(this, _readyToInstantiateObjectsStates);
-                }
-                foreach (bool value in _readyToInstantiateObjectsStates.Values)
-                {
-                    if (!value)
-                        return false;
-                }
-                _isReadyToInstantiateObjects = true;
-            }
-            return true;
         }
 
         public void ServerSendSystemAnnounce(string message)

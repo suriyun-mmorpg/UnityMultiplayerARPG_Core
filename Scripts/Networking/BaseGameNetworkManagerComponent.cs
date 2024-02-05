@@ -75,12 +75,33 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
-        /// This function will be called to update `readyToInstantiateObjectsStates`, if all `readyToInstantiateObjectsStates`'s values are `TRUE` the manager will determined that it is ready to instantiates objects (such as monster, harvestable and so on)
+        /// This one do the same thing with `UpdateServerReadyToInstantiateObjectsStates` but it will be called before that one, just having it for backward compatibility
+        /// </summary>
+        /// <param name="networkManager"></param>
+        /// <param name="serverReadyToInstantiateObjectsStates"></param>
+        public virtual void UpdateReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, Dictionary<string, bool> serverReadyToInstantiateObjectsStates)
+        {
+
+        }
+
+        /// <summary>
+        /// This function will be called to update `serverReadyToInstantiateObjectsStates`, if all `serverReadyToInstantiateObjectsStates`'s values are `TRUE` the manager will determined that it is ready to instantiates objects (such as monster, harvestable and so on)
         /// You may use it in case that your game have an "Procedural Map Generation" system, which have to be proceeded before instantiates objects.
         /// </summary>
         /// <param name="networkManager"></param>
-        /// <param name="readyToInstantiateObjectsStates"></param>
-        public virtual void UpdateReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, Dictionary<string, bool> readyToInstantiateObjectsStates)
+        /// <param name="serverReadyToInstantiateObjectsStates"></param>
+        public virtual void UpdateServerReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, Dictionary<string, bool> serverReadyToInstantiateObjectsStates)
+        {
+
+        }
+
+        /// <summary>
+        /// This function will be called to update `clientReadyToInstantiateObjectsStates`, if all `clientReadyToInstantiateObjectsStates`'s values are `TRUE` the manager will determined that it is ready to instantiates objects (such as monster, harvestable and so on)
+        /// You may use it in case that your game have an "Procedural Map Generation" system, which have to be proceeded before instantiates objects.
+        /// </summary>
+        /// <param name="networkManager"></param>
+        /// <param name="clientReadyToInstantiateObjectsStates"></param>
+        public virtual void UpdateClientReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, Dictionary<string, bool> serverReadyToInstantiateObjectsStates)
         {
 
         }

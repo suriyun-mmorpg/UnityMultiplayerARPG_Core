@@ -207,7 +207,7 @@ namespace MultiplayerARPG
         protected override void OnServerUpdate(LogicUpdater updater)
         {
             base.OnServerUpdate(updater);
-            if (_pendingSpawnPlayerCharacters.Count > 0 && _isReadyToInstantiatePlayers)
+            if (_pendingSpawnPlayerCharacters.Count > 0 && _isServerReadyToInstantiatePlayers)
             {
                 // Spawn pending player characters
                 LiteNetLibPlayer player;
@@ -247,7 +247,7 @@ namespace MultiplayerARPG
             List<CharacterBuff> playerSummonBuffs = reader.GetList<CharacterBuff>();
             List<CharacterItem> playerStorageItems = reader.GetList<CharacterItem>();
             ServerStorageHandlers.SetStorageItems(new StorageId(StorageType.Player, playerCharacterData.Id), playerStorageItems);
-            if (!_isReadyToInstantiatePlayers)
+            if (!_isServerReadyToInstantiatePlayers)
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
                 if (LogDev) Logging.Log(LogTag, "Not ready to deserializing client ready extra");
