@@ -202,7 +202,7 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            UpdateMovement(Time.deltaTime);
+            UpdateMovement(Time.fixedDeltaTime);
             if (CanPredictMovement())
             {
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
