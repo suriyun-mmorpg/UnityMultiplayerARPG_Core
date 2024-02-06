@@ -36,5 +36,5 @@
 	url = https://github.com/insthync/unity-rest-client.git
 [submodule "SharedData"]
 	path = SharedData
-	url = ../UnityMultiplayerARPG_SharedData.git
+	url = https://github.com/suriyun-mmorpg/UnityMultiplayerARPG_SharedData.git
 	branch = litenetlib
