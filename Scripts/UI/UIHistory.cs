@@ -1,12 +1,31 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class UIHistory : MonoBehaviour
 {
+    /// <summary>
+    /// args: Which UI?, Is First UI?
+    /// </summary>
+    [System.Serializable]
+    public class BackEvent : UnityEvent<UIBase, bool>
+    {
+    }
+
+    /// <summary>
+    /// args: Which UI?
+    /// </summary>
+    [System.Serializable]
+    public class NextEvent : UnityEvent<UIBase>
+    {
+    }
+
     public UIBase firstUI;
+    public BackEvent onBack = new BackEvent();
+    public NextEvent onNext = new NextEvent();
     protected readonly Stack<UIBase> _uiStack = new Stack<UIBase>();
 
-    private void Awake()
+    protected virtual void Awake()
     {
         if (firstUI != null)
             firstUI.Show();
@@ -24,6 +43,7 @@ public class UIHistory : MonoBehaviour
 
         _uiStack.Push(ui);
         ui.Show();
+        onNext.Invoke(ui);
     }
 
     public void Back()
@@ -36,9 +56,16 @@ public class UIHistory : MonoBehaviour
         }
         // Show recent ui
         if (_uiStack.Count > 0)
-            _uiStack.Peek().Show();
+        {
+            UIBase ui = _uiStack.Peek();
+            ui.Show();
+            onBack.Invoke(ui, false);
+        }
         else if (firstUI != null)
+        {
             firstUI.Show();
+            onBack.Invoke(firstUI, true);
+        }
     }
 
     public void ClearHistory()
