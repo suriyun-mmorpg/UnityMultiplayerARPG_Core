@@ -289,8 +289,11 @@ namespace MultiplayerARPG
         protected virtual void OnEnable()
         {
             // Setup Events
-            buttonCreate.onClick.RemoveListener(OnClickCreate);
-            buttonCreate.onClick.AddListener(OnClickCreate);
+            if (buttonCreate)
+            {
+                buttonCreate.onClick.RemoveListener(OnClickCreate);
+                buttonCreate.onClick.AddListener(OnClickCreate);
+            }
             CharacterSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacter);
             CharacterSelectionManager.eventOnSelect.AddListener(OnSelectCharacter);
             CharacterClassSelectionManager.eventOnSelect.RemoveListener(OnSelectCharacterClass);
