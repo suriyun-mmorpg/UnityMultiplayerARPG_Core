@@ -4,8 +4,8 @@ namespace MultiplayerARPG
 {
     public static class ClientGachaActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGachaInfoMessage> onResponseGachaInfo;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseOpenGachaMessage> onResponseOpenGacha;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseGachaInfoMessage> onResponseGachaInfo;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseOpenGachaMessage> onResponseOpenGacha;
 
         public static void ResponseGachaInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGachaInfoMessage response)
         {

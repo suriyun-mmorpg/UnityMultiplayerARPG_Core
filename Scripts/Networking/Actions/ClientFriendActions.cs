@@ -4,15 +4,15 @@ namespace MultiplayerARPG
 {
     public static class ClientFriendActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSocialCharacterListMessage> onResponseFindCharacters;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendsMessage> onResponseGetFriends;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAddFriendMessage> onResponseAddFriend;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRemoveFriendMessage> onResponseRemoveFriend;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendFriendRequestMessage> onResponseSendFriendRequest;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptFriendRequestMessage> onResponseAcceptFriendRequest;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineFriendRequestMessage> onResponseDeclineFriendRequest;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendRequestsMessage> onResponseGetFriendRequests;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseFriendRequestNotificationMessage> onResponseFriendRequestNotification;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSocialCharacterListMessage> onResponseFindCharacters;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendsMessage> onResponseGetFriends;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseAddFriendMessage> onResponseAddFriend;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseRemoveFriendMessage> onResponseRemoveFriend;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSendFriendRequestMessage> onResponseSendFriendRequest;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptFriendRequestMessage> onResponseAcceptFriendRequest;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineFriendRequestMessage> onResponseDeclineFriendRequest;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendRequestsMessage> onResponseGetFriendRequests;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseFriendRequestNotificationMessage> onResponseFriendRequestNotification;
 
         public static void ResponseFindCharacters(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSocialCharacterListMessage response)
         {

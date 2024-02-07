@@ -4,10 +4,10 @@ namespace MultiplayerARPG
 {
     public static class ClientCashShopActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseCashShopInfoMessage> onResponseCashShopInfo;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseCashPackageInfoMessage> onResponseCashPackageInfo;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseCashShopBuyMessage> onResponseCashShopBuy;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseCashPackageBuyValidationMessage> onResponseCashPackageBuyValidation;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCashShopInfoMessage> onResponseCashShopInfo;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCashPackageInfoMessage> onResponseCashPackageInfo;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCashShopBuyMessage> onResponseCashShopBuy;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCashPackageBuyValidationMessage> onResponseCashPackageBuyValidation;
 
         public static void ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
         {

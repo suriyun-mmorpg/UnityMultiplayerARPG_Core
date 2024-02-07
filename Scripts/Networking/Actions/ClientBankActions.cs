@@ -4,10 +4,10 @@ namespace MultiplayerARPG
 {
     public static class ClientBankActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDepositUserGoldMessage> onResponseDepositUserGold;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseWithdrawUserGoldMessage> onResponseWithdrawUserGold;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDepositGuildGoldMessage> onResponseDepositGuildGold;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseWithdrawGuildGoldMessage> onResponseWithdrawGuildGold;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDepositUserGoldMessage> onResponseDepositUserGold;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseWithdrawUserGoldMessage> onResponseWithdrawUserGold;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDepositGuildGoldMessage> onResponseDepositGuildGold;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseWithdrawGuildGoldMessage> onResponseWithdrawGuildGold;
 
         public static void ResponseDepositUserGold(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDepositUserGoldMessage response)
         {

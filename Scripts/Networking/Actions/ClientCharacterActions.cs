@@ -4,9 +4,9 @@ namespace MultiplayerARPG
 {
     public static class ClientCharacterActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseAttributeAmountMessage> onResponseIncreaseAttributeAmount;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseSkillLevelMessage> onResponseIncreaseSkillLevel;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRespawnMessage> onResponseRespawn;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseAttributeAmountMessage> onResponseIncreaseAttributeAmount;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseSkillLevelMessage> onResponseIncreaseSkillLevel;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseRespawnMessage> onResponseRespawn;
 
         public static void ResponseIncreaseAttributeAmount(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseIncreaseAttributeAmountMessage response)
         {

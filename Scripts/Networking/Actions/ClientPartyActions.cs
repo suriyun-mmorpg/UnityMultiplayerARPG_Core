@@ -4,17 +4,17 @@ namespace MultiplayerARPG
 {
     public static class ClientPartyActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendPartyInvitationMessage> onResponseSendPartyInvitation;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptPartyInvitationMessage> onResponseAcceptPartyInvitation;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclinePartyInvitationMessage> onResponseDeclinePartyInvitation;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseCreatePartyMessage> onResponseCreateParty;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangePartyLeaderMessage> onResponseChangePartyLeader;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseKickMemberFromPartyMessage> onResponseKickMemberFromParty;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseLeavePartyMessage> onResponseLeaveParty;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangePartySettingMessage> onResponseChangePartySetting;
-        public static System.Action<PartyInvitationData> onNotifyPartyInvitation;
-        public static System.Action<UpdatePartyMessage.UpdateType, PartyData> onNotifyPartyUpdated;
-        public static System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyPartyMemberUpdated;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSendPartyInvitationMessage> onResponseSendPartyInvitation;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptPartyInvitationMessage> onResponseAcceptPartyInvitation;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclinePartyInvitationMessage> onResponseDeclinePartyInvitation;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCreatePartyMessage> onResponseCreateParty;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangePartyLeaderMessage> onResponseChangePartyLeader;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseKickMemberFromPartyMessage> onResponseKickMemberFromParty;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseLeavePartyMessage> onResponseLeaveParty;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangePartySettingMessage> onResponseChangePartySetting;
+        public static event System.Action<PartyInvitationData> onNotifyPartyInvitation;
+        public static event System.Action<UpdatePartyMessage.UpdateType, PartyData> onNotifyPartyUpdated;
+        public static event System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyPartyMemberUpdated;
 
         public static void ResponseSendPartyInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
         {

@@ -5,14 +5,14 @@ namespace MultiplayerARPG
 {
     public static class ClientStorageActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseOpenStorageMessage> onResponseOpenStorage;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseCloseStorageMessage> onResponseCloseStorage;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMoveItemFromStorageMessage> onResponseMoveItemFromStorage;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMoveItemToStorageMessage> onResponseMoveItemToStorage;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeStorageItemMessage> onResponseSwapOrMergeStorageItem;
-        public static System.Action<StorageType, string, uint, int, int> onNotifyStorageOpened;
-        public static System.Action onNotifyStorageClosed;
-        public static System.Action<List<CharacterItem>> onNotifyStorageItemsUpdated;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseOpenStorageMessage> onResponseOpenStorage;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCloseStorageMessage> onResponseCloseStorage;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseMoveItemFromStorageMessage> onResponseMoveItemFromStorage;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseMoveItemToStorageMessage> onResponseMoveItemToStorage;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeStorageItemMessage> onResponseSwapOrMergeStorageItem;
+        public static event System.Action<StorageType, string, uint, int, int> onNotifyStorageOpened;
+        public static event System.Action onNotifyStorageClosed;
+        public static event System.Action<List<CharacterItem>> onNotifyStorageItemsUpdated;
 
         public static void ResponseOpenStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseOpenStorageMessage response)
         {

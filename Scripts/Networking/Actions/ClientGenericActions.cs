@@ -5,18 +5,18 @@ namespace MultiplayerARPG
 {
     public static class ClientGenericActions
     {
-        public static System.Action onClientConnected;
-        public static System.Action<DisconnectReason, SocketError, UITextKeys> onClientDisconnected;
-        public static System.Action onClientStopped;
-        public static System.Action onClientWarp;
-        public static System.Action<ChatMessage> onClientReceiveChatMessage;
-        public static System.Action<UITextKeys> onClientReceiveGameMessage;
-        public static System.Action<UIFormatKeys, string[]> onClientReceiveFormattedGameMessage;
-        public static System.Action<RewardGivenType, int> onNotifyRewardExp;
-        public static System.Action<RewardGivenType, int> onNotifyRewardGold;
-        public static System.Action<RewardGivenType, int, int> onNotifyRewardItem;
-        public static System.Action<RewardGivenType, int, int> onNotifyRewardCurrency;
-        public static System.Action<int> onNotifyBattlePointsChanged;
+        public static event System.Action onClientConnected;
+        public static event System.Action<DisconnectReason, SocketError, UITextKeys> onClientDisconnected;
+        public static event System.Action onClientStopped;
+        public static event System.Action onClientWarp;
+        public static event System.Action<ChatMessage> onClientReceiveChatMessage;
+        public static event System.Action<UITextKeys> onClientReceiveGameMessage;
+        public static event System.Action<UIFormatKeys, string[]> onClientReceiveFormattedGameMessage;
+        public static event System.Action<RewardGivenType, int> onNotifyRewardExp;
+        public static event System.Action<RewardGivenType, int> onNotifyRewardGold;
+        public static event System.Action<RewardGivenType, int, int> onNotifyRewardItem;
+        public static event System.Action<RewardGivenType, int, int> onNotifyRewardCurrency;
+        public static event System.Action<int> onNotifyBattlePointsChanged;
 
         public static void ClientConnected()
         {

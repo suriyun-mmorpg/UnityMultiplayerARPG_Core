@@ -4,22 +4,22 @@ namespace MultiplayerARPG
 {
     public static class ClientInventoryActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeItemMessage> onResponseSwapOrMergeItem;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseEquipArmorMessage> onResponseEquipArmor;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseEquipWeaponMessage> onResponseEquipWeapon;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseUnEquipArmorMessage> onResponseUnEquipArmor;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseUnEquipWeaponMessage> onResponseUnEquipWeapon;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSwitchEquipWeaponSetMessage> onResponseSwitchEquipWeaponSet;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDismantleItemMessage> onResponseDismantleItem;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDismantleItemsMessage> onResponseDismantleItems;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseEnhanceSocketItemMessage> onResponseEnhanceSocketItem;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRefineItemMessage> onResponseRefineItem;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRemoveEnhancerFromItemMessage> onResponseRemoveEnhancerFromItem;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRepairItemMessage> onResponseRepairItem;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseRepairEquipItemsMessage> onResponseRepairEquipItems;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemMessage> onResponseSellItem;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemsMessage> onResponseSellItems;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSortItemsMessage> onResponseSortItems;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeItemMessage> onResponseSwapOrMergeItem;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseEquipArmorMessage> onResponseEquipArmor;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseEquipWeaponMessage> onResponseEquipWeapon;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseUnEquipArmorMessage> onResponseUnEquipArmor;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseUnEquipWeaponMessage> onResponseUnEquipWeapon;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSwitchEquipWeaponSetMessage> onResponseSwitchEquipWeaponSet;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDismantleItemMessage> onResponseDismantleItem;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDismantleItemsMessage> onResponseDismantleItems;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseEnhanceSocketItemMessage> onResponseEnhanceSocketItem;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseRefineItemMessage> onResponseRefineItem;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseRemoveEnhancerFromItemMessage> onResponseRemoveEnhancerFromItem;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseRepairItemMessage> onResponseRepairItem;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseRepairEquipItemsMessage> onResponseRepairEquipItems;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemMessage> onResponseSellItem;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemsMessage> onResponseSellItems;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSortItemsMessage> onResponseSortItems;
 
         public static void ResponseSwapOrMergeItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwapOrMergeItemMessage response)
         {

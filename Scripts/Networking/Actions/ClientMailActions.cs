@@ -4,14 +4,14 @@ namespace MultiplayerARPG
 {
     public static class ClientMailActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMailListMessage> onResponseMailList;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseReadMailMessage> onResponseReadMail;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseClaimMailItemsMessage> onResponseClaimMailItems;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeleteMailMessage> onResponseDeleteMail;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendMailMessage> onResponseSendMail;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseMailNotificationMessage> onResponseMailNotification;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseClaimAllMailsItemsMessage> onResponseClaimAllMailsItems;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeleteAllMailsMessage> onResponseDeleteAllMails;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseMailListMessage> onResponseMailList;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseReadMailMessage> onResponseReadMail;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseClaimMailItemsMessage> onResponseClaimMailItems;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDeleteMailMessage> onResponseDeleteMail;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSendMailMessage> onResponseSendMail;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseMailNotificationMessage> onResponseMailNotification;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseClaimAllMailsItemsMessage> onResponseClaimAllMailsItems;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDeleteAllMailsMessage> onResponseDeleteAllMails;
 
         public static void ResponseMailList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {

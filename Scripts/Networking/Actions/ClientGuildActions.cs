@@ -4,30 +4,30 @@ namespace MultiplayerARPG
 {
     public static class ClientGuildActions
     {
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendGuildInvitationMessage> onResponseSendGuildInvitation;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptGuildInvitationMessage> onResponseAcceptGuildInvitation;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineGuildInvitationMessage> onResponseDeclineGuildInvitation;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseCreateGuildMessage> onResponseCreateGuild;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildLeaderMessage> onResponseChangeGuildLeader;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseKickMemberFromGuildMessage> onResponseKickMemberFromGuild;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseLeaveGuildMessage> onResponseLeaveGuild;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildMessageMessage> onResponseChangeGuildMessage;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildMessageMessage> onResponseChangeGuildMessage2;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildOptionsMessage> onResponseChangeGuildOptions;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildAutoAcceptRequestsMessage> onResponseChangeGuildAutoAcceptRequests;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildRoleMessage> onResponseChangeGuildRole;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeMemberGuildRoleMessage> onResponseChangeMemberGuildRole;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseGuildSkillLevelMessage> onResponseIncreaseGuildSkillLevel;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseSendGuildRequestMessage> onResponseSendGuildRequest;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptGuildRequestMessage> onResponseAcceptGuildRequest;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineGuildRequestMessage> onResponseDeclineGuildRequest;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildRequestsMessage> onResponseGetGuildRequests;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseFindGuildsMessage> onResponseFindGuilds;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildInfoMessage> onResponseGetGuildInfo;
-        public static System.Action<ResponseHandlerData, AckResponseCode, ResponseGuildRequestNotificationMessage> onResponseGuildRequestNotification;
-        public static System.Action<GuildInvitationData> onNotifyGuildInvitation;
-        public static System.Action<UpdateGuildMessage.UpdateType, GuildData> onNotifyGuildUpdated;
-        public static System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyGuildMemberUpdated;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSendGuildInvitationMessage> onResponseSendGuildInvitation;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptGuildInvitationMessage> onResponseAcceptGuildInvitation;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineGuildInvitationMessage> onResponseDeclineGuildInvitation;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCreateGuildMessage> onResponseCreateGuild;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildLeaderMessage> onResponseChangeGuildLeader;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseKickMemberFromGuildMessage> onResponseKickMemberFromGuild;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseLeaveGuildMessage> onResponseLeaveGuild;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildMessageMessage> onResponseChangeGuildMessage;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildMessageMessage> onResponseChangeGuildMessage2;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildOptionsMessage> onResponseChangeGuildOptions;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildAutoAcceptRequestsMessage> onResponseChangeGuildAutoAcceptRequests;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeGuildRoleMessage> onResponseChangeGuildRole;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeMemberGuildRoleMessage> onResponseChangeMemberGuildRole;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseGuildSkillLevelMessage> onResponseIncreaseGuildSkillLevel;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSendGuildRequestMessage> onResponseSendGuildRequest;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseAcceptGuildRequestMessage> onResponseAcceptGuildRequest;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDeclineGuildRequestMessage> onResponseDeclineGuildRequest;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildRequestsMessage> onResponseGetGuildRequests;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseFindGuildsMessage> onResponseFindGuilds;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseGetGuildInfoMessage> onResponseGetGuildInfo;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseGuildRequestNotificationMessage> onResponseGuildRequestNotification;
+        public static event System.Action<GuildInvitationData> onNotifyGuildInvitation;
+        public static event System.Action<UpdateGuildMessage.UpdateType, GuildData> onNotifyGuildUpdated;
+        public static event System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyGuildMemberUpdated;
 
         public static void ResponseSendGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
         {
