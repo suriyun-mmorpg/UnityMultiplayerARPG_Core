@@ -79,19 +79,19 @@ namespace MultiplayerARPG
         /// <summary>
         /// ConnectionID, PlayerCharacterEntity
         /// </summary>
-        public System.Action<long, BasePlayerCharacterEntity> onRegisterCharacter;
+        public event System.Action<long, BasePlayerCharacterEntity> onRegisterCharacter;
         /// <summary>
         /// ConnectionID, CharacterID, UserID
         /// </summary>
-        public System.Action<long, string, string> onUnregisterCharacter;
+        public event System.Action<long, string, string> onUnregisterCharacter;
         /// <summary>
         /// ConnectionID, UserID
         /// </summary>
-        public System.Action<long, string> onRegisterUser;
+        public event System.Action<long, string> onRegisterUser;
         /// <summary>
         /// ConnectionID, UserID
         /// </summary>
-        public System.Action<long, string> onUnregisterUser;
+        public event System.Action<long, string> onUnregisterUser;
         // Private variables
         protected float _updateOnlineCharactersCountDown;
         protected float _updateTimeOfDayCountDown;
