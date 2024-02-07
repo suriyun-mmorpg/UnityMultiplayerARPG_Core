@@ -885,6 +885,7 @@ namespace MultiplayerARPG
             }
             float progress = 0f;
             string sceneName = SceneManager.GetActiveScene().name;
+            await UniTask.NextFrame();
             onSpawnEntitiesStart.Invoke(sceneName, true, progress);
             await PreSpawnEntities();
             RegisterEntities();
@@ -919,13 +920,13 @@ namespace MultiplayerARPG
                             warpPortalEntity.WarpPointsByCondition = warpPortal.warpPointsByCondition;
                             Assets.NetworkSpawn(spawnObj);
                         }
-                        await UniTask.Yield();
+                        await UniTask.NextFrame();
                         progress = 0f + ((float)i / (float)mapWarpPortals.Count * 0.25f);
                         onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
                     }
                 }
             }
-            await UniTask.Yield();
+            await UniTask.NextFrame();
             progress = 0.25f;
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn Npcs
@@ -953,13 +954,13 @@ namespace MultiplayerARPG
                             npcEntity.Graph = npc.graph;
                             Assets.NetworkSpawn(spawnObj);
                         }
-                        await UniTask.Yield();
+                        await UniTask.NextFrame();
                         progress = 0.25f + ((float)i / (float)mapNpcs.Count * 0.25f);
                         onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
                     }
                 }
             }
-            await UniTask.Yield();
+            await UniTask.NextFrame();
             progress = 0.5f;
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn monsters
@@ -969,11 +970,11 @@ namespace MultiplayerARPG
             for (i = 0; i < monsterSpawnAreas.Length; ++i)
             {
                 monsterSpawnAreas[i].SpawnAll();
-                await UniTask.Yield();
+                await UniTask.NextFrame();
                 progress = 0.5f + ((float)i / (float)monsterSpawnAreas.Length * 0.25f);
                 onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             }
-            await UniTask.Yield();
+            await UniTask.NextFrame();
             progress = 0.75f;
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn harvestables
@@ -983,11 +984,11 @@ namespace MultiplayerARPG
             for (i = 0; i < harvestableSpawnAreas.Length; ++i)
             {
                 harvestableSpawnAreas[i].SpawnAll();
-                await UniTask.Yield();
+                await UniTask.NextFrame();
                 progress = 0.75f + ((float)i / (float)harvestableSpawnAreas.Length * 0.125f);
                 onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             }
-            await UniTask.Yield();
+            await UniTask.NextFrame();
             progress = 0.875f;
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // Spawn item drop entities
@@ -997,11 +998,11 @@ namespace MultiplayerARPG
             for (i = 0; i < itemDropSpawnAreas.Length; ++i)
             {
                 itemDropSpawnAreas[i].SpawnAll();
-                await UniTask.Yield();
+                await UniTask.NextFrame();
                 progress = 0.875f + ((float)i / (float)itemDropSpawnAreas.Length * 0.125f);
                 onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             }
-            await UniTask.Yield();
+            await UniTask.NextFrame();
             progress = 1f;
             onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
             // If it's server (not host) spawn simple camera controller
@@ -1012,7 +1013,7 @@ namespace MultiplayerARPG
                     Logging.Log(LogTag, "Spawning server character");
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab, CurrentMapInfo.StartPosition, Quaternion.identity);
             }
-            await UniTask.Yield();
+            await UniTask.NextFrame();
             progress = 1f;
             onSpawnEntitiesFinish.Invoke(sceneName, true, progress);
             await PostSpawnEntities();
@@ -1209,7 +1210,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateTimeOfDay, new UpdateTimeOfDayMessage()
+            ServerSendPacket(connectionId, 0, DeliveryMethod.Unreliable, GameNetworkingConsts.UpdateTimeOfDay, new UpdateTimeOfDayMessage()
             {
                 timeOfDay = CurrentGameInstance.DayNightTimeUpdater.TimeOfDay,
             });
