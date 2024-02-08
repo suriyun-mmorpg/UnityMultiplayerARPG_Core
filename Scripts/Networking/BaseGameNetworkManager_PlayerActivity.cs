@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         #region Activity validation functions
         public virtual bool CanWarpCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (playerCharacterEntity == null || !IsServer || playerCharacterEntity.IsWarping)
+            if (!IsServer || playerCharacterEntity == null || playerCharacterEntity.IsWarping)
                 return false;
             return true;
         }
@@ -20,8 +20,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition ||
-                !CurrentMapInfo.SaveCurrentMapPosition)
+            if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition || !CurrentMapInfo.SaveCurrentMapPosition)
                 return playerCharacterEntity.RespawnMapName;
             return CurrentMapInfo.Id;
         }
