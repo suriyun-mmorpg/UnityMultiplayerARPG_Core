@@ -25,6 +25,10 @@ namespace MultiplayerARPG
         /// </summary>
         float Weight { get; }
         /// <summary>
+        /// If this is `TRUE` it won't use slot
+        /// </summary>
+        bool NoSlotUsage { get; }
+        /// <summary>
         /// Max stack
         /// </summary>
         int MaxStack { get; }

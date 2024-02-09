@@ -95,6 +95,7 @@ namespace MultiplayerARPG
             foreach (CharacterItem item in itemList)
             {
                 if (item.IsEmptySlot()) continue;
+                if (item.GetItem().NoSlotUsage) continue;
                 result++;
             }
             return result;

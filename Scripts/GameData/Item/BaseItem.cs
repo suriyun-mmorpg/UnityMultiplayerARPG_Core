@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         [Min(0f)]
         protected float weight = 0f;
         [SerializeField]
+        protected bool noSlotUsage = false;
+        [SerializeField]
         [Min(1)]
         protected int maxStack = 1;
         [SerializeField]
@@ -82,6 +84,8 @@ namespace MultiplayerARPG
         public int SellPrice { get { return sellPrice; } }
 
         public float Weight { get { return weight; } }
+
+        public bool NoSlotUsage { get { return noSlotUsage; } }
 
         public int MaxStack { get { return maxStack; } }
 

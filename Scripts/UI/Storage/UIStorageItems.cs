@@ -113,7 +113,8 @@ namespace MultiplayerARPG
             {
                 // Increase total weight and used slots, if data is not empty slot
                 TotalWeight += characterItem.GetItem().Weight * characterItem.amount;
-                UsedSlots++;
+                if (!characterItem.GetItem().NoSlotUsage)
+                    UsedSlots++;
             }
         }
     }
