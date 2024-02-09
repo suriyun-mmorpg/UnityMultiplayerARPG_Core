@@ -276,6 +276,14 @@ namespace MultiplayerARPG
             return weaponItem.WeaponType.DualWieldRestriction;
         }
 
+        public static List<byte> GetEquippableSetIndexes<T>(this T weaponItem)
+            where T : IWeaponItem
+        {
+            if (weaponItem == null || !weaponItem.IsWeapon() || !weaponItem.WeaponType)
+                return null;
+            return weaponItem.WeaponType.EquippableSetIndexes;
+        }
+
         public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageAmount<T>(this T weaponItem, int itemLevel, float statsRate)
             where T : IWeaponItem
         {

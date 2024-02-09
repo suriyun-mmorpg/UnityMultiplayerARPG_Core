@@ -497,6 +497,12 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            if (equipWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
+            {
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_EQUIP;
+                return false;
+            }
+
             if (!equippingItem.GetEquipmentItem().CanEquip(character, equippingItem.level, out gameMessage))
                 return false;
 
@@ -515,6 +521,13 @@ namespace MultiplayerARPG
             IWeaponItem equippingWeaponItem = equippingItem.GetWeaponItem();
             if (equippingWeaponItem != null)
             {
+                List<byte> equippableSlotIndexes = equippingWeaponItem.GetEquippableSetIndexes();
+                if (equippableSlotIndexes?.Count > 0 && !equippableSlotIndexes.Contains(equipWeaponSet))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_CANNOT_EQUIP;
+                    return false;
+                }
+
                 switch (equippingWeaponItem.GetEquipType())
                 {
                     case WeaponItemEquipType.MainHandOnly:

@@ -26,12 +26,21 @@ namespace MultiplayerARPG
         [SerializeField]
         private WeaponItemEquipType equipType = WeaponItemEquipType.MainHandOnly;
         public WeaponItemEquipType EquipType { get { return equipType; } }
+
         [SerializeField]
         private DualWieldRestriction dualWieldRestriction = DualWieldRestriction.None;
         public DualWieldRestriction DualWieldRestriction { get { return dualWieldRestriction; } }
+
+        [SerializeField]
+        [Tooltip("Example: If you want to make ASR to be equippable on 1st and 2nd weapon sets, set this to [0, 1].\r\nIf you want to make Pistol to be equippable on 3rd weapon set, set this to [2]. \r\nEach weapon set contains slots for right-hand and left-hand. Useful for shooter game, for an RPG games, set it to be empty.")]
+        [Range(1, 16)]
+        private List<byte> equippableSetIndexes = new List<byte>();
+        public List<byte> EquippableSetIndexes { get { return equippableSetIndexes; } }
+
         [SerializeField]
         private DamageInfo damageInfo = new DamageInfo();
         public DamageInfo DamageInfo { get { return damageInfo; } }
+
         [SerializeField]
         private DamageEffectivenessAttribute[] effectivenessAttributes = new DamageEffectivenessAttribute[0];
 
