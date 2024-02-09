@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             return _cacheUsableItem;
         }
 
-        public void Use(ICharacterData character, int level)
+        public void Use(BaseCharacterEntity character, int level)
         {
             coolDownRemainsDuration = 0f;
             switch (type)
@@ -121,6 +121,7 @@ namespace MultiplayerARPG
                         if (tempAmount < 0)
                             tempAmount = 0;
                         character.CurrentStamina -= tempAmount;
+                        character.ValidateRecovery(character.GetInfo());
                     }
                     break;
             }
