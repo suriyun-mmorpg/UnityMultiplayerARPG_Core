@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             isReadyToSave = false;
         }
 
-        public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
+        public override UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
             storageItems.Clear();
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
                 }
             }
             isReadyToSave = true;
-            await UniTask.Yield();
+            return default;
         }
 
         public override void SaveCharacter(IPlayerCharacterData playerCharacterData)

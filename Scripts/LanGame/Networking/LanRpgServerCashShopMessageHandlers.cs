@@ -7,39 +7,37 @@ namespace MultiplayerARPG
 {
     public partial class LanRpgServerCashShopMessageHandlers : MonoBehaviour, IServerCashShopMessageHandlers
     {
-        public async UniTaskVoid HandleRequestCashShopInfo(
+        public UniTaskVoid HandleRequestCashShopInfo(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashShopInfoMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashShopInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             result.InvokeSuccess(new ResponseCashShopInfoMessage()
             {
                 cash = playerCharacter.UserCash,
                 cashShopItemIds = new List<int>(GameInstance.CashShopItems.Keys),
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestCashShopBuy(
+        public UniTaskVoid HandleRequestCashShopBuy(
             RequestHandlerData requestHandler, RequestCashShopBuyMessage request,
             RequestProceedResultDelegate<ResponseCashShopBuyMessage> result)
         {
-            await UniTask.Yield();
-
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashShopBuyMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
 
             if (request.amount <= 0)
@@ -48,7 +46,7 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
-                return;
+                return default;
             }
 
             if (!GameInstance.CashShopItems.TryGetValue(request.dataId, out CashShopItem cashShopItem))
@@ -57,7 +55,7 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_ITEM_NOT_FOUND,
                 });
-                return;
+                return default;
             }
 
             if ((request.currencyType == CashShopItemCurrencyType.CASH && cashShopItem.SellPriceCash <= 0) ||
@@ -67,7 +65,7 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_INVALID_ITEM_DATA,
                 });
-                return;
+                return default;
             }
 
             int characterGold = playerCharacter.Gold;
@@ -87,7 +85,7 @@ namespace MultiplayerARPG
                     {
                         message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH,
                     });
-                    return;
+                    return default;
                 }
                 changeUserCash -= priceCash;
             }
@@ -102,7 +100,7 @@ namespace MultiplayerARPG
                     {
                         message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
                     });
-                    return;
+                    return default;
                 }
                 changeCharacterGold -= priceGold;
             }
@@ -135,7 +133,7 @@ namespace MultiplayerARPG
                     {
                         message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
                     });
-                    return;
+                    return default;
                 }
             }
 
@@ -169,40 +167,40 @@ namespace MultiplayerARPG
                 rewardGold = cashShopItem.ReceiveGold,
                 rewardItems = rewardItems,
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestCashPackageInfo(
+        public UniTaskVoid HandleRequestCashPackageInfo(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseCashPackageInfoMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashPackageInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             result.InvokeSuccess(new ResponseCashPackageInfoMessage()
             {
                 cash = playerCharacter.UserCash,
                 cashPackageIds = new List<int>(GameInstance.CashPackages.Keys),
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestCashPackageBuyValidation(
+        public UniTaskVoid HandleRequestCashPackageBuyValidation(
             RequestHandlerData requestHandler, RequestCashPackageBuyValidationMessage request,
             RequestProceedResultDelegate<ResponseCashPackageBuyValidationMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseCashPackageBuyValidationMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             if (!GameInstance.CashPackages.TryGetValue(request.dataId, out CashPackage cashPackage))
             {
@@ -210,7 +208,7 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND,
                 });
-                return;
+                return default;
             }
             playerCharacter.UserCash = playerCharacter.UserCash.Increase(cashPackage.CashAmount);
 
@@ -219,6 +217,7 @@ namespace MultiplayerARPG
                 dataId = request.dataId,
                 cash = playerCharacter.UserCash,
             });
+            return default;
         }
     }
 }

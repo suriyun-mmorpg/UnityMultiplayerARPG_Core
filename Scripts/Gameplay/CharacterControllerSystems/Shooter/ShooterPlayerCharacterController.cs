@@ -1253,11 +1253,11 @@ namespace MultiplayerARPG
             _updatingInputs = false;
         }
 
-        protected virtual async UniTaskVoid UpdateInputs_BuildMode(bool isBlockController)
+        protected virtual UniTaskVoid UpdateInputs_BuildMode(bool isBlockController)
         {
             SetTargetLookDirectionWhileMoving();
             _updatingInputs = false;
-            await UniTask.Yield();
+            return default;
         }
 
         protected virtual void UpdateCrosshair()

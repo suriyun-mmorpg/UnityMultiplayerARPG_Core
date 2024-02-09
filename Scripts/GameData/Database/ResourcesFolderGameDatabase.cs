@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.RES_GAME_DATABASE_FILE, menuName = GameDataMenuConsts.RES_GAME_DATABASE_MENU, order = GameDataMenuConsts.RES_GAME_DATABASE_ORDER)]
     public partial class ResourcesFolderGameDatabase : BaseGameDatabase
     {
-        protected override async UniTask LoadDataImplement(GameInstance gameInstance)
+        protected override UniTask LoadDataImplement(GameInstance gameInstance)
         {
             Attribute[] attributes = Resources.LoadAll<Attribute>("");
             BaseItem[] items = Resources.LoadAll<BaseItem>("");
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(characterEntities);
             GameInstance.AddVehicleEntities(vehicleEntities);
             this.InvokeInstanceDevExtMethods("LoadDataImplement", gameInstance);
-            await UniTask.Yield();
+            return default;
         }
     }
 }

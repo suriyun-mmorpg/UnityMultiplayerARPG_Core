@@ -879,10 +879,7 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid SpawnEntities()
         {
-            while (!IsServerReadyToInstantiateObjects())
-            {
-                await UniTask.Yield();
-            }
+            await UniTask.WaitUntil(IsServerReadyToInstantiateObjects);
             float progress = 0f;
             string sceneName = SceneManager.GetActiveScene().name;
             await UniTask.NextFrame();
@@ -1020,14 +1017,14 @@ namespace MultiplayerARPG
             _isServerReadyToInstantiatePlayers = true;
         }
 
-        protected virtual async UniTask PreSpawnEntities()
+        protected virtual UniTask PreSpawnEntities()
         {
-            await UniTask.Yield();
+            return UniTask.CompletedTask;
         }
 
-        protected virtual async UniTask PostSpawnEntities()
+        protected virtual UniTask PostSpawnEntities()
         {
-            await UniTask.Yield();
+            return UniTask.CompletedTask;
         }
 
         public bool IsServerReadyToInstantiateObjects()
@@ -1055,10 +1052,7 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid ProceedUntilClientReady()
         {
-            while (!IsClientReadyToInstantiateObjects())
-            {
-                await UniTask.Yield();
-            }
+            await UniTask.WaitUntil(IsClientReadyToInstantiateObjects);
             SendClientReady();
         }
 

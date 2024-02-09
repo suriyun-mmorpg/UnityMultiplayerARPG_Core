@@ -66,7 +66,7 @@ namespace MultiplayerARPG
         public string gachaBundleName = "gacha";
         public bool setNameForUnnamedAssetsOnly = true;
 
-        protected override async UniTask LoadDataImplement(GameInstance gameInstance)
+        protected override UniTask LoadDataImplement(GameInstance gameInstance)
         {
             GameInstance.AddCharacterEntities(playerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             GameInstance.AddFactions(factions);
             GameInstance.AddGachas(gachas);
             this.InvokeInstanceDevExtMethods("LoadDataImplement", gameInstance);
-            await UniTask.Yield();
+            return default;
         }
 
 #if UNITY_EDITOR

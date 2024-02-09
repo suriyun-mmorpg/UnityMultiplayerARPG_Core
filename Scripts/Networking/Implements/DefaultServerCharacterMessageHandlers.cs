@@ -7,16 +7,15 @@ namespace MultiplayerARPG
 {
     public partial class DefaultServerCharacterMessageHandlers : MonoBehaviour, IServerCharacterMessageHandlers
     {
-        public async UniTaskVoid HandleRequestIncreaseAttributeAmount(RequestHandlerData requestHandler, RequestIncreaseAttributeAmountMessage request, RequestProceedResultDelegate<ResponseIncreaseAttributeAmountMessage> result)
+        public UniTaskVoid HandleRequestIncreaseAttributeAmount(RequestHandlerData requestHandler, RequestIncreaseAttributeAmountMessage request, RequestProceedResultDelegate<ResponseIncreaseAttributeAmountMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseIncreaseAttributeAmountMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             if (!playerCharacter.AddAttribute(out UITextKeys gameMessage, request.dataId))
             {
@@ -24,22 +23,22 @@ namespace MultiplayerARPG
                 {
                     message = gameMessage,
                 });
-                return;
+                return default;
             }
             playerCharacter.StatPoint -= 1;
             result.InvokeSuccess(new ResponseIncreaseAttributeAmountMessage());
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestIncreaseSkillLevel(RequestHandlerData requestHandler, RequestIncreaseSkillLevelMessage request, RequestProceedResultDelegate<ResponseIncreaseSkillLevelMessage> result)
+        public UniTaskVoid HandleRequestIncreaseSkillLevel(RequestHandlerData requestHandler, RequestIncreaseSkillLevelMessage request, RequestProceedResultDelegate<ResponseIncreaseSkillLevelMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseIncreaseSkillLevelMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             if (!playerCharacter.AddSkill(out UITextKeys gameMessage, request.dataId))
             {
@@ -47,7 +46,7 @@ namespace MultiplayerARPG
                 {
                     message = gameMessage,
                 });
-                return;
+                return default;
             }
             int indexOfSkill = playerCharacter.IndexOfSkill(request.dataId);
             CharacterSkill characterSkill = playerCharacter.Skills[indexOfSkill];
@@ -62,18 +61,18 @@ namespace MultiplayerARPG
             playerCharacter.DecreaseCurrencies(requireCurrencies);
             playerCharacter.DecreaseItems(requireItems);
             result.InvokeSuccess(new ResponseIncreaseSkillLevelMessage());
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestRespawn(RequestHandlerData requestHandler, RequestRespawnMessage request, RequestProceedResultDelegate<ResponseRespawnMessage> result)
+        public UniTaskVoid HandleRequestRespawn(RequestHandlerData requestHandler, RequestRespawnMessage request, RequestProceedResultDelegate<ResponseRespawnMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseRespawnMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             if (playerCharacter.CurrentHp > 0)
             {
@@ -81,15 +80,15 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_NOT_DEAD,
                 });
-                return;
+                return default;
             }
             GameInstance.ServerCharacterHandlers.Respawn(request.option, playerCharacter);
             result.InvokeSuccess(new ResponseRespawnMessage());
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestAvailableIcons(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableIconsMessage> result)
+        public UniTaskVoid HandleRequestAvailableIcons(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableIconsMessage> result)
         {
-            await UniTask.Yield();
             // TODO: Implement data unlocking
             List<int> iconIds = new List<int>();
             foreach (PlayerIcon icon in GameInstance.PlayerIcons.Values)
@@ -101,11 +100,11 @@ namespace MultiplayerARPG
             {
                 iconIds = iconIds.ToArray(),
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestAvailableFrames(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableFramesMessage> result)
+        public UniTaskVoid HandleRequestAvailableFrames(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableFramesMessage> result)
         {
-            await UniTask.Yield();
             // TODO: Implement data unlocking
             List<int> frameIds = new List<int>();
             foreach (PlayerFrame frame in GameInstance.PlayerFrames.Values)
@@ -117,11 +116,11 @@ namespace MultiplayerARPG
             {
                 frameIds = frameIds.ToArray(),
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestAvailableTitles(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableTitlesMessage> result)
+        public UniTaskVoid HandleRequestAvailableTitles(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableTitlesMessage> result)
         {
-            await UniTask.Yield();
             // TODO: Implement data unlocking
             List<int> titleIds = new List<int>();
             foreach (PlayerTitle title in GameInstance.PlayerTitles.Values)
@@ -133,18 +132,18 @@ namespace MultiplayerARPG
             {
                 titleIds = titleIds.ToArray(),
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestSetIcon(RequestHandlerData requestHandler, RequestSetIconMessage request, RequestProceedResultDelegate<ResponseSetIconMessage> result)
+        public UniTaskVoid HandleRequestSetIcon(RequestHandlerData requestHandler, RequestSetIconMessage request, RequestProceedResultDelegate<ResponseSetIconMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseSetIconMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             // TODO: Implement data unlocking
             if (!GameInstance.PlayerIcons.TryGetValue(request.dataId, out PlayerIcon data) || data.IsLocked)
@@ -153,25 +152,25 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
-                return;
+                return default;
             }
             playerCharacter.IconDataId = request.dataId;
             result.InvokeSuccess(new ResponseSetIconMessage()
             {
                 dataId = request.dataId,
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestSetFrame(RequestHandlerData requestHandler, RequestSetFrameMessage request, RequestProceedResultDelegate<ResponseSetFrameMessage> result)
+        public UniTaskVoid HandleRequestSetFrame(RequestHandlerData requestHandler, RequestSetFrameMessage request, RequestProceedResultDelegate<ResponseSetFrameMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseSetFrameMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             // TODO: Implement data unlocking
             if (!GameInstance.PlayerFrames.TryGetValue(request.dataId, out PlayerFrame data) || data.IsLocked)
@@ -180,25 +179,25 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
-                return;
+                return default;
             }
             playerCharacter.FrameDataId = request.dataId;
             result.InvokeSuccess(new ResponseSetFrameMessage()
             {
                 dataId = request.dataId,
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestSetTitle(RequestHandlerData requestHandler, RequestSetTitleMessage request, RequestProceedResultDelegate<ResponseSetTitleMessage> result)
+        public UniTaskVoid HandleRequestSetTitle(RequestHandlerData requestHandler, RequestSetTitleMessage request, RequestProceedResultDelegate<ResponseSetTitleMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseSetTitleMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             // TODO: Implement data unlocking
             if (!GameInstance.PlayerTitles.TryGetValue(request.dataId, out PlayerTitle data) || data.IsLocked)
@@ -207,13 +206,14 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
-                return;
+                return default;
             }
             playerCharacter.TitleDataId = request.dataId;
             result.InvokeSuccess(new ResponseSetTitleMessage()
             {
                 dataId = request.dataId,
             });
+            return default;
         }
     }
 }

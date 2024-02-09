@@ -7,36 +7,35 @@ namespace MultiplayerARPG
 {
     public partial class LanRpgServerGachaMessageHandlers : MonoBehaviour, IServerGachaMessageHandlers
     {
-        public async UniTaskVoid HandleRequestGachaInfo(
+        public UniTaskVoid HandleRequestGachaInfo(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<ResponseGachaInfoMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseGachaInfoMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
             result.InvokeSuccess(new ResponseGachaInfoMessage()
             {
                 cash = playerCharacter.UserCash,
                 gachaIds = new List<int>(GameInstance.Gachas.Keys),
             });
+            return default;
         }
 
-        public async UniTaskVoid HandleRequestOpenGacha(RequestHandlerData requestHandler, RequestOpenGachaMessage request, RequestProceedResultDelegate<ResponseOpenGachaMessage> result)
+        public UniTaskVoid HandleRequestOpenGacha(RequestHandlerData requestHandler, RequestOpenGachaMessage request, RequestProceedResultDelegate<ResponseOpenGachaMessage> result)
         {
-            await UniTask.Yield();
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseOpenGachaMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return;
+                return default;
             }
 
             if (!GameInstance.Gachas.TryGetValue(request.dataId, out Gacha gacha))
@@ -45,7 +44,7 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_INVALID_DATA,
                 });
-                return;
+                return default;
             }
 
             int price = request.openMode == GachaOpenMode.Multiple ? gacha.MultipleModeOpenPrice : gacha.SingleModeOpenPrice;
@@ -56,7 +55,7 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_NOT_ENOUGH_CASH,
                 });
-                return;
+                return default;
             }
 
             int openCount = request.openMode == GachaOpenMode.Multiple ? gacha.MultipleModeOpenCount : 1;
@@ -67,7 +66,7 @@ namespace MultiplayerARPG
                 {
                     message = UITextKeys.UI_ERROR_WILL_OVERWHELMING,
                 });
-                return;
+                return default;
             }
             // Decrease cash amount
             cash -= price;
@@ -81,6 +80,7 @@ namespace MultiplayerARPG
                 dataId = request.dataId,
                 rewardItems = rewardItems,
             });
+            return default;
         }
     }
 }

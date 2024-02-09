@@ -64,15 +64,15 @@ namespace MultiplayerARPG
             GuildInvitations.Clear();
         }
 
-        public async UniTaskVoid IncreaseGuildExp(IPlayerCharacterData playerCharacter, int exp)
+        public UniTaskVoid IncreaseGuildExp(IPlayerCharacterData playerCharacter, int exp)
         {
-            await UniTask.Yield();
             ValidateGuildRequestResult validateResult = this.CanIncreaseGuildExp(playerCharacter, exp);
             if (!validateResult.IsSuccess)
-                return;
+                return default;
             validateResult.Guild.IncreaseGuildExp(GameInstance.Singleton.SocialSystemSetting.GuildExpTree, exp);
             SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(validateResult.Guild);
+            return default;
         }
 
         private string GetGuildInvitationId(int guildId, string characterId)

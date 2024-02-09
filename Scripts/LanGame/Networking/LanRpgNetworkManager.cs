@@ -240,9 +240,8 @@ namespace MultiplayerARPG
             writer.PutList(selectedCharacterStorageItems);
         }
 
-        public override async UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
+        public override UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
         {
-            await UniTask.Yield();
             PlayerCharacterData playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
             List<CharacterBuff> playerSummonBuffs = reader.GetList<CharacterBuff>();
             List<CharacterItem> playerStorageItems = reader.GetList<CharacterItem>();
@@ -255,11 +254,11 @@ namespace MultiplayerARPG
                     _pendingSpawnPlayerCharacters.Add(connectionId, playerCharacterData);
                 if (!_pendingSpawnPlayerCharacterSummonBuffs.ContainsKey(connectionId))
                     _pendingSpawnPlayerCharacterSummonBuffs.Add(connectionId, playerSummonBuffs);
-                return true;
+                return UniTask.FromResult(true);
             }
             if (LogDev) Logging.Log(LogTag, "Deserializing client ready extra");
             SpawnPlayerCharacter(connectionId, playerCharacterData, playerSummonBuffs);
-            return true;
+            return UniTask.FromResult(true);
         }
 
         private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
