@@ -584,9 +584,20 @@ namespace MultiplayerARPG
         public override void OnPeerConnected(long connectionId)
         {
             this.InvokeInstanceDevExtMethods("OnPeerConnected", connectionId);
-            SendMapInfo(connectionId);
-            SendTimeOfDay(connectionId);
             base.OnPeerConnected(connectionId);
+        }
+
+        protected override UniTaskVoid HandleEnterGameRequest(RequestHandlerData requestHandler, EnterGameRequestMessage request, RequestProceedResultDelegate<EnterGameResponseMessage> result)
+        {
+            result += (responseCode, response, extraResponseSerializer) =>
+            {
+                if (responseCode == AckResponseCode.Success)
+                {
+                    SendMapInfo(requestHandler.ConnectionId);
+                    SendTimeOfDay(requestHandler.ConnectionId);
+                }
+            };
+            return base.HandleEnterGameRequest(requestHandler, request, result);
         }
 
         protected virtual void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
