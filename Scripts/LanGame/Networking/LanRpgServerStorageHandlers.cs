@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             storageItems.FillEmptySlots(isLimitSlot, slotLimit);
             SetStorageItems(storageId, storageItems);
             NotifyStorageItemsUpdated(storageId.storageType, storageId.storageOwnerId);
-            return new UniTask<List<CharacterItem>>(droppingItems);
+            return UniTask.FromResult(droppingItems);
         }
 
         public List<CharacterItem> GetStorageItems(StorageId storageId)
