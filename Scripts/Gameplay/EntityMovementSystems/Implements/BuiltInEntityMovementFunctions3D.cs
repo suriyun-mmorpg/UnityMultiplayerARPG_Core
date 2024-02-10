@@ -292,9 +292,14 @@ namespace MultiplayerARPG
                 // Not in water
                 return false;
             }
-            float footToSurfaceDist = waterCollider.bounds.max.y - EntityMovement.GetBounds().min.y;
-            float currentThreshold = footToSurfaceDist / (EntityMovement.GetBounds().max.y - EntityMovement.GetBounds().min.y);
-            return currentThreshold >= underWaterThreshold;
+            return Entity.EntityTransform.position.y < TargetWaterSurfaceY(waterCollider) + 0.01f;
+        }
+
+        public float TargetWaterSurfaceY(Collider waterCollider)
+        {
+            Bounds movementBounds = EntityMovement.GetBounds();
+            float result = waterCollider.bounds.max.y - (underWaterThreshold * movementBounds.size.y);
+            return result;
         }
 
         public void UpdateMovement(float deltaTime)
@@ -533,7 +538,7 @@ namespace MultiplayerARPG
                 {
                     if (autoSwimToSurface)
                         _moveDirection.y = 1f;
-                    tempTargetPosition = Vector3.up * (_waterCollider.bounds.max.y - (EntityMovement.GetBounds().size.y * underWaterThreshold));
+                    tempTargetPosition = Vector3.up * TargetWaterSurfaceY(_waterCollider);
                     tempCurrentPosition = Vector3.up * CacheTransform.position.y;
                     tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
@@ -630,8 +635,8 @@ namespace MultiplayerARPG
 
             if (!_isGrounded && _isUnderWater)
             {
-                Vector3 tempTargetPosition = Vector3.up * (_waterCollider.bounds.max.y - (EntityMovement.GetBounds().size.y * underWaterThreshold));
-                if (CacheTransform.position.y > tempTargetPosition.y)
+                Vector3 tempTargetPosition = Vector3.up * TargetWaterSurfaceY(_waterCollider);
+                if (Mathf.Abs(CacheTransform.position.y - tempTargetPosition.y) <= 0.02f)
                     CacheTransform.position = new Vector3(CacheTransform.position.x, tempTargetPosition.y, CacheTransform.position.z);
             }
         }

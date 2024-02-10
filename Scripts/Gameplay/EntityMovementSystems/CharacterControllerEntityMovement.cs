@@ -180,6 +180,31 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
+#if UNITY_EDITOR
+            Functions.stoppingDistance = stoppingDistance;
+            Functions.movementSecure = movementSecure;
+            Functions.jumpHeight = jumpHeight;
+            Functions.applyJumpForceMode = applyJumpForceMode;
+            Functions.applyJumpForceFixedDuration = applyJumpForceFixedDuration;
+            Functions.backwardMoveSpeedRate = backwardMoveSpeedRate;
+            Functions.gravity = gravity;
+            Functions.maxFallVelocity = maxFallVelocity;
+            Functions.stickGroundForce = stickGroundForce;
+            Functions.airborneDelay = airborneDelay;
+            Functions.doNotChangeVelocityWhileAirborne = doNotChangeVelocityWhileAirborne;
+            Functions.landedPauseMovementDuration = landedPauseMovementDuration;
+            Functions.beforeCrawlingPauseMovementDuration = beforeCrawlingPauseMovementDuration;
+            Functions.afterCrawlingPauseMovementDuration = afterCrawlingPauseMovementDuration;
+            Functions.underWaterThreshold = underWaterThreshold;
+            Functions.autoSwimToSurface = autoSwimToSurface;
+            Functions.alwaysUseRootMotion = alwaysUseRootMotion;
+            Functions.useRootMotionForMovement = useRootMotionForMovement;
+            Functions.useRootMotionForAirMovement = useRootMotionForAirMovement;
+            Functions.useRootMotionForJump = useRootMotionForJump;
+            Functions.useRootMotionForFall = useRootMotionForFall;
+            Functions.useRootMotionUnderWater = useRootMotionUnderWater;
+            Functions.snapThreshold = snapThreshold;
+#endif
             float deltaTime = Time.deltaTime;
             Functions.UpdateMovement(deltaTime);
             Functions.AfterMovementUpdate(deltaTime);
@@ -227,6 +252,12 @@ namespace MultiplayerARPG
 
         public Bounds GetBounds()
         {
+            /*
+            Bounds bounds = CacheCharacterController.bounds;
+            Vector3 size = Vector3.up * (bounds.size.y - CacheCharacterController.skinWidth * CacheTransform.localScale.y * 2f);
+            bounds.size = size;
+            return bounds;
+            */
             return CacheCharacterController.bounds;
         }
 
