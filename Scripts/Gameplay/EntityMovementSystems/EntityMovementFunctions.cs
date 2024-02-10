@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            writer.Put((byte)movement.MovementState);
+            writer.PutPackedUInt((uint)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector3(movement.Entity.EntityTransform.position);
             writer.PutPackedInt(GetCompressedAngle(movement.Entity.EntityTransform.eulerAngles.y));
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            writer.Put((byte)movement.MovementState);
+            writer.PutPackedUInt((uint)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector3(movement.Entity.EntityTransform.position);
             writer.PutPackedInt(GetCompressedAngle(movement.Entity.EntityTransform.eulerAngles.y));
@@ -91,7 +91,7 @@ namespace MultiplayerARPG
         public static void ReadMovementInputMessage3D(this NetDataReader reader, out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle)
         {
             inputState = (EntityMovementInputState)reader.GetByte();
-            movementState = (MovementState)reader.GetByte();
+            movementState = (MovementState)reader.GetPackedUInt();
             if (!inputState.Has(EntityMovementInputState.IsStopped))
                 extraMovementState = (ExtraMovementState)reader.GetByte();
             else
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
 
         public static void ReadSyncTransformMessage3D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle)
         {
-            movementState = (MovementState)reader.GetByte();
+            movementState = (MovementState)reader.GetPackedUInt();
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = reader.GetVector3();
             yAngle = GetDecompressedAngle(reader.GetPackedInt());
@@ -131,7 +131,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsServer)
                 return;
-            writer.Put((byte)movement.MovementState);
+            writer.PutPackedUInt((uint)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector2(movement.Entity.EntityTransform.position);
             writer.Put(movement.Direction2D);
@@ -141,7 +141,7 @@ namespace MultiplayerARPG
         {
             if (!movement.Entity.IsOwnerClient)
                 return;
-            writer.Put((byte)movement.MovementState);
+            writer.PutPackedUInt((uint)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector2(movement.Entity.EntityTransform.position);
             writer.Put(movement.Direction2D);
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
         public static void ReadMovementInputMessage2D(this NetDataReader reader, out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D)
         {
             inputState = (EntityMovementInputState)reader.GetByte();
-            movementState = (MovementState)reader.GetByte();
+            movementState = (MovementState)reader.GetPackedUInt();
             if (!inputState.Has(EntityMovementInputState.IsStopped))
                 extraMovementState = (ExtraMovementState)reader.GetByte();
             else
@@ -163,7 +163,7 @@ namespace MultiplayerARPG
 
         public static void ReadSyncTransformMessage2D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D)
         {
-            movementState = (MovementState)reader.GetByte();
+            movementState = (MovementState)reader.GetPackedUInt();
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = reader.GetVector2();
             direction2D = reader.Get<DirectionVector2>();

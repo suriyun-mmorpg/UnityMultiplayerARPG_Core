@@ -1,7 +1,7 @@
 ﻿namespace MultiplayerARPG
 {
     [System.Flags]
-    public enum MovementState : byte
+    public enum MovementState : uint
     {
         None = 0,
         Forward = 1 << 0,
@@ -12,6 +12,9 @@
         IsUnderWater = 1 << 5,
         IsJump = 1 << 6,
         IsTeleport = 1 << 7,
+        Up = 1 << 8,
+        Down = 1 << 9,
+        IsClimbing = 1 << 10,
     }
 
     public static class MovementStateExtensions
