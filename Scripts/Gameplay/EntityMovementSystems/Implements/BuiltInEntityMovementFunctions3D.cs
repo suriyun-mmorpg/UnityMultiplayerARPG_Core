@@ -534,10 +534,12 @@ namespace MultiplayerARPG
                 CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
                 // Move up to surface while under water
-                if (autoSwimToSurface || Mathf.Abs(_moveDirection.y) > 0)
+                if (autoSwimToSurface || _tempMovementState.Has(MovementState.Up) || _tempMovementState.Has(MovementState.Down) || Mathf.Abs(_moveDirection.y) > 0)
                 {
-                    if (autoSwimToSurface)
+                    if (autoSwimToSurface || _tempMovementState.Has(MovementState.Up))
                         _moveDirection.y = 1f;
+                    else if (_tempMovementState.Has(MovementState.Down))
+                        _moveDirection.y = -1f;
                     tempTargetPosition = Vector3.up * TargetWaterSurfaceY(_waterCollider);
                     tempCurrentPosition = Vector3.up * CacheTransform.position.y;
                     tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
@@ -554,7 +556,7 @@ namespace MultiplayerARPG
                     {
                         CurrentMoveSpeed = 0f;
                         // Force set move direction y to 0 to prevent swim move animation playing
-                        if (autoSwimToSurface)
+                        if (autoSwimToSurface || _tempMovementState.Has(MovementState.Up))
                             _moveDirection.y = 0f;
                     }
                     tempMoveVelocity.y = _moveDirection.y * CurrentMoveSpeed;
