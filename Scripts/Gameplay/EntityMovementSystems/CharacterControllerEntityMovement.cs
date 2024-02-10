@@ -252,12 +252,6 @@ namespace MultiplayerARPG
 
         public Bounds GetBounds()
         {
-            /*
-            Bounds bounds = CacheCharacterController.bounds;
-            Vector3 size = Vector3.up * (bounds.size.y - CacheCharacterController.skinWidth * CacheTransform.localScale.y * 2f);
-            bounds.size = size;
-            return bounds;
-            */
             return CacheCharacterController.bounds;
         }
 
