@@ -238,7 +238,10 @@ namespace MultiplayerARPG
 
         public virtual float GetActivatableDistance()
         {
-            return GameInstance.Singleton.conversationDistance;
+            if (activatableDistance > 0f)
+                return activatableDistance;
+            else
+                return GameInstance.Singleton.conversationDistance;
         }
 
         public virtual bool ShouldClearTargetAfterActivated()
