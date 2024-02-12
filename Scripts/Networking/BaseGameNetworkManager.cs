@@ -746,7 +746,16 @@ namespace MultiplayerARPG
 
         public virtual void InitPrefabs()
         {
-            Assets.offlineScene.SceneName = CurrentGameInstance.HomeSceneName;
+            Assets.addressableOfflineScene = null;
+            Assets.offlineScene = default;
+            if (CurrentGameInstance.GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
+            {
+                Assets.addressableOfflineScene = addressableScene;
+            }
+            else
+            {
+                Assets.offlineScene = scene;
+            }
             // Prepare networking prefabs
             Assets.playerPrefab = null;
             HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
@@ -878,14 +887,14 @@ namespace MultiplayerARPG
             SpawnEntities().Forget();
         }
 
-        public override void ServerSceneChange(string sceneName)
+        public override void ServerSceneChange(ServerSceneInfo serverSceneInfo)
         {
             if (!IsServer)
                 return;
             _serverReadyToInstantiateObjectsStates.Clear();
             _isServerReadyToInstantiateObjects = false;
             _isServerReadyToInstantiatePlayers = false;
-            base.ServerSceneChange(sceneName);
+            base.ServerSceneChange(serverSceneInfo);
         }
 
         protected virtual async UniTaskVoid SpawnEntities()

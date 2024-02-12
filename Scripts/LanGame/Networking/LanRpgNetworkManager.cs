@@ -87,7 +87,8 @@ namespace MultiplayerARPG
             {
                 case GameStartType.Host:
                     SetMapInfo(selectedCharacter.CurrentMapName);
-                    Assets.onlineScene.SceneName = CurrentMapInfo.GetSceneName();
+                    Assets.onlineScene = CurrentMapInfo.Scene;
+                    Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
                     networkPort = gameServiceConnection.networkPort;
                     maxConnections = gameServiceConnection.maxConnections;
                     StartHost(false);
@@ -105,7 +106,8 @@ namespace MultiplayerARPG
                     break;
                 case GameStartType.SinglePlayer:
                     SetMapInfo(selectedCharacter.CurrentMapName);
-                    Assets.onlineScene.SceneName = CurrentMapInfo.GetSceneName();
+                    Assets.onlineScene = CurrentMapInfo.Scene;
+                    Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
                     StartHost(true);
                     // Stop discovery client because game started
                     CacheDiscovery.StopClient();
@@ -388,7 +390,7 @@ namespace MultiplayerARPG
             }
 
             if (!string.IsNullOrEmpty(mapName) && playerCharacterEntity.IsServer && playerCharacterEntity.IsOwnerClient &&
-                GameInstance.MapInfos.TryGetValue(mapName, out BaseMapInfo mapInfo) && mapInfo.IsSceneSet())
+                GameInstance.MapInfos.TryGetValue(mapName, out BaseMapInfo mapInfo) && mapInfo.IsSceneValid())
             {
                 // Save data before warp
                 BasePlayerCharacterEntity owningCharacter = GameInstance.PlayingCharacterEntity;
@@ -416,7 +418,7 @@ namespace MultiplayerARPG
                     // Destroy owning character to avoid save while warp
                     owningCharacter.NetworkDestroy();
                 }
-                ServerSceneChange(mapInfo.Scene);
+                ServerSceneChange(mapInfo.GetSceneInfo());
             }
         }
 

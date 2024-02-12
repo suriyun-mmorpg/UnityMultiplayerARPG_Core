@@ -1,17 +1,31 @@
-﻿namespace MultiplayerARPG
+﻿using LiteNetLibManager;
+
+namespace MultiplayerARPG
 {
     public static class MapInfoExtensions
     {
-        public static bool IsSceneSet(this BaseMapInfo mapInfo)
+        public static bool IsAddressableSceneValid(this BaseMapInfo mapInfo)
         {
-            return mapInfo != null && mapInfo.Scene != null && mapInfo.Scene.IsSet();
+            return mapInfo != null && mapInfo.AddressableScene.IsDataValid();
         }
 
-        public static string GetSceneName(this BaseMapInfo mapInfo)
+        public static bool IsSceneValid(this BaseMapInfo mapInfo)
         {
-            if (mapInfo.IsSceneSet())
-                return mapInfo.Scene.SceneName;
-            return string.Empty;
+            return mapInfo != null && mapInfo.Scene.IsDataValid();
+        }
+
+        public static ServerSceneInfo GetSceneInfo(this BaseMapInfo mapInfo)
+        {
+            UnityEngine.Debug.LogError(mapInfo.name + " " + mapInfo.IsAddressableSceneValid() + " " + mapInfo.IsSceneValid());
+            if (mapInfo.IsAddressableSceneValid())
+            {
+                return mapInfo.AddressableScene.GetServerSceneInfo();
+            }
+            else if (mapInfo.IsSceneValid())
+            {
+                return mapInfo.Scene.GetServerSceneInfo();
+            }
+            return default;
         }
     }
 }

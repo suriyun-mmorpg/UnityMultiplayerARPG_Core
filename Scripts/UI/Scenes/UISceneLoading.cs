@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using LiteNetLibManager;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -57,6 +58,48 @@ namespace MultiplayerARPG
                     imageGage.fillAmount = asyncOp.progress;
                 if (sliderGage != null)
                     sliderGage.value = asyncOp.progress;
+                yield return null;
+            }
+            yield return null;
+            if (uiTextProgress != null)
+                uiTextProgress.text = "100.00%";
+            if (imageGage != null)
+                imageGage.fillAmount = 1;
+            if (sliderGage != null)
+                sliderGage.value = 1;
+            yield return new WaitForSecondsRealtime(finishedDelay);
+            if (rootObject != null)
+                rootObject.SetActive(false);
+        }
+
+        public virtual Coroutine LoadScene(AssetReferenceScene sceneRef)
+        {
+            return StartCoroutine(LoadSceneRoutine(sceneRef));
+        }
+
+        protected virtual IEnumerator LoadSceneRoutine(AssetReferenceScene sceneRef)
+        {
+            
+            if (SceneManager.GetActiveScene().name.Equals(sceneRef.SceneName))
+                yield break;
+            if (rootObject != null)
+                rootObject.SetActive(true);
+            if (uiTextProgress != null)
+                uiTextProgress.text = "0.00%";
+            if (imageGage != null)
+                imageGage.fillAmount = 0;
+            if (sliderGage != null)
+                sliderGage.value = 0;
+            yield return null;
+            var asyncOp = sceneRef.LoadSceneAsync(LoadSceneMode.Single);
+            while (!asyncOp.IsDone)
+            {
+                if (uiTextProgress != null)
+                    uiTextProgress.text = (asyncOp.PercentComplete * 100f).ToString("N2") + "%";
+                if (imageGage != null)
+                    imageGage.fillAmount = asyncOp.PercentComplete;
+                if (sliderGage != null)
+                    sliderGage.value = asyncOp.PercentComplete;
                 yield return null;
             }
             yield return null;

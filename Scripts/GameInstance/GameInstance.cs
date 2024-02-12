@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
@@ -415,11 +417,14 @@ namespace MultiplayerARPG
         public ItemAmount[] startItems = new ItemAmount[0];
 
         [Header("Scene/Maps")]
-        public UnityScene homeScene = default;
+        public SceneField homeScene;
+        public AssetReferenceScene addressableHomeScene;
         [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
-        public UnityScene homeMobileScene = default;
+        public SceneField homeMobileScene;
+        public AssetReferenceScene addressableHomeMobileScene;
         [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
-        public UnityScene homeConsoleScene = default;
+        public SceneField homeConsoleScene;
+        public AssetReferenceScene addressableHomeConsoleScene;
 
         [Header("Server Settings")]
         public bool updateAnimationAtServer = true;
@@ -433,8 +438,11 @@ namespace MultiplayerARPG
         [Header("Platforms Configs")]
         public int serverTargetFrameRate = 30;
 
+#if UNITY_EDITOR
         [Header("Playing In Editor")]
         public TestInEditorMode testInEditorMode = TestInEditorMode.Standalone;
+        public AssetReferenceLanRpgNetworkManager networkManagerForOfflineTesting;
+#endif
 
         // Static events
         public static event System.Action<IPlayerCharacterData> onSetPlayingCharacter;
@@ -513,18 +521,6 @@ namespace MultiplayerARPG
                 if ((Application.isConsolePlatform || IsConsoleTestInEditor()) && uiSceneGameplayConsolePrefab != null)
                     return uiSceneGameplayConsolePrefab;
                 return uiSceneGameplayPrefab;
-            }
-        }
-
-        public string HomeSceneName
-        {
-            get
-            {
-                if ((Application.isMobilePlatform || IsMobileTestInEditor()) && homeMobileScene.IsSet())
-                    return homeMobileScene;
-                if ((Application.isConsolePlatform || IsConsoleTestInEditor()) && homeConsoleScene.IsSet())
-                    return homeConsoleScene;
-                return homeScene;
             }
         }
 
@@ -633,8 +629,10 @@ namespace MultiplayerARPG
             Singleton = this;
             LoadHomeScenePreventions.Clear();
             EventSystemManager = gameObject.GetOrAddComponent<EventSystemManager>();
+#if UNITY_EDITOR
             InputManager.useMobileInputOnNonMobile = IsMobileTestInEditor();
             InputManager.useNonMobileInput = testInEditorMode == TestInEditorMode.MobileWithKeyInputs && Application.isEditor;
+#endif
 
             DefaultArmorType = ScriptableObject.CreateInstance<ArmorType>()
                 .GenerateDefaultArmorType();
@@ -712,6 +710,16 @@ namespace MultiplayerARPG
                 IgnoreRaycastLayersValues.Add(layer.LayerIndex);
             }
 
+            // Setup default home scenes
+            if (!addressableHomeMobileScene.IsDataValid())
+                addressableHomeMobileScene = addressableHomeScene;
+            if (!addressableHomeConsoleScene.IsDataValid())
+                addressableHomeConsoleScene = addressableHomeScene;
+            if (!homeMobileScene.IsDataValid())
+                homeMobileScene = homeScene;
+            if (!homeConsoleScene.IsDataValid())
+                homeConsoleScene = homeScene;
+
             ClearData();
             this.InvokeInstanceDevExtMethods("Awake");
         }
@@ -782,12 +790,20 @@ namespace MultiplayerARPG
 
         public static bool IsMobileTestInEditor()
         {
+#if UNITY_EDITOR
             return (Singleton.testInEditorMode == TestInEditorMode.Mobile || Singleton.testInEditorMode == TestInEditorMode.MobileWithKeyInputs) && Application.isEditor;
+#else
+            return false;
+#endif
         }
 
         public static bool IsConsoleTestInEditor()
         {
+#if UNITY_EDITOR
             return Singleton.testInEditorMode == TestInEditorMode.Console && Application.isEditor;
+#else
+            return false;
+#endif
         }
 
         public void LoadedGameData()
@@ -852,9 +868,66 @@ namespace MultiplayerARPG
         IEnumerator LoadHomeSceneRoutine()
         {
             if (UISceneLoading.Singleton)
-                yield return UISceneLoading.Singleton.LoadScene(HomeSceneName);
+            {
+                if (GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
+                {
+                    yield return UISceneLoading.Singleton.LoadScene(addressableScene);
+                }
+                else
+                {
+                    yield return UISceneLoading.Singleton.LoadScene(scene);
+                }
+            }
             else
-                yield return SceneManager.LoadSceneAsync(HomeSceneName);
+            {
+                if (GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
+                {
+                    yield return addressableScene.LoadSceneAsync();
+                }
+                else
+                {
+                    yield return SceneManager.LoadSceneAsync(scene);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Return `TRUE` if it is addressable
+        /// </summary>
+        /// <param name="addressableScene"></param>
+        /// <param name="scene"></param>
+        /// <returns></returns>
+        public bool GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene)
+        {
+            addressableScene = null;
+            scene = default;
+            if (Application.isMobilePlatform || IsMobileTestInEditor())
+            {
+                if (addressableHomeMobileScene.IsDataValid())
+                {
+                    addressableScene = addressableHomeMobileScene;
+                    return true;
+                }
+                scene = homeMobileScene;
+                return false;
+            }
+            if (Application.isConsolePlatform || IsConsoleTestInEditor())
+            {
+                if (addressableHomeConsoleScene.IsDataValid())
+                {
+                    addressableScene = addressableHomeConsoleScene;
+                    return true;
+                }
+                scene = homeConsoleScene;
+                return false;
+            }
+            if (addressableHomeScene.IsDataValid())
+            {
+                addressableScene = addressableHomeScene;
+                return true;
+            }
+            scene = homeScene;
+            return false;
         }
 
         public List<string> GetGameMapIds()
@@ -1537,7 +1610,7 @@ namespace MultiplayerARPG
                 return;
             foreach (BaseMapInfo mapInfo in mapInfos)
             {
-                if (mapInfo == null || MapInfos.ContainsKey(mapInfo.Id) || !mapInfo.IsSceneSet())
+                if (mapInfo == null || MapInfos.ContainsKey(mapInfo.Id) || (!mapInfo.IsAddressableSceneValid() && !mapInfo.IsSceneValid()))
                     continue;
                 mapInfo.Validate();
                 MapInfos[mapInfo.Id] = mapInfo;

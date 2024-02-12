@@ -1,4 +1,5 @@
 ﻿using LiteNetLib.Utils;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -10,8 +11,12 @@ namespace MultiplayerARPG
         #region Map Info Settings
         [Category("Map Info Settings")]
         [SerializeField]
-        private UnityScene scene = default;
-        public virtual UnityScene Scene { get { return scene; } }
+        private AssetReferenceScene addressableScene;
+        public virtual AssetReferenceScene AddressableScene { get { return addressableScene; } }
+
+        [SerializeField]
+        private SceneField scene = default;
+        public virtual SceneField Scene { get { return scene; } }
 
         [Tooltip("This will be used when new character has been created to set its position, and this map data is the start map")]
         [SerializeField]
