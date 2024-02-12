@@ -16,7 +16,6 @@ namespace MultiplayerARPG
 
         public static ServerSceneInfo GetSceneInfo(this BaseMapInfo mapInfo)
         {
-            UnityEngine.Debug.LogError(mapInfo.name + " " + mapInfo.IsAddressableSceneValid() + " " + mapInfo.IsSceneValid());
             if (mapInfo.IsAddressableSceneValid())
             {
                 return mapInfo.AddressableScene.GetServerSceneInfo();
