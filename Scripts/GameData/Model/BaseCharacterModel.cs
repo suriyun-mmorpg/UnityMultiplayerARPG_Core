@@ -213,6 +213,11 @@ namespace MultiplayerARPG
             {
                 foreach (EquipmentContainer equipmentContainer in equipmentContainers)
                 {
+                    if (SetEquipmentLayerFollowEntity)
+                        equipmentContainer.defaultModel?.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = CacheEntity.gameObject);
+                    else
+                        equipmentContainer.defaultModel?.SetLayerRecursively(EquipmentLayer, true);
+
                     if (!cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
                         cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
                 }
