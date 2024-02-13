@@ -1,4 +1,5 @@
 using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -14,10 +15,19 @@ namespace MultiplayerARPG
             public RenderTexture renderTexture;
         }
         public Entry[] entries = new Entry[0];
+        private List<BaseCharacterModel> _characterModels = new List<BaseCharacterModel>();
 
         private void Awake()
         {
             Singleton = this;
+        }
+
+        private void Update()
+        {
+            for (int i = 0; i < _characterModels.Count; ++i)
+            {
+                _characterModels[i].UpdateAnimation(Time.deltaTime);
+            }
         }
 
         public void LoadCharacter(int index, string characterId, out RenderTexture renderTexture, ResponseDelegate<ResponseGetOnlineCharacterDataMessage> callback)
@@ -26,6 +36,7 @@ namespace MultiplayerARPG
             if (index < 0 || index >= entries.Length)
                 return;
             renderTexture = entries[index].renderTexture;
+            _characterModels.Clear();
             ClearContainer(index);
             GameInstance.ClientOnlineCharacterHandlers.RequestGetOnlineCharacterData(new RequestGetOnlineCharacterDataMessage()
             {
@@ -41,6 +52,7 @@ namespace MultiplayerARPG
                 {
                     characterModel.SetEquipItems(response.character.EquipItems, response.character.SelectableWeaponSets, response.character.EquipWeaponSet, false);
                     characterModel.gameObject.SetActive(true);
+                    _characterModels.Add(characterModel);
                 }
             });
         }
