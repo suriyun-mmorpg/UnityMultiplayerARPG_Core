@@ -13,7 +13,7 @@ namespace UtilsComponents
         {
             foreach (UIBase page in pages)
             {
-                page.Hide();
+                page?.Hide();
             }
         }
 
