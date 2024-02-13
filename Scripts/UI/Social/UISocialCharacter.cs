@@ -122,7 +122,7 @@ namespace MultiplayerARPG
             if (uiPlayerTitle != null)
                 uiPlayerTitle.SetDataByDataId(Data.titleDataId);
 
-            if (_characterEntity == null || _characterEntity.Id != Data.id)
+            if (!string.IsNullOrEmpty(Data.id) && (_characterEntity == null || !string.Equals(_characterEntity.Id, Data.id)))
             {
                 // Try looking for the character entity
                 GameInstance.ClientCharacterHandlers.TryGetSubscribedPlayerCharacterById(Data.id, out _characterEntity);
