@@ -14,6 +14,8 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
             ForceUpdate();
         }
     }
+    [Tooltip("UIs set here will be cloned by this UI")]
+    public UISelectionEntry<T>[] clones = new UISelectionEntry<T>[0];
     public UISelectionManager selectionManager;
     public float updateUIRepeatRate = 0.5f;
     protected float _updateCountDown;
@@ -66,6 +68,10 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
     {
         UpdateData();
         UpdateUI();
+        for (int i = 0; i < clones.Length; ++i)
+        {
+            CloneTo(clones[i]);
+        }
         if (onUpdateData != null)
             onUpdateData.Invoke(Data);
         this.InvokeInstanceDevExtMethods("UpdateData");
@@ -114,6 +120,11 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
     public object GetData()
     {
         return Data;
+    }
+
+    protected virtual void CloneTo(UISelectionEntry<T> target)
+    {
+        target.Data = Data;
     }
 
     protected virtual void UpdateUI() { }

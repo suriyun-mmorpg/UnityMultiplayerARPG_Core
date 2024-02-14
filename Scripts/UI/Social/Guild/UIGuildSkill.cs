@@ -55,8 +55,6 @@ namespace MultiplayerARPG
         public UnityEvent onUnableToUse;
 
         [Header("Options")]
-        [Tooltip("UIs in this list will use cloned item data from this UI")]
-        public UIGuildSkill[] clones;
         public UIGuildSkill uiNextLevelSkill;
 
         protected float _coolDownRemainsDuration;
@@ -291,15 +289,6 @@ namespace MultiplayerARPG
                 {
                     uiSkillBuff.Show();
                     uiSkillBuff.Data = new UIBuffData(GuildSkill.Buff, Level);
-                }
-            }
-
-            if (clones != null && clones.Length > 0)
-            {
-                for (int i = 0; i < clones.Length; ++i)
-                {
-                    if (clones[i] == null) continue;
-                    clones[i].Data = Data;
                 }
             }
 

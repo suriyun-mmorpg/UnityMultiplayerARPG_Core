@@ -83,8 +83,6 @@ namespace MultiplayerARPG
         public UnityEvent onUnableToUse = new UnityEvent();
 
         [Header("Options")]
-        [Tooltip("UIs set here will be cloned by this UI")]
-        public UICharacterSkill[] clones;
         public UICharacterSkill uiNextLevelSkill;
 
         protected float _coolDownRemainsDuration;
@@ -488,15 +486,6 @@ namespace MultiplayerARPG
                 {
                     uiSkillDebuff.Show();
                     uiSkillDebuff.Data = new UIBuffData(debuff, Level);
-                }
-            }
-
-            if (clones != null && clones.Length > 0)
-            {
-                for (int i = 0; i < clones.Length; ++i)
-                {
-                    if (clones[i] == null) continue;
-                    clones[i].Data = Data;
                 }
             }
 

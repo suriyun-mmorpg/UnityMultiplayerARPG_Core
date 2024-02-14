@@ -204,8 +204,6 @@ namespace MultiplayerARPG
         public UnityEvent onStartVendingDialogDisappear = new UnityEvent();
 
         [Header("Options")]
-        [Tooltip("UIs in this list will use cloned item data from this UI")]
-        public UICharacterItem[] clones;
         public UICharacterItemDragHandler uiDragging;
         [Tooltip("UI which will be shown if this item level not reached max level")]
         public UICharacterItem uiNextLevelItem;
@@ -1383,15 +1381,6 @@ namespace MultiplayerARPG
                 {
                     uiStatusEffectApplyingsEnemyWhenAttacked.UpdateData(ItemWithStatusEffectApplyings.EnemyStatusEffectsWhenAttacked, Level, UIStatusEffectApplyingTarget.EnemyWhenAttacked);
                     uiStatusEffectApplyingsEnemyWhenAttacked.Show();
-                }
-            }
-
-            if (clones != null && clones.Length > 0)
-            {
-                for (int i = 0; i < clones.Length; ++i)
-                {
-                    if (clones[i] == null) continue;
-                    clones[i].Data = Data;
                 }
             }
 

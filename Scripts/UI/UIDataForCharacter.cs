@@ -29,5 +29,11 @@
         {
             return Character != null && GameInstance.PlayingCharacter != null && Character.Id == GameInstance.PlayingCharacter.Id;
         }
+
+        protected override void CloneTo(UISelectionEntry<T> target)
+        {
+            base.CloneTo(target);
+            (target as UIDataForCharacter<T>).IndexOfData = IndexOfData;
+        }
     }
 }
