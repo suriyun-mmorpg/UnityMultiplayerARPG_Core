@@ -51,7 +51,10 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
-                result.InvokeError(new ResponseEquipArmorMessage());
+                result.InvokeError(new ResponseEquipArmorMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_EQUIP,
+                });
                 return default;
             }
 
@@ -81,7 +84,10 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
-                result.InvokeError(new ResponseEquipWeaponMessage());
+                result.InvokeError(new ResponseEquipWeaponMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_EQUIP,
+                });
                 return default;
             }
 
@@ -171,7 +177,10 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
             {
-                result.InvokeError(new ResponseSwitchEquipWeaponSetMessage());
+                result.InvokeError(new ResponseSwitchEquipWeaponSetMessage()
+                {
+                    message = UITextKeys.UI_ERROR_CANNOT_EQUIP,
+                });
                 return default;
             }
 
