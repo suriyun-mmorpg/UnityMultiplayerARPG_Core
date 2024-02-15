@@ -79,8 +79,6 @@ namespace MultiplayerARPG
 
         public abstract ItemType ItemType { get; }
 
-        public GameObject DropModel { get { return dropModel; } set { dropModel = value; } }
-
         public int SellPrice { get { return sellPrice; } }
 
         public float Weight { get { return weight; } }
@@ -96,6 +94,8 @@ namespace MultiplayerARPG
         public ETimeUnits ExpireDurationUnit { get { return expireDurationUnit; } }
 
         public int ExpireDuration { get { return expireDuration; } }
+
+        public GameObject DropModel { get { return dropModel; } set { dropModel = value; } }
 
         public int DismantleReturnGold { get { return dismantleReturnGold; } }
 

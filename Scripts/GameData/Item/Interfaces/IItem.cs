@@ -13,10 +13,6 @@ namespace MultiplayerARPG
         /// </summary>
         ItemType ItemType { get; }
         /// <summary>
-        /// Drop model
-        /// </summary>
-        GameObject DropModel { get; }
-        /// <summary>
         /// Sell price when sell it to NPC
         /// </summary>
         int SellPrice { get; }
@@ -52,6 +48,10 @@ namespace MultiplayerARPG
         /// This is duration to make item to be expired and destroyed from inventory
         /// </summary>
         int ExpireDuration { get; }
+        /// <summary>
+        /// Drop model
+        /// </summary>
+        GameObject DropModel { get; }
         /// <summary>
         /// Returning gold after this item was dismantled
         /// </summary>
