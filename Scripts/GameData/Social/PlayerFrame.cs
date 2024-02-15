@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.PLAYER_FRAME_FILE, menuName = GameDataMenuConsts.PLAYER_FRAME_MENU, order = GameDataMenuConsts.PLAYER_FRAME_ORDER)]
-    public partial class PlayerFrame : BaseGameData
+    public partial class PlayerFrame : BaseGameData, IUnlockableGameData
     {
         [SerializeField]
         protected bool isLocked;
