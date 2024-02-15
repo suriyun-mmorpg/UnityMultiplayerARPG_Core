@@ -756,17 +756,20 @@ namespace MultiplayerARPG
                         !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
                 }
                 // From mount
-                GetBuffs(data.PassengingVehicleEntity,
-                    !isCalculateStats ? null : (stats) => buffStats += stats,
-                    !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
-                    !isCalculateAttributes ? null : (attributes) => GameDataHelpers.CombineAttributes(buffAttributes, attributes),
-                    !isCalculateAttributes ? null : (attributesRate) => GameDataHelpers.CombineAttributes(buffAttributesRate, attributesRate),
-                    !isCalculateResistances ? null : (resistances) => GameDataHelpers.CombineResistances(buffResistances, resistances),
-                    !isCalculateArmors ? null : (armors) => GameDataHelpers.CombineArmors(buffArmors, armors),
-                    !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
-                    !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
-                    !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
-                    !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
+                if (data is BaseCharacterEntity characterEntity)
+                {
+                    GetBuffs(characterEntity.PassengingVehicleEntity,
+                        !isCalculateStats ? null : (stats) => buffStats += stats,
+                        !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
+                        !isCalculateAttributes ? null : (attributes) => GameDataHelpers.CombineAttributes(buffAttributes, attributes),
+                        !isCalculateAttributes ? null : (attributesRate) => GameDataHelpers.CombineAttributes(buffAttributesRate, attributesRate),
+                        !isCalculateResistances ? null : (resistances) => GameDataHelpers.CombineResistances(buffResistances, resistances),
+                        !isCalculateArmors ? null : (armors) => GameDataHelpers.CombineArmors(buffArmors, armors),
+                        !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
+                        !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
+                        !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                        !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
+                }
             }
 
             if (sumWithSkills)

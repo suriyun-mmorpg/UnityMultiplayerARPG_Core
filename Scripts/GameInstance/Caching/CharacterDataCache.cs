@@ -251,10 +251,13 @@ namespace MultiplayerARPG
             HavingChanceToRemoveBuffWhenPickupItem = false;
 
             bool allAilmentsWereApplied = false;
-            if (characterData.PassengingVehicleEntity != null)
+            if (characterData is BaseCharacterEntity characterEntity)
             {
-                UpdateAppliedAilments(characterData.PassengingVehicleEntity.GetBuff());
-                allAilmentsWereApplied = AllAilmentsWereApplied();
+                if (!allAilmentsWereApplied && !characterEntity.PassengingVehicleEntity.IsNull())
+                {
+                    UpdateAppliedAilments(characterEntity.PassengingVehicleEntity.GetBuff());
+                    allAilmentsWereApplied = AllAilmentsWereApplied();
+                }
             }
 
             if (!allAilmentsWereApplied)
