@@ -75,7 +75,7 @@ namespace MultiplayerARPG
             if (Entity.Characteristic != MonsterCharacteristic.Assist)
                 return;
             // Warn that this character received damage to nearby characters
-            List<BaseCharacterEntity> foundCharacters = Entity.FindAliveEntities<BaseCharacterEntity>(CharacterDatabase.VisualRange, true, false, false, GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.playingLayer.Mask | GameInstance.Singleton.monsterLayer.Mask);
+            List<BaseCharacterEntity> foundCharacters = Entity.FindAliveEntities<BaseCharacterEntity>(CharacterDatabase.VisualRange, true, false, false, CurrentGameInstance.playerLayer.Mask | CurrentGameInstance.playingLayer.Mask | CurrentGameInstance.monsterLayer.Mask);
             if (foundCharacters == null || foundCharacters.Count == 0) return;
             foreach (BaseCharacterEntity foundCharacter in foundCharacters)
             {
@@ -370,7 +370,7 @@ namespace MultiplayerARPG
             if (Entity.Summoner != null)
             {
                 // Random position around summoner
-                randomPosition = CurrentGameInstance.GameplayRule.GetSummonPosition(Entity.Summoner);
+                randomPosition = CurrentGameplayRule.GetSummonPosition(Entity.Summoner);
             }
             else
             {
@@ -396,7 +396,7 @@ namespace MultiplayerARPG
             if (Entity.Summoner != null)
             {
                 // Random position around summoner
-                randomPosition = GameInstance.Singleton.GameplayRule.GetSummonPosition(Entity.Summoner);
+                randomPosition = CurrentGameplayRule.GetSummonPosition(Entity.Summoner);
             }
             else
             {
