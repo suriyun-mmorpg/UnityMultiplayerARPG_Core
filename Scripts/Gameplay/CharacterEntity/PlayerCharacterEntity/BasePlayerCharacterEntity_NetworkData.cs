@@ -599,25 +599,25 @@ namespace MultiplayerARPG
                 onGuildIdChange.Invoke(guildId);
         }
 
-        private void OnIconDataIdChange(bool isInitial, int guildId)
+        private void OnIconDataIdChange(bool isInitial, int iconDataId)
         {
             _isRecaching = true;
             if (onIconDataIdChange != null)
-                onIconDataIdChange.Invoke(guildId);
+                onIconDataIdChange.Invoke(iconDataId);
         }
 
-        private void OnFrameDataIdChange(bool isInitial, int guildId)
+        private void OnFrameDataIdChange(bool isInitial, int frameDataId)
         {
             _isRecaching = true;
             if (onFrameDataIdChange != null)
-                onFrameDataIdChange.Invoke(guildId);
+                onFrameDataIdChange.Invoke(frameDataId);
         }
 
-        private void OnTitleDataIdChange(bool isInitial, int guildId)
+        private void OnTitleDataIdChange(bool isInitial, int titleDataId)
         {
             _isRecaching = true;
             if (onTitleDataIdChange != null)
-                onTitleDataIdChange.Invoke(guildId);
+                onTitleDataIdChange.Invoke(titleDataId);
         }
 
         private void OnIsPkOnChange(bool isInitial, bool isPkOn)
