@@ -7,7 +7,8 @@ namespace MultiplayerARPG
         bool IsImmune { get; }
         int CurrentHp { get; set; }
         Transform OpponentAimTransform { get; }
-        bool IsInSafeArea { get; set; }
+        SafeArea SafeArea { get; set; }
+        bool IsInSafeArea { get; }
         bool CanReceiveDamageFrom(EntityInfo instigator);
     }
 }

@@ -68,10 +68,14 @@ namespace MultiplayerARPG
             get { return DamageableEntity.CurrentHp; }
             set { DamageableEntity.CurrentHp = value; }
         }
+        public SafeArea SafeArea
+        {
+            get { return DamageableEntity.SafeArea; }
+            set { DamageableEntity.SafeArea = value; }
+        }
         public bool IsInSafeArea
         {
             get { return DamageableEntity.IsInSafeArea; }
-            set { DamageableEntity.IsInSafeArea = value; }
         }
         public Transform OpponentAimTransform
         {

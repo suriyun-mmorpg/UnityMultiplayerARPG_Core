@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             IDamageableEntity gameEntity = other.GetComponent<IDamageableEntity>();
             if (gameEntity.IsNull())
                 return;
-            gameEntity.IsInSafeArea = true;
+            gameEntity.SafeArea = this;
         }
 
         private void OnTriggerExit(Collider other)
@@ -42,7 +42,8 @@ namespace MultiplayerARPG
             IDamageableEntity gameEntity = other.GetComponent<IDamageableEntity>();
             if (gameEntity.IsNull())
                 return;
-            gameEntity.IsInSafeArea = false;
+            if (gameEntity.SafeArea == this)
+                gameEntity.SafeArea = null;
         }
     }
 }

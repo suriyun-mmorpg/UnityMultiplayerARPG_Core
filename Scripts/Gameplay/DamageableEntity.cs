@@ -48,7 +48,8 @@ namespace MultiplayerARPG
 
         public virtual bool IsImmune { get { return isImmune.Value || IsInSafeArea; } set { isImmune.Value = value; } }
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
-        public bool IsInSafeArea { get; set; }
+        public SafeArea SafeArea { get; set; }
+        public bool IsInSafeArea { get { return SafeArea != null; } }
         public abstract int MaxHp { get; }
         public float HpRate { get { return (float)CurrentHp / (float)MaxHp; } }
         public DamageableHitBox[] HitBoxes { get; protected set; }
