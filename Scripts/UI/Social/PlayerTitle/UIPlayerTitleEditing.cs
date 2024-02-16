@@ -15,34 +15,33 @@ namespace MultiplayerARPG
         [Header("Options")]
         public bool updateSelectedTitleOnSelect;
 
+        private List<int> _availableTitleIds = new List<int>();
+        private List<PlayerTitle> _list = new List<PlayerTitle>();
 
-        private List<int> availableTitleIds = new List<int>();
-        private List<PlayerTitle> list = new List<PlayerTitle>();
-
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UIPlayerTitleSelectionManager cacheSelectionManager;
+        private UIPlayerTitleSelectionManager _cacheSelectionManager;
         public UIPlayerTitleSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UIPlayerTitleSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UIPlayerTitleSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
@@ -55,26 +54,33 @@ namespace MultiplayerARPG
 
         public virtual void LoadAvailableTitles()
         {
-            GameInstance.ClientCharacterHandlers.RequestAvailableTitles(ResponseAvailableTitles);
+            GameInstance.ClientUserContentHandlers.RequestAvailableContents(new RequestAvailableContentsMessage()
+            {
+                type = UnlockableContentType.Frame,
+            }, ResponseAvailableContents);
         }
 
-        protected virtual void ResponseAvailableTitles(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAvailableTitlesMessage response)
+        protected virtual void ResponseAvailableContents(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAvailableContentsMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            availableTitleIds.Clear();
-            availableTitleIds.AddRange(response.titleIds);
-            list.Clear();
+            _availableTitleIds.Clear();
+            for (int i = 0; i < response.contents.Length; ++i)
+            {
+                if (response.contents[i].unlocked)
+                    _availableTitleIds.Add(response.contents[i].dataId);
+            }
+            _list.Clear();
             List<PlayerTitle> availableTitles = new List<PlayerTitle>();
             List<PlayerTitle> unavailableTitles = new List<PlayerTitle>();
             foreach (PlayerTitle title in GameInstance.PlayerTitles.Values)
             {
-                if (availableTitleIds.Contains(title.DataId))
+                if (_availableTitleIds.Contains(title.DataId))
                     availableTitles.Add(title);
                 else
                     unavailableTitles.Add(title);
             }
-            list.AddRange(availableTitles);
-            list.AddRange(unavailableTitles);
+            _list.AddRange(availableTitles);
+            _list.AddRange(unavailableTitles);
             UpdateData(GameInstance.PlayingCharacter.TitleDataId);
         }
 
@@ -96,7 +102,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            if (list.Count == 0)
+            if (_list.Count == 0)
             {
                 CacheList.HideAll();
                 if (listEmptyObject != null)
@@ -108,14 +114,14 @@ namespace MultiplayerARPG
                 listEmptyObject.SetActive(false);
 
             UIPlayerTitle tempUI;
-            CacheList.Generate(list, (index, data, ui) =>
+            CacheList.Generate(_list, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UIPlayerTitle>();
                 tempUI.Data = data;
-                tempUI.SetIsLocked(availableTitleIds.Contains(data.DataId));
+                tempUI.SetIsLocked(_availableTitleIds.Contains(data.DataId));
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if ((selectedDataId == 0 && availableTitleIds.Contains(data.DataId)) || selectedDataId == data.DataId)
+                if ((selectedDataId == 0 && _availableTitleIds.Contains(data.DataId)) || selectedDataId == data.DataId)
                 {
                     selectedDataId = data.DataId;
                     tempUI.SelectByManager();

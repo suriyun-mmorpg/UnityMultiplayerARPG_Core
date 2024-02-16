@@ -15,34 +15,33 @@ namespace MultiplayerARPG
         [Header("Options")]
         public bool updateSelectedIconOnSelect;
 
+        private List<int> _availableIconIds = new List<int>();
+        private List<PlayerIcon> _list = new List<PlayerIcon>();
 
-        private List<int> availableIconIds = new List<int>();
-        private List<PlayerIcon> list = new List<PlayerIcon>();
-
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UIPlayerIconSelectionManager cacheSelectionManager;
+        private UIPlayerIconSelectionManager _cacheSelectionManager;
         public UIPlayerIconSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UIPlayerIconSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UIPlayerIconSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
@@ -55,26 +54,33 @@ namespace MultiplayerARPG
 
         public virtual void LoadAvailableIcons()
         {
-            GameInstance.ClientCharacterHandlers.RequestAvailableIcons(ResponseAvailableIcons);
+            GameInstance.ClientUserContentHandlers.RequestAvailableContents(new RequestAvailableContentsMessage()
+            {
+                type = UnlockableContentType.Frame,
+            }, ResponseAvailableContents);
         }
 
-        protected virtual void ResponseAvailableIcons(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAvailableIconsMessage response)
+        protected virtual void ResponseAvailableContents(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAvailableContentsMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            availableIconIds.Clear();
-            availableIconIds.AddRange(response.iconIds);
-            list.Clear();
+            _availableIconIds.Clear();
+            for (int i = 0; i < response.contents.Length; ++i)
+            {
+                if (response.contents[i].unlocked)
+                    _availableIconIds.Add(response.contents[i].dataId);
+            }
+            _list.Clear();
             List<PlayerIcon> availableIcons = new List<PlayerIcon>();
             List<PlayerIcon> unavailableIcons = new List<PlayerIcon>();
             foreach (PlayerIcon icon in GameInstance.PlayerIcons.Values)
             {
-                if (availableIconIds.Contains(icon.DataId))
+                if (_availableIconIds.Contains(icon.DataId))
                     availableIcons.Add(icon);
                 else
                     unavailableIcons.Add(icon);
             }
-            list.AddRange(availableIcons);
-            list.AddRange(unavailableIcons);
+            _list.AddRange(availableIcons);
+            _list.AddRange(unavailableIcons);
             UpdateData(GameInstance.PlayingCharacter.IconDataId);
         }
 
@@ -96,7 +102,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            if (list.Count == 0)
+            if (_list.Count == 0)
             {
                 CacheList.HideAll();
                 if (listEmptyObject != null)
@@ -108,14 +114,14 @@ namespace MultiplayerARPG
                 listEmptyObject.SetActive(false);
 
             UIPlayerIcon tempUI;
-            CacheList.Generate(list, (index, data, ui) =>
+            CacheList.Generate(_list, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UIPlayerIcon>();
                 tempUI.Data = data;
-                tempUI.SetIsLocked(availableIconIds.Contains(data.DataId));
+                tempUI.SetIsLocked(_availableIconIds.Contains(data.DataId));
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if ((selectedDataId == 0 && availableIconIds.Contains(data.DataId)) || selectedDataId == data.DataId)
+                if ((selectedDataId == 0 && _availableIconIds.Contains(data.DataId)) || selectedDataId == data.DataId)
                 {
                     selectedDataId = data.DataId;
                     tempUI.SelectByManager();

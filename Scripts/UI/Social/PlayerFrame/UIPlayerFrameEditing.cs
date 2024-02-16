@@ -15,34 +15,33 @@ namespace MultiplayerARPG
         [Header("Options")]
         public bool updateSelectedFrameOnSelect;
 
+        private List<int> _availableFrameIds = new List<int>();
+        private List<PlayerFrame> _list = new List<PlayerFrame>();
 
-        private List<int> availableFrameIds = new List<int>();
-        private List<PlayerFrame> list = new List<PlayerFrame>();
-
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UIPlayerFrameSelectionManager cacheSelectionManager;
+        private UIPlayerFrameSelectionManager _cacheSelectionManager;
         public UIPlayerFrameSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UIPlayerFrameSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UIPlayerFrameSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
@@ -55,26 +54,33 @@ namespace MultiplayerARPG
 
         public virtual void LoadAvailableFrames()
         {
-            GameInstance.ClientCharacterHandlers.RequestAvailableFrames(ResponseAvailableFrames);
+            GameInstance.ClientUserContentHandlers.RequestAvailableContents(new RequestAvailableContentsMessage()
+            {
+                type = UnlockableContentType.Frame,
+            }, ResponseAvailableContents);
         }
 
-        protected virtual void ResponseAvailableFrames(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAvailableFramesMessage response)
+        protected virtual void ResponseAvailableContents(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseAvailableContentsMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            availableFrameIds.Clear();
-            availableFrameIds.AddRange(response.frameIds);
-            list.Clear();
+            _availableFrameIds.Clear();
+            for (int i = 0; i < response.contents.Length; ++i)
+            {
+                if (response.contents[i].unlocked)
+                    _availableFrameIds.Add(response.contents[i].dataId);
+            }
+            _list.Clear();
             List<PlayerFrame> availableFrames = new List<PlayerFrame>();
             List<PlayerFrame> unavailableFrames = new List<PlayerFrame>();
             foreach (PlayerFrame frame in GameInstance.PlayerFrames.Values)
             {
-                if (availableFrameIds.Contains(frame.DataId))
+                if (_availableFrameIds.Contains(frame.DataId))
                     availableFrames.Add(frame);
                 else
                     unavailableFrames.Add(frame);
             }
-            list.AddRange(availableFrames);
-            list.AddRange(unavailableFrames);
+            _list.AddRange(availableFrames);
+            _list.AddRange(unavailableFrames);
             UpdateData(GameInstance.PlayingCharacter.FrameDataId);
         }
 
@@ -96,7 +102,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            if (list.Count == 0)
+            if (_list.Count == 0)
             {
                 CacheList.HideAll();
                 if (listEmptyObject != null)
@@ -108,14 +114,14 @@ namespace MultiplayerARPG
                 listEmptyObject.SetActive(false);
 
             UIPlayerFrame tempUI;
-            CacheList.Generate(list, (index, data, ui) =>
+            CacheList.Generate(_list, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UIPlayerFrame>();
                 tempUI.Data = data;
-                tempUI.SetIsLocked(availableFrameIds.Contains(data.DataId));
+                tempUI.SetIsLocked(_availableFrameIds.Contains(data.DataId));
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if ((selectedDataId == 0 && availableFrameIds.Contains(data.DataId)) || selectedDataId == data.DataId)
+                if ((selectedDataId == 0 && _availableFrameIds.Contains(data.DataId)) || selectedDataId == data.DataId)
                 {
                     selectedDataId = data.DataId;
                     tempUI.SelectByManager();

@@ -87,54 +87,6 @@ namespace MultiplayerARPG
             return default;
         }
 
-        public UniTaskVoid HandleRequestAvailableIcons(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableIconsMessage> result)
-        {
-            // TODO: Implement data unlocking
-            List<int> iconIds = new List<int>();
-            foreach (PlayerIcon icon in GameInstance.PlayerIcons.Values)
-            {
-                if (!icon.IsLocked)
-                    iconIds.Add(icon.DataId);
-            }
-            result.InvokeSuccess(new ResponseAvailableIconsMessage()
-            {
-                iconIds = iconIds.ToArray(),
-            });
-            return default;
-        }
-
-        public UniTaskVoid HandleRequestAvailableFrames(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableFramesMessage> result)
-        {
-            // TODO: Implement data unlocking
-            List<int> frameIds = new List<int>();
-            foreach (PlayerFrame frame in GameInstance.PlayerFrames.Values)
-            {
-                if (!frame.IsLocked)
-                    frameIds.Add(frame.DataId);
-            }
-            result.InvokeSuccess(new ResponseAvailableFramesMessage()
-            {
-                frameIds = frameIds.ToArray(),
-            });
-            return default;
-        }
-
-        public UniTaskVoid HandleRequestAvailableTitles(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseAvailableTitlesMessage> result)
-        {
-            // TODO: Implement data unlocking
-            List<int> titleIds = new List<int>();
-            foreach (PlayerTitle title in GameInstance.PlayerTitles.Values)
-            {
-                if (!title.IsLocked)
-                    titleIds.Add(title.DataId);
-            }
-            result.InvokeSuccess(new ResponseAvailableTitlesMessage()
-            {
-                titleIds = titleIds.ToArray(),
-            });
-            return default;
-        }
-
         public UniTaskVoid HandleRequestSetIcon(RequestHandlerData requestHandler, RequestSetIconMessage request, RequestProceedResultDelegate<ResponseSetIconMessage> result)
         {
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))

@@ -46,6 +46,7 @@ namespace MultiplayerARPG
         protected IServerGachaMessageHandlers ServerGachaMessageHandlers { get; set; }
         protected IServerFriendMessageHandlers ServerFriendMessageHandlers { get; set; }
         protected IServerBankMessageHandlers ServerBankMessageHandlers { get; set; }
+        protected IServerUserContentMessageHandlers ServerUserContentMessageHandlers { get; set; }
         protected IServerOnlineCharacterMessageHandlers ServerOnlineCharacterMessageHandlers { get; set; }
         // Client handlers
         protected IClientCashShopHandlers ClientCashShopHandlers { get; set; }
@@ -58,6 +59,7 @@ namespace MultiplayerARPG
         protected IClientGachaHandlers ClientGachaHandlers { get; set; }
         protected IClientFriendHandlers ClientFriendHandlers { get; set; }
         protected IClientBankHandlers ClientBankHandlers { get; set; }
+        protected IClientUserContentHandlers ClientUserContentHandlers { get; set; }
         protected IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
         protected IClientChatHandlers ClientChatHandlers { get; set; }
         protected IClientGameMessageHandlers ClientGameMessageHandlers { get; set; }
@@ -340,9 +342,6 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<RequestIncreaseAttributeAmountMessage, ResponseIncreaseAttributeAmountMessage>(GameNetworkingConsts.IncreaseAttributeAmount, ServerCharacterMessageHandlers.HandleRequestIncreaseAttributeAmount);
                 RegisterRequestToServer<RequestIncreaseSkillLevelMessage, ResponseIncreaseSkillLevelMessage>(GameNetworkingConsts.IncreaseSkillLevel, ServerCharacterMessageHandlers.HandleRequestIncreaseSkillLevel);
                 RegisterRequestToServer<RequestRespawnMessage, ResponseRespawnMessage>(GameNetworkingConsts.Respawn, ServerCharacterMessageHandlers.HandleRequestRespawn);
-                RegisterRequestToServer<EmptyMessage, ResponseAvailableIconsMessage>(GameNetworkingConsts.AvailableIcons, ServerCharacterMessageHandlers.HandleRequestAvailableIcons);
-                RegisterRequestToServer<EmptyMessage, ResponseAvailableFramesMessage>(GameNetworkingConsts.AvailableFrames, ServerCharacterMessageHandlers.HandleRequestAvailableFrames);
-                RegisterRequestToServer<EmptyMessage, ResponseAvailableTitlesMessage>(GameNetworkingConsts.AvailableTitles, ServerCharacterMessageHandlers.HandleRequestAvailableTitles);
                 RegisterRequestToServer<RequestSetIconMessage, ResponseSetIconMessage>(GameNetworkingConsts.SetIcon, ServerCharacterMessageHandlers.HandleRequestSetIcon);
                 RegisterRequestToServer<RequestSetFrameMessage, ResponseSetFrameMessage>(GameNetworkingConsts.SetFrame, ServerCharacterMessageHandlers.HandleRequestSetFrame);
                 RegisterRequestToServer<RequestSetTitleMessage, ResponseSetTitleMessage>(GameNetworkingConsts.SetTitle, ServerCharacterMessageHandlers.HandleRequestSetTitle);
@@ -435,6 +434,12 @@ namespace MultiplayerARPG
             if (ServerOnlineCharacterMessageHandlers != null)
             {
                 RegisterRequestToServer<RequestGetOnlineCharacterDataMessage, ResponseGetOnlineCharacterDataMessage>(GameNetworkingConsts.GetOnlineCharacterData, ServerOnlineCharacterMessageHandlers.HandleRequestGetOnlineCharacterData);
+            }
+            // User Content
+            if (ServerUserContentMessageHandlers != null)
+            {
+                RegisterRequestToServer<RequestAvailableContentsMessage, ResponseAvailableContentsMessage>(GameNetworkingConsts.AvailableContents, ServerUserContentMessageHandlers.HandleRequestAvailableContents);
+                RegisterRequestToServer<RequestUnlockContentMessage, ResponseUnlockContentMessage>(GameNetworkingConsts.UnlockContent, ServerUserContentMessageHandlers.HandleRequestUnlockContent);
             }
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
@@ -545,6 +550,7 @@ namespace MultiplayerARPG
             GameInstance.ClientGachaHandlers = ClientGachaHandlers;
             GameInstance.ClientFriendHandlers = ClientFriendHandlers;
             GameInstance.ClientBankHandlers = ClientBankHandlers;
+            GameInstance.ClientUserContentHandlers = ClientUserContentHandlers;
             GameInstance.ClientOnlineCharacterHandlers = ClientOnlineCharacterHandlers;
             GameInstance.ClientChatHandlers = ClientChatHandlers;
             base.OnStartClient(client);

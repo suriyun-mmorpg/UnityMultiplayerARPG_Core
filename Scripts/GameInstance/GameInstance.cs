@@ -3,8 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.ResourceManagement.AsyncOperations;
-using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
@@ -71,6 +69,7 @@ namespace MultiplayerARPG
         public static IClientGachaHandlers ClientGachaHandlers { get; set; }
         public static IClientFriendHandlers ClientFriendHandlers { get; set; }
         public static IClientBankHandlers ClientBankHandlers { get; set; }
+        public static IClientUserContentHandlers ClientUserContentHandlers { get; set; }
         public static IClientOnlineCharacterHandlers ClientOnlineCharacterHandlers { get; set; }
         public static IClientChatHandlers ClientChatHandlers { get; set; }
         public static IServerMailHandlers ServerMailHandlers { get; set; }

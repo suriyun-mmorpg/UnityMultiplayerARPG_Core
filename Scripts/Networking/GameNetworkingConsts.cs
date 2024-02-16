@@ -105,12 +105,11 @@
         public const ushort GetOnlineCharacterData = 177;
         public const ushort FriendRequestNotification = 178;
         public const ushort GuildRequestNotification = 179;
-        public const ushort AvailableIcons = 180;
-        public const ushort AvailableFrames = 181;
-        public const ushort AvailableTitles = 182;
         public const ushort SetIcon = 183;
         public const ushort SetFrame = 184;
         public const ushort SetTitle = 185;
         public const ushort SortItems = 186;
+        public const ushort AvailableContents = 187;
+        public const ushort UnlockContent = 188;
     }
 }

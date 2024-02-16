@@ -17,18 +17,6 @@ namespace MultiplayerARPG
             RequestHandlerData requestHandler, RequestRespawnMessage request,
             RequestProceedResultDelegate<ResponseRespawnMessage> result);
 
-        UniTaskVoid HandleRequestAvailableIcons(
-            RequestHandlerData requestHandler, EmptyMessage request,
-            RequestProceedResultDelegate<ResponseAvailableIconsMessage> result);
-
-        UniTaskVoid HandleRequestAvailableFrames(
-            RequestHandlerData requestHandler, EmptyMessage request,
-            RequestProceedResultDelegate<ResponseAvailableFramesMessage> result);
-
-        UniTaskVoid HandleRequestAvailableTitles(
-            RequestHandlerData requestHandler, EmptyMessage request,
-            RequestProceedResultDelegate<ResponseAvailableTitlesMessage> result);
-
         UniTaskVoid HandleRequestSetIcon(
             RequestHandlerData requestHandler, RequestSetIconMessage request,
             RequestProceedResultDelegate<ResponseSetIconMessage> result);
