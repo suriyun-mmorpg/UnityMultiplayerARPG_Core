@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -65,6 +66,7 @@ namespace MultiplayerARPG
 
         internal void InitTpsModel(BaseCharacterModel model)
         {
+            model.Entity = Entity;
             model.MainModel = MainTpsModel;
             model.IsTpsModel = true;
             model.IsFpsModel = false;
@@ -77,7 +79,8 @@ namespace MultiplayerARPG
 
         internal void InitFpsModel(BaseCharacterModel model)
         {
-            model.MainModel = model;
+            model.Entity = Entity;
+            model.MainModel = MainFpsModel;
             model.IsTpsModel = false;
             model.IsFpsModel = true;
             if (model == MainFpsModel)
@@ -92,6 +95,7 @@ namespace MultiplayerARPG
             if (fpsModelPrefab == null)
                 return null;
             MainFpsModel = Instantiate(fpsModelPrefab, container);
+            InitFpsModel(MainFpsModel);
             MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
             MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
             MainFpsModel.SetEquipItems(MainTpsModel.EquipItems, MainTpsModel.SelectableWeaponSets, MainTpsModel.EquipWeaponSet, MainTpsModel.IsWeaponsSheathed);

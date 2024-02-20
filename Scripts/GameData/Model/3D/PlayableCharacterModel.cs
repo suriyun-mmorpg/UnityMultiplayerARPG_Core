@@ -71,7 +71,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Graph.Play();
                 Graph.Evaluate(Time.deltaTime);
             }
-            CacheEntity.onIsUpdateEntityComponentsChanged += CacheEntity_onUpdateEntityComponentsChanged;
+            Entity.onIsUpdateEntityComponentsChanged += CacheEntity_onUpdateEntityComponentsChanged;
         }
 
         private void CacheEntity_onUpdateEntityComponentsChanged(bool isUpdate)
@@ -129,7 +129,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void OnDestroy()
         {
-            CacheEntity.onIsUpdateEntityComponentsChanged -= CacheEntity_onUpdateEntityComponentsChanged;
+            Entity.onIsUpdateEntityComponentsChanged -= CacheEntity_onUpdateEntityComponentsChanged;
             DestroyGraph();
         }
 

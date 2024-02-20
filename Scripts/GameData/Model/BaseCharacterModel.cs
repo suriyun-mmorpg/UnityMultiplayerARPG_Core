@@ -103,31 +103,31 @@ namespace MultiplayerARPG
             get { return IsMainModel ? base.CacheEffectContainers : MainModel.CacheEffectContainers; }
         }
 
-        protected Dictionary<int, VehicleCharacterModel> cacheVehicleModels;
+        protected Dictionary<int, VehicleCharacterModel> _cacheVehicleModels;
         /// <summary>
         /// { vehicleType(Int32), vehicleCharacterModel(VehicleCharacterModel) }
         /// </summary>
         public Dictionary<int, VehicleCharacterModel> CacheVehicleModels
         {
-            get { return IsMainModel ? cacheVehicleModels : MainModel.cacheVehicleModels; }
+            get { return IsMainModel ? _cacheVehicleModels : MainModel._cacheVehicleModels; }
         }
 
-        protected Dictionary<string, EquipmentContainer> cacheEquipmentModelContainers;
+        protected Dictionary<string, EquipmentContainer> _cacheEquipmentModelContainers;
         /// <summary>
         /// { equipSocket(String), container(EquipmentModelContainer) }
         /// </summary>
         public Dictionary<string, EquipmentContainer> CacheEquipmentModelContainers
         {
-            get { return IsMainModel ? cacheEquipmentModelContainers : MainModel.cacheEquipmentModelContainers; }
+            get { return IsMainModel ? _cacheEquipmentModelContainers : MainModel._cacheEquipmentModelContainers; }
         }
 
-        protected Dictionary<string, List<GameEffect>> cacheEffects = new Dictionary<string, List<GameEffect>>();
+        protected Dictionary<string, List<GameEffect>> _cacheEffects = new Dictionary<string, List<GameEffect>>();
         /// <summary>
         /// { equipPosition(String), [ effect(GameEffect) ] }
         /// </summary>
         public Dictionary<string, List<GameEffect>> CacheEffects
         {
-            get { return IsMainModel ? cacheEffects : MainModel.cacheEffects; }
+            get { return IsMainModel ? _cacheEffects : MainModel._cacheEffects; }
         }
 
         protected BaseEquipmentEntity cacheRightHandEquipmentEntity;
@@ -160,39 +160,39 @@ namespace MultiplayerARPG
         public UpdateEquipmentModelsDelegate onBeforeUpdateEquipmentModels;
 
         // Optimize garbage collector
-        protected bool _isCacheDataInitialized = false;
         protected readonly List<string> _tempAddingKeys = new List<string>();
         protected readonly List<string> _tempCachedKeys = new List<string>();
 
         protected override void Awake()
         {
-            base.Awake();
-
             Manager = GetComponent<CharacterModelManager>();
             if (Manager == null)
                 Manager = GetComponentInParent<CharacterModelManager>(true);
 
             // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
-            if (Manager != null)
+            if (Manager == null)
             {
-                CacheEntity = Manager.Entity;
-                Manager.InitTpsModel(this);
-            }
-            else
-            {
+                Entity = GetComponent<BaseGameEntity>();
+                if (Entity == null)
+                    Entity = GetComponentInParent<BaseGameEntity>();
                 MainModel = this;
                 InitCacheData();
                 SwitchModel(null);
             }
+            else
+            {
+                Manager.InitTpsModel(this);
+            }
         }
 
-        internal void InitCacheData()
+        internal override void InitCacheData()
         {
             if (_isCacheDataInitialized)
                 return;
-            _isCacheDataInitialized = true;
 
-            cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
+            base.InitCacheData();
+            // Prepare vehicle models
+            _cacheVehicleModels = new Dictionary<int, VehicleCharacterModel>();
             if (vehicleModels != null && vehicleModels.Length > 0)
             {
                 foreach (VehicleCharacterModel vehicleModel in vehicleModels)
@@ -204,26 +204,26 @@ namespace MultiplayerARPG
                         vehicleModel.modelsForEachSeats[i].IsTpsModel = IsTpsModel;
                         vehicleModel.modelsForEachSeats[i].IsFpsModel = IsFpsModel;
                     }
-                    cacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
+                    _cacheVehicleModels[vehicleModel.vehicleType.DataId] = vehicleModel;
                 }
             }
-
-            cacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
+            // Prepare equipment model containers
+            _cacheEquipmentModelContainers = new Dictionary<string, EquipmentContainer>();
             if (equipmentContainers != null && equipmentContainers.Length > 0)
             {
                 foreach (EquipmentContainer equipmentContainer in equipmentContainers)
                 {
                     if (SetEquipmentLayerFollowEntity)
-                        equipmentContainer.defaultModel?.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = CacheEntity.gameObject);
+                        equipmentContainer.defaultModel?.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = Entity.gameObject);
                     else
                         equipmentContainer.defaultModel?.SetLayerRecursively(EquipmentLayer, true);
 
-                    if (!cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
-                        cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
+                    if (!_cacheEquipmentModelContainers.ContainsKey(equipmentContainer.equipSocket))
+                        _cacheEquipmentModelContainers[equipmentContainer.equipSocket] = equipmentContainer;
                 }
             }
-
-            cacheEffects = new Dictionary<string, List<GameEffect>>();
+            // Prepare game effects collection (for buff effects)
+            _cacheEffects = new Dictionary<string, List<GameEffect>>();
         }
 
         protected void UpdateObjectsWhenSwitch()
@@ -540,7 +540,7 @@ namespace MultiplayerARPG
                             tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
                         tempEquipmentObject.gameObject.SetActive(true);
                         if (SetEquipmentLayerFollowEntity)
-                            tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = CacheEntity.gameObject);
+                            tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = Entity.gameObject);
                         else
                             tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                         tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);

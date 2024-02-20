@@ -142,8 +142,8 @@ namespace MultiplayerARPG
         public bool setEffectContainersBySetters;
 #endif
 
+        public BaseGameEntity Entity { get; set; }
         public Transform CacheTransform { get; protected set; }
-        public BaseGameEntity CacheEntity { get; protected set; }
 
         protected Dictionary<string, EffectContainer> _cacheEffectContainers = null;
         /// <summary>
@@ -153,6 +153,8 @@ namespace MultiplayerARPG
         {
             get { return _cacheEffectContainers; }
         }
+
+        protected bool _isCacheDataInitialized = false;
 
         internal void AssignId()
         {
@@ -166,8 +168,18 @@ namespace MultiplayerARPG
 
         protected virtual void Awake()
         {
+            Entity = GetComponentInParent<BaseGameEntity>();
+            InitCacheData();
+        }
+
+        internal virtual void InitCacheData()
+        {
+            if (_isCacheDataInitialized)
+                return;
+            _isCacheDataInitialized = true;
+            // Prepare cache transform
             CacheTransform = transform;
-            CacheEntity = GetComponentInParent<BaseGameEntity>();
+            // Prepare audio source if it is not set
             if (genericAudioSource == null)
             {
                 genericAudioSource = gameObject.GetOrAddComponent<AudioSource>((obj) =>
@@ -175,6 +187,7 @@ namespace MultiplayerARPG
                     obj.spatialBlend = 1f;
                 });
             }
+            // Prepare effect containers
             _cacheEffectContainers = new Dictionary<string, EffectContainer>();
             if (effectContainers != null && effectContainers.Length > 0)
             {
@@ -297,7 +310,7 @@ namespace MultiplayerARPG
                 tempGameEffect = PoolSystem.GetInstance(effect, tempContainer.transform.position, tempContainer.transform.rotation);
                 tempGameEffect.FollowingTarget = tempContainer.transform;
                 if (SetEffectLayerFollowEntity)
-                    tempGameEffect.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = CacheEntity.gameObject);
+                    tempGameEffect.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = Entity.gameObject);
                 else
                     tempGameEffect.gameObject.SetLayerRecursively(EffectLayer, true);
                 AddingNewEffect(tempGameEffect);
