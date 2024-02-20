@@ -1,6 +1,8 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UtilsComponents;
+using System.Collections;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -69,8 +71,8 @@ namespace MultiplayerARPG
 
         [Tooltip("These objects will be deactivated while entity is invisible")]
         [SerializeField]
-        protected GameObject[] hiddingObjects;
-        public GameObject[] HiddingObjects
+        protected List<GameObject> hiddingObjects = new List<GameObject>();
+        public List<GameObject> HiddingObjects
         {
             get { return hiddingObjects; }
             set { hiddingObjects = value; }
@@ -78,8 +80,8 @@ namespace MultiplayerARPG
 
         [Tooltip("These renderers will be disabled while entity is invisible")]
         [SerializeField]
-        protected Renderer[] hiddingRenderers;
-        public Renderer[] HiddingRenderers
+        protected List<Renderer> hiddingRenderers = new List<Renderer>();
+        public List<Renderer> HiddingRenderers
         {
             get { return hiddingRenderers; }
             set { hiddingRenderers = value; }
@@ -87,8 +89,8 @@ namespace MultiplayerARPG
 
         [Tooltip("These object will be deactivated while view mode is FPS")]
         [SerializeField]
-        protected GameObject[] fpsHiddingObjects;
-        public GameObject[] FpsHiddingObjects
+        protected List<GameObject> fpsHiddingObjects = new List<GameObject>();
+        public List<GameObject> FpsHiddingObjects
         {
             get { return fpsHiddingObjects; }
             set { fpsHiddingObjects = value; }
@@ -96,8 +98,8 @@ namespace MultiplayerARPG
 
         [Tooltip("These renderers will be disabled while view mode is FPS")]
         [SerializeField]
-        protected Renderer[] fpsHiddingRenderers;
-        public Renderer[] FpsHiddingRenderers
+        protected List<Renderer> fpsHiddingRenderers = new List<Renderer>();
+        public List<Renderer> FpsHiddingRenderers
         {
             get { return fpsHiddingRenderers; }
             set { fpsHiddingRenderers = value; }
@@ -142,8 +144,9 @@ namespace MultiplayerARPG
         public bool setEffectContainersBySetters;
 #endif
 
-        public BaseGameEntity Entity { get; set; }
+        public virtual BaseGameEntity Entity { get; set; }
         public Transform CacheTransform { get; protected set; }
+        public BaseModelHiddingUpdater ModelHiddingUpdater { get; protected set; }
 
         protected Dictionary<string, EffectContainer> _cacheEffectContainers = null;
         /// <summary>
@@ -179,6 +182,8 @@ namespace MultiplayerARPG
             _isCacheDataInitialized = true;
             // Prepare cache transform
             CacheTransform = transform;
+            // Prepare hidding renderers updater
+            ModelHiddingUpdater = gameObject.GetOrAddComponent<BaseModelHiddingUpdater>();
             // Prepare audio source if it is not set
             if (genericAudioSource == null)
             {
@@ -246,41 +251,22 @@ namespace MultiplayerARPG
             {
                 case EVisibleState.Visible:
                     // Visible state is Visible, show all objects and renderers
-                    SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, false);
-                    SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, false);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, false);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, false);
                     VisibleMaterials.ApplyMaterials();
                     break;
                 case EVisibleState.Invisible:
                     // Visible state is Invisible, hide all objects and renderers
-                    SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, true);
-                    SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, true);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, true);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, true);
                     InvisibleMaterials.ApplyMaterials();
                     break;
                 case EVisibleState.Fps:
                     // Visible state is Fps, hide Fps objects and renderers
-                    SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, false);
-                    SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, true);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, false);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, true);
                     FpsMaterials.ApplyMaterials();
                     break;
-            }
-        }
-
-        protected void SetHiddingObjectsAndRenderers(GameObject[] hiddingObjects, Renderer[] hiddingRenderers, bool isHidding)
-        {
-            int i;
-            if (hiddingObjects != null && hiddingObjects.Length > 0)
-            {
-                for (i = 0; i < hiddingObjects.Length; ++i)
-                {
-                    hiddingObjects[i].SetActive(!isHidding);
-                }
-            }
-            if (hiddingRenderers != null && hiddingRenderers.Length > 0)
-            {
-                for (i = 0; i < hiddingRenderers.Length; ++i)
-                {
-                    hiddingRenderers[i].forceRenderingOff = isHidding;
-                }
             }
         }
 
