@@ -211,16 +211,24 @@ namespace MultiplayerARPG
 
         public void UpdateVisibleState()
         {
-            GameEntityModel.EVisibleState mainModelVisibleState = GameEntityModel.EVisibleState.Visible;
+            GameEntityModel.EVisibleState tpsModelVisibleState = GameEntityModel.EVisibleState.Visible;
+            GameEntityModel.EVisibleState fpsModelVisibleState = GameEntityModel.EVisibleState.Invisible;
             if (IsFps)
-                mainModelVisibleState = GameEntityModel.EVisibleState.Fps;
+            {
+                tpsModelVisibleState = GameEntityModel.EVisibleState.Fps;
+                fpsModelVisibleState = GameEntityModel.EVisibleState.Visible;
+            }
             if (IsHide)
-                mainModelVisibleState = GameEntityModel.EVisibleState.Invisible;
+            {
+                tpsModelVisibleState = GameEntityModel.EVisibleState.Invisible;
+            }
             // Set visible state to main model
-            MainTpsModel.SetVisibleState(mainModelVisibleState);
+            MainTpsModel.SetVisibleState(tpsModelVisibleState);
             // FPS model will be hidden when it's not FPS mode
             if (MainFpsModel != null)
-                MainFpsModel.gameObject.SetActive(IsFps);
+            {
+                MainFpsModel.SetVisibleState(fpsModelVisibleState);
+            }
         }
     }
 }
