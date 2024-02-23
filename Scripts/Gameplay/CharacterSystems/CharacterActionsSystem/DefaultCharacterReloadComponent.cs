@@ -7,12 +7,8 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterActionComponentManager))]
-    public class DefaultCharacterReloadComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterReloadComponent
+    public class DefaultCharacterReloadComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterReloadComponent, ICharacterActionComponentPreparation
     {
-        public const float DEFAULT_TOTAL_DURATION = 2f;
-        public const float DEFAULT_TRIGGER_DURATION = 1f;
-        public const float DEFAULT_STATE_SETUP_DELAY = 1f;
-
         protected readonly List<CancellationTokenSource> _reloadCancellationTokenSources = new List<CancellationTokenSource>();
         public int ReloadingAmmoDataId { get; protected set; }
         public int ReloadingAmmoAmount { get; protected set; }
@@ -31,6 +27,7 @@ namespace MultiplayerARPG
         public AnimActionType AnimActionType { get; protected set; }
 
         protected CharacterActionComponentManager _manager;
+        protected float _remainsDurationWithoutSpeedRate = 0f;
         // Logging data
         bool _entityIsPlayer = false;
         BasePlayerCharacterEntity _playerCharacterEntity = null;
@@ -58,6 +55,14 @@ namespace MultiplayerARPG
         {
             ReloadingAmmoAmount = 0;
             IsReloading = false;
+        }
+
+        public void OnPrepareActionDurations(float[] triggerDurations, float totalDuration, float remainsDurationWithoutSpeedRate, float endTime)
+        {
+            _triggerDurations = triggerDurations;
+            _totalDuration = totalDuration;
+            _remainsDurationWithoutSpeedRate = remainsDurationWithoutSpeedRate;
+            LastReloadEndTime = endTime;
         }
 
         protected virtual async UniTaskVoid ReloadRoutine(bool isLeftHand, int reloadingAmmoDataId, int reloadingAmmoAmount)
@@ -94,21 +99,15 @@ namespace MultiplayerARPG
             MoveSpeedRateWhileReloading = Entity.GetMoveSpeedRateWhileReloading(weaponItem);
             MovementRestrictionWhileReloading = Entity.GetMovementRestrictionWhileReloading(weaponItem);
 
-            // Last attack end time
-            float remainsDuration = DEFAULT_TOTAL_DURATION;
-            LastReloadEndTime = Time.unscaledTime + DEFAULT_TOTAL_DURATION;
-            if (_totalDuration >= 0f)
-            {
-                remainsDuration = _totalDuration;
-                LastReloadEndTime = Time.unscaledTime + (_totalDuration / animSpeedRate);
-            }
-
             try
             {
                 bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
                 bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
+
+                // Prepare end time
+                LastReloadEndTime = CharacterActionComponentManager.PrepareActionDefaultEndTime(_totalDuration, animSpeedRate);
 
                 // Play animation
                 if (tpsModelAvailable)
@@ -133,31 +132,7 @@ namespace MultiplayerARPG
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                if (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f)
-                {
-                    // Wait some components to setup proper `attackTriggerDurations` and `attackTotalDuration` within `DEFAULT_STATE_SETUP_DELAY`
-                    float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
-                    do
-                    {
-                        await UniTask.Yield(reloadCancellationTokenSource.Token);
-                        setupDelayCountDown -= Time.unscaledDeltaTime;
-                    } while (setupDelayCountDown > 0 && (_triggerDurations == null || _triggerDurations.Length == 0 || _totalDuration < 0f));
-                    if (setupDelayCountDown <= 0f)
-                    {
-                        // Can't setup properly, so try to setup manually to make it still workable
-                        remainsDuration = DEFAULT_TOTAL_DURATION - DEFAULT_STATE_SETUP_DELAY;
-                        _triggerDurations = new float[1]
-                        {
-                            DEFAULT_TRIGGER_DURATION,
-                        };
-                    }
-                    else
-                    {
-                        // Can setup, so set proper `remainsDuration` and `LastAttackEndTime` value
-                        remainsDuration = _totalDuration;
-                        LastReloadEndTime = Time.unscaledTime + (_totalDuration / animSpeedRate);
-                    }
-                }
+                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, animSpeedRate, reloadCancellationTokenSource.Token);
 
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogReloadStart(_playerCharacterEntity, _triggerDurations);
@@ -168,7 +143,7 @@ namespace MultiplayerARPG
                 {
                     // Wait until triggger before reload ammo
                     tempTriggerDuration = _triggerDurations[triggerIndex];
-                    remainsDuration -= tempTriggerDuration;
+                    _remainsDurationWithoutSpeedRate -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
@@ -195,17 +170,17 @@ namespace MultiplayerARPG
                         ActionTrigger(reloadingAmmoDataId, reloadingAmmoAmount, triggerIndex, isLeftHand, weapon);
                     }
 
-                    if (remainsDuration <= 0f)
+                    if (_remainsDurationWithoutSpeedRate <= 0f)
                     {
                         // Stop trigger animations loop
                         break;
                     }
                 }
 
-                if (remainsDuration > 0f)
+                if (_remainsDurationWithoutSpeedRate > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(_remainsDurationWithoutSpeedRate / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)
