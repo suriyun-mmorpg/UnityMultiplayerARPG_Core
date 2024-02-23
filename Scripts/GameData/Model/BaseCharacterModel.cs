@@ -78,24 +78,24 @@ namespace MultiplayerARPG
 
         public CharacterModelManager Manager { get; protected set; }
 
-        protected Dictionary<string, EquipmentModel> equippedModels = new Dictionary<string, EquipmentModel>();
+        protected Dictionary<string, EquipmentModel> _equippedModels = new Dictionary<string, EquipmentModel>();
         /// <summary>
         /// { equipPosition(String), model(EquipmentModel) }
         /// </summary>
         public Dictionary<string, EquipmentModel> EquippedModels
         {
-            get { return IsMainModel ? equippedModels : MainModel.equippedModels; }
-            set { MainModel.equippedModels = value; }
+            get { return IsMainModel ? _equippedModels : MainModel._equippedModels; }
+            set { MainModel._equippedModels = value; }
         }
 
-        protected Dictionary<string, GameObject> equippedModelObjects = new Dictionary<string, GameObject>();
+        protected Dictionary<string, GameObject> _equippedModelObjects = new Dictionary<string, GameObject>();
         /// <summary>
         /// { equipSocket(String), modelObject(GameObject) }
         /// </summary>
         public Dictionary<string, GameObject> EquippedModelObjects
         {
-            get { return IsMainModel ? equippedModelObjects : MainModel.equippedModelObjects; }
-            set { MainModel.equippedModelObjects = value; }
+            get { return IsMainModel ? _equippedModelObjects : MainModel._equippedModelObjects; }
+            set { MainModel._equippedModelObjects = value; }
         }
 
         public override Dictionary<string, EffectContainer> CacheEffectContainers
@@ -130,18 +130,18 @@ namespace MultiplayerARPG
             get { return IsMainModel ? _cacheEffects : MainModel._cacheEffects; }
         }
 
-        protected BaseEquipmentEntity cacheRightHandEquipmentEntity;
+        protected BaseEquipmentEntity _cacheRightHandEquipmentEntity;
         public BaseEquipmentEntity CacheRightHandEquipmentEntity
         {
-            get { return IsMainModel ? cacheRightHandEquipmentEntity : MainModel.cacheRightHandEquipmentEntity; }
-            set { MainModel.cacheRightHandEquipmentEntity = value; }
+            get { return IsMainModel ? _cacheRightHandEquipmentEntity : MainModel._cacheRightHandEquipmentEntity; }
+            set { MainModel._cacheRightHandEquipmentEntity = value; }
         }
 
-        protected BaseEquipmentEntity cacheLeftHandEquipmentEntity;
+        protected BaseEquipmentEntity _cacheLeftHandEquipmentEntity;
         public BaseEquipmentEntity CacheLeftHandEquipmentEntity
         {
-            get { return IsMainModel ? cacheLeftHandEquipmentEntity : MainModel.cacheLeftHandEquipmentEntity; }
-            set { MainModel.cacheLeftHandEquipmentEntity = value; }
+            get { return IsMainModel ? _cacheLeftHandEquipmentEntity : MainModel._cacheLeftHandEquipmentEntity; }
+            set { MainModel._cacheLeftHandEquipmentEntity = value; }
         }
 
         public IList<EquipWeapons> SelectableWeaponSets { get; protected set; }
