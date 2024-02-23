@@ -41,17 +41,17 @@ namespace MultiplayerARPG
         }
 
         public Transform CacheTransform { get; private set; }
-        private FxCollection fxCollection;
+        private FxCollection _fxCollection;
         public FxCollection FxCollection
         {
             get
             {
-                if (fxCollection == null)
-                    fxCollection = new FxCollection(gameObject);
-                return fxCollection;
+                if (_fxCollection == null)
+                    _fxCollection = new FxCollection(gameObject);
+                return _fxCollection;
             }
         }
-        private bool playFxOnEnable;
+        private bool _playFxOnEnable;
 
         protected virtual void Awake()
         {
@@ -60,7 +60,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            if (playFxOnEnable)
+            if (_playFxOnEnable)
                 PlayFx();
         }
 
@@ -151,11 +151,11 @@ namespace MultiplayerARPG
         {
             if (!gameObject.activeInHierarchy)
             {
-                playFxOnEnable = true;
+                _playFxOnEnable = true;
                 return;
             }
             FxCollection.Play();
-            playFxOnEnable = false;
+            _playFxOnEnable = false;
         }
 
         public virtual void StopFx()

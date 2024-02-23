@@ -48,7 +48,7 @@ namespace MultiplayerARPG
                 return fxCollection;
             }
         }
-        private bool playFxOnEnable;
+        private bool _playFxOnEnable;
 
         protected virtual void Awake()
         {
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            if (playFxOnEnable)
+            if (_playFxOnEnable)
                 PlayFx();
         }
 
@@ -107,11 +107,11 @@ namespace MultiplayerARPG
         {
             if (!gameObject.activeInHierarchy)
             {
-                playFxOnEnable = true;
+                _playFxOnEnable = true;
                 return;
             }
             FxCollection.Play();
-            playFxOnEnable = false;
+            _playFxOnEnable = false;
         }
 
         public virtual void StopFx()
