@@ -9,6 +9,13 @@ namespace MultiplayerARPG
             PlayClipAtPoint,
             PlayClipAtAudioSource
         }
+
+        [Header("Generic Settings")]
+        public string effectSocket;
+        public bool isLoop;
+        public float lifeTime;
+
+        [Header("Sound Effect Playing")]
         public PlayMode playMode = PlayMode.PlayClipAtPoint;
 
         private AudioSource _cacheAudioSource;
@@ -32,10 +39,6 @@ namespace MultiplayerARPG
                 return otherSettingId;
             }
         }
-
-        public string effectSocket;
-        public bool isLoop;
-        public float lifeTime;
         public AudioClip[] randomSoundEffects = new AudioClip[0];
 
         private bool _intendToFollowTarget;
@@ -140,7 +143,7 @@ namespace MultiplayerARPG
         /// </summary>
         public virtual void Play()
         {
-            if (!BaseGameNetworkManager.Singleton.IsClientConnected)
+            if (Application.isBatchMode)
             {
                 // Will be destroyed in next frame
                 _destroyTime = Time.time;
