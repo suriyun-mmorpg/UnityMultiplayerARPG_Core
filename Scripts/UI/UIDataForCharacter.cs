@@ -33,7 +33,8 @@
         protected override void CloneTo(UISelectionEntry<T> target)
         {
             base.CloneTo(target);
-            (target as UIDataForCharacter<T>).IndexOfData = IndexOfData;
+            if (target != null)
+                (target as UIDataForCharacter<T>).IndexOfData = IndexOfData;
         }
     }
 }
