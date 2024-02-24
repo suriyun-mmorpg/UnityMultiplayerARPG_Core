@@ -124,7 +124,8 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
 
     protected virtual void CloneTo(UISelectionEntry<T> target)
     {
-        target.Data = Data;
+        if (target != null)
+            target.Data = Data;
     }
 
     protected virtual void UpdateUI() { }
