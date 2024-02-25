@@ -27,6 +27,10 @@ namespace MultiplayerARPG
         [Tooltip("Calculate the speed needed for the arc. Perfect for lock on targets.")]
         public bool recalculateSpeed = false;
 
+        [Header("Prediction Steps")]
+        [Tooltip("How many ray casts per frame to detect collisions.")]
+        public int predictionStepPerFrame = 6;
+
         [Header("Extra Effects")]
         [Tooltip("If you want to activate an effect that is child or instantiate it on client. For 'child' effect, use destroy delay.")]
         public bool instantiateImpact = false;
@@ -100,9 +104,14 @@ namespace MultiplayerARPG
                 missileSpeed = LaunchSpeed(dist, yOffset, gravity.magnitude, angle * Mathf.Deg2Rad);
 
             if (useAngle)
-                CacheTransform.eulerAngles = new Vector3(CacheTransform.eulerAngles.x - angle, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
+                if (angle > 0)
+                    CacheTransform.eulerAngles = new Vector3(CacheTransform.eulerAngles.x - angle, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
+                else
+                    CacheTransform.eulerAngles = new Vector3(0, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
 
             _bulletVelocity = CacheTransform.forward * missileSpeed;
+
+            ResetEffectsPlayOnAwake();
         }
 
         public float LaunchSpeed(float distance, float yOffset, float gravity, float angle)
@@ -111,79 +120,86 @@ namespace MultiplayerARPG
             return speed;
         }
 
-        public override void HitDetect()
-        {
-            if (Destroying)
-                return;
-
-            if (!_previousPosition.HasValue)
-                return;
-
-            int hitCount = 0;
-            Vector3 dir = (CacheTransform.position - _previousPosition.Value).normalized;
-            float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
-            // Raycast to previous position to check is it hitting something or not
-            // If hit, explode
-            switch (hitDetectionMode)
-            {
-                case HitDetectionMode.Raycast:
-                    hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, hitLayers);
-                    break;
-                case HitDetectionMode.SphereCast:
-                    hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, hitLayers);
-                    break;
-                case HitDetectionMode.BoxCast:
-                    hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, hitLayers);
-                    break;
-            }
-
-            RaycastHit hit;
-            for (int i = 0; i < hitCount; ++i)
-            {
-                hit = _hits3D[i];
-                if (!hit.transform.gameObject.GetComponent<IUnHittable>().IsNull())
-                    continue;
-
-                if (useNormal)
-                    _normal = hit.normal;
-                _hitPos = hit.point;
-
-                // Hit itself, no impact
-                if (_instigator.Id != null && _instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
-                    continue;
-
-                Impact(hit.collider.gameObject);
-
-                // Already hit something
-                if (Destroying)
-                    break;
-            }
-        }
-
         protected override void Update()
         {
             if (Destroying)
                 return;
 
-            if (hasGravity)
+            Vector3 point1 = CacheTransform.position;
+            float stepSize = 1.0f / predictionStepPerFrame;
+            // Find hitting objects by future positions
+            for (float step = 0; step < 1; step += stepSize)
             {
-                Vector3 gravity = Physics.gravity;
-                if (customGravity != Vector3.zero)
-                    gravity = customGravity;
-                _bulletVelocity += gravity * Time.deltaTime;
+                if (hasGravity)
+                {
+                    Vector3 gravity = Physics.gravity;
+                    if (customGravity != Vector3.zero)
+                        gravity = customGravity;
+                    _bulletVelocity += gravity * stepSize * Time.deltaTime;
+                }
+
+                Vector3 point2 = point1 + _bulletVelocity * stepSize * Time.deltaTime;
+
+                int hitCount = 0;
+                RaycastHit hit;
+                Vector3 origin = point1;
+                Vector3 dir = (point2 - point1).normalized;
+                float dist = Vector3.Distance(point2, point1);
+                switch (hitDetectionMode)
+                {
+                    case HitDetectionMode.Raycast:
+                        hitCount = Physics.RaycastNonAlloc(origin, dir, _hits3D, dist, hitLayers);
+                        break;
+                    case HitDetectionMode.SphereCast:
+                        hitCount = Physics.SphereCastNonAlloc(origin, sphereCastRadius, dir, _hits3D, dist, hitLayers);
+                        break;
+                    case HitDetectionMode.BoxCast:
+                        hitCount = Physics.BoxCastNonAlloc(origin, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, hitLayers);
+                        break;
+                }
+
+                for (int i = 0; i < hitCount; ++i)
+                {
+                    hit = _hits3D[i];
+                    if (!hit.transform.gameObject.GetComponent<IUnHittable>().IsNull())
+                        continue;
+
+                    if (useNormal)
+                        _normal = hit.normal;
+                    _hitPos = hit.point;
+
+                    // Hit itself, no impact
+                    if (_instigator.Id != null && _instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
+                        continue;
+
+                    // Hit allie, no impact
+                    DamageableHitBox target;
+                    target = hit.transform.GetComponent<DamageableHitBox>();
+                    if (target != null && !target.CanReceiveDamageFrom(_instigator) && _instigator.Id != null)
+                        continue;
+
+                    Impact(hit.collider.gameObject);
+
+                    // Already hit something
+                    if (Destroying)
+                        break;
+                }
+
+                point1 = point2;
+
+                // Already hit something
+                if (Destroying)
+                    break;
+
+                // Moved too far from `_initialPosition`
+                if (Vector3.Distance(_initialPosition, point1) > _missileDistance)
+                {
+                    NoImpact();
+                    break;
+                }
             }
-
-            HitDetect();
-
-            if (Destroying)
-                return;
-
             CacheTransform.rotation = Quaternion.LookRotation(_bulletVelocity);
-            CacheTransform.position += _bulletVelocity * Time.deltaTime;
-
-            // Moved too far from `_initialPosition`
-            if (Vector3.Distance(_initialPosition, CacheTransform.position) > _missileDistance && Time.unscaledTime - _launchTime >= _missileDuration)
-                NoImpact();
+            CacheTransform.position = point1;
         }
 
         protected void NoImpact()
@@ -256,8 +272,9 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    impactEffect.transform.rotation = Quaternion.identity;
                     if (useNormal)
-                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, _normal);
+                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.up, _normal);
                     impactEffect.transform.position = _hitPos;
                     if (stickToHitObject)
                         impactEffect.transform.parent = hitted.transform;
@@ -284,6 +301,51 @@ namespace MultiplayerARPG
                 impactEffect.transform.localPosition = _defaultImpactEffectPosition;
             }
             base.OnPushBack();
+        }
+
+        protected void ResetEffectsPlayOnAwake()
+        {
+            if (projectileObject != null)
+            {
+                SetParticleSystemsPlayOnAwake(projectileObject);
+                SetAudioSourcesPlayOnAwakeAndEnable(projectileObject);
+            }
+            if (impactEffect != null && !instantiateImpact)
+            {
+                SetParticleSystemsPlayOnAwake(impactEffect);
+                SetAudioSourcesPlayOnAwakeAndEnable(impactEffect);
+            }
+            if (disappearEffect != null && !instantiateDisappear)
+            {
+                SetParticleSystemsPlayOnAwake(disappearEffect);
+                SetAudioSourcesPlayOnAwakeAndEnable(disappearEffect);
+            }
+        }
+
+        private void SetParticleSystemsPlayOnAwake(GameObject effectObject)
+        {
+            var particleSystems = effectObject.GetComponentsInChildren<ParticleSystem>(true);
+            foreach (var particle in particleSystems)
+            {
+                if (particle != null)
+                {
+                    var mainModule = particle.main;
+                    mainModule.playOnAwake = true;
+                }
+            }
+        }
+
+        private void SetAudioSourcesPlayOnAwakeAndEnable(GameObject effectObject)
+        {
+            var audioSources = effectObject.GetComponentsInChildren<AudioSource>(true);
+            foreach (var audioSource in audioSources)
+            {
+                if (audioSource != null)
+                {
+                    audioSource.playOnAwake = true;
+                    audioSource.enabled = true;
+                }
+            }
         }
     }
 }
