@@ -98,14 +98,9 @@ namespace MultiplayerARPG
                 missileSpeed = LaunchSpeed(dist, yOffset, Physics.gravity.magnitude, angle * Mathf.Deg2Rad);
 
             if (useAngle)
-                if (angle > 0)
-                    CacheTransform.eulerAngles = new Vector3(CacheTransform.eulerAngles.x - angle, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
-                else
-                    CacheTransform.eulerAngles = new Vector3(0, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
+                CacheTransform.eulerAngles = new Vector3(CacheTransform.eulerAngles.x - angle, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
 
             _bulletVelocity = CacheTransform.forward * missileSpeed;
-
-            ResetEffectsPlayOnAwake();
         }
 
         public float LaunchSpeed(float distance, float yOffset, float gravity, float angle)
@@ -172,7 +167,6 @@ namespace MultiplayerARPG
                     if (_instigator.Id != null && _instigator.TryGetEntity(out BaseGameEntity instigatorEntity) && instigatorEntity.transform.root == hit.transform.root)
                         continue;
 
-<<<<<<< Updated upstream
                     Impact(hit.collider.transform.gameObject);
 
                     // Already hit something
@@ -188,33 +182,6 @@ namespace MultiplayerARPG
                 }
 
                 point1 = point2;
-=======
-                    // Hit allie, no impact
-                    DamageableHitBox target;
-                    target = hit.transform.GetComponent<DamageableHitBox>();
-                    if (target != null && !target.CanReceiveDamageFrom(_instigator) && _instigator.Id != null)
-                        continue;
-
-                    Impact(hit.collider.gameObject);
-
-                    // Already hit something
-                    if (Destroying)
-                        break;
-                }
-
-                point1 = point2;
-
-                // Already hit something
-                if (Destroying)
-                    break;
-
-                // Moved too far from `_initialPosition`
-                if (Vector3.Distance(_initialPosition, point1) > _missileDistance)
-                {
-                    NoImpact();
-                    break;
-                }
->>>>>>> Stashed changes
             }
             CacheTransform.rotation = Quaternion.LookRotation(_bulletVelocity);
             CacheTransform.position = point1;
@@ -290,9 +257,8 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    impactEffect.transform.rotation = Quaternion.identity;
                     if (useNormal)
-                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.up, _normal);
+                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, _normal);
                     impactEffect.transform.position = _hitPos;
                     if (stickToHitObject)
                         impactEffect.transform.parent = hitted.transform;
@@ -320,51 +286,6 @@ namespace MultiplayerARPG
                 impactEffect.transform.localPosition = _defaultImpactEffectPosition;
             }
             base.OnPushBack();
-        }
-
-        protected void ResetEffectsPlayOnAwake()
-        {
-            if (projectileObject != null)
-            {
-                SetParticleSystemsPlayOnAwake(projectileObject);
-                SetAudioSourcesPlayOnAwakeAndEnable(projectileObject);
-            }
-            if (impactEffect != null && !instantiateImpact)
-            {
-                SetParticleSystemsPlayOnAwake(impactEffect);
-                SetAudioSourcesPlayOnAwakeAndEnable(impactEffect);
-            }
-            if (disappearEffect != null && !instantiateDisappear)
-            {
-                SetParticleSystemsPlayOnAwake(disappearEffect);
-                SetAudioSourcesPlayOnAwakeAndEnable(disappearEffect);
-            }
-        }
-
-        private void SetParticleSystemsPlayOnAwake(GameObject effectObject)
-        {
-            var particleSystems = effectObject.GetComponentsInChildren<ParticleSystem>(true);
-            foreach (var particle in particleSystems)
-            {
-                if (particle != null)
-                {
-                    var mainModule = particle.main;
-                    mainModule.playOnAwake = true;
-                }
-            }
-        }
-
-        private void SetAudioSourcesPlayOnAwakeAndEnable(GameObject effectObject)
-        {
-            var audioSources = effectObject.GetComponentsInChildren<AudioSource>(true);
-            foreach (var audioSource in audioSources)
-            {
-                if (audioSource != null)
-                {
-                    audioSource.playOnAwake = true;
-                    audioSource.enabled = true;
-                }
-            }
         }
     }
 }
