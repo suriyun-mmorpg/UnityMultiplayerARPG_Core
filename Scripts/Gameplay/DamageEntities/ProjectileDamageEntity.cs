@@ -46,6 +46,10 @@ namespace MultiplayerARPG
         public bool instantiateDisappear = false;
         public GameObject disappearEffect;
 
+        private FxCollection projectileFx;
+        private FxCollection impactFx;
+        private FxCollection disappearFx;
+
         private Vector3 _initialPosition;
         private Vector3 _defaultImpactEffectPosition;
         private Vector3 _bulletVelocity;
@@ -73,16 +77,29 @@ namespace MultiplayerARPG
 
             // Configuration bullet and effects
             if (projectileObject)
+            {
+                projectileFx = new FxCollection(projectileObject);
+                projectileFx.InitPrefab();
                 projectileObject.SetActive(true);
+                projectileFx.Play();
+            }
 
             if (impactEffect && !instantiateImpact)
             {
+                impactFx = new FxCollection(impactEffect);
+                impactFx.InitPrefab();
                 impactEffect.SetActive(false);
+                impactFx.Stop();
                 _defaultImpactEffectPosition = impactEffect.transform.localPosition;
             }
 
             if (disappearEffect && !instantiateDisappear)
+            {
+                disappearFx = new FxCollection(disappearEffect);
+                disappearFx.InitPrefab();
                 disappearEffect.SetActive(false);
+                disappearFx.Stop();
+            }
 
             // Movement
             Vector3 targetPos = _initialPosition + (CacheTransform.forward * missileDistance);
@@ -110,8 +127,6 @@ namespace MultiplayerARPG
                     CacheTransform.eulerAngles = new Vector3(0, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
 
             _bulletVelocity = CacheTransform.forward * missileSpeed;
-
-            ResetEffectsPlayOnAwake();
         }
 
         public float LaunchSpeed(float distance, float yOffset, float gravity, float angle)
@@ -213,12 +228,18 @@ namespace MultiplayerARPG
                     onProjectileDisappear.Invoke();
 
                 if (projectileObject)
+                {
                     projectileObject.SetActive(false);
+                    projectileFx.Stop();
+                }
 
                 if (instantiateDisappear)
                     Instantiate(disappearEffect, transform.position, CacheTransform.rotation);
                 else
+                {
                     disappearEffect.SetActive(true);
+                    disappearFx.Play();
+                }
 
                 PushBack(destroyDelay);
                 Destroying = true;
@@ -279,6 +300,7 @@ namespace MultiplayerARPG
                     if (stickToHitObject)
                         impactEffect.transform.parent = hitted.transform;
                     impactEffect.SetActive(true);
+                    impactFx.Play();
                 }
             }
 
@@ -301,51 +323,6 @@ namespace MultiplayerARPG
                 impactEffect.transform.localPosition = _defaultImpactEffectPosition;
             }
             base.OnPushBack();
-        }
-
-        protected void ResetEffectsPlayOnAwake()
-        {
-            if (projectileObject != null)
-            {
-                SetParticleSystemsPlayOnAwake(projectileObject);
-                SetAudioSourcesPlayOnAwakeAndEnable(projectileObject);
-            }
-            if (impactEffect != null && !instantiateImpact)
-            {
-                SetParticleSystemsPlayOnAwake(impactEffect);
-                SetAudioSourcesPlayOnAwakeAndEnable(impactEffect);
-            }
-            if (disappearEffect != null && !instantiateDisappear)
-            {
-                SetParticleSystemsPlayOnAwake(disappearEffect);
-                SetAudioSourcesPlayOnAwakeAndEnable(disappearEffect);
-            }
-        }
-
-        private void SetParticleSystemsPlayOnAwake(GameObject effectObject)
-        {
-            var particleSystems = effectObject.GetComponentsInChildren<ParticleSystem>(true);
-            foreach (var particle in particleSystems)
-            {
-                if (particle != null)
-                {
-                    var mainModule = particle.main;
-                    mainModule.playOnAwake = true;
-                }
-            }
-        }
-
-        private void SetAudioSourcesPlayOnAwakeAndEnable(GameObject effectObject)
-        {
-            var audioSources = effectObject.GetComponentsInChildren<AudioSource>(true);
-            foreach (var audioSource in audioSources)
-            {
-                if (audioSource != null)
-                {
-                    audioSource.playOnAwake = true;
-                    audioSource.enabled = true;
-                }
-            }
         }
     }
 }
