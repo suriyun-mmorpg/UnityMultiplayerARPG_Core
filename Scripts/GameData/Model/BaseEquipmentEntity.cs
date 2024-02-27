@@ -23,6 +23,7 @@ namespace MultiplayerARPG
                 {
                     _item = value;
                     OnItemChanged(_item);
+                    onItemChanged.Invoke(_item);
                 }
             }
         }
@@ -31,7 +32,7 @@ namespace MultiplayerARPG
         [Tooltip("These game effects must placed as this children, it will be activated when launch (can place muzzle effects here)")]
         public GameEffect[] weaponLaunchEffects = new GameEffect[0];
         [Tooltip("These game effects prefabs will instantiates to container when launch (can place muzzle effects here)")]
-        public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
+        public GameEffectPoolContainer[] poolingWeaponLaunchEffects = new GameEffectPoolContainer[0];
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
 
@@ -47,6 +48,7 @@ namespace MultiplayerARPG
         public UnityEvent onPlayReload = new UnityEvent();
         public UnityEvent onPlayReloaded = new UnityEvent();
         public UnityEvent onPlayCharge = new UnityEvent();
+        public EquipmentEntityItemEvent onItemChanged = new EquipmentEntityItemEvent();
 
         public IEnumerable<IPoolDescriptor> PoolDescriptors
         {
