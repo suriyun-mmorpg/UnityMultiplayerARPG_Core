@@ -52,7 +52,10 @@ namespace MultiplayerARPG
         public float maxDurability;
         [Tooltip("If this is TRUE, your equipment will be destroyed when durability = 0")]
         public bool destroyIfBroken;
-        [Range(0, 6)]
+        [Tooltip("Its length is max amount of enhancement sockets")]
+        public SocketEnhancerType[] availableSocketEnhancerTypes = new SocketEnhancerType[0];
+        [System.Obsolete("Deprecated, will be removed later")]
+        [HideInInspector]
         public byte maxSocket;
 
         [Header("Armor/Shield Settings")]
@@ -152,8 +155,11 @@ namespace MultiplayerARPG
         [Category(2, "Pet Settings")]
         public BaseMonsterCharacterEntity petEntity;
 
-        [Category(3, "Mount Settings")]
+        [Category(2, "Mount Settings")]
         public VehicleEntity mountEntity;
+
+        [Category(2, "Socket Enhancer Settings")]
+        public SocketEnhancerType socketEnhancerType = SocketEnhancerType.Type1;
 
         [Category("Buff/Bonus Settings")]
         // For socket enhancer items
@@ -308,9 +314,9 @@ namespace MultiplayerARPG
             get { return destroyIfBroken; }
         }
 
-        public byte MaxSocket
+        public SocketEnhancerType[] AvailableSocketEnhancerTypes
         {
-            get { return maxSocket; }
+            get { return availableSocketEnhancerTypes; }
         }
 
         public EquipmentModel[] EquipmentModels
@@ -675,6 +681,11 @@ namespace MultiplayerARPG
         #endregion
 
         #region Implement ISocketEnhancerItem
+        public SocketEnhancerType SocketEnhancerType
+        {
+            get { return socketEnhancerType; }
+        }
+
         public EquipmentBonus SocketEnhanceEffect
         {
             get { return socketEnhanceEffect; }
@@ -720,6 +731,18 @@ namespace MultiplayerARPG
                 increaseSkillLevels = null;
                 hasChanges = true;
             }
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (maxSocket > 0)
+            {
+                availableSocketEnhancerTypes = new SocketEnhancerType[maxSocket];
+                for (byte i = 0; i < maxSocket; ++i)
+                {
+                    availableSocketEnhancerTypes[i] = SocketEnhancerType.Type1;
+                }
+                maxSocket = 0;
+                hasChanges = true;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
             return hasChanges || base.Validate();
         }
 

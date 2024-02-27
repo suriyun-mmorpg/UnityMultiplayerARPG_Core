@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public class UICharacterItemsUtils
     {
-        public static List<KeyValuePair<int, CharacterItem>> GetFilteredList(List<CharacterItem> list, List<string> filterCategories, List<ItemType> filterItemTypes, bool doNotShowEmptySlots)
+        public static List<KeyValuePair<int, CharacterItem>> GetFilteredList(List<CharacterItem> list, List<string> filterCategories, List<ItemType> filterItemTypes, List<SocketEnhancerType> filterSocketEnhancerTypes, bool doNotShowEmptySlots)
         {
             // Prepare result
             List<KeyValuePair<int, CharacterItem>> result = new List<KeyValuePair<int, CharacterItem>>();
@@ -19,8 +19,7 @@ namespace MultiplayerARPG
             {
                 entry = list[i];
                 if (entry.IsEmptySlot() && (!GameInstance.Singleton.IsLimitInventorySlot || doNotShowEmptySlots ||
-                    (filterCategories != null && filterCategories.Count > 0) ||
-                    (filterItemTypes != null && filterItemTypes.Count > 0)))
+                    filterCategories?.Count > 0 || filterItemTypes?.Count > 0 || filterSocketEnhancerTypes?.Count > 0))
                 {
                     // Hide empty slot
                     continue;
@@ -33,15 +32,24 @@ namespace MultiplayerARPG
                     continue;
                 }
                 string category = (string.IsNullOrEmpty(tempItem.Category) ? string.Empty : tempItem.Category).Trim().ToLower();
-                if (filterCategories.Count > 0 && !filterCategories.Contains(category))
+                if (filterCategories?.Count > 0 && !filterCategories.Contains(category))
                 {
                     // Category filtering
                     continue;
                 }
-                if (filterItemTypes.Count > 0 && !filterItemTypes.Contains(tempItem.ItemType))
+                if (filterItemTypes?.Count > 0 && !filterItemTypes.Contains(tempItem.ItemType))
                 {
                     // Item type filtering
                     continue;
+                }
+                if (tempItem.IsSocketEnhancer())
+                {
+                    ISocketEnhancerItem socketEnhancerItem = tempItem as ISocketEnhancerItem;
+                    if (filterSocketEnhancerTypes?.Count > 0 && !filterSocketEnhancerTypes.Contains(socketEnhancerItem.SocketEnhancerType))
+                    {
+                        // Socket Enhancer Type filtering
+                        continue;
+                    }
                 }
                 result.Add(new KeyValuePair<int, CharacterItem>(i, entry));
             }

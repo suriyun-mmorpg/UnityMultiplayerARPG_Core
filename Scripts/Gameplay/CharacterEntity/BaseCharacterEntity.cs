@@ -211,20 +211,15 @@ namespace MultiplayerARPG
             ForceMakeCaches();
             _lastGrounded = false;
             _lastGroundedPosition = EntityTransform.position;
-        }
-
-        protected override void EntityStart()
-        {
-            base.EntityStart();
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 AttackPhysicFunctions = new PhysicFunctions(64);
-                FindPhysicFunctions = new PhysicFunctions(IsOwnerClient ? 128 : 32);
+                FindPhysicFunctions = new PhysicFunctions(128);
             }
             else
             {
                 AttackPhysicFunctions = new PhysicFunctions2D(64);
-                FindPhysicFunctions = new PhysicFunctions2D(IsOwnerClient ? 128 : 32);
+                FindPhysicFunctions = new PhysicFunctions2D(128);
             }
         }
 

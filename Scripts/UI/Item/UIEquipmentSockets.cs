@@ -23,7 +23,7 @@ namespace MultiplayerARPG
             {
                 BaseItem tempItem;
                 string tempText;
-                for (int i = 0; i < Data.maxSocket; ++i)
+                for (int i = 0; i < Data.availableSocketEnhancerTypes.Length; ++i)
                 {
                     if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
                     {

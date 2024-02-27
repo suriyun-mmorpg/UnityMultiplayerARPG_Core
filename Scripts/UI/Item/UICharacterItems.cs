@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         [Header("Filter")]
         public List<string> filterCategories = new List<string>();
         public List<ItemType> filterItemTypes = new List<ItemType>();
+        public List<SocketEnhancerType> filterSocketEnhancerTypes = new List<SocketEnhancerType>();
         public bool doNotShowEmptySlots;
 
         [Header("UI Elements")]
@@ -164,7 +165,7 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            List<KeyValuePair<int, CharacterItem>> filteredList = UICharacterItemsUtils.GetFilteredList(LoadedList, filterCategories, filterItemTypes, doNotShowEmptySlots);
+            List<KeyValuePair<int, CharacterItem>> filteredList = UICharacterItemsUtils.GetFilteredList(LoadedList, filterCategories, filterItemTypes, filterSocketEnhancerTypes, doNotShowEmptySlots);
             if (Character == null || filteredList.Count == 0)
             {
                 if (uiDialog != null)

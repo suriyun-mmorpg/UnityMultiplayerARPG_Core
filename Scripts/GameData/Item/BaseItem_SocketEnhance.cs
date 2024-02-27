@@ -58,7 +58,7 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
                 return false;
             }
-            byte maxSocket = GameInstance.Singleton.GameplayRule.GetItemMaxSocket(character, enhancingItem);
+            int maxSocket = GameInstance.Singleton.GameplayRule.GetItemMaxSocket(character, enhancingItem);
             if (maxSocket <= 0)
             {
                 // Cannot enhance socket because equipment has no socket(s)
@@ -100,6 +100,13 @@ namespace MultiplayerARPG
             if (!GameInstance.Items.TryGetValue(enhancerId, out enhancerItem) || !enhancerItem.IsSocketEnhancer())
             {
                 // Cannot enhance socket because enhancer id is invalid
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_ENHANCE_SOCKET;
+                return false;
+            }
+            ISocketEnhancerItem castedEnhancerItem = enhancerItem as ISocketEnhancerItem;
+            if (castedEnhancerItem.SocketEnhancerType != equipmentItem.AvailableSocketEnhancerTypes[socketIndex])
+            {
+                // Cannot enhance socket because it is not a valid socket
                 gameMessage = UITextKeys.UI_ERROR_CANNOT_ENHANCE_SOCKET;
                 return false;
             }

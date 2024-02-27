@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         {
             Item item = target as Item;
             // Armor
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.maxSocket));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.availableSocketEnhancerTypes));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.equipmentModels));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.requirement));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.increaseStats));
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.maxDurability));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Armor), nameof(item.destroyIfBroken));
             // Weapon
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.maxSocket));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.availableSocketEnhancerTypes));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.equipmentModels));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.offHandEquipmentModels));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.sheathModels));
@@ -91,7 +91,7 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.maxDurability));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.destroyIfBroken));
             // Shield
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.maxSocket));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.availableSocketEnhancerTypes));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.equipmentModels));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.sheathModels));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Shield), nameof(item.requirement));
@@ -134,6 +134,7 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.useItemCooldown));
             // Socket Enhancer
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.requirement));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.socketEnhancerType));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.socketEnhanceEffect));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.selfStatusEffectsWhenAttacking));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.enemyStatusEffectsWhenAttacking));

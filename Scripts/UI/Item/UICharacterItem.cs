@@ -1084,14 +1084,15 @@ namespace MultiplayerARPG
 
             if (uiEquipmentSockets != null)
             {
-                if (EquipmentItem == null || EquipmentItem.MaxSocket <= 0)
+                int maxSocket = EquipmentItem?.AvailableSocketEnhancerTypes?.Length ?? 0;
+                if (maxSocket <= 0)
                 {
                     uiEquipmentSockets.Hide();
                 }
                 else
                 {
                     uiEquipmentSockets.Show();
-                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.MaxSocket);
+                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.AvailableSocketEnhancerTypes);
                 }
             }
 

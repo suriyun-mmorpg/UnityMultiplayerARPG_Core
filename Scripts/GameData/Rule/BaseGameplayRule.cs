@@ -519,10 +519,10 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public virtual byte GetItemMaxSocket(IPlayerCharacterData character, CharacterItem characterItem)
+        public virtual int GetItemMaxSocket(IPlayerCharacterData character, CharacterItem characterItem)
         {
             IEquipmentItem item = characterItem.GetEquipmentItem();
-            return item == null ? (byte)0 : item.MaxSocket;
+            return item?.AvailableSocketEnhancerTypes?.Length ?? 0;
         }
     }
 }

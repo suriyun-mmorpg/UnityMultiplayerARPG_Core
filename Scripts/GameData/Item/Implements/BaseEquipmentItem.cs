@@ -56,12 +56,18 @@ namespace MultiplayerARPG
             get { return destroyIfBroken; }
         }
 
+        [Tooltip("Its length is max amount of enhancement sockets")]
+        [SerializeField]
+        private SocketEnhancerType[] availableSocketEnhancerTypes = new SocketEnhancerType[0];
+        public SocketEnhancerType[] AvailableSocketEnhancerTypes
+        {
+            get { return availableSocketEnhancerTypes; }
+        }
+
+        [System.Obsolete("Deprecated, will be removed later")]
+        [HideInInspector]
         [SerializeField]
         private byte maxSocket = 0;
-        public byte MaxSocket
-        {
-            get { return maxSocket; }
-        }
 
         [Category(3, "Buff/Bonus Settings")]
         [SerializeField]
@@ -202,6 +208,18 @@ namespace MultiplayerARPG
                 increaseSkillLevels = null;
                 hasChanges = true;
             }
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (maxSocket > 0)
+            {
+                availableSocketEnhancerTypes = new SocketEnhancerType[maxSocket];
+                for (byte i = 0; i < maxSocket; ++i)
+                {
+                    availableSocketEnhancerTypes[i] = SocketEnhancerType.Type1;
+                }
+                maxSocket = 0;
+                hasChanges = true;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
             return hasChanges || base.Validate();
         }
 

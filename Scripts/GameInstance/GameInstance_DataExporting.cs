@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                 {
                     item.MaxDurability = (kv.Value as IEquipmentItem).MaxDurability;
                     item.DestroyIfBroken = (kv.Value as IEquipmentItem).DestroyIfBroken;
-                    item.MaxSocket = (kv.Value as IEquipmentItem).MaxSocket;
+                    item.MaxSocket = (kv.Value as IEquipmentItem).AvailableSocketEnhancerTypes?.Length ?? 0;
                 }
                 if (kv.Value.IsWeapon())
                 {
