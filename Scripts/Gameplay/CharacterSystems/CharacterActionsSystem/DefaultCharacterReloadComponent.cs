@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
@@ -248,7 +249,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                RPC(CmdReload, isLeftHand);
+                RPC(CmdReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -317,7 +318,7 @@ namespace MultiplayerARPG
                 return;
             _manager.ActionAccepted();
             ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
-            RPC(RpcReload, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
+            RPC(RpcReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
 #endif
         }
 

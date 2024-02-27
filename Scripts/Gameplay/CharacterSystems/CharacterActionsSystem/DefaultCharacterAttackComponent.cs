@@ -393,7 +393,7 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 ProceedAttack(timestamp, isLeftHand);
-                RPC(CmdAttack, timestamp, isLeftHand);
+                RPC(CmdAttack, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -416,7 +416,7 @@ namespace MultiplayerARPG
                 return;
             _manager.ActionAccepted();
             ProceedAttack(peerTimestamp, isLeftHand);
-            RPC(RpcAttack, peerTimestamp, isLeftHand);
+            RPC(RpcAttack, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, isLeftHand);
         }
 
         [AllRpc]

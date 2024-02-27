@@ -431,7 +431,7 @@ namespace MultiplayerARPG
                     return;
                 }
                 ProceedUseSkill(timestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-                RPC(CmdUseSkill, timestamp, dataId, isLeftHand, targetObjectId, aimPosition);
+                RPC(CmdUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, dataId, isLeftHand, targetObjectId, aimPosition);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -456,7 +456,7 @@ namespace MultiplayerARPG
                 return;
             _manager.ActionAccepted();
             ProceedUseSkill(peerTimestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-            RPC(RpcUseSkill, peerTimestamp, dataId, skillLevel, isLeftHand, targetObjectId, aimPosition);
+            RPC(RpcUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, dataId, skillLevel, isLeftHand, targetObjectId, aimPosition);
         }
 
         [AllRpc]
@@ -498,7 +498,7 @@ namespace MultiplayerARPG
                 }
                 Entity.LastUseItemTime = Time.unscaledTime;
                 ProceedUseSkillItem(timestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-                RPC(CmdUseSkillItem, timestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
+                RPC(CmdUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -524,7 +524,7 @@ namespace MultiplayerARPG
                 return;
             _manager.ActionAccepted();
             ProceedUseSkillItem(peerTimestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-            RPC(RpcUseSkillItem, peerTimestamp, skillItem.DataId, isLeftHand, targetObjectId, aimPosition);
+            RPC(RpcUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, skillItem.DataId, isLeftHand, targetObjectId, aimPosition);
         }
 
         [AllRpc]
@@ -559,14 +559,14 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                RPC(CmdInterruptCastingSkill);
+                RPC(CmdInterruptCastingSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
                 return;
             }
             if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
             {
                 IsCastingSkillInterrupted = true;
                 ProceedInterruptCastingSkill();
-                RPC(RpcInterruptCastingSkill);
+                RPC(RpcInterruptCastingSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             }
         }
 
