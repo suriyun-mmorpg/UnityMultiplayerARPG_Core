@@ -560,7 +560,7 @@ namespace MultiplayerARPG
 
         public virtual void CallCmdPerformHitRegValidation(HitRegisterData hitData)
         {
-            RPC(CmdPerformHitRegValidation, hitData);
+            RPC(CmdPerformHitRegValidation, STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, hitData);
         }
 
         [ServerRpc]
