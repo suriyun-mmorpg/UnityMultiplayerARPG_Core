@@ -46,9 +46,9 @@ namespace MultiplayerARPG
         public bool instantiateDisappear = false;
         public GameObject disappearEffect;
 
-        private FxCollection projectileFx;
-        private FxCollection impactFx;
-        private FxCollection disappearFx;
+        private FxCollection _projectileFx;
+        private FxCollection _impactFx;
+        private FxCollection _disappearFx;
 
         private Vector3 _initialPosition;
         private Vector3 _defaultImpactEffectPosition;
@@ -78,27 +78,27 @@ namespace MultiplayerARPG
             // Configuration bullet and effects
             if (projectileObject)
             {
-                projectileFx = new FxCollection(projectileObject);
-                projectileFx.InitPrefab();
+                _projectileFx = new FxCollection(projectileObject);
+                _projectileFx.InitPrefab();
                 projectileObject.SetActive(true);
-                projectileFx.Play();
+                _projectileFx.Play();
             }
 
             if (impactEffect && !instantiateImpact)
             {
-                impactFx = new FxCollection(impactEffect);
-                impactFx.InitPrefab();
+                _impactFx = new FxCollection(impactEffect);
+                _impactFx.InitPrefab();
                 impactEffect.SetActive(false);
-                impactFx.Stop();
+                _impactFx.Stop();
                 _defaultImpactEffectPosition = impactEffect.transform.localPosition;
             }
 
             if (disappearEffect && !instantiateDisappear)
             {
-                disappearFx = new FxCollection(disappearEffect);
-                disappearFx.InitPrefab();
+                _disappearFx = new FxCollection(disappearEffect);
+                _disappearFx.InitPrefab();
                 disappearEffect.SetActive(false);
-                disappearFx.Stop();
+                _disappearFx.Stop();
             }
 
             // Movement
@@ -230,7 +230,7 @@ namespace MultiplayerARPG
                 if (projectileObject)
                 {
                     projectileObject.SetActive(false);
-                    projectileFx.Stop();
+                    _projectileFx.Stop();
                 }
 
                 if (instantiateDisappear)
@@ -238,7 +238,7 @@ namespace MultiplayerARPG
                 else
                 {
                     disappearEffect.SetActive(true);
-                    disappearFx.Play();
+                    _disappearFx.Play();
                 }
 
                 PushBack(destroyDelay);
@@ -300,7 +300,7 @@ namespace MultiplayerARPG
                     if (stickToHitObject)
                         impactEffect.transform.parent = hitted.transform;
                     impactEffect.SetActive(true);
-                    impactFx.Play();
+                    _impactFx.Play();
                 }
             }
 
