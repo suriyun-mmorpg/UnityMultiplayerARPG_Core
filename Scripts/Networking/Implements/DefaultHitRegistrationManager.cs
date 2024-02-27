@@ -32,13 +32,14 @@ namespace MultiplayerARPG
 
         private void AppendValidatingData(uint objectId, string id, HitValidateData hitValidateData)
         {
-            if (!s_removingQueues.ContainsKey(objectId))
-                s_removingQueues[objectId] = new Queue<string>();
-            while (s_removingQueues[objectId].Count >= MAX_VALIDATE_QUEUE_SIZE)
+            Queue<string> removingQueue;
+            if (!s_removingQueues.TryGetValue(objectId, out removingQueue))
+                s_removingQueues[objectId] = removingQueue = new Queue<string>();
+            while (removingQueue.Count >= MAX_VALIDATE_QUEUE_SIZE)
             {
-                s_validatingHits.Remove(s_removingQueues[objectId].Dequeue());
+                s_validatingHits.Remove(removingQueue.Dequeue());
             }
-            s_removingQueues[objectId].Enqueue(id);
+            removingQueue.Enqueue(id);
             s_validatingHits[id] = hitValidateData;
         }
 
@@ -139,6 +140,13 @@ namespace MultiplayerARPG
             }
 
             uint objectId = hitData.HitObjectId;
+            string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.HitObjectId);
+            if (hitValidateData.HitObjects.Contains(hitObjectId))
+            {
+                // Already hit
+                return false;
+            }
+
             int hitBoxIndex = hitData.HitBoxIndex;
             if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(objectId, out DamageableEntity damageableEntity) ||
                 hitBoxIndex < 0 || hitBoxIndex >= damageableEntity.HitBoxes.Length)
@@ -147,15 +155,8 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.HitObjectId);
-            if (hitValidateData.HitObjects.Contains(hitObjectId))
-            {
-                // Already hit
-                return false;
-            }
-
             DamageableHitBox hitBox = damageableEntity.HitBoxes[hitBoxIndex];
-            if (hitValidateData.DamageInfo != null && !hitValidateData.DamageInfo.IsHitValid(hitValidateData, hitData, hitBox))
+            if (!hitValidateData.DamageInfo?.IsHitValid(hitValidateData, hitData, hitBox) ?? false)
             {
                 // Not valid
                 return false;
