@@ -86,8 +86,11 @@ namespace MultiplayerARPG
 
             if (impactEffect && !instantiateImpact)
             {
-                _impactFx = new FxCollection(impactEffect);
-                _impactFx.InitPrefab();
+                if (_impactFx == null)
+                {
+                    _impactFx = new FxCollection(impactEffect);
+                    _impactFx.InitPrefab();
+                }
                 impactEffect.SetActive(false);
                 _impactFx.Stop();
                 _defaultImpactEffectPosition = impactEffect.transform.localPosition;
@@ -95,8 +98,11 @@ namespace MultiplayerARPG
 
             if (disappearEffect && !instantiateDisappear)
             {
-                _disappearFx = new FxCollection(disappearEffect);
-                _disappearFx.InitPrefab();
+                if (_disappearFx == null)
+                {
+                    _disappearFx = new FxCollection(disappearEffect);
+                    _disappearFx.InitPrefab();
+                }
                 disappearEffect.SetActive(false);
                 _disappearFx.Stop();
             }
@@ -234,7 +240,9 @@ namespace MultiplayerARPG
                 }
 
                 if (instantiateDisappear)
+                {
                     Instantiate(disappearEffect, transform.position, CacheTransform.rotation);
+                }
                 else
                 {
                     disappearEffect.SetActive(true);
