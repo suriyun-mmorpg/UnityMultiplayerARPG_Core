@@ -346,11 +346,12 @@ namespace MultiplayerARPG
         {
             byte fireSpread = 0;
             Vector3 fireStagger = Vector3.zero;
-            if (weapon != null && weapon.GetWeaponItem() != null)
+            IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null;
+            if (weaponItem != null)
             {
                 // For monsters, their weapon can be null so have to avoid null exception
-                fireSpread = weapon.GetWeaponItem().FireSpread;
-                fireStagger = weapon.GetWeaponItem().FireStagger;
+                fireSpread = weaponItem.FireSpread;
+                fireStagger = weaponItem.FireStagger;
             }
 
             // Make sure it won't increase damage to the wrong collction
