@@ -157,7 +157,8 @@ namespace MultiplayerARPG
         public bool IsFreezeAnimation { get; protected set; }
 
         // Public events
-        public UpdateEquipmentModelsDelegate onBeforeUpdateEquipmentModels;
+        public event UpdateEquipmentModelsDelegate onBeforeUpdateEquipmentModels;
+        public event OnInstantiatedEquipmentDelegate onInstantiatedEquipment;
 
         // Optimize garbage collector
         protected readonly List<string> _tempAddingKeys = new List<string>();
@@ -857,6 +858,7 @@ namespace MultiplayerARPG
 
         public virtual void OnInstantiatedEquipment(EquipmentModel model, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
         {
+            onInstantiatedEquipment?.Invoke(model, instantiatedObject, instantiatedEntity, instantiatedObjectGroup, equipmentContainer);
             if (model.useInstantiatedObject || model.doNotSetupBones)
                 return;
             BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager = GameInstance.Singleton.EquipmentModelBonesSetupManager;

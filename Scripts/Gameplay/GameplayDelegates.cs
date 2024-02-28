@@ -152,4 +152,11 @@ namespace MultiplayerARPG
 
     public delegate void CalculatedBuffDelegate(
         CalculatedBuff calculatedBuff);
+
+    public delegate void OnInstantiatedEquipmentDelegate(
+        EquipmentModel model,
+        GameObject instantiatedObject,
+        BaseEquipmentEntity instantiatedEntity,
+        EquipmentInstantiatedObjectGroup instantiatedObjectGroup,
+        EquipmentContainer equipmentContainer);
 }

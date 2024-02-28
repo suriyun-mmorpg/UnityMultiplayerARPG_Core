@@ -36,6 +36,10 @@ namespace MultiplayerARPG
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
 
+        [Header("Grab Hand Transforms")]
+        public Transform mainHandGrabTransform;
+        public Transform offHandGrabTransform;
+
         [Header("Support Hand Transforms")]
         public Transform mainHandSupportTransform;
         public Transform offHandSupportTransform;
@@ -151,6 +155,31 @@ namespace MultiplayerARPG
                 Gizmos.color = new Color(1, 0, 0, 0.5f);
                 Gizmos.DrawSphere(missileDamageTransform.position, 0.03f);
                 Handles.Label(missileDamageTransform.position, name + "(MissleDamage)");
+                DrawArrow.ForGizmo(missileDamageTransform.position, missileDamageTransform.forward, 0.1f);
+            }
+        }
+#endif
+
+#if UNITY_EDITOR
+        protected virtual void OnValidate()
+        {
+            if (missileDamageTransform != null)
+            {
+                if (!missileDamageTransform.eulerAngles.Equals(Vector3.zero))
+                {
+                    Debug.LogWarning($"[EquipmentEntity] {name} `missileDamageTransform` global euler angles must be 0,0,0)");
+                    missileDamageTransform.eulerAngles = Vector3.zero;
+                    EditorUtility.SetDirty(this);
+                }
+
+                if (!Mathf.Approximately(missileDamageTransform.position.x, 0f))
+                {
+                    Debug.LogWarning($"[EquipmentEntity] {name} `missileDamageTransform` global X position must be 0)");
+                    Vector3 position = missileDamageTransform.position;
+                    position.x = 0f;
+                    missileDamageTransform.position = position;
+                    EditorUtility.SetDirty(this);
+                }
             }
         }
 #endif

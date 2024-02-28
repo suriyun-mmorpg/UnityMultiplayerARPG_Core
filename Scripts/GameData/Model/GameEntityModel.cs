@@ -146,7 +146,7 @@ namespace MultiplayerARPG
 
         public virtual BaseGameEntity Entity { get; set; }
         public Transform CacheTransform { get; protected set; }
-        public BaseModelHiddingUpdater ModelHiddingUpdater { get; protected set; }
+        public ModelHiddingUpdater ModelHiddingUpdater { get; protected set; }
 
         protected Dictionary<string, EffectContainer> _cacheEffectContainers = null;
         /// <summary>
@@ -183,7 +183,7 @@ namespace MultiplayerARPG
             // Prepare cache transform
             CacheTransform = transform;
             // Prepare hidding renderers updater
-            ModelHiddingUpdater = gameObject.GetOrAddComponent<BaseModelHiddingUpdater>();
+            ModelHiddingUpdater = gameObject.GetOrAddComponent<ModelHiddingUpdater>();
             // Prepare audio source if it is not set
             if (genericAudioSource == null)
             {

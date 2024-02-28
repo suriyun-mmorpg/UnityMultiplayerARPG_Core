@@ -99,6 +99,13 @@ namespace MultiplayerARPG
             MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
             MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
             MainFpsModel.SetEquipItems(MainTpsModel.EquipItems, MainTpsModel.SelectableWeaponSets, MainTpsModel.EquipWeaponSet, MainTpsModel.IsWeaponsSheathed);
+#if UNITY_EDITOR
+            IComponentWithPrefabRef[] refs = MainFpsModel.GetComponents<IComponentWithPrefabRef>();
+            for (int i = 0; i < refs.Length; ++i)
+            {
+                refs[i].SetupRefToPrefab(fpsModelPrefab.gameObject);
+            }
+#endif
             return MainFpsModel;
         }
 

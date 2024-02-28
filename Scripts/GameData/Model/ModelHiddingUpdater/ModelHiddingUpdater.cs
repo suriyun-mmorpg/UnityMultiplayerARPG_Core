@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class BaseModelHiddingUpdater : MonoBehaviour
+    public class ModelHiddingUpdater : MonoBehaviour
     {
         public virtual void SetHiddingObjectsAndRenderers(List<GameObject> hiddingObjects, List<Renderer> hiddingRenderers, bool isHidding)
         {
