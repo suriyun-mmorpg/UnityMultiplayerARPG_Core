@@ -141,10 +141,10 @@ namespace MultiplayerARPG
                 _totalDuration = 60f / weaponItem.RateOfFire;
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
             Dictionary<DamageElement, MinMaxFloat> damageAmounts;
-            if (isLeftHand && Entity.GetCaches().LeftHandDamages != null)
-                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().LeftHandDamages);
+            if (isLeftHand && Entity.CachedData.LeftHandDamages != null)
+                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.LeftHandDamages);
             else
-                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.GetCaches().RightHandDamages);
+                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.RightHandDamages);
 
 
             // Calculate move speed rate while doing action at clients and server
