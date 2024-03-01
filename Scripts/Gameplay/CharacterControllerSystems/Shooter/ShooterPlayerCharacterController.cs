@@ -1474,7 +1474,7 @@ namespace MultiplayerARPG
         {
             int dataId = BaseGameData.MakeDataId(id);
             if (!GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill) || skill == null ||
-                !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out int skillLevel))
+                !PlayingCharacterEntity.CachedData.Skills.TryGetValue(skill, out int skillLevel))
                 return;
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }
@@ -1606,17 +1606,18 @@ namespace MultiplayerARPG
 
         public virtual void ChangeWeaponAbility(int index)
         {
-            bool isSameAbility = _rightHandWeapon != null && WeaponAbility != null && _rightHandWeapon.WeaponAbilities != null && index < _rightHandWeapon.WeaponAbilities.Length && _rightHandWeapon.WeaponAbilities[index] == WeaponAbility;
+            List<BaseWeaponAbility> abilities = PlayingCharacterEntity.CachedData.RightHandWeaponAbilities;
+            bool isSameAbility = WeaponAbility != null && index < abilities.Count && abilities[index] == WeaponAbility;
             if (isSameAbility)
                 return;
             if (WeaponAbility != null)
             {
                 WeaponAbility.Desetup();
             }
-            if (_rightHandWeapon != null && _rightHandWeapon.WeaponAbilities != null && index < _rightHandWeapon.WeaponAbilities.Length)
+            if (index < abilities.Count)
             {
                 WeaponAbilityIndex = index;
-                WeaponAbility = _rightHandWeapon.WeaponAbilities[index];
+                WeaponAbility = abilities[index];
             }
             else
             {

@@ -20,6 +20,8 @@ namespace MultiplayerARPG
         public Dictionary<BaseSkill, int> Skills { get; private set; }
         public Dictionary<StatusEffect, float> StatusEffectResistances { get; private set; }
         public Dictionary<EquipmentSet, int> EquipmentSets { get; private set; }
+        public List<BaseWeaponAbility> RightHandWeaponAbilities { get; private set; }
+        public List<BaseWeaponAbility> LeftHandWeaponAbilities { get; private set; }
         public int MaxHp => (int)_stats.hp;
         public int MaxMp => (int)_stats.mp;
         public int MaxStamina => (int)_stats.stamina;
@@ -75,6 +77,8 @@ namespace MultiplayerARPG
             Skills = new Dictionary<BaseSkill, int>();
             StatusEffectResistances = new Dictionary<StatusEffect, float>();
             EquipmentSets = new Dictionary<EquipmentSet, int>();
+            RightHandWeaponAbilities = new List<BaseWeaponAbility>();
+            LeftHandWeaponAbilities = new List<BaseWeaponAbility>();
         }
 
         ~CharacterDataCache()
@@ -101,6 +105,10 @@ namespace MultiplayerARPG
             StatusEffectResistances = null;
             EquipmentSets.Clear();
             EquipmentSets = null;
+            RightHandWeaponAbilities.Clear();
+            RightHandWeaponAbilities = null;
+            LeftHandWeaponAbilities.Clear();
+            LeftHandWeaponAbilities = null;
         }
 
         public CharacterDataCache MarkToMakeCaches()
@@ -203,6 +211,8 @@ namespace MultiplayerARPG
             Skills.Clear();
             StatusEffectResistances.Clear();
             EquipmentSets.Clear();
+            RightHandWeaponAbilities.Clear();
+            LeftHandWeaponAbilities.Clear();
 
             int oldBattlePoints = BattlePoints;
 
@@ -251,11 +261,11 @@ namespace MultiplayerARPG
             HavingChanceToRemoveBuffWhenPickupItem = false;
 
             bool allAilmentsWereApplied = false;
-            if (characterData is BaseCharacterEntity characterEntity)
+            if (characterData is BasePlayerCharacterEntity playerCharacterEntity)
             {
-                if (!allAilmentsWereApplied && !characterEntity.PassengingVehicleEntity.IsNull())
+                if (!allAilmentsWereApplied && playerCharacterEntity.PassengingVehicleEntity != null)
                 {
-                    UpdateAppliedAilments(characterEntity.PassengingVehicleEntity.GetBuff());
+                    UpdateAppliedAilments(playerCharacterEntity.PassengingVehicleEntity.GetBuff());
                     allAilmentsWereApplied = AllAilmentsWereApplied();
                 }
             }
@@ -366,12 +376,18 @@ namespace MultiplayerARPG
             {
                 IsRightHandItemAvailable = true;
                 RightHandItem = characterData.EquipWeapons.rightHand;
+                if (rightWeaponItem.WeaponAbilities != null && rightWeaponItem.WeaponAbilities.Length > 0)
+                    RightHandWeaponAbilities.AddRange(rightWeaponItem.WeaponAbilities);
+                AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandItem.Sockets);
             }
             IWeaponItem leftWeaponItem = characterData.EquipWeapons.GetLeftHandWeaponItem();
             if (leftWeaponItem != null)
             {
                 IsLeftHandItemAvailable = true;
                 LeftHandItem = characterData.EquipWeapons.leftHand;
+                if (leftWeaponItem.WeaponAbilities != null && leftWeaponItem.WeaponAbilities.Length > 0)
+                    LeftHandWeaponAbilities.AddRange(leftWeaponItem.WeaponAbilities);
+                AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandItem.Sockets);
             }
             if (!IsLeftHandItemAvailable && !IsRightHandItemAvailable)
             {
@@ -381,6 +397,50 @@ namespace MultiplayerARPG
             }
 
             return this;
+        }
+
+        private void AddOrReplaceWeaponAbilities(List<BaseWeaponAbility> weaponAbilities, List<int> sockets)
+        {
+            Dictionary<string, int> abilityIndexes = new Dictionary<string, int>();
+            int i;
+            for (i = 0; i < weaponAbilities.Count; ++i)
+            {
+                if (weaponAbilities[i] == null)
+                    continue;
+                if (abilityIndexes.ContainsKey(weaponAbilities[i].AbilityKey))
+                    continue;
+                abilityIndexes[weaponAbilities[i].AbilityKey] = i;
+            }
+
+            for (i = 0; i < sockets.Count; ++i)
+            {
+                if (!GameInstance.Items.TryGetValue(sockets[i], out BaseItem item) || !item.IsSocketEnhancer())
+                    continue;
+
+                ISocketEnhancerItem socketEnhancerItem = item as ISocketEnhancerItem;
+                if (socketEnhancerItem.WeaponAbilities == null || socketEnhancerItem.WeaponAbilities.Length == 0)
+                    continue;
+
+                for (int j = 0; j < socketEnhancerItem.WeaponAbilities.Length; ++j)
+                {
+                    if (socketEnhancerItem.WeaponAbilities[j] == null)
+                        continue;
+
+                    string abilityKey = socketEnhancerItem.WeaponAbilities[j].AbilityKey;
+                    if (!abilityIndexes.ContainsKey(abilityKey))
+                    {
+                        // Add a new ability
+                        weaponAbilities.Add(socketEnhancerItem.WeaponAbilities[j]);
+                        abilityIndexes[abilityKey] = weaponAbilities.Count - 1;
+                        continue;
+                    }
+                    else
+                    {
+                        // Change old ability
+                        weaponAbilities[abilityIndexes[abilityKey]] = socketEnhancerItem.WeaponAbilities[j];
+                    }
+                }
+            }
         }
 
         public CharacterItem GetAvailableWeapon(ref bool isLeftHand)

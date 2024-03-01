@@ -21,6 +21,11 @@ namespace MultiplayerARPG
         public bool hideCrosshairWhileZooming;
         public bool shouldDeactivateOnReload;
 
+        public override string AbilityKey
+        {
+            get { return "ZOOM_WEAPON_ABILITY"; }
+        }
+
         [System.NonSerialized]
         private float _currentZoomInterpTime;
         [System.NonSerialized]

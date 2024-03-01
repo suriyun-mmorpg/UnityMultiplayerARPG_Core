@@ -31,6 +31,14 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private BaseWeaponAbility[] weaponAbilities = new BaseWeaponAbility[0];
+
+        public BaseWeaponAbility[] WeaponAbilities
+        {
+            get { return weaponAbilities; }
+        }
+
+        [SerializeField]
         private StatusEffectApplying[] selfStatusEffectsWhenAttacking = new StatusEffectApplying[0];
         public StatusEffectApplying[] SelfStatusEffectsWhenAttacking
         {
