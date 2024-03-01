@@ -161,7 +161,7 @@ namespace MultiplayerARPG
                 Gizmos.color = new Color(1, 0, 0, 0.5f);
                 Gizmos.DrawSphere(missileDamageTransform.position, 0.03f);
                 Handles.Label(missileDamageTransform.position, name + "(MissleDamage)");
-                DrawArrow.ForGizmo(missileDamageTransform.position, missileDamageTransform.forward, 0.1f);
+                DrawArrow.ForGizmo(missileDamageTransform.position, missileDamageTransform.forward, 0.5f, 0.1f);
             }
         }
 #endif

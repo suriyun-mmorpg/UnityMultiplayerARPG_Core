@@ -220,6 +220,7 @@ namespace MultiplayerARPG
                     Gizmos.DrawWireSphere(effectContainer.transform.position, 0.1f);
                     Gizmos.DrawSphere(effectContainer.transform.position, 0.03f);
                     Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
+                    DrawArrow.ForGizmo(effectContainer.transform.position, effectContainer.transform.forward, 0.5f, 0.1f);
                 }
             }
         }

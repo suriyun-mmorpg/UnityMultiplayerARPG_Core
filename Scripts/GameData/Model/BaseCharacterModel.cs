@@ -335,6 +335,7 @@ namespace MultiplayerARPG
                     Gizmos.DrawWireSphere(equipmentContainer.transform.position, 0.1f);
                     Gizmos.DrawSphere(equipmentContainer.transform.position, 0.03f);
                     Handles.Label(equipmentContainer.transform.position, equipmentContainer.equipSocket + "(Equipment)");
+                    DrawArrow.ForGizmo(equipmentContainer.transform.position, equipmentContainer.transform.forward, 0.5f, 0.1f);
                 }
             }
         }
