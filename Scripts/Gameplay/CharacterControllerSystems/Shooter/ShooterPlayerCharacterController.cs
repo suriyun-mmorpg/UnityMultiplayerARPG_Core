@@ -512,18 +512,18 @@ namespace MultiplayerARPG
 
         protected virtual void SetupEquipWeapons(EquipWeapons equipWeapons)
         {
-            CurrentCrosshairSetting = PlayingCharacterEntity.GetCrosshairSetting();
-            UpdateCrosshair(CurrentCrosshairSetting, false, -CurrentCrosshairSetting.shrinkPerFrame);
-
-            _rightHandWeapon = equipWeapons.GetRightHandWeaponItem();
-            _leftHandWeapon = equipWeapons.GetLeftHandWeaponItem();
-            // Clear weapon ability
-            ChangeWeaponAbility(0);
-            // Setup proper weapon data
-            if (_rightHandWeapon == null)
-                _rightHandWeapon = GameInstance.Singleton.DefaultWeaponItem;
-            if (_leftHandWeapon == null)
-                _leftHandWeapon = GameInstance.Singleton.DefaultWeaponItem;
+            IWeaponItem newRightHandWeapon = equipWeapons.GetRightHandWeaponItem();
+            IWeaponItem newLeftHandWeapon = equipWeapons.GetLeftHandWeaponItem();
+            bool isSameWeapons = newRightHandWeapon == _rightHandWeapon && newLeftHandWeapon == _leftHandWeapon;
+            if (!isSameWeapons)
+            {
+                CurrentCrosshairSetting = PlayingCharacterEntity.GetCrosshairSetting();
+                UpdateCrosshair(CurrentCrosshairSetting, false, -CurrentCrosshairSetting.shrinkPerFrame);
+            }
+            _rightHandWeapon = newRightHandWeapon;
+            _leftHandWeapon = newLeftHandWeapon;
+            if (!isSameWeapons)
+                ChangeWeaponAbility(0);
         }
 
         protected override void Update()
@@ -1578,7 +1578,10 @@ namespace MultiplayerARPG
                 return;
             _isReloading = true;
             if (WeaponAbility != null && WeaponAbility.ShouldDeactivateOnReload)
+            {
                 WeaponAbility.ForceDeactivated();
+                WeaponAbilityState = WeaponAbilityState.Deactivated;
+            }
             // Reload ammo at server
             bool allReload;
             do
@@ -1603,15 +1606,17 @@ namespace MultiplayerARPG
 
         public virtual void ChangeWeaponAbility(int index)
         {
+            bool isSameAbility = _rightHandWeapon != null && WeaponAbility != null && _rightHandWeapon.WeaponAbilities != null && index < _rightHandWeapon.WeaponAbilities.Length && _rightHandWeapon.WeaponAbilities[index] == WeaponAbility;
+            if (isSameAbility)
+                return;
             if (WeaponAbility != null)
             {
                 WeaponAbility.Desetup();
             }
-            IWeaponItem rightHandWeapon = PlayingCharacterEntity.EquipWeapons.GetRightHandWeaponItem();
-            if (rightHandWeapon != null && rightHandWeapon.WeaponAbilities != null && index < rightHandWeapon.WeaponAbilities.Length)
+            if (_rightHandWeapon != null && _rightHandWeapon.WeaponAbilities != null && index < _rightHandWeapon.WeaponAbilities.Length)
             {
                 WeaponAbilityIndex = index;
-                WeaponAbility = rightHandWeapon.WeaponAbilities[index];
+                WeaponAbility = _rightHandWeapon.WeaponAbilities[index];
             }
             else
             {
