@@ -1,6 +1,4 @@
-﻿using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public abstract class BaseWeaponAbility : BaseGameData
     {
