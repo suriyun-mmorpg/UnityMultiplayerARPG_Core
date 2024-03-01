@@ -54,6 +54,12 @@ namespace MultiplayerARPG
         public UnityEvent onPlayCharge = new UnityEvent();
         public EquipmentEntityItemEvent onItemChanged = new EquipmentEntityItemEvent();
 
+#if UNITY_EDITOR
+        [Header("Tools")]
+        [InspectorButton(nameof(SetProperMissileDamageTransformForIK))]
+        public bool setProperMissileDamageTransformForIK;
+#endif
+
         public IEnumerable<IPoolDescriptor> PoolDescriptors
         {
             get
@@ -163,23 +169,30 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         protected virtual void OnValidate()
         {
-            if (missileDamageTransform != null)
-            {
-                if (!missileDamageTransform.eulerAngles.Equals(Vector3.zero))
-                {
-                    Debug.LogWarning($"[EquipmentEntity] {name} `missileDamageTransform` global euler angles must be 0,0,0)");
-                    missileDamageTransform.eulerAngles = Vector3.zero;
-                    EditorUtility.SetDirty(this);
-                }
 
-                if (!Mathf.Approximately(missileDamageTransform.position.x, 0f))
-                {
-                    Debug.LogWarning($"[EquipmentEntity] {name} `missileDamageTransform` global X position must be 0)");
-                    Vector3 position = missileDamageTransform.position;
-                    position.x = 0f;
-                    missileDamageTransform.position = position;
-                    EditorUtility.SetDirty(this);
-                }
+        }
+#endif
+
+#if UNITY_EDITOR
+        public void SetProperMissileDamageTransformForIK()
+        {
+            if (missileDamageTransform == null)
+                return;
+
+            if (!missileDamageTransform.eulerAngles.Equals(Vector3.zero))
+            {
+                Debug.LogWarning($"[EquipmentEntity] {name} `missileDamageTransform` global euler angles must be 0,0,0)");
+                missileDamageTransform.eulerAngles = Vector3.zero;
+                EditorUtility.SetDirty(this);
+            }
+
+            if (!Mathf.Approximately(missileDamageTransform.position.x, 0f))
+            {
+                Debug.LogWarning($"[EquipmentEntity] {name} `missileDamageTransform` global X position must be 0)");
+                Vector3 position = missileDamageTransform.position;
+                position.x = 0f;
+                missileDamageTransform.position = position;
+                EditorUtility.SetDirty(this);
             }
         }
 #endif
