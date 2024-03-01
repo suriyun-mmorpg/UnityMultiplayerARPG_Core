@@ -772,13 +772,8 @@ namespace MultiplayerARPG
             _switchEquipWeaponSetInput.OnLateUpdate();
 
             if (ViewMode == ShooterControllerViewMode.Fps)
-            {
-                PlayingCharacterEntity.SetLookRotation(Quaternion.Euler(CacheGameplayCameraController.CameraTransform.eulerAngles.y * Vector3.up));
-            }
-            else
-            {
-                PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection));
-            }
+                _targetLookDirection = _moveLookDirection = _cameraForward;
+            PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection));
         }
 
         protected bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
