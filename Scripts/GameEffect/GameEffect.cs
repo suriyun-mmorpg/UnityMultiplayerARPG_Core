@@ -156,23 +156,20 @@ namespace MultiplayerARPG
             // Prepare destroy time
             _destroyTime = isLoop ? -1 : Time.time + lifeTime;
 
-            switch (playMode)
+            if (!Application.isBatchMode && !AudioListener.pause && randomSoundEffects.Length > 0)
             {
-                case PlayMode.PlayClipAtAudioSource:
-                    if (!Application.isBatchMode && !AudioListener.pause && randomSoundEffects.Length > 0)
-                    {
+                switch (playMode)
+                {
+                    case PlayMode.PlayClipAtAudioSource:
                         _cacheAudioSource.clip = randomSoundEffects[Random.Range(0, randomSoundEffects.Length)];
                         _cacheAudioSource.volume = AudioManager.Singleton.GetVolumeLevel(SettingId);
                         _cacheAudioSource.loop = isLoop;
                         _cacheAudioSource.Play();
-                    }
-                    break;
-                case PlayMode.PlayClipAtPoint:
-                    if (!Application.isBatchMode && !AudioListener.pause && randomSoundEffects.Length > 0)
-                    {
+                        break;
+                    case PlayMode.PlayClipAtPoint:
                         AudioSource.PlayClipAtPoint(randomSoundEffects[Random.Range(0, randomSoundEffects.Length)], CacheTransform.position, AudioManager.Singleton.GetVolumeLevel(SettingId));
-                    }
-                    break;
+                        break;
+                }
             }
 
             FxCollection.Play();
