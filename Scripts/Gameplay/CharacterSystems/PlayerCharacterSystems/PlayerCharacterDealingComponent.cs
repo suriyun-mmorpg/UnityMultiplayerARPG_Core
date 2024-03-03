@@ -137,7 +137,7 @@ namespace MultiplayerARPG
                 for (j = tempDealingItems.Count - 1; j >= 0; --j)
                 {
                     dealingItem = tempDealingItems[j];
-                    if (nonEquipItem.id != dealingItem.id || nonEquipItem.amount < dealingItem.amount)
+                    if (nonEquipItem.id == dealingItem.id && nonEquipItem.amount >= dealingItem.amount)
                     {
                         if (DealingCharacter.IncreaseItems(dealingItem, characterItem => DealingCharacter.OnRewardItem(RewardGivenType.Dealing, characterItem)))
                         {
