@@ -128,28 +128,28 @@ namespace MultiplayerARPG
             if (DealingCharacter == null)
                 return;
             List<CharacterItem> tempDealingItems = new List<CharacterItem>(DealingItems);
-            CharacterItem nonEquipItem;
-            CharacterItem dealingItem;
+            CharacterItem tempNonEquipItem;
+            CharacterItem tempDealingItem;
             int i, j;
             for (i = Entity.NonEquipItems.Count - 1; i >= 0; --i)
             {
-                nonEquipItem = Entity.NonEquipItems[i];
+                tempNonEquipItem = Entity.NonEquipItems[i];
                 for (j = tempDealingItems.Count - 1; j >= 0; --j)
                 {
-                    dealingItem = tempDealingItems[j];
-                    if (dealingItem.id != nonEquipItem.id || dealingItem.amount > nonEquipItem.amount)
+                    tempDealingItem = tempDealingItems[j];
+                    if (tempDealingItem.id != tempNonEquipItem.id || tempDealingItem.amount > tempNonEquipItem.amount)
                     {
                         // Not a item player wish to offer, or its amount more than in inventory
                         continue;
                     }
-                    if (!DealingCharacter.IncreaseItems(dealingItem, characterItem => DealingCharacter.OnRewardItem(RewardGivenType.Dealing, characterItem)))
+                    if (!DealingCharacter.IncreaseItems(tempDealingItem, characterItem => DealingCharacter.OnRewardItem(RewardGivenType.Dealing, characterItem)))
                     {
                         // Another character cannot increase an items
                         continue;
                     }
                     // Reduce item amount when able to increase item to co character
-                    nonEquipItem.amount -= dealingItem.amount;
-                    if (nonEquipItem.amount == 0)
+                    tempNonEquipItem.amount -= tempDealingItem.amount;
+                    if (tempNonEquipItem.amount == 0)
                     {
                         // Amount is 0, remove it from inventory
                         if (CurrentGameInstance.IsLimitInventorySlot)
@@ -160,7 +160,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Update amount
-                        Entity.NonEquipItems[i] = nonEquipItem;
+                        Entity.NonEquipItems[i] = tempNonEquipItem;
                     }
                     tempDealingItems.RemoveAt(j);
                     break;
