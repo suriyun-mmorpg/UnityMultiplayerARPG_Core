@@ -643,7 +643,7 @@ namespace MultiplayerARPG
             if (!_isGrounded && _isUnderWater && _previousMovement.y > 0f)
             {
                 Vector3 tempTargetPosition = Vector3.up * TargetWaterSurfaceY(_waterCollider);
-                if (Mathf.Abs(CacheTransform.position.y - tempTargetPosition.y) <= 0.02f)
+                if (Mathf.Abs(CacheTransform.position.y - tempTargetPosition.y) < 0.05f)
                     CacheTransform.position = new Vector3(CacheTransform.position.x, tempTargetPosition.y, CacheTransform.position.z);
             }
         }
