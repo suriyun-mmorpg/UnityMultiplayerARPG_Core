@@ -680,14 +680,21 @@ namespace MultiplayerARPG
             // If jumping add jump state
             if (!isBlockController)
             {
-                if (InputManager.GetButtonDown("Jump"))
+                if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
                 {
-                    if (unToggleCrouchWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
-                        _toggleCrouchOn = false;
-                    else if (unToggleCrawlWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
-                        _toggleCrawlOn = false;
-                    else
-                        _movementState |= MovementState.IsJump;
+                    if (InputManager.GetButton("SwimUp"))
+                    {
+                        _movementState |= MovementState.Up;
+                    }
+                    else if (InputManager.GetButton("SwimDown"))
+                    {
+                        _movementState |= MovementState.Down;
+                    }
+                    _extraMovementState = ExtraMovementState.None;
+                    _toggleSprintOn = false;
+                    _toggleWalkOn = false;
+                    _toggleCrouchOn = false;
+                    _toggleCrawlOn = false;
                 }
                 else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
                 {
@@ -718,6 +725,15 @@ namespace MultiplayerARPG
                         _toggleSprintOn = false;
                         _toggleWalkOn = false;
                         _toggleCrouchOn = false;
+                    }
+                    if (InputManager.GetButtonDown("Jump"))
+                    {
+                        if (unToggleCrouchWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
+                            _toggleCrouchOn = false;
+                        else if (unToggleCrawlWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
+                            _toggleCrawlOn = false;
+                        else
+                            _movementState |= MovementState.IsJump;
                     }
                 }
             }

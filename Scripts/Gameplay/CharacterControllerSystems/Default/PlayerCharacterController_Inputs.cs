@@ -156,17 +156,25 @@ namespace MultiplayerARPG
                         equipWeaponSet = (byte)(PlayingCharacterEntity.EquipWeaponSet + 1),
                     }, ClientInventoryActions.ResponseSwitchEquipWeaponSet);
                 }
-                if (InputManager.GetButtonDown("Sprint"))
+                if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
                 {
-                    // Toggles sprint state
-                    _isSprinting = !_isSprinting;
+                    _isSprinting = false;
                     _isWalking = false;
                 }
-                else if (InputManager.GetButtonDown("Walk"))
+                else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
                 {
-                    // Toggles sprint state
-                    _isWalking = !_isWalking;
-                    _isSprinting = false;
+                    if (InputManager.GetButtonDown("Sprint"))
+                    {
+                        // Toggles sprint state
+                        _isSprinting = !_isSprinting;
+                        _isWalking = false;
+                    }
+                    else if (InputManager.GetButtonDown("Walk"))
+                    {
+                        // Toggles sprint state
+                        _isWalking = !_isWalking;
+                        _isSprinting = false;
+                    }
                 }
                 // Auto reload
                 if (PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
@@ -182,6 +190,7 @@ namespace MultiplayerARPG
             UpdateQueuedSkill();
             UpdatePointClickInput();
             UpdateWASDInput();
+
             // Set extra movement state
             if (_isSprinting)
                 PlayingCharacterEntity.SetExtraMovementState(ExtraMovementState.IsSprinting);
@@ -427,8 +436,24 @@ namespace MultiplayerARPG
 
             // Always forward
             MovementState movementState = MovementState.Forward;
-            if (InputManager.GetButtonDown("Jump"))
-                movementState |= MovementState.IsJump;
+            if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
+            {
+                if (InputManager.GetButton("SwimUp"))
+                {
+                    movementState |= MovementState.Up;
+                }
+                else if (InputManager.GetButton("SwimDown"))
+                {
+                    movementState |= MovementState.Down;
+                }
+            }
+            else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
+            {
+                if (InputManager.GetButtonDown("Jump"))
+                {
+                    movementState |= MovementState.IsJump;
+                }
+            }
             PlayingCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 

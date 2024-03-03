@@ -94,6 +94,7 @@ namespace MultiplayerARPG
         private Transform _groundedTransform;
         private Vector3 _previousPlatformPosition;
         private Vector3 _previousPosition;
+        private Vector3 _previousMovement;
         private bool _isGrounded = true;
         private bool _isUnderWater = false;
         private bool _previouslyGrounded;
@@ -545,19 +546,22 @@ namespace MultiplayerARPG
                     tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                     tempPredictPosition = tempCurrentPosition + (Vector3.up * _moveDirection.y * CurrentMoveSpeed * deltaTime);
-                    tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
-                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
-                    // rigidbody will reaching target and character is moving pass it,
-                    // so adjust move speed by distance and time (with physic formula: v=s/t)
-                    if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
-                        CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
-                    if (CurrentMoveSpeed < 0.01f || tempTargetDistance <= 0f)
+                    if (_moveDirection.y > 0f)
                     {
-                        CurrentMoveSpeed = 0f;
-                        // Force set move direction y to 0 to prevent swim move animation playing
-                        if (autoSwimToSurface || _tempMovementState.Has(MovementState.Up))
-                            _moveDirection.y = 0f;
+                        tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
+                        // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                        // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                        // rigidbody will reaching target and character is moving pass it,
+                        // so adjust move speed by distance and time (with physic formula: v=s/t)
+                        if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
+                            CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
+                        if (CurrentMoveSpeed < 0.01f || tempTargetDistance <= 0f)
+                        {
+                            CurrentMoveSpeed = 0f;
+                            // Force set move direction y to 0 to prevent swim move animation playing
+                            if (autoSwimToSurface || _tempMovementState.Has(MovementState.Up))
+                                _moveDirection.y = 0f;
+                        }
                     }
                     tempMoveVelocity.y = _moveDirection.y * CurrentMoveSpeed;
                     if (!HasNavPaths)
@@ -591,7 +595,8 @@ namespace MultiplayerARPG
                 }
             }
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
-            EntityMovement.Move((tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime);
+            _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime;
+            EntityMovement.Move(_previousMovement);
             _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
             _isJumping = false;
             _acceptedJump = false;
@@ -635,7 +640,7 @@ namespace MultiplayerARPG
             if (!CanPredictMovement())
                 return;
 
-            if (!_isGrounded && _isUnderWater)
+            if (!_isGrounded && _isUnderWater && _previousMovement.y > 0f)
             {
                 Vector3 tempTargetPosition = Vector3.up * TargetWaterSurfaceY(_waterCollider);
                 if (Mathf.Abs(CacheTransform.position.y - tempTargetPosition.y) <= 0.02f)
