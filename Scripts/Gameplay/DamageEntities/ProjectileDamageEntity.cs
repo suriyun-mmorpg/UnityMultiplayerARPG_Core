@@ -42,6 +42,10 @@ namespace MultiplayerARPG
         public bool instantiateDisappear = false;
         public GameObject disappearEffect;
 
+        private FxCollection _projectileFx;
+        private FxCollection _impactFx;
+        private FxCollection _disappearFx;
+
         private Vector3 _initialPosition;
         private Vector3 _defaultImpactEffectPosition;
         private Vector3 _bulletVelocity;
@@ -69,16 +73,38 @@ namespace MultiplayerARPG
 
             // Configuration bullet and effects
             if (projectileObject)
+            {
+                if (_projectileFx == null)
+                {
+                    _projectileFx = new FxCollection(projectileObject);
+                    _projectileFx.InitPrefab();
+                }
                 projectileObject.SetActive(true);
+                _projectileFx.Play();
+            }
 
             if (impactEffect && !instantiateImpact)
             {
+                if (_impactFx == null)
+                {
+                    _impactFx = new FxCollection(impactEffect);
+                    _impactFx.InitPrefab();
+                }
                 impactEffect.SetActive(false);
+                _impactFx.Stop();
                 _defaultImpactEffectPosition = impactEffect.transform.localPosition;
             }
 
             if (disappearEffect && !instantiateDisappear)
+            {
+                if (_disappearFx == null)
+                {
+                    _disappearFx = new FxCollection(disappearEffect);
+                    _disappearFx.InitPrefab();
+                }
                 disappearEffect.SetActive(false);
+                _disappearFx.Stop();
+            }
 
             // Movement
             Vector3 targetPos = _initialPosition + (CacheTransform.forward * missileDistance);
@@ -98,10 +124,10 @@ namespace MultiplayerARPG
 
             if (recalculateSpeed)
                 missileSpeed = LaunchSpeed(dist, yOffset, gravity.magnitude, angle * Mathf.Deg2Rad);
-
+            
             if (useAngle)
                 CacheTransform.eulerAngles = new Vector3(CacheTransform.eulerAngles.x - angle, CacheTransform.eulerAngles.y, CacheTransform.eulerAngles.z);
-
+            
             _bulletVelocity = CacheTransform.forward * missileSpeed;
         }
 
@@ -198,12 +224,20 @@ namespace MultiplayerARPG
                     onProjectileDisappear.Invoke();
 
                 if (projectileObject)
+                {
                     projectileObject.SetActive(false);
+                    _projectileFx.Stop();
+                }
 
                 if (instantiateDisappear)
+                {
                     Instantiate(disappearEffect, transform.position, CacheTransform.rotation);
+                }
                 else
+                {
                     disappearEffect.SetActive(true);
+                    _disappearFx.Play();
+                }
 
                 PushBack(destroyDelay);
                 Destroying = true;
@@ -257,12 +291,14 @@ namespace MultiplayerARPG
                 }
                 else
                 {
+                    impactEffect.transform.rotation = Quaternion.identity;
                     if (useNormal)
-                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.forward, _normal);
+                        impactEffect.transform.rotation = Quaternion.FromToRotation(Vector3.up, _normal);
                     impactEffect.transform.position = _hitPos;
                     if (stickToHitObject)
                         impactEffect.transform.parent = hitted.transform;
                     impactEffect.SetActive(true);
+                    _impactFx.Play();
                 }
             }
 
