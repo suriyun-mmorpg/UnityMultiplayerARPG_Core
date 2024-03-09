@@ -158,6 +158,7 @@ namespace MultiplayerARPG
                 if (Destroying)
                     break;
             }
+            _previousPosition = CacheTransform.position;
         }
 
         protected override void Update()
