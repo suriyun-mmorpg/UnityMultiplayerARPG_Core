@@ -215,7 +215,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                         selectableWeaponSets.Add(new EquipWeapons());
                     }
                 }
-                newEquipWeapons = selectableWeaponSets[equipWeaponSet];
+                newEquipWeapons = selectableWeaponSets[equipWeaponSet].Clone();
             }
             // Get one equipped weapon from right-hand or left-hand
             IWeaponItem rightWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
