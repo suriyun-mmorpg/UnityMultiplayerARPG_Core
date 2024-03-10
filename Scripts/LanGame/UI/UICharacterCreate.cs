@@ -255,9 +255,13 @@ namespace MultiplayerARPG
             });
             // Select first entry
             if (CharacterSelectionManager.Count > 0)
+            {
                 CharacterSelectionManager.Select(0);
+            }
             else
-                OnSelectCharacter(firstData);
+            {
+                SetSelectCharacter(firstData);
+            }
         }
 
         protected virtual void LoadFactions()
@@ -281,9 +285,13 @@ namespace MultiplayerARPG
             });
             // Select first entry
             if (FactionSelectionManager.Count > 0)
+            {
                 FactionSelectionManager.Select(0);
+            }
             else
-                OnSelectFaction(firstData);
+            {
+                SetSelectFaction(firstData);
+            }
         }
 
         protected virtual void OnEnable()
@@ -339,8 +347,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
         {
-            // Set data
-            _selectedPlayerCharacterData = uiCharacter.Data as PlayerCharacterData;
+            SetSelectCharacter(uiCharacter.Data as PlayerCharacterData);
+        }
+
+        protected void SetSelectCharacter(PlayerCharacterData playerCharacterData)
+        {
+            _selectedPlayerCharacterData = playerCharacterData;
             SelectedDataId = _selectedPlayerCharacterData.DataId;
             SelectedEntityId = _selectedPlayerCharacterData.EntityId;
             PublicBools.Clear();
@@ -389,9 +401,13 @@ namespace MultiplayerARPG
             });
             // Select first entry
             if (CharacterClassSelectionManager.Count > 0)
+            {
                 CharacterClassSelectionManager.Select(0);
+            }
             else
-                OnSelectCharacterClass(firstData);
+            {
+                SetSelectCharacterClass(firstData);
+            }
         }
 
         protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
@@ -401,8 +417,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterClass(UICharacterClass uiCharacterClass)
         {
-            // Set data
-            _selectedPlayerCharacter = uiCharacterClass.Data as PlayerCharacter;
+            SetSelectCharacterClass(uiCharacterClass.Data as PlayerCharacter);
+        }
+
+        protected void SetSelectCharacterClass(PlayerCharacter playerCharacter)
+        {
+            _selectedPlayerCharacter = playerCharacter;
             if (SelectedPlayerCharacter != null)
             {
                 // Set creating player character data
@@ -431,7 +451,7 @@ namespace MultiplayerARPG
             }
             // Run event
             eventOnSelectCharacterClass.Invoke(_selectedPlayerCharacter);
-            OnSelectCharacterClass(uiCharacterClass.Data);
+            OnSelectCharacterClass(_selectedPlayerCharacter);
         }
 
         protected virtual void OnSelectCharacterClass(BaseCharacter baseCharacter)
@@ -441,8 +461,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectFaction(UIFaction uiFaction)
         {
-            // Set data
-            _selectedFaction = uiFaction.Data;
+            SetSelectFaction(uiFaction.Data);
+        }
+
+        protected void SetSelectFaction(Faction faction)
+        {
+            _selectedFaction = faction;
             if (SelectedFaction != null)
             {
                 // Set creating player character's faction
