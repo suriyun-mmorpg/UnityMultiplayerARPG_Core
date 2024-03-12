@@ -36,14 +36,6 @@ namespace MultiplayerARPG
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
 
-        [Header("Grab Hand Transforms")]
-        public Transform mainHandGrabTransform;
-        public Transform offHandGrabTransform;
-
-        [Header("Support Hand Transforms")]
-        public Transform mainHandSupportTransform;
-        public Transform offHandSupportTransform;
-
         [Header("Events")]
         public UnityEvent onSetup = new UnityEvent();
         public UnityEvent onEnable = new UnityEvent();
