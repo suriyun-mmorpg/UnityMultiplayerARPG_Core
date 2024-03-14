@@ -65,7 +65,7 @@ namespace MultiplayerARPG
                 return false;
             if ((data != null && anotherData == null) || (data == null && anotherData != null))
                 return true;
-            return data.id != anotherData.id || data.dataId != anotherData.dataId || data.level != anotherData.level;
+            return data.id != anotherData.id;
         }
 
         public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData, out bool rightIsDiffer, out bool leftIsDiffer)
