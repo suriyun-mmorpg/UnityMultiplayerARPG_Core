@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         public static event System.Action<StorageType, string, uint, int, int> onNotifyStorageOpened;
         public static event System.Action onNotifyStorageClosed;
         public static event System.Action<List<CharacterItem>> onNotifyStorageItemsUpdated;
+        public static List<CharacterItem> UpdatedStorageItems { get; private set; }
 
         public static void ResponseOpenStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseOpenStorageMessage response)
         {
@@ -71,6 +72,7 @@ namespace MultiplayerARPG
         {
             if (onNotifyStorageItemsUpdated != null)
                 onNotifyStorageItemsUpdated.Invoke(storageItems);
+            UpdatedStorageItems = storageItems;
         }
     }
 }

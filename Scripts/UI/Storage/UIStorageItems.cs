@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         protected override void OnEnable()
         {
             inventoryType = InventoryType.StorageItems;
+            UpdateData(ClientStorageActions.UpdatedStorageItems);
             ClientStorageActions.onNotifyStorageItemsUpdated += UpdateData;
             onGenerateEntry += OnGenerateEntry;
             base.OnEnable();
