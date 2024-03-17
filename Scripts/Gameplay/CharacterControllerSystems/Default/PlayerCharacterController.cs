@@ -112,6 +112,7 @@ namespace MultiplayerARPG
 
         // Input & control states variables
         protected Vector3? _destination;
+        protected TargetActionType _previousTargetActionType;
         protected TargetActionType _targetActionType;
         protected IPhysicFunctions _physicFunctions;
         protected bool _isLeftHandAttacking;
