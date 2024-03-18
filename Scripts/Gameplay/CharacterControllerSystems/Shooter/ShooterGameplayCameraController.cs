@@ -24,9 +24,9 @@ namespace MultiplayerARPG
             CameraControls.aimAssistLayerMask = GetAimAssistLayerMask();
         }
 
-        public void Recoil(float x, float y, float z)
+        public void Recoil(float pitch, float yaw, float roll)
         {
-            CameraControls.Recoil(x, y, z);
+            CameraControls.Recoil(pitch, yaw, roll);
         }
 
         public virtual bool AvoidAimAssist(RaycastHit hitInfo)
