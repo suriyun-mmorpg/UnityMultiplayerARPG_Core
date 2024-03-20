@@ -16,6 +16,5 @@ namespace MultiplayerARPG
         public Dictionary<byte, Dictionary<DamageElement, MinMaxFloat>> ConfirmedDamageAmounts { get; } = new Dictionary<byte, Dictionary<DamageElement, MinMaxFloat>>();
         public Dictionary<string, int> HitsCount { get; } = new Dictionary<string, int>();
         public HashSet<string> HitObjects { get; } = new HashSet<string>();
-        public Dictionary<byte, List<HitRegisterData>> Pendings { get; } = new Dictionary<byte, List<HitRegisterData>>();
     }
 }

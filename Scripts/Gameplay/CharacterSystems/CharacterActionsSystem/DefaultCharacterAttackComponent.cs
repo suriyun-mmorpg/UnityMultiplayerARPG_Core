@@ -411,9 +411,6 @@ namespace MultiplayerARPG
         {
             if (!_manager.IsAcceptNewAction())
                 return;
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastAttackEndTime < -0.2f)
-                return;
             _manager.ActionAccepted();
             ProceedAttack(peerTimestamp, isLeftHand);
             RPC(RpcAttack, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, isLeftHand);

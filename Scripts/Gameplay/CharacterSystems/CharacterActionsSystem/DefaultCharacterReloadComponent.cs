@@ -269,10 +269,6 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || UNITY_SERVER
             if (!_manager.IsAcceptNewAction())
                 return;
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastReloadEndTime < -0.2f)
-                return;
-            // Get weapon to reload
             CharacterItem reloadingWeapon = isLeftHand ? Entity.EquipWeapons.leftHand : Entity.EquipWeapons.rightHand;
             if (reloadingWeapon.IsEmptySlot())
                 return;

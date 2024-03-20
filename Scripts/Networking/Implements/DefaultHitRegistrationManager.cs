@@ -97,15 +97,6 @@ namespace MultiplayerARPG
             if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
                 confirmedDamageAmounts = GameDataHelpers.CombineDamages(confirmedDamageAmounts, increaseDamageAmounts);
             hitValidateData.ConfirmedDamageAmounts[triggerIndex] = confirmedDamageAmounts;
-
-            if (hitValidateData.Pendings.TryGetValue(triggerIndex, out List<HitRegisterData> hits))
-            {
-                for (int i = 0; i < hits.Count; ++i)
-                {
-                    PerformValidation(attacker, hits[i]);
-                }
-                hitValidateData.Pendings.Remove(triggerIndex);
-            }
         }
 
         public void PrepareHitRegData(HitRegisterData hitRegisterData)
@@ -122,20 +113,14 @@ namespace MultiplayerARPG
             if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
             {
                 // No validating data
-                hitValidateData = new HitValidateData();
-                if (!hitValidateData.Pendings.ContainsKey(hitData.TriggerIndex))
-                    hitValidateData.Pendings[hitData.TriggerIndex] = new List<HitRegisterData>();
-                hitValidateData.Pendings[hitData.TriggerIndex].Add(hitData);
-                AppendValidatingData(attacker.ObjectId, id, hitValidateData);
+                Logging.LogError($"Cannot find hit validating data, it must be prepared (then confirm damages, and perform validation later)");
                 return false;
             }
 
             if (!hitValidateData.ConfirmedDamageAmounts.ContainsKey(hitData.TriggerIndex))
             {
                 // No confirmed validating data
-                if (!hitValidateData.Pendings.ContainsKey(hitData.TriggerIndex))
-                    hitValidateData.Pendings[hitData.TriggerIndex] = new List<HitRegisterData>();
-                hitValidateData.Pendings[hitData.TriggerIndex].Add(hitData);
+                Logging.LogError($"Cannot find confirmed hit validating data, it must be confirmed damages (and perform validation later)");
                 return false;
             }
 
