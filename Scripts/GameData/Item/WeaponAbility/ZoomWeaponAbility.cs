@@ -85,6 +85,11 @@ namespace MultiplayerARPG
                     return state;
                 case WeaponAbilityState.Activated:
                     _zoomWeaponAbilityController.CameraRotationSpeedScale = CameraRotationSpeedScale;
+                    if (_zoomWeaponAbilityController.ViewMode != viewModeWhileActivated)
+                    {
+                        ForceDeactivated();
+                        return WeaponAbilityState.Deactivating;
+                    }
                     return state;
                 case WeaponAbilityState.Deactivating:
                     _currentZoomInterpTime += deltaTime * ZOOM_SPEED;

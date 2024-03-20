@@ -465,6 +465,7 @@ namespace MultiplayerARPG
                 return;
 
             _targetLookDirection = MovementTransform.forward;
+            characterEntity.ForceMakeCaches();
             SetupEquipWeapons(characterEntity.EquipWeapons);
             characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
             characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
@@ -482,6 +483,15 @@ namespace MultiplayerARPG
             base.Desetup(characterEntity);
             CacheGameplayCameraController.Desetup(characterEntity);
             CacheMinimapCameraController.Desetup(characterEntity);
+
+            // Clear some cached data
+            _rightHandWeapon = null;
+            _leftHandWeapon = null;
+            if (WeaponAbility != null)
+                WeaponAbility.ForceDeactivated();
+            WeaponAbility = null;
+            WeaponAbilityIndex = 0;
+            WeaponAbilityState = WeaponAbilityState.Deactivated;
 
             if (characterEntity == null)
                 return;
@@ -560,9 +570,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (_dirtyViewMode != viewMode)
-                UpdateViewMode();
-
             CacheGameplayCameraController.TargetOffset = CameraTargetOffset;
             CacheGameplayCameraController.EnableWallHitSpring = viewMode == ShooterControllerViewMode.Tps;
             CacheGameplayCameraController.FollowingEntityTransform = ViewMode == ShooterControllerViewMode.Fps ? PlayingCharacterEntity.FpsCameraTargetTransform : PlayingCharacterEntity.CameraTargetTransform;
@@ -613,7 +620,6 @@ namespace MultiplayerARPG
             _movementState = MovementState.None;
             _extraMovementState = ExtraMovementState.None;
             CacheGameplayCameraController.CameraRotationSpeedScale = DefaultCameraRotationSpeedScale;
-            UpdateWeaponAbilityActivation(tempDeltaTime);
 
             // Prepare variables to find nearest raycasted hit point
             _centerRay = CacheGameplayCameraController.Camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
@@ -756,6 +762,7 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.SetExtraMovementState(_extraMovementState);
             PlayingCharacterEntity.SetSmoothTurnSpeed(0f);
 
+            // View mode switching
             if (canSwitchViewMode && InputManager.GetButtonDown("SwitchViewMode"))
             {
                 switch (ViewMode)
@@ -768,6 +775,13 @@ namespace MultiplayerARPG
                         break;
                 }
             }
+
+            // Update weapon ability here to make sure it able to make changes to view mode before apply it
+            UpdateWeaponAbilityActivation(tempDeltaTime);
+
+            // Apply view mode updating
+            if (_dirtyViewMode != viewMode)
+                UpdateViewMode();
         }
 
         protected virtual void LateUpdate()
@@ -1633,11 +1647,15 @@ namespace MultiplayerARPG
             if (index < abilities.Count)
             {
                 WeaponAbilityIndex = index;
-                WeaponAbility = abilities[index];
             }
             else
             {
                 WeaponAbilityIndex = 0;
+            }
+            WeaponAbility = null;
+            if (abilities.Count > 0)
+            {
+                WeaponAbility = abilities[index];
             }
             if (WeaponAbility != null)
             {
