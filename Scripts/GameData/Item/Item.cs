@@ -64,6 +64,7 @@ namespace MultiplayerARPG
 
         [Header("Weapon Settings")]
         public WeaponType weaponType;
+        public bool doRecoilingAsAttackAnimation = false;
         public DamageIncremental damageAmount;
         public IncrementalMinMaxFloat harvestDamageAmount;
         [Range(0f, 1f)]
@@ -433,6 +434,12 @@ namespace MultiplayerARPG
                     weaponType = GameInstance.Singleton.DefaultWeaponType;
                 return weaponType;
             }
+        }
+
+        public bool DoRecoilingAsAttackAnimation
+        {
+            get { return doRecoilingAsAttackAnimation; }
+            set { doRecoilingAsAttackAnimation = value; }
         }
 
         public EquipmentModel[] OffHandEquipmentModels

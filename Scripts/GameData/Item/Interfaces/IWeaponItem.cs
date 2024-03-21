@@ -9,6 +9,10 @@ namespace MultiplayerARPG
         /// </summary>
         WeaponType WeaponType { get; }
         /// <summary>
+        /// If this is `TRUE` it will do recoiling as attack animation
+        /// </summary>
+        bool DoRecoilingAsAttackAnimation { get; }
+        /// <summary>
         /// Off-hand equipment models, these models will be instantiated when equipping this item to off-hand (left-hand)
         /// </summary>
         EquipmentModel[] OffHandEquipmentModels { get; }

@@ -144,6 +144,13 @@ namespace MultiplayerARPG
             set { MainModel._cacheLeftHandEquipmentEntity = value; }
         }
 
+        protected IAttackRecoiler _cacheAttackRecoiler;
+        public IAttackRecoiler CacheAttackRecoiler
+        {
+            get { return IsMainModel ? _cacheAttackRecoiler : MainModel._cacheAttackRecoiler; }
+            set { MainModel._cacheAttackRecoiler = value; }
+        }
+
         public IList<EquipWeapons> SelectableWeaponSets { get; protected set; }
         public byte EquipWeaponSet { get; protected set; }
         public bool IsWeaponsSheathed { get; protected set; }
@@ -225,6 +232,8 @@ namespace MultiplayerARPG
             }
             // Prepare game effects collection (for buff effects)
             _cacheEffects = new Dictionary<string, List<GameEffect>>();
+            // Prepare recoiler
+            _cacheAttackRecoiler = GetComponentInChildren<IAttackRecoiler>();
         }
 
         protected void UpdateObjectsWhenSwitch()

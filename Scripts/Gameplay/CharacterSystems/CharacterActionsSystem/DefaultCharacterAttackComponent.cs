@@ -10,6 +10,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterActionComponentManager))]
     public class DefaultCharacterAttackComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterAttackComponent, ICharacterActionComponentPreparation
     {
+        public const float RATE_OF_FIRE_BASE = 60f;
+
         protected struct AttackState
         {
             public int SimulateSeed;
@@ -138,7 +140,7 @@ namespace MultiplayerARPG
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             if (weaponItem.RateOfFire > 0)
-                _totalDuration = 60f / weaponItem.RateOfFire;
+                _totalDuration = RATE_OF_FIRE_BASE / weaponItem.RateOfFire;
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
             Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts;
             if (isLeftHand && Entity.CachedData.LeftHandDamages != null)
@@ -152,6 +154,8 @@ namespace MultiplayerARPG
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);
+            if (weaponItem.RateOfFire > 0)
+                animSpeedRate = 1f;
 
             if (IsServer)
             {
@@ -174,12 +178,30 @@ namespace MultiplayerARPG
                 LastAttackEndTime = CharacterActionComponentManager.PrepareActionDefaultEndTime(_totalDuration, animSpeedRate);
 
                 // Play action animation
-                if (tpsModelAvailable)
-                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
-                if (vehicleModelAvailable)
-                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
-                if (fpsModelAvailable)
-                    Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                if (weaponItem.DoRecoilingAsAttackAnimation)
+                {
+
+                    _totalDuration = Entity.CharacterModel.CacheAttackRecoiler?.DefaultDuration ?? 1f;
+                    _triggerDurations = new float[]
+                    {
+                        0,
+                    };
+                    if (tpsModelAvailable)
+                        Entity.CharacterModel.CacheAttackRecoiler?.PlayRecoiling();
+                    if (vehicleModelAvailable)
+                        vehicleModel.CacheAttackRecoiler?.PlayRecoiling();
+                    if (fpsModelAvailable)
+                        Entity.FpsModel.CacheAttackRecoiler?.PlayRecoiling();
+                }
+                else
+                {
+                    if (tpsModelAvailable)
+                        Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                    if (vehicleModelAvailable)
+                        vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                    if (fpsModelAvailable)
+                        Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, animSpeedRate, attackCancellationTokenSource.Token);
