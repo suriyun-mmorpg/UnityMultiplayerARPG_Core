@@ -532,7 +532,7 @@ namespace MultiplayerARPG
             characterItem = this.GetAvailableWeapon(ref isLeftHand);
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
 
-            if (!ValidateAmmo(characterItem, 1))
+            if (!this.ValidateAmmo(characterItem, 1))
             {
                 if (IsOwnerClient)
                     ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_NO_AMMO);
@@ -821,131 +821,6 @@ namespace MultiplayerARPG
             animationDataId = weapon.GetWeaponItem().WeaponType.DataId;
             // Assign animation action type
             animActionType = isLeftHand ? AnimActionType.AttackLeftHand : AnimActionType.AttackRightHand;
-        }
-
-        public bool ValidateAmmo(CharacterItem weapon, int amount, bool validIfNoRequireAmmoType = true)
-        {
-            // Avoid null data
-            if (weapon == null)
-                return validIfNoRequireAmmoType;
-
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
-            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
-            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
-            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
-            {
-                // Ammo capacity more than 0 reduce loaded ammo
-                if (weapon.ammo < amount)
-                    return false;
-            }
-            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
-            {
-                // Ammo capacity is 0 so reduce ammo from inventory
-                if (this.CountAmmos(weaponItem.WeaponType.AmmoType, out _) >= amount)
-                    return true;
-                return false;
-            }
-            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
-            {
-                // Ammo capacity is 0 so reduce ammo from inventory
-                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
-                {
-                    if (this.CountNonEquipItems(weaponItem.AmmoItems[i].DataId) >= amount)
-                        return true;
-                }
-                return false;
-            }
-
-            return validIfNoRequireAmmoType;
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesByAmmo(CharacterItem weapon)
-        {
-            // Avoid null data
-            if (weapon == null)
-                return null;
-
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
-            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
-            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
-            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
-            {
-                if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                    return tempAmmoItem.GetIncreaseDamages();
-            }
-            else if (weaponItem.AmmoCapacity <= 0 && (hasAmmoType || hasAmmoItems))
-            {
-                return this.GetIncreaseDamagesByAmmo(weaponItem.WeaponType.AmmoType);
-            }
-
-            return null;
-        }
-
-        public bool DecreaseAmmos(CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
-        {
-            increaseDamages = null;
-
-            // Avoid null data
-            if (weapon == null)
-                return validIfNoRequireAmmoType;
-
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
-            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
-            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
-            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
-            {
-                // Ammo capacity >= `amount` reduce loaded ammo
-                if (weapon.ammo >= amount)
-                {
-                    if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                        increaseDamages = tempAmmoItem.GetIncreaseDamages();
-                    weapon.ammo -= amount;
-                    EquipWeapons equipWeapons = EquipWeapons;
-                    if (isLeftHand)
-                        equipWeapons.leftHand = weapon;
-                    else
-                        equipWeapons.rightHand = weapon;
-                    EquipWeapons = equipWeapons;
-                    return true;
-                }
-                // Not enough ammo
-                return false;
-            }
-            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
-            {
-                // Ammo capacity is 0 so reduce ammo from inventory
-                if (this.DecreaseAmmos(weaponItem.WeaponType.AmmoType, amount, out increaseDamages))
-                {
-                    this.FillEmptySlots();
-                    return true;
-                }
-                // Not enough ammo
-                return false;
-            }
-            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
-            {
-                // Ammo capacity is 0 so reduce ammo from inventory
-                BaseItem tempItemData;
-                int tempAmmoDataId;
-                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
-                {
-                    tempItemData = weaponItem.AmmoItems[i];
-                    if (tempItemData == null)
-                        continue;
-                    tempAmmoDataId = tempItemData.DataId;
-                    if (this.DecreaseItems(tempAmmoDataId, amount))
-                    {
-                        this.FillEmptySlots();
-                        if (tempItemData is IAmmoItem tempAmmoItem)
-                            increaseDamages = tempAmmoItem.GetIncreaseDamages();
-                        return true;
-                    }
-                }
-                // Not enough ammo
-                return false;
-            }
-
-            return validIfNoRequireAmmoType;
         }
 
         public virtual void GetUsingSkillData(

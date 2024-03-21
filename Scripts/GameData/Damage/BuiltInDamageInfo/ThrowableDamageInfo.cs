@@ -57,7 +57,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             if (throwableDamageEntity == null)
                 return;
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             // TODO: May predict and move missile ahead of time based on client's RTT
             float throwForce = this.throwForce;
             float throwableLifeTime = this.throwableLifeTime;
-            PoolSystem.GetInstance(throwableDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, hitRegData, throwForce, throwableLifeTime);
+            PoolSystem.GetInstance(throwableDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], skill, skillLevel, hitRegData, throwForce, throwableLifeTime);
         }
     }
 }

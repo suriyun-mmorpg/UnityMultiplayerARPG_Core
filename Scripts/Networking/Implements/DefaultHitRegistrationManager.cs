@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             return null;
         }    
 
-        public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             string id = MakeValidateId(attacker.ObjectId, simulateSeed);
             bool appending = false;
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             hitValidateData.TriggerDurations = triggerDurations;
             hitValidateData.FireSpread = fireSpread;
             hitValidateData.DamageInfo = damageInfo;
-            hitValidateData.BaseDamageAmounts = damageAmounts;
+            hitValidateData.DamageAmounts = damageAmounts;
             hitValidateData.IsLeftHand = isLeftHand;
             hitValidateData.Weapon = weapon;
             hitValidateData.Skill = skill;
@@ -80,23 +80,6 @@ namespace MultiplayerARPG
                 // Addpend new data
                 AppendValidatingData(attacker.ObjectId, id, hitValidateData);
             }
-        }
-
-        public void ConfirmHitRegValidation(BaseGameEntity attacker, int simulateSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
-        {
-            string id = MakeValidateId(attacker.ObjectId, simulateSeed);
-            if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
-            {
-                Logging.LogError($"Cannot confirm validation data, there is no prepared validation data");
-                return;
-            }
-
-            // Make sure it won't increase damage to the wrong collction
-            Dictionary<DamageElement, MinMaxFloat> confirmedDamageAmounts = hitValidateData.BaseDamageAmounts == null ? new Dictionary<DamageElement, MinMaxFloat>() : new Dictionary<DamageElement, MinMaxFloat>(hitValidateData.BaseDamageAmounts);
-            // Increase damage amounts
-            if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
-                confirmedDamageAmounts = GameDataHelpers.CombineDamages(confirmedDamageAmounts, increaseDamageAmounts);
-            hitValidateData.ConfirmedDamageAmounts[triggerIndex] = confirmedDamageAmounts;
         }
 
         public void PrepareHitRegData(HitRegisterData hitRegisterData)
@@ -117,10 +100,9 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!hitValidateData.ConfirmedDamageAmounts.ContainsKey(hitData.TriggerIndex))
+            if (hitData.TriggerIndex >= hitValidateData.DamageAmounts.Count)
             {
-                // No confirmed validating data
-                Logging.LogError($"Cannot find confirmed hit validating data, it must be confirmed damages (and perform validation later)");
+                // No damage applied (may not have enough ammo)
                 return false;
             }
 
@@ -162,7 +144,7 @@ namespace MultiplayerARPG
             hitValidateData.HitsCount[hitId] = ++hitCount;
 
             // Yes, it is hit
-            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), hitValidateData.ConfirmedDamageAmounts[hitData.TriggerIndex], hitValidateData.Weapon, hitValidateData.Skill, hitValidateData.SkillLevel, hitData.SimulateSeed);
+            hitBox.ReceiveDamage(attacker.EntityTransform.position, attacker.GetInfo(), hitValidateData.DamageAmounts[hitData.TriggerIndex], hitValidateData.Weapon, hitValidateData.Skill, hitValidateData.SkillLevel, hitData.SimulateSeed);
             hitValidateData.HitObjects.Add(hitObjectId);
             return true;
         }

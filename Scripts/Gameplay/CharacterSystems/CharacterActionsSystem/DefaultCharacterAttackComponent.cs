@@ -140,12 +140,11 @@ namespace MultiplayerARPG
             if (weaponItem.RateOfFire > 0)
                 _totalDuration = 60f / weaponItem.RateOfFire;
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts;
+            Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts;
             if (isLeftHand && Entity.CachedData.LeftHandDamages != null)
-                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.LeftHandDamages);
+                baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.LeftHandDamages);
             else
-                damageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.RightHandDamages);
-
+                baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.RightHandDamages);
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttacking = Entity.GetMoveSpeedRateWhileAttacking(weaponItem);
@@ -185,8 +184,12 @@ namespace MultiplayerARPG
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, animSpeedRate, attackCancellationTokenSource.Token);
 
+                // Prepare damage amounts
+                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = Entity.PrepareDamageAmounts(weapon, isLeftHand, baseDamageAmounts, _triggerDurations.Length, 1);
+
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
-                HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
+                if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogAttackStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpread, isLeftHand, weapon);
 
@@ -235,26 +238,25 @@ namespace MultiplayerARPG
                         // Apply attack damages
                         if ((IsServer && IsOwnerClient) || IsOwnedByServer)
                         {
-                            if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
-                                break;
+                            if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out _))
+                                continue;
                             RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                             {
                                 simulateSeed = simulateSeed,
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
-                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                         }
                         else if (IsOwnerClient)
                         {
-                            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(weapon);
                             RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                             {
                                 simulateSeed = simulateSeed,
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
-                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, increaseDamageAmounts, aimPosition);
+                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                         }
                     }
 
@@ -315,15 +317,14 @@ namespace MultiplayerARPG
                     GameInstance.ServerLogHandlers.LogAttackTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NoValidateData);
                 return;
             }
-            if (!Entity.DecreaseAmmos(validateData.Weapon, validateData.IsLeftHand, 1, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+            if (data.triggerIndex >= validateData.DamageAmounts.Count)
             {
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogAttackTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NotEnoughResources);
                 return;
             }
-            HitRegistrationManager.ConfirmHitRegValidation(Entity, data.simulateSeed, data.triggerIndex, increaseDamageAmounts);
             RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
-            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.BaseDamageAmounts, increaseDamageAmounts, data.aimPosition);
+            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogAttackTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
         }
@@ -338,12 +339,17 @@ namespace MultiplayerARPG
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
             if (validateData == null)
                 return;
-            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = Entity.GetIncreaseDamagesByAmmo(validateData.Weapon);
-            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.BaseDamageAmounts, increaseDamageAmounts, data.aimPosition);
+            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, AimPosition aimPosition)
+        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition)
         {
+            if (triggerIndex >= damageAmounts.Count)
+            {
+                // No damage applied (may not have enough ammo)
+                return;
+            }
+
             byte fireSpread = 0;
             Vector3 fireStagger = Vector3.zero;
             IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null;
@@ -355,11 +361,6 @@ namespace MultiplayerARPG
             }
 
             // Make sure it won't increase damage to the wrong collction
-            damageAmounts = damageAmounts == null ? new Dictionary<DamageElement, MinMaxFloat>() : new Dictionary<DamageElement, MinMaxFloat>(damageAmounts);
-            // Increase damage amounts
-            if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
-                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
-
             for (byte spreadIndex = 0; spreadIndex < fireSpread + 1; ++spreadIndex)
             {
                 damageInfo.LaunchDamageEntity(

@@ -1399,7 +1399,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             AimPosition aimPosition)

@@ -60,7 +60,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
                     aimPosition.position,
                     GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
                 AreaDamageEntity entity = spawnObj.GetComponent<AreaDamageEntity>();
-                entity.Setup(skillUser.GetInfo(), weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, this, skillLevel, hitRegData, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
+                entity.Setup(skillUser.GetInfo(), weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], this, skillLevel, hitRegData, areaDuration.GetAmount(skillLevel), applyDuration.GetAmount(skillLevel));
                 BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             }
             // Teleport to aim position

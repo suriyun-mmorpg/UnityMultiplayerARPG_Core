@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;
             bool isHost = attacker.IsOwnerHost;
@@ -180,7 +180,7 @@ namespace MultiplayerARPG
 
                 // Target receives damages
                 if (isHost || isOwnedByServer)
-                    tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts, weapon, skill, skillLevel, simulateSeed);
+                    tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts[triggerIndex], weapon, skill, skillLevel, simulateSeed);
 
                 // Prepare hit reg because it is hitting
                 hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;

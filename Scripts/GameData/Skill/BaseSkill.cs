@@ -563,13 +563,6 @@ namespace MultiplayerARPG
             return 360f;
         }
 
-        public virtual Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamageByResources(
-            BaseCharacterEntity skillUser,
-            CharacterItem weapon)
-        {
-            return skillUser.GetIncreaseDamagesByAmmo(weapon);
-        }
-
         public virtual bool DecreaseResources(
             BaseCharacterEntity skillUser,
             CharacterItem weapon,
@@ -587,6 +580,15 @@ namespace MultiplayerARPG
                     return false;
             }
             return true;
+        }
+
+        public virtual List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(
+            BaseCharacterEntity skillUser,
+            bool isLeftHand,
+            Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts,
+            int triggerCount)
+        {
+            return skillUser.PrepareDamageAmounts(skillUser.GetAvailableWeapon(ref isLeftHand), isLeftHand, baseDamageAmounts, triggerCount, requireAmmoAmount, false);
         }
 
         /// <summary>
@@ -609,7 +611,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
@@ -716,7 +718,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition);
 
@@ -739,7 +741,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
             AimPosition aimPosition)
         {
             return false;

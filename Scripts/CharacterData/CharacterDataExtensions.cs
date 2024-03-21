@@ -633,6 +633,11 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, int amount, bool isLimitInventorySlot)
+        {
+            return DecreaseItems(itemList, dataId, amount, isLimitInventorySlot, out _);
+        }
+
         public static bool DecreaseItems(this ICharacterData data, int dataId, int amount, out Dictionary<int, int> decreaseItems)
         {
             if (data.NonEquipItems.DecreaseItems(dataId, amount, GameInstance.Singleton.IsLimitInventorySlot, out decreaseItems))
@@ -677,21 +682,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Functions
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesByAmmo(this ICharacterData data, AmmoType ammoType)
-        {
-            CharacterItem tempNonEquipItem;
-            IAmmoItem tempAmmoItemData;
-            for (int i = 0; i < data.NonEquipItems.Count; ++i)
-            {
-                tempNonEquipItem = data.NonEquipItems[i];
-                tempAmmoItemData = tempNonEquipItem.GetAmmoItem();
-                if (tempAmmoItemData != null && tempAmmoItemData.AmmoType == ammoType)
-                    return tempAmmoItemData.GetIncreaseDamages();
-            }
-            return null;
-        }
-
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
+        public static bool DecreaseAmmos(this IList<CharacterItem> nonEquipItems, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
         {
             increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             decreaseItems = new Dictionary<CharacterItem, int>();
@@ -704,9 +695,9 @@ namespace MultiplayerARPG
             IAmmoItem tempAmmoItemData;
             int tempDecresingAmount;
             int i;
-            for (i = 0; i < data.NonEquipItems.Count; ++i)
+            for (i = 0; i < nonEquipItems.Count; ++i)
             {
-                tempNonEquipItem = data.NonEquipItems[i];
+                tempNonEquipItem = nonEquipItems[i];
                 tempAmmoItemData = tempNonEquipItem.GetAmmoItem();
                 if (tempAmmoItemData == null)
                     continue;
@@ -739,16 +730,149 @@ namespace MultiplayerARPG
 
             for (i = decreasingItemIndexes.Count - 1; i >= 0; --i)
             {
-                decreaseItems.Add(data.NonEquipItems[decreasingItemIndexes[i]], decreasingItemAmounts[i]);
-                DecreaseItemsByIndex(data, decreasingItemIndexes[i], decreasingItemAmounts[i], true);
+                decreaseItems.Add(nonEquipItems[decreasingItemIndexes[i]], decreasingItemAmounts[i]);
+                DecreaseItemsByIndex(nonEquipItems, decreasingItemIndexes[i], decreasingItemAmounts[i], GameInstance.Singleton.IsLimitInventorySlot, true);
             }
 
             return true;
         }
 
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages)
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
         {
-            return DecreaseAmmos(data, ammoType, amount, out increaseDamages, out _);
+            return data.NonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts, out decreaseItems);
+        }
+
+        public static bool DecreaseAmmos(this IList<CharacterItem> nonEquipItems, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        {
+            return DecreaseAmmos(nonEquipItems, ammoType, amount, out increaseDamageAmounts, out _);
+        }
+
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        {
+            return data.NonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts);
+        }
+
+        public static bool ValidateAmmo(this ICharacterData data, CharacterItem weapon, int amount, bool validIfNoRequireAmmoType = true)
+        {
+            // Avoid null data
+            if (weapon == null)
+                return validIfNoRequireAmmoType;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
+            {
+                // Ammo capacity more than 0 reduce loaded ammo
+                if (weapon.ammo < amount)
+                    return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                if (data.CountAmmos(weaponItem.WeaponType.AmmoType, out _) >= amount)
+                    return true;
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
+                {
+                    if (data.CountNonEquipItems(weaponItem.AmmoItems[i].DataId) >= amount)
+                        return true;
+                }
+                return false;
+            }
+
+            return validIfNoRequireAmmoType;
+        }
+
+        public static bool DecreaseAmmos(EquipWeapons equipWeapons, IList<CharacterItem> nonEquipItems, bool isLimitSlot, int slotLimit, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
+        {
+            increaseDamages = null;
+
+            // Avoid null data
+            if (weapon == null)
+                return validIfNoRequireAmmoType;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
+            {
+                // Ammo capacity >= `amount` reduce loaded ammo
+                if (weapon.ammo >= amount)
+                {
+                    if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
+                        increaseDamages = tempAmmoItem.GetIncreaseDamages();
+                    weapon.ammo -= amount;
+                    if (isLeftHand)
+                        equipWeapons.leftHand = weapon;
+                    else
+                        equipWeapons.rightHand = weapon;
+                    return true;
+                }
+                // Not enough ammo
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                if (nonEquipItems.DecreaseAmmos(weaponItem.WeaponType.AmmoType, amount, out increaseDamages))
+                {
+                    nonEquipItems.FillEmptySlots(isLimitSlot, slotLimit);
+                    return true;
+                }
+                // Not enough ammo
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                BaseItem tempItemData;
+                int tempAmmoDataId;
+                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
+                {
+                    tempItemData = weaponItem.AmmoItems[i];
+                    if (tempItemData == null)
+                        continue;
+                    tempAmmoDataId = tempItemData.DataId;
+                    if (nonEquipItems.DecreaseItems(tempAmmoDataId, amount, isLimitSlot))
+                    {
+                        nonEquipItems.FillEmptySlots(isLimitSlot, slotLimit);
+                        if (tempItemData is IAmmoItem tempAmmoItem)
+                            increaseDamages = tempAmmoItem.GetIncreaseDamages();
+                        return true;
+                    }
+                }
+                // Not enough ammo
+                return false;
+            }
+
+            return validIfNoRequireAmmoType;
+        }
+
+        public static bool DecreaseAmmos(this ICharacterData data, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
+        {
+            return DecreaseAmmos(data.EquipWeapons, data.NonEquipItems, GameInstance.Singleton.IsLimitInventorySlot, data.GetCaches().LimitItemSlot, weapon, isLeftHand, amount, out increaseDamages, validIfNoRequireAmmoType);
+        }
+
+        public static List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(this ICharacterData data, CharacterItem weapon, bool isLeftHand, Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts, int triggerCount, int ammoAmountEachTrigger, bool validIfNoRequireAmmoType = true)
+        {
+            List<Dictionary<DamageElement, MinMaxFloat>> result = new List<Dictionary<DamageElement, MinMaxFloat>>();
+            EquipWeapons equipWeapons = data.EquipWeapons.Clone();
+            List<CharacterItem> nonEquipItems = new List<CharacterItem>(data.NonEquipItems);
+            bool isLimitSlot = GameInstance.Singleton.IsLimitInventorySlot;
+            int slotLimit = data.GetCaches().LimitItemSlot;
+            Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamageAmounts;
+            for (int i = 0; i < triggerCount; ++i)
+            {
+                if (!DecreaseAmmos(equipWeapons, nonEquipItems, isLimitSlot, slotLimit, weapon, isLeftHand, ammoAmountEachTrigger, out tempIncreaseDamageAmounts, validIfNoRequireAmmoType))
+                    break;
+                result.Add(GameDataHelpers.CombineDamages(new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts), tempIncreaseDamageAmounts));
+            }
+            return result;
         }
         #endregion
 
