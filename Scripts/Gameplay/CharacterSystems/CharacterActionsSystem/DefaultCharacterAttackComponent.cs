@@ -204,7 +204,7 @@ namespace MultiplayerARPG
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, animSpeedRate, attackCancellationTokenSource.Token);
+                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, attackCancellationTokenSource.Token);
 
                 // Prepare damage amounts
                 List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = Entity.PrepareDamageAmounts(weapon, isLeftHand, baseDamageAmounts, _triggerDurations.Length, 1);

@@ -254,7 +254,7 @@ namespace MultiplayerARPG
                     Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, animSpeedRate, skillCancellationTokenSource.Token);
+                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token);
 
                 // Prepare damage amounts
                 List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, _triggerDurations.Length);

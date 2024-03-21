@@ -133,7 +133,7 @@ namespace MultiplayerARPG
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, animSpeedRate, reloadCancellationTokenSource.Token);
+                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, reloadCancellationTokenSource.Token);
 
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogReloadStart(_playerCharacterEntity, _triggerDurations);
