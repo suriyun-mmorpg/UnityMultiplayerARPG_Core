@@ -588,7 +588,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts,
             int triggerCount)
         {
-            return skillUser.PrepareDamageAmounts(skillUser.GetAvailableWeapon(ref isLeftHand), isLeftHand, baseDamageAmounts, triggerCount, requireAmmoAmount, false);
+            return skillUser.PrepareDamageAmounts(skillUser.GetAvailableWeapon(ref isLeftHand), isLeftHand, baseDamageAmounts, triggerCount, requireAmmoAmount, true);
         }
 
         /// <summary>
