@@ -6,35 +6,11 @@ namespace MultiplayerARPG
 {
     public partial struct CharacterSummon
     {
-        [System.NonSerialized]
-        private SummonType _dirtyType;
-        [System.NonSerialized]
-        private int _dirtyDataId;
-        [System.NonSerialized]
-        private int _dirtyLevel;
-
-        [System.NonSerialized]
-        private BaseSkill _cacheSkill;
-        [System.NonSerialized]
-        private IPetItem _cachePetItem;
-        [System.NonSerialized]
-        private BaseMonsterCharacterEntity _cachePrefab;
-        [System.NonSerialized]
-        private CalculatedBuff _cacheBuff/* = new CalculatedBuff()*/;
-        [System.NonSerialized]
-        private bool _recachingBuff/* = false*/;
-
-        [System.NonSerialized]
-        private BaseMonsterCharacterEntity _cacheEntity;
         [JsonIgnore]
         public BaseMonsterCharacterEntity CacheEntity
         {
-            get
-            {
-                if (_cacheEntity == null && objectId > 0)
-                    BaseGameNetworkManager.Singleton.Assets.TryGetSpawnedObject(objectId, out _cacheEntity);
-                return _cacheEntity;
-            }
+            set => CharacterRelatesDataCacheManager.CharacterSummons.SetEntity(this, value);
+            get => CharacterRelatesDataCacheManager.CharacterSummons.GetEntity(this);
         }
         [JsonIgnore]
         public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
@@ -44,70 +20,6 @@ namespace MultiplayerARPG
         public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
         [JsonIgnore]
         public int CurrentMp { get { return CacheEntity != null ? CacheEntity.CurrentMp : currentMp; } }
-        /*
-        ~CharacterSummon()
-        {
-            ClearCachedData();
-            _cacheBuff = null;
-            _cacheEntity = null;
-        }
-        */
-        private void ClearCachedData()
-        {
-            _cacheSkill = null;
-            _cachePetItem = null;
-            _cachePrefab = null;
-        }
-
-        private bool IsRecaching()
-        {
-            return _dirtyType != type || _dirtyDataId != dataId || _dirtyLevel != level;
-        }
-
-        private void MakeAsCached()
-        {
-            _dirtyType = type;
-            _dirtyDataId = dataId;
-            _dirtyLevel = level;
-        }
-
-        private void MakeCache()
-        {
-            if (!IsRecaching())
-                return;
-            MakeAsCached();
-            ClearCachedData();
-            _recachingBuff = true;
-            switch (type)
-            {
-                case SummonType.Skill:
-                    if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill) || !_cacheSkill.TryGetSummon(out SkillSummon skillSummon))
-                    {
-                        _cacheSkill = null;
-                        _cachePrefab = null;
-                    }
-                    else
-                    {
-                        _cachePrefab = skillSummon.MonsterEntity;
-                    }
-                    break;
-                case SummonType.PetItem:
-                    if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item) || !item.IsPet())
-                    {
-                        _cachePetItem = null;
-                        _cachePrefab = null;
-                    }
-                    else
-                    {
-                        _cachePetItem = item as IPetItem;
-                        _cachePrefab = _cachePetItem.MonsterCharacterEntity;
-                    }
-                    break;
-                case SummonType.Custom:
-                    _cachePrefab = GameInstance.CustomSummonManager.GetPrefab(dataId);
-                    break;
-            }
-        }
 
         public void Summon(BaseCharacterEntity summoner, int summonLevel, float duration)
         {
@@ -118,7 +30,7 @@ namespace MultiplayerARPG
                 GetPrefab().Identity.HashAssetId,
                 GameInstance.Singleton.GameplayRule.GetSummonPosition(summoner),
                 GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner));
-            _cacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
+            CacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             CacheEntity.Summon(summoner, type, summonLevel);
             objectId = CacheEntity.ObjectId;
@@ -167,34 +79,22 @@ namespace MultiplayerARPG
 
         public BaseSkill GetSkill()
         {
-            MakeCache();
-            return _cacheSkill;
+            return CharacterRelatesDataCacheManager.CharacterSummons.GetSkill(this);
         }
 
         public IPetItem GetPetItem()
         {
-            MakeCache();
-            return _cachePetItem;
+            return CharacterRelatesDataCacheManager.CharacterSummons.GetPetItem(this);
         }
 
         public BaseMonsterCharacterEntity GetPrefab()
         {
-            MakeCache();
-            return _cachePrefab;
+            return CharacterRelatesDataCacheManager.CharacterSummons.GetPrefab(this);
         }
 
         public CalculatedBuff GetBuff()
         {
-            MakeCache();
-            if (_recachingBuff)
-            {
-                _recachingBuff = false;
-                Buff tempBuff = Buff.Empty;
-                if (_cachePrefab != null && _cachePrefab.CharacterDatabase != null)
-                    tempBuff = _cachePrefab.CharacterDatabase.SummonerBuff;
-                _cacheBuff.Build(tempBuff, level);
-            }
-            return _cacheBuff;
+            return CharacterRelatesDataCacheManager.CharacterSummons.GetBuff(this);
         }
 
         public bool ShouldRemove()

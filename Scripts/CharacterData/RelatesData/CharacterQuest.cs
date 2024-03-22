@@ -4,46 +4,11 @@ namespace MultiplayerARPG
 {
     public partial struct CharacterQuest
     {
-        [System.NonSerialized]
-        private int _dirtyDataId;
-
-        [System.NonSerialized]
-        private Quest _cacheQuest;
-        /*
-        ~CharacterQuest()
-        {
-            ClearCachedData();
-        }
-        */
-        private void ClearCachedData()
-        {
-            _cacheQuest = null;
-        }
-
-        private bool IsRecaching()
-        {
-            return _dirtyDataId != dataId;
-        }
-
-        private void MakeAsCached()
-        {
-            _dirtyDataId = dataId;
-        }
-
-        private void MakeCache()
-        {
-            if (!IsRecaching())
-                return;
-            MakeAsCached();
-            ClearCachedData();
-            if (!GameInstance.Quests.TryGetValue(dataId, out _cacheQuest))
-                _cacheQuest = null;
-        }
-
         public Quest GetQuest()
         {
-            MakeCache();
-            return _cacheQuest;
+            if (GameInstance.Quests.TryGetValue(dataId, out Quest result))
+                return result;
+            return null;
         }
 
         public bool IsAllTasksDone(IPlayerCharacterData character, out bool hasCompleteAfterTalkedTask)

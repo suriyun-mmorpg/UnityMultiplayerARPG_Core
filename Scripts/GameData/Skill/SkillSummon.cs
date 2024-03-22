@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -8,8 +9,9 @@ namespace MultiplayerARPG
         public static readonly SkillSummon Empty = new SkillSummon();
         [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
         [SerializeField]
-        private BaseMonsterCharacterEntity monsterEntity;
-        public BaseMonsterCharacterEntity MonsterEntity { get { return monsterEntity; } }
+        [FormerlySerializedAs("monsterEntity")]
+        private BaseMonsterCharacterEntity monsterCharacterEntity;
+        public BaseMonsterCharacterEntity MonsterCharacterEntity { get { return monsterCharacterEntity; } }
 
         [Tooltip("If duration less than or equals to 0, summoned monster will die")]
         [SerializeField]
@@ -29,13 +31,13 @@ namespace MultiplayerARPG
         public IncrementalInt Level { get { return level; } }
 
         public SkillSummon(
-            BaseMonsterCharacterEntity monsterEntity,
+            BaseMonsterCharacterEntity monsterCharacterEntity,
             IncrementalFloat duration,
             IncrementalInt amountEachTime,
             IncrementalInt maxStack,
             IncrementalInt level)
         {
-            this.monsterEntity = monsterEntity;
+            this.monsterCharacterEntity = monsterCharacterEntity;
             this.duration = duration;
             this.amountEachTime = amountEachTime;
             this.maxStack = maxStack;

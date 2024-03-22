@@ -365,7 +365,7 @@ namespace MultiplayerARPG
 
             if (uiTextSummon != null)
             {
-                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || skillSummon.MonsterEntity == null)
+                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || skillSummon.MonsterCharacterEntity == null)
                 {
                     uiTextSummon.SetGameObjectActive(false);
                 }
@@ -374,7 +374,7 @@ namespace MultiplayerARPG
                     uiTextSummon.SetGameObjectActive(true);
                     uiTextSummon.text = ZString.Format(
                         LanguageManager.GetText(formatKeySummon),
-                        skillSummon.MonsterEntity.Title,
+                        skillSummon.MonsterCharacterEntity.Title,
                         skillSummon.Level.GetAmount(Level),
                         skillSummon.AmountEachTime.GetAmount(Level),
                         skillSummon.MaxStack.GetAmount(Level),

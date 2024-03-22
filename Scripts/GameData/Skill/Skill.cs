@@ -289,7 +289,7 @@ namespace MultiplayerARPG
 
         public override bool TryGetSummon(out SkillSummon summon)
         {
-            if (this.summon.MonsterEntity != null)
+            if (this.summon.MonsterCharacterEntity != null)
             {
                 summon = this.summon;
                 return true;

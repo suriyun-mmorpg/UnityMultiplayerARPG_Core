@@ -7,201 +7,74 @@ namespace MultiplayerARPG
     {
         public const byte CURRENT_VERSION = 2;
 
-        [System.NonSerialized]
-        private int _dirtyDataId;
-        [System.NonSerialized]
-        private int _dirtyLevel;
-        [System.NonSerialized]
-        private int _dirtyRandomSeed;
-
-        [System.NonSerialized]
-        private BaseItem _cacheItem;
-        [System.NonSerialized]
-        private IUsableItem _cacheUsableItem;
-        [System.NonSerialized]
-        private IEquipmentItem _cacheEquipmentItem;
-        [System.NonSerialized]
-        private IDefendEquipmentItem _cacheDefendItem;
-        [System.NonSerialized]
-        private IArmorItem _cacheArmorItem;
-        [System.NonSerialized]
-        private IWeaponItem _cacheWeaponItem;
-        [System.NonSerialized]
-        private IShieldItem _cacheShieldItem;
-        [System.NonSerialized]
-        private IPotionItem _cachePotionItem;
-        [System.NonSerialized]
-        private IAmmoItem _cacheAmmoItem;
-        [System.NonSerialized]
-        private IBuildingItem _cacheBuildingItem;
-        [System.NonSerialized]
-        private IPetItem _cachePetItem;
-        [System.NonSerialized]
-        private ISocketEnhancerItem _cacheSocketEnhancerItem;
-        [System.NonSerialized]
-        private IMountItem _cacheMountItem;
-        [System.NonSerialized]
-        private ISkillItem _cacheSkillItem;
-        [System.NonSerialized]
-        private CalculatedItemBuff _cacheBuff/* = new CalculatedItemBuff()*/;
-        [System.NonSerialized]
-        private bool _recachingBuff/* = false*/;
-        /*
-        ~CharacterItem()
-        {
-            ClearCachedData();
-            _cacheBuff = null;
-        }
-        */
-        private void ClearCachedData()
-        {
-            _cacheItem = null;
-            _cacheUsableItem = null;
-            _cacheEquipmentItem = null;
-            _cacheDefendItem = null;
-            _cacheArmorItem = null;
-            _cacheWeaponItem = null;
-            _cacheShieldItem = null;
-            _cachePotionItem = null;
-            _cacheAmmoItem = null;
-            _cacheBuildingItem = null;
-            _cachePetItem = null;
-            _cacheSocketEnhancerItem = null;
-            _cacheMountItem = null;
-            _cacheSkillItem = null;
-        }
-
-        private bool IsRecaching()
-        {
-            return _dirtyDataId != dataId || _dirtyLevel != level || _dirtyRandomSeed != randomSeed;
-        }
-
-        private void MakeAsCached()
-        {
-            _dirtyDataId = dataId;
-            _dirtyLevel = level;
-            _dirtyRandomSeed = randomSeed;
-        }
-
-        private void MakeCache()
-        {
-            if (!IsRecaching())
-                return;
-            MakeAsCached();
-            ClearCachedData();
-            _recachingBuff = true;
-            if (!GameInstance.Items.TryGetValue(dataId, out _cacheItem) || _cacheItem == null)
-                return;
-            if (_cacheItem.IsUsable())
-                _cacheUsableItem = _cacheItem as IUsableItem;
-            if (_cacheItem.IsEquipment())
-                _cacheEquipmentItem = _cacheItem as IEquipmentItem;
-            if (_cacheItem.IsDefendEquipment())
-                _cacheDefendItem = _cacheItem as IDefendEquipmentItem;
-            if (_cacheItem.IsArmor())
-                _cacheArmorItem = _cacheItem as IArmorItem;
-            if (_cacheItem.IsWeapon())
-                _cacheWeaponItem = _cacheItem as IWeaponItem;
-            if (_cacheItem.IsShield())
-                _cacheShieldItem = _cacheItem as IShieldItem;
-            if (_cacheItem.IsPotion())
-                _cachePotionItem = _cacheItem as IPotionItem;
-            if (_cacheItem.IsAmmo())
-                _cacheAmmoItem = _cacheItem as IAmmoItem;
-            if (_cacheItem.IsBuilding())
-                _cacheBuildingItem = _cacheItem as IBuildingItem;
-            if (_cacheItem.IsPet())
-                _cachePetItem = _cacheItem as IPetItem;
-            if (_cacheItem.IsSocketEnhancer())
-                _cacheSocketEnhancerItem = _cacheItem as ISocketEnhancerItem;
-            if (_cacheItem.IsMount())
-                _cacheMountItem = _cacheItem as IMountItem;
-            if (_cacheItem.IsSkill())
-                _cacheSkillItem = _cacheItem as ISkillItem;
-        }
-
         public BaseItem GetItem()
         {
-            MakeCache();
-            return _cacheItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetItem(this);
         }
 
         public IUsableItem GetUsableItem()
         {
-            MakeCache();
-            return _cacheUsableItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetUsableItem(this);
         }
 
         public IEquipmentItem GetEquipmentItem()
         {
-            MakeCache();
-            return _cacheEquipmentItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetEquipmentItem(this);
         }
 
         public IDefendEquipmentItem GetDefendItem()
         {
-            MakeCache();
-            return _cacheDefendItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetDefendItem(this);
         }
 
         public IArmorItem GetArmorItem()
         {
-            MakeCache();
-            return _cacheArmorItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetArmorItem(this);
         }
 
         public IWeaponItem GetWeaponItem()
         {
-            MakeCache();
-            return _cacheWeaponItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetWeaponItem(this);
         }
 
         public IShieldItem GetShieldItem()
         {
-            MakeCache();
-            return _cacheShieldItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetShieldItem(this);
         }
 
         public IPotionItem GetPotionItem()
         {
-            MakeCache();
-            return _cachePotionItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetPotionItem(this);
         }
 
         public IAmmoItem GetAmmoItem()
         {
-            MakeCache();
-            return _cacheAmmoItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetAmmoItem(this);
         }
 
         public IBuildingItem GetBuildingItem()
         {
-            MakeCache();
-            return _cacheBuildingItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetBuildingItem(this);
         }
 
         public IPetItem GetPetItem()
         {
-            MakeCache();
-            return _cachePetItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetPetItem(this);
         }
 
         public ISocketEnhancerItem GetSocketEnhancerItem()
         {
-            MakeCache();
-            return _cacheSocketEnhancerItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetSocketEnhancerItem(this);
         }
 
         public IMountItem GetMountItem()
         {
-            MakeCache();
-            return _cacheMountItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetMountItem(this);
         }
 
         public ISkillItem GetSkillItem()
         {
-            MakeCache();
-            return _cacheSkillItem;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetSkillItem(this);
         }
 
         public int GetMaxStack()
@@ -318,13 +191,7 @@ namespace MultiplayerARPG
 
         public CalculatedItemBuff GetBuff()
         {
-            MakeCache();
-            if (_recachingBuff)
-            {
-                _recachingBuff = false;
-                _cacheBuff.Build(_cacheEquipmentItem, level, randomSeed, version);
-            }
-            return _cacheBuff;
+            return CharacterRelatesDataCacheManager.CharacterItems.GetBuff(this);
         }
 
         public void UpdateDurability(ICharacterData characterData, float amount)
