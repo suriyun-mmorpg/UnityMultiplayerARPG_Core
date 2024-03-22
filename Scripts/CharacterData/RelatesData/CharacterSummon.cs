@@ -4,7 +4,7 @@ using Newtonsoft.Json;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterSummon
+    public partial struct CharacterSummon
     {
         [System.NonSerialized]
         private SummonType _dirtyType;
@@ -20,9 +20,9 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private BaseMonsterCharacterEntity _cachePrefab;
         [System.NonSerialized]
-        private CalculatedBuff _cacheBuff = new CalculatedBuff();
+        private CalculatedBuff _cacheBuff/* = new CalculatedBuff()*/;
         [System.NonSerialized]
-        private bool _recachingBuff = false;
+        private bool _recachingBuff/* = false*/;
 
         [System.NonSerialized]
         private BaseMonsterCharacterEntity _cacheEntity;
@@ -44,14 +44,14 @@ namespace MultiplayerARPG
         public int CurrentHp { get { return CacheEntity != null ? CacheEntity.CurrentHp : currentHp; } }
         [JsonIgnore]
         public int CurrentMp { get { return CacheEntity != null ? CacheEntity.CurrentMp : currentMp; } }
-
+        /*
         ~CharacterSummon()
         {
             ClearCachedData();
             _cacheBuff = null;
             _cacheEntity = null;
         }
-
+        */
         private void ClearCachedData()
         {
             _cacheSkill = null;

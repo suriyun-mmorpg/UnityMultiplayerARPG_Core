@@ -12,22 +12,22 @@ namespace MultiplayerARPG
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public int Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
-        public BaseItem Item { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() : null; } }
-        public IUsableItem UsableItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetUsableItem() : null; } }
-        public IEquipmentItem EquipmentItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
-        public IArmorItem ArmorItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
-        public IShieldItem ShieldItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
-        public IDefendEquipmentItem DefendItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetDefendItem() : null; } }
-        public IWeaponItem WeaponItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
-        public IAmmoItem AmmoItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
-        public ISocketEnhancerItem SocketEnhancerItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
-        public IItemWithBuffData ItemWithBuffData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithBuffData : null; } }
-        public IItemWithBuildingEntity ItemWithBuildingEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithBuildingEntity : null; } }
-        public IItemWithMonsterCharacterEntity ItemWithMonsterEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithMonsterCharacterEntity : null; } }
-        public IItemWithVehicleEntity ItemWithVehicleEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithVehicleEntity : null; } }
-        public IItemWithSkillData ItemWithSkillData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithSkillData : null; } }
-        public IItemWithAttributeData ItemWithAttributeData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithAttributeData : null; } }
-        public IItemWithStatusEffectApplyings ItemWithStatusEffectApplyings { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithStatusEffectApplyings : null; } }
+        public BaseItem Item { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() : null; } }
+        public IUsableItem UsableItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetUsableItem() : null; } }
+        public IEquipmentItem EquipmentItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
+        public IArmorItem ArmorItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
+        public IShieldItem ShieldItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
+        public IDefendEquipmentItem DefendItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetDefendItem() : null; } }
+        public IWeaponItem WeaponItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
+        public IAmmoItem AmmoItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
+        public ISocketEnhancerItem SocketEnhancerItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
+        public IItemWithBuffData ItemWithBuffData { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithBuffData : null; } }
+        public IItemWithBuildingEntity ItemWithBuildingEntity { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithBuildingEntity : null; } }
+        public IItemWithMonsterCharacterEntity ItemWithMonsterEntity { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithMonsterCharacterEntity : null; } }
+        public IItemWithVehicleEntity ItemWithVehicleEntity { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithVehicleEntity : null; } }
+        public IItemWithSkillData ItemWithSkillData { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithSkillData : null; } }
+        public IItemWithAttributeData ItemWithAttributeData { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithAttributeData : null; } }
+        public IItemWithStatusEffectApplyings ItemWithStatusEffectApplyings { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithStatusEffectApplyings : null; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -288,7 +288,7 @@ namespace MultiplayerARPG
 
             if (uiTextExpireTime != null)
             {
-                if (CharacterItem != null && CharacterItem.expireTime > 0)
+                if (!CharacterItem.IsEmptySlot() && CharacterItem.expireTime > 0)
                 {
                     System.DateTime dateTime = GenericUtils.GetDateTimeBySeconds(CharacterItem.expireTime).ToLocalTime();
                     uiTextExpireTime.SetGameObjectActive(true);
@@ -305,7 +305,7 @@ namespace MultiplayerARPG
 
         private void UpdateLockRemainsDuration(float deltaTime)
         {
-            _lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
+            _lockRemainsDuration = CharacterItem.lockRemainsDuration;
 
             if (_lockRemainsDuration > 0f)
             {
@@ -600,7 +600,7 @@ namespace MultiplayerARPG
                         CharacterItem.amount.ToString("N0"),
                         Item.MaxStack);
                 }
-                uiTextStack.SetGameObjectActive(CharacterItem.NotEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
+                uiTextStack.SetGameObjectActive(!CharacterItem.IsEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
                 uiTextStack.text = stackString;
             }
 
@@ -1092,7 +1092,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiEquipmentSockets.Show();
-                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.AvailableSocketEnhancerTypes);
+                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.sockets, EquipmentItem.AvailableSocketEnhancerTypes);
                 }
             }
 

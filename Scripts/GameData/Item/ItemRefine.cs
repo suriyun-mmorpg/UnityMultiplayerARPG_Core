@@ -140,7 +140,7 @@ namespace MultiplayerARPG
             {
                 int materialDataId = materialDataIds[i];
                 int indexOfMaterial = character.IndexOfNonEquipItem(materialDataId);
-                if (indexOfMaterial >= 0 && character.NonEquipItems[indexOfMaterial].NotEmptySlot())
+                if (indexOfMaterial >= 0 && !character.NonEquipItems[indexOfMaterial].IsEmptySlot())
                 {
                     for (int j = 0; j < AvailableEnhancers.Length; ++j)
                     {

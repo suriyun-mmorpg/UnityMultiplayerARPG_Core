@@ -141,7 +141,7 @@ namespace MultiplayerARPG
         {
             inventoryType = InventoryType.NonEquipItems;
             itemIndex = -1;
-            characterItem = null;
+            characterItem = CharacterItem.Empty;
             if (Data.type == HotkeyType.Item)
             {
                 int dataId = BaseGameData.MakeDataId(Data.relateId);
@@ -404,7 +404,7 @@ namespace MultiplayerARPG
         {
             if (IsChanneledAbility())
                 return;
-            if (BasePlayerCharacterController.Singleton != null && Data != null)
+            if (BasePlayerCharacterController.Singleton != null && !Data.IsEmpty())
                 BasePlayerCharacterController.Singleton.UseHotkey(Data.type, Data.relateId, aimPosition);
         }
 

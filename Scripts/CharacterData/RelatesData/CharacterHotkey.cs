@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterHotkey
+    public partial struct CharacterHotkey
     {
         public static CharacterHotkey Create(string hotkeyId, CharacterItem characterItem)
         {

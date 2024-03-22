@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             {
                 if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(member.id, out memberEntity))
                 {
-                    memberEntity.ApplyBuff(dataId, BuffType.GuildSkillBuff, level, GetInfo(), null);
+                    memberEntity.ApplyBuff(dataId, BuffType.GuildSkillBuff, level, GetInfo(), CharacterItem.Empty);
                 }
             }
 #endif

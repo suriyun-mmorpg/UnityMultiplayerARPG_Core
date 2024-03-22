@@ -70,7 +70,7 @@ namespace MultiplayerARPG
             if (!characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             characterEntity.FillEmptySlots();
-            characterEntity.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, characterEntity.GetInfo(), null);
+            characterEntity.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, characterEntity.GetInfo(), CharacterItem.Empty);
             characterEntity.RewardExp(Exp, 1, RewardGivenType.None, 1, 1);
         }
 

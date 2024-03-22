@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterItem
+    public partial struct CharacterItem
     {
         public const byte CURRENT_VERSION = 2;
 
@@ -43,16 +43,16 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private ISkillItem _cacheSkillItem;
         [System.NonSerialized]
-        private CalculatedItemBuff _cacheBuff = new CalculatedItemBuff();
+        private CalculatedItemBuff _cacheBuff/* = new CalculatedItemBuff()*/;
         [System.NonSerialized]
-        private bool _recachingBuff = false;
-
+        private bool _recachingBuff/* = false*/;
+        /*
         ~CharacterItem()
         {
             ClearCachedData();
             _cacheBuff = null;
         }
-
+        */
         private void ClearCachedData()
         {
             _cacheItem = null;
@@ -366,6 +366,7 @@ namespace MultiplayerARPG
             newItem.exp = 0;
             newItem.lockRemainsDuration = 0f;
             newItem.ammo = 0;
+            newItem.sockets = new List<int>();
             if (GameInstance.Items.TryGetValue(dataId, out BaseItem tempItem))
             {
                 if (tempItem.IsEquipment())

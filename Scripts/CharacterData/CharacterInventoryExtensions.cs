@@ -766,7 +766,7 @@ namespace MultiplayerARPG
             {
                 // Unequip left-hand weapon
                 unEquipItem = tempEquipWeapons.leftHand;
-                if (!doNotValidate && unEquipItem.NotEmptySlot() &&
+                if (!doNotValidate && !unEquipItem.IsEmptySlot() &&
                     character.UnEquipItemWillOverwhelming())
                 {
                     gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
@@ -779,7 +779,7 @@ namespace MultiplayerARPG
             {
                 // Unequip right-hand weapon
                 unEquipItem = tempEquipWeapons.rightHand;
-                if (!doNotValidate && unEquipItem.NotEmptySlot() &&
+                if (!doNotValidate && !unEquipItem.IsEmptySlot() &&
                     character.UnEquipItemWillOverwhelming())
                 {
                     gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
@@ -789,7 +789,7 @@ namespace MultiplayerARPG
                 character.SelectableWeaponSets[equipWeaponSet] = tempEquipWeapons;
             }
 
-            if (unEquipItem.NotEmptySlot())
+            if (!unEquipItem.IsEmptySlot())
             {
                 character.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex, expectedUnequippedIndex);
                 if (fillEmptySlots)
@@ -851,7 +851,7 @@ namespace MultiplayerARPG
                 return false;
             }
             CharacterItem unEquipItem = character.EquipItems[index];
-            if (!doNotValidate && unEquipItem.NotEmptySlot() &&
+            if (!doNotValidate && !unEquipItem.IsEmptySlot() &&
                 character.UnEquipItemWillOverwhelming())
             {
                 gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
@@ -859,7 +859,7 @@ namespace MultiplayerARPG
             }
             character.EquipItems.RemoveAt(index);
 
-            if (unEquipItem.NotEmptySlot())
+            if (!unEquipItem.IsEmptySlot())
             {
                 character.AddOrSetNonEquipItems(unEquipItem, out unEquippedIndex, expectedUnequippedIndex);
                 if (fillEmptySlots)

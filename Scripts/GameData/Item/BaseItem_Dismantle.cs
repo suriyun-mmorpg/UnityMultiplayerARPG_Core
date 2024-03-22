@@ -24,12 +24,12 @@ namespace MultiplayerARPG
                     amount = dismantleReturnItems[i].amount * amount,
                 });
             }
-            if (dismantlingItem.Sockets.Count > 0)
+            if (dismantlingItem.sockets.Count > 0)
             {
                 BaseItem socketItem;
-                for (int i = 0; i < dismantlingItem.Sockets.Count; ++i)
+                for (int i = 0; i < dismantlingItem.sockets.Count; ++i)
                 {
-                    if (!GameInstance.Items.TryGetValue(dismantlingItem.Sockets[i], out socketItem))
+                    if (!GameInstance.Items.TryGetValue(dismantlingItem.sockets[i], out socketItem))
                         continue;
                     items.Add(new ItemAmount()
                     {

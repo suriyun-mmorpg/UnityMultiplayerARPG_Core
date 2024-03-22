@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     {
         public CharacterSkill CharacterSkill { get { return Data.characterSkill; } }
         public int Level { get { return Data.targetLevel; } }
-        public BaseSkill Skill { get { return CharacterSkill != null ? CharacterSkill.GetSkill() : null; } }
+        public BaseSkill Skill { get { return CharacterSkill.GetSkill(); } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]

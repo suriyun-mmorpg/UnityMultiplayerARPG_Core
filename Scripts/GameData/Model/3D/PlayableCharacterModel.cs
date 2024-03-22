@@ -49,7 +49,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected WeaponType _equippedWeaponType = null;
         protected Coroutine _actionCoroutine = null;
         protected bool _isDoingAction = false;
-        protected EquipWeapons _oldEquipWeapons = null;
+        protected EquipWeapons? _oldEquipWeapons = null;
         protected System.Action _onStopAction = null;
         protected int _latestCustomAnimationActionId = 0;
 
@@ -231,7 +231,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // Player draw/holster animation
             if (_oldEquipWeapons == null)
                 _oldEquipWeapons = newEquipWeapons;
-            if (Time.unscaledTime - SwitchedTime < 1f || !newEquipWeapons.IsDiffer(_oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (Time.unscaledTime - SwitchedTime < 1f || !newEquipWeapons.IsDiffer(_oldEquipWeapons.Value, out bool rightIsDiffer, out bool leftIsDiffer))
             {
                 SetNewEquipWeapons(newEquipWeapons, equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;
@@ -241,8 +241,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void SetNewEquipWeapons(EquipWeapons newEquipWeapons, IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
-            if (newEquipWeapons != null)
-                _oldEquipWeapons = newEquipWeapons.Clone();
+            _oldEquipWeapons = newEquipWeapons.Clone();
             base.SetEquipItems(equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
         }
 
@@ -299,8 +298,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public void GetLeftHandUnsheathActionState(EquipWeapons newEquipWeapons, out ActionState actionState, out float triggeredDurationRate)
         {
-            IWeaponItem tempWeaponItem = _oldEquipWeapons.GetLeftHandWeaponItem();
-            IShieldItem tempShieldItem = _oldEquipWeapons.GetLeftHandShieldItem();
+            IWeaponItem tempWeaponItem = _oldEquipWeapons.Value.GetLeftHandWeaponItem();
+            IShieldItem tempShieldItem = _oldEquipWeapons.Value.GetLeftHandShieldItem();
             if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandWeaponSheathingAnimation.sheathState.clip != null)
             {
                 actionState = anims.leftHandWeaponSheathingAnimation.unsheathState;
@@ -326,36 +325,30 @@ namespace MultiplayerARPG.GameData.Model.Playables
             float triggeredDurationRate = 0f;
             if (isWeaponsSheathed)
             {
-                if (_oldEquipWeapons != null)
+                if (rightIsDiffer)
                 {
-                    if (rightIsDiffer)
-                    {
-                        GetRightHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
-                    }
-                    else if (leftIsDiffer)
-                    {
-                        GetLeftHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
-                    }
+                    GetRightHandSheathActionState(_oldEquipWeapons.Value, out actionState, out triggeredDurationRate);
+                }
+                else if (leftIsDiffer)
+                {
+                    GetLeftHandSheathActionState(_oldEquipWeapons.Value, out actionState, out triggeredDurationRate);
                 }
             }
             else
             {
-                if (newEquipWeapons != null)
+                if (rightIsDiffer)
                 {
-                    if (rightIsDiffer)
-                    {
-                        if (newEquipWeapons.IsEmptyRightHandSlot())
-                            GetRightHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
-                        else
-                            GetRightHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
-                    }
-                    else if (leftIsDiffer)
-                    {
-                        if (newEquipWeapons.IsEmptyLeftHandSlot())
-                            GetLeftHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
-                        else
-                            GetLeftHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
-                    }
+                    if (newEquipWeapons.IsEmptyRightHandSlot())
+                        GetRightHandSheathActionState(_oldEquipWeapons.Value, out actionState, out triggeredDurationRate);
+                    else
+                        GetRightHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
+                }
+                else if (leftIsDiffer)
+                {
+                    if (newEquipWeapons.IsEmptyLeftHandSlot())
+                        GetLeftHandSheathActionState(_oldEquipWeapons.Value, out actionState, out triggeredDurationRate);
+                    else
+                        GetLeftHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
                 }
             }
 

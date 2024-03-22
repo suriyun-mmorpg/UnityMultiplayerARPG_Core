@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterSkill
+    public partial struct CharacterSkill
     {
         [System.NonSerialized]
         private int _dirtyDataId;
@@ -11,12 +11,12 @@ namespace MultiplayerARPG
 
         [System.NonSerialized]
         private BaseSkill _cacheSkill;
-
+        /*
         ~CharacterSkill()
         {
             ClearCachedData();
         }
-
+        */
         private void ClearCachedData()
         {
             _cacheSkill = null;

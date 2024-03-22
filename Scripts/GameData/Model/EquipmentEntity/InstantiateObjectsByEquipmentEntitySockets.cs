@@ -61,9 +61,9 @@ namespace MultiplayerARPG
         private void OnItemChanged(CharacterItem item)
         {
             BaseItem itemData = null;
-            for (int i = 0; i < item.Sockets.Count; ++i)
+            for (int i = 0; i < item.sockets.Count; ++i)
             {
-                if (!GameInstance.Items.TryGetValue(item.Sockets[i], out itemData) || !itemData.IsSocketEnhancer())
+                if (!GameInstance.Items.TryGetValue(item.sockets[i], out itemData) || !itemData.IsSocketEnhancer())
                 {
                     itemData = null;
                     continue;

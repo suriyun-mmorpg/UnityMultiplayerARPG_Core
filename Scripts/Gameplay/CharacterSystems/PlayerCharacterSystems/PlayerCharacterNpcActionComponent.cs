@@ -110,8 +110,8 @@ namespace MultiplayerARPG
                 if (tempQuest == null || !tempQuest.HaveToTalkToNpc(Entity, npcEntity, tempCharacterQuest.randomTasksIndex, out tempTaskIndex, out tempTalkToNpcTaskDialog, out tempCompleteAfterTalked))
                     continue;
                 await SetServerCurrentDialog(tempTalkToNpcTaskDialog);
-                if (!tempCharacterQuest.CompletedTasks.Contains(tempTaskIndex))
-                    tempCharacterQuest.CompletedTasks.Add(tempTaskIndex);
+                if (!tempCharacterQuest.completedTasks.Contains(tempTaskIndex))
+                    tempCharacterQuest.completedTasks.Add(tempTaskIndex);
                 Entity.Quests[i] = tempCharacterQuest;
                 if (tempCompleteAfterTalked && tempCharacterQuest.IsAllTasksDone(Entity, out _))
                 {

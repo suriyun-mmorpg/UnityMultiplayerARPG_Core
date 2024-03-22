@@ -92,7 +92,7 @@ namespace MultiplayerARPG
 
         public override void OnItemChanged(CharacterItem item)
         {
-            int level = item?.level ?? 1;
+            int level = item.level;
             if (_allEffectObjects != null && _allEffectObjects.Count > 0)
             {
                 foreach (GameObject allEffectObject in _allEffectObjects)

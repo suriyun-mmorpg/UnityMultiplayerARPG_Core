@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterSkillUsage
+    public partial struct CharacterSkillUsage
     {
         [System.NonSerialized]
         private int _dirtyDataId;
@@ -14,12 +14,12 @@ namespace MultiplayerARPG
         private GuildSkill _cacheGuildSkill;
         [System.NonSerialized]
         private IUsableItem _cacheUsableItem;
-
+        /*
         ~CharacterSkillUsage()
         {
             ClearCachedData();
         }
-
+        */
         private void ClearCachedData()
         {
             _cacheSkill = null;

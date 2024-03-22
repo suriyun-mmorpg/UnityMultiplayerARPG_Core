@@ -187,9 +187,9 @@ namespace MultiplayerARPG
                 onIncreasingStatusEffectResistances.Invoke(item.GetBuff().GetIncreaseStatusEffectResistances());
             BaseItem tempItem;
             int i;
-            for (i = 0; i < item.Sockets.Count; ++i)
+            for (i = 0; i < item.sockets.Count; ++i)
             {
-                if (!GameInstance.Items.TryGetValue(item.Sockets[i], out tempItem) || !tempItem.IsSocketEnhancer())
+                if (!GameInstance.Items.TryGetValue(item.sockets[i], out tempItem) || !tempItem.IsSocketEnhancer())
                     continue;
                 GetBuffs(tempItem as ISocketEnhancerItem,
                     onIncreasingStats,

@@ -2,19 +2,19 @@
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterQuest
+    public partial struct CharacterQuest
     {
         [System.NonSerialized]
         private int _dirtyDataId;
 
         [System.NonSerialized]
         private Quest _cacheQuest;
-
+        /*
         ~CharacterQuest()
         {
             ClearCachedData();
         }
-
+        */
         private void ClearCachedData()
         {
             _cacheQuest = null;
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                     if (task.completeAfterTalked)
                         progress = 1;
                     else
-                        progress = CompletedTasks.Contains(taskIndex) ? 1 : 0;
+                        progress = completedTasks.Contains(taskIndex) ? 1 : 0;
                     targetProgress = 1;
                     isComplete = progress >= targetProgress;
                     return progress;
@@ -142,17 +142,17 @@ namespace MultiplayerARPG
             Quest quest = GetQuest();
             if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterDataId))
                 return false;
-            if (!KilledMonsters.ContainsKey(monsterDataId))
-                KilledMonsters.Add(monsterDataId, 0);
-            KilledMonsters[monsterDataId] += killCount;
+            if (!killedMonsters.ContainsKey(monsterDataId))
+                killedMonsters.Add(monsterDataId, 0);
+            killedMonsters[monsterDataId] += killCount;
             return true;
         }
 
         public int CountKillMonster(int monsterDataId)
         {
-            if (!KilledMonsters.ContainsKey(monsterDataId))
+            if (!killedMonsters.ContainsKey(monsterDataId))
                 return 0;
-            return KilledMonsters[monsterDataId];
+            return killedMonsters[monsterDataId];
         }
 
         public static CharacterQuest Create(Quest quest)

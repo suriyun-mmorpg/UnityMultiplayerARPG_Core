@@ -422,10 +422,10 @@ namespace MultiplayerARPG
         {
             float result = character.EquipItems.GetTotalItemWeight() + character.NonEquipItems.GetTotalItemWeight();
             // Weight from right hand equipment
-            if (character.EquipWeapons.rightHand.NotEmptySlot())
+            if (!character.EquipWeapons.rightHand.IsEmptySlot())
                 result += character.EquipWeapons.rightHand.GetItem().Weight;
             // Weight from left hand equipment
-            if (character.EquipWeapons.leftHand.NotEmptySlot())
+            if (!character.EquipWeapons.leftHand.IsEmptySlot())
                 result += character.EquipWeapons.leftHand.GetItem().Weight;
             return result;
         }
@@ -806,13 +806,13 @@ namespace MultiplayerARPG
         private void ApplyStatusEffectsWhenAttacking(CharacterItem characterItem, IEquipmentItem equipmentItem, EntityInfo attackerInfo, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             bool isWeapon = equipmentItem is IWeaponItem;
-            equipmentItem.ApplySelfStatusEffectsWhenAttacking(characterItem.level, attackerInfo, isWeapon ? characterItem : null, attacker);
-            equipmentItem.ApplyEnemyStatusEffectsWhenAttacking(characterItem.level, attackerInfo, isWeapon ? characterItem : null, damageReceiver);
-            if (characterItem.Sockets.Count > 0)
+            equipmentItem.ApplySelfStatusEffectsWhenAttacking(characterItem.level, attackerInfo, isWeapon ? characterItem : CharacterItem.Empty, attacker);
+            equipmentItem.ApplyEnemyStatusEffectsWhenAttacking(characterItem.level, attackerInfo, isWeapon ? characterItem : CharacterItem.Empty, damageReceiver);
+            if (characterItem.sockets.Count > 0)
             {
-                foreach (int socketItemDataId in characterItem.Sockets)
+                foreach (int socketItemDataId in characterItem.sockets)
                 {
-                    ApplyStatusEffectsWhenAttacking(isWeapon ? characterItem : null, socketItemDataId, attackerInfo, attacker, damageReceiver);
+                    ApplyStatusEffectsWhenAttacking(isWeapon ? characterItem : CharacterItem.Empty, socketItemDataId, attackerInfo, attacker, damageReceiver);
                 }
             }
         }
@@ -830,9 +830,9 @@ namespace MultiplayerARPG
         {
             equipmentItem.ApplySelfStatusEffectsWhenAttacked(characterItem.level, damageReceiverInfo, damageReceiver);
             equipmentItem.ApplyEnemyStatusEffectsWhenAttacked(characterItem.level, damageReceiverInfo, attacker);
-            if (characterItem.Sockets.Count > 0)
+            if (characterItem.sockets.Count > 0)
             {
-                foreach (int socketItemDataId in characterItem.Sockets)
+                foreach (int socketItemDataId in characterItem.sockets)
                 {
                     ApplyStatusEffectsWhenAttacked(socketItemDataId, damageReceiverInfo, attacker, damageReceiver);
                 }
@@ -983,7 +983,7 @@ namespace MultiplayerARPG
             if (intDamage < 0)
                 intDamage = 0;
             character.CurrentHp -= intDamage;
-            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, intDamage, null, null, 0, null);
+            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, intDamage, CharacterItem.Empty, null, 0, CharacterBuff.Empty);
             if (character.IsDead())
             {
                 // Dead by itself, so instigator is itself

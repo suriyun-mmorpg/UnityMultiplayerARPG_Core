@@ -71,14 +71,14 @@ namespace MultiplayerARPG
             base.UpdateUI();
 
             // Update remains duration
-            if (summonRemainsDuration <= 0f && CharacterSummon != null)
+            if (summonRemainsDuration <= 0f)
                 summonRemainsDuration = CharacterSummon.summonRemainsDuration;
         }
 
         protected override void UpdateData()
         {
             // Update remains duration
-            if (CharacterSummon != null && CharacterSummon.summonRemainsDuration - summonRemainsDuration > 1)
+            if (CharacterSummon.summonRemainsDuration - summonRemainsDuration > 1)
                 summonRemainsDuration = CharacterSummon.summonRemainsDuration;
 
             tempSummonData = null;

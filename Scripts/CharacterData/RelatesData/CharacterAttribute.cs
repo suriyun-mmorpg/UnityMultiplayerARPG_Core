@@ -2,19 +2,19 @@
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterAttribute
+    public partial struct CharacterAttribute
     {
         [System.NonSerialized]
         private int _dirtyDataId;
 
         [System.NonSerialized]
         private Attribute _cacheAttribute;
-
+        /*
         ~CharacterAttribute()
         {
             ClearCachedData();
         }
-
+        */
         private void ClearCachedData()
         {
             _cacheAttribute = null;

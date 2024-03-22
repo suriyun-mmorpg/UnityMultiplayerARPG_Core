@@ -5,7 +5,7 @@ using Newtonsoft.Json;
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterBuff
+    public partial struct CharacterBuff
     {
         [System.NonSerialized]
         private BuffType _dirtyType;
@@ -25,22 +25,22 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private StatusEffect _cacheStatusEffect;
         [System.NonSerialized]
-        private CalculatedBuff _cacheBuff = new CalculatedBuff();
+        private CalculatedBuff _cacheBuff/* = new CalculatedBuff()*/;
         [System.NonSerialized]
-        private bool _recachingBuff = false;
+        private bool _recachingBuff/* = false*/;
 
         [JsonIgnore]
         public EntityInfo BuffApplier { get; private set; }
         [JsonIgnore]
         public CharacterItem BuffApplierWeapon { get; private set; }
-
+        /*
         ~CharacterBuff()
         {
             ClearCachedData();
             _cacheBuff = null;
             BuffApplierWeapon = null;
         }
-
+        */
         private void ClearCachedData()
         {
             _cacheKey = null;

@@ -2,19 +2,19 @@
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterCurrency
+    public partial struct CharacterCurrency
     {
         [System.NonSerialized]
         private int _dirtyDataId;
 
         [System.NonSerialized]
         private Currency _cacheCurrency;
-
+        /*
         ~CharacterCurrency()
         {
             ClearCachedData();
         }
-
+        */
         private void ClearCachedData()
         {
             _cacheCurrency = null;

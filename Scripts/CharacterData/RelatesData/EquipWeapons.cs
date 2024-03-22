@@ -2,11 +2,6 @@
 
 namespace MultiplayerARPG
 {
-    public partial class EquipWeapons
-    {
-        // NOTE: May add some functions later
-    }
-
     [System.Serializable]
     public class SyncFieldEquipWeapons : LiteNetLibSyncField<EquipWeapons>
     {

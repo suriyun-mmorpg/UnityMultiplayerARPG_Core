@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             get { return _item; }
             set
             {
-                if (_item != value)
+                if (!_item.IsDiffer(value, true))
                 {
                     _item = value;
                     OnItemChanged(_item);
