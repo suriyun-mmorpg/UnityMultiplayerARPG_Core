@@ -2,79 +2,79 @@ namespace MultiplayerARPG
 {
     public class CharacterItemCacheManager : BaseCacheManager<CharacterItem, CharacterItemCacheData>
     {
-        public BaseItem GetItem(CharacterItem data)
+        public BaseItem GetItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetItem();
+            return GetOrMakeCache(data.id, ref data).GetItem();
         }
 
-        public IUsableItem GetUsableItem(CharacterItem data)
+        public IUsableItem GetUsableItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetUsableItem();
+            return GetOrMakeCache(data.id, ref data).GetUsableItem();
         }
 
-        public IEquipmentItem GetEquipmentItem(CharacterItem data)
+        public IEquipmentItem GetEquipmentItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetEquipmentItem();
+            return GetOrMakeCache(data.id, ref data).GetEquipmentItem();
         }
 
-        public IDefendEquipmentItem GetDefendItem(CharacterItem data)
+        public IDefendEquipmentItem GetDefendItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetDefendItem();
+            return GetOrMakeCache(data.id, ref data).GetDefendItem();
         }
 
-        public IArmorItem GetArmorItem(CharacterItem data)
+        public IArmorItem GetArmorItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetArmorItem();
+            return GetOrMakeCache(data.id, ref data).GetArmorItem();
         }
 
-        public IWeaponItem GetWeaponItem(CharacterItem data)
+        public IWeaponItem GetWeaponItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetWeaponItem();
+            return GetOrMakeCache(data.id, ref data).GetWeaponItem();
         }
 
-        public IShieldItem GetShieldItem(CharacterItem data)
+        public IShieldItem GetShieldItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetShieldItem();
+            return GetOrMakeCache(data.id, ref data).GetShieldItem();
         }
 
-        public IPotionItem GetPotionItem(CharacterItem data)
+        public IPotionItem GetPotionItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetPotionItem();
+            return GetOrMakeCache(data.id, ref data).GetPotionItem();
         }
 
-        public IAmmoItem GetAmmoItem(CharacterItem data)
+        public IAmmoItem GetAmmoItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetAmmoItem();
+            return GetOrMakeCache(data.id, ref data).GetAmmoItem();
         }
 
-        public IBuildingItem GetBuildingItem(CharacterItem data)
+        public IBuildingItem GetBuildingItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetBuildingItem();
+            return GetOrMakeCache(data.id, ref data).GetBuildingItem();
         }
 
-        public IPetItem GetPetItem(CharacterItem data)
+        public IPetItem GetPetItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetPetItem();
+            return GetOrMakeCache(data.id, ref data).GetPetItem();
         }
 
-        public ISocketEnhancerItem GetSocketEnhancerItem(CharacterItem data)
+        public ISocketEnhancerItem GetSocketEnhancerItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetSocketEnhancerItem();
+            return GetOrMakeCache(data.id, ref data).GetSocketEnhancerItem();
         }
 
-        public IMountItem GetMountItem(CharacterItem data)
+        public IMountItem GetMountItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetMountItem();
+            return GetOrMakeCache(data.id, ref data).GetMountItem();
         }
 
-        public ISkillItem GetSkillItem(CharacterItem data)
+        public ISkillItem GetSkillItem(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetSkillItem();
+            return GetOrMakeCache(data.id, ref data).GetSkillItem();
         }
 
-        public CalculatedItemBuff GetBuff(CharacterItem data)
+        public CalculatedItemBuff GetBuff(ref CharacterItem data)
         {
-            return GetOrMakeCache(data.id, data).GetBuff();
+            return GetOrMakeCache(data.id, ref data).GetBuff();
         }
     }
 }

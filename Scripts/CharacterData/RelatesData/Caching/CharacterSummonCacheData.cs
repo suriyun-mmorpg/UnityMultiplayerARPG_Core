@@ -11,9 +11,9 @@ namespace MultiplayerARPG
 
         public BaseMonsterCharacterEntity CacheEntity { get; set; }
 
-        public override BaseCacheData<CharacterSummon> Prepare(CharacterSummon source)
+        public override BaseCacheData<CharacterSummon> Prepare(ref CharacterSummon source)
         {
-            base.Prepare(source);
+            base.Prepare(ref source);
             if (source.type == _type && source.dataId == _dataId && source.level == _level)
                 return this;
             _type = source.type;

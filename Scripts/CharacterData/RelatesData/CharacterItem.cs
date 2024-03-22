@@ -9,72 +9,72 @@ namespace MultiplayerARPG
 
         public BaseItem GetItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetItem(ref this);
         }
 
         public IUsableItem GetUsableItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetUsableItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetUsableItem(ref this);
         }
 
         public IEquipmentItem GetEquipmentItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetEquipmentItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetEquipmentItem(ref this);
         }
 
         public IDefendEquipmentItem GetDefendItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetDefendItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetDefendItem(ref this);
         }
 
         public IArmorItem GetArmorItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetArmorItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetArmorItem(ref this);
         }
 
         public IWeaponItem GetWeaponItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetWeaponItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetWeaponItem(ref this);
         }
 
         public IShieldItem GetShieldItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetShieldItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetShieldItem(ref this);
         }
 
         public IPotionItem GetPotionItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetPotionItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetPotionItem(ref this);
         }
 
         public IAmmoItem GetAmmoItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetAmmoItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetAmmoItem(ref this);
         }
 
         public IBuildingItem GetBuildingItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetBuildingItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetBuildingItem(ref this);
         }
 
         public IPetItem GetPetItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetPetItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetPetItem(ref this);
         }
 
         public ISocketEnhancerItem GetSocketEnhancerItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetSocketEnhancerItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetSocketEnhancerItem(ref this);
         }
 
         public IMountItem GetMountItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetMountItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetMountItem(ref this);
         }
 
         public ISkillItem GetSkillItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetSkillItem(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetSkillItem(ref this);
         }
 
         public int GetMaxStack()
@@ -191,7 +191,7 @@ namespace MultiplayerARPG
 
         public CalculatedItemBuff GetBuff()
         {
-            return CharacterRelatesDataCacheManager.CharacterItems.GetBuff(this);
+            return CharacterRelatesDataCacheManager.CharacterItems.GetBuff(ref this);
         }
 
         public void UpdateDurability(ICharacterData characterData, float amount)

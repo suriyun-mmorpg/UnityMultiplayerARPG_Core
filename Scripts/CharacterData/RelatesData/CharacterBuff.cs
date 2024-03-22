@@ -5,42 +5,42 @@ namespace MultiplayerARPG
 {
     public partial struct CharacterBuff
     {
-        public EntityInfo BuffApplier => CharacterRelatesDataCacheManager.CharacterBuffs.GetBuffApplier(this);
-        public CharacterItem BuffApplierWeapon => CharacterRelatesDataCacheManager.CharacterBuffs.GetBuffApplierWeapon(this);
+        public EntityInfo BuffApplier => CharacterRelatesDataCacheManager.CharacterBuffs.GetBuffApplier(ref this);
+        public CharacterItem BuffApplierWeapon => CharacterRelatesDataCacheManager.CharacterBuffs.GetBuffApplierWeapon(ref this);
 
         public BaseSkill GetSkill()
         {
-            return CharacterRelatesDataCacheManager.CharacterBuffs.GetSkill(this);
+            return CharacterRelatesDataCacheManager.CharacterBuffs.GetSkill(ref this);
         }
 
         public BaseItem GetItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterBuffs.GetItem(this);
+            return CharacterRelatesDataCacheManager.CharacterBuffs.GetItem(ref this);
         }
 
         public GuildSkill GetGuildSkill()
         {
-            return  CharacterRelatesDataCacheManager.CharacterBuffs.GetGuildSkill(this);
+            return  CharacterRelatesDataCacheManager.CharacterBuffs.GetGuildSkill(ref this);
         }
 
         public StatusEffect GetStatusEffect()
         {
-            return  CharacterRelatesDataCacheManager.CharacterBuffs.GetStatusEffect(this);
+            return  CharacterRelatesDataCacheManager.CharacterBuffs.GetStatusEffect(ref this);
         }
 
         public CalculatedBuff GetBuff()
         {
-            return CharacterRelatesDataCacheManager.CharacterBuffs.GetBuff(this);
+            return CharacterRelatesDataCacheManager.CharacterBuffs.GetBuff(ref this);
         }
 
         public string GetKey()
         {
-            return CharacterRelatesDataCacheManager.CharacterBuffs.GetKey(this);
+            return CharacterRelatesDataCacheManager.CharacterBuffs.GetKey(ref this);
         }
 
         public void SetApplier(EntityInfo buffApplier, CharacterItem buffApplierWeapon)
         {
-            CharacterRelatesDataCacheManager.CharacterBuffs.SetApplier(this, buffApplier, buffApplierWeapon);
+            CharacterRelatesDataCacheManager.CharacterBuffs.SetApplier(ref this, buffApplier, buffApplierWeapon);
         }
 
         public bool ShouldRemove()

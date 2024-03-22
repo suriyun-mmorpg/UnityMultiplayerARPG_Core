@@ -2,34 +2,34 @@ namespace MultiplayerARPG
 {
     public class CharacterSummonCacheManager : BaseCacheManager<CharacterSummon, CharacterSummonCacheData>
     {
-        public BaseMonsterCharacterEntity GetEntity(CharacterSummon data)
+        public BaseMonsterCharacterEntity GetEntity(ref CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, data).CacheEntity;
+            return GetOrMakeCache(data.id, ref data).CacheEntity;
         }
 
-        public void SetEntity(CharacterSummon data, BaseMonsterCharacterEntity value)
+        public void SetEntity(ref CharacterSummon data, BaseMonsterCharacterEntity value)
         {
-            GetOrMakeCache(data.id, data).CacheEntity = value;
+            GetOrMakeCache(data.id, ref data).CacheEntity = value;
         }
 
-        public BaseSkill GetSkill(CharacterSummon data)
+        public BaseSkill GetSkill(ref CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, data).GetSkill();
+            return GetOrMakeCache(data.id, ref data).GetSkill();
         }
 
-        public IPetItem GetPetItem(CharacterSummon data)
+        public IPetItem GetPetItem(ref CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, data).GetPetItem();
+            return GetOrMakeCache(data.id, ref data).GetPetItem();
         }
 
-        public BaseMonsterCharacterEntity GetPrefab(CharacterSummon data)
+        public BaseMonsterCharacterEntity GetPrefab(ref CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, data).GetPrefab();
+            return GetOrMakeCache(data.id, ref data).GetPrefab();
         }
 
-        public CalculatedBuff GetBuff(CharacterSummon data)
+        public CalculatedBuff GetBuff(ref CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, data).GetBuff();
+            return GetOrMakeCache(data.id, ref data).GetBuff();
         }
     }
 }

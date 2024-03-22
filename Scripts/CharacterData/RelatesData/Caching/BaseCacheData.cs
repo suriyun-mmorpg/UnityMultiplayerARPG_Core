@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     {
         public float TouchedTime { get; private set; }
 
-        public virtual BaseCacheData<T> Prepare(T source)
+        public virtual BaseCacheData<T> Prepare(ref T source)
         {
             TouchedTime = Time.unscaledTime;
             return this;

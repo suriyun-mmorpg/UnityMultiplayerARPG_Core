@@ -20,9 +20,9 @@ namespace MultiplayerARPG
             return ZString.Concat((byte)type, '_', dataId);
         }
 
-        public override BaseCacheData<CharacterBuff> Prepare(CharacterBuff source)
+        public override BaseCacheData<CharacterBuff> Prepare(ref CharacterBuff source)
         {
-            base.Prepare(source);
+            base.Prepare(ref source);
             if (source.type == _type && source.dataId == _dataId && source.level == _level)
                 return this;
             _type = source.type;

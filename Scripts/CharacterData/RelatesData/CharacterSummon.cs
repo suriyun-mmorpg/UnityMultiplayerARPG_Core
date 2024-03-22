@@ -9,8 +9,8 @@ namespace MultiplayerARPG
         [JsonIgnore]
         public BaseMonsterCharacterEntity CacheEntity
         {
-            set => CharacterRelatesDataCacheManager.CharacterSummons.SetEntity(this, value);
-            get => CharacterRelatesDataCacheManager.CharacterSummons.GetEntity(this);
+            set => CharacterRelatesDataCacheManager.CharacterSummons.SetEntity(ref this, value);
+            get => CharacterRelatesDataCacheManager.CharacterSummons.GetEntity(ref this);
         }
         [JsonIgnore]
         public int Level { get { return CacheEntity != null ? CacheEntity.Level : level; } }
@@ -79,22 +79,22 @@ namespace MultiplayerARPG
 
         public BaseSkill GetSkill()
         {
-            return CharacterRelatesDataCacheManager.CharacterSummons.GetSkill(this);
+            return CharacterRelatesDataCacheManager.CharacterSummons.GetSkill(ref this);
         }
 
         public IPetItem GetPetItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterSummons.GetPetItem(this);
+            return CharacterRelatesDataCacheManager.CharacterSummons.GetPetItem(ref this);
         }
 
         public BaseMonsterCharacterEntity GetPrefab()
         {
-            return CharacterRelatesDataCacheManager.CharacterSummons.GetPrefab(this);
+            return CharacterRelatesDataCacheManager.CharacterSummons.GetPrefab(ref this);
         }
 
         public CalculatedBuff GetBuff()
         {
-            return CharacterRelatesDataCacheManager.CharacterSummons.GetBuff(this);
+            return CharacterRelatesDataCacheManager.CharacterSummons.GetBuff(ref this);
         }
 
         public bool ShouldRemove()
