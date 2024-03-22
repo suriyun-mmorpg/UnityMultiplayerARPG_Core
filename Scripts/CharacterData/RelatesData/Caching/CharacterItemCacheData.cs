@@ -10,9 +10,9 @@ namespace MultiplayerARPG
         private CalculatedItemBuff _cacheBuff;
         private bool _recachingBuff = false;
 
-        public override BaseCacheData<CharacterItem> Prepare(ref CharacterItem source)
+        public override BaseCacheData<CharacterItem> Prepare(in CharacterItem source)
         {
-            base.Prepare(ref source);
+            base.Prepare(in source);
             if (source.dataId == _dataId && source.level == _level && source.randomSeed == _randomSeed && source.level == _version)
                 return this;
             _dataId = source.dataId;

@@ -35,13 +35,13 @@ namespace MultiplayerARPG
             _caches.Clear();
         }
 
-        public TCache GetOrMakeCache(string id, ref T data)
+        public TCache GetOrMakeCache(string id, in T data)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return null;
             if (_caches.TryGetValue(id, out TCache cacheData))
-                return cacheData.Prepare(ref data) as TCache;
-            cacheData = new TCache().Prepare(ref data) as TCache;
+                return cacheData.Prepare(in data) as TCache;
+            cacheData = new TCache().Prepare(in data) as TCache;
             _caches[id] = cacheData;
             return cacheData;
         }

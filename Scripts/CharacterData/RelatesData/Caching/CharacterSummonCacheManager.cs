@@ -2,34 +2,36 @@ namespace MultiplayerARPG
 {
     public class CharacterSummonCacheManager : BaseCacheManager<CharacterSummon, CharacterSummonCacheData>
     {
-        public BaseMonsterCharacterEntity GetEntity(ref CharacterSummon data)
+        public BaseMonsterCharacterEntity GetEntity(in CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, ref data).CacheEntity;
+            return GetOrMakeCache(data.id, in data)?.CacheEntity;
         }
 
-        public void SetEntity(ref CharacterSummon data, BaseMonsterCharacterEntity value)
+        public void SetEntity(in CharacterSummon data, BaseMonsterCharacterEntity value)
         {
-            GetOrMakeCache(data.id, ref data).CacheEntity = value;
+            CharacterSummonCacheData cachedData = GetOrMakeCache(data.id, in data);
+            if (cachedData != null)
+                cachedData.CacheEntity = value;
         }
 
-        public BaseSkill GetSkill(ref CharacterSummon data)
+        public BaseSkill GetSkill(in CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, ref data).GetSkill();
+            return GetOrMakeCache(data.id, in data)?.GetSkill();
         }
 
-        public IPetItem GetPetItem(ref CharacterSummon data)
+        public IPetItem GetPetItem(in CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, ref data).GetPetItem();
+            return GetOrMakeCache(data.id, in data)?.GetPetItem();
         }
 
-        public BaseMonsterCharacterEntity GetPrefab(ref CharacterSummon data)
+        public BaseMonsterCharacterEntity GetPrefab(in CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, ref data).GetPrefab();
+            return GetOrMakeCache(data.id, in data)?.GetPrefab();
         }
 
-        public CalculatedBuff GetBuff(ref CharacterSummon data)
+        public CalculatedBuff GetBuff(in CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, ref data).GetBuff();
+            return GetOrMakeCache(data.id, in data)?.GetBuff();
         }
     }
 }

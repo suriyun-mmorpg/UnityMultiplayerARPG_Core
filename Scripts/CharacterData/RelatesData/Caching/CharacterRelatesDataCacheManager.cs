@@ -16,13 +16,16 @@ namespace MultiplayerARPG
             }
         }
 
-        public static readonly CharacterBuffCacheManager CharacterBuffs = new CharacterBuffCacheManager();
-        public static readonly CharacterItemCacheManager CharacterItems = new CharacterItemCacheManager();
-        public static readonly CharacterSummonCacheManager CharacterSummons = new CharacterSummonCacheManager();
+        public static CharacterBuffCacheManager CharacterBuffs => Instance._characterBuffs;
+        public static CharacterItemCacheManager CharacterItems => Instance._characterItems;
+        public static CharacterSummonCacheManager CharacterSummons => Instance._characterSummons;
 
         public float updateDelay = 10f;
 
         private float _lastUpdateTime;
+        private readonly CharacterBuffCacheManager _characterBuffs = new CharacterBuffCacheManager();
+        private readonly CharacterItemCacheManager _characterItems = new CharacterItemCacheManager();
+        private readonly CharacterSummonCacheManager _characterSummons = new CharacterSummonCacheManager();
 
         private void Update()
         {

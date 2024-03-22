@@ -2,49 +2,49 @@ namespace MultiplayerARPG
 {
     public class CharacterBuffCacheManager : BaseCacheManager<CharacterBuff, CharacterBuffCacheData>
     {
-        public BaseSkill GetSkill(ref CharacterBuff data)
+        public BaseSkill GetSkill(in CharacterBuff data)
         {
-            return GetOrMakeCache(data.id, ref data).GetSkill();
+            return GetOrMakeCache(data.id, in data)?.GetSkill();
         }
 
-        public BaseItem GetItem(ref CharacterBuff data)
+        public BaseItem GetItem(in CharacterBuff data)
         {
-            return GetOrMakeCache(data.id, ref data).GetItem();
+            return GetOrMakeCache(data.id, in data)?.GetItem();
         }
 
-        public GuildSkill GetGuildSkill(ref CharacterBuff data)
+        public GuildSkill GetGuildSkill(in CharacterBuff data)
         {
-            return GetOrMakeCache(data.id, ref data).GetGuildSkill();
+            return GetOrMakeCache(data.id, in data)?.GetGuildSkill();
         }
 
-        public StatusEffect GetStatusEffect(ref CharacterBuff data)
+        public StatusEffect GetStatusEffect(in CharacterBuff data)
         {
-            return GetOrMakeCache(data.id, ref data).GetStatusEffect();
+            return GetOrMakeCache(data.id, in data)?.GetStatusEffect();
         }
 
-        public CalculatedBuff GetBuff(ref CharacterBuff data)
+        public CalculatedBuff GetBuff(in CharacterBuff data)
         {
-            return GetOrMakeCache(data.id, ref data).GetBuff();
+            return GetOrMakeCache(data.id, in data)?.GetBuff();
         }
 
-        public string GetKey(ref CharacterBuff data)
+        public string GetKey(in CharacterBuff data)
         {
-            return GetOrMakeCache(data.id, ref data).GetKey();
+            return GetOrMakeCache(data.id, in data)?.GetKey();
         }
 
-        public void SetApplier(ref CharacterBuff data, EntityInfo buffApplier, CharacterItem buffApplierWeapon)
+        public void SetApplier(in CharacterBuff data, EntityInfo buffApplier, CharacterItem buffApplierWeapon)
         {
-            GetOrMakeCache(data.id, ref data).SetApplier(buffApplier, buffApplierWeapon);
+            GetOrMakeCache(data.id, in data)?.SetApplier(buffApplier, buffApplierWeapon);
         }
 
-        public EntityInfo GetBuffApplier(ref CharacterBuff data)
+        public EntityInfo GetBuffApplier(in CharacterBuff data)
         {
-            return GetOrMakeCache(data.id, ref data).BuffApplier;
+            return GetOrMakeCache(data.id, in data)?.BuffApplier ?? default;
         }
 
-        public CharacterItem GetBuffApplierWeapon(ref CharacterBuff data)
+        public CharacterItem GetBuffApplierWeapon(in CharacterBuff data)
         {
-            return GetOrMakeCache(data.id, ref data).BuffApplierWeapon;
+            return GetOrMakeCache(data.id, in data)?.BuffApplierWeapon ?? default;
         }
     }
 }
