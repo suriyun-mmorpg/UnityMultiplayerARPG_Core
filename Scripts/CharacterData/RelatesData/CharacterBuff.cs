@@ -5,42 +5,42 @@ namespace MultiplayerARPG
 {
     public partial struct CharacterBuff
     {
-        public EntityInfo BuffApplier => CharacterRelatesDataCacheManager.CharacterBuffs.GetBuffApplier(in this);
-        public CharacterItem BuffApplierWeapon => CharacterRelatesDataCacheManager.CharacterBuffs.GetBuffApplierWeapon(in this);
+        public EntityInfo BuffApplier => MemoryManager.CharacterBuffs.GetBuffApplier(in this);
+        public CharacterItem BuffApplierWeapon => MemoryManager.CharacterBuffs.GetBuffApplierWeapon(in this);
 
         public BaseSkill GetSkill()
         {
-            return CharacterRelatesDataCacheManager.CharacterBuffs.GetSkill(in this);
+            return MemoryManager.CharacterBuffs.GetSkill(in this);
         }
 
         public BaseItem GetItem()
         {
-            return CharacterRelatesDataCacheManager.CharacterBuffs.GetItem(in this);
+            return MemoryManager.CharacterBuffs.GetItem(in this);
         }
 
         public GuildSkill GetGuildSkill()
         {
-            return  CharacterRelatesDataCacheManager.CharacterBuffs.GetGuildSkill(in this);
+            return  MemoryManager.CharacterBuffs.GetGuildSkill(in this);
         }
 
         public StatusEffect GetStatusEffect()
         {
-            return  CharacterRelatesDataCacheManager.CharacterBuffs.GetStatusEffect(in this);
+            return  MemoryManager.CharacterBuffs.GetStatusEffect(in this);
         }
 
         public CalculatedBuff GetBuff()
         {
-            return CharacterRelatesDataCacheManager.CharacterBuffs.GetBuff(in this);
+            return MemoryManager.CharacterBuffs.GetBuff(in this);
         }
 
         public string GetKey()
         {
-            return CharacterRelatesDataCacheManager.CharacterBuffs.GetKey(in this);
+            return MemoryManager.CharacterBuffs.GetKey(in this);
         }
 
         public void SetApplier(EntityInfo buffApplier, CharacterItem buffApplierWeapon)
         {
-            CharacterRelatesDataCacheManager.CharacterBuffs.SetApplier(in this, buffApplier, buffApplierWeapon);
+            MemoryManager.CharacterBuffs.SetApplier(in this, buffApplier, buffApplierWeapon);
         }
 
         public bool ShouldRemove()

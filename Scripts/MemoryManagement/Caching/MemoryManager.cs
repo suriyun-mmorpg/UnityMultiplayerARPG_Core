@@ -2,16 +2,19 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class CharacterRelatesDataCacheManager : MonoBehaviour
+    public class MemoryManager : MonoBehaviour
     {
 
-        private static CharacterRelatesDataCacheManager s_Instance;
-        public static CharacterRelatesDataCacheManager Instance
+        private static MemoryManager s_Instance;
+        public static MemoryManager Instance
         {
             get
             {
                 if (s_Instance == null)
-                    s_Instance = new GameObject("_CharacterRelatesDataCacheManager").AddComponent<CharacterRelatesDataCacheManager>();
+                {
+                    s_Instance = new GameObject("_MemoryManager").AddComponent<MemoryManager>();
+                    DontDestroyOnLoad(s_Instance.gameObject);
+                }
                 return s_Instance;
             }
         }
