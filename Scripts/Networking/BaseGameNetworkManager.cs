@@ -520,7 +520,7 @@ namespace MultiplayerARPG
                 Assets.offlineScene = scene;
             }
 #endif
-// Prepare networking prefabs
+            // Prepare networking prefabs
 #if !LNLM_NO_PREFABS
             Assets.playerPrefab = null;
             HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
@@ -538,44 +538,31 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(CurrentGameInstance.playerCorpsePrefab.Identity);
             if (CurrentGameInstance.monsterCorpsePrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.monsterCorpsePrefab.Identity);
-#endif
+            Assets.addressablePlayerPrefab = null;
             foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
-#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
-#endif
             }
             foreach (VehicleEntity entry in GameInstance.VehicleEntities.Values)
             {
-#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
-#endif
             }
             foreach (WarpPortalEntity entry in GameInstance.WarpPortalEntities.Values)
             {
-#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
-#endif
             }
             foreach (NpcEntity entry in GameInstance.NpcEntities.Values)
             {
-#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
-#endif
             }
             foreach (BuildingEntity entry in GameInstance.BuildingEntities.Values)
             {
-#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
-#endif
             }
             foreach (LiteNetLibIdentity identity in GameInstance.OtherNetworkObjectPrefabs.Values)
             {
-#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(identity);
-#endif
             }
-#if !LNLM_NO_PREFABS
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
 #endif

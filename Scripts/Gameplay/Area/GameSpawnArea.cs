@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     public abstract class GameSpawnArea<T> : GameArea where T : LiteNetLibBehaviour
     {
         [System.Serializable]
-        public class AddressablePrefab : ComponentReference<T>
+        public class AddressablePrefab : AssetReferenceComponent<T>
         {
             public AddressablePrefab(string guid) : base(guid)
             {
@@ -77,13 +77,19 @@ namespace MultiplayerARPG
 #if !LNLM_NO_PREFABS
             if (prefab != null)
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
+#endif
+            if (!addressablePrefab.IsDataValid())
+                BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefab(addressablePrefab);
+
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
+#if !LNLM_NO_PREFABS
                 if (spawningPrefab.prefab != null)
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
-            }
 #endif
-
+                if (!spawningPrefab.addressablePrefab.IsDataValid())
+                    BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefab(spawningPrefab.addressablePrefab);
+            }
         }
 
         public virtual void SpawnAll()
