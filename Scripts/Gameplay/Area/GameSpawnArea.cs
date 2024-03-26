@@ -60,11 +60,11 @@ namespace MultiplayerARPG
                     foreach (SpawnPrefabData pendingEntry in _pending)
                     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                        Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab.name}, Amount: {pendingEntry.amount}.");
+                        Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab?.name ?? "None"}, Addressable: {pendingEntry.addressablePrefab?.RuntimeKey ?? "None"}, Amount: {pendingEntry.amount}.");
 #endif
                         for (int i = 0; i < pendingEntry.amount; ++i)
                         {
-                            Spawn(pendingEntry.prefab, pendingEntry.level, 0);
+                            Spawn(pendingEntry.prefab, pendingEntry.addressablePrefab, pendingEntry.level, 0);
                         }
                     }
                     _pending.Clear();
@@ -83,34 +83,35 @@ namespace MultiplayerARPG
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
             }
 #endif
+
         }
 
         public virtual void SpawnAll()
         {
             for (int i = 0; i < amount; ++i)
             {
-                Spawn(prefab, Random.Range(minLevel, maxLevel + 1), 0);
+                Spawn(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), 0);
             }
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
-                SpawnByAmount(spawningPrefab.prefab, spawningPrefab.level, spawningPrefab.amount);
+                SpawnByAmount(spawningPrefab.prefab, spawningPrefab.addressablePrefab, spawningPrefab.level, spawningPrefab.amount);
             }
         }
 
-        public virtual void SpawnByAmount(T prefab, int level, int amount)
+        public virtual void SpawnByAmount(T prefab, AddressablePrefab addressablePrefab, int level, int amount)
         {
             for (int i = 0; i < amount; ++i)
             {
-                Spawn(prefab, level, 0);
+                Spawn(prefab, addressablePrefab, level, 0);
             }
         }
 
-        public virtual Coroutine Spawn(T prefab, int level, float delay)
+        public virtual Coroutine Spawn(T prefab, AddressablePrefab addressablePrefab, int level, float delay)
         {
-            return StartCoroutine(SpawnRoutine(prefab, level, delay));
+            return StartCoroutine(SpawnRoutine(prefab, addressablePrefab, level, delay));
         }
 
-        IEnumerator SpawnRoutine(T prefab, int level, float delay)
+        IEnumerator SpawnRoutine(T prefab, AddressablePrefab addressablePrefab, int level, float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
             T newEntity = SpawnInternal(prefab, level);
@@ -119,6 +120,7 @@ namespace MultiplayerARPG
                 AddPending(new SpawnPrefabData()
                 {
                     prefab = prefab,
+                    addressablePrefab = addressablePrefab,
                     level = level,
                     amount = 1,
                 });

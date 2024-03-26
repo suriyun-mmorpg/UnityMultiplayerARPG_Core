@@ -36,6 +36,13 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
 #endif
             }
+            if (prefab != null && monsterCharacterEntity != null)
+            {
+                monsterCharacterEntity = null;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this);
+#endif
+            }
         }
 
         public override void RegisterPrefabs()

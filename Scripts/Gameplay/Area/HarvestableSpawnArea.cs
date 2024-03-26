@@ -35,6 +35,13 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
 #endif
             }
+            if (prefab != null && harvestableEntity != null)
+            {
+                harvestableEntity = null;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this);
+#endif
+            }
         }
 
         public override void RegisterPrefabs()
