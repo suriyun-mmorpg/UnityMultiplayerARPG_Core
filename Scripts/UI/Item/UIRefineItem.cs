@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 {
     public partial class UIRefineItem : UIBaseOwningCharacterItem
     {
-        public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
+        public IEquipmentItem EquipmentItem { get { return CharacterItem.GetEquipmentItem(); } }
         public bool CanRefine { get; private set; }
         public bool ReachedMaxLevel { get; private set; }
 

@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         public CharacterCurrency CharacterCurrency { get { return Data.characterCurrency; } }
         public float Amount { get { return Data.targetAmount; } }
-        public Currency Currency { get { return CharacterCurrency != null ? CharacterCurrency.GetCurrency() : null; } }
+        public Currency Currency { get { return CharacterCurrency.GetCurrency(); } }
         
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]

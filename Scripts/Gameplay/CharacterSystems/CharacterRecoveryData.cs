@@ -82,7 +82,7 @@ namespace MultiplayerARPG
 
         public void Clear()
         {
-            _buff = null;
+            _buff = CharacterBuff.Empty;
             RecoveryingHp = 0f;
             RecoveryingMp = 0f;
             RecoveryingStamina = 0f;
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
 
         public void Apply(float rate)
         {
-            EntityInfo instigator = _buff != null ? _buff.BuffApplier : EntityInfo.Empty;
+            EntityInfo instigator = !_buff.IsEmpty() ? _buff.BuffApplier : EntityInfo.Empty;
 
             int tempAmount;
             // Hp
@@ -262,10 +262,10 @@ namespace MultiplayerARPG
                 _calculatingTotalDamageOverTime += TotalDamageOverTime * rate;
                 if (_calculatingTotalDamageOverTime >= 1)
                 {
-                    CharacterItem weapon = null;
+                    CharacterItem weapon = CharacterItem.Empty;
                     BaseSkill skill = null;
                     int skillLevel = 0;
-                    if (_buff != null)
+                    if (!_buff.IsEmpty())
                     {
                         weapon = _buff.BuffApplierWeapon;
                         skill = _buff.GetSkill();

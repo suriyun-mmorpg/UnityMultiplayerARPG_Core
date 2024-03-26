@@ -279,7 +279,7 @@ namespace MultiplayerARPG
         {
             ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
             ApplyReceiveDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out CombatAmountType combatAmountType, out int totalDamage);
-            ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, null);
+            ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, CharacterBuff.Empty);
         }
 
         /// <summary>

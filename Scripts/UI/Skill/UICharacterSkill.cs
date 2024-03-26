@@ -10,7 +10,7 @@ namespace MultiplayerARPG
     {
         public CharacterSkill CharacterSkill { get { return Data.characterSkill; } }
         public int Level { get { return Data.targetLevel; } }
-        public BaseSkill Skill { get { return CharacterSkill != null ? CharacterSkill.GetSkill() : null; } }
+        public BaseSkill Skill { get { return CharacterSkill.GetSkill(); } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -365,7 +365,7 @@ namespace MultiplayerARPG
 
             if (uiTextSummon != null)
             {
-                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || skillSummon.MonsterEntity == null)
+                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || skillSummon.MonsterCharacterEntity == null)
                 {
                     uiTextSummon.SetGameObjectActive(false);
                 }
@@ -374,7 +374,7 @@ namespace MultiplayerARPG
                     uiTextSummon.SetGameObjectActive(true);
                     uiTextSummon.text = ZString.Format(
                         LanguageManager.GetText(formatKeySummon),
-                        skillSummon.MonsterEntity.Title,
+                        skillSummon.MonsterCharacterEntity.Title,
                         skillSummon.Level.GetAmount(Level),
                         skillSummon.AmountEachTime.GetAmount(Level),
                         skillSummon.MaxStack.GetAmount(Level),

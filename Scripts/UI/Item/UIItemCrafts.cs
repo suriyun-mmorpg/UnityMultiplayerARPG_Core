@@ -57,7 +57,7 @@ namespace MultiplayerARPG
                     List<ItemCraft> itemCrafts = new List<ItemCraft>();
                     foreach (CharacterSkill characterSkill in owningCharacter.Skills)
                     {
-                        if (characterSkill == null || characterSkill.GetSkill() == null || !characterSkill.GetSkill().TryGetItemCraft(out ItemCraft itemCraft))
+                        if (characterSkill.GetSkill() == null || !characterSkill.GetSkill().TryGetItemCraft(out ItemCraft itemCraft))
                             continue;
                         itemCrafts.Add(itemCraft);
                     }

@@ -77,14 +77,14 @@ namespace MultiplayerARPG
             base.UpdateUI();
 
             // Update remains duration
-            if (_buffRemainsDuration <= 0f && CharacterBuff != null)
+            if (_buffRemainsDuration <= 0f)
                 _buffRemainsDuration = CharacterBuff.buffRemainsDuration;
         }
 
         protected override void UpdateData()
         {
             // Update remains duration
-            if (CharacterBuff != null && Mathf.Abs(CharacterBuff.buffRemainsDuration - _buffRemainsDuration) > 1)
+            if (Mathf.Abs(CharacterBuff.buffRemainsDuration - _buffRemainsDuration) > 1)
                 _buffRemainsDuration = CharacterBuff.buffRemainsDuration;
 
             BaseGameData tempGameData = null;

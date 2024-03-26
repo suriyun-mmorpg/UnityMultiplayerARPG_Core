@@ -67,17 +67,17 @@ namespace MultiplayerARPG
             int skillLevel,
             bool applyBuffToEveryone)
         {
-            this._buffApplier = buffApplier;
-            this._skill = skill;
-            this._skillLevel = skillLevel;
-            this._applyBuffToEveryone = applyBuffToEveryone;
+            _buffApplier = buffApplier;
+            _skill = skill;
+            _skillLevel = skillLevel;
+            _applyBuffToEveryone = applyBuffToEveryone;
         }
 
         public virtual void ApplyBuffTo(BaseCharacterEntity target)
         {
             if (!IsServer || target == null || target.IsDead() || (!_applyBuffToEveryone && !target.IsAlly(_buffApplier)))
                 return;
-            target.ApplyBuff(_skill.DataId, BuffType.SkillBuff, _skillLevel, _buffApplier, null);
+            target.ApplyBuff(_skill.DataId, BuffType.SkillBuff, _skillLevel, _buffApplier, CharacterItem.Empty);
         }
 
         public override void InitPrefab()

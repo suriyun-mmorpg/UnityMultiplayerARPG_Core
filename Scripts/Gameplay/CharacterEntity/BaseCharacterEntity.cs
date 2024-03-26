@@ -521,7 +521,7 @@ namespace MultiplayerARPG
         #region Attack / Skill / Weapon / Damage
         public bool ValidateAttack(ref bool isLeftHand, out CharacterItem characterItem)
         {
-            characterItem = null;
+            characterItem = CharacterItem.Empty;
 
             if (!CanAttack())
                 return false;

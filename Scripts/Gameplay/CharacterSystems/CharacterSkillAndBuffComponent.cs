@@ -48,7 +48,7 @@ namespace MultiplayerARPG
                         if (!_recoveryBuffs.TryGetValue(KEY_VEHICLE_BUFF, out recoveryData))
                         {
                             recoveryData = new CharacterRecoveryData(Entity);
-                            recoveryData.SetupByBuff(null, Entity.PassengingVehicleEntity.GetBuff());
+                            recoveryData.SetupByBuff(CharacterBuff.Empty, Entity.PassengingVehicleEntity.GetBuff());
                             _recoveryBuffs.Add(KEY_VEHICLE_BUFF, recoveryData);
                         }
                         recoveryData.Apply(1 / tempDuration * _updatingTime);
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
                             if (!_recoveryBuffs.TryGetValue(summon.id, out recoveryData))
                             {
                                 recoveryData = new CharacterRecoveryData(Entity);
-                                recoveryData.SetupByBuff(null, summon.GetBuff());
+                                recoveryData.SetupByBuff(CharacterBuff.Empty, summon.GetBuff());
                                 _recoveryBuffs.Add(summon.id, recoveryData);
                             }
                             recoveryData.Apply(1 / tempDuration * _updatingTime);

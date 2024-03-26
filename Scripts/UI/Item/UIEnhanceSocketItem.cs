@@ -7,7 +7,7 @@ namespace MultiplayerARPG
 {
     public class UIEnhanceSocketItem : UIBaseOwningCharacterItem
     {
-        public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
+        public IEquipmentItem EquipmentItem { get { return CharacterItem.GetEquipmentItem(); } }
 
         public int SelectedSocketIndex
         {
@@ -169,10 +169,10 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < EquipmentItem.AvailableSocketEnhancerTypes.Length; ++i)
                 {
-                    if (i >= characterItem.Sockets.Count || characterItem.Sockets[i] == 0)
+                    if (i >= characterItem.sockets.Count || characterItem.sockets[i] == 0)
                         characterItems.Add(CharacterItem.CreateEmptySlot());
                     else
-                        characterItems.Add(CharacterItem.Create(characterItem.Sockets[i]));
+                        characterItems.Add(CharacterItem.Create(characterItem.sockets[i]));
                 }
             }
             uiAppliedSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);

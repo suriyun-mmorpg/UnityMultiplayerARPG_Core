@@ -74,13 +74,13 @@ namespace MultiplayerARPG
             CharacterItem leftHand = equipWeapons.leftHand;
             if (rightHand.GetEquipmentItem() == null)
             {
-                if (rightHand.NotEmptySlot())
+                if (!rightHand.IsEmptySlot())
                     returningItems.Add(rightHand);
                 equipWeapons.rightHand = CharacterItem.Empty;
             }
             if (leftHand.GetEquipmentItem() == null)
             {
-                if (leftHand.NotEmptySlot())
+                if (!leftHand.IsEmptySlot())
                     returningItems.Add(leftHand);
                 equipWeapons.leftHand = CharacterItem.Empty;
             }
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                 // If equipment is invalid
                 if (equipItem.GetEquipmentItem() == null)
                 {
-                    if (equipItem.NotEmptySlot())
+                    if (!equipItem.IsEmptySlot())
                         returningItems.Add(equipItem);
                     character.EquipItems.RemoveAt(i);
                 }
@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             // Return items to non equip items
             foreach (CharacterItem returningItem in returningItems)
             {
-                if (returningItem.NotEmptySlot())
+                if (!returningItem.IsEmptySlot())
                     character.AddOrSetNonEquipItems(returningItem);
             }
             character.FillEmptySlots();

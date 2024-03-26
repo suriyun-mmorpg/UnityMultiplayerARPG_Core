@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public partial class UIRepairItem : UIBaseOwningCharacterItem
     {
-        public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
+        public IEquipmentItem EquipmentItem { get { return CharacterItem.GetEquipmentItem(); } }
         public bool CanRepair { get; private set; }
 
         [Header("String Formats")]

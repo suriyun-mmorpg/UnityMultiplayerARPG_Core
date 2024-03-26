@@ -2,51 +2,13 @@
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterSkill
+    public partial struct CharacterSkill
     {
-        [System.NonSerialized]
-        private int _dirtyDataId;
-        [System.NonSerialized]
-        private int _dirtyLevel;
-
-        [System.NonSerialized]
-        private BaseSkill _cacheSkill;
-
-        ~CharacterSkill()
-        {
-            ClearCachedData();
-        }
-
-        private void ClearCachedData()
-        {
-            _cacheSkill = null;
-        }
-
-        private bool IsRecaching()
-        {
-            return _dirtyDataId != dataId || _dirtyLevel != level;
-        }
-
-        private void MakeAsCached()
-        {
-            _dirtyDataId = dataId;
-            _dirtyLevel = level;
-        }
-
-        private void MakeCache()
-        {
-            if (!IsRecaching())
-                return;
-            MakeAsCached();
-            ClearCachedData();
-            if (!GameInstance.Skills.TryGetValue(dataId, out _cacheSkill))
-                _cacheSkill = null;
-        }
-
         public BaseSkill GetSkill()
         {
-            MakeCache();
-            return _cacheSkill;
+            if (GameInstance.Skills.TryGetValue(dataId, out BaseSkill result))
+                return result;
+            return null;
         }
 
         public static CharacterSkill Create(BaseSkill skill, int level = 1)

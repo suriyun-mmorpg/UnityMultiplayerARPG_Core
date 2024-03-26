@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     public partial class UICharacterQuest : UIDataForCharacter<CharacterQuest>
     {
         public CharacterQuest CharacterQuest { get { return Data; } }
-        public Quest Quest { get { return CharacterQuest != null ? CharacterQuest.GetQuest() : null; } }
+        public Quest Quest { get { return CharacterQuest.GetQuest(); } }
 
         [Header("Generic Info Format")]
         [Tooltip("Format => {0} = {Title}")]

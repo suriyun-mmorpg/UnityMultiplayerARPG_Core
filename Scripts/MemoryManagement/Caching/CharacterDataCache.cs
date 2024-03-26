@@ -378,7 +378,7 @@ namespace MultiplayerARPG
                 RightHandItem = characterData.EquipWeapons.rightHand;
                 if (rightWeaponItem.WeaponAbilities != null && rightWeaponItem.WeaponAbilities.Length > 0)
                     RightHandWeaponAbilities.AddRange(rightWeaponItem.WeaponAbilities);
-                AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandItem.Sockets);
+                AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandItem.sockets);
             }
             IWeaponItem leftWeaponItem = characterData.EquipWeapons.GetLeftHandWeaponItem();
             if (leftWeaponItem != null)
@@ -387,7 +387,7 @@ namespace MultiplayerARPG
                 LeftHandItem = characterData.EquipWeapons.leftHand;
                 if (leftWeaponItem.WeaponAbilities != null && leftWeaponItem.WeaponAbilities.Length > 0)
                     LeftHandWeaponAbilities.AddRange(leftWeaponItem.WeaponAbilities);
-                AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandItem.Sockets);
+                AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandItem.sockets);
             }
             if (!IsLeftHandItemAvailable && !IsRightHandItemAvailable)
             {

@@ -11,22 +11,22 @@ namespace MultiplayerARPG
 
         public static bool IsEmpty(this CharacterAttribute data)
         {
-            return data == null || data.Equals(CharacterAttribute.Empty);
+            return data.Equals(CharacterAttribute.Empty);
         }
 
         public static bool IsEmpty(this CharacterBuff data)
         {
-            return data == null || data.Equals(CharacterBuff.Empty);
+            return data.Equals(CharacterBuff.Empty);
         }
 
         public static bool IsEmpty(this CharacterHotkey data)
         {
-            return data == null || data.Equals(CharacterHotkey.Empty);
+            return data.Equals(CharacterHotkey.Empty);
         }
 
         public static bool IsEmpty(this CharacterItem data)
         {
-            return data == null || data.Equals(CharacterItem.Empty);
+            return data.Equals(CharacterItem.Empty);
         }
 
         public static bool IsEmptySlot(this CharacterItem data)
@@ -41,47 +41,35 @@ namespace MultiplayerARPG
 
         public static bool IsEmpty(this CharacterQuest data)
         {
-            return data == null || data.Equals(CharacterQuest.Empty);
+            return data.Equals(CharacterQuest.Empty);
         }
 
         public static bool IsEmpty(this CharacterSkill data)
         {
-            return data == null || data.Equals(CharacterSkill.Empty);
+            return data.Equals(CharacterSkill.Empty);
         }
 
         public static bool IsEmpty(this CharacterSkillUsage data)
         {
-            return data == null || data.Equals(CharacterSkillUsage.Empty);
+            return data.Equals(CharacterSkillUsage.Empty);
         }
 
         public static bool IsEmpty(this CharacterSummon data)
         {
-            return data == null || data.Equals(CharacterSummon.Empty);
+            return data.Equals(CharacterSummon.Empty);
         }
 
-        public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData)
+        public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData, bool checkLevel = false)
         {
-            if (data == null && anotherData == null)
+            if (checkLevel && data.level != anotherData.level)
                 return false;
-            if ((data != null && anotherData == null) || (data == null && anotherData != null))
-                return true;
-            return data.id != anotherData.id;
+            return data.id != anotherData.id || data.dataId != anotherData.dataId;
         }
 
-        public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData, out bool rightIsDiffer, out bool leftIsDiffer)
+        public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData, out bool rightIsDiffer, out bool leftIsDiffer, bool checkLevel = false)
         {
-            rightIsDiffer = false;
-            leftIsDiffer = false;
-            if (data == null && anotherData == null)
-                return false;
-            if ((data != null && anotherData == null) || (data == null && anotherData != null))
-            {
-                rightIsDiffer = true;
-                leftIsDiffer = true;
-                return true;
-            }
-            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand);
-            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand);
+            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand, checkLevel);
+            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand, checkLevel);
             return rightIsDiffer || leftIsDiffer;
         }
 
@@ -136,12 +124,12 @@ namespace MultiplayerARPG
 
         public static bool IsEmptyRightHandSlot(this EquipWeapons equipWeapons)
         {
-            return equipWeapons == null || equipWeapons.rightHand.IsEmptySlot();
+            return equipWeapons.rightHand.IsEmptySlot();
         }
 
         public static bool IsEmptyLeftHandSlot(this EquipWeapons equipWeapons)
         {
-            return equipWeapons == null || equipWeapons.leftHand.IsEmptySlot();
+            return equipWeapons.leftHand.IsEmptySlot();
         }
 
         public static bool NotEmptyRightHandSlot(this EquipWeapons equipWeapons)

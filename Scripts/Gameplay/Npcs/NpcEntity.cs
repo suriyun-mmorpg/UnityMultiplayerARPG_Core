@@ -267,7 +267,7 @@ namespace MultiplayerARPG
                 quest = characterQuest.GetQuest();
                 if (quest == null || characterQuest.isComplete)
                     continue;
-                if (quest.HaveToTalkToNpc(playerCharacter, this, characterQuest.randomTasksIndex, out int talkToNpcTaskIndex, out _, out bool completeAfterTalked) && !completeAfterTalked && !characterQuest.CompletedTasks.Contains(talkToNpcTaskIndex))
+                if (quest.HaveToTalkToNpc(playerCharacter, this, characterQuest.randomTasksIndex, out int talkToNpcTaskIndex, out _, out bool completeAfterTalked) && !completeAfterTalked && !characterQuest.completedTasks.Contains(talkToNpcTaskIndex))
                     return true;
                 inProgressQuests.Add(quest.DataId);
             }

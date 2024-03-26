@@ -110,7 +110,7 @@ namespace MultiplayerARPG
 
         private void OnGenerateEntry(int indexOfData, CharacterItem characterItem)
         {
-            if (characterItem.NotEmptySlot())
+            if (!characterItem.IsEmptySlot())
             {
                 // Increase total weight and used slots, if data is not empty slot
                 TotalWeight += characterItem.GetItem().Weight * characterItem.amount;

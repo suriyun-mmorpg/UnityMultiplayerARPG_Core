@@ -261,7 +261,7 @@ namespace MultiplayerARPG
             }
             if (TryGetSummon(out SkillSummon summon))
             {
-                GameInstance.AddCharacterEntities(summon.MonsterEntity);
+                GameInstance.AddCharacterEntities(summon.MonsterCharacterEntity);
             }
             if (TryGetMount(out SkillMount mount))
             {
@@ -653,7 +653,7 @@ namespace MultiplayerARPG
             if (!skillUser.IsServer)
                 return;
 
-            if (!TryGetSummon(out SkillSummon summon) || summon.MonsterEntity == null)
+            if (!TryGetSummon(out SkillSummon summon) || summon.MonsterCharacterEntity == null)
                 return;
 
             int i;

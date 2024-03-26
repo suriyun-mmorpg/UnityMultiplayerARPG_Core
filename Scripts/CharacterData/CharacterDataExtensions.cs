@@ -755,7 +755,7 @@ namespace MultiplayerARPG
         public static bool ValidateAmmo(this ICharacterData data, CharacterItem weapon, int amount, bool validIfNoRequireAmmoType = true)
         {
             // Avoid null data
-            if (weapon == null)
+            if (weapon.IsEmptySlot())
                 return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
@@ -793,7 +793,7 @@ namespace MultiplayerARPG
             increaseDamages = null;
 
             // Avoid null data
-            if (weapon == null)
+            if (weapon.IsEmptySlot())
                 return validIfNoRequireAmmoType;
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
@@ -1248,7 +1248,7 @@ namespace MultiplayerARPG
         public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, out int index, int expectedIndex = -1)
         {
             index = expectedIndex;
-            if (index < 0 || index >= itemList.Count || itemList[index].NotEmptySlot())
+            if (index < 0 || index >= itemList.Count || !itemList[index].IsEmptySlot())
                 index = itemList.IndexOfEmptyItemSlot();
             if (index >= 0)
             {

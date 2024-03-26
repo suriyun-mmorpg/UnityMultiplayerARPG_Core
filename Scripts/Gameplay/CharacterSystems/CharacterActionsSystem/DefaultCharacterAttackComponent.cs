@@ -374,7 +374,7 @@ namespace MultiplayerARPG
 
             byte fireSpread = 0;
             Vector3 fireStagger = Vector3.zero;
-            IWeaponItem weaponItem = weapon != null ? weapon.GetWeaponItem() : null;
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
             if (weaponItem != null)
             {
                 // For monsters, their weapon can be null so have to avoid null exception
