@@ -2,6 +2,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
+    [System.Serializable]
     public class AssetReferenceHarvestableEntity : AssetReferenceLiteNetLibBehaviour<HarvestableEntity>
     {
 #if UNITY_EDITOR
