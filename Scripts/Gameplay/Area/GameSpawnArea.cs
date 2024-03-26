@@ -9,9 +9,18 @@ namespace MultiplayerARPG
     public abstract class GameSpawnArea<T> : GameArea where T : LiteNetLibBehaviour
     {
         [System.Serializable]
+        public class AddressablePrefab : ComponentReference<T>
+        {
+            public AddressablePrefab(string guid) : base(guid)
+            {
+            }
+        }
+
+        [System.Serializable]
         public class SpawnPrefabData
         {
             public T prefab;
+            public AddressablePrefab addressablePrefab;
             [Min(1)]
             public int level;
             [Min(1)]
@@ -21,6 +30,7 @@ namespace MultiplayerARPG
         [Header("Spawning Data")]
         [FormerlySerializedAs("asset")]
         public T prefab;
+        public AddressablePrefab addressablePrefab;
         [FormerlySerializedAs("level")]
         [Min(1)]
         public int minLevel = 1;
@@ -64,6 +74,7 @@ namespace MultiplayerARPG
 
         public virtual void RegisterPrefabs()
         {
+#if !LNLM_NO_PREFABS
             if (prefab != null)
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
@@ -71,6 +82,7 @@ namespace MultiplayerARPG
                 if (spawningPrefab.prefab != null)
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
             }
+#endif
         }
 
         public virtual void SpawnAll()

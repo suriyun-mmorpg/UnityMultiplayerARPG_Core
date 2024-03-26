@@ -507,16 +507,21 @@ namespace MultiplayerARPG
         public virtual void InitPrefabs()
         {
             Assets.addressableOfflineScene = null;
+#if !LNLM_NO_PREFABS
             Assets.offlineScene = default;
+#endif
             if (CurrentGameInstance.GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
             {
                 Assets.addressableOfflineScene = addressableScene;
             }
+#if !LNLM_NO_PREFABS
             else
             {
                 Assets.offlineScene = scene;
             }
-            // Prepare networking prefabs
+#endif
+// Prepare networking prefabs
+#if !LNLM_NO_PREFABS
             Assets.playerPrefab = null;
             HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             if (CurrentGameInstance.itemDropEntityPrefab != null)
@@ -533,32 +538,47 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(CurrentGameInstance.playerCorpsePrefab.Identity);
             if (CurrentGameInstance.monsterCorpsePrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.monsterCorpsePrefab.Identity);
+#endif
             foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
+#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
+#endif
             }
             foreach (VehicleEntity entry in GameInstance.VehicleEntities.Values)
             {
+#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
+#endif
             }
             foreach (WarpPortalEntity entry in GameInstance.WarpPortalEntities.Values)
             {
+#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
+#endif
             }
             foreach (NpcEntity entry in GameInstance.NpcEntities.Values)
             {
+#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
+#endif
             }
             foreach (BuildingEntity entry in GameInstance.BuildingEntities.Values)
             {
+#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(entry.Identity);
+#endif
             }
             foreach (LiteNetLibIdentity identity in GameInstance.OtherNetworkObjectPrefabs.Values)
             {
+#if !LNLM_NO_PREFABS
                 spawnablePrefabs.Add(identity);
+#endif
             }
+#if !LNLM_NO_PREFABS
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
+#endif
             this.InvokeInstanceDevExtMethods("InitPrefabs");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {

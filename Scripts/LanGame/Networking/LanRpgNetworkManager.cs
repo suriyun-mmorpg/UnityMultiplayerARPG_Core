@@ -54,8 +54,10 @@ namespace MultiplayerARPG
             {
                 case GameStartType.Host:
                     SetMapInfo(selectedCharacter.CurrentMapName);
-                    Assets.onlineScene = CurrentMapInfo.Scene;
                     Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
+#if !LNLM_NO_PREFABS
+                    Assets.onlineScene = CurrentMapInfo.Scene;
+#endif
                     networkPort = gameServiceConnection.networkPort;
                     maxConnections = gameServiceConnection.maxConnections;
                     StartHost(false);
@@ -73,8 +75,10 @@ namespace MultiplayerARPG
                     break;
                 case GameStartType.SinglePlayer:
                     SetMapInfo(selectedCharacter.CurrentMapName);
-                    Assets.onlineScene = CurrentMapInfo.Scene;
                     Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
+#if !LNLM_NO_PREFABS
+                    Assets.onlineScene = CurrentMapInfo.Scene;
+#endif
                     StartHost(true);
                     // Stop discovery client because game started
                     CacheDiscovery.StopClient();
