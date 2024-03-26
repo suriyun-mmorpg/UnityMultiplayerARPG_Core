@@ -3,69 +3,17 @@ using System.Collections.Generic;
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
 
 namespace MultiplayerARPG
 {
     public abstract class GameSpawnArea<T> : GameArea where T : LiteNetLibBehaviour
     {
         [System.Serializable]
-        public class AddressablePrefab : AssetReferenceComponent<T>
+        public class AddressablePrefab : AssetReferenceLiteNetLibBehaviour<T>
         {
-            [SerializeField]
-            private int hashAssetId;
-
-            public int HashAssetId
-            {
-                get { return hashAssetId; }
-            }
-
 #if UNITY_EDITOR
-            public AddressablePrefab(T behaviour) : base(AssetDatabase.AssetPathToGUID(AssetDatabase.GetAssetPath(behaviour)))
+            public AddressablePrefab(T behaviour) : base(behaviour)
             {
-                if (behaviour != null && behaviour.TryGetComponent(out LiteNetLibIdentity identity))
-                {
-                    hashAssetId = identity.HashAssetId;
-                    Debug.Log($"[GameSpawnArea.AddressablePrefab] Set `hashAssetId` to `{hashAssetId}`, name: {behaviour.name}");
-                }
-                else
-                {
-                    hashAssetId = 0;
-                    Debug.LogWarning($"[GameSpawnArea.AddressablePrefab] Cannot find identity, so set `hashAssetId` to `0`");
-                }
-            }
-
-            public override bool ValidateAsset(string path)
-            {
-                return ValidateAsset(AssetDatabase.LoadAssetAtPath<LiteNetLibBehaviour>(path));
-            }
-
-            public override bool ValidateAsset(Object obj)
-            {
-                return (obj != null) && (obj is LiteNetLibBehaviour);
-            }
-
-            public override bool SetEditorAsset(Object value)
-            {
-                if (!base.SetEditorAsset(value))
-                {
-                    return false;
-                }
-
-                if ((value is GameObject gameObject) && gameObject.TryGetComponent(out LiteNetLibIdentity identity))
-                {
-                    hashAssetId = identity.GetComponent<LiteNetLibIdentity>().HashAssetId;
-                    Debug.Log($"[GameSpawnArea.AddressablePrefab] Set `hashAssetId` to `{hashAssetId}` when set editor asset: `{value.name}`");
-                    return true;
-                }
-                else
-                {
-                    hashAssetId = 0;
-                    Debug.LogWarning($"[GameSpawnArea.AddressablePrefab] Cannot find identity or not proper object's type, so set `hashAssetId` to `0`");
-                    return false;
-                }
             }
 #endif
         }
