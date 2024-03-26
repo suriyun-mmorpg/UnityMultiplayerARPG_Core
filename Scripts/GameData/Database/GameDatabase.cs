@@ -15,13 +15,20 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.GAME_DATABASE_FILE, menuName = GameDataMenuConsts.GAME_DATABASE_MENU, order = GameDataMenuConsts.GAME_DATABASE_ORDER)]
     public partial class GameDatabase : BaseGameDatabase
     {
-        [Header("Entity")]
         public UnityHelpBox entityHelpBox = new UnityHelpBox("Game database will load referring game data from an entities when game instance initializing");
+
+        [Header("Entity")]
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
         [FormerlySerializedAs("mountEntities")]
         public VehicleEntity[] vehicleEntities;
         public LiteNetLibIdentity[] otherNetworkObjects;
+
+        [Header("Addressable Entity")]
+        public AssetReferenceBasePlayerCharacterEntity[] addressablePlayerCharacterEntities;
+        public AssetReferenceBaseMonsterCharacterEntity[] addressableMonsterCharacterEntities;
+        public AssetReferenceVehicleEntity[] addressableVehicleEntities;
+        public AssetReferenceLiteNetLibIdentity[] addressableOtherNetworkObjects;
 
         [Header("Game Data")]
         public Attribute[] attributes;

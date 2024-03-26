@@ -39,11 +39,21 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, VehicleEntity> VehicleEntities = new Dictionary<int, VehicleEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
+        public static readonly Dictionary<int, AssetReferenceBuildingEntity> AddressableBuildingEntities = new Dictionary<int, AssetReferenceBuildingEntity>();
+        public static readonly Dictionary<int, AssetReferenceBaseCharacterEntity> AddressableCharacterEntities = new Dictionary<int, AssetReferenceBaseCharacterEntity>();
+        public static readonly Dictionary<int, AssetReferenceBasePlayerCharacterEntity> AddressablePlayerCharacterEntities = new Dictionary<int, AssetReferenceBasePlayerCharacterEntity>();
+        public static readonly Dictionary<int, AssetReferenceBaseMonsterCharacterEntity> AddressableMonsterCharacterEntities = new Dictionary<int, AssetReferenceBaseMonsterCharacterEntity>();
+        public static readonly Dictionary<int, AssetReferenceItemDropEntity> AddressableItemDropEntities = new Dictionary<int, AssetReferenceItemDropEntity>();
+        public static readonly Dictionary<int, AssetReferenceHarvestableEntity> AddressableHarvestableEntities = new Dictionary<int, AssetReferenceHarvestableEntity>();
+        public static readonly Dictionary<int, AssetReferenceVehicleEntity> AddressableVehicleEntities = new Dictionary<int, AssetReferenceVehicleEntity>();
+        public static readonly Dictionary<int, AssetReferenceWarpPortalEntity> AddressableWarpPortalEntities = new Dictionary<int, AssetReferenceWarpPortalEntity>();
+        public static readonly Dictionary<int, AssetReferenceNpcEntity> AddressableNpcEntities = new Dictionary<int, AssetReferenceNpcEntity>();
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, BaseMapInfo> MapInfos = new Dictionary<string, BaseMapInfo>();
         public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
         public static readonly Dictionary<int, LiteNetLibIdentity> OtherNetworkObjectPrefabs = new Dictionary<int, LiteNetLibIdentity>();
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibIdentity> AddressableOtherNetworkObjectPrefabs = new Dictionary<int, AssetReferenceLiteNetLibIdentity>();
         public static readonly HashSet<IPoolDescriptor> PoolingObjectPrefabs = new HashSet<IPoolDescriptor>();
 
         #region Add game data functions
