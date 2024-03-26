@@ -1,3 +1,5 @@
+using LiteNetLibManager;
+
 namespace MultiplayerARPG
 {
     [System.Serializable]
