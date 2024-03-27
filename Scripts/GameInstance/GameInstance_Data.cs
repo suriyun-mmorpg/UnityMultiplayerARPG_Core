@@ -1,6 +1,7 @@
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace MultiplayerARPG
 {
@@ -796,6 +797,89 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Add asset reference functions
+        public static void AddAssetReferenceCharacterEntities(params AssetReferenceBaseCharacterEntity[] characterEntities)
+        {
+            AddAssetReferenceCharacterEntities((IEnumerable<AssetReferenceBaseCharacterEntity>)characterEntities);
+        }
+
+        public static void AddAssetReferenceCharacterEntities(IEnumerable<AssetReferenceBaseCharacterEntity> characterEntities)
+        {
+            if (characterEntities == null)
+                return;
+            foreach (AssetReferenceBaseCharacterEntity characterEntity in characterEntities)
+            {
+                if (characterEntity == null)
+                    continue;
+                AddressableCharacterEntities[characterEntity.HashAssetId] = characterEntity;
+                if (characterEntity is AssetReferenceBasePlayerCharacterEntity playerCharacterEntity)
+                    AddAssetReference<AssetReferenceBasePlayerCharacterEntity, BaseCharacterEntity>(AddressablePlayerCharacterEntities, playerCharacterEntity);
+                else if (characterEntity is AssetReferenceBaseMonsterCharacterEntity monsterCharacterEntity)
+                    AddAssetReference<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>(AddressableMonsterCharacterEntities, monsterCharacterEntity);
+            }
+        }
+
+        public static void AddAssetReferenceItemDropEntities(params AssetReferenceItemDropEntity[] itemDropEntities)
+        {
+            AddAssetReferenceItemDropEntities((IEnumerable<AssetReferenceItemDropEntity>)itemDropEntities);
+        }
+
+        public static void AddAssetReferenceItemDropEntities(IEnumerable<AssetReferenceItemDropEntity> itemDropEntities)
+        {
+            AddManyAssetReference<AssetReferenceItemDropEntity, ItemDropEntity>(AddressableItemDropEntities, itemDropEntities);
+        }
+
+        public static void AddAssetReferenceHarvestableEntities(params AssetReferenceHarvestableEntity[] harvestableEntities)
+        {
+            AddAssetReferenceHarvestableEntities((IEnumerable<AssetReferenceHarvestableEntity>)harvestableEntities);
+        }
+
+        public static void AddAssetReferenceHarvestableEntities(IEnumerable<AssetReferenceHarvestableEntity> harvestableEntities)
+        {
+            AddManyAssetReference<AssetReferenceHarvestableEntity, HarvestableEntity>(AddressableHarvestableEntities, harvestableEntities);
+        }
+
+        public static void AddAssetReferenceVehicleEntities(params AssetReferenceVehicleEntity[] vehicleEntities)
+        {
+            AddAssetReferenceVehicleEntities((IEnumerable<AssetReferenceVehicleEntity>)vehicleEntities);
+        }
+
+        public static void AddAssetReferenceVehicleEntities(IEnumerable<AssetReferenceVehicleEntity> vehicleEntities)
+        {
+            AddManyAssetReference<AssetReferenceVehicleEntity, VehicleEntity>(AddressableVehicleEntities, vehicleEntities);
+        }
+
+        public static void AddAssetReferenceBuildingEntities(params AssetReferenceBuildingEntity[] buildingEntities)
+        {
+            AddAssetReferenceBuildingEntities((IEnumerable<AssetReferenceBuildingEntity>)buildingEntities);
+        }
+
+        public static void AddAssetReferenceBuildingEntities(IEnumerable<AssetReferenceBuildingEntity> buildingEntities)
+        {
+            AddManyAssetReference<AssetReferenceBuildingEntity, BuildingEntity>(AddressableBuildingEntities, buildingEntities);
+        }
+
+        public static void AddAssetReferenceWarpPortalEntities(params AssetReferenceWarpPortalEntity[] warpPortalEntities)
+        {
+            AddAssetReferenceWarpPortalEntities((IEnumerable<AssetReferenceWarpPortalEntity>)warpPortalEntities);
+        }
+
+        public static void AddAssetReferenceWarpPortalEntities(IEnumerable<AssetReferenceWarpPortalEntity> warpPortalEntities)
+        {
+            AddManyAssetReference<AssetReferenceWarpPortalEntity, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortalEntities);
+        }
+
+        public static void AddAssetReferenceNpcEntities(params AssetReferenceNpcEntity[] npcEntities)
+        {
+            AddAssetReferenceNpcEntities((IEnumerable<AssetReferenceNpcEntity>)npcEntities);
+        }
+
+        public static void AddAssetReferenceNpcEntities(IEnumerable<AssetReferenceNpcEntity> npcEntities)
+        {
+            AddManyAssetReference<AssetReferenceNpcEntity, NpcEntity>(AddressableNpcEntities, npcEntities);
+        }
+        #endregion
+
         public static void AddPoolingObjects(params IPoolDescriptor[] poolingObjects)
         {
             AddPoolingObjects((IEnumerable<IPoolDescriptor>)poolingObjects);
@@ -827,6 +911,23 @@ namespace MultiplayerARPG
                 if (networkObject == null || OtherNetworkObjectPrefabs.ContainsKey(networkObject.HashAssetId))
                     continue;
                 OtherNetworkObjectPrefabs.Add(networkObject.HashAssetId, networkObject);
+            }
+        }
+
+        public static void AddAssetReferenceOtherNetworkObjects(params AssetReferenceLiteNetLibIdentity[] networkObjects)
+        {
+            AddAssetReferenceOtherNetworkObjects((IEnumerable<AssetReferenceLiteNetLibIdentity>)networkObjects);
+        }
+
+        public static void AddAssetReferenceOtherNetworkObjects(IEnumerable<AssetReferenceLiteNetLibIdentity> networkObjects)
+        {
+            if (networkObjects == null)
+                return;
+            foreach (AssetReferenceLiteNetLibIdentity networkObject in networkObjects)
+            {
+                if (networkObject == null || AddressableOtherNetworkObjectPrefabs.ContainsKey(networkObject.HashAssetId))
+                    continue;
+                AddressableOtherNetworkObjectPrefabs.Add(networkObject.HashAssetId, networkObject);
             }
         }
 
@@ -914,6 +1015,29 @@ namespace MultiplayerARPG
             else if (entity.Identity.IsSceneObject)
             {
                 entity.PrepareRelatesData();
+            }
+            return true;
+        }
+
+        private static void AddManyAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, IEnumerable<TBehaviour> list)
+            where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
+            where TType : LiteNetLibBehaviour
+        {
+            if (list == null)
+                return;
+            foreach (TBehaviour entry in list)
+            {
+                AddAssetReference<TBehaviour, TType>(dict, entry);
+            }
+        }
+
+        private static bool AddAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, TBehaviour data)
+            where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
+            where TType : LiteNetLibBehaviour
+        {
+            if (!dict.ContainsKey(data.HashAssetId))
+            {
+                dict[data.HashAssetId] = data;
             }
             return true;
         }
