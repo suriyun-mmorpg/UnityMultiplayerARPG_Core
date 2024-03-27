@@ -538,7 +538,6 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(CurrentGameInstance.playerCorpsePrefab.Identity);
             if (CurrentGameInstance.monsterCorpsePrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.monsterCorpsePrefab.Identity);
-            Assets.addressablePlayerPrefab = null;
             foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);
@@ -569,6 +568,20 @@ namespace MultiplayerARPG
 
             Assets.addressablePlayerPrefab = null;
             HashSet<AssetReferenceLiteNetLibIdentity> addressableSpawnablePrefabs = new HashSet<AssetReferenceLiteNetLibIdentity>(Assets.addressableSpawnablePrefabs);
+            if (CurrentGameInstance.addressableItemDropEntityPrefab != null)
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableItemDropEntityPrefab);
+            if (CurrentGameInstance.addressableExpDropEntityPrefab != null)
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableExpDropEntityPrefab);
+            if (CurrentGameInstance.addressableGoldDropEntityPrefab != null)
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableGoldDropEntityPrefab);
+            if (CurrentGameInstance.addressableCurrencyDropEntityPrefab != null)
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableCurrencyDropEntityPrefab);
+            if (CurrentGameInstance.addressableWarpPortalEntityPrefab != null)
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableWarpPortalEntityPrefab);
+            if (CurrentGameInstance.addressablePlayerCorpsePrefab != null)
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressablePlayerCorpsePrefab);
+            if (CurrentGameInstance.addressableMonsterCorpsePrefab != null)
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableMonsterCorpsePrefab);
             foreach (AssetReferenceBaseCharacterEntity entry in GameInstance.AddressableCharacterEntities.Values)
             {
                 addressableSpawnablePrefabs.Add(entry);

@@ -124,12 +124,19 @@ namespace MultiplayerARPG
 
         [Header("Gameplay Objects")]
         public ItemDropEntity itemDropEntityPrefab = null;
+        public AssetReferenceItemDropEntity addressableItemDropEntityPrefab = null;
         public ExpDropEntity expDropEntityPrefab = null;
+        public AssetReferenceExpDropEntity addressableExpDropEntityPrefab = null;
         public GoldDropEntity goldDropEntityPrefab = null;
+        public AssetReferenceGoldDropEntity addressableGoldDropEntityPrefab = null;
         public CurrencyDropEntity currencyDropEntityPrefab = null;
+        public AssetReferenceCurrencyDropEntity addressableCurrencyDropEntityPrefab = null;
         public WarpPortalEntity warpPortalEntityPrefab = null;
+        public AssetReferenceWarpPortalEntity addressableWarpPortalEntityPrefab = null;
         public ItemsContainerEntity playerCorpsePrefab = null;
+        public AssetReferenceItemsContainerEntity addressablePlayerCorpsePrefab = null;
         public ItemsContainerEntity monsterCorpsePrefab = null;
+        public AssetReferenceItemsContainerEntity addressableMonsterCorpsePrefab = null;
         public BaseUISceneGameplay uiSceneGameplayPrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
         public BaseUISceneGameplay uiSceneGameplayMobilePrefab = null;
