@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using LiteNetLibManager;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -24,27 +25,35 @@ namespace MultiplayerARPG
             return database;
         }
 
-        public static BaseCharacterEntity GetEntityPrefab(this ICharacterData data)
+        public static bool TryGetEntityPrefab(this ICharacterData data, out BaseCharacterEntity prefab)
         {
-            BaseCharacterEntity entityPrefab;
-            if (!GameInstance.CharacterEntities.TryGetValue(data.EntityId, out entityPrefab))
-            {
-                Logging.LogWarning($"[GetEntityPrefab] Cannot find character entity with id: {data.EntityId}");
-                return null;
-            }
-            return entityPrefab;
+            return GameInstance.CharacterEntities.TryGetValue(data.EntityId, out prefab);
+        }
+
+        public static bool TryGetEntityAddressablePrefab(this ICharacterData data, out AssetReferenceBaseCharacterEntity assetRef)
+        {
+            return GameInstance.AddressableCharacterEntities.TryGetValue(data.EntityId, out assetRef);
         }
 
         public static BaseCharacterModel InstantiateModel(this ICharacterData data, Transform parent)
         {
-            BaseCharacterEntity entityPrefab = data.GetEntityPrefab();
-            if (entityPrefab == null)
+            BaseCharacterEntity result;
+            if (data.TryGetEntityAddressablePrefab(out AssetReferenceBaseCharacterEntity assetRef))
+            {
+                AsyncOperationHandle<BaseCharacterEntity> handler = assetRef.InstantiateAsync(parent);
+                result = handler.WaitForCompletion();
+                result.gameObject.AddComponent<AssetReferenceReleaser>().Setup(handler);
+            }
+            else if (data.TryGetEntityPrefab(out BaseCharacterEntity prefab))
+            {
+                result = Object.Instantiate(prefab, parent);
+            }
+            else
             {
                 Logging.LogWarning($"[InstantiateModel] Cannot find character entity with id: {data.EntityId}");
                 return null;
             }
 
-            BaseCharacterEntity result = Object.Instantiate(entityPrefab, parent);
             LiteNetLibBehaviour[] networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
             foreach (LiteNetLibBehaviour networkBehaviour in networkBehaviours)
             {

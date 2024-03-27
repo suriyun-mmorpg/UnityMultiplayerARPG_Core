@@ -236,9 +236,8 @@ namespace MultiplayerARPG
 
         private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
         {
-            BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
             // If it is not allow this character data, disconnect user
-            if (entityPrefab == null)
+            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _) && playerCharacterData.TryGetEntityPrefab(out _))
             {
                 Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
@@ -248,8 +247,9 @@ namespace MultiplayerARPG
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
+            // NOTE: entity ID is a hash asset ID :)
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                entityPrefab.Identity.HashAssetId,
+                playerCharacterData.EntityId,
                 playerCharacterData.CurrentPosition,
                 characterRotation);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
