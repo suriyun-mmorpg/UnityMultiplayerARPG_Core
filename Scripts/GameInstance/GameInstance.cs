@@ -728,12 +728,22 @@ namespace MultiplayerARPG
             VehicleEntities.Clear();
             WarpPortalEntities.Clear();
             NpcEntities.Clear();
+            AddressableBuildingEntities.Clear();
+            AddressableCharacterEntities.Clear();
+            AddressablePlayerCharacterEntities.Clear();
+            AddressableMonsterCharacterEntities.Clear();
+            AddressableItemDropEntities.Clear();
+            AddressableHarvestableEntities.Clear();
+            AddressableVehicleEntities.Clear();
+            AddressableWarpPortalEntities.Clear();
+            AddressableNpcEntities.Clear();
             MapWarpPortals.Clear();
             MapNpcs.Clear();
             MapInfos.Clear();
             Factions.Clear();
             PoolingObjectPrefabs.Clear();
             OtherNetworkObjectPrefabs.Clear();
+            AddressableOtherNetworkObjectPrefabs.Clear();
             GameEntityModel.GeneratingId = 0;
         }
 
@@ -842,7 +852,9 @@ namespace MultiplayerARPG
             {
                 if (GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
                 {
-                    yield return addressableScene.LoadSceneAsync();
+                    var asyncOp = addressableScene.LoadSceneAsync();
+                    LiteNetLibGameManager.LatestLoadedAddressableSceneAsyncOperation = asyncOp;
+                    yield return asyncOp;
                 }
                 else
                 {

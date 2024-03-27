@@ -57,9 +57,13 @@ namespace MultiplayerARPG
         protected override UniTask LoadDataImplement(GameInstance gameInstance)
         {
             GameInstance.AddCharacterEntities(playerCharacterEntities);
+            GameInstance.AddAssetReferenceCharacterEntities(addressablePlayerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
+            GameInstance.AddAssetReferenceCharacterEntities(addressableMonsterCharacterEntities);
             GameInstance.AddVehicleEntities(vehicleEntities);
+            GameInstance.AddAssetReferenceVehicleEntities(addressableVehicleEntities);
             GameInstance.AddOtherNetworkObjects(otherNetworkObjects);
+            GameInstance.AddAssetReferenceOtherNetworkObjects(addressableOtherNetworkObjects);
             GameInstance.AddAttributes(attributes);
             GameInstance.AddCurrencies(currencies);
             GameInstance.AddDamageElements(damageElements);
@@ -112,8 +116,11 @@ namespace MultiplayerARPG
             GameInstance.AddFactions(factions);
             GameInstance.AddGachas(gachas);
             GameInstance.AddCharacterEntities(playerCharacterEntities);
+            GameInstance.AddAssetReferenceCharacterEntities(addressablePlayerCharacterEntities);
             GameInstance.AddCharacterEntities(monsterCharacterEntities);
+            GameInstance.AddAssetReferenceCharacterEntities(addressableMonsterCharacterEntities);
             GameInstance.AddVehicleEntities(vehicleEntities);
+            GameInstance.AddAssetReferenceVehicleEntities(addressableVehicleEntities);
 
             List<Attribute> tempAttributes = new List<Attribute>(GameInstance.Attributes.Values);
             tempAttributes.Sort();
