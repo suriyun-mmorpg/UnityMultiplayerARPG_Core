@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             if (prefab != null)
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
 #endif
-            if (!addressablePrefab.IsDataValid())
+            if (addressablePrefab.IsDataValid())
                 BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefab(addressablePrefab);
 
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
@@ -93,7 +93,7 @@ namespace MultiplayerARPG
                 if (spawningPrefab.prefab != null)
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
 #endif
-                if (!spawningPrefab.addressablePrefab.IsDataValid())
+                if (spawningPrefab.addressablePrefab.IsDataValid())
                     BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefab(spawningPrefab.addressablePrefab);
             }
         }
