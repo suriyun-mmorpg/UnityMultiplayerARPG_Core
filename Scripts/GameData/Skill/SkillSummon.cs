@@ -13,6 +13,10 @@ namespace MultiplayerARPG
         private BaseMonsterCharacterEntity monsterCharacterEntity;
         public BaseMonsterCharacterEntity MonsterCharacterEntity { get { return monsterCharacterEntity; } }
 
+        [SerializeField]
+        private AssetReferenceBaseMonsterCharacterEntity addressableMonsterCharacterEntity;
+        public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity { get { return addressableMonsterCharacterEntity; } }
+
         [Tooltip("If duration less than or equals to 0, summoned monster will die")]
         [SerializeField]
         private IncrementalFloat duration;
@@ -32,12 +36,14 @@ namespace MultiplayerARPG
 
         public SkillSummon(
             BaseMonsterCharacterEntity monsterCharacterEntity,
+            AssetReferenceBaseMonsterCharacterEntity addressableMonsterCharacterEntity,
             IncrementalFloat duration,
             IncrementalInt amountEachTime,
             IncrementalInt maxStack,
             IncrementalInt level)
         {
             this.monsterCharacterEntity = monsterCharacterEntity;
+            this.addressableMonsterCharacterEntity = addressableMonsterCharacterEntity;
             this.duration = duration;
             this.amountEachTime = amountEachTime;
             this.maxStack = maxStack;

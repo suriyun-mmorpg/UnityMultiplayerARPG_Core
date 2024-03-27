@@ -23,14 +23,25 @@ namespace MultiplayerARPG
 
         public void Summon(BaseCharacterEntity summoner, int summonLevel, float duration)
         {
-            if (GetPrefab() == null)
+            LiteNetLibIdentity spawnObj;
+            if (GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId,
+                    GameInstance.Singleton.GameplayRule.GetSummonPosition(summoner),
+                    GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner));
+                CacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
+            }
+            else
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    prefab.Identity.HashAssetId,
+                    GameInstance.Singleton.GameplayRule.GetSummonPosition(summoner),
+                    GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner));
+                CacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
+            }
+            if (spawnObj == null)
                 return;
-
-            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                GetPrefab().Identity.HashAssetId,
-                GameInstance.Singleton.GameplayRule.GetSummonPosition(summoner),
-                GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner));
-            CacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             CacheEntity.Summon(summoner, type, summonLevel);
             objectId = CacheEntity.ObjectId;
@@ -87,9 +98,15 @@ namespace MultiplayerARPG
             return MemoryManager.CharacterSummons.GetPetItem(in this);
         }
 
-        public BaseMonsterCharacterEntity GetPrefab()
+        /// <summary>
+        /// Return `TRUE` if it is addressable
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <param name="addressablePrefab"></param>
+        /// <returns></returns>
+        public bool GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab)
         {
-            return MemoryManager.CharacterSummons.GetPrefab(in this);
+            return MemoryManager.CharacterSummons.GetPrefab(in this, out prefab, out addressablePrefab);
         }
 
         public CalculatedBuff GetBuff()

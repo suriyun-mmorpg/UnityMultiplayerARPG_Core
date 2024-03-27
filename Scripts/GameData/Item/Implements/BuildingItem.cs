@@ -45,6 +45,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private AssetReferenceBuildingEntity addressableBuildingEntity = null;
+        public AssetReferenceBuildingEntity AddressableBuildingEntity
+        {
+            get { return addressableBuildingEntity; }
+        }
+
+        [SerializeField]
         private float useItemCooldown = 0f;
         public float UseItemCooldown
         {

@@ -6,5 +6,6 @@ namespace MultiplayerARPG
         /// Monster entity for this item
         /// </summary>
         BaseMonsterCharacterEntity MonsterCharacterEntity { get; }
+        AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity { get; }
     }
 }

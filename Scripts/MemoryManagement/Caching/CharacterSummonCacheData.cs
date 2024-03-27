@@ -1,3 +1,7 @@
+using LiteNetLibManager;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+
 namespace MultiplayerARPG
 {
     public class CharacterSummonCacheData : BaseCacheData<CharacterSummon>
@@ -46,22 +50,53 @@ namespace MultiplayerARPG
             return null;
         }
 
-        public BaseMonsterCharacterEntity GetPrefab()
+        /// <summary>
+        /// Return `TRUE` if it is addressable
+        /// </summary>
+        /// <param name="prefab"></param>
+        /// <param name="addressablePrefab"></param>
+        /// <returns></returns>
+        public bool GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab)
         {
+            prefab = null;
+            addressablePrefab = null;
             switch (_type)
             {
                 case SummonType.Skill:
                     if (GameInstance.Skills.TryGetValue(_dataId, out BaseSkill skill) && skill.TryGetSummon(out SkillSummon skillSummon))
-                        return skillSummon.MonsterCharacterEntity;
+                    {
+                        if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
+                        {
+                            addressablePrefab = skillSummon.AddressableMonsterCharacterEntity;
+                            return true;
+                        }
+                        else if (skillSummon.MonsterCharacterEntity != null)
+                        {
+                            prefab = skillSummon.MonsterCharacterEntity;
+                            return false;
+                        }
+                    }
                     break;
                 case SummonType.PetItem:
                     if (GameInstance.Items.TryGetValue(_dataId, out BaseItem item) && item.IsPet())
-                        return (item as IPetItem).MonsterCharacterEntity;
+                    {
+                        IPetItem petItem = item as IPetItem;
+                        if (petItem.AddressableMonsterCharacterEntity.IsDataValid())
+                        {
+                            addressablePrefab = petItem.AddressableMonsterCharacterEntity;
+                            return true;
+                        }
+                        else if (petItem.MonsterCharacterEntity != null)
+                        {
+                            prefab = petItem.MonsterCharacterEntity;
+                            return false;
+                        }
+                    }
                     break;
                 case SummonType.Custom:
-                    return GameInstance.CustomSummonManager.GetPrefab(_dataId);
+                    return GameInstance.CustomSummonManager.GetPrefab(out prefab, out addressablePrefab);
             }
-            return null;
+            return false;
         }
 
         public CalculatedBuff GetBuff()
@@ -72,9 +107,21 @@ namespace MultiplayerARPG
                 return _cacheBuff;
             _recachingBuff = false;
             Buff tempBuff = Buff.Empty;
-            BaseMonsterCharacterEntity tempPrefab = GetPrefab();
-            if (tempPrefab != null && tempPrefab.CharacterDatabase != null)
-                tempBuff = tempPrefab.CharacterDatabase.SummonerBuff;
+            BaseMonsterCharacterEntity tempPrefab;
+            if (GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
+            {
+                AsyncOperationHandle<BaseMonsterCharacterEntity> asyncOpHandler = addressablePrefab.LoadAssetAsync();
+                tempPrefab = asyncOpHandler.WaitForCompletion();
+                if (tempPrefab != null && tempPrefab.CharacterDatabase != null)
+                    tempBuff = tempPrefab.CharacterDatabase.SummonerBuff;
+                Addressables.Release(asyncOpHandler);
+            }
+            else
+            {
+                tempPrefab = prefab;
+                if (tempPrefab != null && tempPrefab.CharacterDatabase != null)
+                    tempBuff = tempPrefab.CharacterDatabase.SummonerBuff;
+            }
             _cacheBuff.Build(tempBuff, _level);
             return _cacheBuff;
         }

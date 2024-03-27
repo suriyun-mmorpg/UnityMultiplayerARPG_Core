@@ -1,5 +1,7 @@
 ﻿using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -15,7 +17,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected void CmdConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
+        protected async void CmdConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -31,16 +33,35 @@ namespace MultiplayerARPG
             }
 
             CharacterItem nonEquipItem = Entity.NonEquipItems[itemIndex];
-            if (nonEquipItem.IsEmptySlot() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().BuildingEntity == null)
+            if (nonEquipItem.IsEmptySlot())
             {
                 // Invalid data
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_DATA);
                 return;
             }
 
-            if (!GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.EntityId, out BuildingEntity buildingEntity))
+            IBuildingItem buildingItem = nonEquipItem.GetBuildingItem();
+            if (buildingItem == null)
             {
-                // Invalid entity
+                // Invalid data
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_DATA);
+                return;
+            }
+
+            AsyncOperationHandle<BuildingEntity>? asyncOpHandler = null;
+            BuildingEntity buildingEntity;
+            if (buildingItem.AddressableBuildingEntity.IsDataValid())
+            {
+                asyncOpHandler = buildingItem.AddressableBuildingEntity.LoadAssetAsync();
+                buildingEntity = await asyncOpHandler.Value.Task;
+            }
+            else if (buildingItem.BuildingEntity != null)
+            {
+                buildingEntity = buildingItem.BuildingEntity;
+            }
+            else
+            {
+                // Invalid data
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_ENTITY);
                 return;
             }
@@ -59,6 +80,8 @@ namespace MultiplayerARPG
             }
 
             Entity.FillEmptySlots();
+
+            // Create the building
             BuildingSaveData buildingSaveData = new BuildingSaveData();
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;
@@ -72,6 +95,9 @@ namespace MultiplayerARPG
             buildingSaveData.CreatorId = Entity.Id;
             buildingSaveData.CreatorName = Entity.CharacterName;
             CurrentGameManager.CreateBuildingEntity(buildingSaveData, false);
+
+            if (asyncOpHandler.HasValue)
+                Addressables.Release(asyncOpHandler.Value);
 #endif
         }
 

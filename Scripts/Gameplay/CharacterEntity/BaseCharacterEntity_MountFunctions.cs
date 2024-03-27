@@ -7,9 +7,9 @@ namespace MultiplayerARPG
     {
         protected float _lastMountTime;
 
-        public virtual void Mount(VehicleEntity mountEntityPrefab)
+        public virtual void Mount(VehicleEntity prefab, AssetReferenceVehicleEntity addressablePrefab)
         {
-            if (!IsServer || mountEntityPrefab == null || Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
+            if (!IsServer || (prefab == null && !addressablePrefab.IsDataValid()) || Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
                 return;
 
             _lastMountTime = Time.unscaledTime;
@@ -22,9 +22,23 @@ namespace MultiplayerARPG
             }
 
             // Instantiate new mount entity
-            LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                mountEntityPrefab.Identity.HashAssetId, enterPosition,
-                Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
+            LiteNetLibIdentity spawnObj = null;
+            if (addressablePrefab.IsDataValid())
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId, enterPosition,
+                    Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
+            }
+            else if (prefab != null)
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    prefab.Identity.HashAssetId, enterPosition,
+                    Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
+            }
+
+            if (spawnObj == null)
+                return;
+
             VehicleEntity vehicle = spawnObj.GetComponent<VehicleEntity>();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj, 0, ConnectionId);
 

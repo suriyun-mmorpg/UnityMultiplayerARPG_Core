@@ -693,7 +693,7 @@ namespace MultiplayerARPG
             if (!TryGetMount(out SkillMount mount) || mount.MountEntity == null)
                 return;
 
-            skillUser.Mount(mount.MountEntity);
+            skillUser.Mount(mount.MountEntity, mount.AddressableMountEntity);
         }
 
         /// <summary>
