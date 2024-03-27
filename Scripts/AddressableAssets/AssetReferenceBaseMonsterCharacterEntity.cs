@@ -8,8 +8,11 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class AssetReferenceBaseMonsterCharacterEntity : AssetReferenceBaseCharacterEntity
     {
-#if UNITY_EDITOR
+        public AssetReferenceBaseMonsterCharacterEntity(string guid) : base(guid)
+        {
+        }
 
+#if UNITY_EDITOR
         public AssetReferenceBaseMonsterCharacterEntity(LiteNetLibBehaviour behaviour) : base(behaviour)
         {
         }

@@ -11,6 +11,10 @@ namespace MultiplayerARPG
         [System.Serializable]
         public class AddressablePrefab : AssetReferenceLiteNetLibBehaviour<T>
         {
+            public AddressablePrefab(string guid) : base(guid)
+            {
+            }
+
 #if UNITY_EDITOR
             public AddressablePrefab(T behaviour) : base(behaviour)
             {

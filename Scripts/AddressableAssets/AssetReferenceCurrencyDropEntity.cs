@@ -8,8 +8,11 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class AssetReferenceCurrencyDropEntity : AssetReferenceBaseRewardDropEntity
     {
-#if UNITY_EDITOR
+        public AssetReferenceCurrencyDropEntity(string guid) : base(guid)
+        {
+        }
 
+#if UNITY_EDITOR
         public AssetReferenceCurrencyDropEntity(LiteNetLibBehaviour behaviour) : base(behaviour)
         {
         }

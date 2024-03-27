@@ -5,6 +5,10 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class AssetReferenceBaseCharacterEntity : AssetReferenceLiteNetLibBehaviour<BaseCharacterEntity>
     {
+        public AssetReferenceBaseCharacterEntity(string guid) : base(guid)
+        {
+        }
+
 #if UNITY_EDITOR
         public AssetReferenceBaseCharacterEntity(LiteNetLibBehaviour behaviour) : base(behaviour)
         {
