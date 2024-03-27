@@ -122,7 +122,7 @@ namespace MultiplayerARPG
         IEnumerator SpawnRoutine(T prefab, AddressablePrefab addressablePrefab, int level, float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
-            T newEntity = SpawnInternal(prefab, level);
+            T newEntity = SpawnInternal(prefab, addressablePrefab, level);
             if (newEntity == null)
             {
                 AddPending(new SpawnPrefabData()
@@ -135,7 +135,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected abstract T SpawnInternal(T prefab, int level);
+        protected abstract T SpawnInternal(T prefab, AddressablePrefab addressablePrefab, int level);
 
         protected virtual void AddPending(SpawnPrefabData data)
         {

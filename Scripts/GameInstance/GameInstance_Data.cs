@@ -496,6 +496,7 @@ namespace MultiplayerARPG
                 foreach (WarpPortal warpPortal in mapWarpPortal.warpPortals)
                 {
                     AddGameEntity(WarpPortalEntities, warpPortal.entityPrefab);
+                    AddAssetReference<AssetReferenceWarpPortalEntity, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortal.addressableEntityPrefab);
                 }
             }
         }
@@ -520,6 +521,7 @@ namespace MultiplayerARPG
                 foreach (Npc npc in mapNpc.npcs)
                 {
                     AddGameEntity(NpcEntities, npc.entityPrefab);
+                    AddAssetReference<AssetReferenceNpcEntity, NpcEntity>(AddressableNpcEntities, npc.addressableEntityPrefab);
                     if (npc.startDialog != null)
                         AddGameData(NpcDialogs, npc.startDialog);
                     if (npc.graph != null)
@@ -1035,6 +1037,8 @@ namespace MultiplayerARPG
             where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
             where TType : LiteNetLibBehaviour
         {
+            if (!data.IsDataValid())
+                return false;
             if (!dict.ContainsKey(data.HashAssetId))
             {
                 dict[data.HashAssetId] = data;

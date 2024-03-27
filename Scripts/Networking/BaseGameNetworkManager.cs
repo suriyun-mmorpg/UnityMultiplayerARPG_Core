@@ -728,16 +728,28 @@ namespace MultiplayerARPG
                 {
                     WarpPortal warpPortal;
                     WarpPortalEntity warpPortalPrefab;
+                    AssetReferenceWarpPortalEntity addressableWarpPortalPrefab;
                     WarpPortalEntity warpPortalEntity;
                     for (i = 0; i < mapWarpPortals.Count; ++i)
                     {
                         warpPortal = mapWarpPortals[i];
                         warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
-                        if (warpPortalPrefab != null)
+                        addressableWarpPortalPrefab = warpPortal.addressableEntityPrefab.IsDataValid() ? warpPortal.addressableEntityPrefab : CurrentGameInstance.addressableWarpPortalEntityPrefab;
+                        spawnObj = null;
+                        if (addressableWarpPortalPrefab.IsDataValid())
+                        {
+                            spawnObj = Assets.GetObjectInstance(
+                                addressableWarpPortalPrefab.HashAssetId, warpPortal.position,
+                                Quaternion.Euler(warpPortal.rotation));
+                        }
+                        else if (warpPortalPrefab != null)
                         {
                             spawnObj = Assets.GetObjectInstance(
                                 warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
                                 Quaternion.Euler(warpPortal.rotation));
+                        }
+                        if (spawnObj != null)
+                        {
                             warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
                             warpPortalEntity.WarpPortalType = warpPortal.warpPortalType;
                             warpPortalEntity.WarpToMapInfo = warpPortal.warpToMapInfo;
@@ -765,16 +777,28 @@ namespace MultiplayerARPG
                 {
                     Npc npc;
                     NpcEntity npcPrefab;
+                    AssetReferenceNpcEntity addressableNpcPrefab;
                     NpcEntity npcEntity;
                     for (i = 0; i < mapNpcs.Count; ++i)
                     {
                         npc = mapNpcs[i];
                         npcPrefab = npc.entityPrefab;
-                        if (npcPrefab != null)
+                        addressableNpcPrefab = npc.addressableEntityPrefab;
+                        spawnObj = null;
+                        if (addressableNpcPrefab.IsDataValid())
+                        {
+                            spawnObj = Assets.GetObjectInstance(
+                                addressableNpcPrefab.HashAssetId, npc.position,
+                                Quaternion.Euler(npc.rotation));
+                        }
+                        else if (npcPrefab != null)
                         {
                             spawnObj = Assets.GetObjectInstance(
                                 npcPrefab.Identity.HashAssetId, npc.position,
                                 Quaternion.Euler(npc.rotation));
+                        }
+                        if (spawnObj != null)
+                        {
                             npcEntity = spawnObj.GetComponent<NpcEntity>();
                             npcEntity.Title = npc.title;
                             npcEntity.StartDialog = npc.startDialog;

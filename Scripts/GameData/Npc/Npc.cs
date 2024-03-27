@@ -6,6 +6,7 @@ namespace MultiplayerARPG
     public struct Npc
     {
         public NpcEntity entityPrefab;
+        public AssetReferenceNpcEntity addressableEntityPrefab;
         public Vector3 position;
         public Vector3 rotation;
         public string title;
