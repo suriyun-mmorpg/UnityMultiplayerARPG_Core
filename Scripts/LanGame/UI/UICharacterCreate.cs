@@ -1,8 +1,11 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
+using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -155,6 +158,7 @@ namespace MultiplayerARPG
         }
 
         protected readonly Dictionary<int, BaseCharacterModel> _characterModelByEntityId = new Dictionary<int, BaseCharacterModel>();
+        protected List<AsyncOperationHandle<BasePlayerCharacterEntity>> _addressablePlayerCharacterEntities = null;
         protected BaseCharacterModel _selectedModel;
         public BaseCharacterModel SelectedModel { get { return _selectedModel; } }
         protected readonly Dictionary<int, PlayerCharacter[]> _playerCharacterDataByEntityId = new Dictionary<int, PlayerCharacter[]>();
@@ -178,6 +182,14 @@ namespace MultiplayerARPG
         {
             base.Awake();
             MigrateInputComponent();
+        }
+
+        protected virtual void OnDestroy()
+        {
+            for (int i = 0; i < _addressablePlayerCharacterEntities.Count; ++i)
+            {
+                Addressables.Release(_addressablePlayerCharacterEntities[i]);
+            }
         }
 
 #if UNITY_EDITOR
@@ -205,12 +217,33 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
+        protected virtual async Task<List<BasePlayerCharacterEntity>> GetCreatableCharacters()
         {
-            if (RaceToggles.Count == 0)
-                return GameInstance.PlayerCharacterEntities.Values.ToList();
-            else
-                return GameInstance.PlayerCharacterEntities.Values.Where((o) => SelectedRaces.Contains(o.Race)).ToList();
+            if (_addressablePlayerCharacterEntities == null)
+            {
+                _addressablePlayerCharacterEntities = new List<AsyncOperationHandle<BasePlayerCharacterEntity>>();
+                if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
+                {
+                    List<Task<BasePlayerCharacterEntity>> loadTasks = new List<Task<BasePlayerCharacterEntity>>();
+                    foreach (var entry in GameInstance.AddressablePlayerCharacterEntities)
+                    {
+                        AsyncOperationHandle<BasePlayerCharacterEntity> handler = entry.Value.LoadAssetAsync();
+                        _addressablePlayerCharacterEntities.Add(handler);
+                        loadTasks.Add(handler.Task);
+                    }
+                    await Task.WhenAll(loadTasks);
+                }
+            }
+            List<BasePlayerCharacterEntity> tempPlayerCharacterEntities = new List<BasePlayerCharacterEntity>(GameInstance.PlayerCharacterEntities.Values);
+            for (int i = 0; i < _addressablePlayerCharacterEntities.Count; ++i)
+            {
+                tempPlayerCharacterEntities.Add(_addressablePlayerCharacterEntities[i].Result);
+            }
+            if (RaceToggles.Count > 0)
+            {
+                tempPlayerCharacterEntities = new List<BasePlayerCharacterEntity>(tempPlayerCharacterEntities.Where(o => SelectedRaces.Contains(o.Race)));
+            }
+            return tempPlayerCharacterEntities;
         }
 
         protected virtual List<Faction> GetSelectableFactions()
@@ -218,7 +251,7 @@ namespace MultiplayerARPG
             return GameInstance.Factions.Values.Where(o => !o.IsLocked).ToList();
         }
 
-        protected virtual void LoadCharacters()
+        protected virtual async void LoadCharacters()
         {
             // Remove all models
             characterModelContainer.RemoveChildren();
@@ -230,7 +263,7 @@ namespace MultiplayerARPG
             CharacterList.HideAll();
             // Show list of characters that can be created
             PlayerCharacterData firstData = null;
-            CharacterList.Generate(GetCreatableCharacters(), (index, characterEntity, ui) =>
+            CharacterList.Generate(await GetCreatableCharacters(), (index, characterEntity, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
                 _playerCharacterDataByEntityId[characterEntity.EntityId] = characterEntity.CharacterDatabases;
