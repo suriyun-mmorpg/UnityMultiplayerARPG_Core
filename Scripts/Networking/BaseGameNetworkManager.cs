@@ -566,6 +566,36 @@ namespace MultiplayerARPG
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
 #endif
+
+            Assets.addressablePlayerPrefab = null;
+            HashSet<AssetReferenceLiteNetLibIdentity> addressableSpawnablePrefabs = new HashSet<AssetReferenceLiteNetLibIdentity>(Assets.addressableSpawnablePrefabs);
+            foreach (AssetReferenceBaseCharacterEntity entry in GameInstance.AddressableCharacterEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceVehicleEntity entry in GameInstance.AddressableVehicleEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceWarpPortalEntity entry in GameInstance.AddressableWarpPortalEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceNpcEntity entry in GameInstance.AddressableNpcEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceBuildingEntity entry in GameInstance.AddressableBuildingEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceLiteNetLibIdentity identity in GameInstance.AddressableOtherNetworkObjectPrefabs.Values)
+            {
+                addressableSpawnablePrefabs.Add(identity);
+            }
+            Assets.addressableSpawnablePrefabs = new AssetReferenceLiteNetLibIdentity[addressableSpawnablePrefabs.Count];
+            addressableSpawnablePrefabs.CopyTo(Assets.addressableSpawnablePrefabs);
+
             this.InvokeInstanceDevExtMethods("InitPrefabs");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
