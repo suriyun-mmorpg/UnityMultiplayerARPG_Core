@@ -846,7 +846,7 @@ namespace MultiplayerARPG
         {
             if (UISceneLoading.Singleton)
             {
-                if (GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
+                if (GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
                 {
                     yield return UISceneLoading.Singleton.LoadScene(addressableScene);
                 }
@@ -857,7 +857,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                if (GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
+                if (GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
                 {
                     var asyncOp = addressableScene.LoadSceneAsync();
                     LiteNetLibGameManager.LatestLoadedAddressableSceneAsyncOperation = asyncOp;
@@ -876,7 +876,7 @@ namespace MultiplayerARPG
         /// <param name="addressableScene"></param>
         /// <param name="scene"></param>
         /// <returns></returns>
-        public bool GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene)
+        public bool GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene)
         {
             addressableScene = null;
             scene = default;

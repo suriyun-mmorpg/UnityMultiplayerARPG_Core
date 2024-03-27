@@ -510,7 +510,7 @@ namespace MultiplayerARPG
 #if !LNLM_NO_PREFABS
             Assets.offlineScene = default;
 #endif
-            if (CurrentGameInstance.GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
+            if (CurrentGameInstance.GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
             {
                 Assets.addressableOfflineScene = addressableScene;
             }
