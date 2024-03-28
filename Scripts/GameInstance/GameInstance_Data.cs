@@ -1002,17 +1002,6 @@ namespace MultiplayerARPG
             {
                 dict[entity.Identity.HashAssetId] = entity;
                 entity.PrepareRelatesData();
-                // Assign game entity model's ID for caching
-                GameEntityModel tempModel = entity.GetTransform().root.gameObject.GetComponent<GameEntityModel>();
-                if (tempModel != null)
-                    tempModel.AssignId();
-                GameEntityModel[] tempModels = entity.GetTransform().root.gameObject.GetComponentsInChildren<GameEntityModel>(true);
-                for (int i = 0; i < tempModels.Length; ++i)
-                {
-                    tempModel = tempModels[i];
-                    if (tempModel != null)
-                        tempModel.AssignId();
-                }
             }
             else if (entity.Identity.IsSceneObject)
             {

@@ -10,6 +10,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel
     {
+        public int Id { get; protected set; }
         public BaseCharacterModel MainModel { get; set; }
         public bool IsMainModel { get { return MainModel == this; } }
         public bool IsActiveModel { get; protected set; } = false;
@@ -176,20 +177,25 @@ namespace MultiplayerARPG
             Manager = GetComponent<CharacterModelManager>();
             if (Manager == null)
                 Manager = GetComponentInParent<CharacterModelManager>(true);
-
+            Entity = GetComponent<BaseGameEntity>();
+            if (Entity == null)
+                Entity = GetComponentInParent<BaseGameEntity>();
+            Id = GetInstanceID();
             // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
             if (Manager == null)
             {
-                Entity = GetComponent<BaseGameEntity>();
-                if (Entity == null)
-                    Entity = GetComponentInParent<BaseGameEntity>();
+                Id = Entity.Identity.HashAssetId;
                 MainModel = this;
                 InitCacheData();
                 SwitchModel(null);
             }
             else
             {
-                Manager.InitTpsModel(this);
+                byte id = Manager.InitTpsModel(this);
+                unchecked
+                {
+                    Id = Entity.Identity.HashAssetId + id;
+                }
             }
         }
 

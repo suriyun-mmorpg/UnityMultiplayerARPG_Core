@@ -751,7 +751,6 @@ namespace MultiplayerARPG
             PoolingObjectPrefabs.Clear();
             OtherNetworkObjectPrefabs.Clear();
             AddressableOtherNetworkObjectPrefabs.Clear();
-            GameEntityModel.GeneratingId = 0;
         }
 
         public static bool UseMobileInput()
