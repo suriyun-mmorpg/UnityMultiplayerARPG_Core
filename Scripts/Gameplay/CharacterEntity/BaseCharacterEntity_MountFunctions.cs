@@ -22,7 +22,7 @@ namespace MultiplayerARPG
             }
 
             // Instantiate new mount entity
-            LiteNetLibIdentity spawnObj = null;
+            LiteNetLibIdentity spawnObj;
             if (addressablePrefab.IsDataValid())
             {
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
@@ -35,9 +35,15 @@ namespace MultiplayerARPG
                     prefab.Identity.HashAssetId, enterPosition,
                     Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
             }
+            else
+            {
+                return;
+            }
 
             if (spawnObj == null)
+            {
                 return;
+            }
 
             VehicleEntity vehicle = spawnObj.GetComponent<VehicleEntity>();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj, 0, ConnectionId);

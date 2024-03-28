@@ -968,27 +968,43 @@ namespace MultiplayerARPG
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
-            if (GameInstance.BuildingEntities.ContainsKey(saveData.EntityId))
+            LiteNetLibIdentity spawnObj;
+            if (GameInstance.AddressableBuildingEntities.TryGetValue(saveData.EntityId, out AssetReferenceBuildingEntity addressablePrefab))
             {
-                LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                    GameInstance.BuildingEntities[saveData.EntityId].Identity.HashAssetId,
+                spawnObj = Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId,
                     saveData.Position, Quaternion.Euler(saveData.Rotation));
-                BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
-                buildingEntity.Id = saveData.Id;
-                buildingEntity.ParentId = saveData.ParentId;
-                buildingEntity.CurrentHp = saveData.CurrentHp;
-                buildingEntity.RemainsLifeTime = saveData.RemainsLifeTime;
-                buildingEntity.IsLocked = saveData.IsLocked;
-                buildingEntity.LockPassword = saveData.LockPassword;
-                buildingEntity.CreatorId = saveData.CreatorId;
-                buildingEntity.CreatorName = saveData.CreatorName;
-                buildingEntity.ExtraData = saveData.ExtraData;
-                Assets.NetworkSpawn(spawnObj);
-                ServerBuildingHandlers.AddBuilding(buildingEntity.Id, buildingEntity);
-                buildingEntity.CallRpcOnBuildingConstruct();
-                return buildingEntity;
             }
-            return null;
+            else if (GameInstance.BuildingEntities.TryGetValue(saveData.EntityId, out BuildingEntity prefab))
+            {
+                spawnObj = Assets.GetObjectInstance(
+                    prefab.Identity.HashAssetId,
+                    saveData.Position, Quaternion.Euler(saveData.Rotation));
+            }
+            else
+            {
+                return null;
+            }
+
+            if (spawnObj == null)
+            {
+                return null;
+            }
+
+            BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
+            buildingEntity.Id = saveData.Id;
+            buildingEntity.ParentId = saveData.ParentId;
+            buildingEntity.CurrentHp = saveData.CurrentHp;
+            buildingEntity.RemainsLifeTime = saveData.RemainsLifeTime;
+            buildingEntity.IsLocked = saveData.IsLocked;
+            buildingEntity.LockPassword = saveData.LockPassword;
+            buildingEntity.CreatorId = saveData.CreatorId;
+            buildingEntity.CreatorName = saveData.CreatorName;
+            buildingEntity.ExtraData = saveData.ExtraData;
+            Assets.NetworkSpawn(spawnObj);
+            ServerBuildingHandlers.AddBuilding(buildingEntity.Id, buildingEntity);
+            buildingEntity.CallRpcOnBuildingConstruct();
+            return buildingEntity;
         }
 
         public virtual void DestroyBuildingEntity(string id, bool isSceneObject)

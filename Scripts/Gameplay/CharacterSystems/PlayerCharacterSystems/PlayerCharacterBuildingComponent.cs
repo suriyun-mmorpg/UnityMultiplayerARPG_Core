@@ -1,7 +1,5 @@
 ﻿using LiteNetLibManager;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -17,7 +15,7 @@ namespace MultiplayerARPG
         }
 
         [ServerRpc]
-        protected async void CmdConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
+        protected void CmdConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
 #if UNITY_EDITOR || UNITY_SERVER
             if (!Entity.CanDoActions())
@@ -48,12 +46,10 @@ namespace MultiplayerARPG
                 return;
             }
 
-            AsyncOperationHandle<BuildingEntity>? asyncOpHandler = null;
             BuildingEntity buildingEntity;
             if (buildingItem.AddressableBuildingEntity.IsDataValid())
             {
-                asyncOpHandler = buildingItem.AddressableBuildingEntity.LoadAssetAsync();
-                buildingEntity = await asyncOpHandler.Value.Task;
+                buildingEntity = buildingItem.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>();
             }
             else if (buildingItem.BuildingEntity != null)
             {
@@ -95,9 +91,6 @@ namespace MultiplayerARPG
             buildingSaveData.CreatorId = Entity.Id;
             buildingSaveData.CreatorName = Entity.CharacterName;
             CurrentGameManager.CreateBuildingEntity(buildingSaveData, false);
-
-            if (asyncOpHandler.HasValue)
-                Addressables.Release(asyncOpHandler.Value);
 #endif
         }
 

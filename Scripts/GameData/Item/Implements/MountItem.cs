@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -91,6 +90,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddVehicleEntities(VehicleEntity);
+            GameInstance.AddAssetReferenceVehicleEntities(AddressableVehicleEntity);
         }
     }
 }

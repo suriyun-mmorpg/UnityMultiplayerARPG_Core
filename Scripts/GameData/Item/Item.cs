@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -823,8 +824,11 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddBuildingEntities(buildingEntity);
+            GameInstance.AddAssetReferenceBuildingEntities(addressableBuildingEntity);
             GameInstance.AddCharacterEntities(petEntity);
+            GameInstance.AddAssetReferenceCharacterEntities(addressablePetEntity);
             GameInstance.AddVehicleEntities(mountEntity);
+            GameInstance.AddAssetReferenceVehicleEntities(addressableMountEntity);
             GameInstance.AddAttributes(increaseAttributes);
             GameInstance.AddAttributes(increaseAttributesRate);
             GameInstance.AddDamageElements(increaseResistances);
@@ -1002,7 +1006,15 @@ namespace MultiplayerARPG
                 case LegacyItemType.Potion:
                     return default;
                 case LegacyItemType.Building:
-                    return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+                    if (AddressableBuildingEntity.IsDataValid())
+                    {
+                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>());
+                    }
+                    else if (BuildingEntity != null)
+                    {
+                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+                    }
+                    return default;
                 case LegacyItemType.Pet:
                     return default;
                 case LegacyItemType.Mount:

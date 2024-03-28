@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
@@ -158,7 +159,7 @@ namespace MultiplayerARPG
         }
 
         protected readonly Dictionary<int, BaseCharacterModel> _characterModelByEntityId = new Dictionary<int, BaseCharacterModel>();
-        protected List<AsyncOperationHandle<BasePlayerCharacterEntity>> _addressablePlayerCharacterEntities = null;
+        protected List<BasePlayerCharacterEntity> _addressablePlayerCharacterEntities = null;
         protected BaseCharacterModel _selectedModel;
         public BaseCharacterModel SelectedModel { get { return _selectedModel; } }
         protected readonly Dictionary<int, PlayerCharacter[]> _playerCharacterDataByEntityId = new Dictionary<int, PlayerCharacter[]>();
@@ -182,14 +183,6 @@ namespace MultiplayerARPG
         {
             base.Awake();
             MigrateInputComponent();
-        }
-
-        protected virtual void OnDestroy()
-        {
-            for (int i = 0; i < _addressablePlayerCharacterEntities.Count; ++i)
-            {
-                Addressables.Release(_addressablePlayerCharacterEntities[i]);
-            }
         }
 
 #if UNITY_EDITOR
@@ -221,23 +214,25 @@ namespace MultiplayerARPG
         {
             if (_addressablePlayerCharacterEntities == null)
             {
-                _addressablePlayerCharacterEntities = new List<AsyncOperationHandle<BasePlayerCharacterEntity>>();
+                _addressablePlayerCharacterEntities = new List<BasePlayerCharacterEntity>();
                 if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
                 {
-                    List<Task<BasePlayerCharacterEntity>> loadTasks = new List<Task<BasePlayerCharacterEntity>>();
-                    foreach (var entry in GameInstance.AddressablePlayerCharacterEntities)
+                    List<Task<BaseCharacterEntity>> loadTasks = new List<Task<BaseCharacterEntity>>();
+                    foreach (AssetReferenceBasePlayerCharacterEntity entry in GameInstance.AddressablePlayerCharacterEntities.Values)
                     {
-                        AsyncOperationHandle<BasePlayerCharacterEntity> handler = entry.Value.LoadAssetAsync();
-                        _addressablePlayerCharacterEntities.Add(handler);
-                        loadTasks.Add(handler.Task);
+                        loadTasks.Add(entry.GetOrLoadAssetAsync<AssetReferenceBasePlayerCharacterEntity, BaseCharacterEntity>());
                     }
                     await Task.WhenAll(loadTasks);
+                    for (int i = 0; i < loadTasks.Count; ++i)
+                    {
+                        _addressablePlayerCharacterEntities.Add(loadTasks[i].Result as BasePlayerCharacterEntity);
+                    }
                 }
             }
             List<BasePlayerCharacterEntity> tempPlayerCharacterEntities = new List<BasePlayerCharacterEntity>(GameInstance.PlayerCharacterEntities.Values);
             for (int i = 0; i < _addressablePlayerCharacterEntities.Count; ++i)
             {
-                tempPlayerCharacterEntities.Add(_addressablePlayerCharacterEntities[i].Result);
+                tempPlayerCharacterEntities.Add(_addressablePlayerCharacterEntities[i]);
             }
             if (RaceToggles.Count > 0)
             {

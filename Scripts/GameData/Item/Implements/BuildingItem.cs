@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -70,7 +71,15 @@ namespace MultiplayerARPG
 
         public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+            if (AddressableBuildingEntity.IsDataValid())
+            {
+                return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>());
+            }
+            else if (BuildingEntity != null)
+            {
+                return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+            }
+            return default;
         }
 
         public void FinishAimControls(bool isCancel)
@@ -87,6 +96,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddBuildingEntities(BuildingEntity);
+            GameInstance.AddAssetReferenceBuildingEntities(AddressableBuildingEntity);
         }
     }
 }

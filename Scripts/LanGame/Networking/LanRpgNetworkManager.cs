@@ -280,7 +280,7 @@ namespace MultiplayerARPG
             {
                 playerCharacterEntity.CallRpcOnRespawn();
                 // Summon saved mount entity
-                if (GameInstance.AddressableVehicleEntities.TryGetValue(playerCharacterData.MountDataId, out AssetReferenceVehicleEntity addressablePrefab) && addressablePrefab.IsDataValid())
+                if (GameInstance.AddressableVehicleEntities.TryGetValue(playerCharacterData.MountDataId, out AssetReferenceVehicleEntity addressablePrefab))
                 {
                     playerCharacterEntity.Mount(null, addressablePrefab);
                 }

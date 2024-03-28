@@ -1,6 +1,4 @@
 using LiteNetLibManager;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -110,11 +108,9 @@ namespace MultiplayerARPG
             BaseMonsterCharacterEntity tempPrefab;
             if (GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
             {
-                AsyncOperationHandle<BaseMonsterCharacterEntity> asyncOpHandler = addressablePrefab.LoadAssetAsync();
-                tempPrefab = asyncOpHandler.WaitForCompletion();
+                tempPrefab = addressablePrefab.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>() as BaseMonsterCharacterEntity;
                 if (tempPrefab != null && tempPrefab.CharacterDatabase != null)
                     tempBuff = tempPrefab.CharacterDatabase.SummonerBuff;
-                Addressables.Release(asyncOpHandler);
             }
             else
             {
