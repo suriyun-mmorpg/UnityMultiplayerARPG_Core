@@ -20,23 +20,22 @@ namespace MultiplayerARPG
 
         public new AsyncOperationHandle<BasePlayerCharacterEntity> InstantiateAsync(Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, position, rotation, parent, false), GameObjectReady);
+            return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, position, rotation, parent, false), GetComponentChainOperation);
         }
 
         public new AsyncOperationHandle<BasePlayerCharacterEntity> InstantiateAsync(Transform parent = null, bool instantiateInWorldSpace = false)
         {
-            return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, parent, instantiateInWorldSpace, false), GameObjectReady);
+            return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, parent, instantiateInWorldSpace, false), GetComponentChainOperation);
         }
 
         public new AsyncOperationHandle<BasePlayerCharacterEntity> LoadAssetAsync()
         {
-            return Addressables.ResourceManager.CreateChainOperation(base.LoadAssetAsync<GameObject>(), GameObjectReady);
+            return Addressables.ResourceManager.CreateChainOperation(base.LoadAssetAsync<GameObject>(), GetComponentChainOperation);
         }
 
-        static AsyncOperationHandle<BasePlayerCharacterEntity> GameObjectReady(AsyncOperationHandle<GameObject> arg)
+        private static AsyncOperationHandle<BasePlayerCharacterEntity> GetComponentChainOperation(AsyncOperationHandle<GameObject> handler)
         {
-            var comp = arg.Result.GetComponent<BasePlayerCharacterEntity>();
-            return Addressables.ResourceManager.CreateCompletedOperation(comp, string.Empty);
+            return Addressables.ResourceManager.CreateCompletedOperation(handler.Result.GetComponent<BasePlayerCharacterEntity>(), string.Empty);
         }
 
         public override bool ValidateAsset(Object obj)

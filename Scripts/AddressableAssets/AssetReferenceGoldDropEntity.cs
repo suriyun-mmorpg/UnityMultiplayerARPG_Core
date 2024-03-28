@@ -20,23 +20,22 @@ namespace MultiplayerARPG
 
         public new AsyncOperationHandle<GoldDropEntity> InstantiateAsync(Vector3 position, Quaternion rotation, Transform parent = null)
         {
-            return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, position, rotation, parent, false), GameObjectReady);
+            return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, position, rotation, parent, false), GetComponentChainOperation);
         }
 
         public new AsyncOperationHandle<GoldDropEntity> InstantiateAsync(Transform parent = null, bool instantiateInWorldSpace = false)
         {
-            return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, parent, instantiateInWorldSpace, false), GameObjectReady);
+            return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, parent, instantiateInWorldSpace, false), GetComponentChainOperation);
         }
 
         public new AsyncOperationHandle<GoldDropEntity> LoadAssetAsync()
         {
-            return Addressables.ResourceManager.CreateChainOperation(base.LoadAssetAsync<GameObject>(), GameObjectReady);
+            return Addressables.ResourceManager.CreateChainOperation(base.LoadAssetAsync<GameObject>(), GetComponentChainOperation);
         }
 
-        static AsyncOperationHandle<GoldDropEntity> GameObjectReady(AsyncOperationHandle<GameObject> arg)
+        private static AsyncOperationHandle<GoldDropEntity> GetComponentChainOperation(AsyncOperationHandle<GameObject> handler)
         {
-            var comp = arg.Result.GetComponent<GoldDropEntity>();
-            return Addressables.ResourceManager.CreateCompletedOperation(comp, string.Empty);
+            return Addressables.ResourceManager.CreateCompletedOperation(handler.Result.GetComponent<GoldDropEntity>(), string.Empty);
         }
 
         public override bool ValidateAsset(Object obj)
