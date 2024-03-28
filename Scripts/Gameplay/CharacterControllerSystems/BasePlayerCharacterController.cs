@@ -135,7 +135,10 @@ namespace MultiplayerARPG
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
         {
             if (UISceneGameplay != null)
+            {
+                UISceneGameplay.OnControllerDesetup(characterEntity);
                 Destroy(UISceneGameplay.gameObject);
+            }
             if (onDesetup != null)
                 onDesetup.Invoke(this);
         }
