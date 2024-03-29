@@ -24,9 +24,18 @@ namespace MultiplayerARPG
             return GetOrMakeCache(data.id, in data)?.GetPetItem();
         }
 
-        public BaseMonsterCharacterEntity GetPrefab(in CharacterSummon data)
+        /// <summary>
+        /// Return `TRUE` if it is addressable
+        /// </summary>
+        /// <param name="data"></param>
+        /// <param name="prefab"></param>
+        /// <param name="addressablePrefab"></param>
+        /// <returns></returns>
+        public bool GetPrefab(in CharacterSummon data, out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab)
         {
-            return GetOrMakeCache(data.id, in data)?.GetPrefab();
+            prefab = null;
+            addressablePrefab = null;
+            return GetOrMakeCache(data.id, in data)?.GetPrefab(out prefab, out addressablePrefab) ?? false;
         }
 
         public CalculatedBuff GetBuff(in CharacterSummon data)

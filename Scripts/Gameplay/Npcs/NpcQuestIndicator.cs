@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -30,6 +29,7 @@ namespace MultiplayerARPG
 
         private void OnDestroy()
         {
+            npcEntity = null;
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
         }

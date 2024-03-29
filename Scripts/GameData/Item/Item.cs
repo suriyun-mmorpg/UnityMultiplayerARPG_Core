@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -152,12 +153,15 @@ namespace MultiplayerARPG
 
         [Category(2, "Building Settings")]
         public BuildingEntity buildingEntity;
+        public AssetReferenceBuildingEntity addressableBuildingEntity;
 
         [Category(2, "Pet Settings")]
         public BaseMonsterCharacterEntity petEntity;
+        public AssetReferenceBaseMonsterCharacterEntity addressablePetEntity;
 
         [Category(2, "Mount Settings")]
         public VehicleEntity mountEntity;
+        public AssetReferenceVehicleEntity addressableMountEntity;
 
         [Category(2, "Socket Enhancer Settings")]
         public SocketEnhancerType socketEnhancerType = SocketEnhancerType.Type1;
@@ -626,6 +630,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public AssetReferenceBuildingEntity AddressableBuildingEntity
+        {
+            get
+            {
+                if (itemType == LegacyItemType.Building)
+                    return addressableBuildingEntity;
+                return null;
+            }
+        }
+
         public BaseMonsterCharacterEntity MonsterCharacterEntity
         {
             get
@@ -636,12 +650,32 @@ namespace MultiplayerARPG
             }
         }
 
+        public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
+        {
+            get
+            {
+                if (itemType == LegacyItemType.Pet)
+                    return addressablePetEntity;
+                return null;
+            }
+        }
+
         public VehicleEntity VehicleEntity
         {
             get
             {
                 if (itemType == LegacyItemType.Mount)
                     return mountEntity;
+                return null;
+            }
+        }
+
+        public AssetReferenceVehicleEntity AddressableVehicleEntity
+        {
+            get
+            {
+                if (itemType == LegacyItemType.Mount)
+                    return addressableMountEntity;
                 return null;
             }
         }
@@ -790,8 +824,11 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddBuildingEntities(buildingEntity);
+            GameInstance.AddAssetReferenceBuildingEntities(addressableBuildingEntity);
             GameInstance.AddCharacterEntities(petEntity);
+            GameInstance.AddAssetReferenceCharacterEntities(addressablePetEntity);
             GameInstance.AddVehicleEntities(mountEntity);
+            GameInstance.AddAssetReferenceVehicleEntities(addressableMountEntity);
             GameInstance.AddAttributes(increaseAttributes);
             GameInstance.AddAttributes(increaseAttributesRate);
             GameInstance.AddDamageElements(increaseResistances);
@@ -905,7 +942,7 @@ namespace MultiplayerARPG
             if (!character.CanUseItem() || level <= 0)
                 return;
 
-            character.Mount(VehicleEntity);
+            character.Mount(VehicleEntity, AddressableVehicleEntity);
         }
 
         protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)
@@ -969,7 +1006,15 @@ namespace MultiplayerARPG
                 case LegacyItemType.Potion:
                     return default;
                 case LegacyItemType.Building:
-                    return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+                    if (AddressableBuildingEntity.IsDataValid())
+                    {
+                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>());
+                    }
+                    else if (BuildingEntity != null)
+                    {
+                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+                    }
+                    return default;
                 case LegacyItemType.Pet:
                     return default;
                 case LegacyItemType.Mount:

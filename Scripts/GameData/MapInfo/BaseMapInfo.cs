@@ -11,12 +11,12 @@ namespace MultiplayerARPG
         #region Map Info Settings
         [Category("Map Info Settings")]
         [SerializeField]
-        private AssetReferenceScene addressableScene;
-        public virtual AssetReferenceScene AddressableScene { get { return addressableScene; } }
-
-        [SerializeField]
         private SceneField scene = default;
         public virtual SceneField Scene { get { return scene; } }
+
+        [SerializeField]
+        private AssetReferenceScene addressableScene;
+        public virtual AssetReferenceScene AddressableScene { get { return addressableScene; } }
 
         [Tooltip("This will be used when new character has been created to set its position, and this map data is the start map")]
         [SerializeField]

@@ -9,9 +9,24 @@ namespace MultiplayerARPG
     public abstract class GameSpawnArea<T> : GameArea where T : LiteNetLibBehaviour
     {
         [System.Serializable]
+        public class AddressablePrefab : AssetReferenceLiteNetLibBehaviour<T>
+        {
+            public AddressablePrefab(string guid) : base(guid)
+            {
+            }
+
+#if UNITY_EDITOR
+            public AddressablePrefab(T behaviour) : base(behaviour)
+            {
+            }
+#endif
+        }
+
+        [System.Serializable]
         public class SpawnPrefabData
         {
             public T prefab;
+            public AddressablePrefab addressablePrefab;
             [Min(1)]
             public int level;
             [Min(1)]
@@ -21,6 +36,7 @@ namespace MultiplayerARPG
         [Header("Spawning Data")]
         [FormerlySerializedAs("asset")]
         public T prefab;
+        public AddressablePrefab addressablePrefab;
         [FormerlySerializedAs("level")]
         [Min(1)]
         public int minLevel = 1;
@@ -50,11 +66,11 @@ namespace MultiplayerARPG
                     foreach (SpawnPrefabData pendingEntry in _pending)
                     {
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                        Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab.name}, Amount: {pendingEntry.amount}.");
+                        Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab?.name ?? "None"}, Addressable: {pendingEntry.addressablePrefab?.RuntimeKey ?? "None"}, Amount: {pendingEntry.amount}.");
 #endif
                         for (int i = 0; i < pendingEntry.amount; ++i)
                         {
-                            Spawn(pendingEntry.prefab, pendingEntry.level, 0);
+                            Spawn(pendingEntry.prefab, pendingEntry.addressablePrefab, pendingEntry.level, 0);
                         }
                     }
                     _pending.Clear();
@@ -64,12 +80,21 @@ namespace MultiplayerARPG
 
         public virtual void RegisterPrefabs()
         {
+#if !LNLM_NO_PREFABS
             if (prefab != null)
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
+#endif
+            if (addressablePrefab.IsDataValid())
+                BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefab(addressablePrefab);
+
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
+#if !LNLM_NO_PREFABS
                 if (spawningPrefab.prefab != null)
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
+#endif
+                if (spawningPrefab.addressablePrefab.IsDataValid())
+                    BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefab(spawningPrefab.addressablePrefab);
             }
         }
 
@@ -77,43 +102,44 @@ namespace MultiplayerARPG
         {
             for (int i = 0; i < amount; ++i)
             {
-                Spawn(prefab, Random.Range(minLevel, maxLevel + 1), 0);
+                Spawn(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), 0);
             }
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
-                SpawnByAmount(spawningPrefab.prefab, spawningPrefab.level, spawningPrefab.amount);
+                SpawnByAmount(spawningPrefab.prefab, spawningPrefab.addressablePrefab, spawningPrefab.level, spawningPrefab.amount);
             }
         }
 
-        public virtual void SpawnByAmount(T prefab, int level, int amount)
+        public virtual void SpawnByAmount(T prefab, AddressablePrefab addressablePrefab, int level, int amount)
         {
             for (int i = 0; i < amount; ++i)
             {
-                Spawn(prefab, level, 0);
+                Spawn(prefab, addressablePrefab, level, 0);
             }
         }
 
-        public virtual Coroutine Spawn(T prefab, int level, float delay)
+        public virtual Coroutine Spawn(T prefab, AddressablePrefab addressablePrefab, int level, float delay)
         {
-            return StartCoroutine(SpawnRoutine(prefab, level, delay));
+            return StartCoroutine(SpawnRoutine(prefab, addressablePrefab, level, delay));
         }
 
-        IEnumerator SpawnRoutine(T prefab, int level, float delay)
+        IEnumerator SpawnRoutine(T prefab, AddressablePrefab addressablePrefab, int level, float delay)
         {
             yield return new WaitForSecondsRealtime(delay);
-            T newEntity = SpawnInternal(prefab, level);
+            T newEntity = SpawnInternal(prefab, addressablePrefab, level);
             if (newEntity == null)
             {
                 AddPending(new SpawnPrefabData()
                 {
                     prefab = prefab,
+                    addressablePrefab = addressablePrefab,
                     level = level,
                     amount = 1,
                 });
             }
         }
 
-        protected abstract T SpawnInternal(T prefab, int level);
+        protected abstract T SpawnInternal(T prefab, AddressablePrefab addressablePrefab, int level);
 
         protected virtual void AddPending(SpawnPrefabData data)
         {

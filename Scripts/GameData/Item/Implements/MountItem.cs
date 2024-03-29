@@ -45,6 +45,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private AssetReferenceVehicleEntity addressableMountEntity = null;
+        public AssetReferenceVehicleEntity AddressableVehicleEntity
+        {
+            get { return addressableMountEntity; }
+        }
+
+        [SerializeField]
         private float useItemCooldown = 0f;
         public float UseItemCooldown
         {
@@ -56,7 +63,7 @@ namespace MultiplayerARPG
             if (!characterEntity.CanUseItem() || characterItem.level <= 0)
                 return;
 
-            characterEntity.Mount(VehicleEntity);
+            characterEntity.Mount(VehicleEntity, AddressableVehicleEntity);
         }
 
         public bool HasCustomAimControls()
@@ -83,6 +90,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddVehicleEntities(VehicleEntity);
+            GameInstance.AddAssetReferenceVehicleEntities(AddressableVehicleEntity);
         }
     }
 }

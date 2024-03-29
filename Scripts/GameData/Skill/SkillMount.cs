@@ -10,10 +10,14 @@ namespace MultiplayerARPG
         [SerializeField]
         private VehicleEntity mountEntity;
         public VehicleEntity MountEntity { get { return mountEntity; } }
+        [SerializeField]
+        private AssetReferenceVehicleEntity addressableMountEntity;
+        public AssetReferenceVehicleEntity AddressableMountEntity { get { return addressableMountEntity; } }
 
-        public SkillMount(VehicleEntity mountEntity)
+        public SkillMount(VehicleEntity mountEntity, AssetReferenceVehicleEntity addressableMountEntity)
         {
             this.mountEntity = mountEntity;
+            this.addressableMountEntity = addressableMountEntity;
         }
     }
 }

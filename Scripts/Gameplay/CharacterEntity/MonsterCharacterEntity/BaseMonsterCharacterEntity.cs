@@ -86,6 +86,8 @@ namespace MultiplayerARPG
 
         public BaseMonsterCharacterEntity SpawnPrefab { get; protected set; }
 
+        public GameSpawnArea<BaseMonsterCharacterEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+
         public int SpawnLevel { get; protected set; }
 
         public Vector3 SpawnPosition { get; protected set; }
@@ -236,6 +238,16 @@ namespace MultiplayerARPG
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;
+            SpawnAddressablePrefab = null;
+            SpawnLevel = spawnLevel;
+            SpawnPosition = spawnPosition;
+        }
+
+        public virtual void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, GameSpawnArea<BaseMonsterCharacterEntity>.AddressablePrefab spawnAddressablePrefab, int spawnLevel, Vector3 spawnPosition)
+        {
+            SpawnArea = spawnArea;
+            SpawnPrefab = null;
+            SpawnAddressablePrefab = spawnAddressablePrefab;
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
@@ -734,7 +746,7 @@ namespace MultiplayerARPG
             NetworkDestroy(DestroyDelay);
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
+                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
         }

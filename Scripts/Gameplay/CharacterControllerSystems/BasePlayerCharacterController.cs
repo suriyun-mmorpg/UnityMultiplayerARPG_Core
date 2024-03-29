@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -124,8 +126,14 @@ namespace MultiplayerARPG
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
-            if (CurrentGameInstance.UISceneGameplayPrefab != null)
+            if (CurrentGameInstance.AddressableUISceneGameplayPrefab.IsDataValid())
+            {
+                UISceneGameplay = Instantiate(CurrentGameInstance.AddressableUISceneGameplayPrefab.GetOrLoadAsset<AssetReferenceBaseUISceneGameplay, BaseUISceneGameplay>());
+            }
+            else if (CurrentGameInstance.UISceneGameplayPrefab != null)
+            {
                 UISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
+            }
             if (UISceneGameplay != null)
                 UISceneGameplay.OnControllerSetup(characterEntity);
             if (onSetup != null)
@@ -135,7 +143,10 @@ namespace MultiplayerARPG
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
         {
             if (UISceneGameplay != null)
+            {
+                UISceneGameplay.OnControllerDesetup(characterEntity);
                 Destroy(UISceneGameplay.gameObject);
+            }
             if (onDesetup != null)
                 onDesetup.Invoke(this);
         }

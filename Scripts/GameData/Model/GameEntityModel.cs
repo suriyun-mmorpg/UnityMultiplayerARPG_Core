@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UtilsComponents;
-using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,26 +16,6 @@ namespace MultiplayerARPG
             Visible,
             Invisible,
             Fps
-        }
-
-        internal static int GeneratingId { get; set; } = 0;
-
-        [SerializeField]
-        [ReadOnlyField]
-        protected int _id;
-
-        public int Id
-        {
-            get
-            {
-                if (_id <= 0)
-                    _id = ++GeneratingId;
-                return _id;
-            }
-            protected set
-            {
-                _id = value;
-            }
         }
 
         public EVisibleState VisibleState { get; protected set; }
@@ -159,19 +138,11 @@ namespace MultiplayerARPG
 
         protected bool _isCacheDataInitialized = false;
 
-        internal void AssignId()
-        {
-            Id = ++GeneratingId;
-        }
-
-        internal void UnassignId()
-        {
-            Id = 0;
-        }
-
         protected virtual void Awake()
         {
-            Entity = GetComponentInParent<BaseGameEntity>();
+            Entity = GetComponent<BaseGameEntity>();
+            if (Entity == null)
+                Entity = GetComponentInParent<BaseGameEntity>();
             InitCacheData();
         }
 

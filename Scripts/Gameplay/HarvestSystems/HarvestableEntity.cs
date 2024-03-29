@@ -43,14 +43,30 @@ namespace MultiplayerARPG
                 return !string.IsNullOrEmpty(title) ? title : harvestable.Title;
             }
         }
+
         public override int MaxHp { get { return maxHp; } }
+
         public float ColliderDetectionRadius { get { return colliderDetectionRadius; } }
+
         public GameSpawnArea<HarvestableEntity> SpawnArea { get; protected set; }
+
         public HarvestableEntity SpawnPrefab { get; protected set; }
+
+        public GameSpawnArea<HarvestableEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+
         public int SpawnLevel { get; protected set; }
+
         public Vector3 SpawnPosition { get; protected set; }
-        public float DestroyDelay { get { return destroyDelay; } }
-        public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
+
+        public float DestroyDelay
+        {
+            get { return destroyDelay; }
+        }
+
+        public float DestroyRespawnDelay
+        {
+            get { return destroyRespawnDelay; }
+        }
 
         protected bool _isDestroyed;
 
@@ -78,6 +94,16 @@ namespace MultiplayerARPG
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;
+            SpawnAddressablePrefab = null;
+            SpawnLevel = spawnLevel;
+            SpawnPosition = spawnPosition;
+        }
+
+        public virtual void SetSpawnArea(GameSpawnArea<HarvestableEntity> spawnArea, GameSpawnArea<HarvestableEntity>.AddressablePrefab spawnAddressablePrefab, int spawnLevel, Vector3 spawnPosition)
+        {
+            SpawnArea = spawnArea;
+            SpawnPrefab = null;
+            SpawnAddressablePrefab = spawnAddressablePrefab;
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
@@ -198,7 +224,7 @@ namespace MultiplayerARPG
             CallRpcOnHarvestableDestroy();
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
+                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
             // Destroy this entity

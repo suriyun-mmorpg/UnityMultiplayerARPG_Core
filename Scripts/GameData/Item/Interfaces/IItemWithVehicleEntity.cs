@@ -6,5 +6,6 @@ namespace MultiplayerARPG
         /// Vehicle entity for this item
         /// </summary>
         VehicleEntity VehicleEntity { get; }
+        AssetReferenceVehicleEntity AddressableVehicleEntity { get; }
     }
 }

@@ -31,16 +31,33 @@ namespace MultiplayerARPG
             }
 
             CharacterItem nonEquipItem = Entity.NonEquipItems[itemIndex];
-            if (nonEquipItem.IsEmptySlot() || nonEquipItem.GetBuildingItem() == null || nonEquipItem.GetBuildingItem().BuildingEntity == null)
+            if (nonEquipItem.IsEmptySlot())
             {
                 // Invalid data
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_DATA);
                 return;
             }
 
-            if (!GameInstance.BuildingEntities.TryGetValue(nonEquipItem.GetBuildingItem().BuildingEntity.EntityId, out BuildingEntity buildingEntity))
+            IBuildingItem buildingItem = nonEquipItem.GetBuildingItem();
+            if (buildingItem == null)
             {
-                // Invalid entity
+                // Invalid data
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_DATA);
+                return;
+            }
+
+            BuildingEntity buildingEntity;
+            if (buildingItem.AddressableBuildingEntity.IsDataValid())
+            {
+                buildingEntity = buildingItem.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>();
+            }
+            else if (buildingItem.BuildingEntity != null)
+            {
+                buildingEntity = buildingItem.BuildingEntity;
+            }
+            else
+            {
+                // Invalid data
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_ENTITY);
                 return;
             }
@@ -59,6 +76,8 @@ namespace MultiplayerARPG
             }
 
             Entity.FillEmptySlots();
+
+            // Create the building
             BuildingSaveData buildingSaveData = new BuildingSaveData();
             buildingSaveData.Id = GenericUtils.GetUniqueId();
             buildingSaveData.ParentId = string.Empty;

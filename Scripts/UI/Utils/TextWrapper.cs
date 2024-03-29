@@ -40,12 +40,19 @@ public class TextWrapper : MonoBehaviour
         }
     }
 
-    void Awake()
+    private void Awake()
     {
         if (unityText == null) unityText = GetComponent<Text>();
         if (textMeshText == null) textMeshText = GetComponent<TextMeshProUGUI>();
         if (_textValue != null)
             text = _textValue;
+    }
+
+    private void OnDestroy()
+    {
+        unityText = null;
+        textMeshText = null;
+        _textValue = null;
     }
 
     public void SetGameObjectActive(bool isActive)

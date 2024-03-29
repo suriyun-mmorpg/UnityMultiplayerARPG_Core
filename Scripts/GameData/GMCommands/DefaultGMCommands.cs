@@ -490,14 +490,32 @@ namespace MultiplayerARPG
                 if (commandKey.ToLower().Equals(Monster.ToLower()))
                 {
                     BaseMonsterCharacterEntity targetMonster = null;
-                    foreach (BaseMonsterCharacterEntity monster in GameInstance.MonsterCharacterEntities.Values)
+                    foreach (AssetReferenceBaseMonsterCharacterEntity addressableMonster in GameInstance.AddressableMonsterCharacterEntities.Values)
                     {
+                        BaseMonsterCharacterEntity monster = addressableMonster.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>() as BaseMonsterCharacterEntity;
+                        if (monster == null)
+                            continue;
                         if (monster.name.Equals(data[1]) ||
                             monster.name.Replace(' ', '_').Equals(data[1]) ||
                             monster.Identity.AssetId.Equals(data[1]))
                         {
                             targetMonster = monster;
                             break;
+                        }
+                    }
+                    if (targetMonster == null)
+                    {
+                        foreach (BaseMonsterCharacterEntity monster in GameInstance.MonsterCharacterEntities.Values)
+                        {
+                            if (monster == null)
+                                continue;
+                            if (monster.name.Equals(data[1]) ||
+                                monster.name.Replace(' ', '_').Equals(data[1]) ||
+                                monster.Identity.AssetId.Equals(data[1]))
+                            {
+                                targetMonster = monster;
+                                break;
+                            }
                         }
                     }
                     int level;

@@ -54,8 +54,10 @@ namespace MultiplayerARPG
             {
                 case GameStartType.Host:
                     SetMapInfo(selectedCharacter.CurrentMapName);
-                    Assets.onlineScene = CurrentMapInfo.Scene;
                     Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
+#if !LNLM_NO_PREFABS
+                    Assets.onlineScene = CurrentMapInfo.Scene;
+#endif
                     networkPort = gameServiceConnection.networkPort;
                     maxConnections = gameServiceConnection.maxConnections;
                     StartHost(false);
@@ -73,8 +75,10 @@ namespace MultiplayerARPG
                     break;
                 case GameStartType.SinglePlayer:
                     SetMapInfo(selectedCharacter.CurrentMapName);
-                    Assets.onlineScene = CurrentMapInfo.Scene;
                     Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
+#if !LNLM_NO_PREFABS
+                    Assets.onlineScene = CurrentMapInfo.Scene;
+#endif
                     StartHost(true);
                     // Stop discovery client because game started
                     CacheDiscovery.StopClient();
@@ -232,9 +236,8 @@ namespace MultiplayerARPG
 
         private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
         {
-            BasePlayerCharacterEntity entityPrefab = playerCharacterData.GetEntityPrefab() as BasePlayerCharacterEntity;
             // If it is not allow this character data, disconnect user
-            if (entityPrefab == null)
+            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _) && playerCharacterData.TryGetEntityPrefab(out _))
             {
                 Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
@@ -244,8 +247,9 @@ namespace MultiplayerARPG
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
+            // NOTE: entity ID is a hash asset ID :)
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                entityPrefab.Identity.HashAssetId,
+                playerCharacterData.EntityId,
                 playerCharacterData.CurrentPosition,
                 characterRotation);
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
@@ -276,8 +280,14 @@ namespace MultiplayerARPG
             {
                 playerCharacterEntity.CallRpcOnRespawn();
                 // Summon saved mount entity
-                if (GameInstance.VehicleEntities.ContainsKey(playerCharacterData.MountDataId))
-                    playerCharacterEntity.Mount(GameInstance.VehicleEntities[playerCharacterData.MountDataId]);
+                if (GameInstance.AddressableVehicleEntities.TryGetValue(playerCharacterData.MountDataId, out AssetReferenceVehicleEntity addressablePrefab))
+                {
+                    playerCharacterEntity.Mount(null, addressablePrefab);
+                }
+                else if (GameInstance.VehicleEntities.TryGetValue(playerCharacterData.MountDataId, out VehicleEntity prefab))
+                {
+                    playerCharacterEntity.Mount(prefab, null);
+                }
                 // Summon monsters
                 for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                 {

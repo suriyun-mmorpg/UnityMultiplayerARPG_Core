@@ -36,6 +36,13 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
 #endif
             }
+            if (prefab != null && monsterCharacterEntity != null)
+            {
+                monsterCharacterEntity = null;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this);
+#endif
+            }
         }
 
         public override void RegisterPrefabs()
@@ -44,36 +51,56 @@ namespace MultiplayerARPG
             GameInstance.AddCharacterEntities(prefab);
         }
 
-        protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab, int level)
+        protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab, AddressablePrefab addressablePrefab, int level)
         {
-            if (GetRandomPosition(out Vector3 spawnPosition))
+            if (!GetRandomPosition(out Vector3 spawnPosition))
             {
-                Quaternion spawnRotation = GetRandomRotation();
-                LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
+#endif
+                return null;
+            }
+
+            Quaternion spawnRotation = GetRandomRotation();
+            LiteNetLibIdentity spawnObj = null;
+            BaseMonsterCharacterEntity entity = null;
+            if (addressablePrefab.IsDataValid())
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId,
+                    spawnPosition, spawnRotation);
+                if (spawnObj == null)
+                    return null;
+                entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
+                entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
+            }
+            else if (prefab != null)
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId,
                     spawnPosition, spawnRotation);
-                BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
-                if (!entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
-                {
-                    // Destroy the entity (because it can't find ground position)
-                    BaseGameNetworkManager.Singleton.Assets.DestroyObjectInstance(spawnObj);
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                    Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
-#endif
+                if (spawnObj == null)
                     return null;
-                }
-                entity.Level = level;
-                entity.Faction = faction;
+                entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
-                entity.Teleport(spawnPosition, spawnRotation, false);
-                entity.InitStats();
-                BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
-                return entity;
             }
+
+            if (!entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
+            {
+                // Destroy the entity (because it can't find ground position)
+                BaseGameNetworkManager.Singleton.Assets.DestroyObjectInstance(spawnObj);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
+                Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
 #endif
-            return null;
+                return null;
+            }
+
+            entity.Level = level;
+            entity.Faction = faction;
+            entity.Teleport(spawnPosition, spawnRotation, false);
+            entity.InitStats();
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            return entity;
         }
 
         public override int GroundLayerMask

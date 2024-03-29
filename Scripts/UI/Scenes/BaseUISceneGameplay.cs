@@ -37,6 +37,11 @@ namespace MultiplayerARPG
             Singleton = this;
         }
 
+        protected virtual void OnDestroy()
+        {
+            OnControllerDesetup(null);
+        }
+
         protected virtual void OnEnable()
         {
             GameInstance.ItemUIVisibilityManager = this;

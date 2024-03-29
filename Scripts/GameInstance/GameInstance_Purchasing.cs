@@ -9,7 +9,11 @@ using UnityEngine.Purchasing;
 
 namespace MultiplayerARPG
 {
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
+    public partial class GameInstance : IStoreListener
+#else
     public partial class GameInstance
+#endif
     {
         // NOTE: something about product type
         // -- Consumable product is product such as gold, gem that can be consumed

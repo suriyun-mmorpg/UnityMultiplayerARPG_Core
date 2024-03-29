@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     {
         [Tooltip("The `WarpPortalEntity` prefab which will instantiates on the map scene. If this is not set, it will use the one which set to `GameInstance` → `warpPortalEntityPrefab`")]
         public WarpPortalEntity entityPrefab;
+        public AssetReferenceWarpPortalEntity addressableEntityPrefab;
         [Tooltip("Position for the warp portal which will be placed on the map scene")]
         public Vector3 position;
         [Tooltip("Rotation for the warp portal which will be placed on the map scene")]

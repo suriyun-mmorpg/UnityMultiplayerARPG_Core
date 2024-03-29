@@ -11,24 +11,43 @@ namespace MultiplayerARPG
             GameInstance.AddItemDropEntities(prefab);
         }
 
-        protected override ItemDropEntity SpawnInternal(ItemDropEntity prefab, int level)
+        protected override ItemDropEntity SpawnInternal(ItemDropEntity prefab, AddressablePrefab addressablePrefab, int level)
         {
-            if (GetRandomPosition(out Vector3 spawnPosition))
+            if (!GetRandomPosition(out Vector3 spawnPosition))
             {
-                Quaternion spawnRotation = GetRandomRotation();
-                LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Logging.LogWarning(ToString(), $"Cannot spawn item drop, it cannot find grounded position, pending item drop amount {_pending.Count}");
+#endif
+                return null;
+            }
+
+            Quaternion spawnRotation = GetRandomRotation();
+            LiteNetLibIdentity spawnObj = null;
+            ItemDropEntity entity = null;
+            if (addressablePrefab.IsDataValid())
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId,
+                    spawnPosition, spawnRotation);
+                if (spawnObj == null)
+                    return null;
+                entity = spawnObj.GetComponent<ItemDropEntity>();
+                entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
+            }
+            else
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId,
                     spawnPosition, spawnRotation);
-                ItemDropEntity entity = spawnObj.GetComponent<ItemDropEntity>();
+                if (spawnObj == null)
+                    return null;
+                entity = spawnObj.GetComponent<ItemDropEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
-                entity.Init();
-                BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
-                return entity;
             }
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Logging.LogWarning(ToString(), $"Cannot spawn item drop, it cannot find grounded position, pending item drop amount {_pending.Count}");
-#endif
-            return null;
+
+            entity.Init();
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            return entity;
         }
 
         public override int GroundLayerMask

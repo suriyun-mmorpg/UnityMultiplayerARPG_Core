@@ -45,6 +45,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private AssetReferenceBaseMonsterCharacterEntity addressablePetEntity = null;
+        public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
+        {
+            get { return addressablePetEntity; }
+        }
+
+        [SerializeField]
         private float useItemCooldown = 0f;
         public float UseItemCooldown
         {
@@ -96,6 +103,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddCharacterEntities(MonsterCharacterEntity);
+            GameInstance.AddAssetReferenceCharacterEntities(AddressableMonsterCharacterEntity);
         }
     }
 }

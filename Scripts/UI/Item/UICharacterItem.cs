@@ -1,5 +1,6 @@
 ﻿using Cysharp.Text;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -1176,8 +1177,9 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (ItemWithMonsterEntity != null && ItemWithMonsterEntity.MonsterCharacterEntity != null)
+            if (ItemWithMonsterEntity != null && (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid() || ItemWithMonsterEntity.MonsterCharacterEntity != null))
             {
+                // Item's EXP (pet's EXP)
                 int[] expTree = GameInstance.Singleton.ExpTree;
                 int currentExp = 0;
                 int nextLevelExp = 0;
@@ -1219,46 +1221,73 @@ namespace MultiplayerARPG
 
             if (uiTextBuilding != null)
             {
-                if (ItemWithBuildingEntity == null || ItemWithBuildingEntity.BuildingEntity == null)
+                if (ItemWithBuildingEntity == null || (!ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid() && ItemWithBuildingEntity.BuildingEntity == null))
                 {
                     uiTextBuilding.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextBuilding.SetGameObjectActive(true);
-                    uiTextBuilding.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyBuilding),
-                        ItemWithBuildingEntity.BuildingEntity.Title);
+                    if (ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid())
+                    {
+                        uiTextBuilding.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyBuilding),
+                            ItemWithBuildingEntity.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>().Title);
+                    }
+                    else if (ItemWithBuildingEntity.BuildingEntity != null)
+                    {
+                        uiTextBuilding.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyBuilding),
+                            ItemWithBuildingEntity.BuildingEntity.Title);
+                    }
                 }
             }
 
             if (uiTextMonster != null)
             {
-                if (ItemWithMonsterEntity == null || ItemWithMonsterEntity.MonsterCharacterEntity == null)
+                if (ItemWithMonsterEntity == null || (!ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid() && ItemWithMonsterEntity.MonsterCharacterEntity == null))
                 {
                     uiTextMonster.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextMonster.SetGameObjectActive(true);
-                    uiTextMonster.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyPet),
-                        ItemWithMonsterEntity.MonsterCharacterEntity.Title);
+                    if (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid())
+                    {
+                        uiTextMonster.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyPet),
+                            ItemWithMonsterEntity.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>().Title);
+                    }
+                    else if (ItemWithMonsterEntity.MonsterCharacterEntity != null)
+                    {
+                        uiTextMonster.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyPet),
+                            ItemWithMonsterEntity.MonsterCharacterEntity.Title);
+                    }
                 }
             }
 
             if (uiTextVehicle != null)
             {
-                if (ItemWithVehicleEntity == null || ItemWithVehicleEntity.VehicleEntity == null)
+                if (ItemWithVehicleEntity == null || (!ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid() && ItemWithVehicleEntity.VehicleEntity == null))
                 {
                     uiTextVehicle.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextVehicle.SetGameObjectActive(true);
-                    uiTextVehicle.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyMount),
-                        ItemWithVehicleEntity.VehicleEntity.Title);
+                    if (ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid())
+                    {
+                        uiTextVehicle.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            ItemWithVehicleEntity.AddressableVehicleEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>().Title);
+                    }
+                    else if (ItemWithVehicleEntity.VehicleEntity != null)
+                    {
+                        uiTextVehicle.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            ItemWithVehicleEntity.VehicleEntity.Title);
+                    }
                 }
             }
 
