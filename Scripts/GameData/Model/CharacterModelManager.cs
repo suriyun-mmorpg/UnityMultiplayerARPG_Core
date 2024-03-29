@@ -65,6 +65,15 @@ namespace MultiplayerARPG
             MigrateVehicleModels();
         }
 
+        public override void EntityOnDestroy()
+        {
+            mainTpsModel = null;
+            fpsModelPrefab = null;
+            ActiveTpsModel = null;
+            ActiveFpsModel = null;
+            MainFpsModel = null;
+        }
+
         internal byte InitTpsModel(BaseCharacterModel model)
         {
             model.Entity = Entity;
