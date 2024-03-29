@@ -147,6 +147,7 @@ namespace MultiplayerARPG
         public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayConsolePrefab = null;
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
         public BasePlayerCharacterController defaultControllerPrefab = null;
+        public AssetReferenceBasePlayerCharacterController addressableDefaultControllerPrefab = null;
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
         public ServerCharacter serverCharacterPrefab = null;
         [Tooltip("These objects will be instantiate as owning character's children")]

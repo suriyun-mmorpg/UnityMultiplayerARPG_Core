@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLibManager;
 using LiteNetLib;
+using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -452,9 +452,17 @@ namespace MultiplayerARPG
             if (IsOwnerClient)
             {
                 BasePlayerCharacterController prefab;
-                if (ControllerPrefab != null)
+                if (AddressableControllerPrefab.IsDataValid())
+                {
+                    prefab = AddressableControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
+                }
+                else if (ControllerPrefab != null)
                 {
                     prefab = ControllerPrefab;
+                }
+                else if (CurrentGameInstance.addressableDefaultControllerPrefab.IsDataValid())
+                {
+                    prefab = CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
                 }
                 else if (CurrentGameInstance.defaultControllerPrefab != null)
                 {

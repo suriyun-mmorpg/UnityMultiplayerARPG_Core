@@ -18,6 +18,8 @@ namespace MultiplayerARPG
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected BasePlayerCharacterController controllerPrefab;
+        [SerializeField]
+        protected AssetReferenceBasePlayerCharacterController addressableControllerPrefab;
 
         public PlayerCharacter[] CharacterDatabases
         {
@@ -28,6 +30,11 @@ namespace MultiplayerARPG
         public BasePlayerCharacterController ControllerPrefab
         {
             get { return controllerPrefab; }
+        }
+
+        public AssetReferenceBasePlayerCharacterController AddressableControllerPrefab
+        {
+            get { return addressableControllerPrefab; }
         }
 
         public PlayerCharacterBuildingComponent Building

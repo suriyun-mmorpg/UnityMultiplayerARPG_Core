@@ -1,5 +1,6 @@
 ﻿using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -127,8 +128,7 @@ namespace MultiplayerARPG
         {
             if (CurrentGameInstance.AddressableUISceneGameplayPrefab.IsDataValid())
             {
-                UISceneGameplay = CurrentGameInstance.AddressableUISceneGameplayPrefab.InstantiateAsync().WaitForCompletion();
-                UISceneGameplay.gameObject.AddComponent<AssetReferenceReleaser>();
+                UISceneGameplay = Instantiate(CurrentGameInstance.AddressableUISceneGameplayPrefab.GetOrLoadAsset<AssetReferenceBaseUISceneGameplay, BaseUISceneGameplay>());
             }
             else if (CurrentGameInstance.UISceneGameplayPrefab != null)
             {
