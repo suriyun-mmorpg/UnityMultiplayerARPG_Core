@@ -55,6 +55,7 @@ namespace MultiplayerARPG
         protected virtual void OnDestroy()
         {
             RemoveEvents(_previousEntity);
+            _previousEntity = null;
         }
 
         protected virtual void AddEvents(T entity)
