@@ -36,5 +36,10 @@
             if (target != null)
                 (target as UIDataForCharacter<T>).IndexOfData = IndexOfData;
         }
+
+        protected virtual void OnDestroy()
+        {
+            _character = null;
+        }
     }
 }
