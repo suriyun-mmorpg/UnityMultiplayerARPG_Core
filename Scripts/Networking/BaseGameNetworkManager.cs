@@ -61,8 +61,6 @@ namespace MultiplayerARPG
         protected float _serverSceneLoadedTime;
         protected float _clientSceneLoadedTime;
         protected HashSet<BaseGameEntity> _setOfGameEntity = new HashSet<BaseGameEntity>();
-        protected BaseGameEntity[] _arrayGameEntity = new BaseGameEntity[4096];
-        protected int _arrayGameEntityLength = 0;
 
         // Instantiate object allowing status
         /// <summary>
@@ -160,11 +158,11 @@ namespace MultiplayerARPG
             {
                 // Update day-night time on both client and server. It will sync from server some time to make sure that clients time of day won't very difference
                 CurrentGameInstance.DayNightTimeUpdater.UpdateTimeOfDay(tempDeltaTime);
-                for (int i = 0; i < _arrayGameEntityLength; ++i)
+                foreach (BaseGameEntity entity in _setOfGameEntity)
                 {
-                    if (!_arrayGameEntity[i].enabled)
+                    if (!entity.enabled)
                         continue;
-                    _arrayGameEntity[i].DoUpdate();
+                    entity.DoUpdate();
                 }
             }
         }
@@ -173,11 +171,11 @@ namespace MultiplayerARPG
         {
             if (IsNetworkActive)
             {
-                for (int i = 0; i < _arrayGameEntityLength; ++i)
+                foreach (BaseGameEntity entity in _setOfGameEntity)
                 {
-                    if (!_arrayGameEntity[i].enabled)
+                    if (!entity.enabled)
                         continue;
-                    _arrayGameEntity[i].DoLateUpdate();
+                    entity.DoLateUpdate();
                 }
             }
         }
@@ -187,11 +185,11 @@ namespace MultiplayerARPG
             base.OnServerUpdate(updater);
             Profiler.BeginSample("BaseGameNetworkManager - SendServerState");
             long timestamp = Timestamp;
-            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            foreach (BaseGameEntity entity in _setOfGameEntity)
             {
-                if (!_arrayGameEntity[i].enabled)
+                if (!entity.enabled)
                     continue;
-                _arrayGameEntity[i].SendServerState(timestamp);
+                entity.SendServerState(timestamp);
             }
             Profiler.EndSample();
         }
@@ -203,12 +201,13 @@ namespace MultiplayerARPG
                 return;
             Profiler.BeginSample("BaseGameNetworkManager - SendClientState");
             long timestamp = Timestamp;
-            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            foreach (BaseGameEntity entity in _setOfGameEntity)
             {
-                if (!_arrayGameEntity[i].enabled)
+                if (!entity.enabled)
                     continue;
-                if (_arrayGameEntity[i].IsOwnerClient)
-                    _arrayGameEntity[i].SendClientState(timestamp);
+                entity.SendServerState(timestamp);
+                if (entity.IsOwnerClient)
+                    entity.SendClientState(timestamp);
             }
             Profiler.EndSample();
         }
@@ -216,17 +215,11 @@ namespace MultiplayerARPG
         public void RegisterGameEntity(BaseGameEntity gameEntity)
         {
             _setOfGameEntity.Add(gameEntity);
-            _arrayGameEntityLength = _setOfGameEntity.Count;
-            if (_setOfGameEntity.Count > _arrayGameEntity.Length)
-                System.Array.Resize(ref _arrayGameEntity, _setOfGameEntity.Count);
-            _setOfGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
         }
 
         public void UnregisterGameEntity(BaseGameEntity gameEntity)
         {
             _setOfGameEntity.Remove(gameEntity);
-            _arrayGameEntityLength = _setOfGameEntity.Count;
-            _setOfGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
         }
 
         protected override void RegisterMessages()
@@ -253,7 +246,6 @@ namespace MultiplayerARPG
             _isClientReadyToInstantiateObjects = false;
             _isServerReadyToInstantiatePlayers = false;
             _setOfGameEntity.Clear();
-            _arrayGameEntityLength = 0;
             // Extensions
             this.InvokeInstanceDevExtMethods("Clean");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
