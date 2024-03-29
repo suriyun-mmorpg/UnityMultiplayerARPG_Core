@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -124,8 +125,15 @@ namespace MultiplayerARPG
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
-            if (CurrentGameInstance.UISceneGameplayPrefab != null)
+            if (CurrentGameInstance.AddressableUISceneGameplayPrefab.IsDataValid())
+            {
+                UISceneGameplay = CurrentGameInstance.AddressableUISceneGameplayPrefab.InstantiateAsync().WaitForCompletion();
+                UISceneGameplay.gameObject.AddComponent<AssetReferenceReleaser>();
+            }
+            else if (CurrentGameInstance.UISceneGameplayPrefab != null)
+            {
                 UISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
+            }
             if (UISceneGameplay != null)
                 UISceneGameplay.OnControllerSetup(characterEntity);
             if (onSetup != null)

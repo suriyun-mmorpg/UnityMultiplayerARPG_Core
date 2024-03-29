@@ -138,10 +138,13 @@ namespace MultiplayerARPG
         public ItemsContainerEntity monsterCorpsePrefab = null;
         public AssetReferenceItemsContainerEntity addressableMonsterCorpsePrefab = null;
         public BaseUISceneGameplay uiSceneGameplayPrefab = null;
+        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayPrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
         public BaseUISceneGameplay uiSceneGameplayMobilePrefab = null;
+        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayMobilePrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
         public BaseUISceneGameplay uiSceneGameplayConsolePrefab = null;
+        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayConsolePrefab = null;
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
         public BasePlayerCharacterController defaultControllerPrefab = null;
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
@@ -487,6 +490,18 @@ namespace MultiplayerARPG
                 if ((Application.isConsolePlatform || IsConsoleTestInEditor()) && uiSceneGameplayConsolePrefab != null)
                     return uiSceneGameplayConsolePrefab;
                 return uiSceneGameplayPrefab;
+            }
+        }
+
+        public AssetReferenceBaseUISceneGameplay AddressableUISceneGameplayPrefab
+        {
+            get
+            {
+                if ((Application.isMobilePlatform || IsMobileTestInEditor()) && addressableUiSceneGameplayMobilePrefab.IsDataValid())
+                    return addressableUiSceneGameplayMobilePrefab;
+                if ((Application.isConsolePlatform || IsConsoleTestInEditor()) && addressableUiSceneGameplayConsolePrefab.IsDataValid())
+                    return addressableUiSceneGameplayConsolePrefab;
+                return addressableUiSceneGameplayPrefab;
             }
         }
 
