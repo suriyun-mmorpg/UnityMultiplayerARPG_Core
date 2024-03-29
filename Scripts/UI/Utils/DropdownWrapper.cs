@@ -125,6 +125,12 @@ public class DropdownWrapper : MonoBehaviour
         if (textMeshDropdown == null) textMeshDropdown = GetComponent<TMP_Dropdown>();
     }
 
+    private void OnDestroy()
+    {
+        unityDropdown = null;
+        textMeshDropdown = null;
+    }
+
     public void SetGameObjectActive(bool isActive)
     {
         if (unityDropdown != null)
