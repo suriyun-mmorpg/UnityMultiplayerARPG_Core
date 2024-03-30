@@ -234,10 +234,13 @@ namespace MultiplayerARPG
             for (int i = 0; i < EntityComponents.Length; ++i)
             {
                 EntityComponents[i].EntityOnDestroy();
+                EntityComponents[i].Clean();
+                EntityComponents[i] = null;
             }
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
             BaseGameNetworkManager.Singleton.UnregisterGameEntity(this);
+            Clean();
         }
         protected virtual void EntityOnDestroy()
         {
