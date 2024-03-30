@@ -40,6 +40,26 @@ namespace MultiplayerARPG
         protected virtual void OnDestroy()
         {
             OnControllerDesetup(null);
+            combatTextTransform = null;
+            uiCombatTextMiss = null;
+            uiCombatTextNormalDamage = null;
+            uiCombatTextCriticalDamage = null;
+            uiCombatTextBlockedDamage = null;
+            uiCombatTextHpRecovery = null;
+            uiCombatTextMpRecovery = null;
+            uiCombatTextStaminaRecovery = null;
+            uiCombatTextFoodRecovery = null;
+            uiCombatTextWaterRecovery = null;
+            uiCombatTextHpDecrease = null;
+            uiCombatTextMpDecrease = null;
+            uiCombatTextStaminaDecrease = null;
+            uiCombatTextFoodDecrease = null;
+            uiCombatTextWaterDecrease = null;
+            uiCombatTextHpLeech = null;
+            uiCombatTextMpLeech = null;
+            uiCombatTextStaminaLeech = null;
+            _spawningCombatTexts?.Clear();
+            _spawningCombatTextTimes?.Clear();
         }
 
         protected virtual void OnEnable()
