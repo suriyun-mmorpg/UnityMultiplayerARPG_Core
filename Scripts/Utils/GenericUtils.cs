@@ -538,4 +538,27 @@ public static partial class GenericUtils
     {
         return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => ZString.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
     }
+
+    public static void Nulling<T>(this IList<T> objects)
+        where T : Object
+    {
+        if (objects == null)
+            return;
+        for (int i = 0; i < objects.Count; ++i)
+        {
+            objects[i] = null;
+        }
+    }
+
+    public static void DestroyAndNulling<T>(this IList<T> objects)
+        where T : Object
+    {
+        if (objects == null)
+            return;
+        for (int i = 0; i < objects.Count; ++i)
+        {
+            Object.Destroy(objects[i]);
+            objects[i] = null;
+        }
+    }
 }
