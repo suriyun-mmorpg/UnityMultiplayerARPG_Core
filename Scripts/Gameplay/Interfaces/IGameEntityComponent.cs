@@ -9,5 +9,6 @@
         void EntityUpdate();
         void EntityLateUpdate();
         void EntityOnDestroy();
+        void Clean();
     }
 }
