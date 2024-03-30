@@ -30,6 +30,13 @@ namespace MultiplayerARPG
         public TextWrapper textApplyingTarget;
         public UIBuff uiBuff;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textApplyingTarget = null;
+            uiBuff = null;
+        }
+
         protected override void UpdateData()
         {
             if (textApplyingTarget != null)

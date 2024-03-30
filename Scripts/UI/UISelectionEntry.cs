@@ -4,13 +4,13 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
 {
     [Header("UI Selection Elements")]
     public GameObject objectSelected;
-    private T data;
+    protected T _data;
     public T Data
     {
-        get { return data; }
+        get { return _data; }
         set
         {
-            data = value;
+            _data = value;
             ForceUpdate();
         }
     }

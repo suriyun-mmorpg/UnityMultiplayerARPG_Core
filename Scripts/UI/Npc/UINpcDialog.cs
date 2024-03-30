@@ -21,6 +21,18 @@ namespace MultiplayerARPG
         protected BaseNpcDialog _lastData;
         protected BasePlayerCharacterEntity _previousEntity;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            imageIcon = null;
+            voiceSource = null;
+            _lastData = null;
+            _previousEntity = null;
+            _data = null;
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();

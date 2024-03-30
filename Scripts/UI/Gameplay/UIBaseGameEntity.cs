@@ -61,6 +61,7 @@ namespace MultiplayerARPG
             onSetEntity = null;
             _cacheCanvas = null;
             _previousEntity = null;
+            _data = null;
         }
 
         protected virtual void AddEvents(T entity)

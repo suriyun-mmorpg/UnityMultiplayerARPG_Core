@@ -23,18 +23,34 @@ namespace MultiplayerARPG
         public UICharacter uiAnotherCharacter;
 
         [Header("Other Settings")]
-        [Tooltip("")]
         public float delayBeforeHideAfterEnd = 3f;
 
         [Header("UI Events")]
-        public CountDownEvent onCountDown;
-        public UnityEvent onStart;
-        public UnityEvent onWin;
-        public UnityEvent onLose;
+        public CountDownEvent onCountDown = new CountDownEvent();
+        public UnityEvent onStart = new UnityEvent();
+        public UnityEvent onWin = new UnityEvent();
+        public UnityEvent onLose = new UnityEvent();
 
         public float CountDown { get; set; }
         public float DuelingTime { get; set; }
         private int _dirtyCountDown = -1;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTimerCountDown = null;
+            uiTimerDuelingTime = null;
+            uiAnotherCharacter = null;
+            onCountDown?.RemoveAllListeners();
+            onCountDown = null;
+            onStart?.RemoveAllListeners();
+            onStart = null;
+            onWin?.RemoveAllListeners();
+            onWin = null;
+            onLose?.RemoveAllListeners();
+            onLose = null;
+            _data = null;
+        }
 
         protected override void OnEnable()
         {

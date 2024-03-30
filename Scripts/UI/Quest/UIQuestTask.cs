@@ -25,6 +25,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextTaskDescription;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTaskDescription = null;
+        }
+
         protected override void UpdateData()
         {
             bool isComplete;

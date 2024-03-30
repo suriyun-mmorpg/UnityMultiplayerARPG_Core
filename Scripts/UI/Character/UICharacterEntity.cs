@@ -31,7 +31,6 @@ namespace MultiplayerARPG
         {
             base.OnDestroy();
             uiTextLevel = null;
-            uiGageMp?.Clean();
             uiGageMp = null;
             uiSkillCastContainer = null;
             uiTextSkillCast = null;

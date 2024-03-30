@@ -20,6 +20,17 @@ namespace MultiplayerARPG
         public GameObject[] readObjects;
         public GameObject[] unreadObjects;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textSenderName = null;
+            textTitle = null;
+            textSentDate = null;
+            readObjects.Nulling();
+            unreadObjects.Nulling();
+            _data = null;
+        }
+
         protected override void UpdateData()
         {
             if (textSenderName != null)

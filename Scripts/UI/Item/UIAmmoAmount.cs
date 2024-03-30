@@ -30,7 +30,6 @@ namespace MultiplayerARPG
             uiTextRightHandSumAmmo = null;
             rightHandRequireAmmoSymbols.Nulling();
             rightHandNoRequireAmmoSymbols.Nulling();
-            gageRightHandAmmo?.Clean();
             gageRightHandAmmo = null;
             uiLeftHandAmmoRoot = null;
             uiTextLeftHandCurrentAmmo = null;
@@ -38,7 +37,6 @@ namespace MultiplayerARPG
             uiTextLeftHandSumAmmo = null;
             leftHandRequireAmmoSymbols.Nulling();
             leftHandNoRequireAmmoSymbols.Nulling();
-            gageLeftHandAmmo?.Clean();
             gageLeftHandAmmo = null;
         }
 

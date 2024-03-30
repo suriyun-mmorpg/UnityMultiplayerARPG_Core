@@ -23,7 +23,6 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            uiGageHp?.Clean();
             uiGageHp = null;
         }
 

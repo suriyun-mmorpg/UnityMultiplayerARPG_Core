@@ -73,6 +73,18 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextAllAmounts = null;
+            textAmounts = null;
+            uiEntryPrefab = null;
+            uiListContainer = null;
+            _cacheTextAmounts?.Clear();
+            _cacheList = null;
+            _data?.Clear();
+        }
+
         protected override void UpdateData()
         {
             // Reset number

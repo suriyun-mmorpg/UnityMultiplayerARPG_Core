@@ -19,14 +19,14 @@ namespace MultiplayerARPG
         [Header("Options")]
         public bool inactiveIfAmountZero;
 
-        private Dictionary<DamageElement, UIDamageElementTextPair> cacheTextInflictions;
+        private Dictionary<DamageElement, UIDamageElementTextPair> _cacheTextInflictions;
         public Dictionary<DamageElement, UIDamageElementTextPair> CacheTextInflictions
         {
             get
             {
-                if (cacheTextInflictions == null)
+                if (_cacheTextInflictions == null)
                 {
-                    cacheTextInflictions = new Dictionary<DamageElement, UIDamageElementTextPair>();
+                    _cacheTextInflictions = new Dictionary<DamageElement, UIDamageElementTextPair>();
                     DamageElement tempElement;
                     foreach (UIDamageElementTextPair componentPair in textInflictions)
                     {
@@ -34,11 +34,20 @@ namespace MultiplayerARPG
                             continue;
                         tempElement = componentPair.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : componentPair.damageElement;
                         SetDefaultValue(componentPair);
-                        cacheTextInflictions[tempElement] = componentPair;
+                        _cacheTextInflictions[tempElement] = componentPair;
                     }
                 }
-                return cacheTextInflictions;
+                return _cacheTextInflictions;
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextAllInflictions = null;
+            textInflictions = null;
+            _cacheTextInflictions?.Clear();
+            _data?.Clear();
         }
 
         protected override void UpdateData()

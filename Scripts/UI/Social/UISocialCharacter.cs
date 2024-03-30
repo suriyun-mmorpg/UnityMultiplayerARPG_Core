@@ -58,6 +58,53 @@ namespace MultiplayerARPG
 
         private IPlayerCharacterData _characterEntity;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiSocialGroup = null;
+            uiTextName = null;
+            uiTextLevel = null;
+            uiGageHp = null;
+            uiGageMp = null;
+            uiPlayerIcon = null;
+            uiPlayerFrame = null;
+            uiPlayerTitle = null;
+            uiTextOnlineStatus = null;
+            uiCharacterBuffs = null;
+            memberIsOnlineObjects.Nulling();
+            memberIsNotOnlineObjects.Nulling();
+            memberIsLeaderObjects.Nulling();
+            memberIsNotLeaderObjects.Nulling();
+            owningCharacterIsLeaderObjects.Nulling();
+            owningCharacterIsNotLeaderObjects.Nulling();
+            owningCharacterCanKickObjects.Nulling();
+            owningCharacterCannotKickObjects.Nulling();
+            uiCharacterClass = null;
+            onFriendAdded?.RemoveAllListeners();
+            onFriendAdded = null;
+            onFriendRemoved?.RemoveAllListeners();
+            onFriendRemoved = null;
+            onFriendRequested?.RemoveAllListeners();
+            onFriendRequested = null;
+            onFriendRequestAccepted?.RemoveAllListeners();
+            onFriendRequestAccepted = null;
+            onFriendRequestDeclined?.RemoveAllListeners();
+            onFriendRequestDeclined = null;
+            onGuildRequestAccepted?.RemoveAllListeners();
+            onGuildRequestAccepted = null;
+            onGuildRequestDeclined?.RemoveAllListeners();
+            onGuildRequestDeclined = null;
+            onPartyInvitationSent?.RemoveAllListeners();
+            onPartyInvitationSent = null;
+            onGuildInvitationSent?.RemoveAllListeners();
+            onGuildInvitationSent = null;
+            onPartyMemberKicked?.RemoveAllListeners();
+            onPartyMemberKicked = null;
+            onGuildMemberKicked?.RemoveAllListeners();
+            onGuildMemberKicked = null;
+            _characterEntity = null;
+        }
+
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -206,7 +253,7 @@ namespace MultiplayerARPG
 
         protected virtual string GetOnlineStatusText(bool isOnline, int offlineOffsets)
         {
-            if (isOnline) 
+            if (isOnline)
                 return "Online";
             return (System.DateTime.Now - System.DateTime.Now.AddSeconds(-offlineOffsets)).GetPrettyDate();
         }

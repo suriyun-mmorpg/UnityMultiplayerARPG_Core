@@ -25,13 +25,13 @@ namespace MultiplayerARPG
         public Transform uiAnotherDealingItemsContainer;
 
         [Header("UI Events")]
-        public UnityEvent onStateChangeToDealing;
-        public UnityEvent onStateChangeToLock;
-        public UnityEvent onStateChangeToConfirm;
-        public UnityEvent onAnotherStateChangeToDealing;
-        public UnityEvent onAnotherStateChangeToLock;
-        public UnityEvent onAnotherStateChangeToConfirm;
-        public UnityEvent onBothStateChangeToLock;
+        public UnityEvent onStateChangeToDealing = new UnityEvent();
+        public UnityEvent onStateChangeToLock = new UnityEvent();
+        public UnityEvent onStateChangeToConfirm = new UnityEvent();
+        public UnityEvent onAnotherStateChangeToDealing = new UnityEvent();
+        public UnityEvent onAnotherStateChangeToLock = new UnityEvent();
+        public UnityEvent onAnotherStateChangeToConfirm = new UnityEvent();
+        public UnityEvent onBothStateChangeToLock = new UnityEvent();
 
         public DealingState DealingState { get; private set; }
         public DealingState AnotherDealingState { get; private set; }
@@ -82,6 +82,40 @@ namespace MultiplayerARPG
 
         private readonly List<UICharacterItem> _tempDealingItemUIs = new List<UICharacterItem>();
         private readonly List<UICharacterItem> _tempAnotherDealingItemUIs = new List<UICharacterItem>();
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiDealingItemPrefab = null;
+            uiItemDialog = null;
+            uiTextDealingGold = null;
+            uiDealingItemsContainer = null;
+            uiAnotherCharacter = null;
+            uiTextAnotherDealingGold = null;
+            uiAnotherDealingItemsContainer = null;
+            onStateChangeToDealing?.RemoveAllListeners();
+            onStateChangeToDealing = null;
+            onStateChangeToLock?.RemoveAllListeners();
+            onStateChangeToLock = null;
+            onStateChangeToConfirm?.RemoveAllListeners();
+            onStateChangeToConfirm = null;
+            onAnotherStateChangeToDealing?.RemoveAllListeners();
+            onAnotherStateChangeToDealing = null;
+            onAnotherStateChangeToLock?.RemoveAllListeners();
+            onAnotherStateChangeToLock = null;
+            onAnotherStateChangeToConfirm?.RemoveAllListeners();
+            onAnotherStateChangeToConfirm = null;
+            onBothStateChangeToLock?.RemoveAllListeners();
+            onBothStateChangeToLock = null;
+            _cacheDealingItemsList = null;
+            _cacheAnotherDealingItemsList = null;
+            _cacheItemSelectionManager = null;
+            _tempDealingItemUIs.Nulling();
+            _tempDealingItemUIs?.Clear();
+            _tempAnotherDealingItemUIs.Nulling();
+            _tempAnotherDealingItemUIs?.Clear();
+            _data = null;
+        }
 
         protected override void OnEnable()
         {
@@ -305,9 +339,9 @@ namespace MultiplayerARPG
         public void OnClickSetDealingGold()
         {
             UISceneGlobal.Singleton.ShowInputDialog(
-                LanguageManager.GetText(UITextKeys.UI_OFFER_GOLD.ToString()), 
-                LanguageManager.GetText(UITextKeys.UI_OFFER_GOLD_DESCRIPTION.ToString()), 
-                OnDealingGoldConfirmed, 
+                LanguageManager.GetText(UITextKeys.UI_OFFER_GOLD.ToString()),
+                LanguageManager.GetText(UITextKeys.UI_OFFER_GOLD_DESCRIPTION.ToString()),
+                OnDealingGoldConfirmed,
                 0, // Min amount is 0
                 GameInstance.PlayingCharacterEntity.Gold, // Max amount is number of gold
                 GameInstance.PlayingCharacterEntity.Dealing.DealingGold);

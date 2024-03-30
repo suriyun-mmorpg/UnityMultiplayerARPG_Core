@@ -28,6 +28,16 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRequireFactions;
         public UIAttributeAmounts uiRequireAttributeAmounts;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextRequireLevel = null;
+            uiTextRequireClasses = null;
+            uiTextRequireFactions = null;
+            uiRequireAttributeAmounts = null;
+            _data = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextRequireLevel != null)

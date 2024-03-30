@@ -247,11 +247,9 @@ namespace MultiplayerARPG
             uiTextSellPrice = null;
             uiTextStack = null;
             uiTextDurability = null;
-            uiGageDurability?.Clean();
             uiGageDurability = null;
             uiTextWeight = null;
             uiTextExp = null;
-            uiGageExp?.Clean();
             uiGageExp = null;
             uiTextExpireDuration = null;
             uiTextExpireTime = null;
@@ -283,7 +281,6 @@ namespace MultiplayerARPG
             uiTextSumAmmo = null;
             requireAmmoSymbols.Nulling();
             noRequireAmmoSymbols.Nulling();
-            gageAmmo?.Clean();
             gageAmmo = null;
             uiTextBuilding = null;
             uiTextMonster = null;

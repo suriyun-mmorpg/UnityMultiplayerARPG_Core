@@ -146,6 +146,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAllBonus;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextAllBonus = null;
+        }
+
         public string GetEquipmentBonusText(EquipmentBonus equipmentBonus)
         {
             using (Utf16ValueStringBuilder result = ZString.CreateStringBuilder(false))

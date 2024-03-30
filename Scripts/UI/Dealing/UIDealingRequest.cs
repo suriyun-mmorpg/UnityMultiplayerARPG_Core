@@ -4,6 +4,13 @@
     {
         public UICharacter uiAnotherCharacter;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiAnotherCharacter = null;
+            _data = null;
+        }
+
         protected override void UpdateData()
         {
             BasePlayerCharacterEntity anotherCharacter = Data;

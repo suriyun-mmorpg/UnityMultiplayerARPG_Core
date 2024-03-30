@@ -102,6 +102,56 @@ namespace MultiplayerARPG
         [Tooltip("Seperator for ailments")]
         public string extrasSeparator = ", ";
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextDuration = null;
+            uiTextMaxStack = null;
+            uiTextRecoveryHp = null;
+            uiTextRecoveryMp = null;
+            uiTextRecoveryStamina = null;
+            uiTextRecoveryFood = null;
+            uiTextRecoveryWater = null;
+            uiTextRemoveBuffWhenAttackChance = null;
+            uiTextRemoveBuffWhenAttackedChance = null;
+            uiTextRemoveBuffWhenUseSkillChance = null;
+            uiTextRemoveBuffWhenUseItemChance = null;
+            uiTextRemoveBuffWhenPickupItemChance = null;
+            uiBuffStats = null;
+            uiBuffStatsRate = null;
+            uiBuffAttributes = null;
+            uiBuffAttributesRate = null;
+            uiBuffResistances = null;
+            uiBuffArmors = null;
+            uiBuffArmorsRate = null;
+            uiBuffDamages = null;
+            uiBuffDamagesRate = null;
+            uiDamageOverTimes = null;
+            uiStatusEffectApplyingsSelfWhenAttacking = null;
+            uiStatusEffectApplyingsEnemyWhenAttacking = null;
+            uiStatusEffectApplyingsSelfWhenAttacked = null;
+            uiStatusEffectApplyingsEnemyWhenAttacked = null;
+            uiStatusEffectResistances = null;
+            uiBuffRemovals = null;
+            disallowMoveObject = null;
+            disallowSprintObject = null;
+            disallowWalkObject = null;
+            disallowJumpObject = null;
+            disallowCrouchObject = null;
+            disallowCrawlObject = null;
+            disallowAttackObject = null;
+            disallowUseSkillObject = null;
+            disallowUseItemObject = null;
+            freezeAnimationObject = null;
+            isHideObject = null;
+            isRevealsHideObject = null;
+            isBlindObject = null;
+            doNotRemoveOnDeadObject = null;
+            muteFootstepSoundObject = null;
+            isExtendDurationObject = null;
+            uiTextExtras = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextDuration != null)

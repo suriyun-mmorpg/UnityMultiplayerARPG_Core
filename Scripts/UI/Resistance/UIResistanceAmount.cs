@@ -19,6 +19,14 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("uiTextAmount")]
         public TextWrapper uiTextTitleWithAmount;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiGameDataElements = null;
+            uiTextAmountOnly = null;
+            uiTextTitleWithAmount = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiGameDataElements != null)

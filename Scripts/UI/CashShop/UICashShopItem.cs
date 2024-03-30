@@ -57,6 +57,26 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCashShop = null;
+            uiTextTitle = null;
+            uiTextDescription = null;
+            imageIcon = null;
+            rawImageExternalIcon = null;
+            uiTextSellPriceCash = null;
+            uiTextSellPriceGold = null;
+            uiTextReceiveGold = null;
+            uiTextSingleItemAmount = null;
+            uiReceiveCurrencies = null;
+            uiReceiveItems = null;
+            inputAmount = null;
+            cashObjects.Nulling();
+            goldObjects.Nulling();
+            _data = null;
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();

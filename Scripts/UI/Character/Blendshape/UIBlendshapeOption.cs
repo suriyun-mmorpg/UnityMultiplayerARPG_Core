@@ -22,6 +22,17 @@ namespace MultiplayerARPG
         public int HashedSettingId { get; set; }
         public int Index { get; set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            imageIcon = null;
+            sliderValue = null;
+            Manager = null;
+            Component = null;
+            _data = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextTitle != null)

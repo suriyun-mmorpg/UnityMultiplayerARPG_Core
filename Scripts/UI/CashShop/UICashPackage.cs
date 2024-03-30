@@ -29,6 +29,19 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSellPrice;
         public TextWrapper uiTextCashAmount;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCashPackages = null;
+            uiTextTitle = null;
+            uiTextDescription = null;
+            imageIcon = null;
+            rawImageExternalIcon = null;
+            uiTextSellPrice = null;
+            uiTextCashAmount = null;
+            _data = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextTitle != null)

@@ -139,6 +139,48 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextId = null;
+            uiTextName = null;
+            uiTextLevel = null;
+            uiGageExp = null;
+            uiGageHp = null;
+            uiGageMp = null;
+            uiGageStamina = null;
+            uiGageFood = null;
+            uiGageWater = null;
+            uiTextStatPoint = null;
+            uiTextSkillPoint = null;
+            uiTextBattlePoint = null;
+            uiTextGold = null;
+            uiTextWeightLimit = null;
+            uiTextSlotLimit = null;
+            uiTextAllDamages = null;
+            uiRightHandDamages = null;
+            uiLeftHandDamages = null;
+            uiCharacterStats = null;
+            uiCharacterBuffs = null;
+            uiCharacterResistances = null;
+            uiCharacterArmors = null;
+            uiCharacterStatusEffectResistances = null;
+            uiCharacterClass = null;
+            uiPlayerIcon = null;
+            uiPlayerFrame = null;
+            uiPlayerTitle = null;
+            uiFaction = null;
+            _cacheAttributes?.Clear();
+            _cacheResistances?.Clear();
+            _cacheArmors?.Clear();
+            _cacheStatusEffects?.Clear();
+            _cacheRightHandDamages?.Clear();
+            _cacheLeftHandDamages?.Clear();
+            _cacheUICharacterAttributes?.Clear();
+            _cacheUICharacterCurrencies?.Clear();
+            _data = null;
+        }
+
         protected override void OnEnable()
         {
             UpdateOwningCharacterData();

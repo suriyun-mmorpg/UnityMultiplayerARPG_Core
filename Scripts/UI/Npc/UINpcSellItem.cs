@@ -20,6 +20,14 @@ namespace MultiplayerARPG
 
         public int indexOfData { get; protected set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCharacterItem = null;
+            uiTextSellPrice = null;
+            uiSellPrices = null;
+        }
+
         public void Setup(NpcSellItem data, int indexOfData)
         {
             this.indexOfData = indexOfData;

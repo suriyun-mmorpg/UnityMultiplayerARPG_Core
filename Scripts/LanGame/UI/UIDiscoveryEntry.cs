@@ -15,6 +15,13 @@ namespace MultiplayerARPG
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextName = null;
+            uiTextLevel = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextName != null)

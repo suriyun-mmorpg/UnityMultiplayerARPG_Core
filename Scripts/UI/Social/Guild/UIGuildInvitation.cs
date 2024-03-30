@@ -22,6 +22,15 @@ namespace MultiplayerARPG
         public TextWrapper uiTextGuildName;
         public TextWrapper uiTextGuildLevel;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextName = null;
+            uiTextLevel = null;
+            uiTextGuildName = null;
+            uiTextGuildLevel = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextName != null)

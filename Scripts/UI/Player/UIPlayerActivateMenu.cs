@@ -15,6 +15,16 @@ namespace MultiplayerARPG
         [Tooltip("These objects will be activated when owning character can see vending")]
         public GameObject[] vendingObjects;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiAnotherCharacter = null;
+            partyInviteObjects.Nulling();
+            guildInviteObjects.Nulling();
+            vendingObjects.Nulling();
+            _data = null;
+        }
+
         protected override void UpdateUI()
         {
             if (Data == null)

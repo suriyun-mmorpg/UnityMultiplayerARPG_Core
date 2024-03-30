@@ -38,6 +38,14 @@ namespace MultiplayerARPG
         [Tooltip("These objects will be activated while item is not set")]
         public GameObject[] noItemObjects;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCharacterItem = null;
+            hasItemObjects.Nulling();
+            noItemObjects.Nulling();
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
