@@ -32,9 +32,16 @@ namespace MultiplayerARPG
 
         private void OnDestroy()
         {
-            _characterEntity = null;
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
+            owningIndicator = null;
+            allyIndicator = null;
+            partyMemberIndicator = null;
+            guildMemberIndicator = null;
+            enemyIndicator = null;
+            neutralIndicator = null;
+            _characterEntity = null;
+            _previousEntity = null;
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)

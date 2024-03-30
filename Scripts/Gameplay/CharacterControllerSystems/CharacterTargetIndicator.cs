@@ -24,6 +24,15 @@ namespace MultiplayerARPG
             indicatorObject = Instantiate(indicatorPrefab);
         }
 
+        private void OnDestroy()
+        {
+            indicatorPrefab = null;
+            indicatorObject = null;
+            currentTarget = null;
+            colliders2D.Nulling();
+            colliders.Nulling();
+        }
+
         private void LateUpdate()
         {
             if (currentTarget != GameInstance.PlayingCharacterEntity.GetTargetEntity())

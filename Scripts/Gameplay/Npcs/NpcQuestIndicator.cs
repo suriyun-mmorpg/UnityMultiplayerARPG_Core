@@ -29,9 +29,13 @@ namespace MultiplayerARPG
 
         private void OnDestroy()
         {
-            npcEntity = null;
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
+            haveTasksDoneQuestsIndicator = null;
+            haveInProgressQuestsIndicator = null;
+            haveNewQuestsIndicator = null;
+            npcEntity = null;
+            _previousEntity = null;
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
@@ -44,20 +48,20 @@ namespace MultiplayerARPG
                 UpdateStatus();
         }
 
-        private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        private void AddEvents(BasePlayerCharacterEntity playingCharacterEntity)
         {
-            if (PlayingCharacterEntity == null)
+            if (playingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onRecached += UpdateStatus;
-            PlayingCharacterEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
+            playingCharacterEntity.onRecached += UpdateStatus;
+            playingCharacterEntity.onQuestsOperation += PlayingCharacterEntity_onQuestsOperation;
         }
 
-        private void RemoveEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        private void RemoveEvents(BasePlayerCharacterEntity playingCharacterEntity)
         {
-            if (PlayingCharacterEntity == null)
+            if (playingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onRecached -= UpdateStatus;
-            PlayingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
+            playingCharacterEntity.onRecached -= UpdateStatus;
+            playingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
         }
 
         private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
