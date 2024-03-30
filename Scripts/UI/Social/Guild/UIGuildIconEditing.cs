@@ -18,42 +18,54 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("updateGuildOptionsOnSelectIcon")]
         public bool updateGuildOptionsOnSelect = false;
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UIGuildIconSelectionManager cacheSelectionManager;
+        private UIGuildIconSelectionManager _cacheSelectionManager;
         public UIGuildIconSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UIGuildIconSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UIGuildIconSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
-        private UIGuildIconUpdater guildIconUpdater;
+        private UIGuildIconUpdater _guildIconUpdater;
         public UIGuildIconUpdater GuildIconUpdater
         {
             get
             {
-                if (guildIconUpdater == null)
-                    guildIconUpdater = gameObject.GetOrAddComponent<UIGuildIconUpdater>();
-                return guildIconUpdater;
+                if (_guildIconUpdater == null)
+                    _guildIconUpdater = gameObject.GetOrAddComponent<UIGuildIconUpdater>();
+                return _guildIconUpdater;
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            listEmptyObject = null;
+            uiPrefab = null;
+            uiContainer = null;
+            selectedIcons.Nulling();
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            _guildIconUpdater = null;
         }
 
         protected virtual void OnEnable()

@@ -18,6 +18,14 @@ namespace MultiplayerARPG
         public TextWrapper uiTextTotalGold;
         public TextWrapper uiTextUserCash;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextUserGold = null;
+            uiTextTotalGold = null;
+            uiTextUserCash = null;
+        }
+
         private void Update()
         {
             int amount;

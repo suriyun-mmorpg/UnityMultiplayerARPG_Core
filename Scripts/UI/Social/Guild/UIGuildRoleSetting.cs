@@ -13,13 +13,23 @@ namespace MultiplayerARPG
         public Toggle toggleCanUseStorage;
         public InputFieldWrapper inputFieldShareExpPercentage;
 
-        private byte guildRole;
+        private byte _guildRole;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            inputFieldRoleName = null;
+            toggleCanInvite = null;
+            toggleCanKick = null;
+            toggleCanUseStorage = null;
+            inputFieldShareExpPercentage = null;
+        }
 
         public void Show(byte guildRole, GuildRoleData guildRoleData)
         {
             base.Show();
 
-            this.guildRole = guildRole;
+            this._guildRole = guildRole;
             if (inputFieldRoleName != null)
             {
                 inputFieldRoleName.unityInputField.contentType = InputField.ContentType.Standard;
@@ -63,7 +73,7 @@ namespace MultiplayerARPG
 
             GameInstance.ClientGuildHandlers.RequestChangeGuildRole(new RequestChangeGuildRoleMessage()
             {
-                guildRole = guildRole,
+                guildRole = _guildRole,
                 guildRoleData = new GuildRoleData()
                 {
                     roleName = inputFieldRoleName.text,

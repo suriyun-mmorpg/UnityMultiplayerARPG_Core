@@ -11,6 +11,12 @@ namespace MultiplayerARPG
 
         public GuildData Guild { get { return GameInstance.JoinedGuild; } }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textGuildName = null;
+        }
+
         private void Update()
         {
             if (textGuildName != null)

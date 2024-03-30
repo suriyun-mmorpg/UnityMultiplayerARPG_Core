@@ -98,6 +98,24 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCharacterHotkey = null;
+            uiCharacterSkillPrefab = null;
+            uiCharacterItemPrefab = null;
+            uiGuildSkillPrefab = null;
+            uiCharacterSkillContainer = null;
+            uiCharacterItemContainer = null;
+            uiGuildSkillContainer = null;
+            _cacheSkillList = null;
+            _cacheItemList = null;
+            _cacheGuildSkillList = null;
+            _cacheSkillSelectionManager = null;
+            _cacheItemSelectionManager = null;
+            _cacheGuildSkillSelectionManager = null;
+        }
+
         public void Setup(UICharacterHotkey uiCharacterHotkey)
         {
             this.uiCharacterHotkey = uiCharacterHotkey;

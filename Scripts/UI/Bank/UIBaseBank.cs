@@ -12,6 +12,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAmount;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextAmount = null;
+        }
+
         private void Update()
         {
             if (uiTextAmount != null)

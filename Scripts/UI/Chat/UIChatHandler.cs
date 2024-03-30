@@ -61,18 +61,18 @@ namespace MultiplayerARPG
             set { if (uiMessageField != null) uiMessageField.text = value; }
         }
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
@@ -86,6 +86,21 @@ namespace MultiplayerARPG
         {
             base.Awake();
             SetOnClientReceiveChatMessage();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            RemoveOnClientReceiveChatMessage();
+            ChannelBasedChatMessages?.Clear();
+            enterChatActiveObjects.Nulling();
+            uiReceiverField = null;
+            uiMessageField = null;
+            uiPrefab = null;
+            uiContainer = null;
+            scrollRect = null;
+            _cacheList = null;
+            onClickChatEntry = null;
         }
 
         private void Start()
@@ -102,11 +117,6 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             StartCoroutine(VerticalScroll(0f));
-        }
-
-        private void OnDestroy()
-        {
-            RemoveOnClientReceiveChatMessage();
         }
 
         public void SetOnClientReceiveChatMessage()

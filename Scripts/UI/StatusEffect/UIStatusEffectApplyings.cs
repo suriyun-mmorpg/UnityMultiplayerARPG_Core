@@ -54,6 +54,18 @@ namespace MultiplayerARPG
 
         private UISelectionManagerShowOnSelectEventManager<UIStatusEffectApplyingData, UIStatusEffectApplying> _listEventSetupManager = new UISelectionManagerShowOnSelectEventManager<UIStatusEffectApplyingData, UIStatusEffectApplying>();
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            uiTextAllEntries = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            _listEventSetupManager = null;
+        }
+
         protected virtual void OnEnable()
         {
             _listEventSetupManager.OnEnable(CacheSelectionManager, uiDialog);

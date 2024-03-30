@@ -70,31 +70,74 @@ namespace MultiplayerARPG
         public int memberAmount { get; protected set; }
         public HashSet<string> onlineMembers { get; protected set; } = new HashSet<string>();
 
-        private UIList memberList;
+        private UIList _memberList;
         public UIList MemberList
         {
             get
             {
-                if (memberList == null)
+                if (_memberList == null)
                 {
-                    memberList = gameObject.AddComponent<UIList>();
-                    memberList.uiPrefab = uiMemberPrefab.gameObject;
-                    memberList.uiContainer = uiMemberContainer;
+                    _memberList = gameObject.AddComponent<UIList>();
+                    _memberList.uiPrefab = uiMemberPrefab.gameObject;
+                    _memberList.uiContainer = uiMemberContainer;
                 }
-                return memberList;
+                return _memberList;
             }
         }
 
-        private UISocialCharacterSelectionManager memberSelectionManager;
+        private UISocialCharacterSelectionManager _memberSelectionManager;
         public UISocialCharacterSelectionManager MemberSelectionManager
         {
             get
             {
-                if (memberSelectionManager == null)
-                    memberSelectionManager = gameObject.GetOrAddComponent<UISocialCharacterSelectionManager>();
-                memberSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return memberSelectionManager;
+                if (_memberSelectionManager == null)
+                    _memberSelectionManager = gameObject.GetOrAddComponent<UISocialCharacterSelectionManager>();
+                _memberSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _memberSelectionManager;
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            memberListEmptyObject = null;
+            uiMemberDialog = null;
+            uiMemberPrefab = null;
+            uiMemberContainer = null;
+            textSocialId = null;
+            textMemberAmount = null;
+            textOnlineMemberAmount = null;
+            owningCharacterIsInGroupObjects.Nulling();
+            owningCharacterIsNotInGroupObjects.Nulling();
+            owningCharacterIsLeaderObjects.Nulling();
+            owningCharacterIsNotLeaderObjects.Nulling();
+            owningCharacterCanKickObjects.Nulling();
+            owningCharacterCannotKickObjects.Nulling();
+            onFriendAdded?.RemoveAllListeners();
+            onFriendAdded = null;
+            onFriendRemoved?.RemoveAllListeners();
+            onFriendRemoved = null;
+            onFriendRequested?.RemoveAllListeners();
+            onFriendRequested = null;
+            onFriendRequestAccepted?.RemoveAllListeners();
+            onFriendRequestAccepted = null;
+            onFriendRequestDeclined?.RemoveAllListeners();
+            onFriendRequestDeclined = null;
+            onGuildRequestAccepted?.RemoveAllListeners();
+            onGuildRequestAccepted = null;
+            onGuildRequestDeclined?.RemoveAllListeners();
+            onGuildRequestDeclined = null;
+            onPartyInvitationSent?.RemoveAllListeners();
+            onPartyInvitationSent = null;
+            onGuildInvitationSent?.RemoveAllListeners();
+            onGuildInvitationSent = null;
+            onPartyMemberKicked?.RemoveAllListeners();
+            onPartyMemberKicked = null;
+            onGuildMemberKicked?.RemoveAllListeners();
+            onGuildMemberKicked = null;
+            onlineMembers?.Clear();
+            _memberList = null;
+            _memberSelectionManager = null;
         }
 
         protected virtual void Update()

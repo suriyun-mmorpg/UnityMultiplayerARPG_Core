@@ -24,6 +24,12 @@ public class UITabManager : UIBase
         base.Awake();
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        _toggleGroup = null;
+    }
+
     protected void SetupToggles()
     {
         if (_alreadySetup)

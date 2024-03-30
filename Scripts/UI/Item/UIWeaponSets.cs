@@ -5,6 +5,13 @@
         public UIWeaponSet currentWeaponSet;
         public UIWeaponSet[] otherWeaponSets;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            currentWeaponSet = null;
+            otherWeaponSets.Nulling();
+        }
+
         private void OnEnable()
         {
             UpdateData(GameInstance.PlayingCharacter);

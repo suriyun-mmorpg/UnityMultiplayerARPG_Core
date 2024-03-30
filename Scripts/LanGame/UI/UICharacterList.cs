@@ -58,6 +58,38 @@ namespace MultiplayerARPG
         protected PlayerCharacterData _selectedPlayerCharacterData;
         public PlayerCharacterData SelectedPlayerCharacterData { get { return _selectedPlayerCharacterData; } }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCharacterPrefab = null;
+            uiCharacterContainer = null;
+            characterModelContainer = null;
+            buttonStart = null;
+            buttonDelete = null;
+            selectedCharacterObjects.Nulling();
+            selectedCharacterObjects?.Clear();
+            eventOnNoCharacter?.RemoveAllListeners();
+            eventOnNoCharacter = null;
+            eventOnAbleToCreateCharacter?.RemoveAllListeners();
+            eventOnAbleToCreateCharacter = null;
+            eventOnNotAbleToCreateCharacter?.RemoveAllListeners();
+            eventOnNotAbleToCreateCharacter = null;
+            eventOnSelectCharacter?.RemoveAllListeners();
+            eventOnSelectCharacter = null;
+            eventOnBeforeUpdateAnimation?.RemoveAllListeners();
+            eventOnBeforeUpdateAnimation = null;
+            eventOnAfterUpdateAnimation?.RemoveAllListeners();
+            eventOnAfterUpdateAnimation = null;
+            eventOnShowInstantiatedCharacter?.RemoveAllListeners();
+            eventOnShowInstantiatedCharacter = null;
+            _characterList = null;
+            _characterSelectionManager = null;
+            _characterModelById?.Clear();
+            _selectedModel = null;
+            _playerCharacterDataById?.Clear();
+            _selectedPlayerCharacterData = null;
+        }
+
         protected virtual void LoadCharacters()
         {
             CharacterSelectionManager.Clear();

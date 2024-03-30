@@ -2,9 +2,7 @@
 using System.Linq;
 using LiteNetLibManager;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.Events;
-using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.UI;
 using System.Threading.Tasks;
 #if UNITY_EDITOR
@@ -183,6 +181,57 @@ namespace MultiplayerARPG
         {
             base.Awake();
             MigrateInputComponent();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            characterModelContainer = null;
+            uiCharacterPrefab = null;
+            uiCharacterContainer = null;
+            uiCharacterClassPrefab = null;
+            uiCharacterClassContainer = null;
+            uiFactionPrefab = null;
+            uiFactionContainer = null;
+            uiInputCharacterName = null;
+            buttonCreate = null;
+            uiBodyPartManagers.Nulling();
+            uiBlendshapeManager = null;
+            eventOnCreateCharacter?.RemoveAllListeners();
+            eventOnCreateCharacter = null;
+            eventOnSelectCharacter?.RemoveAllListeners();
+            eventOnSelectCharacter = null;
+            eventOnSelectFaction?.RemoveAllListeners();
+            eventOnSelectFaction = null;
+            eventOnSelectCharacterClass?.RemoveAllListeners();
+            eventOnSelectCharacterClass = null;
+            eventOnBeforeUpdateAnimation?.RemoveAllListeners();
+            eventOnBeforeUpdateAnimation = null;
+            eventOnAfterUpdateAnimation?.RemoveAllListeners();
+            eventOnAfterUpdateAnimation = null;
+            eventOnShowInstantiatedCharacter?.RemoveAllListeners();
+            eventOnShowInstantiatedCharacter = null;
+            firstRaceToggle = null;
+            _raceToggles?.Clear();
+            _characterList = null;
+            _characterClassList = null;
+            _factionList = null;
+            _characterSelectionManager = null;
+            _characterClassSelectionManager = null;
+            _factionSelectionManager = null;
+            _characterModelByEntityId?.Clear();
+            _addressablePlayerCharacterEntities.Nulling();
+            _addressablePlayerCharacterEntities?.Clear();
+            _selectedModel = null;
+            _playerCharacterDataByEntityId?.Clear();
+            _selectableCharacterClasses.Nulling();
+            _selectedPlayerCharacter = null;
+            _selectedPlayerCharacterData = null;
+            SelectedRaces?.Clear();
+            _selectedFaction = null;
+            PublicBools?.Clear();
+            PublicInts?.Clear();
+            PublicFloats?.Clear();
         }
 
 #if UNITY_EDITOR

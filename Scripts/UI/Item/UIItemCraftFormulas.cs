@@ -17,35 +17,50 @@ namespace MultiplayerARPG
         public Transform uiContainer;
         public bool selectFirstEntryByDefault;
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UIItemCraftFormulaSelectionManager cacheSelectionManager;
+        private UIItemCraftFormulaSelectionManager _cacheSelectionManager;
         public UIItemCraftFormulaSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UIItemCraftFormulaSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UIItemCraftFormulaSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
         public UICraftingQueueItems CraftingQueueManager { get; set; }
         public List<ItemCraftFormula> LoadedList { get; private set; } = new List<ItemCraftFormula>();
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            filterCategories.Clear();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            CraftingQueueManager = null;
+            LoadedList.Nulling();
+            LoadedList?.Clear();
+        }
 
         protected virtual void OnEnable()
         {

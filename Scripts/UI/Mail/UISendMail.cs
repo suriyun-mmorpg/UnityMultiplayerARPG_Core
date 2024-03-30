@@ -14,14 +14,17 @@ namespace MultiplayerARPG
         {
             get { return inputReceiverName == null ? string.Empty : inputReceiverName.text; }
         }
+
         public string Title
         {
             get { return inputTitle == null ? string.Empty : inputTitle.text; }
         }
+
         public string Content
         {
             get { return inputContent == null ? string.Empty : inputContent.text; }
         }
+
         public int Gold
         {
             get
@@ -35,6 +38,15 @@ namespace MultiplayerARPG
                     return 0;
                 }
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            inputReceiverName = null;
+            inputTitle = null;
+            inputContent = null;
+            inputGold = null;
         }
 
         private void OnEnable()

@@ -63,6 +63,17 @@ namespace MultiplayerARPG
         protected bool _activated;
         protected string _activeItemId;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiSocketEnhancerItems = null;
+            uiAppliedSocketEnhancerItems = null;
+            uiRequireItemAmounts = null;
+            uiRequireCurrencyAmounts = null;
+            uiTextRequireGold = null;
+            uiTextSimpleRequireGold = null;
+        }
+
         protected override void Update()
         {
             base.Update();

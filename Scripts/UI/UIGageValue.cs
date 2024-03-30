@@ -29,6 +29,13 @@ namespace MultiplayerARPG
 
         private float rate;
 
+        public virtual void Clean()
+        {
+            textValue = null;
+            imageGage = null;
+            sliderGage = null;
+        }
+
         public void SetVisible(bool isVisible)
         {
             if (textValue != null)

@@ -5,6 +5,12 @@
         public BasePlayerCharacterController Controller { get { return BasePlayerCharacterController.Singleton; } }
         public TextWrapper textTitle;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textTitle = null;
+        }
+
         public override void Show()
         {
             if (Controller.ConstructingBuildingEntity == null)

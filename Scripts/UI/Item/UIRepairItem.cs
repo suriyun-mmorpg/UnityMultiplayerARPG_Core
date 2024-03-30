@@ -25,8 +25,18 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSimpleRequireGold;
         public TextWrapper uiTextDurability;
 
-        protected bool activated;
-        protected string activeItemId;
+        protected bool _activated;
+        protected string _activeItemId;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextRequireGold = null;
+            uiRequireItemAmounts = null;
+            uiRequireCurrencyAmounts = null;
+            uiTextSimpleRequireGold = null;
+            uiTextDurability = null;
+        }
 
         public override void OnUpdateCharacterItems()
         {
@@ -36,7 +46,7 @@ namespace MultiplayerARPG
             // Store data to variable so it won't lookup for data from property again
             CharacterItem characterItem = CharacterItem;
 
-            if (activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(activeItemId)))
+            if (_activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(_activeItemId)))
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
@@ -136,7 +146,7 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
-            activated = false;
+            _activated = false;
             OnUpdateCharacterItems();
         }
 
@@ -150,8 +160,8 @@ namespace MultiplayerARPG
         {
             if (CharacterItem.IsEmptySlot())
                 return;
-            activated = true;
-            activeItemId = CharacterItem.id;
+            _activated = true;
+            _activeItemId = CharacterItem.id;
             GameInstance.ClientInventoryHandlers.RequestRepairItem(new RequestRepairItemMessage()
             {
                 inventoryType = InventoryType,

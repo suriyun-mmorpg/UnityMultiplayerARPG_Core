@@ -23,34 +23,50 @@ namespace MultiplayerARPG
         public UIRewarding uiRewarding;
         public bool selectFirstEntryByDefault;
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UIGachaSelectionManager cacheSelectionManager;
+        private UIGachaSelectionManager _cacheSelectionManager;
         public UIGachaSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UIGachaSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UIGachaSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return _cacheSelectionManager;
             }
         }
 
         public List<Gacha> LoadedList { get; private set; } = new List<Gacha>();
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            filterCategories?.Clear();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            uiTextCash = null;
+            uiRewarding = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            LoadedList.Nulling();
+            LoadedList?.Clear();
+        }
 
         public void Refresh()
         {

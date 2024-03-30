@@ -58,6 +58,34 @@ namespace MultiplayerARPG
 
         public Mail Mail { get; protected set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textSenderName = null;
+            textTitle = null;
+            textContent = null;
+            textGoldRoot = null;
+            textGold = null;
+            textCashRoot = null;
+            textCash = null;
+            uiCurrencies = null;
+            uiItems = null;
+            textSentDate = null;
+            uiMailList = null;
+            hasGoldObjects.Nulling();
+            hasCashObjects.Nulling();
+            readObjects.Nulling();
+            unreadObjects.Nulling();
+            claimObjects.Nulling();
+            unclaimObjects.Nulling();
+            onReadMail?.RemoveAllListeners();
+            onReadMail = null;
+            onClaimMailItems?.RemoveAllListeners();
+            onClaimMailItems = null;
+            onDeleteMail?.RemoveAllListeners();
+            onDeleteMail = null;
+        }
+
         private void ReadMail()
         {
             UpdateData(null);

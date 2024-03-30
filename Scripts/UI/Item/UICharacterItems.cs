@@ -22,29 +22,29 @@ namespace MultiplayerARPG
         public Transform uiContainer;
         public InventoryType inventoryType = InventoryType.NonEquipItems;
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UICharacterItemSelectionManager cacheSelectionManager;
+        private UICharacterItemSelectionManager _cacheSelectionManager;
         public UICharacterItemSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICharacterItemSelectionManager>();
+                return _cacheSelectionManager;
             }
         }
 
@@ -53,6 +53,20 @@ namespace MultiplayerARPG
         public List<CharacterItem> LoadedList { get; private set; } = new List<CharacterItem>();
 
         private UISelectionMode dirtySelectionMode;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            onGenerateEntry = null;
+            Character = null;
+            LoadedList?.Clear();
+        }
 
         protected virtual void OnEnable()
         {

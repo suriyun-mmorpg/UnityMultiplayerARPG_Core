@@ -13,6 +13,15 @@ public class UIList : MonoBehaviour
     public int? ChildPrefabsCount { get; protected set; }
     protected readonly List<GameObject> _uis = new List<GameObject>();
 
+    protected virtual void OnDestroy()
+    {
+        uiPrefab = null;
+        uiContainer = null;
+        onGenerateEntry = null;
+        _uis.Nulling();
+        _uis?.Clear();
+    }
+
     public void RemoveContainerChildren()
     {
         if (!ChildPrefabsCount.HasValue)

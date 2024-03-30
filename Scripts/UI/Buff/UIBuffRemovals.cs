@@ -51,6 +51,18 @@ namespace MultiplayerARPG
 
         private UISelectionManagerShowOnSelectEventManager<UIBuffRemovalData, UIBuffRemoval> _listEventSetupManager = new UISelectionManagerShowOnSelectEventManager<UIBuffRemovalData, UIBuffRemoval>();
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            uiTextAllEntries = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            _listEventSetupManager = null;
+        }
+
         protected virtual void OnEnable()
         {
             _listEventSetupManager.OnEnable(CacheSelectionManager, uiDialog);

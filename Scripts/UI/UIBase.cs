@@ -49,6 +49,19 @@ public class UIBase : MonoBehaviour
             Show();
     }
 
+    protected virtual void OnDestroy()
+    {
+        root = null;
+        onShow?.RemoveAllListeners();
+        onShow = null;
+        onHide?.RemoveAllListeners();
+        onHide = null;
+        onShowWithObject?.RemoveAllListeners();
+        onShowWithObject = null;
+        onHideWithObject?.RemoveAllListeners();
+        onHideWithObject = null;
+    }
+
     protected virtual void CacheComponents()
     {
         if (AlreadyCachedComponents)

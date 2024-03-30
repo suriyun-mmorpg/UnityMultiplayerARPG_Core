@@ -20,6 +20,13 @@ namespace MultiplayerARPG
 
         protected float _receivedDamageTime;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiGageHp?.Clean();
+            uiGageHp = null;
+        }
+
         protected override void AddEvents(T entity)
         {
             if (entity == null)

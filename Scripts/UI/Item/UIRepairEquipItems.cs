@@ -20,6 +20,15 @@ namespace MultiplayerARPG
         public UICurrencyAmounts uiRequireCurrencyAmounts;
         public TextWrapper uiTextSimpleRequireGold;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextRequireGold = null;
+            uiRequireItemAmounts = null;
+            uiRequireCurrencyAmounts = null;
+            uiTextSimpleRequireGold = null;
+        }
+
         private void LateUpdate()
         {
             int requireGold = 0;

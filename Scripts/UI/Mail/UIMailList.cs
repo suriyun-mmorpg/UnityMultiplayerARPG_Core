@@ -47,6 +47,23 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            onRefresh?.RemoveAllListeners();
+            onRefresh = null;
+            onClaimAllMailsItems?.RemoveAllListeners();
+            onClaimAllMailsItems = null;
+            onDeleteAllMails?.RemoveAllListeners();
+            onDeleteAllMails = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+        }
+
         protected virtual void OnEnable()
         {
             CacheSelectionManager.eventOnSelect.RemoveListener(OnSelect);

@@ -44,6 +44,19 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            uiFormulas = null;
+            Source = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+        }
+
         public void Show(ICraftingQueueSource source)
         {
             if (IsVisible())

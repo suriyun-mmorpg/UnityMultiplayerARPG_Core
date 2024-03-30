@@ -79,6 +79,15 @@ namespace MultiplayerARPG
 
         public ICharacterData Character { get; protected set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiDialog = null;
+            _cacheEquipItemSlots?.Clear();
+            _cacheSelectionManager = null;
+            Character = null;
+        }
+
         protected virtual void OnEnable()
         {
             CacheSelectionManager.eventOnSelected.RemoveListener(OnSelect);

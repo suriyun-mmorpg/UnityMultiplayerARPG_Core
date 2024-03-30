@@ -25,10 +25,16 @@ namespace MultiplayerARPG
             GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
+            pkOnObjects.Nulling();
+            pkOffObjects.Nulling();
+            uiTextPkPoint = null;
+            uiTextConsecutivePkKills = null;
+            _previousEntity = null;
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)

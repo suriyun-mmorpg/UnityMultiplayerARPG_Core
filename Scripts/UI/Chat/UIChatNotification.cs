@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         public TextWrapper[] notificationCountTexts = new TextWrapper[0];
         public bool StopCounting { get; set; } = false;
 
-        private int notificationCount = 0;
+        private int _notificationCount = 0;
 
         protected override void Awake()
         {
@@ -24,9 +24,14 @@ namespace MultiplayerARPG
             SetNotificationCount(0);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             RemoveOnClientReceiveChatMessage();
+            objectsToStopCounting.Nulling();
+            togglesToStopCounting.Nulling();
+            notificationObjects.Nulling();
+            notificationCountTexts.Nulling();
         }
 
         private void Update()
@@ -37,8 +42,8 @@ namespace MultiplayerARPG
                 {
                     if (!StopCounting)
                     {
-                        notificationCount = 0;
-                        SetNotificationCount(notificationCount);
+                        _notificationCount = 0;
+                        SetNotificationCount(_notificationCount);
                     }
                     StopCounting = true;
                     return;
@@ -50,8 +55,8 @@ namespace MultiplayerARPG
                 {
                     if (!StopCounting)
                     {
-                        notificationCount = 0;
-                        SetNotificationCount(notificationCount);
+                        _notificationCount = 0;
+                        SetNotificationCount(_notificationCount);
                     }
                     StopCounting = true;
                     return;
@@ -83,39 +88,39 @@ namespace MultiplayerARPG
                 return;
             if (notifyForAllChannels)
             {
-                notificationCount++;
+                _notificationCount++;
             }
             else if (chatMessage.channel == ChatChannel.Local &&
                 chatChannel == ChatChannel.Local)
             {
-                notificationCount++;
+                _notificationCount++;
             }
             else if (chatMessage.channel == ChatChannel.Global &&
                 chatChannel == ChatChannel.Global)
             {
-                notificationCount++;
+                _notificationCount++;
             }
             else if (chatMessage.channel == ChatChannel.Whisper &&
                 chatChannel == ChatChannel.Whisper)
             {
-                notificationCount++;
+                _notificationCount++;
             }
             else if (chatMessage.channel == ChatChannel.Party &&
                 chatChannel == ChatChannel.Party)
             {
-                notificationCount++;
+                _notificationCount++;
             }
             else if (chatMessage.channel == ChatChannel.Guild &&
                 chatChannel == ChatChannel.Guild)
             {
-                notificationCount++;
+                _notificationCount++;
             }
             else if (chatMessage.channel == ChatChannel.System &&
                 chatChannel == ChatChannel.System)
             {
-                notificationCount++;
+                _notificationCount++;
             }
-            SetNotificationCount(notificationCount);
+            SetNotificationCount(_notificationCount);
         }
 
         public void SetNotificationCount(int count)

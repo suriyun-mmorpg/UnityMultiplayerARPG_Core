@@ -15,6 +15,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public UICharacterItems uiAppliedSocketEnhancerItems;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiAppliedSocketEnhancerItems = null;
+        }
+
         protected override void UpdateData()
         {
             List<CharacterItem> appliedSocketEnhancerItems = new List<CharacterItem>();

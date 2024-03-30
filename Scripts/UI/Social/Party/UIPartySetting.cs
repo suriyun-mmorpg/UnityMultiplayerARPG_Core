@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -8,6 +7,13 @@ namespace MultiplayerARPG
     {
         public Toggle toggleShareExp;
         public Toggle toggleShareItem;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            toggleShareExp = null;
+            toggleShareItem = null;
+        }
 
         public void Show(bool shareExp, bool shareItem)
         {

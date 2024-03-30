@@ -41,6 +41,16 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
         _updateCountDown = 0f;
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        objectSelected = null;
+        clones.Nulling();
+        selectionManager = null;
+        onUpdateUI = null;
+        onUpdateData = null;
+    }
+
     protected virtual void OnEnable()
     {
         UpdateUI();
