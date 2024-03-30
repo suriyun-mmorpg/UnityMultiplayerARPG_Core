@@ -7,6 +7,12 @@ namespace MultiplayerARPG
     {
         public InputFieldWrapper inputCharacterName;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            inputCharacterName = null;
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();

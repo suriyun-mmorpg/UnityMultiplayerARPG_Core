@@ -27,6 +27,20 @@ namespace MultiplayerARPG
         protected float _castingSkillDuration;
         protected BasePlayerCharacterEntity _previousPlayingCharacterEntity;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextLevel = null;
+            uiGageMp?.Clean();
+            uiGageMp = null;
+            uiSkillCastContainer = null;
+            uiTextSkillCast = null;
+            imageSkillCastGage = null;
+            sliderSkillCastGage = null;
+            uiCharacterBuffs = null;
+            _previousPlayingCharacterEntity = null;
+        }
+
         protected override void AddEvents(BaseCharacterEntity entity)
         {
             if (entity == null)
