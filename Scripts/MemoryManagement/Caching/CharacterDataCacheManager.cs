@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -9,6 +10,8 @@ namespace MultiplayerARPG
         public static CharacterDataCache GetCaches(this ICharacterData characterData)
         {
             if (characterData == null)
+                return null;
+            if (characterData is Object unityObj && unityObj == null)
                 return null;
             int hashCode = characterData.GetHashCode();
             if (!s_caches.ContainsKey(hashCode))
@@ -22,6 +25,8 @@ namespace MultiplayerARPG
         public static CharacterDataCache MarkToMakeCaches(this ICharacterData characterData)
         {
             if (characterData == null)
+                return null;
+            if (characterData is Object unityObj && unityObj == null)
                 return null;
             int hashCode = characterData.GetHashCode();
             if (!s_caches.ContainsKey(hashCode))
