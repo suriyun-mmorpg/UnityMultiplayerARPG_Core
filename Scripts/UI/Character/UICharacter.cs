@@ -225,13 +225,14 @@ namespace MultiplayerARPG
             base.Update();
 
             Profiler.BeginSample("UICharacter - Update UI (Immediately)");
+            CharacterDataCache cache = Data.GetCaches();
             // Hp
             int currentHp = 0;
             int maxHp = 0;
             if (Data != null)
             {
                 currentHp = Data.CurrentHp;
-                maxHp = Data.GetCaches().MaxHp;
+                maxHp = cache?.MaxHp ?? 0;
             }
             if (uiGageHp != null)
                 uiGageHp.Update(currentHp, maxHp);
@@ -242,7 +243,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentMp = Data.CurrentMp;
-                maxMp = Data.GetCaches().MaxMp;
+                maxMp = cache?.MaxMp ?? 0;
             }
             if (uiGageMp != null)
                 uiGageMp.Update(currentMp, maxMp);
@@ -253,7 +254,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentStamina = Data.CurrentStamina;
-                maxStamina = Data.GetCaches().MaxStamina;
+                maxStamina = cache?.MaxStamina ?? 0;
             }
             if (uiGageStamina != null)
                 uiGageStamina.Update(currentStamina, maxStamina);
@@ -264,7 +265,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentFood = Data.CurrentFood;
-                maxFood = Data.GetCaches().MaxFood;
+                maxFood = cache?.MaxFood ?? 0;
             }
             if (uiGageFood != null)
                 uiGageFood.Update(currentFood, maxFood);
@@ -275,7 +276,7 @@ namespace MultiplayerARPG
             if (Data != null)
             {
                 currentWater = Data.CurrentWater;
-                maxWater = Data.GetCaches().MaxWater;
+                maxWater = cache?.MaxWater ?? 0;
             }
             if (uiGageWater != null)
                 uiGageWater.Update(currentWater, maxWater);
