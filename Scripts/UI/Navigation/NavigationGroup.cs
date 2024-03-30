@@ -29,6 +29,22 @@ namespace MultiplayerARPG
             childs.Clear();
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            upSelectables.Nulling();
+            upSelectables?.Clear();
+            downSelectables.Nulling();
+            downSelectables?.Clear();
+            leftSelectables.Nulling();
+            leftSelectables?.Clear();
+            rightSelectables.Nulling();
+            rightSelectables?.Clear();
+            childs.Nulling();
+            childs?.Clear();
+            _lastSelectedChild = null;
+        }
+
         public void SetLastSelectedChild(NavigationChild child)
         {
             if (!childs.Contains(child))
