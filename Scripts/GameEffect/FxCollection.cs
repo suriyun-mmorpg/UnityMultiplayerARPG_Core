@@ -36,6 +36,14 @@ namespace MultiplayerARPG
             _audioSourceSetters = gameObject.GetComponentsInChildren<AudioSourceSetter>(true);
         }
 
+        ~FxCollection()
+        {
+            _particles?.Nulling();
+            _lineRenderers?.Nulling();
+            _audioSources?.Nulling();
+            _audioSourceSetters?.Nulling();
+        }
+
         public void RevertLoop()
         {
             int i;
