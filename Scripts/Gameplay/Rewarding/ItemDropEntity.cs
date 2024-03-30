@@ -12,7 +12,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity
+    public partial class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity
     {
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
 
@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         [Category(99, "Events")]
         [FormerlySerializedAs("onItemDropDestroy")]
         [SerializeField]
-        protected UnityEvent onPickedUp;
+        protected UnityEvent onPickedUp = new UnityEvent();
 
         [Category(6, "Drop Settings")]
         public ItemDropManager itemDropManager = new ItemDropManager();

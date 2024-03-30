@@ -7,7 +7,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseRewardDropEntity : BaseGameEntity, IPickupActivatableEntity
+    public abstract partial class BaseRewardDropEntity : BaseGameEntity, IPickupActivatableEntity
     {
         [System.Serializable]
         public struct AppearanceSetting : System.IComparable<AppearanceSetting>
@@ -18,6 +18,11 @@ namespace MultiplayerARPG
             public int CompareTo(AppearanceSetting other)
             {
                 return amount.CompareTo(other.amount);
+            }
+
+            public void Clean()
+            {
+                activatingObjects.Nulling();
             }
         }
 
@@ -36,7 +41,7 @@ namespace MultiplayerARPG
 
         [Category(99, "Events")]
         [SerializeField]
-        protected UnityEvent onPickedUp;
+        protected UnityEvent onPickedUp = new UnityEvent();
 
         public float Multiplier { get; protected set; }
 

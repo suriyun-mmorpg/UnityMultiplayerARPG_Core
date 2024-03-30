@@ -5,13 +5,18 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class CurrencyDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
+    public partial class CurrencyDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
     {
         [System.Serializable]
         public struct CurrencyAppearanceSetting
         {
             public Currency currency;
             public GameObject[] activatingObjects;
+
+            public void Clean()
+            {
+                activatingObjects.Nulling();
+            }
         }
 
         protected Currency _currency;

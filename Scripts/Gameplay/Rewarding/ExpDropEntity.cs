@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public class ExpDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
+    public partial class ExpDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
     {
         public static ExpDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {

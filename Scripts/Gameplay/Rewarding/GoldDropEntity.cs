@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public class GoldDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
+    public partial class GoldDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
     {
         public static GoldDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {

@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class ItemsContainerEntity : BaseGameEntity, IActivatableEntity
+    public partial class ItemsContainerEntity : BaseGameEntity, IActivatableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         [Category("Events")]
         [FormerlySerializedAs("onItemsContainerDestroy")]
         [SerializeField]
-        protected UnityEvent onPickedUp;
+        protected UnityEvent onPickedUp = new UnityEvent();
 
         protected SyncFieldString _dropperTitle = new SyncFieldString();
         public SyncFieldString DropperTitle
