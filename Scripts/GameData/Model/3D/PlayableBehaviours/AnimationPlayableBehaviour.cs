@@ -247,6 +247,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             internal readonly HashSet<string> LeftHandWeaponTypeIds = new HashSet<string>();
             internal readonly Dictionary<string, BaseStateInfo> BaseStates = new Dictionary<string, BaseStateInfo>();
             internal readonly Dictionary<string, LeftHandWieldingStateInfo> LeftHandWieldingStates = new Dictionary<string, LeftHandWieldingStateInfo>();
+            internal int RefCount = 0;
 
             internal CacheData(PlayableCharacterModel characterModel)
             {
@@ -459,8 +460,19 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public void Setup(PlayableCharacterModel characterModel)
         {
             CharacterModel = characterModel;
-            if (!s_caches.ContainsKey(characterModel.Id))
-                s_caches[characterModel.Id] = new CacheData(characterModel);
+            if (!s_caches.TryGetValue(characterModel.Id, out CacheData cache))
+                cache = new CacheData(characterModel);
+            cache.RefCount++;
+            s_caches[characterModel.Id] = cache;
+        }
+
+        public void Desetup(PlayableCharacterModel characterModel)
+        {
+            if (!s_caches.TryGetValue(characterModel.Id, out CacheData cache))
+                return;
+            cache.RefCount--;
+            if (cache.RefCount <= 0)
+                s_caches.Remove(characterModel.Id);
         }
 
         public override void OnPlayableCreate(Playable playable)

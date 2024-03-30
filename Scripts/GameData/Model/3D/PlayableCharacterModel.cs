@@ -130,6 +130,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private void OnDestroy()
         {
             Entity.onIsUpdateEntityComponentsChanged -= CacheEntity_onUpdateEntityComponentsChanged;
+            Template?.Desetup(this);
             DestroyGraph();
         }
 
