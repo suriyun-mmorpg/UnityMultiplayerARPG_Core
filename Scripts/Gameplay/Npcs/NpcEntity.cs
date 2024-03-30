@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
-    public class NpcEntity : BaseGameEntity, IActivatableEntity
+    public partial class NpcEntity : BaseGameEntity, IActivatableEntity
     {
         [Category(5, "NPC Settings")]
         [SerializeField]
@@ -58,8 +58,6 @@ namespace MultiplayerARPG
 
         private UINpcEntity _uiNpcEntity;
         private NpcQuestIndicator _questIndicator;
-
-
 
         public Transform CharacterUiTransform
         {
