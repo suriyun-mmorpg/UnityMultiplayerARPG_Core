@@ -37,6 +37,8 @@ namespace MultiplayerARPG
             imageSkillCastGage = null;
             sliderSkillCastGage = null;
             uiCharacterBuffs = null;
+            if (_previousPlayingCharacterEntity != null)
+                _previousPlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
             _previousPlayingCharacterEntity = null;
         }
 
