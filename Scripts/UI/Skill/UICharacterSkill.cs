@@ -90,6 +90,50 @@ namespace MultiplayerARPG
         protected bool _dirtyAbleToLevelUp;
         protected bool _dirtyAbleToUse;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            uiTextLevel = null;
+            imageIcon = null;
+            uiTextSkillType = null;
+            uiTextAvailableWeapons = null;
+            uiTextAvailableArmors = null;
+            uiTextAvailableVehicles = null;
+            uiTextConsumeHp = null;
+            uiTextConsumeMp = null;
+            uiTextConsumeStamina = null;
+            uiTextCoolDownDuration = null;
+            uiTextCoolDownRemainsDuration = null;
+            imageCoolDownGage = null;
+            countDownObjects.Nulling();
+            noCountDownObjects.Nulling();
+            uiRequirement = null;
+            uiTextSummon = null;
+            uiTextMount = null;
+            uiCraftItem = null;
+            uiDamageAmount = null;
+            uiDamageInflictions = null;
+            uiAdditionalDamageAmounts = null;
+            uiAttackStatusEffects = null;
+            uiSkillBuff = null;
+            uiSkillDebuff = null;
+            onSetLevelZeroData?.RemoveAllListeners();
+            onSetLevelZeroData = null;
+            onSetNonLevelZeroData?.RemoveAllListeners();
+            onSetNonLevelZeroData = null;
+            onAbleToLevelUp?.RemoveAllListeners();
+            onAbleToLevelUp = null;
+            onUnableToLevelUp?.RemoveAllListeners();
+            onUnableToLevelUp = null;
+            onAbleToUse?.RemoveAllListeners();
+            onAbleToUse = null;
+            onUnableToUse?.RemoveAllListeners();
+            onUnableToUse = null;
+            uiNextLevelSkill = null;
+        }
+
         protected override void OnDisable()
         {
             base.OnDisable();

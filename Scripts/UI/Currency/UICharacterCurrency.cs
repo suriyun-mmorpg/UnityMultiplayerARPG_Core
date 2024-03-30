@@ -24,6 +24,15 @@ namespace MultiplayerARPG
         public TextWrapper uiTextAmount;
         public Image imageIcon;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            uiTextAmount = null;
+            imageIcon = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextTitle != null)

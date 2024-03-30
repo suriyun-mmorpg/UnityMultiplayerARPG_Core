@@ -26,6 +26,17 @@ namespace MultiplayerARPG
 
         protected float _buffRemainsDuration;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            imageIcon = null;
+            uiTextDuration = null;
+            uiTextRemainsDuration = null;
+            imageDurationGage = null;
+            uiBuff = null;
+        }
+
         protected override void OnDisable()
         {
             base.OnDisable();

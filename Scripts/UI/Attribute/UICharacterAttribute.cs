@@ -34,8 +34,24 @@ namespace MultiplayerARPG
         public UIStatusEffectResistances uiStatusEffectResistances;
 
         [Header("Events")]
-        public UnityEvent onAbleToIncrease;
-        public UnityEvent onUnableToIncrease;
+        public UnityEvent onAbleToIncrease = new UnityEvent();
+        public UnityEvent onUnableToIncrease = new UnityEvent();
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            uiTextAmount = null;
+            imageIcon = null;
+            uiIncreaseStats = null;
+            uiIncreaseResistances = null;
+            uiIncreaseArmors = null;
+            uiIncreaseDamages = null;
+            uiStatusEffectResistances = null;
+            onAbleToIncrease?.RemoveAllListeners();
+            onUnableToIncrease?.RemoveAllListeners();
+        }
 
         protected override void UpdateUI()
         {

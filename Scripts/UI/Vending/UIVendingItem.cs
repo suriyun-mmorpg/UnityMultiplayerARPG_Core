@@ -16,6 +16,15 @@ namespace MultiplayerARPG
         public InputFieldWrapper inputPrice;
         public UIStartVending uiStartVending;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCharacterItem = null;
+            textPrice = null;
+            inputPrice = null;
+            uiStartVending = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiCharacterItem != null)

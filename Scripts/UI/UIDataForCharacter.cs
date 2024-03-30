@@ -37,8 +37,9 @@
                 (target as UIDataForCharacter<T>).IndexOfData = IndexOfData;
         }
 
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             _character = null;
         }
     }
