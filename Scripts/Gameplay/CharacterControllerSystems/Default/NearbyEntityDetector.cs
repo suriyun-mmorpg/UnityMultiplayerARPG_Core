@@ -50,6 +50,37 @@ namespace MultiplayerARPG
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
+        private void OnDestroy()
+        {
+            CacheTransform = null;
+            characters.Nulling();
+            characters?.Clear();
+            players.Nulling();
+            players?.Clear();
+            monsters.Nulling();
+            monsters?.Clear();
+            npcs.Nulling();
+            npcs?.Clear();
+            itemDrops.Nulling();
+            itemDrops?.Clear();
+            buildings.Nulling();
+            buildings?.Clear();
+            vehicles.Nulling();
+            vehicles?.Clear();
+            warpPortals.Nulling();
+            warpPortals?.Clear();
+            itemsContainers.Nulling();
+            itemsContainers?.Clear();
+            activatableEntities?.Clear();
+            holdActivatableEntities?.Clear();
+            pickupActivatableEntities?.Clear();
+            _excludeColliders?.Clear();
+            _excludeCollider2Ds?.Clear();
+            _cacheCollider = null;
+            _cacheCollider2D = null;
+            onUpdateList = null;
+        }
+
         private void Start()
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
