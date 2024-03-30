@@ -38,14 +38,14 @@ namespace MultiplayerARPG
         }
         
         public Transform CacheTransform { get; private set; }
-        private FxCollection fxCollection;
+        private FxCollection _fxCollection;
         public FxCollection FxCollection
         {
             get
             {
-                if (fxCollection == null)
-                    fxCollection = new FxCollection(gameObject);
-                return fxCollection;
+                if (_fxCollection == null)
+                    _fxCollection = new FxCollection(gameObject);
+                return _fxCollection;
             }
         }
         private bool _playFxOnEnable;
@@ -53,6 +53,13 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             CacheTransform = transform;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            _skill = null;
+            _fxCollection = null;
+            CacheTransform = null;
         }
 
         protected virtual void OnEnable()
