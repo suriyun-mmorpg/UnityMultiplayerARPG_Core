@@ -98,12 +98,6 @@ namespace MultiplayerARPG
             set { characterDatabase = value; }
         }
 
-        public Faction Faction
-        {
-            get { return faction; }
-            set { faction = value; }
-        }
-
         public bool IsOverrideCharacteristic
         {
             get { return isOverrideCharacteristic; }
@@ -119,6 +113,12 @@ namespace MultiplayerARPG
         public MonsterCharacteristic Characteristic
         {
             get { return IsOverrideCharacteristic ? OverrideCharacteristic : CharacterDatabase.Characteristic; }
+        }
+
+        public Faction Faction
+        {
+            get { return faction; }
+            set { faction = value; }
         }
 
         public override int DataId

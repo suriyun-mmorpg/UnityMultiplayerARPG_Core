@@ -311,8 +311,6 @@ namespace MultiplayerARPG
 
             if (UICharacterEntity != null)
                 Destroy(UICharacterEntity.gameObject);
-
-            this.RemoveCaches();
         }
         #endregion
 
