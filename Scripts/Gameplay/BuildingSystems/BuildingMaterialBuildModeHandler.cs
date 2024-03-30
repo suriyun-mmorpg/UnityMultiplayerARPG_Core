@@ -12,6 +12,11 @@ namespace MultiplayerARPG
             this.buildingMaterial = buildingMaterial;
         }
 
+        private void OnDestroy()
+        {
+            buildingMaterial = null;
+        }
+
         private void OnTriggerStay(Collider other)
         {
             TriggerEnter(other.gameObject, other, null);

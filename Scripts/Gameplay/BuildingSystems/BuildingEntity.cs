@@ -10,7 +10,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class BuildingEntity : DamageableEntity, IBuildingSaveData, IActivatableEntity, IHoldActivatableEntity
+    public partial class BuildingEntity : DamageableEntity, IBuildingSaveData, IActivatableEntity, IHoldActivatableEntity
     {
         public const float BUILD_DISTANCE_BUFFER = 0.1f;
 

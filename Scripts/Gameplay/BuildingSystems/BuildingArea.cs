@@ -44,6 +44,15 @@ namespace MultiplayerARPG
             }
         }
 
+        private void OnDestroy()
+        {
+            entity = null;
+            CacheCollider = null;
+            CacheRigidbody = null;
+            CacheCollider2D = null;
+            CacheRigidbody2D = null;
+        }
+
         public bool IsPartOfBuildingEntity(BuildingEntity entity)
         {
             if (this.entity == null)

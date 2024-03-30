@@ -8,7 +8,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class CampFireEntity : StorageEntity
+    public partial class CampFireEntity : StorageEntity
     {
         [Category(7, "Campfire Settings")]
         [SerializeField]

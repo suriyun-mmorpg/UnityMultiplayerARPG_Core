@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class WorkbenchEntity : BuildingEntity
+    public partial class WorkbenchEntity : BuildingEntity
     {
         [Category(6, "Workbench Settings")]
         [SerializeField]
