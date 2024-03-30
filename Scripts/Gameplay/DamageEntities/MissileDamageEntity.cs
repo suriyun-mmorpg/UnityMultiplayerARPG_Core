@@ -16,8 +16,8 @@ namespace MultiplayerARPG
         public float sphereCastRadius = 1f;
         public Vector3 boxCastSize = Vector3.one;
         public float destroyDelay;
-        public UnityEvent onExploded;
-        public UnityEvent onDestroy;
+        public UnityEvent onExploded = new UnityEvent();
+        public UnityEvent onDestroy = new UnityEvent();
         [Tooltip("If this value more than 0, when it hit anything or it is out of life, it will explode and apply damage to characters in this distance")]
         public float explodeDistance;
 
@@ -56,6 +56,18 @@ namespace MultiplayerARPG
             {
                 _destroying = value;
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            onExploded?.RemoveAllListeners();
+            onExploded = null;
+            onDestroy?.RemoveAllListeners();
+            onDestroy = null;
+            _lockingTarget = null;
+            _previousPosition = null;
+            _alreadyHitObjects?.Clear();
         }
 
         /// <summary>

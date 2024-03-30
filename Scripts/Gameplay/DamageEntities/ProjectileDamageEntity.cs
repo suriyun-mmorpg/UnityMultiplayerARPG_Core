@@ -52,6 +52,17 @@ namespace MultiplayerARPG
         private Vector3 _normal;
         private Vector3 _hitPos;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            projectileObject = null;
+            impactEffect = null;
+            disappearEffect = null;
+            _projectileFx = null;
+            _impactFx = null;
+            _disappearFx = null;
+        }
+
         public override void Setup(
             EntityInfo instigator,
             CharacterItem weapon,

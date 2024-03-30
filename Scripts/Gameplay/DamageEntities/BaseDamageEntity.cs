@@ -58,6 +58,14 @@ namespace MultiplayerARPG
             CacheTransform = transform;
         }
 
+        protected virtual void OnDestroy()
+        {
+            CacheTransform = null;
+            _damageAmounts?.Clear();
+            _skill = null;
+            _fxCollection = null;
+        }
+
         protected virtual void OnEnable()
         {
             if (_playFxOnEnable)

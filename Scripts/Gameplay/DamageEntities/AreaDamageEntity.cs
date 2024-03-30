@@ -11,16 +11,16 @@ namespace MultiplayerARPG
     {
         public bool canApplyDamageToUser;
         public bool canApplyDamageToAllies;
-        public UnityEvent onDestroy;
+        public UnityEvent onDestroy = new UnityEvent();
 
-        private LiteNetLibIdentity identity;
+        private LiteNetLibIdentity _identity;
         public LiteNetLibIdentity Identity
         {
             get
             {
-                if (identity == null)
-                    identity = GetComponent<LiteNetLibIdentity>();
-                return identity;
+                if (_identity == null)
+                    _identity = GetComponent<LiteNetLibIdentity>();
+                return _identity;
             }
         }
 
@@ -34,9 +34,14 @@ namespace MultiplayerARPG
             Identity.onGetInstance.AddListener(OnGetInstance);
         }
 
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             Identity.onGetInstance.RemoveListener(OnGetInstance);
+            _identity = null;
+            _receivingDamageHitBoxes?.Clear();
+            onDestroy?.RemoveAllListeners();
+            onDestroy = null;
         }
 
         /// <summary>
