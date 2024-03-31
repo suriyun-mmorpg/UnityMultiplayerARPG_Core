@@ -15,6 +15,19 @@ namespace MultiplayerARPG
         public static event System.Action<List<CharacterItem>> onNotifyStorageItemsUpdated;
         public static List<CharacterItem> UpdatedStorageItems { get; private set; }
 
+        public static void Clean()
+        {
+            onResponseOpenStorage = null;
+            onResponseCloseStorage = null;
+            onResponseMoveItemFromStorage = null;
+            onResponseMoveItemToStorage = null;
+            onResponseSwapOrMergeStorageItem = null;
+            onNotifyStorageOpened = null;
+            onNotifyStorageClosed = null;
+            onNotifyStorageItemsUpdated = null;
+            UpdatedStorageItems?.Clear();
+        }
+
         public static void ResponseOpenStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseOpenStorageMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);

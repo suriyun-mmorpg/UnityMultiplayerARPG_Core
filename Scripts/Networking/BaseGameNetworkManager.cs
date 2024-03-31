@@ -247,6 +247,17 @@ namespace MultiplayerARPG
             _isServerReadyToInstantiatePlayers = false;
             _setOfGameEntity.Clear();
             PoolSystem.Clear();
+            ClientBankActions.Clean();
+            ClientCashShopActions.Clean();
+            ClientCharacterActions.Clean();
+            ClientFriendActions.Clean();
+            ClientGachaActions.Clean();
+            ClientGenericActions.Clean();
+            ClientGuildActions.Clean();
+            ClientInventoryActions.Clean();
+            ClientMailActions.Clean();
+            ClientPartyActions.Clean();
+            ClientStorageActions.Clean();
             // Extensions
             this.InvokeInstanceDevExtMethods("Clean");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)

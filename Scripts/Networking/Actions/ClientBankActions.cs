@@ -9,6 +9,14 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDepositGuildGoldMessage> onResponseDepositGuildGold;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseWithdrawGuildGoldMessage> onResponseWithdrawGuildGold;
 
+        public static void Clean()
+        {
+            onResponseDepositUserGold = null;
+            onResponseWithdrawUserGold = null;
+            onResponseDepositGuildGold = null;
+            onResponseWithdrawGuildGold = null;
+        }
+
         public static void ResponseDepositUserGold(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDepositUserGoldMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);

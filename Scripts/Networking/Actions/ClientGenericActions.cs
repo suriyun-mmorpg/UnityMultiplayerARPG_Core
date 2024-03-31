@@ -18,6 +18,22 @@ namespace MultiplayerARPG
         public static event System.Action<RewardGivenType, int, int> onNotifyRewardCurrency;
         public static event System.Action<int> onNotifyBattlePointsChanged;
 
+        public static void Clean()
+        {
+            onClientConnected = null;
+            onClientDisconnected = null;
+            onClientStopped = null;
+            onClientWarp = null;
+            onClientReceiveChatMessage = null;
+            onClientReceiveGameMessage = null;
+            onClientReceiveFormattedGameMessage = null;
+            onNotifyRewardExp = null;
+            onNotifyRewardGold = null;
+            onNotifyRewardItem = null;
+            onNotifyRewardCurrency = null;
+            onNotifyBattlePointsChanged = null;
+        }
+
         public static void ClientConnected()
         {
             if (onClientConnected != null)

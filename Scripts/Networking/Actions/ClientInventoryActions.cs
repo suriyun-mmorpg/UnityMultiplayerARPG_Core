@@ -21,6 +21,26 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemsMessage> onResponseSellItems;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSortItemsMessage> onResponseSortItems;
 
+        public static void Clean()
+        {
+            onResponseSwapOrMergeItem = null;
+            onResponseEquipArmor = null;
+            onResponseEquipWeapon = null;
+            onResponseUnEquipArmor = null;
+            onResponseUnEquipWeapon = null;
+            onResponseSwitchEquipWeaponSet = null;
+            onResponseDismantleItem = null;
+            onResponseDismantleItems = null;
+            onResponseEnhanceSocketItem = null;
+            onResponseRefineItem = null;
+            onResponseRemoveEnhancerFromItem = null;
+            onResponseRepairItem = null;
+            onResponseRepairEquipItems = null;
+            onResponseSellItem = null;
+            onResponseSellItems = null;
+            onResponseSortItems = null;
+        }
+
         public static void ResponseSwapOrMergeItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSwapOrMergeItemMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);

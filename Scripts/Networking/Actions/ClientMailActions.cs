@@ -13,6 +13,18 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseClaimAllMailsItemsMessage> onResponseClaimAllMailsItems;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseDeleteAllMailsMessage> onResponseDeleteAllMails;
 
+        public static void Clean()
+        {
+            onResponseMailList = null;
+            onResponseReadMail = null;
+            onResponseClaimMailItems = null;
+            onResponseDeleteMail = null;
+            onResponseSendMail = null;
+            onResponseMailNotification = null;
+            onResponseClaimAllMailsItems = null;
+            onResponseDeleteAllMails = null;
+        }
+
         public static void ResponseMailList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
         {
             if (onResponseMailList != null)

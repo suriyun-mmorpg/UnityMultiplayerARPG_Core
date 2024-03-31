@@ -16,6 +16,21 @@ namespace MultiplayerARPG
         public static event System.Action<UpdatePartyMessage.UpdateType, PartyData> onNotifyPartyUpdated;
         public static event System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyPartyMemberUpdated;
 
+        public static void Clean()
+        {
+            onResponseSendPartyInvitation = null;
+            onResponseAcceptPartyInvitation = null;
+            onResponseDeclinePartyInvitation = null;
+            onResponseCreateParty = null;
+            onResponseChangePartyLeader = null;
+            onResponseKickMemberFromParty = null;
+            onResponseLeaveParty = null;
+            onResponseChangePartySetting = null;
+            onNotifyPartyInvitation = null;
+            onNotifyPartyUpdated = null;
+            onNotifyPartyMemberUpdated = null;
+        }
+
         public static void ResponseSendPartyInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendPartyInvitationMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);

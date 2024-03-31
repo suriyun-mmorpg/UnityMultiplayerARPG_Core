@@ -8,6 +8,13 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseIncreaseSkillLevelMessage> onResponseIncreaseSkillLevel;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseRespawnMessage> onResponseRespawn;
 
+        public static void Clean()
+        {
+            onResponseIncreaseAttributeAmount = null;
+            onResponseIncreaseSkillLevel = null;
+            onResponseRespawn = null;
+        }
+
         public static void ResponseIncreaseAttributeAmount(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseIncreaseAttributeAmountMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);

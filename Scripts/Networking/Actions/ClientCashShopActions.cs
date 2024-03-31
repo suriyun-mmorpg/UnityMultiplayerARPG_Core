@@ -9,6 +9,14 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCashShopBuyMessage> onResponseCashShopBuy;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseCashPackageBuyValidationMessage> onResponseCashPackageBuyValidation;
 
+        public static void Clean()
+        {
+            onResponseCashShopInfo = null;
+            onResponseCashPackageInfo = null;
+            onResponseCashShopBuy = null;
+            onResponseCashPackageBuyValidation = null;
+        }
+
         public static void ResponseCashShopInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCashShopInfoMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);
