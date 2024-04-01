@@ -225,7 +225,8 @@ namespace MultiplayerARPG
             EntityStart();
             if (onStart != null)
                 onStart.Invoke();
-            BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
+            if (BaseGameNetworkManager.Singleton != null)
+                BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
         }
         protected virtual void EntityStart() { }
 
@@ -239,7 +240,8 @@ namespace MultiplayerARPG
             }
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
-            BaseGameNetworkManager.Singleton.UnregisterGameEntity(this);
+            if (BaseGameNetworkManager.Singleton != null)
+                BaseGameNetworkManager.Singleton.UnregisterGameEntity(this);
             Clean();
         }
         protected virtual void EntityOnDestroy()
