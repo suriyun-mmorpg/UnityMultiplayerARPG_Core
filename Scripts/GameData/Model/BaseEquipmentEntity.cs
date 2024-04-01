@@ -8,7 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public abstract partial class BaseEquipmentEntity : MonoBehaviour, IPoolDescriptorCollection
+    public abstract partial class BaseEquipmentEntity : ComponentWithPrefabRef<BaseEquipmentEntity>, IPoolDescriptorCollection
     {
         public BaseCharacterModel CharacterModel { get; set; }
         public string EquipPosition { get; set; }
@@ -158,6 +158,8 @@ namespace MultiplayerARPG
                 Gizmos.color = new Color(0, 1, 0, 0.5f);
                 DrawArrow.ForGizmo(missileDamageTransform.position, -missileDamageTransform.up, 0.5f, 0.1f);
             }
+
+            this.InvokeInstanceDevExtMethods("OnDrawGizmos");
         }
 #endif
 
