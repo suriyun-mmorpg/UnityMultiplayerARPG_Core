@@ -560,7 +560,7 @@ namespace MultiplayerARPG
                             tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
                         tempEquipmentObject.gameObject.SetActive(true);
                         if (SetEquipmentLayerFollowEntity)
-                            tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = Entity.gameObject);
+                            tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = Entity?.gameObject ?? null);
                         else
                             tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                         tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
@@ -574,7 +574,10 @@ namespace MultiplayerARPG
                 {
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     if (tempEquipmentEntity != null)
+                    {
                         tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.item);
+                        tempEquipmentEntity.SetupRefToPrefab(tempEquipmentModel.meshPrefab);
+                    }
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
                         CacheRightHandEquipmentEntity = tempEquipmentEntity;
                     if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
