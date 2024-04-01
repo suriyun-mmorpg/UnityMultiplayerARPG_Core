@@ -12,12 +12,6 @@ namespace MultiplayerARPG
         {
         }
 
-#if UNITY_EDITOR
-        public AssetReferenceCurrencyDropEntity(LiteNetLibBehaviour behaviour) : base(behaviour)
-        {
-        }
-#endif
-
         public new AsyncOperationHandle<CurrencyDropEntity> InstantiateAsync(Vector3 position, Quaternion rotation, Transform parent = null)
         {
             return Addressables.ResourceManager.CreateChainOperation(Addressables.InstantiateAsync(RuntimeKey, position, rotation, parent, false), GetComponentChainOperation);
