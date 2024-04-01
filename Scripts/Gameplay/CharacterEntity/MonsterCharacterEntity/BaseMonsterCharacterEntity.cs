@@ -422,7 +422,7 @@ namespace MultiplayerARPG
             return CharacterDatabase.DamageInfo.GetFov();
         }
 
-        public override async void Killed(EntityInfo lastAttacker)
+        public override void Killed(EntityInfo lastAttacker)
         {
             base.Killed(lastAttacker);
 
@@ -452,7 +452,7 @@ namespace MultiplayerARPG
                     {
                         if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
                         {
-                            ItemsContainerEntity.DropItems(await CurrentGameInstance.addressableMonsterCorpsePrefab.GetOrLoadAssetAsync<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                            ItemsContainerEntity.DropItems(CurrentGameInstance.addressableMonsterCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
                         }
 #if !LNLM_NO_PREFABS
                         else if (CurrentGameInstance.monsterCorpsePrefab != null)
