@@ -123,31 +123,39 @@ namespace MultiplayerARPG
         private NetworkSetting networkSetting = null;
 
         [Header("Gameplay Objects")]
+#if UNITY_EDITOR && LNLM_NO_PREFABS
+        public UnityHelpBox entityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
         public ItemDropEntity itemDropEntityPrefab = null;
-        public AssetReferenceItemDropEntity addressableItemDropEntityPrefab = null;
         public ExpDropEntity expDropEntityPrefab = null;
-        public AssetReferenceExpDropEntity addressableExpDropEntityPrefab = null;
         public GoldDropEntity goldDropEntityPrefab = null;
-        public AssetReferenceGoldDropEntity addressableGoldDropEntityPrefab = null;
         public CurrencyDropEntity currencyDropEntityPrefab = null;
-        public AssetReferenceCurrencyDropEntity addressableCurrencyDropEntityPrefab = null;
         public WarpPortalEntity warpPortalEntityPrefab = null;
-        public AssetReferenceWarpPortalEntity addressableWarpPortalEntityPrefab = null;
         public ItemsContainerEntity playerCorpsePrefab = null;
-        public AssetReferenceItemsContainerEntity addressablePlayerCorpsePrefab = null;
         public ItemsContainerEntity monsterCorpsePrefab = null;
-        public AssetReferenceItemsContainerEntity addressableMonsterCorpsePrefab = null;
         public BaseUISceneGameplay uiSceneGameplayPrefab = null;
-        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayPrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
         public BaseUISceneGameplay uiSceneGameplayMobilePrefab = null;
-        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayMobilePrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
         public BaseUISceneGameplay uiSceneGameplayConsolePrefab = null;
-        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayConsolePrefab = null;
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
         public BasePlayerCharacterController defaultControllerPrefab = null;
+#endif
+        public AssetReferenceItemDropEntity addressableItemDropEntityPrefab = null;
+        public AssetReferenceExpDropEntity addressableExpDropEntityPrefab = null;
+        public AssetReferenceGoldDropEntity addressableGoldDropEntityPrefab = null;
+        public AssetReferenceCurrencyDropEntity addressableCurrencyDropEntityPrefab = null;
+        public AssetReferenceWarpPortalEntity addressableWarpPortalEntityPrefab = null;
+        public AssetReferenceItemsContainerEntity addressablePlayerCorpsePrefab = null;
+        public AssetReferenceItemsContainerEntity addressableMonsterCorpsePrefab = null;
+        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayPrefab = null;
+        [Tooltip("If this is empty, it will use `Addressable UI Scene Gameplay Prefab` as gameplay UI prefab")]
+        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayMobilePrefab = null;
+        [Tooltip("If this is empty, it will use `Addressable UI Scene Gameplay Prefab` as gameplay UI prefab")]
+        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayConsolePrefab = null;
         public AssetReferenceBasePlayerCharacterController addressableDefaultControllerPrefab = null;
+
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
         public ServerCharacter serverCharacterPrefab = null;
         [Tooltip("These objects will be instantiate as owning character's children")]
@@ -482,6 +490,7 @@ namespace MultiplayerARPG
             get { return socialSystemSetting; }
         }
 
+#if !LNLM_NO_PREFABS
         public BaseUISceneGameplay UISceneGameplayPrefab
         {
             get
@@ -493,6 +502,7 @@ namespace MultiplayerARPG
                 return uiSceneGameplayPrefab;
             }
         }
+#endif
 
         public AssetReferenceBaseUISceneGameplay AddressableUISceneGameplayPrefab
         {
@@ -591,7 +601,7 @@ namespace MultiplayerARPG
                 return false;
             }
         }
-        #endregion
+#endregion
 
         protected virtual void Awake()
         {

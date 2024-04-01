@@ -422,7 +422,7 @@ namespace MultiplayerARPG
             return CharacterDatabase.DamageInfo.GetFov();
         }
 
-        public override void Killed(EntityInfo lastAttacker)
+        public override async void Killed(EntityInfo lastAttacker)
         {
             base.Killed(lastAttacker);
 
@@ -449,7 +449,18 @@ namespace MultiplayerARPG
                     break;
                 case DeadDropItemMode.CorpseLooting:
                     if (_droppingItems.Count > 0)
-                        ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                    {
+                        if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
+                        {
+                            ItemsContainerEntity.DropItems(await CurrentGameInstance.addressableMonsterCorpsePrefab.GetOrLoadAssetAsync<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                        }
+#if !LNLM_NO_PREFABS
+                        else if (CurrentGameInstance.monsterCorpsePrefab != null)
+                        {
+                            ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                        }
+#endif
+                    }
                     break;
             }
 

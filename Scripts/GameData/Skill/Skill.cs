@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -289,21 +290,35 @@ namespace MultiplayerARPG
 
         public override bool TryGetSummon(out SkillSummon summon)
         {
-            if (this.summon.MonsterCharacterEntity != null)
+            if (this.summon.AddressableMonsterCharacterEntity.IsDataValid())
             {
                 summon = this.summon;
                 return true;
             }
+#if !LNLM_NO_PREFABS
+            else if (this.summon.MonsterCharacterEntity != null)
+            {
+                summon = this.summon;
+                return true;
+            }
+#endif
             return base.TryGetSummon(out summon);
         }
 
         public override bool TryGetMount(out SkillMount mount)
         {
-            if (this.mount.MountEntity != null)
+            if (this.mount.AddressableMountEntity.IsDataValid())
             {
                 mount = this.mount;
                 return true;
             }
+#if !LNLM_NO_PREFABS
+            else if (this.mount.MountEntity != null)
+            {
+                mount = this.mount;
+                return true;
+            }
+#endif
             return base.TryGetMount(out mount);
         }
 

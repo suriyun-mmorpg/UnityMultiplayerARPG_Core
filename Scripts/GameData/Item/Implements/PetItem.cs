@@ -36,12 +36,24 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR && LNLM_NO_PREFABS
+        public UnityHelpBox entityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
         [Category(3, "Pet Settings")]
         [SerializeField]
         private BaseMonsterCharacterEntity petEntity = null;
+#endif
         public BaseMonsterCharacterEntity MonsterCharacterEntity
         {
-            get { return petEntity; }
+            get
+            {
+#if !LNLM_NO_PREFABS
+                return petEntity;
+#else
+                return null;
+#endif
+            }
         }
 
         [SerializeField]

@@ -35,9 +35,9 @@ namespace MultiplayerARPG
 
         public bool useUnityAutoPhysicSyncTransform = true;
         // Spawn entities events
-        public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
-        public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
-        public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish;
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesStart = new LiteNetLibLoadSceneEvent();
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress = new LiteNetLibLoadSceneEvent();
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish = new LiteNetLibLoadSceneEvent();
         // Other events
         /// <summary>
         /// ConnectionID, PlayerCharacterEntity
@@ -117,7 +117,7 @@ namespace MultiplayerARPG
             LiteNetLibIdentity.ForceHideFunctions.Remove(IsHideEntity);
         }
 
-        protected static bool IsHideEntity(LiteNetLibIdentity mustHideThis, LiteNetLibIdentity fromThis)
+        protected bool IsHideEntity(LiteNetLibIdentity mustHideThis, LiteNetLibIdentity fromThis)
         {
             if (!mustHideThis.TryGetComponent(out BaseGameEntity mustHideThisEntity) ||
                 !fromThis.TryGetComponent(out BaseGameEntity fromThisEntity))
@@ -731,13 +731,17 @@ namespace MultiplayerARPG
                 if (GameInstance.MapWarpPortals.TryGetValue(CurrentMapInfo.Id, out List<WarpPortal> mapWarpPortals))
                 {
                     WarpPortal warpPortal;
-                    WarpPortalEntity warpPortalPrefab;
+#if !LNLM_NO_PREFABS
+                        WarpPortalEntity warpPortalPrefab;
+#endif
                     AssetReferenceWarpPortalEntity addressableWarpPortalPrefab;
                     WarpPortalEntity warpPortalEntity;
                     for (i = 0; i < mapWarpPortals.Count; ++i)
                     {
                         warpPortal = mapWarpPortals[i];
-                        warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
+#if !LNLM_NO_PREFABS
+                            warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
+#endif
                         addressableWarpPortalPrefab = warpPortal.addressableEntityPrefab.IsDataValid() ? warpPortal.addressableEntityPrefab : CurrentGameInstance.addressableWarpPortalEntityPrefab;
                         spawnObj = null;
                         if (addressableWarpPortalPrefab.IsDataValid())
@@ -746,12 +750,14 @@ namespace MultiplayerARPG
                                 addressableWarpPortalPrefab.HashAssetId, warpPortal.position,
                                 Quaternion.Euler(warpPortal.rotation));
                         }
-                        else if (warpPortalPrefab != null)
-                        {
-                            spawnObj = Assets.GetObjectInstance(
-                                warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
-                                Quaternion.Euler(warpPortal.rotation));
-                        }
+#if !LNLM_NO_PREFABS
+                            else if (warpPortalPrefab != null)
+                            {
+                                spawnObj = Assets.GetObjectInstance(
+                                    warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
+                                    Quaternion.Euler(warpPortal.rotation));
+                            }
+#endif
                         if (spawnObj != null)
                         {
                             warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
@@ -780,13 +786,17 @@ namespace MultiplayerARPG
                 if (GameInstance.MapNpcs.TryGetValue(CurrentMapInfo.Id, out List<Npc> mapNpcs))
                 {
                     Npc npc;
-                    NpcEntity npcPrefab;
+#if !LNLM_NO_PREFABS
+                        NpcEntity npcPrefab;
+#endif
                     AssetReferenceNpcEntity addressableNpcPrefab;
                     NpcEntity npcEntity;
                     for (i = 0; i < mapNpcs.Count; ++i)
                     {
                         npc = mapNpcs[i];
-                        npcPrefab = npc.entityPrefab;
+#if !LNLM_NO_PREFABS
+                            npcPrefab = npc.entityPrefab;
+#endif
                         addressableNpcPrefab = npc.addressableEntityPrefab;
                         spawnObj = null;
                         if (addressableNpcPrefab.IsDataValid())
@@ -795,12 +805,14 @@ namespace MultiplayerARPG
                                 addressableNpcPrefab.HashAssetId, npc.position,
                                 Quaternion.Euler(npc.rotation));
                         }
-                        else if (npcPrefab != null)
-                        {
-                            spawnObj = Assets.GetObjectInstance(
-                                npcPrefab.Identity.HashAssetId, npc.position,
-                                Quaternion.Euler(npc.rotation));
-                        }
+#if !LNLM_NO_PREFABS
+                            else if (npcPrefab != null)
+                            {
+                                spawnObj = Assets.GetObjectInstance(
+                                    npcPrefab.Identity.HashAssetId, npc.position,
+                                    Quaternion.Euler(npc.rotation));
+                            }
+#endif
                         if (spawnObj != null)
                         {
                             npcEntity = spawnObj.GetComponent<NpcEntity>();
@@ -869,6 +881,7 @@ namespace MultiplayerARPG
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab, CurrentMapInfo.StartPosition, Quaternion.identity);
             }
             await UniTask.NextFrame();
+            // Entities were spawned
             progress = 1f;
             onSpawnEntitiesFinish.Invoke(sceneName, true, progress);
             await PostSpawnEntities();

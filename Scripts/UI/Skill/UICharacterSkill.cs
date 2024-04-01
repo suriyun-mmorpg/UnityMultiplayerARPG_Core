@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using Cysharp.Text;
+﻿using Cysharp.Text;
+using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -409,35 +410,57 @@ namespace MultiplayerARPG
 
             if (uiTextSummon != null)
             {
-                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || skillSummon.MonsterCharacterEntity == null)
+                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || (!skillSummon.AddressableMonsterCharacterEntity.IsDataValid() && skillSummon.MonsterCharacterEntity == null))
                 {
                     uiTextSummon.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextSummon.SetGameObjectActive(true);
-                    uiTextSummon.text = ZString.Format(
-                        LanguageManager.GetText(formatKeySummon),
-                        skillSummon.MonsterCharacterEntity.Title,
-                        skillSummon.Level.GetAmount(Level),
-                        skillSummon.AmountEachTime.GetAmount(Level),
-                        skillSummon.MaxStack.GetAmount(Level),
-                        skillSummon.Duration.GetAmount(Level));
+                    if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
+                    {
+                        uiTextSummon.text = ZString.Format(
+                            LanguageManager.GetText(formatKeySummon),
+                            skillSummon.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseMonsterCharacterEntity>().Title,
+                            skillSummon.Level.GetAmount(Level),
+                            skillSummon.AmountEachTime.GetAmount(Level),
+                            skillSummon.MaxStack.GetAmount(Level),
+                            skillSummon.Duration.GetAmount(Level));
+                    }
+                    else if (skillSummon.MonsterCharacterEntity != null)
+                    {
+                        uiTextSummon.text = ZString.Format(
+                            LanguageManager.GetText(formatKeySummon),
+                            skillSummon.MonsterCharacterEntity.Title,
+                            skillSummon.Level.GetAmount(Level),
+                            skillSummon.AmountEachTime.GetAmount(Level),
+                            skillSummon.MaxStack.GetAmount(Level),
+                            skillSummon.Duration.GetAmount(Level));
+                    }
                 }
             }
 
             if (uiTextMount != null)
             {
-                if (Skill == null || !Skill.TryGetMount(out SkillMount skillMount) || skillMount.MountEntity == null)
+                if (Skill == null || !Skill.TryGetMount(out SkillMount skillMount) || (!skillMount.AddressableMountEntity.IsDataValid() && skillMount.MountEntity == null))
                 {
                     uiTextMount.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextMount.SetGameObjectActive(true);
-                    uiTextMount.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyMount),
-                        skillMount.MountEntity.Title);
+                    if (skillMount.AddressableMountEntity.IsDataValid())
+                    {
+                        uiTextMount.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            skillMount.AddressableMountEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>().Title);
+                    }
+                    else if (skillMount.MountEntity != null)
+                    {
+                        uiTextMount.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            skillMount.MountEntity.Title);
+                    }
                 }
             }
 

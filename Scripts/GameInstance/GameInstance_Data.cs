@@ -495,7 +495,9 @@ namespace MultiplayerARPG
                     MapWarpPortals[mapWarpPortal.mapInfo.Id] = new List<WarpPortal>(mapWarpPortal.warpPortals);
                 foreach (WarpPortal warpPortal in mapWarpPortal.warpPortals)
                 {
+#if !LNLM_NO_PREFABS
                     AddGameEntity(WarpPortalEntities, warpPortal.entityPrefab);
+#endif
                     AddAssetReference<AssetReferenceWarpPortalEntity, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortal.addressableEntityPrefab);
                 }
             }
@@ -520,7 +522,9 @@ namespace MultiplayerARPG
                     MapNpcs[mapNpc.mapInfo.Id] = new List<Npc>(mapNpc.npcs);
                 foreach (Npc npc in mapNpc.npcs)
                 {
+#if !LNLM_NO_PREFABS
                     AddGameEntity(NpcEntities, npc.entityPrefab);
+#endif
                     AddAssetReference<AssetReferenceNpcEntity, NpcEntity>(AddressableNpcEntities, npc.addressableEntityPrefab);
                     if (npc.startDialog != null)
                         AddGameData(NpcDialogs, npc.startDialog);
@@ -713,7 +717,7 @@ namespace MultiplayerARPG
         {
             AddManyGameData(EquipmentSets, equipmentSets);
         }
-        #endregion
+#endregion
 
         #region Add game entity functions
         public static void AddCharacterEntities(params BaseCharacterEntity[] characterEntities)

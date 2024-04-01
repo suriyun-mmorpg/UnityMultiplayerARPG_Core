@@ -7,15 +7,33 @@ namespace MultiplayerARPG
     public partial struct SkillSummon
     {
         public static readonly SkillSummon Empty = new SkillSummon();
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
         [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
         [SerializeField]
         [FormerlySerializedAs("monsterEntity")]
         private BaseMonsterCharacterEntity monsterCharacterEntity;
-        public BaseMonsterCharacterEntity MonsterCharacterEntity { get { return monsterCharacterEntity; } }
+#endif
+        public BaseMonsterCharacterEntity MonsterCharacterEntity
+        {
+            get
+            {
+#if !LNLM_NO_PREFABS
+                return monsterCharacterEntity;
+#else
+                return null;
+#endif
+            }
+        }
 
         [SerializeField]
         private AssetReferenceBaseMonsterCharacterEntity addressableMonsterCharacterEntity;
-        public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity { get { return addressableMonsterCharacterEntity; } }
+        public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
+        {
+            get
+            {
+                return addressableMonsterCharacterEntity;
+            }
+        }
 
         [Tooltip("If duration less than or equals to 0, summoned monster will die")]
         [SerializeField]
@@ -42,7 +60,9 @@ namespace MultiplayerARPG
             IncrementalInt maxStack,
             IncrementalInt level)
         {
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
             this.monsterCharacterEntity = monsterCharacterEntity;
+#endif
             this.addressableMonsterCharacterEntity = addressableMonsterCharacterEntity;
             this.duration = duration;
             this.amountEachTime = amountEachTime;

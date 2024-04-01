@@ -456,18 +456,22 @@ namespace MultiplayerARPG
                 {
                     prefab = AddressableControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
                 }
+#if !LNLM_NO_PREFABS
                 else if (ControllerPrefab != null)
                 {
                     prefab = ControllerPrefab;
                 }
+#endif
                 else if (CurrentGameInstance.addressableDefaultControllerPrefab.IsDataValid())
                 {
                     prefab = CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
                 }
+#if !LNLM_NO_PREFABS
                 else if (CurrentGameInstance.defaultControllerPrefab != null)
                 {
                     prefab = CurrentGameInstance.defaultControllerPrefab;
                 }
+#endif
                 else if (BasePlayerCharacterController.Singleton != null)
                 {
                     prefab = BasePlayerCharacterController.LastPrefab;

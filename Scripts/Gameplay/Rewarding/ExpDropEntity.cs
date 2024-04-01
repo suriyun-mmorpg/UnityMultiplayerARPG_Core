@@ -1,3 +1,4 @@
+using LiteNetLibManager;
 using System.Collections.Generic;
 
 namespace MultiplayerARPG
@@ -6,7 +7,17 @@ namespace MultiplayerARPG
     {
         public static ExpDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {
-            return Drop(GameInstance.Singleton.expDropEntityPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
+            if (GameInstance.Singleton.addressableExpDropEntityPrefab.IsDataValid())
+            {
+                return Drop(GameInstance.Singleton.addressableExpDropEntityPrefab.GetOrLoadAsset<AssetReferenceExpDropEntity, ExpDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
+            }
+#if !LNLM_NO_PREFABS
+            else if (GameInstance.Singleton.expDropEntityPrefab != null)
+            {
+                return Drop(GameInstance.Singleton.expDropEntityPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
+            }
+#endif
+            return null;
         }
 
         protected override bool ProceedPickingUpAtServer_Implementation(BaseCharacterEntity characterEntity, out UITextKeys message)

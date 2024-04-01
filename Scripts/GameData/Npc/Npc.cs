@@ -5,7 +5,9 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct Npc
     {
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
         public NpcEntity entityPrefab;
+#endif
         public AssetReferenceNpcEntity addressableEntityPrefab;
         public Vector3 position;
         public Vector3 rotation;

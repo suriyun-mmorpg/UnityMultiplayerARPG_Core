@@ -15,9 +15,12 @@ namespace MultiplayerARPG
         [SerializeField]
         [FormerlySerializedAs("playerCharacters")]
         protected PlayerCharacter[] characterDatabases;
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected BasePlayerCharacterController controllerPrefab;
+#endif
+        [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected AssetReferenceBasePlayerCharacterController addressableControllerPrefab;
 
@@ -27,10 +30,12 @@ namespace MultiplayerARPG
             set { characterDatabases = value; }
         }
 
+#if !LNLM_NO_PREFABS
         public BasePlayerCharacterController ControllerPrefab
         {
             get { return controllerPrefab; }
         }
+#endif
 
         public AssetReferenceBasePlayerCharacterController AddressableControllerPrefab
         {

@@ -151,16 +151,31 @@ namespace MultiplayerARPG
         public AmmoType ammoType;
         public int overrideAmmoCapacity;
 
+#if UNITY_EDITOR && LNLM_NO_PREFABS
+        public UnityHelpBox buildingEntityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
         [Category(2, "Building Settings")]
         public BuildingEntity buildingEntity;
+#endif
         public AssetReferenceBuildingEntity addressableBuildingEntity;
 
+#if UNITY_EDITOR && LNLM_NO_PREFABS
+        public UnityHelpBox petEntityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
         [Category(2, "Pet Settings")]
         public BaseMonsterCharacterEntity petEntity;
+#endif
         public AssetReferenceBaseMonsterCharacterEntity addressablePetEntity;
 
+#if UNITY_EDITOR && LNLM_NO_PREFABS
+        public UnityHelpBox mountEntityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !LNLM_NO_PREFABS
         [Category(2, "Mount Settings")]
         public VehicleEntity mountEntity;
+#endif
         public AssetReferenceVehicleEntity addressableMountEntity;
 
         [Category(2, "Socket Enhancer Settings")]
@@ -624,8 +639,10 @@ namespace MultiplayerARPG
         {
             get
             {
+#if !LNLM_NO_PREFABS
                 if (itemType == LegacyItemType.Building)
                     return buildingEntity;
+#endif
                 return null;
             }
         }
@@ -644,8 +661,10 @@ namespace MultiplayerARPG
         {
             get
             {
+#if !LNLM_NO_PREFABS
                 if (itemType == LegacyItemType.Pet)
                     return petEntity;
+#endif
                 return null;
             }
         }
@@ -664,8 +683,10 @@ namespace MultiplayerARPG
         {
             get
             {
+#if !LNLM_NO_PREFABS
                 if (itemType == LegacyItemType.Mount)
                     return mountEntity;
+#endif
                 return null;
             }
         }
@@ -719,7 +740,7 @@ namespace MultiplayerARPG
                 return 0;
             }
         }
-        #endregion
+#endregion
 
         #region Implement ISocketEnhancerItem
         public SocketEnhancerType SocketEnhancerType
@@ -823,11 +844,13 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+#if !LNLM_NO_PREFABS
             GameInstance.AddBuildingEntities(buildingEntity);
-            GameInstance.AddAssetReferenceBuildingEntities(addressableBuildingEntity);
             GameInstance.AddCharacterEntities(petEntity);
-            GameInstance.AddAssetReferenceCharacterEntities(addressablePetEntity);
             GameInstance.AddVehicleEntities(mountEntity);
+#endif
+            GameInstance.AddAssetReferenceBuildingEntities(addressableBuildingEntity);
+            GameInstance.AddAssetReferenceCharacterEntities(addressablePetEntity);
             GameInstance.AddAssetReferenceVehicleEntities(addressableMountEntity);
             GameInstance.AddAttributes(increaseAttributes);
             GameInstance.AddAttributes(increaseAttributesRate);

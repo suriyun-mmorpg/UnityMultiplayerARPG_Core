@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -259,7 +260,18 @@ namespace MultiplayerARPG
                             break;
                         case DeadDropItemMode.CorpseLooting:
                             if (removingItemInstances.Count > 0)
-                                ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                            {
+                                if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
+                                {
+                                    ItemsContainerEntity.DropItems(CurrentGameInstance.addressablePlayerCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                                }
+#if !LNLM_NO_PREFABS
+                                else if (CurrentGameInstance.playerCorpsePrefab != null)
+                                {
+                                    ItemsContainerEntity.DropItems(CurrentGameInstance.playerCorpsePrefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                                }
+#endif
+                            }
                             break;
                     }
                 }

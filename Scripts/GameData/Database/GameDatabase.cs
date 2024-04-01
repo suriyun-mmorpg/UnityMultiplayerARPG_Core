@@ -15,8 +15,9 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.GAME_DATABASE_FILE, menuName = GameDataMenuConsts.GAME_DATABASE_MENU, order = GameDataMenuConsts.GAME_DATABASE_ORDER)]
     public partial class GameDatabase : BaseGameDatabase
     {
+#if UNITY_EDITOR
         public UnityHelpBox entityHelpBox = new UnityHelpBox("Game database will load referring game data from an entities when game instance initializing");
-
+#endif
         [Header("Entity")]
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;

@@ -130,10 +130,12 @@ namespace MultiplayerARPG
             {
                 UISceneGameplay = Instantiate(CurrentGameInstance.AddressableUISceneGameplayPrefab.GetOrLoadAsset<AssetReferenceBaseUISceneGameplay, BaseUISceneGameplay>());
             }
+#if !LNLM_NO_PREFABS
             else if (CurrentGameInstance.UISceneGameplayPrefab != null)
             {
                 UISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
             }
+#endif
             if (UISceneGameplay != null)
                 UISceneGameplay.OnControllerSetup(characterEntity);
             if (onSetup != null)

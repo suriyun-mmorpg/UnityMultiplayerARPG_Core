@@ -333,7 +333,17 @@ namespace MultiplayerARPG
 
         public static ItemDropEntity Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
         {
-            return Drop(GameInstance.Singleton.itemDropEntityPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+            if (GameInstance.Singleton.addressableItemDropEntityPrefab.IsDataValid())
+            {
+                return Drop(GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAsset<AssetReferenceItemDropEntity, ItemDropEntity>(), dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+            }
+#if !LNLM_NO_PREFABS
+            else if (GameInstance.Singleton.itemDropEntityPrefab != null)
+            {
+                return Drop(GameInstance.Singleton.itemDropEntityPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+            }
+#endif
+            return null;
         }
 
         public static ItemDropEntity Drop(ItemDropEntity prefab, BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters, float appearDuration)
