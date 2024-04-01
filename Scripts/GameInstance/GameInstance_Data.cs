@@ -1011,8 +1011,8 @@ namespace MultiplayerARPG
         }
 
         private static void AddManyAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, IEnumerable<TBehaviour> list)
-            where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
-            where TType : LiteNetLibBehaviour
+            where TBehaviour : AssetReferenceBaseGameEntity<TType>
+            where TType : BaseGameEntity
         {
             if (list == null)
                 return;
@@ -1023,8 +1023,8 @@ namespace MultiplayerARPG
         }
 
         private static bool AddAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, TBehaviour data)
-            where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
-            where TType : LiteNetLibBehaviour
+            where TBehaviour : AssetReferenceBaseGameEntity<TType>
+            where TType : BaseGameEntity
         {
             if (!data.IsDataValid())
                 return false;
