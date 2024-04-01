@@ -165,7 +165,7 @@ namespace MultiplayerARPG
 
         public override void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, IEnumerable<IBuildingSaveData> buildings)
         {
-            if (!isReadyToSave)
+            if (!isReadyToSave || BaseGameNetworkManager.CurrentMapInfo == null)
                 return;
 
             // Save building entities / Tree / Rocks
