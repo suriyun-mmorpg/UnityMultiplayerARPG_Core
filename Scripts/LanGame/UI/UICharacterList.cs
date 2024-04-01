@@ -149,7 +149,7 @@ namespace MultiplayerARPG
                     if (characterModel != null)
                     {
                         _characterModelById[characterData.Id] = characterModel;
-                        PlayerCharacterBodyPartComponent[] comps = characterModel.GetComponentInParent<BaseCharacterEntity>().GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
+                        PlayerCharacterBodyPartComponent[] comps = characterModel.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
                         for (int i = 0; i < comps.Length; ++i)
                         {
                             comps[i].SetupCharacterModelEvents(characterModel);
