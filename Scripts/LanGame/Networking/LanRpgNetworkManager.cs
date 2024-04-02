@@ -237,7 +237,7 @@ namespace MultiplayerARPG
         private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
         {
             // If it is not allow this character data, disconnect user
-            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _) && playerCharacterData.TryGetEntityPrefab(out _))
+            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _) && !playerCharacterData.TryGetEntityPrefab(out _))
             {
                 Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
