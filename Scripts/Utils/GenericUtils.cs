@@ -540,13 +540,24 @@ public static partial class GenericUtils
     }
 
     public static void Nulling<T>(this IList<T> objects)
-        where T : Object
+        where T : class
     {
         if (objects == null)
             return;
         for (int i = 0; i < objects.Count; ++i)
         {
             objects[i] = null;
+        }
+    }
+
+    public static void Defaulting<T>(this IList<T> objects)
+        where T : struct
+    {
+        if (objects == null)
+            return;
+        for (int i = 0; i < objects.Count; ++i)
+        {
+            objects[i] = default;
         }
     }
 
