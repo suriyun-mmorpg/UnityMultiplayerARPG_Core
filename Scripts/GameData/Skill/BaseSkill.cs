@@ -262,14 +262,14 @@ namespace MultiplayerARPG
             if (TryGetSummon(out SkillSummon summon))
             {
                 GameInstance.AddAssetReferenceCharacterEntities(summon.AddressableMonsterCharacterEntity);
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 GameInstance.AddCharacterEntities(summon.MonsterCharacterEntity);
 #endif
             }
             if (TryGetMount(out SkillMount mount))
             {
                 GameInstance.AddAssetReferenceVehicleEntities(mount.AddressableMountEntity);
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 GameInstance.AddVehicleEntities(mount.MountEntity);
 #endif
             }

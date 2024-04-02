@@ -55,7 +55,7 @@ namespace MultiplayerARPG
                 case GameStartType.Host:
                     SetMapInfo(selectedCharacter.CurrentMapName);
                     Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                     Assets.onlineScene = CurrentMapInfo.Scene;
 #endif
                     networkPort = gameServiceConnection.networkPort;
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                 case GameStartType.SinglePlayer:
                     SetMapInfo(selectedCharacter.CurrentMapName);
                     Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                     Assets.onlineScene = CurrentMapInfo.Scene;
 #endif
                     StartHost(true);

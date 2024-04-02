@@ -11,7 +11,7 @@ namespace MultiplayerARPG
             {
                 return Drop(GameInstance.Singleton.addressableGoldDropEntityPrefab.GetOrLoadAsset<AssetReferenceGoldDropEntity, GoldDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as GoldDropEntity;
             }
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
             else if (GameInstance.Singleton.goldDropEntityPrefab != null)
             {
                 return Drop(GameInstance.Singleton.goldDropEntityPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as GoldDropEntity;

@@ -123,10 +123,10 @@ namespace MultiplayerARPG
         private NetworkSetting networkSetting = null;
 
         [Header("Gameplay Objects")]
-#if UNITY_EDITOR && LNLM_NO_PREFABS
-        public UnityHelpBox entityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !LNLM_NO_PREFABS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         public ItemDropEntity itemDropEntityPrefab = null;
         public ExpDropEntity expDropEntityPrefab = null;
         public GoldDropEntity goldDropEntityPrefab = null;
@@ -490,7 +490,7 @@ namespace MultiplayerARPG
             get { return socialSystemSetting; }
         }
 
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
         public BaseUISceneGameplay UISceneGameplayPrefab
         {
             get

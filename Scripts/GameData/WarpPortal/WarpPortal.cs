@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct WarpPortal
     {
-#if UNITY_EDITOR || !LNLM_NO_PREFABS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("The `WarpPortalEntity` prefab which will instantiates on the map scene. If this is not set, it will use the one which set to `GameInstance` → `warpPortalEntityPrefab`")]
         public WarpPortalEntity entityPrefab;
 #endif

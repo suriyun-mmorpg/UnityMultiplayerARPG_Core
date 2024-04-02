@@ -80,7 +80,7 @@ namespace MultiplayerARPG
 
         public virtual void RegisterPrefabs()
         {
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
             if (prefab != null)
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
 #endif
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
 
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 if (spawningPrefab.prefab != null)
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
 #endif

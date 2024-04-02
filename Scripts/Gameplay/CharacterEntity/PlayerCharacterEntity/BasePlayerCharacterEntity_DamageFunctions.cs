@@ -265,7 +265,7 @@ namespace MultiplayerARPG
                                 {
                                     ItemsContainerEntity.DropItems(CurrentGameInstance.addressablePlayerCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
                                 }
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                                 else if (CurrentGameInstance.playerCorpsePrefab != null)
                                 {
                                     ItemsContainerEntity.DropItems(CurrentGameInstance.playerCorpsePrefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);

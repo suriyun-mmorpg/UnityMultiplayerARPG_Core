@@ -151,28 +151,28 @@ namespace MultiplayerARPG
         public AmmoType ammoType;
         public int overrideAmmoCapacity;
 
-#if UNITY_EDITOR && LNLM_NO_PREFABS
-        public UnityHelpBox buildingEntityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox buildingEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !LNLM_NO_PREFABS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(2, "Building Settings")]
         public BuildingEntity buildingEntity;
 #endif
         public AssetReferenceBuildingEntity addressableBuildingEntity;
 
-#if UNITY_EDITOR && LNLM_NO_PREFABS
-        public UnityHelpBox petEntityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox petEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !LNLM_NO_PREFABS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(2, "Pet Settings")]
         public BaseMonsterCharacterEntity petEntity;
 #endif
         public AssetReferenceBaseMonsterCharacterEntity addressablePetEntity;
 
-#if UNITY_EDITOR && LNLM_NO_PREFABS
-        public UnityHelpBox mountEntityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox mountEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !LNLM_NO_PREFABS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(2, "Mount Settings")]
         public VehicleEntity mountEntity;
 #endif
@@ -639,7 +639,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 if (itemType == LegacyItemType.Building)
                     return buildingEntity;
 #endif
@@ -661,7 +661,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 if (itemType == LegacyItemType.Pet)
                     return petEntity;
 #endif
@@ -683,7 +683,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 if (itemType == LegacyItemType.Mount)
                     return mountEntity;
 #endif
@@ -844,7 +844,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddBuildingEntities(buildingEntity);
             GameInstance.AddCharacterEntities(petEntity);
             GameInstance.AddVehicleEntities(mountEntity);

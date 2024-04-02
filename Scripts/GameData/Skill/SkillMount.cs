@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     public partial struct SkillMount
     {
         public static readonly SkillMount Empty = new SkillMount();
-#if UNITY_EDITOR || !LNLM_NO_PREFABS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("Leave `Mount Entity` to NULL to not summon mount entity")]
         [SerializeField]
         private VehicleEntity mountEntity;
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 return mountEntity;
 #else
                 return null;
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
 
         public SkillMount(VehicleEntity mountEntity, AssetReferenceVehicleEntity addressableMountEntity)
         {
-#if UNITY_EDITOR || !LNLM_NO_PREFABS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
             this.mountEntity = mountEntity;
 #endif
             this.addressableMountEntity = addressableMountEntity;

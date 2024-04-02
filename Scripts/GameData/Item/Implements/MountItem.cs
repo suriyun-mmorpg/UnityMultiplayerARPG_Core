@@ -36,10 +36,10 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR && LNLM_NO_PREFABS
-        public UnityHelpBox entityHelpBox = new UnityHelpBox("`LNLM_NO_PREFABS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !LNLM_NO_PREFABS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(3, "Mount Settings")]
         [SerializeField]
         private VehicleEntity mountEntity = null;
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 return mountEntity;
 #else
                 return null;

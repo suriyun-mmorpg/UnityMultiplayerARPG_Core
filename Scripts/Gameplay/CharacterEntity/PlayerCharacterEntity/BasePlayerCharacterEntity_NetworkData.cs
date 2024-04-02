@@ -456,7 +456,7 @@ namespace MultiplayerARPG
                 {
                     prefab = AddressableControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
                 }
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 else if (ControllerPrefab != null)
                 {
                     prefab = ControllerPrefab;
@@ -466,7 +466,7 @@ namespace MultiplayerARPG
                 {
                     prefab = CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
                 }
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
                 else if (CurrentGameInstance.defaultControllerPrefab != null)
                 {
                     prefab = CurrentGameInstance.defaultControllerPrefab;

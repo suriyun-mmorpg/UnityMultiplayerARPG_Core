@@ -295,7 +295,7 @@ namespace MultiplayerARPG
                 summon = this.summon;
                 return true;
             }
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
             else if (this.summon.MonsterCharacterEntity != null)
             {
                 summon = this.summon;
@@ -312,7 +312,7 @@ namespace MultiplayerARPG
                 mount = this.mount;
                 return true;
             }
-#if !LNLM_NO_PREFABS
+#if !EXCLUDE_PREFAB_REFS
             else if (this.mount.MountEntity != null)
             {
                 mount = this.mount;
