@@ -184,7 +184,8 @@ namespace MultiplayerARPG
             // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
             if (Manager == null)
             {
-                Id = Entity.Identity.HashAssetId;
+                if (Entity != null && Entity.Identity != null)
+                    Id = Entity.Identity.HashAssetId;
                 MainModel = this;
                 InitCacheData();
                 SwitchModel(null);
