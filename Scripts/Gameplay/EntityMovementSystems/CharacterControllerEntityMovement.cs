@@ -236,6 +236,8 @@ namespace MultiplayerARPG
 
         private float GetGroundCheckRadius()
         {
+            if (CacheCharacterController == null || CacheTransform == null)
+                return 0f;
             return CacheCharacterController.radius * Mathf.Max(Mathf.Max(CacheTransform.lossyScale.x, CacheTransform.lossyScale.y), CacheTransform.lossyScale.z);
         }
 
