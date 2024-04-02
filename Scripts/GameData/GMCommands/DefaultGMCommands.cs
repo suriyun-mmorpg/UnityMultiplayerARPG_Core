@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public class DefaultGMCommands : BaseGMCommands
     {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
         /// <summary>
         /// Get list of all GM commands
         /// </summary>
@@ -132,7 +132,7 @@ namespace MultiplayerARPG
         {
             if (string.IsNullOrEmpty(command))
                 return false;
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (command.ToLower().Equals(Help.ToLower()))
                 return true;
             if (command.ToLower().Equals(Level.ToLower()) && dataLength == 2)
@@ -190,7 +190,7 @@ namespace MultiplayerARPG
             command = string.Empty;
             if (string.IsNullOrEmpty(chatMessage))
                 return false;
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             string[] splited = chatMessage.Split(' ');
             command = splited[0];
             if (command.ToLower().Equals(Help.ToLower()) ||
@@ -236,7 +236,7 @@ namespace MultiplayerARPG
             if (string.IsNullOrEmpty(chatMessage))
                 return string.Empty;
             string response = string.Empty;
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             string[] data = chatMessage.Split(' ');
             string commandKey = data[0];
             string receiver;

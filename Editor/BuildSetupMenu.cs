@@ -11,13 +11,15 @@ namespace MultiplayerARPG
         [MenuItem(EditorMenuConsts.BUILD_SETUP_OFFLINE_LAN_MENU, false, EditorMenuConsts.BUILD_SETUP_OFFLINE_LAN_ORDER)]
         public static void BuildSetupOfflineLan()
         {
-            AddToDefines("UNITY_SERVER");
+            RemoveFromDefines("EXCLUDE_SERVER_CODES");
+            RemoveFromDefines("UNITY_SERVER");
             EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for Offline/LAN games is done, you will have wait a bit for compiling", "Ok");
         }
 
         [MenuItem(EditorMenuConsts.BUILD_SETUP_MMO_MENU, false, EditorMenuConsts.BUILD_SETUP_MMO_ORDER)]
         public static void BuildSetupMMO()
         {
+            AddToDefines("EXCLUDE_SERVER_CODES");
             RemoveFromDefines("UNITY_SERVER");
             EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for MMO games is done, you will have wait a bit for compiling", "Ok");
         }
@@ -25,7 +27,8 @@ namespace MultiplayerARPG
         [MenuItem(EditorMenuConsts.BUILD_SETUP_MMO_SERVER_INCLUDE_MENU, false, EditorMenuConsts.BUILD_SETUP_MMO_SERVER_INCLUDE_ORDER)]
         public static void BuildSetupMMOServerInclude()
         {
-            AddToDefines("UNITY_SERVER");
+            RemoveFromDefines("EXCLUDE_SERVER_CODES");
+            RemoveFromDefines("UNITY_SERVER");
             EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for MMO (with Server Codes) is done, you will have wait a bit for compiling", "Ok");
         }
 

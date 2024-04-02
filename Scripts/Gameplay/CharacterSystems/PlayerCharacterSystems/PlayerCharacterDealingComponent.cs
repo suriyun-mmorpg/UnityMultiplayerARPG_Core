@@ -210,7 +210,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSendDealingRequest(uint objectId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DisableDealing)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
@@ -263,7 +263,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdAcceptDealingRequest()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingCharacter == null)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCEPT_DEALING_REQUEST);
@@ -296,7 +296,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdDeclineDealingRequest()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingCharacter != null)
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_DEALING_REQUEST_DECLINED);
             GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_DEALING_REQUEST_DECLINED);
@@ -335,7 +335,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSetDealingItem(string id, int amount)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingState != DealingState.Dealing)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
@@ -389,7 +389,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSetDealingGold(int gold)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingState != DealingState.Dealing)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
@@ -412,7 +412,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdLockDealing()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingState != DealingState.Dealing)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
@@ -431,7 +431,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdConfirmDealing()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingState != DealingState.LockDealing || !(DealingCharacter.Dealing.DealingState == DealingState.LockDealing || DealingCharacter.Dealing.DealingState == DealingState.ConfirmDealing))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
@@ -469,7 +469,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdCancelDealing()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingCharacter != null && DealingCharacter.Dealing.DealingState != DealingState.None)
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);
             if (DealingState != DealingState.None)

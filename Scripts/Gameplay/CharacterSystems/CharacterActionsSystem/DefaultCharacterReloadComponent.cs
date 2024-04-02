@@ -266,7 +266,7 @@ namespace MultiplayerARPG
 
         protected void ProceedCmdReload(bool isLeftHand)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (!_manager.IsAcceptNewAction())
                 return;
             CharacterItem reloadingWeapon = isLeftHand ? Entity.EquipWeapons.leftHand : Entity.EquipWeapons.rightHand;
