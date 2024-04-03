@@ -1,10 +1,13 @@
-﻿namespace MultiplayerARPG
+﻿using System.Runtime.InteropServices;
+
+namespace MultiplayerARPG
 {
     /// <summary>
-    /// NOTE: Make this class to be partial class in-case other developer wants to add other options
+    /// NOTE: Make this struct to be partial struct in-case other developer wants to add other options
     /// </summary>
     [System.Serializable]
-    public partial class GuildOptions
+    [StructLayout(LayoutKind.Auto)]
+    public partial struct GuildOptions
     {
         public int iconDataId;
     }
