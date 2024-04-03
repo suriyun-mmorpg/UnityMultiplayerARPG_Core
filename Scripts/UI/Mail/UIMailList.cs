@@ -89,12 +89,14 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelect(UIMailListEntry ui)
         {
-            if (uiDialog != null && ui.Data != null)
+            if (uiDialog != null)
             {
+                MailListEntry data = ui.Data;
                 uiDialog.uiMailList = this;
-                uiDialog.MailId = ui.Data.Id;
+                uiDialog.MailId = data.Id;
                 uiDialog.Show();
-                ui.Data.IsRead = true;
+                data.IsRead = true;
+                ui.Data = data;
                 ui.ForceUpdate();
             }
         }
