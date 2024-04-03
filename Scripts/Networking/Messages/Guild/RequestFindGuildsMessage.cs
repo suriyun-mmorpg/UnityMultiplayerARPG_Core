@@ -6,14 +6,14 @@ namespace MultiplayerARPG
     {
         public string guildName;
         public int skip;
-        public int take;
+        public int limit;
         public GuildListFieldOptions fieldOptions;
 
         public void Deserialize(NetDataReader reader)
         {
             guildName = reader.GetString();
             skip = reader.GetPackedInt();
-            take = reader.GetPackedInt();
+            limit = reader.GetPackedInt();
             fieldOptions = (GuildListFieldOptions)reader.GetPackedInt();
         }
 
@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         {
             writer.Put(guildName);
             writer.PutPackedInt(skip);
-            writer.PutPackedInt(take);
+            writer.PutPackedInt(limit);
             writer.PutPackedInt((int)fieldOptions);
         }
     }
