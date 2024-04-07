@@ -205,7 +205,6 @@ namespace MultiplayerARPG
             {
                 if (!entity.enabled)
                     continue;
-                entity.SendServerState(timestamp);
                 if (entity.IsOwnerClient)
                     entity.SendClientState(timestamp);
             }
