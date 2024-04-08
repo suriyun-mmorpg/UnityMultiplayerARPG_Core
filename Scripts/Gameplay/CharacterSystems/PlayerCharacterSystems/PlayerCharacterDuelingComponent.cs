@@ -303,8 +303,6 @@ namespace MultiplayerARPG
 
         public bool CallOwnerEndDueling(uint loserObjectId)
         {
-            if (!DuelingStarted)
-                return false;
             RPC(TargetEndDueling, ConnectionId, loserObjectId);
             return true;
         }
