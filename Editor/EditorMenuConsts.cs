@@ -9,6 +9,10 @@ namespace MultiplayerARPG
         public const int BUILD_SETUP_MMO_ORDER = 1;
         public const string BUILD_SETUP_MMO_SERVER_INCLUDE_MENU = "MMORPG KIT/Setup For MMO with Server Codes Build";
         public const int BUILD_SETUP_MMO_SERVER_INCLUDE_ORDER = 2;
+        public const string BUILD_SETUP_EXCLUDE_PREFAB_REFS_MENU = "MMORPG KIT/Exclude Prefab Refs";
+        public const int BUILD_SETUP_EXCLUDE_PREFAB_REFS_ORDER = 3;
+        public const string BUILD_SETUP_INCLUDE_PREFAB_REFS_MENU = "MMORPG KIT/Include Prefab Refs";
+        public const int BUILD_SETUP_INCLUDE_PREFAB_REFS_ORDER = 4;
         #endregion
 
         #region Database

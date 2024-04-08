@@ -32,6 +32,20 @@ namespace MultiplayerARPG
             EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for MMO (with Server Codes) is done, you will have wait a bit for compiling", "Ok");
         }
 
+        [MenuItem(EditorMenuConsts.BUILD_SETUP_EXCLUDE_PREFAB_REFS_MENU, false, EditorMenuConsts.BUILD_SETUP_EXCLUDE_PREFAB_REFS_ORDER)]
+        public static void BuildSetupExcludePrefabRefs()
+        {
+            AddToDefines("EXCLUDE_PREFAB_REFS");
+            EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for prefab refs excluding is done, you will have wait a bit for compiling", "Ok");
+        }
+
+        [MenuItem(EditorMenuConsts.BUILD_SETUP_INCLUDE_PREFAB_REFS_MENU, false, EditorMenuConsts.BUILD_SETUP_INCLUDE_PREFAB_REFS_ORDER)]
+        public static void BuildSetupIncludePrefabRefs()
+        {
+            RemoveFromDefines("EXCLUDE_PREFAB_REFS");
+            EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for prefab refs including is done, you will have wait a bit for compiling", "Ok");
+        }
+
         private static void AddToDefines(string symbol)
         {
             string previousProjectDefines = GetCurrentProjectDefines(out BuildTargetGroup buildTargetGroup);
