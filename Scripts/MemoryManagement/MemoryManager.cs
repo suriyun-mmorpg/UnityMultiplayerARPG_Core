@@ -10,25 +10,54 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (s_Instance == null)
-                {
-                    s_Instance = new GameObject("_MemoryManager").AddComponent<MemoryManager>();
-                    DontDestroyOnLoad(s_Instance.gameObject);
-                }
+                PrepareInstance();
                 return s_Instance;
             }
         }
 
-        public static CharacterBuffCacheManager CharacterBuffs => Instance._characterBuffs;
-        public static CharacterItemCacheManager CharacterItems => Instance._characterItems;
-        public static CharacterSummonCacheManager CharacterSummons => Instance._characterSummons;
+        private static void PrepareInstance()
+        {
+            if (!Application.isPlaying)
+                return;
+            if (s_Instance != null)
+                return;
+            s_Instance = new GameObject("_MemoryManager").AddComponent<MemoryManager>();
+            DontDestroyOnLoad(s_Instance.gameObject);
+        }
+
+        public static CharacterBuffCacheManager CharacterBuffs
+        {
+            get
+            {
+                PrepareInstance();
+                return _characterBuffs;
+            }
+        }
+
+        public static CharacterItemCacheManager CharacterItems
+        {
+            get
+            {
+                PrepareInstance();
+                return _characterItems;
+            }
+        }
+
+        public static CharacterSummonCacheManager CharacterSummons
+        {
+            get
+            {
+                PrepareInstance();
+                return _characterSummons;
+            }
+        }
 
         public float updateDelay = 10f;
 
         private float _lastUpdateTime;
-        private readonly CharacterBuffCacheManager _characterBuffs = new CharacterBuffCacheManager();
-        private readonly CharacterItemCacheManager _characterItems = new CharacterItemCacheManager();
-        private readonly CharacterSummonCacheManager _characterSummons = new CharacterSummonCacheManager();
+        private static readonly CharacterBuffCacheManager _characterBuffs = new CharacterBuffCacheManager();
+        private static readonly CharacterItemCacheManager _characterItems = new CharacterItemCacheManager();
+        private static readonly CharacterSummonCacheManager _characterSummons = new CharacterSummonCacheManager();
 
         private void Update()
         {
