@@ -153,19 +153,6 @@ namespace MultiplayerARPG
                 data.MarkToMakeCaches();
             data.NonEquipItems.FillEmptySlots(GameInstance.Singleton.IsLimitInventorySlot, data.GetCaches().LimitItemSlot);
         }
-
-        public static void FillWeaponSetsIfNeeded(this ICharacterData data, byte equipWeaponSet)
-        {
-            if (data is IGameEntity gameEntity && !gameEntity.Entity.IsServer)
-            {
-                Logging.LogWarning("[FillWeaponSetsIfNeeded] Client can't fill weapon sets");
-                return;
-            }
-            while (data.SelectableWeaponSets.Count <= equipWeaponSet)
-            {
-                data.SelectableWeaponSets.Add(new EquipWeapons());
-            }
-        }
         #endregion
 
         #region Increasing Items Will Overwhelming
