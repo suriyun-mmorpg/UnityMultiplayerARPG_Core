@@ -15,6 +15,7 @@ namespace MultiplayerARPG
         public InventoryType InventoryType { get { return Data.inventoryType; } }
         public BaseItem Item { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() : null; } }
         public IUsableItem UsableItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetUsableItem() : null; } }
+        public IPotionItem PotionItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetPotionItem() : null; } }
         public IEquipmentItem EquipmentItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
         public IArmorItem ArmorItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
         public IShieldItem ShieldItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
