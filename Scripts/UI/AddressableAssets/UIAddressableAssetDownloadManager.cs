@@ -34,6 +34,7 @@ namespace MultiplayerARPG
         {
             onStart.AddListener(OnStart);
             onEnd.AddListener(OnEnd);
+            onDownloadedAll.AddListener(OnDownloadedAll);
         }
 
         private void OnDestroy()
@@ -42,6 +43,8 @@ namespace MultiplayerARPG
             onStart = null;
             onEnd.RemoveAllListeners();
             onEnd = null;
+            onDownloadedAll.RemoveAllListeners();
+            onDownloadedAll = null;
         }
 
         private void OnStart()
@@ -56,6 +59,20 @@ namespace MultiplayerARPG
                 root.SetActive(false);
         }
 
+        private void OnDownloadedAll()
+        {
+            UpdateTotalProgress();
+        }
+
+        private void UpdateTotalProgress()
+        {
+            if (uiTextTotalProgress != null)
+            {
+                uiTextTotalProgress.gameObject.SetActive(true);
+                uiTextTotalProgress.text = string.Format(formatLoadedFilesProgress.Text, LoadedCount, TotalCount);
+            }
+        }
+
         protected override void OnFileSizeRetrieving()
         {
             base.OnFileSizeRetrieving();
@@ -64,7 +81,7 @@ namespace MultiplayerARPG
             if (loadGageRoot != null)
                 loadGageRoot.SetActive(false);
             if (uiTextProgress != null)
-                uiTextProgress.gameObject.SetActive(false);
+                uiTextProgress.gameObject.SetActive(true);
             uiTextStatus.text = msgGetFileSize.Text;
         }
 
@@ -79,16 +96,12 @@ namespace MultiplayerARPG
             }
             if (loadGage != null)
                 loadGage.fillAmount = percentComplete;
+            UpdateTotalProgress();
         }
 
         protected override void OnDepsDownloading()
         {
             base.OnDepsDownloading();
-            if (uiTextTotalProgress != null)
-            {
-                uiTextTotalProgress.gameObject.SetActive(true);
-                uiTextTotalProgress.text = string.Format(formatLoadedFilesProgress.Text, LoadedCount, TotalCount);
-            }
             if (uiTextStatus != null)
                 uiTextStatus.text = msgFileLoading.Text;
             if (uiTextProgress != null)
@@ -103,8 +116,6 @@ namespace MultiplayerARPG
         protected override void OnDepsDownloaded()
         {
             base.OnDepsDownloaded();
-            if (uiTextTotalProgress != null)
-                uiTextTotalProgress.gameObject.SetActive(false);
             if (loadGage != null)
                 loadGage.fillAmount = 1f;
             if (loadGageRoot != null)
@@ -113,6 +124,7 @@ namespace MultiplayerARPG
                 uiTextProgress.gameObject.SetActive(false);
             if (uiTextStatus != null)
                 uiTextStatus.text = msgFileLoaded.Text;
+            UpdateTotalProgress();
         }
     }
 }
