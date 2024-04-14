@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,11 +13,16 @@ namespace MultiplayerARPG
             CurrentByMax,
             Percentage
         }
+
         [Header("General Setting")]
         public DisplayType displayType = DisplayType.CurrentByMax;
         public TextWrapper textValue;
         public Image imageGage;
         public Slider sliderGage;
+        [Tooltip("Enable smooth transitions for the gauge.")]
+        public bool smoothTransition = false;
+        [BoolShowConditional("smoothTransition", true)]
+        public float smoothingSpeed = 10.0f;
 
         [Header("Min By Max Setting")]
         public UILocaleKeySetting formatCurrentByMax = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_MIN_BY_MAX);
@@ -27,23 +33,16 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatPercentage = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
         public string formatPercentageAmount = "N0";
 
-        private float _rate;
-
-        ~UIGageValue()
-        {
-            textValue = null;
-            imageGage = null;
-            sliderGage = null;
-        }
+        private float _targetRate;
+        private Coroutine _smoothingCoroutineForImage;
+        private Coroutine _smoothingCoroutineForSlider;
 
         public void SetVisible(bool isVisible)
         {
             if (textValue != null)
                 textValue.SetGameObjectActive(isVisible);
-
             if (imageGage != null)
                 imageGage.gameObject.SetActive(isVisible);
-
             if (sliderGage != null)
                 sliderGage.gameObject.SetActive(isVisible);
         }
@@ -55,7 +54,7 @@ namespace MultiplayerARPG
 
         public void Update(float current, float max)
         {
-            _rate = max == 0 ? 1 : current / max;
+            _targetRate = max == 0 ? 1 : current / max;
 
             if (textValue != null)
             {
@@ -70,17 +69,55 @@ namespace MultiplayerARPG
                 {
                     textValue.text = ZString.Format(
                         LanguageManager.GetText(formatPercentage),
-                        (_rate * 100f).ToString(formatPercentageAmount));
+                        (_targetRate * 100f).ToString(formatPercentageAmount));
                 }
             }
 
-            if (imageGage != null)
-                imageGage.fillAmount = _rate;
-
-            if (sliderGage != null)
+            if (smoothTransition)
             {
-                sliderGage.maxValue = 1f;
-                sliderGage.value = _rate;
+                if (imageGage != null)
+                {
+                    if (_smoothingCoroutineForImage != null)
+                        imageGage.StopCoroutine(_smoothingCoroutineForImage);
+                    _smoothingCoroutineForImage = imageGage.StartCoroutine(SmoothUpdateImageGageRoutine(_targetRate));
+                }
+                if (sliderGage != null)
+                {
+                    sliderGage.maxValue = 1f;
+                    if (_smoothingCoroutineForSlider != null)
+                        sliderGage.StopCoroutine(_smoothingCoroutineForSlider);
+                    _smoothingCoroutineForSlider = sliderGage.StartCoroutine(SmoothUpdateSliderGageRoutine(_targetRate));
+                }
+            }
+            else
+            {
+                if (imageGage != null)
+                {
+                    imageGage.fillAmount = _targetRate;
+                }
+                if (sliderGage != null)
+                {
+                    sliderGage.maxValue = 1f;
+                    sliderGage.value = _targetRate;
+                }
+            }
+        }
+
+        IEnumerator SmoothUpdateImageGageRoutine(float targetRate)
+        {
+            while (!Mathf.Approximately(imageGage.fillAmount, targetRate))
+            {
+                imageGage.fillAmount = Mathf.Lerp(imageGage.fillAmount, targetRate, Time.deltaTime * smoothingSpeed);
+                yield return null;
+            }
+        }
+
+        IEnumerator SmoothUpdateSliderGageRoutine(float targetRate)
+        {
+            while (!Mathf.Approximately(imageGage.fillAmount, targetRate))
+            {
+                sliderGage.value = Mathf.Lerp(sliderGage.value, targetRate, Time.deltaTime * smoothingSpeed);
+                yield return null;
             }
         }
     }
