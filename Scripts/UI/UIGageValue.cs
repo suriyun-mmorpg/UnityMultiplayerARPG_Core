@@ -114,7 +114,7 @@ namespace MultiplayerARPG
 
         IEnumerator SmoothUpdateSliderGageRoutine(float targetRate)
         {
-            while (!Mathf.Approximately(imageGage.fillAmount, targetRate))
+            while (!Mathf.Approximately(sliderGage.value, targetRate))
             {
                 sliderGage.value = Mathf.Lerp(sliderGage.value, targetRate, Time.deltaTime * smoothingSpeed);
                 yield return null;
