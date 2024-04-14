@@ -381,7 +381,6 @@ namespace MultiplayerARPG
                 fireSpread = weaponItem.FireSpread;
                 fireStagger = weaponItem.FireStagger;
             }
-
             // Make sure it won't increase damage to the wrong collction
             for (byte spreadIndex = 0; spreadIndex < fireSpread + 1; ++spreadIndex)
             {

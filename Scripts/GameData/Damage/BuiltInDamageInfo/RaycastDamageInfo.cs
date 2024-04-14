@@ -68,9 +68,10 @@ namespace MultiplayerARPG
         public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;
-            bool isHost = attacker.IsOwnerHost;
+            bool isServer = attacker.IsServer;
             bool isOwnerClient = attacker.IsOwnerClient;
             bool isOwnedByServer = attacker.IsOwnedByServer;
+            bool willProceedHitRegByClient = !attacker.IsOwnedByServer && !attacker.IsOwnerHost;
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
@@ -179,15 +180,18 @@ namespace MultiplayerARPG
                     continue;
 
                 // Target receives damages
-                if (isHost || isOwnedByServer)
+                if (isServer && !willProceedHitRegByClient)
                     tempDamageableHitBox.ReceiveDamage(attacker.EntityTransform.position, instigator, damageAmounts[triggerIndex], weapon, skill, skillLevel, simulateSeed);
 
                 // Prepare hit reg because it is hitting
-                hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
-                hitRegData.HitObjectId = tempDamageableHitBox.GetObjectId();
-                hitRegData.HitBoxIndex = tempDamageableHitBox.Index;
-                hitRegData.HitOrigin = tempHitPoint;
-                attacker.CallCmdPerformHitRegValidation(hitRegData);
+                if (isOwnerClient && willProceedHitRegByClient)
+                {
+                    hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
+                    hitRegData.HitObjectId = tempDamageableHitBox.GetObjectId();
+                    hitRegData.HitBoxIndex = tempDamageableHitBox.Index;
+                    hitRegData.HitOrigin = tempHitPoint;
+                    attacker.CallCmdPerformHitRegValidation(hitRegData);
+                }
 
                 // Prepare data to instantiate impact effects
                 if (isPlayImpactEffects)
