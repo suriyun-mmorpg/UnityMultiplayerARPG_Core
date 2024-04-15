@@ -241,6 +241,139 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
         }
 
+        private class ActionStatePlayingData
+        {
+            private PlayingActionState _playingActionState = PlayingActionState.None;
+            private int _latestActionId = 0;
+            private int _layer = ACTION_LAYER;
+            private float _actionTransitionDuration = 0f;
+            private float _actionClipLength = 0f;
+            private float _actionPlayElapsed = 0f;
+            private float _actionLayerClipSpeed = 0f;
+            public AnimationMixerPlayable ActionLayerMixer { get; private set; }
+
+            public void Update(AnimationPlayableBehaviour behaviour, FrameData info)
+            {
+
+                if (_playingActionState == PlayingActionState.None)
+                    return;
+
+                if (behaviour.CharacterModel.IsDead && _playingActionState != PlayingActionState.Stopping)
+                {
+                    // Character dead, stop action animation
+                    _playingActionState = PlayingActionState.Stopping;
+                }
+
+                // Update freezing state
+                ActionLayerMixer.GetInput(0).SetSpeed(behaviour.IsFreeze ? 0 : _actionLayerClipSpeed);
+
+                // Update transition
+                float weightUpdate = info.deltaTime / _actionTransitionDuration;
+                float weight = behaviour.LayerMixer.GetInputWeight(_layer);
+                switch (_playingActionState)
+                {
+                    case PlayingActionState.Playing:
+                    case PlayingActionState.Looping:
+                        weight += weightUpdate;
+                        if (weight > 1f)
+                            weight = 1f;
+                        break;
+                    case PlayingActionState.Stopping:
+                        weight -= weightUpdate;
+                        if (weight < 0f)
+                            weight = 0f;
+                        break;
+                }
+                behaviour.LayerMixer.SetInputWeight(_layer, weight);
+
+                // Update playing state
+                _actionPlayElapsed += info.deltaTime;
+
+                // Stopped
+                if (weight <= 0f)
+                {
+                    _playingActionState = PlayingActionState.None;
+                    if (ActionLayerMixer.IsValid())
+                        ActionLayerMixer.Destroy();
+                    return;
+                }
+
+                // Animation end, transition to idle
+                if (_actionPlayElapsed >= _actionClipLength && _playingActionState == PlayingActionState.Playing)
+                {
+                    _playingActionState = PlayingActionState.Stopping;
+                }
+            }
+
+            public float PlayAction(AnimationPlayableBehaviour behaviour, int layerId, ActionState actionState, float speedRate, float duration = 0f, bool loop = false, int actionId = 0)
+            {
+                _layer = ACTION_LAYER + layerId;
+                uint castedLayer = (uint)_layer;
+                _latestActionId = actionId;
+
+                if (behaviour.IsFreeze || behaviour.CharacterModel.IsDead)
+                    return 0f;
+
+                // Destroy playing state
+                if (ActionLayerMixer.IsValid())
+                    ActionLayerMixer.Destroy();
+
+                ActionLayerMixer = AnimationMixerPlayable.Create(behaviour.Graph, 1);
+                behaviour.Graph.Connect(ActionLayerMixer, 0, behaviour.LayerMixer, _layer);
+                behaviour.LayerMixer.SetInputWeight(_layer, 0f);
+
+                AnimationClip clip = actionState.clip != null ? actionState.clip : EmptyClip;
+                AnimationClipPlayable playable = AnimationClipPlayable.Create(behaviour.Graph, clip);
+                playable.SetApplyFootIK(actionState.applyFootIk);
+                playable.SetApplyPlayableIK(actionState.applyPlayableIk);
+                behaviour.Graph.Connect(playable, 0, ActionLayerMixer, 0);
+                ActionLayerMixer.SetInputWeight(0, 1f);
+
+                // Set avatar mask
+                AvatarMask avatarMask = actionState.avatarMask;
+                if (avatarMask == null)
+                    avatarMask = behaviour.CharacterModel.actionAvatarMask;
+                if (avatarMask == null)
+                    avatarMask = EmptyMask;
+                behaviour.LayerMixer.SetLayerMaskFromAvatarMask(castedLayer, avatarMask);
+
+                // Set clip info
+                _actionLayerClipSpeed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
+                // Set transition duration
+                _actionTransitionDuration = actionState.transitionDuration;
+                if (_actionTransitionDuration <= 0f)
+                    _actionTransitionDuration = behaviour.CharacterModel.transitionDuration;
+                _actionTransitionDuration /= _actionLayerClipSpeed;
+                // Set clip length
+                ActionLayerMixer.GetInput(0).SetTime(0f);
+                _actionClipLength = (duration > 0f ? duration : clip.length) / _actionLayerClipSpeed;
+                // Set layer additive
+                behaviour.LayerMixer.SetLayerAdditive(castedLayer, actionState.isAdditive);
+                // Reset play elapsed
+                _actionPlayElapsed = 0f;
+
+                if (loop)
+                    _playingActionState = PlayingActionState.Looping;
+                else
+                    _playingActionState = PlayingActionState.Playing;
+
+                return _actionClipLength;
+            }
+
+            public void StopActionIfActionIdIs(int actionId)
+            {
+                if (_latestActionId == actionId)
+                    StopAction();
+            }
+
+            public void StopAction()
+            {
+                if (_playingActionState == PlayingActionState.Playing ||
+                    _playingActionState == PlayingActionState.Looping)
+                    _playingActionState = PlayingActionState.Stopping;
+            }
+        }
+
         private class CacheData
         {
             internal readonly HashSet<string> WeaponTypeIds = new HashSet<string>();
@@ -442,19 +575,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationLayerMixerPlayable LayerMixer { get; private set; }
         public AnimationMixerPlayable BaseLayerMixer { get; private set; }
         public AnimationMixerPlayable LeftHandWieldingLayerMixer { get; private set; }
-        public AnimationMixerPlayable ActionLayerMixer { get; private set; }
         public PlayableCharacterModel CharacterModel { get; private set; }
         public bool IsFreeze { get; set; }
 
         private readonly StateUpdateData _baseStateUpdateData = new StateUpdateData();
         private readonly StateUpdateData _leftHandWieldingStateUpdateData = new StateUpdateData();
-        private PlayingActionState _playingActionState = PlayingActionState.None;
-        private float _actionTransitionDuration = 0f;
-        private float _actionClipLength = 0f;
-        private float _actionPlayElapsed = 0f;
-        private float _actionLayerClipSpeed = 0f;
+        private readonly Dictionary<int, ActionStatePlayingData> _actionStatePlayings = new Dictionary<int, ActionStatePlayingData>();
         private float _moveAnimationSpeedMultiplier = 1f;
-        private int _latestActionId = 0;
         private bool _readyToPlay = false;
 
         public void Setup(PlayableCharacterModel characterModel)
@@ -851,53 +978,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
             #endregion
 
             #region Update action state
-            if (_playingActionState == PlayingActionState.None)
-                return;
-
-            if (CharacterModel.IsDead && _playingActionState != PlayingActionState.Stopping)
+            foreach (ActionStatePlayingData actionStatePlaying in _actionStatePlayings.Values)
             {
-                // Character dead, stop action animation
-                _playingActionState = PlayingActionState.Stopping;
-            }
-
-            // Update freezing state
-            ActionLayerMixer.GetInput(0).SetSpeed(IsFreeze ? 0 : _actionLayerClipSpeed);
-
-            // Update transition
-            float weightUpdate = info.deltaTime / _actionTransitionDuration;
-            float weight = LayerMixer.GetInputWeight(ACTION_LAYER);
-            switch (_playingActionState)
-            {
-                case PlayingActionState.Playing:
-                case PlayingActionState.Looping:
-                    weight += weightUpdate;
-                    if (weight > 1f)
-                        weight = 1f;
-                    break;
-                case PlayingActionState.Stopping:
-                    weight -= weightUpdate;
-                    if (weight < 0f)
-                        weight = 0f;
-                    break;
-            }
-            LayerMixer.SetInputWeight(ACTION_LAYER, weight);
-
-            // Update playing state
-            _actionPlayElapsed += info.deltaTime;
-
-            // Stopped
-            if (weight <= 0f)
-            {
-                _playingActionState = PlayingActionState.None;
-                if (ActionLayerMixer.IsValid())
-                    ActionLayerMixer.Destroy();
-                return;
-            }
-
-            // Animation end, transition to idle
-            if (_actionPlayElapsed >= _actionClipLength && _playingActionState == PlayingActionState.Playing)
-            {
-                _playingActionState = PlayingActionState.Stopping;
+                actionStatePlaying.Update(this, info);
             }
             #endregion
         }
@@ -925,6 +1008,25 @@ namespace MultiplayerARPG.GameData.Model.Playables
         /// <summary>
         /// Order it to play action animation by action state, return calculated animation length
         /// </summary>
+        /// <param name="layerId"></param>
+        /// <param name="actionState"></param>
+        /// <param name="speedRate"></param>
+        /// <param name="duration"></param>
+        /// <param name="loop"></param>
+        /// <param name="actionId"></param>
+        /// <returns></returns>
+        public float PlayAction(int layerId, ActionState actionState, float speedRate, float duration = 0f, bool loop = false, int actionId = 0)
+        {
+            if (!_actionStatePlayings.TryGetValue(layerId, out ActionStatePlayingData playingData))
+                playingData = new ActionStatePlayingData();
+            float length = playingData.PlayAction(this, layerId, actionState, speedRate, duration, loop, actionId);
+            _actionStatePlayings[layerId] = playingData;
+            return length;
+        }
+
+        /// <summary>
+        /// Order it to play action animation by action state, return calculated animation length, the layer ID will be set to `0`
+        /// </summary>
         /// <param name="actionState"></param>
         /// <param name="speedRate"></param>
         /// <param name="duration"></param>
@@ -933,68 +1035,37 @@ namespace MultiplayerARPG.GameData.Model.Playables
         /// <returns></returns>
         public float PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false, int actionId = 0)
         {
-            _latestActionId = actionId;
+            return PlayAction(0, actionState, speedRate, duration, loop, actionId);
+        }
 
-            if (IsFreeze || CharacterModel.IsDead)
-                return 0f;
-
-            // Destroy playing state
-            if (ActionLayerMixer.IsValid())
-                ActionLayerMixer.Destroy();
-
-            ActionLayerMixer = AnimationMixerPlayable.Create(Graph, 1);
-            Graph.Connect(ActionLayerMixer, 0, LayerMixer, ACTION_LAYER);
-            LayerMixer.SetInputWeight(ACTION_LAYER, 0f);
-
-            AnimationClip clip = actionState.clip != null ? actionState.clip : EmptyClip;
-            AnimationClipPlayable playable = AnimationClipPlayable.Create(Graph, clip);
-            playable.SetApplyFootIK(actionState.applyFootIk);
-            playable.SetApplyPlayableIK(actionState.applyPlayableIk);
-            Graph.Connect(playable, 0, ActionLayerMixer, 0);
-            ActionLayerMixer.SetInputWeight(0, 1f);
-
-            // Set avatar mask
-            AvatarMask avatarMask = actionState.avatarMask;
-            if (avatarMask == null)
-                avatarMask = CharacterModel.actionAvatarMask;
-            if (avatarMask == null)
-                avatarMask = EmptyMask;
-            LayerMixer.SetLayerMaskFromAvatarMask(ACTION_LAYER, avatarMask);
-
-            // Set clip info
-            _actionLayerClipSpeed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
-            // Set transition duration
-            _actionTransitionDuration = actionState.transitionDuration;
-            if (_actionTransitionDuration <= 0f)
-                _actionTransitionDuration = CharacterModel.transitionDuration;
-            _actionTransitionDuration /= _actionLayerClipSpeed;
-            // Set clip length
-            ActionLayerMixer.GetInput(0).SetTime(0f);
-            _actionClipLength = (duration > 0f ? duration : clip.length) / _actionLayerClipSpeed;
-            // Set layer additive
-            LayerMixer.SetLayerAdditive(ACTION_LAYER, actionState.isAdditive);
-            // Reset play elapsed
-            _actionPlayElapsed = 0f;
-
-            if (loop)
-                _playingActionState = PlayingActionState.Looping;
-            else
-                _playingActionState = PlayingActionState.Playing;
-
-            return _actionClipLength;
+        public void StopActionIfActionIdIs(int layerId, int actionId)
+        {
+            if (!_actionStatePlayings.TryGetValue(layerId, out ActionStatePlayingData playingData))
+                return;
+            playingData.StopActionIfActionIdIs(actionId);
         }
 
         public void StopActionIfActionIdIs(int actionId)
         {
-            if (_latestActionId == actionId)
-                StopAction();
+            foreach (ActionStatePlayingData actionStatePlaying in _actionStatePlayings.Values)
+            {
+                actionStatePlaying.StopActionIfActionIdIs(actionId);
+            }
+        }
+
+        public void StopAction(int layerId)
+        {
+            if (!_actionStatePlayings.TryGetValue(layerId, out ActionStatePlayingData playingData))
+                return;
+            playingData.StopAction();
         }
 
         public void StopAction()
         {
-            if (_playingActionState == PlayingActionState.Playing ||
-                _playingActionState == PlayingActionState.Looping)
-                _playingActionState = PlayingActionState.Stopping;
+            foreach (ActionStatePlayingData actionStatePlaying in _actionStatePlayings.Values)
+            {
+                actionStatePlaying.StopAction();
+            }
         }
     }
 }
