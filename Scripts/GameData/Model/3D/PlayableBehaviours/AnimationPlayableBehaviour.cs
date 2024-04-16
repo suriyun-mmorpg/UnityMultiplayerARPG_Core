@@ -319,6 +319,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     ActionLayerMixer.Destroy();
 
                 ActionLayerMixer = AnimationMixerPlayable.Create(behaviour.Graph, 1);
+                if (_layer >= behaviour.LayerMixer.GetInputCount())
+                    behaviour.LayerMixer.SetInputCount(_layer + 1);
                 behaviour.Graph.Connect(ActionLayerMixer, 0, behaviour.LayerMixer, _layer);
                 behaviour.LayerMixer.SetInputWeight(_layer, 0f);
 
