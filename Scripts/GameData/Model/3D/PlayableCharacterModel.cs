@@ -715,7 +715,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             StopActionCoroutine();
             _isDoingAction = true;
             _actionCoroutine = StartCoroutine(routine);
-            this._onStopAction = onStopAction;
+            _onStopAction = onStopAction;
             return _actionCoroutine;
         }
 
