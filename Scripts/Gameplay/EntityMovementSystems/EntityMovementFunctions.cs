@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             if (!movement.Entity.IsOwnerClient)
                 return;
             writer.Put((byte)inputState);
-            writer.Put((byte)movementState);
+            writer.PutPackedUInt((uint)movementState);
             if (!inputState.Has(EntityMovementInputState.IsStopped))
                 writer.Put((byte)extraMovementState);
             if (inputState.Has(EntityMovementInputState.PositionChanged))
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
             if (!movement.Entity.IsOwnerClient)
                 return;
             writer.Put((byte)inputState);
-            writer.Put((byte)movementState);
+            writer.PutPackedUInt((uint)movementState);
             if (!inputState.Has(EntityMovementInputState.IsStopped))
                 writer.Put((byte)extraMovementState);
             if (inputState.Has(EntityMovementInputState.PositionChanged))
