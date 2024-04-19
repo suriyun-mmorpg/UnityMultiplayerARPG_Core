@@ -457,6 +457,10 @@ namespace MultiplayerARPG
                 {
                     movementState |= MovementState.IsJump;
                 }
+                else if (InputManager.GetButtonDown("Dash"))
+                {
+                    movementState |= MovementState.IsDash;
+                }
             }
             PlayingCharacterEntity.KeyMovement(moveDirection, movementState);
         }

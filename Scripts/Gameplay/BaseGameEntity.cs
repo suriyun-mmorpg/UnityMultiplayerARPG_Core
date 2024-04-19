@@ -504,6 +504,16 @@ namespace MultiplayerARPG
         {
             PlayJumpAnimation();
         }
+        public void CallRpcPlayDashAnimation()
+        {
+            RPC(RpcPlayDashAnimation);
+        }
+
+        [AllRpc]
+        protected void RpcPlayDashAnimation()
+        {
+            PlayDashAnimation();
+        }
 
         public void CallRpcPlayPickupAnimation()
         {
@@ -542,6 +552,12 @@ namespace MultiplayerARPG
         {
             if (Model is IJumppableModel jumppableModel)
                 jumppableModel.PlayJumpAnimation();
+        }
+
+        public virtual void PlayDashAnimation()
+        {
+            if (Model is IDashableModel dashableModel)
+                dashableModel.PlayDashAnimation();
         }
 
         public virtual void PlayPickupAnimation()

@@ -128,6 +128,9 @@ namespace MultiplayerARPG
     public delegate void CanJumpDelegate(
         ref bool canJump);
 
+    public delegate void CanDashDelegate(
+        ref bool canDash);
+
     public delegate void CanTurnDelegate(
         ref bool canTurn);
 

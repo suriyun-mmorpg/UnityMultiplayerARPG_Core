@@ -116,6 +116,23 @@ namespace MultiplayerARPG
             return input;
         }
 
+        public static EntityMovementInput SetInputDash(this BaseGameEntity entity, EntityMovementInput input)
+        {
+            if (input == null)
+                input = entity.InitInput();
+            input.IsStopped = false;
+            input.MovementState |= MovementState.IsDash;
+            return input;
+        }
+
+        public static EntityMovementInput ClearInputDash(this BaseGameEntity entity, EntityMovementInput input)
+        {
+            if (input == null)
+                input = entity.InitInput();
+            input.MovementState &= ~MovementState.IsDash;
+            return input;
+        }
+
         public static EntityMovementInput SetInputStop(this BaseGameEntity entity, EntityMovementInput input)
         {
             if (input == null)

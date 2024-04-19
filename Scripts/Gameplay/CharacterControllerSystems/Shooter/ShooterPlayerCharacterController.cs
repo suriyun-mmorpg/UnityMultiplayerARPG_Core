@@ -741,6 +741,10 @@ namespace MultiplayerARPG
                         else
                             _movementState |= MovementState.IsJump;
                     }
+                    if (InputManager.GetButtonDown("Dash"))
+                    {
+                        _movementState |= MovementState.IsDash;
+                    }
                 }
             }
             if (_moveDirection.magnitude > 0f)
@@ -1291,7 +1295,8 @@ namespace MultiplayerARPG
                 _movementState.Has(MovementState.Backward) ||
                 _movementState.Has(MovementState.Left) ||
                 _movementState.Has(MovementState.Right) ||
-                _movementState.Has(MovementState.IsJump);
+                _movementState.Has(MovementState.IsJump) ||
+                _movementState.Has(MovementState.IsDash);
             if (_updateAttackingCrosshair)
             {
                 UpdateCrosshair(CurrentCrosshairSetting, true, CurrentCrosshairSetting.expandPerFrameWhileAttacking);

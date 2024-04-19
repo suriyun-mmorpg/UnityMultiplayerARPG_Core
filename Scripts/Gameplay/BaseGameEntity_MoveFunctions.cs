@@ -203,6 +203,19 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public bool CanDash()
+        {
+            bool canDash = CanDash_Implementation();
+            if (onCanDashValidated != null)
+                onCanDashValidated(ref canDash);
+            return canDash;
+        }
+
+        protected virtual bool CanDash_Implementation()
+        {
+            return false;
+        }
+
         public bool CanTurn()
         {
             bool canTurn = CanTurn_Implementation();

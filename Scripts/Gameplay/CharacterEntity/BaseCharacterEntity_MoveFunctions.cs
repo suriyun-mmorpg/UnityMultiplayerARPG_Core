@@ -155,7 +155,32 @@ namespace MultiplayerARPG
             {
                 return false;
             }
-            return true;
+            return ExtraMovementState != ExtraMovementState.IsCrawling;
+        }
+
+        protected override bool CanDash_Implementation()
+        {
+            if (CachedData.DisallowDash)
+            {
+                return false;
+            }
+            if (IsAttacking && MovementRestrictionWhileAttacking.dashRestricted)
+            {
+                return false;
+            }
+            else if (IsUsingSkill && MovementRestrictionWhileUsingSkill.dashRestricted)
+            {
+                return false;
+            }
+            else if (IsReloading && MovementRestrictionWhileReloading.dashRestricted)
+            {
+                return false;
+            }
+            else if (IsCharging && MovementRestrictionWhileCharging.dashRestricted)
+            {
+                return false;
+            }
+            return ExtraMovementState != ExtraMovementState.IsCrawling;
         }
 
         protected override bool CanTurn_Implementation()
