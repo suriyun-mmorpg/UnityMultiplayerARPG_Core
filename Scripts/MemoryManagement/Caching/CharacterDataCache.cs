@@ -43,6 +43,7 @@ namespace MultiplayerARPG
         public bool DisallowSprint { get; private set; }
         public bool DisallowWalk { get; private set; }
         public bool DisallowJump { get; private set; }
+        public bool DisallowDash { get; private set; }
         public bool DisallowCrouch { get; private set; }
         public bool DisallowCrawl { get; private set; }
         public bool DisallowAttack { get; private set; }
@@ -244,6 +245,7 @@ namespace MultiplayerARPG
             DisallowSprint = false;
             DisallowWalk = false;
             DisallowJump = false;
+            DisallowDash = false;
             DisallowCrouch = false;
             DisallowCrawl = false;
             DisallowAttack = false;
@@ -606,6 +608,7 @@ namespace MultiplayerARPG
                     DisallowSprint = true;
                     DisallowWalk = true;
                     DisallowJump = true;
+                    DisallowDash = true;
                     DisallowCrouch = true;
                     DisallowCrawl = true;
                     DisallowAttack = true;
@@ -620,6 +623,7 @@ namespace MultiplayerARPG
                     DisallowSprint = true;
                     DisallowWalk = true;
                     DisallowJump = true;
+                    DisallowDash = true;
                     DisallowCrouch = true;
                     DisallowCrawl = true;
                     DisallowAttack = true;
@@ -636,6 +640,8 @@ namespace MultiplayerARPG
                         DisallowWalk = true;
                     if (tempBuff.disallowJump)
                         DisallowJump = true;
+                    if (tempBuff.disallowDash)
+                        DisallowDash = true;
                     if (tempBuff.disallowCrouch)
                         DisallowCrouch = true;
                     if (tempBuff.disallowCrawl)

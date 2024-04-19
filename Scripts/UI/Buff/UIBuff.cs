@@ -73,6 +73,8 @@ namespace MultiplayerARPG
         public GameObject disallowWalkObject;
         [Tooltip("This will activate if buff's disallow jump is `TRUE`, developer may set text or icon here")]
         public GameObject disallowJumpObject;
+        [Tooltip("This will activate if buff's disallow dash is `TRUE`, developer may set text or icon here")]
+        public GameObject disallowDashObject;
         [Tooltip("This will activate if buff's disallow crouch is `TRUE`, developer may set text or icon here")]
         public GameObject disallowCrouchObject;
         [Tooltip("This will activate if buff's disallow prone is `TRUE`, developer may set text or icon here")]
@@ -316,6 +318,7 @@ namespace MultiplayerARPG
                     Data.buff.disallowSprint ||
                     Data.buff.disallowWalk ||
                     Data.buff.disallowJump ||
+                    Data.buff.disallowDash ||
                     Data.buff.disallowCrouch ||
                     Data.buff.disallowCrawl ||
                     Data.buff.disallowAttack ||
@@ -340,6 +343,8 @@ namespace MultiplayerARPG
                         ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_DISALLOW_WALK.ToString(), "Disallow Walk"));
                     if (Data.buff.disallowJump)
                         ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_DISALLOW_JUMP.ToString(), "Disallow Jump"));
+                    if (Data.buff.disallowDash)
+                        ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_DISALLOW_DASH.ToString(), "Disallow Dash"));
                     if (Data.buff.disallowCrouch)
                         ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_DISALLOW_CROUCH.ToString(), "Disallow Crouch"));
                     if (Data.buff.disallowCrawl)
@@ -608,6 +613,9 @@ namespace MultiplayerARPG
 
             if (disallowJumpObject != null)
                 disallowJumpObject.SetActive(Data.buff.disallowJump);
+
+            if (disallowDashObject != null)
+                disallowDashObject.SetActive(Data.buff.disallowDash);
 
             if (disallowCrouchObject != null)
                 disallowCrouchObject.SetActive(Data.buff.disallowCrouch);

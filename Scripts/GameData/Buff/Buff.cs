@@ -69,6 +69,7 @@ namespace MultiplayerARPG
         public bool disallowSprint;
         public bool disallowWalk;
         public bool disallowJump;
+        public bool disallowDash;
         public bool disallowCrouch;
         public bool disallowCrawl;
         [Tooltip("Disallow character to attack while applied. This won't be applied to monster's summoner.")]
