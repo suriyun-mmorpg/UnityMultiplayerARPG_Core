@@ -298,7 +298,7 @@ namespace MultiplayerARPG
                 _yAngle = Mathf.LerpAngle(_yAngle, _targetYAngle, _yTurnSpeed * deltaTime);
             UpdateRotation();
             _lookRotationApplied = true;
-            _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
+            _currentInput = Entity.SetInputYAngle(_currentInput, CacheTransform.eulerAngles.y);
             Profiler.EndSample();
         }
 
@@ -355,7 +355,7 @@ namespace MultiplayerARPG
                         // Point click should be reliably
                         shouldSendReliably = true;
                     }
-                    this.ClientWriteMovementInput3D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Rotation);
+                    this.ClientWriteMovementInput3D(writer, inputState, _currentInput);
                     _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
@@ -455,8 +455,8 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
-            if (movementState.Has(MovementState.IsTeleport))
+            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
+            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
                 _isServerWaitingTeleportConfirm = false;
@@ -482,21 +482,21 @@ namespace MultiplayerARPG
                 long lagDeltaTime = Entity.Player.Rtt;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
-                _tempExtraMovementState = extraMovementState;
+                _tempExtraMovementState = entityMovementInput.ExtraMovementState;
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
-                    SetMovePaths(position);
+                    SetMovePaths(entityMovementInput.Position);
                 }
                 if (inputState.Has(EntityMovementInputState.RotationChanged))
                 {
                     if (IsClient)
                     {
-                        _targetYAngle = yAngle;
+                        _targetYAngle = entityMovementInput.YAngle;
                         _yTurnSpeed = 1f / unityDeltaTime;
                     }
                     else
                     {
-                        _yAngle = _targetYAngle = yAngle;
+                        _yAngle = _targetYAngle = entityMovementInput.YAngle;
                         UpdateRotation();
                     }
                 }

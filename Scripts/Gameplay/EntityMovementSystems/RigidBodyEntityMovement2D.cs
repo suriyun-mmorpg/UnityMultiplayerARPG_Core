@@ -382,7 +382,7 @@ namespace MultiplayerARPG
                         // Point click should be reliably
                         shouldSendReliably = true;
                     }
-                    this.ClientWriteMovementInput2D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Direction2D);
+                    this.ClientWriteMovementInput2D(writer, inputState, _currentInput);
                     _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
@@ -481,8 +481,8 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
-            if (movementState.Has(MovementState.IsTeleport))
+            reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
+            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
                 _isServerWaitingTeleportConfirm = false;
@@ -505,14 +505,14 @@ namespace MultiplayerARPG
             if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 NavPaths = null;
-                _tempMovementState = movementState;
-                _tempExtraMovementState = extraMovementState;
+                _tempMovementState = entityMovementInput.MovementState;
+                _tempExtraMovementState = entityMovementInput.ExtraMovementState;
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
                     _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
-                    SetMovePaths(position, !_simulatingKeyMovement);
+                    SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
                 }
-                Direction2D = direction2D;
+                Direction2D = entityMovementInput.Direction2D;
                 if (inputState.Has(EntityMovementInputState.IsStopped))
                     StopMoveFunction();
                 _acceptedPositionTimestamp = peerTimestamp;

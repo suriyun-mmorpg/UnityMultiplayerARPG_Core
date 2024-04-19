@@ -636,7 +636,7 @@ namespace MultiplayerARPG
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
             _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime;
             EntityMovement.Move(_previousMovement);
-            _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
+            _currentInput = Entity.SetInputYAngle(_currentInput, CacheTransform.eulerAngles.y);
         }
 
         public void UpdateRotation(float deltaTime)
@@ -856,7 +856,7 @@ namespace MultiplayerARPG
                         // Stop should be reliably
                         shouldSendReliably = true;
                     }
-                    Entity.ClientWriteMovementInput3D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Rotation);
+                    Entity.ClientWriteMovementInput3D(writer, inputState, _currentInput);
                     _sendingJump = false;
                     _sendingDash = false;
                     _isClientConfirmingTeleport = false;
@@ -968,9 +968,14 @@ namespace MultiplayerARPG
                 _acceptedPositionTimestamp = peerTimestamp;
             }
             if (!IsOwnerClient && movementState.Has(MovementState.IsJump))
+            {
                 _acceptedJump = true;
+            }
             if (!IsOwnerClient && movementState.Has(MovementState.IsDash))
+            {
                 _acceptedDash = true;
+                TurnImmediately(yAngle);
+            }
         }
 
         public void ReadMovementInputAtServer(long peerTimestamp, NetDataReader reader)
@@ -985,8 +990,8 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
-            if (movementState.Has(MovementState.IsTeleport))
+            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
+            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
                 _isServerWaitingTeleportConfirm = false;
@@ -1012,25 +1017,26 @@ namespace MultiplayerARPG
                 long lagDeltaTime = Entity.Player.Rtt;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
-                _tempMovementState = movementState;
-                _tempExtraMovementState = extraMovementState;
+                _tempMovementState = entityMovementInput.MovementState;
+                _tempExtraMovementState = entityMovementInput.ExtraMovementState;
                 _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
-                    if (!UseRootMotion() || movementState.HasDirectionMovement())
-                        SetMovePaths(position, !_simulatingKeyMovement);
+                    if (!UseRootMotion() || entityMovementInput.MovementState.HasDirectionMovement())
+                        SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
                 }
                 if (inputState.Has(EntityMovementInputState.RotationChanged))
                 {
-                    RemoteTurnSimulation(_simulatingKeyMovement, yAngle, unityDeltaTime);
+                    RemoteTurnSimulation(_simulatingKeyMovement, entityMovementInput.YAngle, unityDeltaTime);
                 }
-                if (movementState.Has(MovementState.IsJump))
+                if (entityMovementInput.MovementState.Has(MovementState.IsJump))
                 {
                     _acceptedJump = true;
                 }
-                if (movementState.Has(MovementState.IsDash))
+                if (entityMovementInput.MovementState.Has(MovementState.IsDash))
                 {
                     _acceptedDash = true;
+                    TurnImmediately(entityMovementInput.YAngle);
                 }
                 if (inputState.Has(EntityMovementInputState.IsStopped))
                 {
@@ -1090,14 +1096,6 @@ namespace MultiplayerARPG
                 // Prepare movement state
                 MovementState = _tempMovementState = movementState;
                 ExtraMovementState = _tempExtraMovementState = extraMovementState;
-                if (movementState.Has(MovementState.IsJump))
-                {
-                    _acceptedJump = true;
-                }
-                if (movementState.Has(MovementState.IsDash))
-                {
-                    _acceptedDash = true;
-                }
                 // Skip simulation because while playing root motion animation it will also move charcter by root motion at server too, can determined that it is simulated
                 if (!IsClient)
                 {
@@ -1156,6 +1154,15 @@ namespace MultiplayerARPG
                     }
                     RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                 }
+                if (movementState.Has(MovementState.IsJump))
+                {
+                    _acceptedJump = true;
+                }
+                if (movementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
+                    TurnImmediately(yAngle);
+                }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
         }
@@ -1168,8 +1175,7 @@ namespace MultiplayerARPG
             _verticalVelocity = 0;
             CacheTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
-            _yAngle = _targetYAngle = yAngle;
-            RotateY();
+            TurnImmediately(yAngle);
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
@@ -1195,8 +1201,7 @@ namespace MultiplayerARPG
                 if (isKeyMovement)
                 {
                     // Turn to target immediately
-                    _yAngle = _targetYAngle = yAngle;
-                    RotateY();
+                    TurnImmediately(yAngle);
                 }
                 else
                 {
@@ -1209,13 +1214,18 @@ namespace MultiplayerARPG
             if (!IsClient)
             {
                 // Turn to target immediately
-                _yAngle = _targetYAngle = yAngle;
-                RotateY();
+                TurnImmediately(yAngle);
                 return;
             }
             // Will turn smoothly later
             _targetYAngle = yAngle;
             _yTurnSpeed = 1f / deltaTime;
+        }
+
+        public void TurnImmediately(float yAngle)
+        {
+            _yAngle = _targetYAngle = yAngle;
+            RotateY();
         }
 
         public void ApplyRemoteTurnAngle()
