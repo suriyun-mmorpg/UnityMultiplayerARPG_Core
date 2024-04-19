@@ -805,7 +805,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    MovementState &= MovementState.IsDash;
+                    MovementState &= ~MovementState.IsDash;
                 }
                 if (_isClientConfirmingTeleport)
                 {
