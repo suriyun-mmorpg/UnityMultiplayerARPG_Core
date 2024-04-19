@@ -1036,7 +1036,10 @@ namespace MultiplayerARPG
                 if (entityMovementInput.MovementState.Has(MovementState.IsDash))
                 {
                     _acceptedDash = true;
-                    TurnImmediately(entityMovementInput.YAngle);
+                    if (_remoteTargetYAngle.HasValue)
+                        TurnImmediately(_remoteTargetYAngle.Value);
+                    else
+                        TurnImmediately(_targetYAngle);
                 }
                 if (inputState.Has(EntityMovementInputState.IsStopped))
                 {
