@@ -351,6 +351,7 @@ namespace MultiplayerARPG
             if (_isUnderWater)
                 _tempMovementState |= MovementState.IsUnderWater;
 
+            tempTargetPosition = tempCurrentPosition;
             if (HasNavPaths)
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
@@ -386,8 +387,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                tempTargetPosition = tempCurrentPosition;
-                StopMove();
+                if (_previousMovement.sqrMagnitude <= 0f)
+                    StopMove();
                 ApplyRemoteTurnAngle();
             }
 
