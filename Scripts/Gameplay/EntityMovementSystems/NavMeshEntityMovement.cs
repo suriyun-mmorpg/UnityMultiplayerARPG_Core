@@ -217,6 +217,16 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
+        {
+            // TODO: Implement this
+        }
+
+        public void ClearAllForces()
+        {
+            // TODO: Implement this
+        }
+
         protected float GetPathRemainingDistance()
         {
             if (CacheNavMeshAgent.pathPending ||

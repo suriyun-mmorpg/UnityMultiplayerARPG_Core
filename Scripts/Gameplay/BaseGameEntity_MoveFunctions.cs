@@ -316,6 +316,18 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
+        {
+            if (!ActiveMovement.IsNull())
+                ActiveMovement.ApplyForce(direction, force, minForce, deceleration, duration);
+        }
+
+        public void ClearAllForces()
+        {
+            if (!ActiveMovement.IsNull())
+                ActiveMovement.ClearAllForces();
+        }
+
         public void OnJumpForceApplied(float verticalVelocity)
         {
             if (onJumpForceApplied != null)

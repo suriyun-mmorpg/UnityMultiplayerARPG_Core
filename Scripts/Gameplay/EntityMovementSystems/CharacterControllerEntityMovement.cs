@@ -355,5 +355,15 @@ namespace MultiplayerARPG
         {
             return Functions.FindGroundedPosition(fromPosition, findDistance, out result);
         }
+
+        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
+        {
+            Functions.ApplyForce(direction, force, minForce, deceleration, duration);
+        }
+
+        public void ClearAllForces()
+        {
+            Functions.ClearAllForces();
+        }
     }
 }

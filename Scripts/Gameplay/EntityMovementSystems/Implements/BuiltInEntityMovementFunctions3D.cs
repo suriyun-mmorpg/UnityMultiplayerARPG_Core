@@ -301,6 +301,16 @@ namespace MultiplayerARPG
             return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
         }
 
+        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
+        {
+            // TODO: Implement this
+        }
+
+        public void ClearAllForces()
+        {
+            // TODO: Implement this
+        }
+
         public bool WaterCheck(Collider waterCollider)
         {
             if (waterCollider == null)

@@ -200,6 +200,16 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
+        {
+            // TODO: Implement this
+        }
+
+        public void ClearAllForces()
+        {
+            // TODO: Implement this
+        }
+
         public override void EntityUpdate()
         {
             UpdateMovement(Time.fixedDeltaTime);
