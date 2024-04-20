@@ -438,8 +438,12 @@ namespace MultiplayerARPG
             if (InputManager.GetButton("Attack"))
                 UpdateWASDAttack();
 
-            // Always forward
-            MovementState movementState = MovementState.Forward;
+            // Set movement state to be forward only when it is having moving direction
+            MovementState movementState = MovementState.None;
+            if (moveDirection.sqrMagnitude > 0)
+            {
+                movementState = MovementState.Forward;
+            }
             if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
             {
                 if (InputManager.GetButton("SwimUp"))
