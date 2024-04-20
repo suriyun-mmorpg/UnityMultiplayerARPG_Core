@@ -482,12 +482,13 @@ namespace MultiplayerARPG
             if (_acceptedDash || (_pauseMovementCountDown <= 0f && _isGrounded && _isDashing))
             {
                 _sendingDash = true;
-                Entity.PlayDashAnimation();
                 dashingForceApplier.Apply(CacheTransform.forward);
             }
             dashingForceApplier.MinSpeed = Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None);
             if (_pauseMovementCountDown <= 0f && dashingForceApplier.Update(deltaTime))
             {
+                // Still dashing to add dash to movement state
+                _tempMovementState |= MovementState.IsDash;
                 // Force turn to dashed direction
                 _moveDirection = dashingForceApplier.Direction;
                 _targetYAngle = Quaternion.LookRotation(_moveDirection).eulerAngles.y;

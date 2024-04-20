@@ -171,13 +171,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState swimIdleState;
         public MoveStates swimMoveStates;
 
-        [Header("Jump")]
+        [Header("Airborne")]
         public AnimState jumpState;
-
-        [Header("Fall")]
         public AnimState fallState;
-
-        [Header("Landed")]
         public AnimState landedState;
 
         [Header("Hurt")]
@@ -185,6 +181,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         [Header("Dead")]
         public AnimState deadState;
+
+        [Header("Dash")]
+        public AnimState dashStartState;
+        public AnimState dashLoopState;
+        public AnimState dashEndState;
 
         [Header("Pickup")]
         public ActionState pickupState;
@@ -233,13 +234,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState swimIdleState;
         public WieldMoveStates swimMoveStates;
 
-        [Header("Jump")]
+        [Header("Airborne")]
         public ActionState jumpState;
-
-        [Header("Fall")]
         public ActionState fallState;
-
-        [Header("Landed")]
         public ActionState landedState;
 
         [Header("Hurt")]
@@ -247,6 +244,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         [Header("Dead")]
         public ActionState deadState;
+
+        [Header("Dash")]
+        public ActionState dashStartState;
+        public ActionState dashLoopState;
+        public ActionState dashEndState;
 
         [Header("Pickup")]
         public ActionState pickupState;
@@ -286,13 +288,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState swimIdleState;
         public MoveStates swimMoveStates;
 
-        [Header("Jump")]
+        [Header("Airborne")]
         public AnimState jumpState;
-
-        [Header("Fall")]
         public AnimState fallState;
-
-        [Header("Landed")]
         public AnimState landedState;
 
         [Header("Hurt")]
@@ -300,6 +298,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         [Header("Dead")]
         public AnimState deadState;
+
+        [Header("Dash")]
+        public AnimState dashStartState;
+        public AnimState dashLoopState;
+        public AnimState dashEndState;
 
         [Header("Pickup")]
         public ActionState pickupState;
