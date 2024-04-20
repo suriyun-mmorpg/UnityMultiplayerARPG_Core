@@ -663,6 +663,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
             _readyToPlay = true;
         }
 
+        private bool TryGetStateInfoId<T>(Dictionary<string, T> stateInfos, string weaponTypeId, string clipId, out string foundStateInfoId)
+        {
+            foundStateInfoId = ZString.Concat(weaponTypeId, clipId);
+            // State not found, use state from default animations
+            if (!stateInfos.ContainsKey(foundStateInfoId))
+                foundStateInfoId = clipId;
+            if (!stateInfos.ContainsKey(foundStateInfoId))
+                return false;
+            return true;
+        }
+
         private string GetPlayingStateId<T>(string weaponTypeId, Dictionary<string, T> stateInfos, StateUpdateData stateUpdateData) where T : IStateInfo
         {
             stateUpdateData.IsDead = CharacterModel.IsDead;
@@ -675,76 +686,47 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (stateUpdateData.IsDead)
             {
                 stateUpdateData.PlayingSpecialMoveState = PlayingSpecialMoveState.None;
-                // Get dead state by weapon type
-                string stateId = ZString.Concat(weaponTypeId, CLIP_DEAD);
-                // State not found, use dead state from default animations
-                if (!stateInfos.ContainsKey(stateId))
-                    stateId = CLIP_DEAD;
-                return stateId;
+                TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_DEAD, out string foundStateInfoId);
+                return foundStateInfoId;
             }
             else if (stateUpdateData.PlayingSpecialMoveState == PlayingSpecialMoveState.JumpStarting)
             {
-                // Jumping animation starting
-                stateUpdateData.PlayingSpecialMoveState = PlayingSpecialMoveState.JumpPlaying;
-                stateUpdateData.ForcePlay = true;
-                // Get jump state by weapon type
-                string stateId = ZString.Concat(weaponTypeId, CLIP_JUMP);
-                // State not found, use jump state from default animations
-                if (!stateInfos.ContainsKey(stateId))
-                    stateId = CLIP_JUMP;
-                return stateId;
+                if (TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_JUMP, out string foundStateInfoId))
+                {
+                    stateUpdateData.PlayingSpecialMoveState = PlayingSpecialMoveState.JumpPlaying;
+                    stateUpdateData.ForcePlay = true;
+                    return foundStateInfoId;
+                }
             }
             else if (stateUpdateData.MovementState.Has(MovementState.IsDash) && !stateUpdateData.PreviousMovementState.Has(MovementState.IsDash))
             {
-                // Get dash start state by weapon type
-                string stateId = ZString.Concat(weaponTypeId, CLIP_DASH_START);
-                // State not found, use landed state from default animations
-                if (!stateInfos.ContainsKey(stateId))
-                    stateId = CLIP_DASH_START;
-                // State found, use this state Id. If it not, use move state
-                if (stateInfos.ContainsKey(stateId))
+                if (TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_DASH_START, out string foundStateInfoId))
                 {
                     stateUpdateData.PlayingSpecialMoveState = PlayingSpecialMoveState.DashStartPlaying;
-                    return stateId;
+                    return foundStateInfoId;
                 }
             }
             else if (stateUpdateData.MovementState.Has(MovementState.IsDash) && stateUpdateData.PreviousMovementState.Has(MovementState.IsDash) && !stateUpdateData.IsPlayingAnySpecialMoveState)
             {
-                // Get dash loop state by weapon type
-                string stateId = ZString.Concat(weaponTypeId, CLIP_DASH_LOOP);
-                // State not found, use landed state from default animations
-                if (!stateInfos.ContainsKey(stateId))
-                    stateId = CLIP_DASH_LOOP;
-                // State found, use this state Id. If it not, use move state
-                if (stateInfos.ContainsKey(stateId))
-                    return stateId;
+                if (TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_DASH_LOOP, out string foundStateInfoId))
+                {
+                    return foundStateInfoId;
+                }
             }
             else if (!stateUpdateData.MovementState.Has(MovementState.IsDash) && stateUpdateData.PreviousMovementState.Has(MovementState.IsDash))
             {
-                // Get dash end state by weapon type
-                string stateId = ZString.Concat(weaponTypeId, CLIP_DASH_END);
-                // State not found, use landed state from default animations
-                if (!stateInfos.ContainsKey(stateId))
-                    stateId = CLIP_DASH_END;
-                // State found, use this state Id. If it not, use move state
-                if (stateInfos.ContainsKey(stateId))
+                if (TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_DASH_END, out string foundStateInfoId))
                 {
                     stateUpdateData.PlayingSpecialMoveState = PlayingSpecialMoveState.DashEndPlaying;
-                    return stateId;
+                    return foundStateInfoId;
                 }
             }
             else if (stateUpdateData.MovementState.Has(MovementState.IsGrounded) && !stateUpdateData.PreviousMovementState.Has(MovementState.IsGrounded))
             {
-                // Get landed state by weapon type
-                string stateId = ZString.Concat(weaponTypeId, CLIP_LANDED);
-                // State not found, use landed state from default animations
-                if (!stateInfos.ContainsKey(stateId))
-                    stateId = CLIP_LANDED;
-                // State found, use this state Id. If it not, use move state
-                if (stateInfos.ContainsKey(stateId))
+                if (TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_LANDED, out string foundStateInfoId))
                 {
                     stateUpdateData.PlayingSpecialMoveState = PlayingSpecialMoveState.LandedPlaying;
-                    return stateId;
+                    return foundStateInfoId;
                 }
             }
             else if (stateUpdateData.IsPlayingAnySpecialMoveState)
@@ -756,12 +738,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
             if (!stateUpdateData.MovementState.Has(MovementState.IsUnderWater) && !stateUpdateData.MovementState.Has(MovementState.IsGrounded))
             {
-                // Get fall state by weapon type
-                string stateId = ZString.Concat(weaponTypeId, CLIP_FALL);
-                // State not found, use fall state from default animations
-                if (!stateInfos.ContainsKey(stateId))
-                    stateId = CLIP_FALL;
-                return stateId;
+                TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_FALL, out string foundStateInfoId);
+                return foundStateInfoId;
             }
 
             // Get movement state
