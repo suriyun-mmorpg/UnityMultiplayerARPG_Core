@@ -34,7 +34,6 @@ namespace MultiplayerARPG
             Deceleration = deceleration;
             Duration = duration;
             Elasped = 0f;
-            ReplaceCharacterMovement = false;
         }
 
         public bool Update(float deltaTime)
