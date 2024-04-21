@@ -1,4 +1,4 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using Cysharp.Text;
 using UnityEngine;
 
@@ -70,18 +70,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            uiTextAllAmounts = null;
-            textAmounts = null;
-            uiEntryPrefab = null;
-            uiListContainer = null;
-            _cacheTextAmounts?.Clear();
-            _cacheList = null;
-            _data?.Clear();
-        }
-
         protected override void UpdateData()
         {
             // Reset number
@@ -108,10 +96,10 @@ namespace MultiplayerARPG
                     {
                         if (dataEntry.Key == null)
                             continue;
-                        // Set temp data
+
                         tempData = dataEntry.Key;
                         tempAmount = dataEntry.Value;
-                        // Use difference format by option
+
                         switch (displayType)
                         {
                             case DisplayType.Rate:
@@ -129,15 +117,14 @@ namespace MultiplayerARPG
                                     tempValue));
                                 break;
                         }
-                        // Append current elemental armor text
-                        if (dataEntry.Value != 0)
+
+                        if (dataEntry.Value != 0 || !inactiveIfAmountZero)
                         {
-                            // Add new line if text is not empty
                             if (tempAllText.Length > 0)
                                 tempAllText.Append('\n');
                             tempAllText.Append(tempAmountText);
                         }
-                        // Set current elemental armor text to UI
+
                         if (CacheTextAmounts.TryGetValue(dataEntry.Key, out tempComponentPair))
                         {
                             tempComponentPair.uiText.text = tempAmountText;
@@ -148,7 +135,7 @@ namespace MultiplayerARPG
 
                     if (uiTextAllAmounts != null)
                     {
-                        uiTextAllAmounts.SetGameObjectActive(tempAllText.Length > 0);
+                        uiTextAllAmounts.SetGameObjectActive(tempAllText.Length > 0 || !inactiveIfAmountZero);
                         uiTextAllAmounts.text = tempAllText.ToString();
                     }
                 }
