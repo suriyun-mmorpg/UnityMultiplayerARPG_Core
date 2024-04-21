@@ -137,7 +137,6 @@ namespace MultiplayerARPG
                 autoSwimToSurface = autoSwimToSurface,
                 alwaysUseRootMotion = alwaysUseRootMotion,
                 dashingForceApplier = dashingForceApplier,
-                knockingBackForceApplier = knockingBackForceApplier,
                 useRootMotionForMovement = useRootMotionForMovement,
                 useRootMotionForAirMovement = useRootMotionForAirMovement,
                 useRootMotionForJump = useRootMotionForJump,
@@ -211,7 +210,6 @@ namespace MultiplayerARPG
             Functions.autoSwimToSurface = autoSwimToSurface;
             Functions.alwaysUseRootMotion = alwaysUseRootMotion;
             Functions.dashingForceApplier = dashingForceApplier;
-            Functions.knockingBackForceApplier = knockingBackForceApplier;
             Functions.useRootMotionForMovement = useRootMotionForMovement;
             Functions.useRootMotionForAirMovement = useRootMotionForAirMovement;
             Functions.useRootMotionForJump = useRootMotionForJump;

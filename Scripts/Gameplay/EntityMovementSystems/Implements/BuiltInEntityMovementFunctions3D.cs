@@ -44,9 +44,6 @@ namespace MultiplayerARPG
         [Header("Dashing")]
         public EntityMovementForceApplier dashingForceApplier;
 
-        [Header("Knocking Back")]
-        public EntityMovementForceApplier knockingBackForceApplier;
-
         [Header("Root Motion Settings")]
         public bool alwaysUseRootMotion;
         public bool useRootMotionForMovement;
@@ -118,6 +115,8 @@ namespace MultiplayerARPG
         // Move simulate codes
         private float _pauseMovementCountDown;
         private Vector3 _moveDirection;
+        private EntityMovementForceApplier _replaceCharacterMovementForceApplier = null;
+        private readonly List<EntityMovementForceApplier> movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Jump simulate codes
         private float _airborneElapsed;
@@ -493,17 +492,28 @@ namespace MultiplayerARPG
             {
                 _sendingDash = true;
                 dashingForceApplier.Apply(CacheTransform.forward);
+                _replaceCharacterMovementForceApplier = dashingForceApplier;
             }
             dashingForceApplier.MinSpeed = Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None);
-            if (_pauseMovementCountDown <= 0f && dashingForceApplier.Update(deltaTime))
+            if (_pauseMovementCountDown <= 0f && _replaceCharacterMovementForceApplier != null && _replaceCharacterMovementForceApplier.Update(deltaTime))
             {
                 // Still dashing to add dash to movement state
-                _tempMovementState |= MovementState.IsDash;
+                if (_replaceCharacterMovementForceApplier == dashingForceApplier)
+                    _tempMovementState |= MovementState.IsDash;
                 // Force turn to dashed direction
-                _moveDirection = dashingForceApplier.Direction;
+                _moveDirection = _replaceCharacterMovementForceApplier.Direction;
                 _targetYAngle = Quaternion.LookRotation(_moveDirection).eulerAngles.y;
                 // Change move speed to dash force
-                tempMaxMoveSpeed = dashingForceApplier.CurrentSpeed;
+                tempMaxMoveSpeed = _replaceCharacterMovementForceApplier.CurrentSpeed;
+            }
+
+            // Force
+            Vector3 forceVelocity = Vector3.zero;
+            for (int i = 0; i < movementForceAppliers.Count; ++i)
+            {
+                if (!movementForceAppliers[i].Update(deltaTime))
+                    continue;
+                forceVelocity += movementForceAppliers[i].Velocity;
             }
 
             // Movement updating
