@@ -302,11 +302,15 @@ namespace MultiplayerARPG
 
         public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
         {
+            if (!IsServer)
+                return;
             // TODO: Implement this
         }
 
         public void ClearAllForces()
         {
+            if (!IsServer)
+                return;
             // TODO: Implement this
         }
 
@@ -508,12 +512,15 @@ namespace MultiplayerARPG
             }
 
             // Force
-            Vector3 forceVelocity = Vector3.zero;
-            for (int i = 0; i < movementForceAppliers.Count; ++i)
+            Vector3 forceMotion = Vector3.zero;
+            for (int i = movementForceAppliers.Count - 1; i >= 0; --i)
             {
                 if (!movementForceAppliers[i].Update(deltaTime))
+                {
+                    movementForceAppliers.RemoveAt(i);
                     continue;
-                forceVelocity += movementForceAppliers[i].Velocity;
+                }
+                forceMotion += movementForceAppliers[i].Velocity;
             }
 
             // Movement updating
@@ -656,7 +663,7 @@ namespace MultiplayerARPG
                 }
             }
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
-            _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime;
+            _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion + forceMotion) * deltaTime;
             EntityMovement.Move(_previousMovement);
             _currentInput = Entity.SetInputYAngle(_currentInput, CacheTransform.eulerAngles.y);
         }
