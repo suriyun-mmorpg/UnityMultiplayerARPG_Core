@@ -670,7 +670,7 @@ namespace MultiplayerARPG
             }
 
             _isAimming = false;
-            // Update input
+            // Update input, aimming state will be updated in `UpdateInputs` functions
             if (!_updatingInputs)
             {
                 if (ConstructingBuildingEntity == null)
@@ -1413,9 +1413,9 @@ namespace MultiplayerARPG
 
         protected virtual async UniTask Aimming()
         {
+            _isAimming = true;
             while (!SetTargetLookDirectionWhileDoingAction())
             {
-                _isAimming = true;
                 _lastAimmingTime = Time.unscaledTime;
                 await UniTask.Yield();
             }
@@ -1430,6 +1430,7 @@ namespace MultiplayerARPG
             switch (ViewMode)
             {
                 case ShooterControllerViewMode.Fps:
+                    // It is look forwarding already, so it can do next action
                     return PlayingCharacterEntity.CanDoNextAction();
                 case ShooterControllerViewMode.Tps:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
