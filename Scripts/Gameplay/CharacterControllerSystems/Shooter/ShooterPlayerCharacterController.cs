@@ -1806,7 +1806,8 @@ namespace MultiplayerARPG
             CurrentCameraFov = CameraFov;
             CurrentCameraNearClipPlane = CameraNearClipPlane;
             CurrentCameraFarClipPlane = CameraFarClipPlane;
-            PlayingCharacterEntity.ModelManager.SetIsFps(viewMode == ShooterControllerViewMode.Fps);
+            if (PlayingCharacterEntity != null && PlayingCharacterEntity.ModelManager != null)
+                PlayingCharacterEntity.ModelManager.SetIsFps(viewMode == ShooterControllerViewMode.Fps);
         }
 
         public virtual bool IsInFront(Vector3 target)
