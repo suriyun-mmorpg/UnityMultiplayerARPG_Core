@@ -1411,6 +1411,10 @@ namespace MultiplayerARPG
             UpdateRecoil();
         }
 
+        /// <summary>
+        /// Turning forwarding and wait character ready to do actions before doing an actions
+        /// </summary>
+        /// <returns></returns>
         protected virtual async UniTask Aimming()
         {
             _isAimming = true;
