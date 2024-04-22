@@ -172,7 +172,8 @@ namespace MultiplayerARPG
             float tempTime = Time.unscaledTime;
             if (tempTime - _lastSaveTime > autoSaveDuration)
             {
-                Save();
+                if (IsClientConnected || IsServer)
+                    Save();
                 _lastSaveTime = tempTime;
             }
         }
