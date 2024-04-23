@@ -46,6 +46,11 @@ namespace MultiplayerARPG
                 direction = direction,
             };
         }
+
+        public override string ToString()
+        {
+            return $"{type} {position} {(Vector3)direction}";
+        }
     }
 
     [System.Serializable]
