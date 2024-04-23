@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public DamageIncremental damageAmount;
         public DamageEffectivenessAttribute[] effectivenessAttributes;
         public DamageInflictionIncremental[] weaponDamageInflictions;
+        public IncrementalFloat weaponDamageMultiplicator;
         public DamageIncremental[] additionalDamageAmounts;
         public bool increaseDamageAmountsWithBuffs;
         public bool isDebuff;
@@ -119,6 +120,16 @@ namespace MultiplayerARPG
                 return true;
             }
             return base.TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
+        }
+
+        public override bool TryGetAttackWeaponDamageMultiplicator(ICharacterData skillUser, int skillLevel, out float result)
+        {
+            if (IsAttack)
+            {
+                result = weaponDamageMultiplicator.GetAmount(skillLevel);
+                return true;
+            }
+            return base.TryGetAttackWeaponDamageMultiplicator(skillUser, skillLevel, out result);
         }
 
         public override bool TryGetAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel, out Dictionary<DamageElement, MinMaxFloat> result)

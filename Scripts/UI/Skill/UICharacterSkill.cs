@@ -40,6 +40,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeySummon = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_SUMMON);
         [Tooltip("Format => {0} = {Mount Title}")]
         public UILocaleKeySetting formatKeyMount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_MOUNT);
+        [Tooltip("Format => {0} = {Weapon Damage Multiplicator}")]
+        public UILocaleKeySetting formatKeyWeaponDamageMultiplicator = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_ATTACK_WEAPON_DAMAGE_MULTIPLICATOR);
         [Tooltip("Format => {0} = {Skill Type Title}")]
         public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_TYPE);
 
@@ -68,6 +70,7 @@ namespace MultiplayerARPG
         [Header("Skill Attack")]
         public UIDamageElementAmount uiDamageAmount;
         public UIDamageElementInflictions uiDamageInflictions;
+        public TextWrapper uiWeaponDamageMultiplicator;
         public UIDamageElementAmounts uiAdditionalDamageAmounts;
         public UIStatusEffectApplyings uiAttackStatusEffects;
 
@@ -116,6 +119,7 @@ namespace MultiplayerARPG
             uiCraftItem = null;
             uiDamageAmount = null;
             uiDamageInflictions = null;
+            uiWeaponDamageMultiplicator = null;
             uiAdditionalDamageAmounts = null;
             uiAttackStatusEffects = null;
             uiSkillBuff = null;
@@ -500,6 +504,21 @@ namespace MultiplayerARPG
                 {
                     uiDamageInflictions.Show();
                     uiDamageInflictions.Data = damageInflictionRates;
+                }
+            }
+
+            if (uiWeaponDamageMultiplicator != null)
+            {
+                if (Skill == null || !Skill.TryGetAttackWeaponDamageMultiplicator(Character, Level, out float weaponDamageMultiplicator))
+                {
+                    uiWeaponDamageMultiplicator.SetGameObjectActive(false);
+                }
+                else
+                {
+                    uiWeaponDamageMultiplicator.SetGameObjectActive(true);
+                    uiWeaponDamageMultiplicator.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyWeaponDamageMultiplicator),
+                        weaponDamageMultiplicator.ToString("N2"));
                 }
             }
 

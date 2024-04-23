@@ -489,6 +489,20 @@ namespace MultiplayerARPG
                 }
             }
 
+            // Multiply weapon damage with damage multiplicator
+            if (TryGetAttackWeaponDamageMultiplicator(skillUser, skillLevel, out float multiplicator))
+            {
+                // Apply the multiplicator to the base weapon damage amount for either left or right hand
+                KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount;
+                if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)
+                    weaponDamageAmount = skillUser.GetCaches().LeftHandWeaponDamage.Value;
+                else
+                    weaponDamageAmount = skillUser.GetCaches().RightHandWeaponDamage.Value;
+
+                // Multiply both min and max damage by the multiplicator
+                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, new KeyValuePair<DamageElement, MinMaxFloat>(weaponDamageAmount.Key, weaponDamageAmount.Value * multiplicator));
+            }
+
             // Sum damage with additional damage amounts
             if (TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
                 damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, additionalDamageAmounts);
@@ -517,6 +531,12 @@ namespace MultiplayerARPG
         public virtual bool TryGetAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel, out Dictionary<DamageElement, float> weaponDamageInflictions)
         {
             weaponDamageInflictions = null;
+            return false;
+        }
+
+        public virtual bool TryGetAttackWeaponDamageMultiplicator(ICharacterData skillUser, int skillLevel, out float weaponDamageMultiplicator)
+        {
+            weaponDamageMultiplicator = 0;
             return false;
         }
 
