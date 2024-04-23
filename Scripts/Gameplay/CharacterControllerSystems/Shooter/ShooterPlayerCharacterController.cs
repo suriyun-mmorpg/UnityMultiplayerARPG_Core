@@ -855,25 +855,24 @@ namespace MultiplayerARPG
                     // Priority is right > left
                     _isLeftHandAttacking = !_tempPressAttackRight && _tempPressAttackLeft;
                 }
-
-                // Calculate aim distance by skill or weapon
-                if (PlayingCharacterEntity.UsingSkill != null && PlayingCharacterEntity.UsingSkill.IsAttack)
-                {
-                    // Increase aim distance by skill attack distance
-                    attackDistance = PlayingCharacterEntity.UsingSkill.GetCastDistance(PlayingCharacterEntity, PlayingCharacterEntity.UsingSkillLevel, _isLeftHandAttacking);
-                    attacking = true;
-                }
-                else if (_queueUsingSkill.skill != null && _queueUsingSkill.skill.IsAttack)
-                {
-                    // Increase aim distance by skill attack distance
-                    attackDistance = _queueUsingSkill.skill.GetCastDistance(PlayingCharacterEntity, _queueUsingSkill.level, _isLeftHandAttacking);
-                    attacking = true;
-                }
-                else
-                {
-                    // Increase aim distance by attack distance
-                    attackDistance = PlayingCharacterEntity.GetAttackDistance(_isLeftHandAttacking);
-                }
+            }
+            // Calculate aim distance by skill or weapon
+            if (PlayingCharacterEntity.UsingSkill != null && PlayingCharacterEntity.UsingSkill.IsAttack)
+            {
+                // Increase aim distance by skill attack distance
+                attackDistance = PlayingCharacterEntity.UsingSkill.GetCastDistance(PlayingCharacterEntity, PlayingCharacterEntity.UsingSkillLevel, _isLeftHandAttacking);
+                attacking = true;
+            }
+            else if (_queueUsingSkill.skill != null && _queueUsingSkill.skill.IsAttack)
+            {
+                // Increase aim distance by skill attack distance
+                attackDistance = _queueUsingSkill.skill.GetCastDistance(PlayingCharacterEntity, _queueUsingSkill.level, _isLeftHandAttacking);
+                attacking = true;
+            }
+            else
+            {
+                // Increase aim distance by attack distance
+                attackDistance = PlayingCharacterEntity.GetAttackDistance(_isLeftHandAttacking);
             }
             // Temporary variables
             DamageableHitBox tempHitBox;
