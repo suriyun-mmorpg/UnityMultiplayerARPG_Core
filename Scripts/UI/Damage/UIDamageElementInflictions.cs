@@ -93,7 +93,7 @@ namespace MultiplayerARPG
                                 (tempInfliction * 100f).ToString("N0"));
                         }
                         // Append current elemental damage infliction text
-                        if (dataEntry.Value != 0)
+                        if (dataEntry.Value != 0 || !inactiveIfAmountZero)
                         {
                             // Add new line if text is not empty
                             if (tempAllText.Length > 0)
@@ -111,7 +111,7 @@ namespace MultiplayerARPG
 
                     if (uiTextAllInflictions != null)
                     {
-                        uiTextAllInflictions.SetGameObjectActive(tempAllText.Length > 0);
+                        uiTextAllInflictions.SetGameObjectActive(tempAllText.Length > 0 || !inactiveIfAmountZero);
                         uiTextAllInflictions.text = tempAllText.ToString();
                     }
                 }

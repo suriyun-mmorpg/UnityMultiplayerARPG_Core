@@ -150,7 +150,7 @@ namespace MultiplayerARPG
                                 break;
                         }
                         // Append current currency amount text
-                        if (dataEntry.Value != 0)
+                        if (dataEntry.Value != 0 || !inactiveIfAmountZero)
                         {
                             // Add new line if text is not empty
                             if (tempAllText.Length > 0)
@@ -168,7 +168,7 @@ namespace MultiplayerARPG
 
                     if (uiTextAllAmounts != null)
                     {
-                        uiTextAllAmounts.SetGameObjectActive(tempAllText.Length > 0);
+                        uiTextAllAmounts.SetGameObjectActive(tempAllText.Length > 0 || !inactiveIfAmountZero);
                         uiTextAllAmounts.text = tempAllText.ToString();
                     }
                 }
