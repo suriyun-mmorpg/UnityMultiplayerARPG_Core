@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         public float Elasped { get; set; }
         public Vector3 Velocity { get => Direction * CurrentSpeed; }
 
-        public void Apply(Vector3 direction)
+        public EntityMovementForceApplier Apply(Vector3 direction)
         {
             Direction = direction;
             CurrentSpeed = speed;
@@ -34,6 +34,17 @@ namespace MultiplayerARPG
             Deceleration = deceleration;
             Duration = duration;
             Elasped = 0f;
+            return this;
+        }
+
+        public EntityMovementForceApplier Apply(Vector3 direction, float speed, float minSpeed, float deceleration, float duration)
+        {
+            Apply(direction);
+            CurrentSpeed = speed;
+            MinSpeed = minSpeed;
+            Deceleration = deceleration;
+            Duration = duration;
+            return this;
         }
 
         public bool Update(float deltaTime)

@@ -300,18 +300,30 @@ namespace MultiplayerARPG
             return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
         }
 
-        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
+        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration, bool replaceCharacterMovement)
         {
             if (!IsServer)
                 return;
-            // TODO: Implement this
+            if (replaceCharacterMovement)
+            {
+                _replaceCharacterMovementForceApplier = new EntityMovementForceApplier()
+                    .Apply(direction, force, minForce, deceleration, duration);
+            }
+            else
+            {
+                _movementForceAppliers.Add(new EntityMovementForceApplier()
+                    .Apply(direction, force, minForce, deceleration, duration));
+            }
+            // TODO: Sync force updates with client
         }
 
         public void ClearAllForces()
         {
             if (!IsServer)
                 return;
-            // TODO: Implement this
+            _replaceCharacterMovementForceApplier = null;
+            _movementForceAppliers.Clear();
+            // TODO: Sync force updates with client
         }
 
         public bool WaterCheck(Collider waterCollider)

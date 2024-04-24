@@ -316,10 +316,10 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
+        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration, bool replaceCharacterMovement)
         {
             if (!ActiveMovement.IsNull())
-                ActiveMovement.ApplyForce(direction, force, minForce, deceleration, duration);
+                ActiveMovement.ApplyForce(direction, force, minForce, deceleration, duration, replaceCharacterMovement);
         }
 
         public void ClearAllForces()

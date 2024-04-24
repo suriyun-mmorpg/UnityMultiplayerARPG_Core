@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         float GetSmoothTurnSpeed();
         void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport);
         bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
-        void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration);
+        void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration, bool replaceCharacterMovement);
         void ClearAllForces();
     }
 }

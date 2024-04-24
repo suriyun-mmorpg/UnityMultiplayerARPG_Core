@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration)
+        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration, bool replaceCharacterMovement)
         {
             // TODO: Implement this
         }
