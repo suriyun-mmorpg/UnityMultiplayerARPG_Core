@@ -116,7 +116,7 @@ namespace MultiplayerARPG
         private float _pauseMovementCountDown;
         private Vector3 _moveDirection;
         private EntityMovementForceApplier _replaceCharacterMovementForceApplier = null;
-        private readonly List<EntityMovementForceApplier> movementForceAppliers = new List<EntityMovementForceApplier>();
+        private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Jump simulate codes
         private float _airborneElapsed;
@@ -513,14 +513,14 @@ namespace MultiplayerARPG
 
             // Force
             Vector3 forceMotion = Vector3.zero;
-            for (int i = movementForceAppliers.Count - 1; i >= 0; --i)
+            for (int i = _movementForceAppliers.Count - 1; i >= 0; --i)
             {
-                if (!movementForceAppliers[i].Update(deltaTime))
+                if (!_movementForceAppliers[i].Update(deltaTime))
                 {
-                    movementForceAppliers.RemoveAt(i);
+                    _movementForceAppliers.RemoveAt(i);
                     continue;
                 }
-                forceMotion += movementForceAppliers[i].Velocity;
+                forceMotion += _movementForceAppliers[i].Velocity;
             }
 
             // Movement updating
