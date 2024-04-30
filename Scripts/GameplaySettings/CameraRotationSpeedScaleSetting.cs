@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public Slider slider;
         public TextWrapper textScaleValue;
         public string valueFormat = "{0}%";
+        public float valueTextMultiplicator = 100f;
         public float minValue = 0.01f;
         public float maxValue = 1f;
         public float defaultValue = 1f;
@@ -56,7 +57,7 @@ namespace MultiplayerARPG
         {
             CameraRotationSpeedScale = value;
             if (textScaleValue != null)
-                textScaleValue.text = string.Format(valueFormat, value.ToString("N2"));
+                textScaleValue.text = string.Format(valueFormat, (value * valueTextMultiplicator).ToString("N2"));
         }
     }
 }
