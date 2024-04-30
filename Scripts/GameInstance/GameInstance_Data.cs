@@ -2,6 +2,7 @@ using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -1035,6 +1036,10 @@ namespace MultiplayerARPG
             if (!dict.ContainsKey(data.HashAssetId))
             {
                 dict[data.HashAssetId] = data;
+                AsyncOperationHandle<TType> loadOp = data.LoadAssetAsync();
+                TType loadedData = loadOp.WaitForCompletion();
+                loadedData.PrepareRelatesData();
+                Addressables.Release(loadOp);
             }
             return true;
         }
