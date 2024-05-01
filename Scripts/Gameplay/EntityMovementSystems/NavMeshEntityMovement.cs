@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using System.Collections.Generic;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.AI;
@@ -36,6 +37,9 @@ namespace MultiplayerARPG
         protected Vector3? _inputDirection;
         protected ExtraMovementState _tempExtraMovementState;
         protected bool _moveByDestination;
+
+        // Move simulate codes
+        private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Client state codes
         protected EntityMovementInput _oldInput;
@@ -217,14 +221,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration, bool replaceCharacterMovement)
+        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
         {
-            // TODO: Implement this
+            if (!IsServer)
+                return;
+            if (mode.IsReplaceMovement())
+            {
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+            }
+            _movementForceAppliers.Add(new EntityMovementForceApplier()
+                .Apply(direction, mode, force, deceleration, duration));
         }
 
         public void ClearAllForces()
         {
-            // TODO: Implement this
+            if (!IsServer)
+                return;
+            _movementForceAppliers.Clear();
         }
 
         protected float GetPathRemainingDistance()
@@ -391,7 +405,7 @@ namespace MultiplayerARPG
                 MovementState &= ~MovementState.IsTeleport;
             }
             // Sync transform from server to all clients (include owner client)
-            this.ServerWriteSyncTransform3D(writer);
+            this.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
             return true;
@@ -417,7 +431,9 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            reader.ClientReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers);
+            _movementForceAppliers.Clear();
+            _movementForceAppliers.AddRange(movementForceAppliers);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
@@ -528,7 +544,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            reader.ServerReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client

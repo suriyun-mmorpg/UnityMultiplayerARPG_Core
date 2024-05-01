@@ -115,7 +115,6 @@ namespace MultiplayerARPG
         // Move simulate codes
         private float _pauseMovementCountDown;
         private Vector3 _moveDirection;
-        private EntityMovementForceApplier _replaceCharacterMovementForceApplier = null;
         private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Jump simulate codes
@@ -300,30 +299,24 @@ namespace MultiplayerARPG
             return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
         }
 
-        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration, bool replaceCharacterMovement)
+        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
         {
             if (!IsServer)
                 return;
-            if (replaceCharacterMovement)
+            if (mode.IsReplaceMovement())
             {
-                _replaceCharacterMovementForceApplier = new EntityMovementForceApplier()
-                    .Apply(direction, force, minForce, deceleration, duration);
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
             }
-            else
-            {
-                _movementForceAppliers.Add(new EntityMovementForceApplier()
-                    .Apply(direction, force, minForce, deceleration, duration));
-            }
-            // TODO: Sync force updates with client
+            _movementForceAppliers.Add(new EntityMovementForceApplier()
+                .Apply(direction, mode, force, deceleration, duration));
         }
 
         public void ClearAllForces()
         {
             if (!IsServer)
                 return;
-            _replaceCharacterMovementForceApplier = null;
             _movementForceAppliers.Clear();
-            // TODO: Sync force updates with client
         }
 
         public bool WaterCheck(Collider waterCollider)
@@ -508,31 +501,28 @@ namespace MultiplayerARPG
             {
                 _sendingDash = true;
                 dashingForceApplier.Apply(CacheTransform.forward);
-                _replaceCharacterMovementForceApplier = dashingForceApplier;
-            }
-            dashingForceApplier.MinSpeed = Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None);
-            if (_pauseMovementCountDown <= 0f && _replaceCharacterMovementForceApplier != null && _replaceCharacterMovementForceApplier.Update(deltaTime))
-            {
-                // Still dashing to add dash to movement state
-                if (_replaceCharacterMovementForceApplier == dashingForceApplier)
-                    _tempMovementState |= MovementState.IsDash;
-                // Force turn to dashed direction
-                _moveDirection = _replaceCharacterMovementForceApplier.Direction;
-                _targetYAngle = Quaternion.LookRotation(_moveDirection).eulerAngles.y;
-                // Change move speed to dash force
-                tempMaxMoveSpeed = _replaceCharacterMovementForceApplier.CurrentSpeed;
+                dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+                _movementForceAppliers.Add(dashingForceApplier);
             }
 
-            // Force
-            Vector3 forceMotion = Vector3.zero;
-            for (int i = _movementForceAppliers.Count - 1; i >= 0; --i)
+            // Apply Forces
+            _movementForceAppliers.UpdateForces(deltaTime,
+                Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
+                out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
+
+            // Replace player's movement by this
+            if (replaceMovementForceApplier != null)
             {
-                if (!_movementForceAppliers[i].Update(deltaTime))
-                {
-                    _movementForceAppliers.RemoveAt(i);
-                    continue;
-                }
-                forceMotion += _movementForceAppliers[i].Velocity;
+                // Still dashing to add dash to movement state
+                if (replaceMovementForceApplier.Mode == ApplyMovementForceMode.Dash)
+                    _tempMovementState |= MovementState.IsDash;
+                // Force turn to dashed direction
+                _moveDirection = replaceMovementForceApplier.Direction;
+                _targetYAngle = Quaternion.LookRotation(_moveDirection).eulerAngles.y;
+                // Change move speed to dash force
+                tempMaxMoveSpeed = replaceMovementForceApplier.CurrentSpeed;
             }
 
             // Movement updating
@@ -943,7 +933,7 @@ namespace MultiplayerARPG
             {
                 MovementState &= ~MovementState.IsTeleport;
             }
-            Entity.ServerWriteSyncTransform3D(writer);
+            Entity.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
             _sendingJump = false;
             _sendingDash = false;
             _isTeleporting = false;
@@ -971,7 +961,9 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            reader.ClientReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers);
+            _movementForceAppliers.Clear();
+            _movementForceAppliers.AddRange(movementForceAppliers);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
@@ -1115,7 +1107,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            reader.ServerReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client

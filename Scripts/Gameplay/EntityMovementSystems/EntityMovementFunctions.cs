@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using System.Collections.Generic;
+using LiteNetLib.Utils;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -114,7 +115,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Sync Transform Serialization (3D)
-        public static void ServerWriteSyncTransform3D(this IEntityMovement movement, NetDataWriter writer)
+        public static void ServerWriteSyncTransform3D(this IEntityMovement movement, List<EntityMovementForceApplier> movementForceAppliers, NetDataWriter writer)
         {
             if (!movement.Entity.IsServer)
                 return;
@@ -122,6 +123,7 @@ namespace MultiplayerARPG
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector3(movement.Entity.EntityTransform.position);
             writer.PutPackedInt(GetCompressedAngle(movement.Entity.EntityTransform.eulerAngles.y));
+            writer.PutList(movementForceAppliers);
         }
 
         public static void ClientWriteSyncTransform3D(this IEntityMovement movement, NetDataWriter writer)
@@ -134,17 +136,26 @@ namespace MultiplayerARPG
             writer.PutPackedInt(GetCompressedAngle(movement.Entity.EntityTransform.eulerAngles.y));
         }
 
-        public static void ReadSyncTransformMessage3D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle)
+        public static void ServerReadSyncTransformMessage3D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle)
         {
             movementState = (MovementState)reader.GetPackedUInt();
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = reader.GetVector3();
             yAngle = GetDecompressedAngle(reader.GetPackedInt());
         }
+
+        public static void ClientReadSyncTransformMessage3D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers)
+        {
+            movementState = (MovementState)reader.GetPackedUInt();
+            extraMovementState = (ExtraMovementState)reader.GetByte();
+            position = reader.GetVector3();
+            yAngle = GetDecompressedAngle(reader.GetPackedInt());
+            movementForceAppliers = reader.GetList<EntityMovementForceApplier>();
+        }
         #endregion
 
         #region Sync Transform Serialization (2D)
-        public static void ServerWriteSyncTransform2D(this IEntityMovement movement, NetDataWriter writer)
+        public static void ServerWriteSyncTransform2D(this IEntityMovement movement, List<EntityMovementForceApplier> movementForceAppliers, NetDataWriter writer)
         {
             if (!movement.Entity.IsServer)
                 return;
@@ -152,6 +163,7 @@ namespace MultiplayerARPG
             writer.Put((byte)movement.ExtraMovementState);
             writer.PutVector2(movement.Entity.EntityTransform.position);
             writer.Put(movement.Direction2D);
+            writer.PutList(movementForceAppliers);
         }
 
         public static void ClientWriteSyncTransform2D(this IEntityMovement movement, NetDataWriter writer)
@@ -164,12 +176,21 @@ namespace MultiplayerARPG
             writer.Put(movement.Direction2D);
         }
 
-        public static void ReadSyncTransformMessage2D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D)
+        public static void ServerReadSyncTransformMessage2D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D)
         {
             movementState = (MovementState)reader.GetPackedUInt();
             extraMovementState = (ExtraMovementState)reader.GetByte();
             position = reader.GetVector2();
             direction2D = reader.Get<DirectionVector2>();
+        }
+
+        public static void ClientReadSyncTransformMessage2D(this NetDataReader reader, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out List<EntityMovementForceApplier> movementForceAppliers)
+        {
+            movementState = (MovementState)reader.GetPackedUInt();
+            extraMovementState = (ExtraMovementState)reader.GetByte();
+            position = reader.GetVector2();
+            direction2D = reader.Get<DirectionVector2>();
+            movementForceAppliers = reader.GetList<EntityMovementForceApplier>();
         }
         #endregion
 

@@ -44,6 +44,7 @@ namespace MultiplayerARPG
 
         // Move simulate codes
         protected Vector2 _moveDirection;
+        private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Teleport codes
         protected bool _isTeleporting;
@@ -200,14 +201,24 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ApplyForce(Vector3 direction, float force, float minForce, float deceleration, float duration, bool replaceCharacterMovement)
+        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
         {
-            // TODO: Implement this
+            if (!IsServer)
+                return;
+            if (mode.IsReplaceMovement())
+            {
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+            }
+            _movementForceAppliers.Add(new EntityMovementForceApplier()
+                .Apply(direction, mode, force, deceleration, duration));
         }
 
         public void ClearAllForces()
         {
-            // TODO: Implement this
+            if (!IsServer)
+                return;
+            _movementForceAppliers.Clear();
         }
 
         public override void EntityUpdate()
@@ -418,7 +429,7 @@ namespace MultiplayerARPG
                 MovementState &= ~MovementState.IsTeleport;
             }
             // Sync transform from server to all clients (include owner client)
-            this.ServerWriteSyncTransform2D(writer);
+            this.ServerWriteSyncTransform2D(_movementForceAppliers, writer);
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
             return true;
@@ -444,7 +455,9 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
+            reader.ClientReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out List<EntityMovementForceApplier> movementForceAppliers);
+            _movementForceAppliers.Clear();
+            _movementForceAppliers.AddRange(movementForceAppliers);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
@@ -541,7 +554,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
+            reader.ServerReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client

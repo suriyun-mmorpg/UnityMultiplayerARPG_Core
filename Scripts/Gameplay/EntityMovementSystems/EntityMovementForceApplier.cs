@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using LiteNetLib.Utils;
 using UnityEngine;
 
@@ -7,11 +8,10 @@ namespace MultiplayerARPG
     public class EntityMovementForceApplier : INetSerializable
     {
         [SerializeField]
+        private ApplyMovementForceMode mode;
+        [SerializeField]
         [Tooltip("Speed when apply then current speed will be decreased by deceleration * delta time")]
         private float speed = 20f;
-        [SerializeField]
-        [Tooltip("If current speed is less than this value, it will stop applying immediately (by set current speed to 0)")]
-        private float minSpeed = 4f;
         [SerializeField]
         [Tooltip("Current speed will be decreased by this value * delta time, you can set this to 0 to make speed not decrease (but you should set duration more than 0)")]
         private float deceleration = 20f;
@@ -20,8 +20,8 @@ namespace MultiplayerARPG
         private float duration = 0f;
 
         public Vector3 Direction { get; set; }
+        public ApplyMovementForceMode Mode { get; set; }
         public float CurrentSpeed { get; set; }
-        public float MinSpeed { get; set; }
         public float Deceleration { get; set; }
         public float Duration { get; set; }
         public float Elasped { get; set; }
@@ -30,19 +30,19 @@ namespace MultiplayerARPG
         public EntityMovementForceApplier Apply(Vector3 direction)
         {
             Direction = direction;
+            Mode = mode;
             CurrentSpeed = speed;
-            MinSpeed = minSpeed;
             Deceleration = deceleration;
             Duration = duration;
             Elasped = 0f;
             return this;
         }
 
-        public EntityMovementForceApplier Apply(Vector3 direction, float speed, float minSpeed, float deceleration, float duration)
+        public EntityMovementForceApplier Apply(Vector3 direction, ApplyMovementForceMode mode, float speed, float deceleration, float duration)
         {
             Apply(direction);
+            Mode = mode;
             CurrentSpeed = speed;
-            MinSpeed = minSpeed;
             Deceleration = deceleration;
             Duration = duration;
             return this;
@@ -50,18 +50,18 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
+            Mode = (ApplyMovementForceMode)reader.GetByte();
             Direction = reader.GetVector3();
             CurrentSpeed = reader.GetFloat();
-            MinSpeed = reader.GetFloat();
             Deceleration = reader.GetFloat();
             Elasped = reader.GetFloat();
         }
 
         public void Serialize(NetDataWriter writer)
         {
+            writer.Put((byte)Mode);
             writer.PutVector3(Direction);
             writer.Put(CurrentSpeed);
-            writer.Put(MinSpeed);
             writer.Put(Deceleration);
             writer.Put(Elasped);
         }
@@ -72,16 +72,40 @@ namespace MultiplayerARPG
                 return false;
             CurrentSpeed -= deltaTime * Deceleration;
             Elasped += deltaTime;
-            if (CurrentSpeed < MinSpeed)
-            {
-                CurrentSpeed = 0f;
-            }
             if (Duration > 0f && Elasped >= Duration)
             {
                 Elasped = Duration;
                 CurrentSpeed = 0f;
             }
             return CurrentSpeed > 0f;
+        }
+    }
+
+
+    public static class EntityMovementForceApplierExtensions
+    {
+        public static void RemoveReplaceMovementForces(this IList<EntityMovementForceApplier> forceAppliers)
+        {
+            for (int i = forceAppliers.Count - 1; i >= 0; --i)
+            {
+                if (forceAppliers[i].Mode.IsReplaceMovement())
+                    forceAppliers.RemoveAt(i);
+            }
+        }
+
+        public static void UpdateForces(this IList<EntityMovementForceApplier> forceAppliers, float deltaTime, float characterMoveSpeed, out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier)
+        {
+            forceMotion = Vector3.zero;
+            replaceMovementForceApplier = null;
+            for (int i = forceAppliers.Count - 1; i >= 0; --i)
+            {
+                if (!forceAppliers[i].Update(deltaTime) || forceAppliers[i].CurrentSpeed < characterMoveSpeed)
+                    forceAppliers.RemoveAt(i);
+                if (!forceAppliers[i].Mode.IsReplaceMovement())
+                    forceMotion += forceAppliers[i].Velocity;
+                else
+                    replaceMovementForceApplier = forceAppliers[i];
+            }
         }
     }
 }
