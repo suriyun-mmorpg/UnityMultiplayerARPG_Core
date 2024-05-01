@@ -100,7 +100,10 @@ namespace MultiplayerARPG
             for (int i = forceAppliers.Count - 1; i >= 0; --i)
             {
                 if (!forceAppliers[i].Update(deltaTime) || forceAppliers[i].CurrentSpeed < characterMoveSpeed)
+                {
                     forceAppliers.RemoveAt(i);
+                    continue;
+                }
                 if (!forceAppliers[i].Mode.IsReplaceMovement())
                     forceMotion += forceAppliers[i].Velocity;
                 else
