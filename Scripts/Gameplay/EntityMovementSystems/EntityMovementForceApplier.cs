@@ -1,9 +1,10 @@
+using LiteNetLib.Utils;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class EntityMovementForceApplier
+    public class EntityMovementForceApplier : INetSerializable
     {
         [SerializeField]
         [Tooltip("Speed when apply then current speed will be decreased by deceleration * delta time")]
@@ -45,6 +46,24 @@ namespace MultiplayerARPG
             Deceleration = deceleration;
             Duration = duration;
             return this;
+        }
+
+        public void Deserialize(NetDataReader reader)
+        {
+            Direction = reader.GetVector3();
+            CurrentSpeed = reader.GetFloat();
+            MinSpeed = reader.GetFloat();
+            Deceleration = reader.GetFloat();
+            Elasped = reader.GetFloat();
+        }
+
+        public void Serialize(NetDataWriter writer)
+        {
+            writer.PutVector3(Direction);
+            writer.Put(CurrentSpeed);
+            writer.Put(MinSpeed);
+            writer.Put(Deceleration);
+            writer.Put(Elasped);
         }
 
         public bool Update(float deltaTime)
