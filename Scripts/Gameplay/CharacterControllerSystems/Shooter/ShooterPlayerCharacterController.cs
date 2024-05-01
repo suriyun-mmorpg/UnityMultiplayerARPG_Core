@@ -1033,13 +1033,13 @@ namespace MultiplayerARPG
         {
             _updatingInputs = true;
             // Prepare fire type data
-            FireType rightHandFireType = FireType.SingleFire;
+            FireType rightHandFireType = GameInstance.Singleton.DefaultWeaponItem.FireType;
             if (_rightHandWeapon != null)
             {
                 rightHandFireType = _rightHandWeapon.FireType;
             }
             // Prepare fire type data
-            FireType leftHandFireType = FireType.SingleFire;
+            FireType leftHandFireType = GameInstance.Singleton.DefaultWeaponItem.FireType;
             if (_leftHandWeapon != null)
             {
                 leftHandFireType = _leftHandWeapon.FireType;
