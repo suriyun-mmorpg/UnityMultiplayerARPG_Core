@@ -1,9 +1,7 @@
 ﻿using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
@@ -39,6 +37,12 @@ namespace MultiplayerARPG
     {
         Immediately,
         DropOnGround,
+    }
+
+    public enum GoldStoreMode
+    {
+        Default,
+        UserGoldOnly,
     }
 
     public enum TestInEditorMode
@@ -337,6 +341,8 @@ namespace MultiplayerARPG
         public float useItemDelay = 0.25f;
         [Tooltip("If this is `TRUE`, it will clear skills cooldown when character dead")]
         public bool clearSkillCooldownOnDead = true;
+        [Tooltip("How the gold stored and being used, If this is `UserGoldOnly`, it won't have character's gold, all gold will being used from user's gold")]
+        public GoldStoreMode goldStoreMode = GoldStoreMode.Default;
 
         [Header("Gameplay Configs - Items, Inventory and Storage")]
         public ItemTypeFilter dismantleFilter = new ItemTypeFilter()

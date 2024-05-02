@@ -28,10 +28,11 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            int amount;
+            int amount = 0;
             if (uiTextUserGold != null)
             {
-                amount = GameInstance.PlayingCharacter == null ? 0 : GameInstance.PlayingCharacter.UserGold;
+                if (GameInstance.PlayingCharacter != null)
+                    amount = GameInstance.PlayingCharacter.UserGold;
                 uiTextUserGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyUserGold),
                     amount.ToString("N0"));
@@ -39,7 +40,18 @@ namespace MultiplayerARPG
 
             if (uiTextTotalGold != null)
             {
-                amount = GameInstance.PlayingCharacter == null ? 0 : (GameInstance.PlayingCharacter.UserGold + GameInstance.PlayingCharacter.Gold);
+                if (GameInstance.PlayingCharacter != null)
+                {
+                    switch (GameInstance.Singleton.goldStoreMode)
+                    {
+                        case GoldStoreMode.UserGoldOnly:
+                            amount = GameInstance.PlayingCharacter.UserGold;
+                            break;
+                        default:
+                            amount = GameInstance.PlayingCharacter.UserGold + GameInstance.PlayingCharacter.Gold;
+                            break;
+                    }
+                }
                 uiTextTotalGold.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTotalGold),
                     amount.ToString("N0"));
@@ -47,7 +59,8 @@ namespace MultiplayerARPG
 
             if (uiTextUserCash != null)
             {
-                amount = GameInstance.PlayingCharacter == null ? 0 : GameInstance.PlayingCharacter.UserCash;
+                if (GameInstance.PlayingCharacter != null)
+                    amount = GameInstance.PlayingCharacter.UserCash;
                 uiTextUserCash.text = ZString.Format(
                     LanguageManager.GetText(formatKeyUserCash),
                     amount.ToString("N0"));

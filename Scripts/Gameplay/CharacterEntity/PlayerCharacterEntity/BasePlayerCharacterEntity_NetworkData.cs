@@ -82,7 +82,28 @@ namespace MultiplayerARPG
         public override int FactionId { get { return factionId.Value; } set { factionId.Value = value; } }
         public float StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
         public float SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
-        public int Gold { get { return gold.Value; } set { gold.Value = value; } }
+        public int Gold
+        {
+            get
+            {
+                if (CurrentGameInstance.goldStoreMode == GoldStoreMode.UserGoldOnly)
+                    return UserCash;
+                return gold.Value;
+            }
+            set
+            {
+                if (!IsServer)
+                {
+                    return;
+                }
+                if (CurrentGameInstance.goldStoreMode == GoldStoreMode.UserGoldOnly)
+                {
+                    GameInstance.ServerUserHandlers.ChangeUserGold(UserId, value - UserCash);
+                    return;
+                }
+                gold.Value = value;
+            }
+        }
         public int UserGold { get { return userGold.Value; } set { userGold.Value = value; } }
         public int UserCash { get { return userCash.Value; } set { userCash.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
