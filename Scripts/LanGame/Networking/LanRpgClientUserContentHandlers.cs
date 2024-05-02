@@ -27,7 +27,7 @@ namespace MultiplayerARPG
                         {
                             type = UnlockableContentType.Icon,
                             dataId = playerIcon.DataId,
-                            shardAmount = 0,
+                            progression = 0,
                             unlocked = true,
                         });
                     }
@@ -39,7 +39,7 @@ namespace MultiplayerARPG
                         {
                             type = UnlockableContentType.Frame,
                             dataId = playerFrame.DataId,
-                            shardAmount = 0,
+                            progression = 0,
                             unlocked = true,
                         });
                     }
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
                         {
                             type = UnlockableContentType.Title,
                             dataId = playerTitle.DataId,
-                            shardAmount = 0,
+                            progression = 0,
                             unlocked = true,
                         });
                     }
