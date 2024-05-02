@@ -136,14 +136,14 @@ namespace MultiplayerARPG
             throw new System.NotImplementedException();
         }
 
-        public void ChangeUserGold(string userId, int gold)
+        public virtual void ChangeUserGold(string userId, int gold)
         {
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
                 return;
             playerCharacter.UserGold.Increase(gold);
         }
 
-        public void ChangeUserCash(string userId, int cash)
+        public virtual void ChangeUserCash(string userId, int cash)
         {
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
                 return;
