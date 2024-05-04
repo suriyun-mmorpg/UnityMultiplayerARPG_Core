@@ -421,21 +421,21 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextSummon.SetGameObjectActive(true);
-                    if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
+                    if (skillSummon.MonsterCharacterEntity != null)
                     {
                         uiTextSummon.text = ZString.Format(
                             LanguageManager.GetText(formatKeySummon),
-                            skillSummon.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseMonsterCharacterEntity>().Title,
+                            skillSummon.MonsterCharacterEntity.Title,
                             skillSummon.Level.GetAmount(Level),
                             skillSummon.AmountEachTime.GetAmount(Level),
                             skillSummon.MaxStack.GetAmount(Level),
                             skillSummon.Duration.GetAmount(Level));
                     }
-                    else if (skillSummon.MonsterCharacterEntity != null)
+                    else if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
                     {
                         uiTextSummon.text = ZString.Format(
                             LanguageManager.GetText(formatKeySummon),
-                            skillSummon.MonsterCharacterEntity.Title,
+                            skillSummon.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseMonsterCharacterEntity>().Title,
                             skillSummon.Level.GetAmount(Level),
                             skillSummon.AmountEachTime.GetAmount(Level),
                             skillSummon.MaxStack.GetAmount(Level),
@@ -453,17 +453,17 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextMount.SetGameObjectActive(true);
-                    if (skillMount.AddressableMountEntity.IsDataValid())
-                    {
-                        uiTextMount.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyMount),
-                            skillMount.AddressableMountEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>().Title);
-                    }
-                    else if (skillMount.MountEntity != null)
+                    if (skillMount.MountEntity != null)
                     {
                         uiTextMount.text = ZString.Format(
                             LanguageManager.GetText(formatKeyMount),
                             skillMount.MountEntity.Title);
+                    }
+                    else if (skillMount.AddressableMountEntity.IsDataValid())
+                    {
+                        uiTextMount.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            skillMount.AddressableMountEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>().Title);
                     }
                 }
             }

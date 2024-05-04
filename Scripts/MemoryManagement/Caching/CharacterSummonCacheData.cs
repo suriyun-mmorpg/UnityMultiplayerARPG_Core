@@ -63,15 +63,15 @@ namespace MultiplayerARPG
                 case SummonType.Skill:
                     if (GameInstance.Skills.TryGetValue(_dataId, out BaseSkill skill) && skill.TryGetSummon(out SkillSummon skillSummon))
                     {
-                        if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
-                        {
-                            addressablePrefab = skillSummon.AddressableMonsterCharacterEntity;
-                            return true;
-                        }
-                        else if (skillSummon.MonsterCharacterEntity != null)
+                        if (skillSummon.MonsterCharacterEntity != null)
                         {
                             prefab = skillSummon.MonsterCharacterEntity;
                             return false;
+                        }
+                        else if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
+                        {
+                            addressablePrefab = skillSummon.AddressableMonsterCharacterEntity;
+                            return true;
                         }
                     }
                     break;
@@ -79,15 +79,15 @@ namespace MultiplayerARPG
                     if (GameInstance.Items.TryGetValue(_dataId, out BaseItem item) && item.IsPet())
                     {
                         IPetItem petItem = item as IPetItem;
-                        if (petItem.AddressableMonsterCharacterEntity.IsDataValid())
-                        {
-                            addressablePrefab = petItem.AddressableMonsterCharacterEntity;
-                            return true;
-                        }
-                        else if (petItem.MonsterCharacterEntity != null)
+                        if (petItem.MonsterCharacterEntity != null)
                         {
                             prefab = petItem.MonsterCharacterEntity;
                             return false;
+                        }
+                        else if (petItem.AddressableMonsterCharacterEntity.IsDataValid())
+                        {
+                            addressablePrefab = petItem.AddressableMonsterCharacterEntity;
+                            return true;
                         }
                     }
                     break;

@@ -24,17 +24,7 @@ namespace MultiplayerARPG
             Quaternion spawnRotation = GetRandomRotation();
             LiteNetLibIdentity spawnObj = null;
             ItemDropEntity entity = null;
-            if (addressablePrefab.IsDataValid())
-            {
-                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                    addressablePrefab.HashAssetId,
-                    spawnPosition, spawnRotation);
-                if (spawnObj == null)
-                    return null;
-                entity = spawnObj.GetComponent<ItemDropEntity>();
-                entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
-            }
-            else
+            if (prefab != null)
             {
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId,
@@ -43,6 +33,16 @@ namespace MultiplayerARPG
                     return null;
                 entity = spawnObj.GetComponent<ItemDropEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
+            }
+            else if (addressablePrefab.IsDataValid())
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId,
+                    spawnPosition, spawnRotation);
+                if (spawnObj == null)
+                    return null;
+                entity = spawnObj.GetComponent<ItemDropEntity>();
+                entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
             }
 
             entity.Init();

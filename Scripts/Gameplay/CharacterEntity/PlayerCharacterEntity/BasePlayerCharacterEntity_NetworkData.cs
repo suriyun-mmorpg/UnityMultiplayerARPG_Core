@@ -472,27 +472,29 @@ namespace MultiplayerARPG
             // Setup relates elements
             if (IsOwnerClient)
             {
-                BasePlayerCharacterController prefab;
-                if (AddressableControllerPrefab.IsDataValid())
-                {
-                    prefab = AddressableControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
-                }
+                BasePlayerCharacterController prefab = null;
 #if !EXCLUDE_PREFAB_REFS
-                else if (ControllerPrefab != null)
+                if (ControllerPrefab != null)
                 {
                     prefab = ControllerPrefab;
                 }
-#endif
-                else if (CurrentGameInstance.addressableDefaultControllerPrefab.IsDataValid())
-                {
-                    prefab = CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
-                }
-#if !EXCLUDE_PREFAB_REFS
                 else if (CurrentGameInstance.defaultControllerPrefab != null)
                 {
                     prefab = CurrentGameInstance.defaultControllerPrefab;
                 }
 #endif
+                if (prefab != null)
+                {
+                    // Do nothing, just have it to make it able to compile properly (it have compile condition above)
+                }
+                else if (AddressableControllerPrefab.IsDataValid())
+                {
+                    prefab = AddressableControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
+                }
+                else if (CurrentGameInstance.addressableDefaultControllerPrefab.IsDataValid())
+                {
+                    prefab = CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
+                }
                 else if (BasePlayerCharacterController.Singleton != null)
                 {
                     prefab = BasePlayerCharacterController.LastPrefab;

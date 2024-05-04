@@ -80,20 +80,27 @@ namespace MultiplayerARPG
 
         public virtual void RegisterPrefabs()
         {
+            T prefab;
 #if !EXCLUDE_PREFAB_REFS
+            prefab = this.prefab;
+#else
+            prefab = null;
+#endif
             if (prefab != null)
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
-#endif
-            if (addressablePrefab.IsDataValid())
+            else if (addressablePrefab.IsDataValid())
                 BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefab(addressablePrefab);
 
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
 #if !EXCLUDE_PREFAB_REFS
-                if (spawningPrefab.prefab != null)
-                    BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(spawningPrefab.prefab.Identity);
+                prefab = spawningPrefab.prefab;
+#else
+                prefab = null;
 #endif
-                if (spawningPrefab.addressablePrefab.IsDataValid())
+                if (prefab != null)
+                    BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
+                else if (spawningPrefab.addressablePrefab.IsDataValid())
                     BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefab(spawningPrefab.addressablePrefab);
             }
         }

@@ -301,35 +301,31 @@ namespace MultiplayerARPG
 
         public override bool TryGetSummon(out SkillSummon summon)
         {
-            if (this.summon.AddressableMonsterCharacterEntity.IsDataValid())
+            if (this.summon.MonsterCharacterEntity != null)
             {
                 summon = this.summon;
                 return true;
             }
-#if !EXCLUDE_PREFAB_REFS
-            else if (this.summon.MonsterCharacterEntity != null)
+            else if (this.summon.AddressableMonsterCharacterEntity.IsDataValid())
             {
                 summon = this.summon;
                 return true;
             }
-#endif
             return base.TryGetSummon(out summon);
         }
 
         public override bool TryGetMount(out SkillMount mount)
         {
-            if (this.mount.AddressableMountEntity.IsDataValid())
+            if (this.mount.MountEntity != null)
             {
                 mount = this.mount;
                 return true;
             }
-#if !EXCLUDE_PREFAB_REFS
-            else if (this.mount.MountEntity != null)
+            else if (this.mount.AddressableMountEntity.IsDataValid())
             {
                 mount = this.mount;
                 return true;
             }
-#endif
             return base.TryGetMount(out mount);
         }
 

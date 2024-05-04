@@ -63,17 +63,7 @@ namespace MultiplayerARPG
             Quaternion spawnRotation = GetRandomRotation();
             LiteNetLibIdentity spawnObj = null;
             HarvestableEntity entity = null;
-            if (addressablePrefab.IsDataValid())
-            {
-                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                    addressablePrefab.HashAssetId,
-                    spawnPosition, spawnRotation);
-                if (spawnObj == null)
-                    return null;
-                entity = spawnObj.GetComponent<HarvestableEntity>();
-                entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
-            }
-            else if (prefab != null)
+            if (prefab != null)
             {
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId,
@@ -82,6 +72,16 @@ namespace MultiplayerARPG
                     return null;
                 entity = spawnObj.GetComponent<HarvestableEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
+            }
+            else if (addressablePrefab.IsDataValid())
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId,
+                    spawnPosition, spawnRotation);
+                if (spawnObj == null)
+                    return null;
+                entity = spawnObj.GetComponent<HarvestableEntity>();
+                entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
             }
 
             if (IsOverlapSomethingNearby(spawnPosition, entity))

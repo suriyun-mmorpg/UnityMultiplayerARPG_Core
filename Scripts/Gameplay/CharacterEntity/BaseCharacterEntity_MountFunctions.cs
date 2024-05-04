@@ -23,16 +23,16 @@ namespace MultiplayerARPG
 
             // Instantiate new mount entity
             LiteNetLibIdentity spawnObj;
-            if (addressablePrefab.IsDataValid())
-            {
-                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                    addressablePrefab.HashAssetId, enterPosition,
-                    Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
-            }
-            else if (prefab != null)
+            if (prefab != null)
             {
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId, enterPosition,
+                    Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
+            }
+            else if (addressablePrefab.IsDataValid())
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId, enterPosition,
                     Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
             }
             else

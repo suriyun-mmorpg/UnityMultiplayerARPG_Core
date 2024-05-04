@@ -83,13 +83,13 @@ namespace MultiplayerARPG
 
         public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            if (AddressableBuildingEntity.IsDataValid())
-            {
-                return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>());
-            }
-            else if (BuildingEntity != null)
+            if (BuildingEntity != null)
             {
                 return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+            }
+            else if (AddressableBuildingEntity.IsDataValid())
+            {
+                return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>());
             }
             return default;
         }

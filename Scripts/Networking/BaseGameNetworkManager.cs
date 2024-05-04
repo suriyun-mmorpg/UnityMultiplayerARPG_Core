@@ -730,33 +730,31 @@ namespace MultiplayerARPG
                 if (GameInstance.MapWarpPortals.TryGetValue(CurrentMapInfo.Id, out List<WarpPortal> mapWarpPortals))
                 {
                     WarpPortal warpPortal;
-#if !EXCLUDE_PREFAB_REFS
-                        WarpPortalEntity warpPortalPrefab;
-#endif
+                    WarpPortalEntity warpPortalPrefab;
                     AssetReferenceWarpPortalEntity addressableWarpPortalPrefab;
                     WarpPortalEntity warpPortalEntity;
                     for (i = 0; i < mapWarpPortals.Count; ++i)
                     {
                         warpPortal = mapWarpPortals[i];
 #if !EXCLUDE_PREFAB_REFS
-                            warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
+                        warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
+#else
+                        warpPortalPrefab = null;
 #endif
                         addressableWarpPortalPrefab = warpPortal.addressableEntityPrefab.IsDataValid() ? warpPortal.addressableEntityPrefab : CurrentGameInstance.addressableWarpPortalEntityPrefab;
                         spawnObj = null;
-                        if (addressableWarpPortalPrefab.IsDataValid())
+                        if (warpPortalPrefab != null)
+                        {
+                            spawnObj = Assets.GetObjectInstance(
+                                warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
+                                Quaternion.Euler(warpPortal.rotation));
+                        }
+                        else if (addressableWarpPortalPrefab.IsDataValid())
                         {
                             spawnObj = Assets.GetObjectInstance(
                                 addressableWarpPortalPrefab.HashAssetId, warpPortal.position,
                                 Quaternion.Euler(warpPortal.rotation));
                         }
-#if !EXCLUDE_PREFAB_REFS
-                            else if (warpPortalPrefab != null)
-                            {
-                                spawnObj = Assets.GetObjectInstance(
-                                    warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
-                                    Quaternion.Euler(warpPortal.rotation));
-                            }
-#endif
                         if (spawnObj != null)
                         {
                             warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
@@ -785,33 +783,31 @@ namespace MultiplayerARPG
                 if (GameInstance.MapNpcs.TryGetValue(CurrentMapInfo.Id, out List<Npc> mapNpcs))
                 {
                     Npc npc;
-#if !EXCLUDE_PREFAB_REFS
-                        NpcEntity npcPrefab;
-#endif
+                    NpcEntity npcPrefab;
                     AssetReferenceNpcEntity addressableNpcPrefab;
                     NpcEntity npcEntity;
                     for (i = 0; i < mapNpcs.Count; ++i)
                     {
                         npc = mapNpcs[i];
 #if !EXCLUDE_PREFAB_REFS
-                            npcPrefab = npc.entityPrefab;
+                        npcPrefab = npc.entityPrefab;
+#else
+                        npcPrefab = null;
 #endif
                         addressableNpcPrefab = npc.addressableEntityPrefab;
                         spawnObj = null;
-                        if (addressableNpcPrefab.IsDataValid())
+                        if (npcPrefab != null)
+                        {
+                            spawnObj = Assets.GetObjectInstance(
+                                npcPrefab.Identity.HashAssetId, npc.position,
+                                Quaternion.Euler(npc.rotation));
+                        }
+                        else if (addressableNpcPrefab.IsDataValid())
                         {
                             spawnObj = Assets.GetObjectInstance(
                                 addressableNpcPrefab.HashAssetId, npc.position,
                                 Quaternion.Euler(npc.rotation));
                         }
-#if !EXCLUDE_PREFAB_REFS
-                            else if (npcPrefab != null)
-                            {
-                                spawnObj = Assets.GetObjectInstance(
-                                    npcPrefab.Identity.HashAssetId, npc.position,
-                                    Quaternion.Euler(npc.rotation));
-                            }
-#endif
                         if (spawnObj != null)
                         {
                             npcEntity = spawnObj.GetComponent<NpcEntity>();

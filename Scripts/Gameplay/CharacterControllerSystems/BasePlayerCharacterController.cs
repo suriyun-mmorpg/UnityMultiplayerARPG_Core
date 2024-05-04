@@ -126,16 +126,20 @@ namespace MultiplayerARPG
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
-            if (CurrentGameInstance.AddressableUISceneGameplayPrefab.IsDataValid())
+            BaseUISceneGameplay prefab;
+#if !EXCLUDE_PREFAB_REFS
+            prefab = CurrentGameInstance.UISceneGameplayPrefab;
+#else
+            prefab = null;
+#endif
+            if (prefab != null)
+            {
+                UISceneGameplay = Instantiate(prefab);
+            }
+            else if (CurrentGameInstance.AddressableUISceneGameplayPrefab.IsDataValid())
             {
                 UISceneGameplay = Instantiate(CurrentGameInstance.AddressableUISceneGameplayPrefab.GetOrLoadAsset<AssetReferenceBaseUISceneGameplay, BaseUISceneGameplay>());
             }
-#if !EXCLUDE_PREFAB_REFS
-            else if (CurrentGameInstance.UISceneGameplayPrefab != null)
-            {
-                UISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
-            }
-#endif
             if (UISceneGameplay != null)
                 UISceneGameplay.OnControllerSetup(characterEntity);
             if (onSetup != null)

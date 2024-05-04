@@ -261,16 +261,20 @@ namespace MultiplayerARPG
                         case DeadDropItemMode.CorpseLooting:
                             if (removingItemInstances.Count > 0)
                             {
-                                if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
+                                ItemsContainerEntity prefab;
+#if !EXCLUDE_PREFAB_REFS
+                                prefab = CurrentGameInstance.playerCorpsePrefab;
+#else
+                                prefab = null;
+#endif
+                                if (prefab != null)
+                                {
+                                    ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                                }
+                                else if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
                                 {
                                     ItemsContainerEntity.DropItems(CurrentGameInstance.addressablePlayerCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
                                 }
-#if !EXCLUDE_PREFAB_REFS
-                                else if (CurrentGameInstance.playerCorpsePrefab != null)
-                                {
-                                    ItemsContainerEntity.DropItems(CurrentGameInstance.playerCorpsePrefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
-                                }
-#endif
                             }
                             break;
                     }

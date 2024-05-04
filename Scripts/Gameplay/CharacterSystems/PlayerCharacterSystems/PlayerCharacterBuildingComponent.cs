@@ -47,13 +47,13 @@ namespace MultiplayerARPG
             }
 
             BuildingEntity buildingEntity;
-            if (buildingItem.AddressableBuildingEntity.IsDataValid())
-            {
-                buildingEntity = buildingItem.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>();
-            }
-            else if (buildingItem.BuildingEntity != null)
+            if (buildingItem.BuildingEntity != null)
             {
                 buildingEntity = buildingItem.BuildingEntity;
+            }
+            else if (buildingItem.AddressableBuildingEntity.IsDataValid())
+            {
+                buildingEntity = buildingItem.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>();
             }
             else
             {

@@ -7,17 +7,22 @@ namespace MultiplayerARPG
     {
         public static ExpDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {
-            if (GameInstance.Singleton.addressableExpDropEntityPrefab.IsDataValid())
-            {
-                return Drop(GameInstance.Singleton.addressableExpDropEntityPrefab.GetOrLoadAsset<AssetReferenceExpDropEntity, ExpDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
-            }
+            ExpDropEntity entity = null;
+            ExpDropEntity prefab;
 #if !EXCLUDE_PREFAB_REFS
-            else if (GameInstance.Singleton.expDropEntityPrefab != null)
-            {
-                return Drop(GameInstance.Singleton.expDropEntityPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
-            }
+            prefab = GameInstance.Singleton.expDropEntityPrefab;
+#else
+            prefab = null;
 #endif
-            return null;
+            if (prefab != null)
+            {
+                entity = Drop(prefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
+            }
+            else if (GameInstance.Singleton.addressableExpDropEntityPrefab.IsDataValid())
+            {
+                entity = Drop(GameInstance.Singleton.addressableExpDropEntityPrefab.GetOrLoadAsset<AssetReferenceExpDropEntity, ExpDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;
+            }
+            return entity;
         }
 
         protected override bool ProceedPickingUpAtServer_Implementation(BaseCharacterEntity characterEntity, out UITextKeys message)
