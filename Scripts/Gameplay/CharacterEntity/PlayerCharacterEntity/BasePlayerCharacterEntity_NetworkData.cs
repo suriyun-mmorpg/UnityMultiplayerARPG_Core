@@ -87,7 +87,7 @@ namespace MultiplayerARPG
             get
             {
                 if (CurrentGameInstance.goldStoreMode == GoldStoreMode.UserGoldOnly)
-                    return UserCash;
+                    return UserGold;
                 return gold.Value;
             }
             set
