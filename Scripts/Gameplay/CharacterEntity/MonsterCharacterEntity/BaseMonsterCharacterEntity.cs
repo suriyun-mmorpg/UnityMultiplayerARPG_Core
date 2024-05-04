@@ -441,13 +441,13 @@ namespace MultiplayerARPG
 
             switch (CurrentGameInstance.monsterDeadDropItemMode)
             {
-                case DeadDropItemMode.DropOnGround:
+                case RewardingItemMode.DropOnGround:
                     for (int i = 0; i < _droppingItems.Count; ++i)
                     {
                         ItemDropEntity.Drop(this, RewardGivenType.KillMonster, _droppingItems[i], _looters);
                     }
                     break;
-                case DeadDropItemMode.CorpseLooting:
+                case RewardingItemMode.CorpseLooting:
                     if (_droppingItems.Count > 0)
                     {
                         ItemsContainerEntity prefab;
@@ -463,6 +463,42 @@ namespace MultiplayerARPG
                         else if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
                         {
                             ItemsContainerEntity.DropItems(CurrentGameInstance.addressableMonsterCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                        }
+                    }
+                    break;
+                case RewardingItemMode.Immediately:
+                    // NOTE: might have to think about how the item should be sent, now it will be sent randomly to `_looters`
+                    List<string> shufflingLooters = new List<string>(_looters);
+                    shufflingLooters.Shuffle();
+                    int looterIndex = 0;
+                    for (int i = 0; i < _droppingItems.Count; ++i)
+                    {
+                        if (looterIndex >= shufflingLooters.Count)
+                        {
+                            looterIndex = 0;
+                        }
+                        BasePlayerCharacterEntity looterEntity = null;
+                        while (shufflingLooters.Count > 0 && !GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(shufflingLooters[looterIndex], out looterEntity))
+                        {
+                            shufflingLooters.RemoveAt(looterIndex);
+                            looterEntity = null;
+                            continue;
+                        }
+                        if (shufflingLooters.Count <= 0)
+                        {
+                            // Prevent no looters error
+                            break;
+                        }
+                        looterIndex++;
+                        if (looterEntity != null)
+                        {
+                            // Increase items directly to character inventory
+                            if (looterEntity.IncreasingItemsWillOverwhelming(_droppingItems[i].dataId, _droppingItems[i].amount))
+                            {
+                                GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(looterEntity.Id, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
+                                continue;
+                            }
+                            looterEntity.IncreaseItems(_droppingItems[i]);
                         }
                     }
                     break;
