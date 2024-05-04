@@ -571,19 +571,19 @@ namespace MultiplayerARPG
 
             Assets.addressablePlayerPrefab = null;
             HashSet<AssetReferenceLiteNetLibIdentity> addressableSpawnablePrefabs = new HashSet<AssetReferenceLiteNetLibIdentity>(Assets.addressableSpawnablePrefabs);
-            if (CurrentGameInstance.addressableItemDropEntityPrefab != null)
+            if (CurrentGameInstance.addressableItemDropEntityPrefab.IsDataValid())
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableItemDropEntityPrefab);
-            if (CurrentGameInstance.addressableExpDropEntityPrefab != null)
+            if (CurrentGameInstance.addressableExpDropEntityPrefab.IsDataValid())
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableExpDropEntityPrefab);
-            if (CurrentGameInstance.addressableGoldDropEntityPrefab != null)
+            if (CurrentGameInstance.addressableGoldDropEntityPrefab.IsDataValid())
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableGoldDropEntityPrefab);
-            if (CurrentGameInstance.addressableCurrencyDropEntityPrefab != null)
+            if (CurrentGameInstance.addressableCurrencyDropEntityPrefab.IsDataValid())
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableCurrencyDropEntityPrefab);
-            if (CurrentGameInstance.addressableWarpPortalEntityPrefab != null)
+            if (CurrentGameInstance.addressableWarpPortalEntityPrefab.IsDataValid())
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableWarpPortalEntityPrefab);
-            if (CurrentGameInstance.addressablePlayerCorpsePrefab != null)
+            if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.addressablePlayerCorpsePrefab);
-            if (CurrentGameInstance.addressableMonsterCorpsePrefab != null)
+            if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableMonsterCorpsePrefab);
             foreach (AssetReferenceBaseCharacterEntity entry in GameInstance.AddressableCharacterEntities.Values)
             {
