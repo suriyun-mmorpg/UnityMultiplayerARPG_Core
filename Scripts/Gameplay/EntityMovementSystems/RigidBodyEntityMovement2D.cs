@@ -350,6 +350,7 @@ namespace MultiplayerARPG
                     _tempMovementState |= MovementState.IsDash;
                 // Force turn to dashed direction
                 _moveDirection = replaceMovementForceApplier.Direction;
+                Direction2D = _moveDirection;
                 // Change move speed to dash force
                 tempMaxMoveSpeed = replaceMovementForceApplier.CurrentSpeed;
             }
