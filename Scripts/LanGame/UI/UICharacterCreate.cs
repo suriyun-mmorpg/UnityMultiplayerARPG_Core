@@ -160,9 +160,9 @@ namespace MultiplayerARPG
         protected List<BasePlayerCharacterEntity> _addressablePlayerCharacterEntities = null;
         protected BaseCharacterModel _selectedModel;
         public BaseCharacterModel SelectedModel { get { return _selectedModel; } }
-        protected readonly Dictionary<int, PlayerCharacter[]> _playerCharacterDataByEntityId = new Dictionary<int, PlayerCharacter[]>();
-        protected PlayerCharacter[] _selectableCharacterClasses;
-        public PlayerCharacter[] SelectableCharacterClasses { get { return _selectableCharacterClasses; } }
+        protected readonly Dictionary<int, List<PlayerCharacter>> _playerCharacterDataByEntityId = new Dictionary<int, List<PlayerCharacter>>();
+        protected List<PlayerCharacter> _selectableCharacterClasses;
+        public List<PlayerCharacter> SelectableCharacterClasses { get { return _selectableCharacterClasses; } }
         protected PlayerCharacter _selectedPlayerCharacter;
         public PlayerCharacter SelectedPlayerCharacter { get { return _selectedPlayerCharacter; } }
         protected PlayerCharacterData _selectedPlayerCharacterData;
@@ -310,7 +310,7 @@ namespace MultiplayerARPG
             CharacterList.Generate(await GetCreatableCharacters(), (index, characterEntity, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
-                _playerCharacterDataByEntityId[characterEntity.EntityId] = characterEntity.CharacterDatabases;
+                _playerCharacterDataByEntityId[characterEntity.EntityId] = new List<PlayerCharacter>(characterEntity.CharacterDatabases);
                 // Prepare data
                 BaseCharacter playerCharacter = characterEntity.CharacterDatabases[0];
                 PlayerCharacterData playerCharacterData = new PlayerCharacterData();
