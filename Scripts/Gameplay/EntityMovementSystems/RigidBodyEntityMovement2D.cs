@@ -330,7 +330,7 @@ namespace MultiplayerARPG
             if (_acceptedDash || _isDashing)
             {
                 _sendingDash = true;
-                dashingForceApplier.Apply(CacheTransform.forward);
+                dashingForceApplier.Apply(Direction2D);
                 dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
                 // Can have only one replace movement force applier, so remove stored ones
                 _movementForceAppliers.RemoveReplaceMovementForces();
@@ -338,7 +338,7 @@ namespace MultiplayerARPG
             }
 
             // Apply Forces
-            _movementForceAppliers.UpdateForces(deltaTime,
+            _movementForceAppliers.UpdateForces(Time.deltaTime,
                 Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
                 out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
 
@@ -387,7 +387,7 @@ namespace MultiplayerARPG
                 }
             }
             _currentInput = Entity.SetInputDirection2D(_currentInput, Direction2D);
-            CacheRigidbody2D.velocity = tempMoveVelocity + (new Vector2(forceMotion.x, forceMotion.y) / deltaTime);
+            CacheRigidbody2D.velocity = tempMoveVelocity + new Vector2(forceMotion.x, forceMotion.y);
         }
 
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
