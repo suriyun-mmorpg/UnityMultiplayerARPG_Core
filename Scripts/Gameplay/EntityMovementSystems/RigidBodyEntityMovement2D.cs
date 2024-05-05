@@ -380,7 +380,7 @@ namespace MultiplayerARPG
                 }
             }
             _currentInput = Entity.SetInputDirection2D(_currentInput, Direction2D);
-            CacheRigidbody2D.velocity = tempMoveVelocity;
+            CacheRigidbody2D.velocity = tempMoveVelocity + (new Vector2(forceMotion.x, forceMotion.y) / deltaTime);
         }
 
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
