@@ -425,10 +425,14 @@ namespace MultiplayerARPG
             }
 
             if (!Entity.CanJump())
+            {
                 _isJumping = false;
+            }
 
             if (!Entity.CanDash())
+            {
                 _isDashing = false;
+            }
 
             // Prepare movement speed
             _tempExtraMovementState = Entity.ValidateExtraMovementState(_tempMovementState, _tempExtraMovementState);
