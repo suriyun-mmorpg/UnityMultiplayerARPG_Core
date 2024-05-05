@@ -137,6 +137,8 @@ namespace MultiplayerARPG
                 _tempMovementState = movementState;
                 if (_inputDirection.sqrMagnitude > 0)
                     NavPaths = null;
+                if (!_isDashing)
+                    _isDashing = _tempMovementState.Has(MovementState.IsDash);
             }
         }
 
@@ -313,6 +315,11 @@ namespace MultiplayerARPG
             if (!Entity.CanMove())
             {
                 _moveDirection = Vector2.zero;
+            }
+
+            if (!Entity.CanDash())
+            {
+                _isDashing = false;
             }
 
             // Prepare movement speed
