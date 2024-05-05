@@ -17,6 +17,9 @@ namespace MultiplayerARPG
         public float stoppingDistance = 0.1f;
         public MovementSecure movementSecure = MovementSecure.NotSecure;
 
+        [Header("Dashing")]
+        public EntityMovementForceApplier dashingForceApplier;
+
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
 
@@ -38,6 +41,7 @@ namespace MultiplayerARPG
         }
 
         // Input codes
+        protected bool _isDashing;
         protected Vector2 _inputDirection;
         protected MovementState _tempMovementState;
         protected ExtraMovementState _tempExtraMovementState;
@@ -53,12 +57,15 @@ namespace MultiplayerARPG
         // Client state codes
         protected EntityMovementInput _oldInput;
         protected EntityMovementInput _currentInput;
+        protected bool _sendingDash;
 
         // State simulate codes
         protected float? _lagMoveSpeedRate;
         protected bool _simulatingKeyMovement = false;
 
         // Peers accept codes
+        protected bool _acceptedJump;
+        protected bool _acceptedDash;
         protected long _acceptedPositionTimestamp;
 
         // Server validate codes
@@ -242,6 +249,8 @@ namespace MultiplayerARPG
                 if (HasNavPaths && !MovementState.Has(MovementState.Forward))
                     MovementState |= MovementState.Forward;
             }
+            _isDashing = false;
+            _acceptedDash = false;
         }
 
         protected virtual void UpdateMovement(float deltaTime)
@@ -311,6 +320,34 @@ namespace MultiplayerARPG
             tempEntityMoveSpeed = Entity.GetMoveSpeed();
             tempMaxMoveSpeed = tempEntityMoveSpeed;
 
+            // Dashing
+            if (_acceptedDash || _isDashing)
+            {
+                _sendingDash = true;
+                dashingForceApplier.Apply(CacheTransform.forward);
+                dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+                _movementForceAppliers.Add(dashingForceApplier);
+            }
+
+            // Apply Forces
+            _movementForceAppliers.UpdateForces(deltaTime,
+                Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
+                out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
+
+            // Replace player's movement by this
+            if (replaceMovementForceApplier != null)
+            {
+                // Still dashing to add dash to movement state
+                if (replaceMovementForceApplier.Mode == ApplyMovementForceMode.Dash)
+                    _tempMovementState |= MovementState.IsDash;
+                // Force turn to dashed direction
+                _moveDirection = replaceMovementForceApplier.Direction;
+                // Change move speed to dash force
+                tempMaxMoveSpeed = replaceMovementForceApplier.CurrentSpeed;
+            }
+
             // Updating horizontal movement (WASD inputs)
             if (_moveDirection.sqrMagnitude > 0f)
             {
@@ -379,18 +416,37 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsDash;
+                }
+                else
+                {
+                    MovementState &= ~MovementState.IsDash;
+                }
                 if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
                     MovementState |= MovementState.IsTeleport;
                 }
                 this.ClientWriteSyncTransform2D(writer);
+                _sendingDash = false;
                 _isClientConfirmingTeleport = false;
                 return true;
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 _currentInput = Entity.SetInputExtraMovementState(_currentInput, _tempExtraMovementState);
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsDash;
+                }
+                else
+                {
+                    MovementState &= ~MovementState.IsDash;
+                }
                 if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
@@ -404,6 +460,7 @@ namespace MultiplayerARPG
                         shouldSendReliably = true;
                     }
                     this.ClientWriteMovementInput2D(writer, inputState, _currentInput);
+                    _sendingDash = false;
                     _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
@@ -416,6 +473,15 @@ namespace MultiplayerARPG
         public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
+            if (_sendingDash)
+            {
+                shouldSendReliably = true;
+                MovementState |= MovementState.IsDash;
+            }
+            else
+            {
+                MovementState &= ~MovementState.IsDash;
+            }
             if (_isTeleporting)
             {
                 shouldSendReliably = true;
@@ -430,6 +496,7 @@ namespace MultiplayerARPG
             }
             // Sync transform from server to all clients (include owner client)
             this.ServerWriteSyncTransform2D(_movementForceAppliers, writer);
+            _sendingDash = false;
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
             return true;
@@ -490,6 +557,10 @@ namespace MultiplayerARPG
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
+            if (!IsOwnerClient && movementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+            }
         }
 
         public void ReadMovementInputAtServer(long peerTimestamp, NetDataReader reader)
@@ -536,8 +607,14 @@ namespace MultiplayerARPG
                     SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
                 }
                 Direction2D = entityMovementInput.Direction2D;
+                if (entityMovementInput.MovementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
+                }
                 if (inputState.Has(EntityMovementInputState.IsStopped))
+                {
                     StopMoveFunction();
+                }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
         }
@@ -615,6 +692,10 @@ namespace MultiplayerARPG
                     // It's both server and client, translate position (it's a host so don't do speed hack validation)
                     if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
                         SetMovePaths(position, false);
+                }
+                if (movementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
