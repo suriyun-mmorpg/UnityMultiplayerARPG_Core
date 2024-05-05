@@ -448,11 +448,11 @@ namespace MultiplayerARPG
                 if (_sendingDash)
                 {
                     shouldSendReliably = true;
-                    MovementState |= MovementState.IsDash;
+                    _currentInput = Entity.SetInputDash(_currentInput);
                 }
                 else
                 {
-                    MovementState &= ~MovementState.IsDash;
+                    _currentInput = Entity.ClearInputDash(_currentInput);
                 }
                 if (_isClientConfirmingTeleport)
                 {
