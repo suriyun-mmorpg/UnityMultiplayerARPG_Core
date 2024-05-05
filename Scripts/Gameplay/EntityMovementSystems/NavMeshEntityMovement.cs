@@ -20,6 +20,9 @@ namespace MultiplayerARPG
         public ObstacleAvoidanceType obstacleAvoidanceWhileStationary = ObstacleAvoidanceType.NoObstacleAvoidance;
         public MovementSecure movementSecure = MovementSecure.NotSecure;
 
+        [Header("Dashing")]
+        public EntityMovementForceApplier dashingForceApplier;
+
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
 
@@ -34,19 +37,21 @@ namespace MultiplayerARPG
         public float CurrentMoveSpeed { get { return CacheNavMeshAgent.isStopped ? 0f : CacheNavMeshAgent.speed; } }
 
         // Input codes
+        protected bool _isDashing;
         protected Vector3? _inputDirection;
         protected ExtraMovementState _tempExtraMovementState;
         protected bool _moveByDestination;
 
         // Move simulate codes
-        private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
+        protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Client state codes
         protected EntityMovementInput _oldInput;
         protected EntityMovementInput _currentInput;
+        protected bool _sendingDash;
 
         // State simulate codes
-        private float? _lagMoveSpeedRate;
+        protected float? _lagMoveSpeedRate;
 
         // Turn simulate codes
         protected bool _lookRotationApplied;
@@ -59,9 +64,10 @@ namespace MultiplayerARPG
         protected bool _stillMoveAfterTeleport;
 
         // Peers accept codes
+        protected bool _acceptedDash;
         protected long _acceptedPositionTimestamp;
-        private MovementState _acceptedMovementStateBeforeStopped;
-        private ExtraMovementState _acceptedExtraMovementStateBeforeStopped;
+        protected MovementState _acceptedMovementStateBeforeStopped;
+        protected ExtraMovementState _acceptedExtraMovementStateBeforeStopped;
 
         // Server validate codes
         protected float _lastServerValidateHorDistDiff;
