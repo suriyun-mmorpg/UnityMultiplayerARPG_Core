@@ -48,7 +48,7 @@ namespace MultiplayerARPG
 
         // Move simulate codes
         protected Vector2 _moveDirection;
-        private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
+        protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Teleport codes
         protected bool _isTeleporting;
@@ -64,7 +64,6 @@ namespace MultiplayerARPG
         protected bool _simulatingKeyMovement = false;
 
         // Peers accept codes
-        protected bool _acceptedJump;
         protected bool _acceptedDash;
         protected long _acceptedPositionTimestamp;
 
