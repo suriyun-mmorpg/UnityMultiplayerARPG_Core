@@ -68,6 +68,9 @@ namespace MultiplayerARPG
         public TextWrapper uiTextFallDamageAbsorbs;
         public TextWrapper uiTextGravityRate;
 
+        public string numberFormatSimple = "N0";
+        public string numberFormatRate = "N2";
+
         public string GetText()
         {
             StringBuilder statsStringBuilder = new StringBuilder();
@@ -188,16 +191,26 @@ namespace MultiplayerARPG
 
         public void GetSingleStatsText(StringBuilder builder, bool isRateStats, string format, float value, TextWrapper textComponent)
         {
-            string tempValue = isRate ? (value * 100).ToString("N2") : (value * (isRateStats ? 100 : 1)).ToString("N2");
+            // Determine the correct format string based on whether the stat is a rate
+            string numberFormat = isRateStats ? numberFormatRate : numberFormatSimple;
+
+            // Calculate the value to display, adjusting for rates if necessary
+            string tempValue = isRateStats ? (value * 100).ToString(numberFormat) : value.ToString(numberFormat);
+
+            // Construct the display string
             string statsStringPart = ZString.Concat(isBonus ? "+" : string.Empty, ZString.Format(
                 format,
                 tempValue));
+
+            // Append the stat text to the builder if the value is not zero
             if (value != 0)
             {
                 if (builder.Length > 0)
                     builder.Append('\n');
                 builder.Append(statsStringPart);
             }
+
+            // Set the text component if it's provided
             if (textComponent != null)
                 textComponent.text = statsStringPart;
         }
