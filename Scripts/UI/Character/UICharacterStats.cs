@@ -164,6 +164,10 @@ namespace MultiplayerARPG
         public DisplayType displayType;
         public bool isBonus;
 
+        [Header("Options")]
+        public string numberFormatSimple = "N0";
+        public string numberFormatRate = "N2";
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -234,6 +238,8 @@ namespace MultiplayerARPG
                         data = Data,
                         isRate = true,
                         isBonus = isBonus,
+                        numberFormatSimple = this.numberFormatSimple,
+                        numberFormatRate = this.numberFormatRate,
                         hpStatsFormat = formatKeyHpRateStats,
                         hpRecoveryStatsFormat = formatKeyHpRecoveryRateStats,
                         hpLeechRateStatsFormat = formatKeyHpLeechRateRateStats,
@@ -302,6 +308,8 @@ namespace MultiplayerARPG
                         data = Data,
                         isRate = false,
                         isBonus = isBonus,
+                        numberFormatSimple = this.numberFormatSimple,
+                        numberFormatRate = this.numberFormatRate,
                         hpStatsFormat = formatKeyHpStats,
                         hpRecoveryStatsFormat = formatKeyHpRecoveryStats,
                         hpLeechRateStatsFormat = formatKeyHpLeechRateStats,
