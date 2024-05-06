@@ -683,13 +683,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (!stateUpdateData.HasChanges)
                 return stateUpdateData.playingStateId;
 
+            // Is dead
             if (stateUpdateData.IsDead)
             {
                 stateUpdateData.PlayingSpecialMoveState = PlayingSpecialMoveState.None;
                 TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_DEAD, out string foundStateInfoId);
                 return foundStateInfoId;
             }
-            else if (stateUpdateData.PlayingSpecialMoveState == PlayingSpecialMoveState.JumpStarting)
+
+            // Playing special move state
+            if (stateUpdateData.PlayingSpecialMoveState == PlayingSpecialMoveState.JumpStarting)
             {
                 if (TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_JUMP, out string foundStateInfoId))
                 {
@@ -729,13 +732,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     return foundStateInfoId;
                 }
             }
-            else if (stateUpdateData.IsPlayingAnySpecialMoveState)
+
+            // Special move state still playing, continue it
+            if (stateUpdateData.IsPlayingAnySpecialMoveState)
             {
                 // Jumping animation not end yet
                 // Don't change state because character is jumping, it will change to fall when jump animation played
                 return stateUpdateData.playingStateId;
             }
 
+            // Falling
             if (!stateUpdateData.MovementState.Has(MovementState.IsUnderWater) && !stateUpdateData.MovementState.Has(MovementState.IsGrounded))
             {
                 TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_FALL, out string foundStateInfoId);
