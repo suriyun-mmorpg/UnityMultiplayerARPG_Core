@@ -44,9 +44,6 @@ namespace MultiplayerARPG
         [Header("Dashing")]
         public EntityMovementForceApplier dashingForceApplier = new EntityMovementForceApplier();
 
-        [Header("Knocking Back")]
-        public EntityMovementForceApplier knockingBackForceApplier = new EntityMovementForceApplier();
-
         [Header("Root Motion Settings")]
         [FormerlySerializedAs("useRootMotionWhileNotMoving")]
         public bool alwaysUseRootMotion;
