@@ -16,6 +16,16 @@ namespace MultiplayerARPG
 
         public UIItemCraftFormulas CraftFormulaManager { get; set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextDuration = null;
+            uiItemCraft = null;
+            inputAmount = null;
+            CraftFormulaManager = null;
+            _data = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextDuration != null)

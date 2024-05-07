@@ -52,6 +52,15 @@
             this.MarkToMakeCaches();
             CachedData = this.GetCaches();
 
+            CallRecachingEvents();
+
+            // Invoke recached event
+            if (onRecached != null)
+                onRecached.Invoke();
+        }
+
+        protected virtual void CallRecachingEvents()
+        {
             if (_selectableWeaponSetsRecachingState.isRecaching)
             {
                 if (onSelectableWeaponSetsOperation != null)
@@ -100,10 +109,6 @@
                     onSummonsOperation.Invoke(_summonsRecachingState.operation, _summonsRecachingState.index);
                 _summonsRecachingState = SyncListRecachingState.Empty;
             }
-
-            // Invoke recached event
-            if (onRecached != null)
-                onRecached.Invoke();
         }
     }
 }

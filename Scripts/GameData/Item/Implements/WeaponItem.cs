@@ -58,6 +58,15 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("This value will being used by character model's animator to set its `WeaponType` value")]
+        private bool doRecoilingAsAttackAnimation = false;
+        public bool DoRecoilingAsAttackAnimation
+        {
+            get { return doRecoilingAsAttackAnimation; }
+            set { doRecoilingAsAttackAnimation = value; }
+        }
+
+        [SerializeField]
         [Tooltip("Damange amount which will be used when attacking characters, buildings and so on")]
         private DamageIncremental damageAmount = default;
         public DamageIncremental DamageAmount

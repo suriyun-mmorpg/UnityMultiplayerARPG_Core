@@ -1,9 +1,11 @@
 #if UNITY_EDITOR
+using LiteNetLibManager;
 using Newtonsoft.Json;
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace MultiplayerARPG
 {
@@ -63,7 +65,7 @@ namespace MultiplayerARPG
                 {
                     item.MaxDurability = (kv.Value as IEquipmentItem).MaxDurability;
                     item.DestroyIfBroken = (kv.Value as IEquipmentItem).DestroyIfBroken;
-                    item.MaxSocket = (kv.Value as IEquipmentItem).MaxSocket;
+                    item.MaxSocket = (kv.Value as IEquipmentItem).AvailableSocketEnhancerTypes?.Length ?? 0;
                 }
                 if (kv.Value.IsWeapon())
                 {
@@ -126,6 +128,31 @@ namespace MultiplayerARPG
                 {
                     data.AvailableCharacters[kv.Key][database.DataId] = new PlayerCharacterData().SetNewPlayerCharacterData(string.Empty, database.DataId, kv.Key, 0);
                 }
+            }
+
+            foreach (var kv in AddressablePlayerCharacterEntities)
+            {
+                if (!kv.Value.IsDataValid())
+                    continue;
+                var op = kv.Value.InstantiateAsync();
+                op.WaitForCompletion();
+                BasePlayerCharacterEntity comp = op.Result;
+                if (comp.CharacterDatabases == null || comp.CharacterDatabases.Length == 0)
+                {
+                    Addressables.ReleaseInstance(comp.gameObject);
+                    Addressables.Release(op);
+                    DestroyImmediate(comp.gameObject);
+                    continue;
+                }
+                if (!data.AvailableCharacters.ContainsKey(kv.Key))
+                    data.AvailableCharacters[kv.Key] = new Dictionary<int, PlayerCharacterData>();
+                foreach (var database in comp.CharacterDatabases)
+                {
+                    data.AvailableCharacters[kv.Key][database.DataId] = new PlayerCharacterData().SetNewPlayerCharacterData(string.Empty, database.DataId, kv.Key, 0);
+                }
+                Addressables.ReleaseInstance(comp.gameObject);
+                Addressables.Release(op);
+                DestroyImmediate(comp.gameObject);
             }
 
             foreach (var kv in Factions)

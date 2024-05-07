@@ -20,6 +20,12 @@ namespace MultiplayerARPG
 
         protected float _receivedDamageTime;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiGageHp = null;
+        }
+
         protected override void AddEvents(T entity)
         {
             if (entity == null)
@@ -43,7 +49,7 @@ namespace MultiplayerARPG
             return base.ValidateToUpdateUI() && (!hideWhileDead || !Data.IsDead());
         }
 
-        private void OnReceivedDamage(
+        protected void OnReceivedDamage(
             HitBoxPosition position,
             Vector3 fromPosition,
             IGameEntity attacker,
@@ -58,7 +64,7 @@ namespace MultiplayerARPG
             _receivedDamageTime = Time.unscaledTime;
         }
 
-        private void OnCurrentHpChange(int hp)
+        protected void OnCurrentHpChange(int hp)
         {
             UpdateHp();
         }
@@ -86,7 +92,7 @@ namespace MultiplayerARPG
             UpdateHp();
         }
 
-        private void UpdateHp()
+        protected void UpdateHp()
         {
             if (uiGageHp == null)
                 return;

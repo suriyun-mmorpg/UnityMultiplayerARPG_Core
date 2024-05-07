@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -36,12 +37,31 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(3, "Building Settings")]
         [SerializeField]
         private BuildingEntity buildingEntity = null;
+#endif
         public BuildingEntity BuildingEntity
         {
-            get { return buildingEntity; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return buildingEntity;
+#else
+                return null;
+#endif
+            }
+        }
+
+        [SerializeField]
+        private AssetReferenceBuildingEntity addressableBuildingEntity = null;
+        public AssetReferenceBuildingEntity AddressableBuildingEntity
+        {
+            get { return addressableBuildingEntity; }
         }
 
         [SerializeField]
@@ -63,7 +83,15 @@ namespace MultiplayerARPG
 
         public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+            if (BuildingEntity != null)
+            {
+                return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+            }
+            else if (AddressableBuildingEntity.IsDataValid())
+            {
+                return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>());
+            }
+            return default;
         }
 
         public void FinishAimControls(bool isCancel)
@@ -80,6 +108,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddBuildingEntities(BuildingEntity);
+            GameInstance.AddAssetReferenceBuildingEntities(AddressableBuildingEntity);
         }
     }
 }

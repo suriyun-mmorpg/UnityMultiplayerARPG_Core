@@ -44,6 +44,13 @@ namespace MultiplayerARPG
             return base.CanJump_Implementation();
         }
 
+        protected override bool CanDash_Implementation()
+        {
+            if (Vending.Data.isStarted)
+                return false;
+            return base.CanDash_Implementation();
+        }
+
         protected override bool CanTurn_Implementation()
         {
             if (Vending.Data.isStarted)

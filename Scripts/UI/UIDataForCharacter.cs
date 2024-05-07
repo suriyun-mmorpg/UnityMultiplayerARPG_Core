@@ -36,5 +36,11 @@
             if (target != null)
                 (target as UIDataForCharacter<T>).IndexOfData = IndexOfData;
         }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            _character = null;
+        }
     }
 }

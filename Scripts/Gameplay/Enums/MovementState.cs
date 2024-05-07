@@ -4,17 +4,18 @@
     public enum MovementState : uint
     {
         None = 0,
-        Forward = 1 << 0,
-        Backward = 1 << 1,
-        Left = 1 << 2,
-        Right = 1 << 3,
-        IsGrounded = 1 << 4,
-        IsUnderWater = 1 << 5,
-        IsJump = 1 << 6,
-        IsTeleport = 1 << 7,
-        Up = 1 << 8,
-        Down = 1 << 9,
-        IsClimbing = 1 << 10,
+        Forward = 1 << 0, // 1
+        Backward = 1 << 1, // 2
+        Left = 1 << 2, // 4
+        Right = 1 << 3, // 8
+        IsGrounded = 1 << 4, // 16
+        IsUnderWater = 1 << 5, // 32
+        IsJump = 1 << 6, // 64
+        IsTeleport = 1 << 7, // 128
+        Up = 1 << 8, // 256
+        Down = 1 << 9, // 512
+        IsClimbing = 1 << 10, // 1024
+        IsDash = 1 << 11, // 2048
     }
 
     public static class MovementStateExtensions

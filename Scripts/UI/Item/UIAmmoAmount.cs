@@ -21,6 +21,25 @@ namespace MultiplayerARPG
         public GameObject[] leftHandNoRequireAmmoSymbols;
         public UIGageValue gageLeftHandAmmo;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiRightHandAmmoRoot = null;
+            uiTextRightHandCurrentAmmo = null;
+            uiTextRightHandReserveAmmo = null;
+            uiTextRightHandSumAmmo = null;
+            rightHandRequireAmmoSymbols.Nulling();
+            rightHandNoRequireAmmoSymbols.Nulling();
+            gageRightHandAmmo = null;
+            uiLeftHandAmmoRoot = null;
+            uiTextLeftHandCurrentAmmo = null;
+            uiTextLeftHandReserveAmmo = null;
+            uiTextLeftHandSumAmmo = null;
+            leftHandRequireAmmoSymbols.Nulling();
+            leftHandNoRequireAmmoSymbols.Nulling();
+            gageLeftHandAmmo = null;
+        }
+
         protected virtual void OnEnable()
         {
             UpdateOwningCharacterData();

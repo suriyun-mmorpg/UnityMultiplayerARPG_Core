@@ -47,6 +47,23 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            onRefresh?.RemoveAllListeners();
+            onRefresh = null;
+            onClaimAllMailsItems?.RemoveAllListeners();
+            onClaimAllMailsItems = null;
+            onDeleteAllMails?.RemoveAllListeners();
+            onDeleteAllMails = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+        }
+
         protected virtual void OnEnable()
         {
             CacheSelectionManager.eventOnSelect.RemoveListener(OnSelect);
@@ -72,12 +89,14 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelect(UIMailListEntry ui)
         {
-            if (uiDialog != null && ui.Data != null)
+            if (uiDialog != null)
             {
+                MailListEntry data = ui.Data;
                 uiDialog.uiMailList = this;
-                uiDialog.MailId = ui.Data.Id;
+                uiDialog.MailId = data.Id;
                 uiDialog.Show();
-                ui.Data.IsRead = true;
+                data.IsRead = true;
+                ui.Data = data;
                 ui.ForceUpdate();
             }
         }

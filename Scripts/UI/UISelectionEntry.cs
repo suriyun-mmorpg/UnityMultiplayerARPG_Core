@@ -4,13 +4,13 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
 {
     [Header("UI Selection Elements")]
     public GameObject objectSelected;
-    private T data;
+    protected T _data;
     public T Data
     {
-        get { return data; }
+        get { return _data; }
         set
         {
-            data = value;
+            _data = value;
             ForceUpdate();
         }
     }
@@ -39,6 +39,16 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
         base.Awake();
         IsSelected = false;
         _updateCountDown = 0f;
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        objectSelected = null;
+        clones.Nulling();
+        selectionManager = null;
+        onUpdateUI = null;
+        onUpdateData = null;
     }
 
     protected virtual void OnEnable()

@@ -16,35 +16,47 @@ namespace MultiplayerARPG
         public Transform uiContainer;
         public bool selectFirstEntryByDefault;
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UIItemCraftSelectionManager cacheSelectionManager;
+        private UIItemCraftSelectionManager _cacheSelectionManager;
         public UIItemCraftSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UIItemCraftSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UIItemCraftSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
         public CrafterType CrafterType { get; private set; }
         public BaseGameEntity TargetEntity { get; private set; }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            TargetEntity = null;
+        }
 
         public void Show(CrafterType crafterType, BaseGameEntity targetEntity)
         {
@@ -57,7 +69,7 @@ namespace MultiplayerARPG
                     List<ItemCraft> itemCrafts = new List<ItemCraft>();
                     foreach (CharacterSkill characterSkill in owningCharacter.Skills)
                     {
-                        if (characterSkill == null || characterSkill.GetSkill() == null || !characterSkill.GetSkill().TryGetItemCraft(out ItemCraft itemCraft))
+                        if (characterSkill.GetSkill() == null || !characterSkill.GetSkill().TryGetItemCraft(out ItemCraft itemCraft))
                             continue;
                         itemCrafts.Add(itemCraft);
                     }

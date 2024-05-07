@@ -26,43 +26,63 @@ namespace MultiplayerARPG
         public UICharacter uiCharacter;
 
         [Header("Events")]
-        public UnityEvent onTypeIsSkill;
-        public UnityEvent onTypeIsPet;
-        public UnityEvent onStackEntriesEmpty;
-        public UnityEvent onStackEntriesNotEmpty;
+        public UnityEvent onTypeIsSkill = new UnityEvent();
+        public UnityEvent onTypeIsPet = new UnityEvent();
+        public UnityEvent onStackEntriesEmpty = new UnityEvent();
+        public UnityEvent onStackEntriesNotEmpty = new UnityEvent();
 
-        protected readonly Dictionary<uint, CharacterSummon> stackingEntries = new Dictionary<uint, CharacterSummon>();
-        protected float summonRemainsDuration;
-        private BaseGameData tempSummonData;
+        protected readonly Dictionary<uint, CharacterSummon> _stackingEntries = new Dictionary<uint, CharacterSummon>();
+        protected float _summonRemainsDuration;
+        private BaseGameData _tempSummonData;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            imageIcon = null;
+            uiTextRemainsDuration = null;
+            uiTextStack = null;
+            uiCharacter = null;
+            onTypeIsSkill?.RemoveAllListeners();
+            onTypeIsSkill = null;
+            onTypeIsPet?.RemoveAllListeners();
+            onTypeIsPet = null;
+            onStackEntriesEmpty?.RemoveAllListeners();
+            onStackEntriesEmpty = null;
+            onStackEntriesNotEmpty?.RemoveAllListeners();
+            onStackEntriesNotEmpty = null;
+            _stackingEntries?.Clear();
+            _tempSummonData = null;
+        }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            summonRemainsDuration = 0f;
+            _summonRemainsDuration = 0f;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (summonRemainsDuration > 0f)
+            if (_summonRemainsDuration > 0f)
             {
-                summonRemainsDuration -= Time.deltaTime;
-                if (summonRemainsDuration <= 0f)
-                    summonRemainsDuration = 0f;
+                _summonRemainsDuration -= Time.deltaTime;
+                if (_summonRemainsDuration <= 0f)
+                    _summonRemainsDuration = 0f;
             }
             else
             {
-                summonRemainsDuration = 0f;
+                _summonRemainsDuration = 0f;
             }
 
             // Update UIs
             if (uiTextRemainsDuration != null)
             {
-                uiTextRemainsDuration.SetGameObjectActive(summonRemainsDuration > 0);
+                uiTextRemainsDuration.SetGameObjectActive(_summonRemainsDuration > 0);
                 uiTextRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeySummonRemainsDuration),
-                    summonRemainsDuration.ToString("N0"));
+                    _summonRemainsDuration.ToString("N0"));
             }
         }
 
@@ -71,26 +91,26 @@ namespace MultiplayerARPG
             base.UpdateUI();
 
             // Update remains duration
-            if (summonRemainsDuration <= 0f && CharacterSummon != null)
-                summonRemainsDuration = CharacterSummon.summonRemainsDuration;
+            if (_summonRemainsDuration <= 0f)
+                _summonRemainsDuration = CharacterSummon.summonRemainsDuration;
         }
 
         protected override void UpdateData()
         {
             // Update remains duration
-            if (CharacterSummon != null && CharacterSummon.summonRemainsDuration - summonRemainsDuration > 1)
-                summonRemainsDuration = CharacterSummon.summonRemainsDuration;
+            if (CharacterSummon.summonRemainsDuration - _summonRemainsDuration > 1)
+                _summonRemainsDuration = CharacterSummon.summonRemainsDuration;
 
-            tempSummonData = null;
+            _tempSummonData = null;
             switch (Data.type)
             {
                 case SummonType.Skill:
                     onTypeIsSkill.Invoke();
-                    tempSummonData = Data.GetSkill();
+                    _tempSummonData = Data.GetSkill();
                     break;
                 case SummonType.PetItem:
                     onTypeIsPet.Invoke();
-                    tempSummonData = Data.GetPetItem() as BaseItem;
+                    _tempSummonData = Data.GetPetItem() as BaseItem;
                     break;
             }
 
@@ -98,12 +118,12 @@ namespace MultiplayerARPG
             {
                 uiTextTitle.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
-                    !tempSummonData ? LanguageManager.GetUnknowTitle() : tempSummonData.Title);
+                    !_tempSummonData ? LanguageManager.GetUnknowTitle() : _tempSummonData.Title);
             }
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = !tempSummonData ? null : tempSummonData.Icon;
+                Sprite iconSprite = !_tempSummonData ? null : _tempSummonData.Icon;
                 imageIcon.gameObject.SetActive(iconSprite);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
@@ -111,7 +131,7 @@ namespace MultiplayerARPG
 
             if (uiCharacter != null)
             {
-                if (!tempSummonData || !Data.CacheEntity)
+                if (!_tempSummonData || !Data.CacheEntity)
                 {
                     uiCharacter.Hide();
                 }
@@ -136,10 +156,10 @@ namespace MultiplayerARPG
             {
                 uiTextStack.text = ZString.Format(
                     LanguageManager.GetText(formatKeySummonStack),
-                    stackingEntries.Count + 1);
+                    _stackingEntries.Count + 1);
             }
 
-            if (stackingEntries.Count > 0)
+            if (_stackingEntries.Count > 0)
                 onStackEntriesNotEmpty.Invoke();
             else
                 onStackEntriesEmpty.Invoke();
@@ -147,19 +167,19 @@ namespace MultiplayerARPG
 
         public void AddStackingEntry(CharacterSummon summon)
         {
-            stackingEntries[summon.objectId] = summon;
+            _stackingEntries[summon.objectId] = summon;
             OnStackingEntriesUpdate();
         }
 
         public void RemoveStackingEntry(uint objectId)
         {
-            stackingEntries.Remove(objectId);
+            _stackingEntries.Remove(objectId);
             OnStackingEntriesUpdate();
         }
 
         public void ClearStackingEntries()
         {
-            stackingEntries.Clear();
+            _stackingEntries.Clear();
             OnStackingEntriesUpdate();
         }
 

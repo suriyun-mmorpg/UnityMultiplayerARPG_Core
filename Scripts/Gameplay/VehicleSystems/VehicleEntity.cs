@@ -6,7 +6,7 @@ using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class VehicleEntity : DamageableEntity, IVehicleEntity
+    public partial class VehicleEntity : DamageableEntity, IVehicleEntity
     {
         [Category(5, "Vehicle Settings")]
         [SerializeField]

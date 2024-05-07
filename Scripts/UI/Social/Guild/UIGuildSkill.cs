@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Skill Type Title}")]
         public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_TYPE);
 
+        [Header("UI Elements")]
         public TextWrapper uiTextTitle;
         public TextWrapper uiTextDescription;
         public TextWrapper uiTextLevel;
@@ -47,18 +48,53 @@ namespace MultiplayerARPG
         public UIBuff uiSkillBuff;
 
         [Header("Events")]
-        public UnityEvent onSetLevelZeroData;
-        public UnityEvent onSetNonLevelZeroData;
-        public UnityEvent onAbleToLevelUp;
-        public UnityEvent onUnableToLevelUp;
-        public UnityEvent onAbleToUse;
-        public UnityEvent onUnableToUse;
+        public UnityEvent onSetLevelZeroData = new UnityEvent();
+        public UnityEvent onSetNonLevelZeroData = new UnityEvent();
+        public UnityEvent onAbleToLevelUp = new UnityEvent();
+        public UnityEvent onUnableToLevelUp = new UnityEvent();
+        public UnityEvent onAbleToUse = new UnityEvent();
+        public UnityEvent onUnableToUse = new UnityEvent();
 
         [Header("Options")]
         public UIGuildSkill uiNextLevelSkill;
 
         protected float _coolDownRemainsDuration;
         protected bool _dirtyIsCountDown;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            uiTextLevel = null;
+            imageIcon = null;
+            uiTextSkillType = null;
+            uiTextCoolDownDuration = null;
+            uiTextCoolDownRemainsDuration = null;
+            imageCoolDownGage = null;
+            countDownObjects.Nulling();
+            noCountDownObjects.Nulling();
+            uiTextIncreaseMaxMember = null;
+            uiTextIncreaseExpGainPercentage = null;
+            uiTextIncreaseGoldGainPercentage = null;
+            uiTextIncreaseShareExpGainPercentage = null;
+            uiTextIncreaseShareGoldGainPercentage = null;
+            uiTextDecreaseExpLostPercentage = null;
+            uiSkillBuff = null;
+            onSetLevelZeroData?.RemoveAllListeners();
+            onSetLevelZeroData = null;
+            onSetNonLevelZeroData?.RemoveAllListeners();
+            onSetNonLevelZeroData = null;
+            onAbleToLevelUp?.RemoveAllListeners();
+            onAbleToLevelUp = null;
+            onUnableToLevelUp?.RemoveAllListeners();
+            onUnableToLevelUp = null;
+            onAbleToUse?.RemoveAllListeners();
+            onAbleToUse = null;
+            onUnableToUse?.RemoveAllListeners();
+            onUnableToUse = null;
+            uiNextLevelSkill = null;
+        }
 
         protected override void OnDisable()
         {

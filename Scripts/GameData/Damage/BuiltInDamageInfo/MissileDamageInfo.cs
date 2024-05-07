@@ -112,7 +112,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, Dictionary<DamageElement, MinMaxFloat> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             // Spawn missile damage entity, it will move to target then apply damage when hit
             // Instantiates on both client and server (damage applies at server)
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
             // Instantiate missile damage entity
             float missileDistance = this.missileDistance;
             float missileSpeed = this.missileSpeed;
-            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts, skill, skillLevel, hitRegData, missileDistance, missileSpeed, lockingTarget);
+            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], skill, skillLevel, hitRegData, missileDistance, missileSpeed, lockingTarget);
         }
     }
 }

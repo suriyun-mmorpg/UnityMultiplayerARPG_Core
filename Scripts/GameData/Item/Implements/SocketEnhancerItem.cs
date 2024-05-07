@@ -15,12 +15,27 @@ namespace MultiplayerARPG
             get { return ItemType.SocketEnhancer; }
         }
 
+        [SerializeField]
+        private SocketEnhancerType socketEnhancerType = SocketEnhancerType.Type1;
+        public SocketEnhancerType SocketEnhancerType
+        {
+            get { return socketEnhancerType; }
+        }
+
         [Category(3, "Buff/Bonus Settings")]
         [SerializeField]
         private EquipmentBonus socketEnhanceEffect = default;
         public EquipmentBonus SocketEnhanceEffect
         {
             get { return socketEnhanceEffect; }
+        }
+
+        [SerializeField]
+        private BaseWeaponAbility[] weaponAbilities = new BaseWeaponAbility[0];
+
+        public BaseWeaponAbility[] WeaponAbilities
+        {
+            get { return weaponAbilities; }
         }
 
         [SerializeField]

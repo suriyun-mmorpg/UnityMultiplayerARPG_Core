@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     public partial class UICharacterQuest : UIDataForCharacter<CharacterQuest>
     {
         public CharacterQuest CharacterQuest { get { return Data; } }
-        public Quest Quest { get { return CharacterQuest != null ? CharacterQuest.GetQuest() : null; } }
+        public Quest Quest { get { return CharacterQuest.GetQuest(); } }
 
         [Header("Generic Info Format")]
         [Tooltip("Format => {0} = {Title}")]
@@ -160,6 +160,50 @@ namespace MultiplayerARPG
         {
             base.Awake();
             MigrateStatusObject();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            uiTextRewardExp = null;
+            uiTextRewardGold = null;
+            uiTextRewardStatPoints = null;
+            uiTextRewardSkillPoints = null;
+            uiRewardItemDialog = null;
+            uiRewardItemPrefab = null;
+            uiRewardItemRoot = null;
+            uiRewardItemContainer = null;
+            uiSelectableRewardItemRoot = null;
+            uiSelectableRewardItemContainer = null;
+            uiRandomRewardItemRoot = null;
+            uiRandomRewardItemContainer = null;
+            uiRewardCurrencies = null;
+            uiQuestTaskRoot = null;
+            uiQuestTaskPrefab = null;
+            uiQuestTaskContainer = null;
+            toggleQuestTracking = null;
+            questOnGoingStatusObject = null;
+            questOnGoingStatusObjects.Nulling();
+            questOnGoingStatusObjects?.Clear();
+            questTasksCompleteStatusObject = null;
+            questTasksCompleteStatusObjects.Nulling();
+            questTasksCompleteStatusObjects?.Clear();
+            questCompleteStatusObject = null;
+            questCompleteStatusObjects.Nulling();
+            questCompleteStatusObjects?.Clear();
+            questIsTrackingObject = null;
+            questIsTrackingObjects.Nulling();
+            questIsTrackingObjects?.Clear();
+            questIsNotTrackingObject = null;
+            questIsNotTrackingObjects.Nulling();
+            questIsNotTrackingObjects?.Clear();
+            _cacheRewardItemList = null;
+            _cacheSelectableRewardItemList = null;
+            _cacheRandomRewardItemList = null;
+            _cacheRewardItemSelectionManager = null;
+            _cacheQuestTaskList = null;
         }
 
 #if UNITY_EDITOR

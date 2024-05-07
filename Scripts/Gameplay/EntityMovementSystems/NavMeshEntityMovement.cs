@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using System.Collections.Generic;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.AI;
@@ -19,6 +20,9 @@ namespace MultiplayerARPG
         public ObstacleAvoidanceType obstacleAvoidanceWhileStationary = ObstacleAvoidanceType.NoObstacleAvoidance;
         public MovementSecure movementSecure = MovementSecure.NotSecure;
 
+        [Header("Dashing")]
+        public EntityMovementForceApplier dashingForceApplier;
+
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
 
@@ -33,31 +37,38 @@ namespace MultiplayerARPG
         public float CurrentMoveSpeed { get { return CacheNavMeshAgent.isStopped ? 0f : CacheNavMeshAgent.speed; } }
 
         // Input codes
-        protected Vector3? _inputDirection;
+        protected bool _isDashing;
+        protected Vector3 _inputDirection;
         protected ExtraMovementState _tempExtraMovementState;
         protected bool _moveByDestination;
+
+        // Move simulate codes
+        protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Client state codes
         protected EntityMovementInput _oldInput;
         protected EntityMovementInput _currentInput;
+        protected bool _sendingDash;
 
         // State simulate codes
-        private float? _lagMoveSpeedRate;
+        protected float? _lagMoveSpeedRate;
 
         // Turn simulate codes
         protected bool _lookRotationApplied;
         protected float _yAngle;
         protected float _targetYAngle;
         protected float _yTurnSpeed;
+        private float? _remoteTargetYAngle;
 
         // Teleport codes
         protected bool _isTeleporting;
         protected bool _stillMoveAfterTeleport;
 
         // Peers accept codes
+        protected bool _acceptedDash;
         protected long _acceptedPositionTimestamp;
-        private MovementState _acceptedMovementStateBeforeStopped;
-        private ExtraMovementState _acceptedExtraMovementStateBeforeStopped;
+        protected MovementState _acceptedMovementStateBeforeStopped;
+        protected ExtraMovementState _acceptedExtraMovementStateBeforeStopped;
 
         // Server validate codes
         protected float _lastServerValidateHorDistDiff;
@@ -108,20 +119,20 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (moveDirection.sqrMagnitude <= 0)
-            {
-                _inputDirection = null;
-                return;
-            }
             if (CanPredictMovement())
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 _inputDirection = moveDirection;
-                _moveByDestination = false;
-                CacheNavMeshAgent.updatePosition = true;
-                CacheNavMeshAgent.updateRotation = false;
-                if (CacheNavMeshAgent.isOnNavMesh)
-                    CacheNavMeshAgent.isStopped = true;
+                if (_inputDirection.sqrMagnitude > 0)
+                {
+                    _moveByDestination = false;
+                    CacheNavMeshAgent.updatePosition = true;
+                    CacheNavMeshAgent.updateRotation = false;
+                    if (CacheNavMeshAgent.isOnNavMesh)
+                        CacheNavMeshAgent.isStopped = true;
+                }
+                if (!_isDashing)
+                    _isDashing = movementState.Has(MovementState.IsDash);
             }
         }
 
@@ -159,7 +170,7 @@ namespace MultiplayerARPG
 
         private void StopMoveFunction()
         {
-            _inputDirection = null;
+            _inputDirection = Vector3.zero;
             _moveByDestination = false;
             CacheNavMeshAgent.updatePosition = false;
             CacheNavMeshAgent.updateRotation = false;
@@ -217,6 +228,26 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        {
+            if (!IsServer)
+                return;
+            if (mode.IsReplaceMovement())
+            {
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+            }
+            _movementForceAppliers.Add(new EntityMovementForceApplier()
+                .Apply(direction, mode, force, deceleration, duration));
+        }
+
+        public void ClearAllForces()
+        {
+            if (!IsServer)
+                return;
+            _movementForceAppliers.Clear();
+        }
+
         protected float GetPathRemainingDistance()
         {
             if (CacheNavMeshAgent.pathPending ||
@@ -236,36 +267,91 @@ namespace MultiplayerARPG
         public override void EntityUpdate()
         {
             Profiler.BeginSample("NavMeshEntityMovement - Update");
-            CacheNavMeshAgent.speed = Entity.GetMoveSpeed();
             float deltaTime = Time.deltaTime;
+            UpdateMovement(deltaTime);
+            UpdateRotation(deltaTime);
+            _isDashing = false;
+            _acceptedDash = false;
+            Profiler.EndSample();
+        }
+
+        public void UpdateMovement(float deltaTime)
+        {
+            // Prepare speed
+            CacheNavMeshAgent.speed = Entity.GetMoveSpeed();
+
+            ApplyMovementForceMode replaceMovementForceApplierMode = ApplyMovementForceMode.Default;
+            // Update force applying
+            // Dashing
+            if (_acceptedDash || _isDashing)
+            {
+                _sendingDash = true;
+                dashingForceApplier.Apply(CacheTransform.forward);
+                dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+                _movementForceAppliers.Add(dashingForceApplier);
+            }
+
+            // Apply Forces
+            _movementForceAppliers.UpdateForces(deltaTime,
+                Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
+                out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
+
+            // Replace player's movement by this
+            if (replaceMovementForceApplier != null)
+            {
+                // Still dashing to add dash to movement state
+                replaceMovementForceApplierMode = replaceMovementForceApplier.Mode;
+                // Force turn to dashed direction
+                _targetYAngle = Quaternion.LookRotation(replaceMovementForceApplier.Direction).eulerAngles.y;
+                // Change move speed to dash force
+                if (CacheNavMeshAgent.hasPath)
+                {
+                    CacheNavMeshAgent.isStopped = true;
+                }
+                if (CacheNavMeshAgent.isOnNavMesh)
+                {
+                    CacheNavMeshAgent.Move(replaceMovementForceApplier.CurrentSpeed * replaceMovementForceApplier.Direction * deltaTime);
+                }
+            }
+
+            if (forceMotion.magnitude > 0 && CacheNavMeshAgent.isOnNavMesh)
+            {
+                CacheNavMeshAgent.Move(forceMotion * deltaTime);
+            }
+
             bool isStationary = !CacheNavMeshAgent.isOnNavMesh || CacheNavMeshAgent.isStopped || GetPathRemainingDistance() <= CacheNavMeshAgent.stoppingDistance;
             if (CanPredictMovement())
             {
                 CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
-
-                if (_inputDirection.HasValue)
+                MovementState = MovementState.IsGrounded;
+                if (!replaceMovementForceApplierMode.IsReplaceMovement())
                 {
-                    // Moving by WASD keys
-                    CacheNavMeshAgent.Move(_inputDirection.Value * CacheNavMeshAgent.speed * deltaTime);
-                    MovementState = MovementState.Forward | MovementState.IsGrounded;
-                    // Turn character to destination
-                    if (_lookRotationApplied && Entity.CanTurn())
-                        _targetYAngle = Quaternion.LookRotation(_inputDirection.Value).eulerAngles.y;
-                }
-                else
-                {
-                    // Moving by clicked position
-                    MovementState = (CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving ? MovementState.Forward : MovementState.None) | MovementState.IsGrounded;
-                    // Turn character to destination
-                    if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
-                        _targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
+                    if (_inputDirection.sqrMagnitude > 0f)
+                    {
+                        // Moving by WASD keys
+                        CacheNavMeshAgent.Move(_inputDirection * CacheNavMeshAgent.speed * deltaTime);
+                        MovementState |= MovementState.Forward;
+                        // Turn character to destination
+                        if (_lookRotationApplied && Entity.CanTurn())
+                            _targetYAngle = Quaternion.LookRotation(_inputDirection).eulerAngles.y;
+                    }
+                    else
+                    {
+                        // Moving by clicked position
+                        MovementState |= CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving ? MovementState.Forward : MovementState.None;
+                        // Turn character to destination
+                        if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
+                            _targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
+                    }
                 }
                 // Update extra movement state
                 ExtraMovementState = this.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
                 // Set current input
                 _currentInput = Entity.SetInputMovementState(_currentInput, MovementState);
                 _currentInput = Entity.SetInputExtraMovementState(_currentInput, ExtraMovementState);
-                if (_inputDirection.HasValue)
+                if (_inputDirection.sqrMagnitude > 0f)
                 {
                     _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
                     _currentInput = Entity.SetInputPosition(_currentInput, CacheTransform.position);
@@ -291,18 +377,24 @@ namespace MultiplayerARPG
                     ExtraMovementState = ExtraMovementState.None;
                 }
             }
-            // Update rotating
+
+            if (replaceMovementForceApplierMode == ApplyMovementForceMode.Dash)
+                MovementState |= MovementState.IsDash;
+
+            _currentInput = Entity.SetInputYAngle(_currentInput, CacheTransform.eulerAngles.y);
+        }
+
+        public void UpdateRotation(float deltaTime)
+        {
             if (_yTurnSpeed <= 0f)
                 _yAngle = _targetYAngle;
             else if (Mathf.Abs(_yAngle - _targetYAngle) > 1f)
                 _yAngle = Mathf.LerpAngle(_yAngle, _targetYAngle, _yTurnSpeed * deltaTime);
-            UpdateRotation();
             _lookRotationApplied = true;
-            _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
-            Profiler.EndSample();
+            RotateY();
         }
 
-        private void UpdateRotation()
+        private void RotateY()
         {
             CacheTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);
         }
@@ -311,7 +403,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            _inputDirection = null;
+            _inputDirection = Vector3.zero;
             _moveByDestination = true;
             CacheNavMeshAgent.updatePosition = true;
             CacheNavMeshAgent.updateRotation = false;
@@ -331,18 +423,37 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsDash;
+                }
+                else
+                {
+                    MovementState &= ~MovementState.IsDash;
+                }
                 if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
                     MovementState |= MovementState.IsTeleport;
                 }
                 this.ClientWriteSyncTransform3D(writer);
+                _sendingDash = false;
                 _isClientConfirmingTeleport = false;
                 return true;
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 _currentInput = Entity.SetInputExtraMovementState(_currentInput, _tempExtraMovementState);
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    _currentInput = Entity.SetInputDash(_currentInput);
+                }
+                else
+                {
+                    _currentInput = Entity.ClearInputDash(_currentInput);
+                }
                 if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
@@ -355,7 +466,8 @@ namespace MultiplayerARPG
                         // Point click should be reliably
                         shouldSendReliably = true;
                     }
-                    this.ClientWriteMovementInput3D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Rotation);
+                    this.ClientWriteMovementInput3D(writer, inputState, _currentInput);
+                    _sendingDash = false;
                     _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
@@ -368,6 +480,15 @@ namespace MultiplayerARPG
         public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
+            if (_sendingDash)
+            {
+                shouldSendReliably = true;
+                MovementState |= MovementState.IsDash;
+            }
+            else
+            {
+                MovementState &= ~MovementState.IsDash;
+            }
             if (_isTeleporting)
             {
                 shouldSendReliably = true;
@@ -381,7 +502,7 @@ namespace MultiplayerARPG
                 MovementState &= ~MovementState.IsTeleport;
             }
             // Sync transform from server to all clients (include owner client)
-            this.ServerWriteSyncTransform3D(writer);
+            this.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
             return true;
@@ -407,7 +528,9 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            reader.ClientReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers);
+            _movementForceAppliers.Clear();
+            _movementForceAppliers.AddRange(movementForceAppliers);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
@@ -430,8 +553,7 @@ namespace MultiplayerARPG
                 }
                 else if (!IsOwnerClient)
                 {
-                    _targetYAngle = yAngle;
-                    _yTurnSpeed = 1f / unityDeltaTime;
+                    RemoteTurnSimulation(yAngle, unityDeltaTime);
                     SetMovePaths(position);
                 }
                 if (movementState.HasDirectionMovement())
@@ -440,6 +562,11 @@ namespace MultiplayerARPG
                     _acceptedExtraMovementStateBeforeStopped = extraMovementState;
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
+            }
+            if (!IsOwnerClient && movementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+                TurnImmediately(yAngle);
             }
         }
 
@@ -455,8 +582,8 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
-            if (movementState.Has(MovementState.IsTeleport))
+            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
+            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
                 _isServerWaitingTeleportConfirm = false;
@@ -482,26 +609,27 @@ namespace MultiplayerARPG
                 long lagDeltaTime = Entity.Player.Rtt;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
-                _tempExtraMovementState = extraMovementState;
+                _tempExtraMovementState = entityMovementInput.ExtraMovementState;
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
-                    SetMovePaths(position);
+                    SetMovePaths(entityMovementInput.Position);
                 }
                 if (inputState.Has(EntityMovementInputState.RotationChanged))
                 {
-                    if (IsClient)
-                    {
-                        _targetYAngle = yAngle;
-                        _yTurnSpeed = 1f / unityDeltaTime;
-                    }
+                    RemoteTurnSimulation(entityMovementInput.YAngle, unityDeltaTime);
+                }
+                if (entityMovementInput.MovementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
+                    if (_remoteTargetYAngle.HasValue)
+                        TurnImmediately(_remoteTargetYAngle.Value);
                     else
-                    {
-                        _yAngle = _targetYAngle = yAngle;
-                        UpdateRotation();
-                    }
+                        TurnImmediately(_targetYAngle);
                 }
                 if (inputState.Has(EntityMovementInputState.IsStopped))
+                {
                     StopMoveFunction();
+                }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
         }
@@ -518,7 +646,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            reader.ServerReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -560,8 +688,7 @@ namespace MultiplayerARPG
                         CacheNavMeshAgent.Warp(position);
                         _lastServerValidateHorDistDiff = horMoveableDist - clientHorMoveDist;
                         // Update character rotation
-                        _yAngle = _targetYAngle = yAngle;
-                        UpdateRotation();
+                        RemoteTurnSimulation(yAngle, unityDeltaTime);
                     }
                     else
                     {
@@ -580,9 +707,15 @@ namespace MultiplayerARPG
                     // It's both server and client, translate position (it's a host so don't do speed hack validation)
                     if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
                         SetMovePaths(position);
+                    RemoteTurnSimulation(yAngle, unityDeltaTime);
                     // Simulate character turning
                     _targetYAngle = yAngle;
                     _yTurnSpeed = 1f / unityDeltaTime;
+                }
+                if (movementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
+                    TurnImmediately(yAngle);
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
@@ -590,7 +723,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnTeleport(Vector3 position, float yAngle, bool stillMoveAfterTeleport)
         {
-            _inputDirection = null;
+            _inputDirection = Vector3.zero;
             _moveByDestination = false;
             Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
             CacheNavMeshAgent.Warp(position);
@@ -598,8 +731,7 @@ namespace MultiplayerARPG
                 CacheNavMeshAgent.isStopped = true;
             if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
                 CacheNavMeshAgent.SetDestination(beforeWarpDest);
-            _yAngle = _targetYAngle = yAngle;
-            UpdateRotation();
+            TurnImmediately(yAngle);
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
@@ -609,6 +741,34 @@ namespace MultiplayerARPG
         public bool CanPredictMovement()
         {
             return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
+        }
+
+        public void RemoteTurnSimulation(float yAngle, float deltaTime)
+        {
+            if (!IsClient)
+            {
+                // Turn to target immediately
+                TurnImmediately(yAngle);
+                return;
+            }
+            // Will turn smoothly later
+            _targetYAngle = yAngle;
+            _yTurnSpeed = 1f / deltaTime;
+        }
+
+        public void TurnImmediately(float yAngle)
+        {
+            _yAngle = _targetYAngle = yAngle;
+            RotateY();
+        }
+
+        public void ApplyRemoteTurnAngle()
+        {
+            if (_remoteTargetYAngle.HasValue)
+            {
+                _targetYAngle = _remoteTargetYAngle.Value;
+                _remoteTargetYAngle = null;
+            }
         }
     }
 }

@@ -26,17 +26,25 @@ namespace MultiplayerARPG
                     case InventoryType.EquipWeaponLeft:
                         return GameInstance.PlayingCharacter.EquipWeapons.leftHand;
                 }
-                return null;
+                return CharacterItem.Empty;
             }
         }
-        public int Level { get { return CharacterItem != null ? CharacterItem.level : 1; } }
-        public int Amount { get { return CharacterItem != null ? CharacterItem.amount : 0; } }
+        public int Level { get { return CharacterItem.level; } }
+        public int Amount { get { return CharacterItem.amount; } }
 
         public UICharacterItem uiCharacterItem;
         [Tooltip("These objects will be activated while item is set")]
         public GameObject[] hasItemObjects;
         [Tooltip("These objects will be activated while item is not set")]
         public GameObject[] noItemObjects;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCharacterItem = null;
+            hasItemObjects.Nulling();
+            noItemObjects.Nulling();
+        }
 
         protected override void OnEnable()
         {

@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
@@ -132,7 +133,7 @@ namespace MultiplayerARPG
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, animSpeedRate, reloadCancellationTokenSource.Token);
+                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, reloadCancellationTokenSource.Token);
 
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogReloadStart(_playerCharacterEntity, _triggerDurations);
@@ -248,7 +249,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                RPC(CmdReload, isLeftHand);
+                RPC(CmdReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -265,13 +266,9 @@ namespace MultiplayerARPG
 
         protected void ProceedCmdReload(bool isLeftHand)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (!_manager.IsAcceptNewAction())
                 return;
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastReloadEndTime < -0.2f)
-                return;
-            // Get weapon to reload
             CharacterItem reloadingWeapon = isLeftHand ? Entity.EquipWeapons.leftHand : Entity.EquipWeapons.rightHand;
             if (reloadingWeapon.IsEmptySlot())
                 return;
@@ -317,7 +314,7 @@ namespace MultiplayerARPG
                 return;
             _manager.ActionAccepted();
             ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
-            RPC(RpcReload, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
+            RPC(RpcReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
 #endif
         }
 

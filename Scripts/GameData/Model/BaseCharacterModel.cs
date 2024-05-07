@@ -10,6 +10,7 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel
     {
+        public int Id { get; protected set; }
         public BaseCharacterModel MainModel { get; set; }
         public bool IsMainModel { get { return MainModel == this; } }
         public bool IsActiveModel { get; protected set; } = false;
@@ -144,6 +145,13 @@ namespace MultiplayerARPG
             set { MainModel._cacheLeftHandEquipmentEntity = value; }
         }
 
+        protected IAttackRecoiler _cacheAttackRecoiler;
+        public IAttackRecoiler CacheAttackRecoiler
+        {
+            get { return IsMainModel ? _cacheAttackRecoiler : MainModel._cacheAttackRecoiler; }
+            set { MainModel._cacheAttackRecoiler = value; }
+        }
+
         public IList<EquipWeapons> SelectableWeaponSets { get; protected set; }
         public byte EquipWeaponSet { get; protected set; }
         public bool IsWeaponsSheathed { get; protected set; }
@@ -157,7 +165,8 @@ namespace MultiplayerARPG
         public bool IsFreezeAnimation { get; protected set; }
 
         // Public events
-        public UpdateEquipmentModelsDelegate onBeforeUpdateEquipmentModels;
+        public event UpdateEquipmentModelsDelegate onBeforeUpdateEquipmentModels;
+        public event OnInstantiatedEquipmentDelegate onInstantiatedEquipment;
 
         // Optimize garbage collector
         protected readonly List<string> _tempAddingKeys = new List<string>();
@@ -168,20 +177,26 @@ namespace MultiplayerARPG
             Manager = GetComponent<CharacterModelManager>();
             if (Manager == null)
                 Manager = GetComponentInParent<CharacterModelManager>(true);
-
+            Entity = GetComponent<BaseGameEntity>();
+            if (Entity == null)
+                Entity = GetComponentInParent<BaseGameEntity>();
+            Id = GetInstanceID();
             // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
             if (Manager == null)
             {
-                Entity = GetComponent<BaseGameEntity>();
-                if (Entity == null)
-                    Entity = GetComponentInParent<BaseGameEntity>();
+                if (Entity != null && Entity.Identity != null)
+                    Id = Entity.Identity.HashAssetId;
                 MainModel = this;
                 InitCacheData();
                 SwitchModel(null);
             }
             else
             {
-                Manager.InitTpsModel(this);
+                byte id = Manager.InitTpsModel(this);
+                unchecked
+                {
+                    Id = Entity.Identity.HashAssetId + id;
+                }
             }
         }
 
@@ -224,6 +239,8 @@ namespace MultiplayerARPG
             }
             // Prepare game effects collection (for buff effects)
             _cacheEffects = new Dictionary<string, List<GameEffect>>();
+            // Prepare recoiler
+            _cacheAttackRecoiler = GetComponentInChildren<IAttackRecoiler>();
         }
 
         protected void UpdateObjectsWhenSwitch()
@@ -334,6 +351,10 @@ namespace MultiplayerARPG
                     Gizmos.DrawWireSphere(equipmentContainer.transform.position, 0.1f);
                     Gizmos.DrawSphere(equipmentContainer.transform.position, 0.03f);
                     Handles.Label(equipmentContainer.transform.position, equipmentContainer.equipSocket + "(Equipment)");
+                    Gizmos.color = new Color(0, 0, 1, 0.5f);
+                    DrawArrow.ForGizmo(equipmentContainer.transform.position, equipmentContainer.transform.forward, 0.5f, 0.1f);
+                    Gizmos.color = new Color(0, 1, 0, 0.5f);
+                    DrawArrow.ForGizmo(equipmentContainer.transform.position, -equipmentContainer.transform.up, 0.5f, 0.1f);
                 }
             }
         }
@@ -540,7 +561,7 @@ namespace MultiplayerARPG
                             tempEquipmentObject.transform.localScale = tempEquipmentModel.localScale.Equals(Vector3.zero) ? Vector3.one : tempEquipmentModel.localScale;
                         tempEquipmentObject.gameObject.SetActive(true);
                         if (SetEquipmentLayerFollowEntity)
-                            tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = Entity.gameObject);
+                            tempEquipmentObject.gameObject.GetOrAddComponent<SetLayerFollowGameObject>((comp) => comp.source = Entity?.gameObject ?? null);
                         else
                             tempEquipmentObject.gameObject.SetLayerRecursively(EquipmentLayer, true);
                         tempEquipmentObject.RemoveComponentsInChildren<Collider>(false);
@@ -554,7 +575,10 @@ namespace MultiplayerARPG
                 {
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     if (tempEquipmentEntity != null)
+                    {
                         tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.item);
+                        tempEquipmentEntity.SetupRefToPrefab(tempEquipmentModel.meshPrefab);
+                    }
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
                         CacheRightHandEquipmentEntity = tempEquipmentEntity;
                     if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
@@ -857,6 +881,7 @@ namespace MultiplayerARPG
 
         public virtual void OnInstantiatedEquipment(EquipmentModel model, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
         {
+            onInstantiatedEquipment?.Invoke(model, instantiatedObject, instantiatedEntity, instantiatedObjectGroup, equipmentContainer);
             if (model.useInstantiatedObject || model.doNotSetupBones)
                 return;
             BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager = GameInstance.Singleton.EquipmentModelBonesSetupManager;

@@ -1,18 +1,20 @@
-﻿using UnityEngine;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public abstract class BaseWeaponAbility : BaseGameData
     {
-        protected BasePlayerCharacterController controller;
-        protected CharacterItem weapon;
+        public abstract string AbilityKey { get; }
         public virtual bool ShouldDeactivateOnDead { get { return true; } }
         public virtual bool ShouldDeactivateOnReload { get { return true; } }
 
+        [System.NonSerialized]
+        protected BasePlayerCharacterController _controller;
+        [System.NonSerialized]
+        protected CharacterItem _weapon;
+
         public virtual void Setup(BasePlayerCharacterController controller, CharacterItem weapon)
         {
-            this.controller = controller;
-            this.weapon = weapon;
+            _controller = controller;
+            _weapon = weapon;
         }
 
         public virtual void Desetup() { }

@@ -164,6 +164,45 @@ namespace MultiplayerARPG
         public DisplayType displayType;
         public bool isBonus;
 
+        [Header("Options")]
+        public string numberFormatSimple = "N0";
+        public string numberFormatRate = "N2";
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextStats = null;
+            uiTextHp = null;
+            uiTextHpRecovery = null;
+            uiTextHpLeechRate = null;
+            uiTextMp = null;
+            uiTextMpRecovery = null;
+            uiTextMpLeechRate = null;
+            uiTextStamina = null;
+            uiTextStaminaRecovery = null;
+            uiTextStaminaLeechRate = null;
+            uiTextFood = null;
+            uiTextWater = null;
+            uiTextAccuracy = null;
+            uiTextEvasion = null;
+            uiTextCriRate = null;
+            uiTextCriDmgRate = null;
+            uiTextBlockRate = null;
+            uiTextBlockDmgRate = null;
+            uiTextMoveSpeed = null;
+            uiTextAtkSpeed = null;
+            uiTextWeightLimit = null;
+            uiTextSlotLimit = null;
+            uiTextGoldRate = null;
+            uiTextExpRate = null;
+            uiTextItemDropRate = null;
+            uiTextJumpHeight = null;
+            uiTextHeadDamageAbsorbs = null;
+            uiTextBodyDamageAbsorbs = null;
+            uiTextFallDamageAbsorbs = null;
+            uiTextGravityRate = null;
+        }
+
         protected override void UpdateData()
         {
             CharacterStatsTextGenerateData generateTextData;
@@ -199,6 +238,8 @@ namespace MultiplayerARPG
                         data = Data,
                         isRate = true,
                         isBonus = isBonus,
+                        numberFormatSimple = this.numberFormatSimple,
+                        numberFormatRate = this.numberFormatRate,
                         hpStatsFormat = formatKeyHpRateStats,
                         hpRecoveryStatsFormat = formatKeyHpRecoveryRateStats,
                         hpLeechRateStatsFormat = formatKeyHpLeechRateRateStats,
@@ -267,6 +308,8 @@ namespace MultiplayerARPG
                         data = Data,
                         isRate = false,
                         isBonus = isBonus,
+                        numberFormatSimple = this.numberFormatSimple,
+                        numberFormatRate = this.numberFormatRate,
                         hpStatsFormat = formatKeyHpStats,
                         hpRecoveryStatsFormat = formatKeyHpRecoveryStats,
                         hpLeechRateStatsFormat = formatKeyHpLeechRateStats,

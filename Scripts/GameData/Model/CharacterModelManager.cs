@@ -57,6 +57,7 @@ namespace MultiplayerARPG
         private readonly Dictionary<byte, bool> _hideStates = new Dictionary<byte, bool>();
         private int _dirtyVehicleDataId;
         private byte _dirtySeatIndex;
+        private byte _modelIdCounter = 0;
 
         public override void EntityAwake()
         {
@@ -64,7 +65,16 @@ namespace MultiplayerARPG
             MigrateVehicleModels();
         }
 
-        internal void InitTpsModel(BaseCharacterModel model)
+        public override void EntityOnDestroy()
+        {
+            mainTpsModel = null;
+            fpsModelPrefab = null;
+            ActiveTpsModel = null;
+            ActiveFpsModel = null;
+            MainFpsModel = null;
+        }
+
+        internal byte InitTpsModel(BaseCharacterModel model)
         {
             model.Entity = Entity;
             model.MainModel = MainTpsModel;
@@ -75,6 +85,7 @@ namespace MultiplayerARPG
                 MainTpsModel.InitCacheData();
                 SwitchTpsModel(MainTpsModel);
             }
+            return _modelIdCounter++;
         }
 
         internal void InitFpsModel(BaseCharacterModel model)
@@ -99,6 +110,13 @@ namespace MultiplayerARPG
             MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
             MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
             MainFpsModel.SetEquipItems(MainTpsModel.EquipItems, MainTpsModel.SelectableWeaponSets, MainTpsModel.EquipWeaponSet, MainTpsModel.IsWeaponsSheathed);
+#if UNITY_EDITOR
+            IComponentWithPrefabRef[] refs = MainFpsModel.GetComponents<IComponentWithPrefabRef>();
+            for (int i = 0; i < refs.Length; ++i)
+            {
+                refs[i].SetupRefToPrefab(fpsModelPrefab.gameObject);
+            }
+#endif
             return MainFpsModel;
         }
 

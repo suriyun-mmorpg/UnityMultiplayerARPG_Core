@@ -64,6 +64,21 @@ namespace MultiplayerARPG
         public ICharacterData Character { get; protected set; }
         public Dictionary<BaseSkill, int> LoadedList { get; private set; } = new Dictionary<BaseSkill, int>();
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            filterCategories?.Clear();
+            filterSkillTypes?.Clear();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            Character = null;
+            LoadedList?.Clear();
+        }
+
         protected virtual void OnEnable()
         {
             CacheSelectionManager.eventOnSelect.RemoveListener(OnSelect);

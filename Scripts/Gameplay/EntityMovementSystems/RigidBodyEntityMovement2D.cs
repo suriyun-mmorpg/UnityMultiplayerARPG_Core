@@ -17,6 +17,9 @@ namespace MultiplayerARPG
         public float stoppingDistance = 0.1f;
         public MovementSecure movementSecure = MovementSecure.NotSecure;
 
+        [Header("Dashing")]
+        public EntityMovementForceApplier dashingForceApplier;
+
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
 
@@ -38,12 +41,14 @@ namespace MultiplayerARPG
         }
 
         // Input codes
+        protected bool _isDashing;
         protected Vector2 _inputDirection;
         protected MovementState _tempMovementState;
         protected ExtraMovementState _tempExtraMovementState;
 
         // Move simulate codes
         protected Vector2 _moveDirection;
+        protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Teleport codes
         protected bool _isTeleporting;
@@ -52,12 +57,14 @@ namespace MultiplayerARPG
         // Client state codes
         protected EntityMovementInput _oldInput;
         protected EntityMovementInput _currentInput;
+        protected bool _sendingDash;
 
         // State simulate codes
         protected float? _lagMoveSpeedRate;
         protected bool _simulatingKeyMovement = false;
 
         // Peers accept codes
+        protected bool _acceptedDash;
         protected long _acceptedPositionTimestamp;
 
         // Server validate codes
@@ -130,6 +137,8 @@ namespace MultiplayerARPG
                 _tempMovementState = movementState;
                 if (_inputDirection.sqrMagnitude > 0)
                     NavPaths = null;
+                if (!_isDashing)
+                    _isDashing = _tempMovementState.Has(MovementState.IsDash);
             }
         }
 
@@ -200,6 +209,26 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        {
+            if (!IsServer)
+                return;
+            if (mode.IsReplaceMovement())
+            {
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+            }
+            _movementForceAppliers.Add(new EntityMovementForceApplier()
+                .Apply(direction, mode, force, deceleration, duration));
+        }
+
+        public void ClearAllForces()
+        {
+            if (!IsServer)
+                return;
+            _movementForceAppliers.Clear();
+        }
+
         public override void EntityUpdate()
         {
             UpdateMovement(Time.fixedDeltaTime);
@@ -221,6 +250,8 @@ namespace MultiplayerARPG
                 if (HasNavPaths && !MovementState.Has(MovementState.Forward))
                     MovementState |= MovementState.Forward;
             }
+            _isDashing = false;
+            _acceptedDash = false;
         }
 
         protected virtual void UpdateMovement(float deltaTime)
@@ -286,9 +317,43 @@ namespace MultiplayerARPG
                 _moveDirection = Vector2.zero;
             }
 
+            if (!Entity.CanDash())
+            {
+                _isDashing = false;
+            }
+
             // Prepare movement speed
             tempEntityMoveSpeed = Entity.GetMoveSpeed();
             tempMaxMoveSpeed = tempEntityMoveSpeed;
+
+            // Dashing
+            if (_acceptedDash || _isDashing)
+            {
+                _sendingDash = true;
+                dashingForceApplier.Apply(Direction2D);
+                dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+                _movementForceAppliers.Add(dashingForceApplier);
+            }
+
+            // Apply Forces
+            _movementForceAppliers.UpdateForces(Time.deltaTime,
+                Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
+                out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
+
+            // Replace player's movement by this
+            if (replaceMovementForceApplier != null)
+            {
+                // Still dashing to add dash to movement state
+                if (replaceMovementForceApplier.Mode == ApplyMovementForceMode.Dash)
+                    _tempMovementState |= MovementState.IsDash;
+                // Force turn to dashed direction
+                _moveDirection = replaceMovementForceApplier.Direction;
+                Direction2D = _moveDirection;
+                // Change move speed to dash force
+                tempMaxMoveSpeed = replaceMovementForceApplier.CurrentSpeed;
+            }
 
             // Updating horizontal movement (WASD inputs)
             if (_moveDirection.sqrMagnitude > 0f)
@@ -323,7 +388,7 @@ namespace MultiplayerARPG
                 }
             }
             _currentInput = Entity.SetInputDirection2D(_currentInput, Direction2D);
-            CacheRigidbody2D.velocity = tempMoveVelocity;
+            CacheRigidbody2D.velocity = tempMoveVelocity + new Vector2(forceMotion.x, forceMotion.y);
         }
 
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)
@@ -358,18 +423,37 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsDash;
+                }
+                else
+                {
+                    MovementState &= ~MovementState.IsDash;
+                }
                 if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
                     MovementState |= MovementState.IsTeleport;
                 }
                 this.ClientWriteSyncTransform2D(writer);
+                _sendingDash = false;
                 _isClientConfirmingTeleport = false;
                 return true;
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
             {
                 _currentInput = Entity.SetInputExtraMovementState(_currentInput, _tempExtraMovementState);
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    _currentInput = Entity.SetInputDash(_currentInput);
+                }
+                else
+                {
+                    _currentInput = Entity.ClearInputDash(_currentInput);
+                }
                 if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
@@ -382,7 +466,8 @@ namespace MultiplayerARPG
                         // Point click should be reliably
                         shouldSendReliably = true;
                     }
-                    this.ClientWriteMovementInput2D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Direction2D);
+                    this.ClientWriteMovementInput2D(writer, inputState, _currentInput);
+                    _sendingDash = false;
                     _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
@@ -395,6 +480,15 @@ namespace MultiplayerARPG
         public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
+            if (_sendingDash)
+            {
+                shouldSendReliably = true;
+                MovementState |= MovementState.IsDash;
+            }
+            else
+            {
+                MovementState &= ~MovementState.IsDash;
+            }
             if (_isTeleporting)
             {
                 shouldSendReliably = true;
@@ -408,7 +502,8 @@ namespace MultiplayerARPG
                 MovementState &= ~MovementState.IsTeleport;
             }
             // Sync transform from server to all clients (include owner client)
-            this.ServerWriteSyncTransform2D(writer);
+            this.ServerWriteSyncTransform2D(_movementForceAppliers, writer);
+            _sendingDash = false;
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
             return true;
@@ -434,7 +529,9 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
+            reader.ClientReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D, out List<EntityMovementForceApplier> movementForceAppliers);
+            _movementForceAppliers.Clear();
+            _movementForceAppliers.AddRange(movementForceAppliers);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
@@ -467,6 +564,10 @@ namespace MultiplayerARPG
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
+            if (!IsOwnerClient && movementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+            }
         }
 
         public void ReadMovementInputAtServer(long peerTimestamp, NetDataReader reader)
@@ -481,8 +582,8 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
-            if (movementState.Has(MovementState.IsTeleport))
+            reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
+            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
                 _isServerWaitingTeleportConfirm = false;
@@ -505,16 +606,22 @@ namespace MultiplayerARPG
             if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 NavPaths = null;
-                _tempMovementState = movementState;
-                _tempExtraMovementState = extraMovementState;
+                _tempMovementState = entityMovementInput.MovementState;
+                _tempExtraMovementState = entityMovementInput.ExtraMovementState;
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
                     _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
-                    SetMovePaths(position, !_simulatingKeyMovement);
+                    SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
                 }
-                Direction2D = direction2D;
+                Direction2D = entityMovementInput.Direction2D;
+                if (entityMovementInput.MovementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
+                }
                 if (inputState.Has(EntityMovementInputState.IsStopped))
+                {
                     StopMoveFunction();
+                }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
         }
@@ -531,7 +638,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            reader.ReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
+            reader.ServerReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -592,6 +699,10 @@ namespace MultiplayerARPG
                     // It's both server and client, translate position (it's a host so don't do speed hack validation)
                     if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
                         SetMovePaths(position, false);
+                }
+                if (movementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
             }

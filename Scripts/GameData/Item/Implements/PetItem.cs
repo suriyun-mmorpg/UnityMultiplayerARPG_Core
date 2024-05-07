@@ -36,12 +36,31 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(3, "Pet Settings")]
         [SerializeField]
         private BaseMonsterCharacterEntity petEntity = null;
+#endif
         public BaseMonsterCharacterEntity MonsterCharacterEntity
         {
-            get { return petEntity; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return petEntity;
+#else
+                return null;
+#endif
+            }
+        }
+
+        [SerializeField]
+        private AssetReferenceBaseMonsterCharacterEntity addressablePetEntity = null;
+        public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
+        {
+            get { return addressablePetEntity; }
         }
 
         [SerializeField]
@@ -96,6 +115,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddCharacterEntities(MonsterCharacterEntity);
+            GameInstance.AddAssetReferenceCharacterEntities(AddressableMonsterCharacterEntity);
         }
     }
 }

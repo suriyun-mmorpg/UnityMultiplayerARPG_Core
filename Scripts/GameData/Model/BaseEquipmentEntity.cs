@@ -8,7 +8,7 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public abstract partial class BaseEquipmentEntity : MonoBehaviour, IPoolDescriptorCollection
+    public abstract partial class BaseEquipmentEntity : ComponentWithPrefabRef<BaseEquipmentEntity>, IPoolDescriptorCollection
     {
         public BaseCharacterModel CharacterModel { get; set; }
         public string EquipPosition { get; set; }
@@ -19,10 +19,11 @@ namespace MultiplayerARPG
             get { return _item; }
             set
             {
-                if (_item != value)
+                if (!_item.IsDiffer(value, true))
                 {
                     _item = value;
                     OnItemChanged(_item);
+                    onItemChanged.Invoke(_item);
                 }
             }
         }
@@ -31,13 +32,9 @@ namespace MultiplayerARPG
         [Tooltip("These game effects must placed as this children, it will be activated when launch (can place muzzle effects here)")]
         public GameEffect[] weaponLaunchEffects = new GameEffect[0];
         [Tooltip("These game effects prefabs will instantiates to container when launch (can place muzzle effects here)")]
-        public GameEffectPoolContainer[] poolingWeaponLaunchEffects;
+        public GameEffectPoolContainer[] poolingWeaponLaunchEffects = new GameEffectPoolContainer[0];
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
         public Transform missileDamageTransform;
-
-        [Header("Support Hand Transforms")]
-        public Transform mainHandSupportTransform;
-        public Transform offHandSupportTransform;
 
         [Header("Events")]
         public UnityEvent onSetup = new UnityEvent();
@@ -47,6 +44,13 @@ namespace MultiplayerARPG
         public UnityEvent onPlayReload = new UnityEvent();
         public UnityEvent onPlayReloaded = new UnityEvent();
         public UnityEvent onPlayCharge = new UnityEvent();
+        public EquipmentEntityItemEvent onItemChanged = new EquipmentEntityItemEvent();
+
+#if UNITY_EDITOR
+        [Header("Tools")]
+        [InspectorButton(nameof(SetProperMissileDamageTransformForIK))]
+        public bool setProperMissileDamageTransformForIK;
+#endif
 
         public IEnumerable<IPoolDescriptor> PoolDescriptors
         {
@@ -149,6 +153,43 @@ namespace MultiplayerARPG
                 Gizmos.color = new Color(1, 0, 0, 0.5f);
                 Gizmos.DrawSphere(missileDamageTransform.position, 0.03f);
                 Handles.Label(missileDamageTransform.position, name + "(MissleDamage)");
+                Gizmos.color = new Color(0, 0, 1, 0.5f);
+                DrawArrow.ForGizmo(missileDamageTransform.position, missileDamageTransform.forward, 0.5f, 0.1f);
+                Gizmos.color = new Color(0, 1, 0, 0.5f);
+                DrawArrow.ForGizmo(missileDamageTransform.position, -missileDamageTransform.up, 0.5f, 0.1f);
+            }
+
+            this.InvokeInstanceDevExtMethods("OnDrawGizmos");
+        }
+#endif
+
+#if UNITY_EDITOR
+        protected virtual void OnValidate()
+        {
+
+        }
+#endif
+
+#if UNITY_EDITOR
+        public void SetProperMissileDamageTransformForIK()
+        {
+            if (missileDamageTransform == null)
+                return;
+
+            if (!missileDamageTransform.eulerAngles.Equals(Vector3.zero))
+            {
+                Debug.LogWarning($"[EquipmentEntity] {name} `missileDamageTransform` global euler angles must be 0,0,0)");
+                missileDamageTransform.eulerAngles = Vector3.zero;
+                EditorUtility.SetDirty(this);
+            }
+
+            if (!Mathf.Approximately(missileDamageTransform.position.x, 0f))
+            {
+                Debug.LogWarning($"[EquipmentEntity] {name} `missileDamageTransform` global X position must be 0)");
+                Vector3 position = missileDamageTransform.position;
+                position.x = 0f;
+                missileDamageTransform.position = position;
+                EditorUtility.SetDirty(this);
             }
         }
 #endif

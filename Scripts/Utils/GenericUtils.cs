@@ -538,4 +538,94 @@ public static partial class GenericUtils
     {
         return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => ZString.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
     }
+
+    public static void Nulling<T>(this IList<T> objects)
+        where T : class
+    {
+        if (objects == null)
+            return;
+        for (int i = 0; i < objects.Count; ++i)
+        {
+            objects[i] = null;
+        }
+    }
+
+    public static void Defaulting<T>(this IList<T> objects)
+        where T : struct
+    {
+        if (objects == null)
+            return;
+        for (int i = 0; i < objects.Count; ++i)
+        {
+            objects[i] = default;
+        }
+    }
+
+    public static void DestroyAndNulling<T>(this IList<T> objects)
+        where T : Object
+    {
+        if (objects == null)
+            return;
+        for (int i = 0; i < objects.Count; ++i)
+        {
+            Object.Destroy(objects[i]);
+            objects[i] = null;
+        }
+    }
+
+    static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
+    public static string SizeSuffix(long value, int decimalPlaces = 1)
+    {
+        if (decimalPlaces < 0) { throw new System.ArgumentOutOfRangeException("decimalPlaces"); }
+        if (value < 0) { return "-" + SizeSuffix(-value, decimalPlaces); }
+        if (value == 0) { return string.Format("{0:n" + decimalPlaces + "} " + SizeSuffixes[0], 0); }
+
+        // mag is 0 for bytes, 1 for KB, 2, for MB, etc.
+        int mag = (int)System.Math.Log(value, 1024);
+
+        // 1L << (mag * 10) == 2 ^ (10 * mag) 
+        // [i.e. the number of bytes in the unit corresponding to mag]
+        decimal adjustedSize = (decimal)value / (1L << (mag * 10));
+
+        // make adjustment when the value is large enough that
+        // it would round up to 1000 or more
+        if (System.Math.Round(adjustedSize, decimalPlaces) >= 1000)
+        {
+            mag += 1;
+            adjustedSize /= 1024;
+        }
+
+        return string.Format("{0:n" + decimalPlaces + "} {1}",
+            adjustedSize,
+            SizeSuffixes[mag]);
+    }
+
+    public static string MinMaxSizeSuffix(long min, long max, int decimalPlaces = 1)
+    {
+        if (decimalPlaces < 0) { throw new System.ArgumentOutOfRangeException("decimalPlaces"); }
+        if (max < 0) { return "-" + MinMaxSizeSuffix(min, -max, decimalPlaces); }
+        if (max == 0) { return string.Format("{0:n" + decimalPlaces + "}{1:n" + decimalPlaces + "} " + SizeSuffixes[0], 0, 0); }
+
+        // mag is 0 for bytes, 1 for KB, 2, for MB, etc.
+        int mag = (int)System.Math.Log(max, 1024);
+
+        // 1L << (mag * 10) == 2 ^ (10 * mag) 
+        // [i.e. the number of bytes in the unit corresponding to mag]
+        decimal adjustedMinSize = (decimal)min / (1L << (mag * 10));
+        decimal adjustedMaxSize = (decimal)max / (1L << (mag * 10));
+
+        // make adjustment when the value is large enough that
+        // it would round up to 1000 or more
+        if (System.Math.Round(adjustedMaxSize, decimalPlaces) >= 1000)
+        {
+            mag += 1;
+            adjustedMinSize /= 1024;
+            adjustedMaxSize /= 1024;
+        }
+
+        return string.Format("{0:n" + decimalPlaces + "}/{1:n" + decimalPlaces + "} {2}",
+            adjustedMinSize,
+            adjustedMaxSize,
+            SizeSuffixes[mag]);
+    }
 }

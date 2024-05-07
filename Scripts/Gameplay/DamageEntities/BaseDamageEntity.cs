@@ -58,6 +58,14 @@ namespace MultiplayerARPG
             CacheTransform = transform;
         }
 
+        protected virtual void OnDestroy()
+        {
+            CacheTransform = null;
+            _damageAmounts?.Clear();
+            _skill = null;
+            _fxCollection = null;
+        }
+
         protected virtual void OnEnable()
         {
             if (_playFxOnEnable)
@@ -102,6 +110,7 @@ namespace MultiplayerARPG
         {
             if (target == null || target.IsDead() || !target.CanReceiveDamageFrom(_instigator))
                 return;
+
             bool willProceedHitRegByClient = false;
             bool isOwnerClient = false;
             if (_instigator.TryGetEntity(out BaseGameEntity entity))
@@ -109,10 +118,12 @@ namespace MultiplayerARPG
                 isOwnerClient = entity.IsOwnerClient;
                 willProceedHitRegByClient = !entity.IsOwnedByServer && !entity.IsOwnerHost;
             }
+
             if (IsServer && !willProceedHitRegByClient)
             {
                 target.ReceiveDamage(CacheTransform.position, _instigator, _damageAmounts, _weapon, _skill, _skillLevel, _simulateSeed);
             }
+
             if (isOwnerClient && willProceedHitRegByClient)
             {
                 _hitRegisterData.HitTimestamp = CurrentGameManager.Timestamp;

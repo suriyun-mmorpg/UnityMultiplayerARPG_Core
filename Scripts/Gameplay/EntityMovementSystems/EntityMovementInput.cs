@@ -9,8 +9,10 @@ namespace MultiplayerARPG
         public MovementState MovementState { get; set; }
         public ExtraMovementState ExtraMovementState { get; set; }
         public Vector3 Position { get; set; }
-        public Quaternion Rotation { get; set; }
-        public Vector2 Direction2D { get; set; }
+        // For 3D games
+        public float YAngle { get; set; }
+        // For 2D games
+        public DirectionVector2 Direction2D { get; set; }
     }
 
     public static class EntityMovementInputExtension
@@ -20,7 +22,7 @@ namespace MultiplayerARPG
             return new EntityMovementInput()
             {
                 Position = entity.EntityTransform.position,
-                Rotation = entity.EntityTransform.rotation,
+                YAngle = entity.EntityTransform.eulerAngles.y,
             };
         }
 
@@ -83,19 +85,19 @@ namespace MultiplayerARPG
             return input;
         }
 
-        public static EntityMovementInput SetInputRotation(this BaseGameEntity entity, EntityMovementInput input, Quaternion rotation)
+        public static EntityMovementInput SetInputYAngle(this BaseGameEntity entity, EntityMovementInput input, float yAngle)
         {
             if (input == null)
                 input = entity.InitInput();
-            input.Rotation = rotation;
+            input.YAngle = yAngle;
             return input;
         }
 
-        public static EntityMovementInput SetInputDirection2D(this BaseGameEntity entity, EntityMovementInput input, Vector2 direction2D)
+        public static EntityMovementInput SetInputDirection2D(this BaseGameEntity entity, EntityMovementInput input, DirectionVector2 direction)
         {
             if (input == null)
                 input = entity.InitInput();
-            input.Direction2D = direction2D;
+            input.Direction2D = direction;
             return input;
         }
 
@@ -113,6 +115,23 @@ namespace MultiplayerARPG
             if (input == null)
                 input = entity.InitInput();
             input.MovementState &= ~MovementState.IsJump;
+            return input;
+        }
+
+        public static EntityMovementInput SetInputDash(this BaseGameEntity entity, EntityMovementInput input)
+        {
+            if (input == null)
+                input = entity.InitInput();
+            input.IsStopped = false;
+            input.MovementState |= MovementState.IsDash;
+            return input;
+        }
+
+        public static EntityMovementInput ClearInputDash(this BaseGameEntity entity, EntityMovementInput input)
+        {
+            if (input == null)
+                input = entity.InitInput();
+            input.MovementState &= ~MovementState.IsDash;
             return input;
         }
 
@@ -144,7 +163,7 @@ namespace MultiplayerARPG
                 state |= EntityMovementInputState.IsKeyMovement;
             if (Vector3.Distance(newInput.Position, oldInput.Position) > 0.01f)
                 state |= EntityMovementInputState.PositionChanged;
-            if (Quaternion.Angle(newInput.Rotation, oldInput.Rotation) > 0.01f)
+            if (Mathf.Abs(newInput.YAngle - oldInput.YAngle) > 0.01f)
                 state |= EntityMovementInputState.RotationChanged;
             if (newInput.MovementState.Has(MovementState.IsJump) || newInput.MovementState.Has(MovementState.IsTeleport))
                 state |= EntityMovementInputState.Other;

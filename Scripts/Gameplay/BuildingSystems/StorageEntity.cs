@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public class StorageEntity : BuildingEntity
+    public partial class StorageEntity : BuildingEntity
     {
         [Category(6, "Storage Settings")]
         [SerializeField]

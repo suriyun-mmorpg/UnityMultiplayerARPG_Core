@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -87,7 +88,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
@@ -300,7 +301,12 @@ namespace MultiplayerARPG
 
         public override bool TryGetSummon(out SkillSummon summon)
         {
-            if (this.summon.MonsterEntity != null)
+            if (this.summon.MonsterCharacterEntity != null)
+            {
+                summon = this.summon;
+                return true;
+            }
+            else if (this.summon.AddressableMonsterCharacterEntity.IsDataValid())
             {
                 summon = this.summon;
                 return true;
@@ -311,6 +317,11 @@ namespace MultiplayerARPG
         public override bool TryGetMount(out SkillMount mount)
         {
             if (this.mount.MountEntity != null)
+            {
+                mount = this.mount;
+                return true;
+            }
+            else if (this.mount.AddressableMountEntity.IsDataValid())
             {
                 mount = this.mount;
                 return true;

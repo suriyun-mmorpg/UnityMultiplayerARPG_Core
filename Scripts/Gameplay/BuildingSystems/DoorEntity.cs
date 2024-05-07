@@ -5,7 +5,7 @@ using LiteNetLib;
 
 namespace MultiplayerARPG
 {
-    public class DoorEntity : BuildingEntity
+    public partial class DoorEntity : BuildingEntity
     {
         [Category(6, "Door Settings")]
         [SerializeField]

@@ -27,6 +27,17 @@ namespace MultiplayerARPG
         public CrafterType CrafterType { get; private set; }
         public BaseGameEntity TargetEntity { get; private set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCraftingItem = null;
+            uiRequireItemAmounts = null;
+            uiRequireCurrencyAmounts = null;
+            uiTextRequireGold = null;
+            uiTextSimpleRequireGold = null;
+            TargetEntity = null;
+        }
+
         public void Setup(CrafterType crafterType, BaseGameEntity targetEntity, ItemCraft data)
         {
             CrafterType = crafterType;

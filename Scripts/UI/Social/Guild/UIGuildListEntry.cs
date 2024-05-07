@@ -34,7 +34,23 @@ namespace MultiplayerARPG
         public GameObject[] notAutoAcceptRequestsObjects;
 
         [Header("Events")]
-        public UnityEvent onGuildRequested;
+        public UnityEvent onGuildRequested = new UnityEvent();
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiGuildIcon = null;
+            textGuildName = null;
+            textLevel = null;
+            textMessage = null;
+            textScore = null;
+            textRank = null;
+            textMemberAmount = null;
+            autoAcceptRequestsObjects.Nulling();
+            notAutoAcceptRequestsObjects.Nulling();
+            onGuildRequested?.RemoveAllListeners();
+            onGuildRequested = null;
+        }
 
         protected override void UpdateData()
         {

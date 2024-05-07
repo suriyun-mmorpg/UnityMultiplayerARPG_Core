@@ -24,32 +24,44 @@ namespace MultiplayerARPG
 
         public UICraftingQueueItems CraftingQueueManager { get; set; }
 
-        protected float craftRemainsDuration;
+        protected float _craftRemainsDuration;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextAmount = null;
+            uiTextDuration = null;
+            uiTextRemainsDuration = null;
+            imageDurationGage = null;
+            uiItemCraft = null;
+            inputAmount = null;
+            CraftingQueueManager = null;
+        }
 
         protected override void OnDisable()
         {
             base.OnDisable();
-            craftRemainsDuration = 0f;
+            _craftRemainsDuration = 0f;
         }
 
         protected override void Update()
         {
             base.Update();
 
-            if (craftRemainsDuration > 0f)
+            if (_craftRemainsDuration > 0f)
             {
-                craftRemainsDuration -= Time.deltaTime;
-                if (craftRemainsDuration <= 0f)
-                    craftRemainsDuration = 0f;
+                _craftRemainsDuration -= Time.deltaTime;
+                if (_craftRemainsDuration <= 0f)
+                    _craftRemainsDuration = 0f;
             }
             else
             {
-                craftRemainsDuration = 0f;
+                _craftRemainsDuration = 0f;
             }
 
             // Only first queue will show remains duration
             if (IndexOfData > 0)
-                craftRemainsDuration = 0f;
+                _craftRemainsDuration = 0f;
 
             // Update UIs
             float craftDuration = 0;
@@ -74,15 +86,15 @@ namespace MultiplayerARPG
 
             if (uiTextRemainsDuration != null)
             {
-                uiTextRemainsDuration.SetGameObjectActive(craftRemainsDuration > 0);
+                uiTextRemainsDuration.SetGameObjectActive(_craftRemainsDuration > 0);
                 uiTextRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCraftRemainsDuration),
-                    craftRemainsDuration.ToString("N0"));
+                    _craftRemainsDuration.ToString("N0"));
             }
 
             if (imageDurationGage != null)
             {
-                imageDurationGage.fillAmount = craftDuration <= 0 ? 0 : craftRemainsDuration / craftDuration;
+                imageDurationGage.fillAmount = craftDuration <= 0 ? 0 : _craftRemainsDuration / craftDuration;
                 imageDurationGage.gameObject.SetActive(imageDurationGage.fillAmount > 0f);
             }
         }
@@ -92,15 +104,15 @@ namespace MultiplayerARPG
             base.UpdateUI();
 
             // Update remains duration
-            if (craftRemainsDuration <= 0f)
-                craftRemainsDuration = Data.craftRemainsDuration;
+            if (_craftRemainsDuration <= 0f)
+                _craftRemainsDuration = Data.craftRemainsDuration;
         }
 
         protected override void UpdateData()
         {
             // Update remains duration
-            if (Mathf.Abs(Data.craftRemainsDuration - craftRemainsDuration) > 1)
-                craftRemainsDuration = Data.craftRemainsDuration;
+            if (Mathf.Abs(Data.craftRemainsDuration - _craftRemainsDuration) > 1)
+                _craftRemainsDuration = Data.craftRemainsDuration;
 
             ItemCraftFormula formula;
             GameInstance.ItemCraftFormulas.TryGetValue(Data.dataId, out formula);

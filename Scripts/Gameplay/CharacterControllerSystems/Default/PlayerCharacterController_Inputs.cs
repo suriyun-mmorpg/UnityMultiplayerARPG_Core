@@ -156,17 +156,25 @@ namespace MultiplayerARPG
                         equipWeaponSet = (byte)(PlayingCharacterEntity.EquipWeaponSet + 1),
                     }, ClientInventoryActions.ResponseSwitchEquipWeaponSet);
                 }
-                if (InputManager.GetButtonDown("Sprint"))
+                if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
                 {
-                    // Toggles sprint state
-                    _isSprinting = !_isSprinting;
+                    _isSprinting = false;
                     _isWalking = false;
                 }
-                else if (InputManager.GetButtonDown("Walk"))
+                else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
                 {
-                    // Toggles sprint state
-                    _isWalking = !_isWalking;
-                    _isSprinting = false;
+                    if (InputManager.GetButtonDown("Sprint"))
+                    {
+                        // Toggles sprint state
+                        _isSprinting = !_isSprinting;
+                        _isWalking = false;
+                    }
+                    else if (InputManager.GetButtonDown("Walk"))
+                    {
+                        // Toggles sprint state
+                        _isWalking = !_isWalking;
+                        _isSprinting = false;
+                    }
                 }
                 // Auto reload
                 if (PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoEmpty() ||
@@ -182,6 +190,7 @@ namespace MultiplayerARPG
             UpdateQueuedSkill();
             UpdatePointClickInput();
             UpdateWASDInput();
+
             // Set extra movement state
             if (_isSprinting)
                 PlayingCharacterEntity.SetExtraMovementState(ExtraMovementState.IsSprinting);
@@ -361,7 +370,9 @@ namespace MultiplayerARPG
             _targetPosition = null;
             if (checkControllerMode && controllerMode == PlayerCharacterControllerMode.WASD)
             {
-                this._targetActionType = targetActionType;
+                if (_targetActionType != targetActionType)
+                    _previousTargetActionType = _targetActionType;
+                _targetActionType = targetActionType;
                 _destination = null;
                 SelectedEntity = entity;
                 return;
@@ -370,7 +381,9 @@ namespace MultiplayerARPG
                 (entity != null && SelectedEntity != null && entity.EntityGameObject == SelectedEntity.EntityGameObject) ||
                 (entity != null && entity.SetAsTargetInOneClick()))
             {
-                this._targetActionType = targetActionType;
+                if (_targetActionType != targetActionType)
+                    _previousTargetActionType = _targetActionType;
+                _targetActionType = targetActionType;
                 _destination = null;
                 TargetEntity = entity;
                 if (entity is IGameEntity gameEntity)
@@ -386,7 +399,7 @@ namespace MultiplayerARPG
             TargetEntity = null;
             PlayingCharacterEntity.SetTargetEntity(null);
             _targetPosition = null;
-            _targetActionType = TargetActionType.ClickActivate;
+            _targetActionType = _previousTargetActionType = TargetActionType.ClickActivate;
         }
 
         public override void DeselectBuilding()
@@ -425,10 +438,34 @@ namespace MultiplayerARPG
             if (InputManager.GetButton("Attack"))
                 UpdateWASDAttack();
 
-            // Always forward
-            MovementState movementState = MovementState.Forward;
-            if (InputManager.GetButtonDown("Jump"))
-                movementState |= MovementState.IsJump;
+            // Set movement state to be forward only when it is having moving direction
+            MovementState movementState = MovementState.None;
+            if (moveDirection.sqrMagnitude > 0)
+            {
+                movementState = MovementState.Forward;
+            }
+            if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
+            {
+                if (InputManager.GetButton("SwimUp"))
+                {
+                    movementState |= MovementState.Up;
+                }
+                else if (InputManager.GetButton("SwimDown"))
+                {
+                    movementState |= MovementState.Down;
+                }
+            }
+            else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
+            {
+                if (InputManager.GetButtonDown("Jump"))
+                {
+                    movementState |= MovementState.IsJump;
+                }
+                else if (InputManager.GetButtonDown("Dash"))
+                {
+                    movementState |= MovementState.IsDash;
+                }
+            }
             PlayingCharacterEntity.KeyMovement(moveDirection, movementState);
         }
 
@@ -615,7 +652,6 @@ namespace MultiplayerARPG
                 {
                     // Target not required, use skill immediately
                     RequestUsePendingSkill();
-                    _isFollowingTarget = false;
                 }
             }
         }
@@ -790,7 +826,7 @@ namespace MultiplayerARPG
                     OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
                 {
                     // Set next frame target action type
-                    _targetActionType = _queueUsingSkill.skill.IsAttack ? TargetActionType.Attack : TargetActionType.ClickActivate;
+                    _targetActionType = _queueUsingSkill.skill.IsAttack ? TargetActionType.Attack : _previousTargetActionType;
                     // Stop movement to use skill
                     PlayingCharacterEntity.StopMove();
                     // Turn character to attacking target
@@ -809,7 +845,7 @@ namespace MultiplayerARPG
             else
             {
                 // Can't use skill
-                _targetActionType = TargetActionType.ClickActivate;
+                _targetActionType = _previousTargetActionType;
                 ClearQueueUsingSkill();
                 return;
             }
@@ -879,7 +915,7 @@ namespace MultiplayerARPG
         {
             int dataId = BaseGameData.MakeDataId(id);
             if (!GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill) || skill == null ||
-                !PlayingCharacterEntity.GetCaches().Skills.TryGetValue(skill, out int skillLevel))
+                !PlayingCharacterEntity.CachedData.Skills.TryGetValue(skill, out int skillLevel))
                 return;
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
         }

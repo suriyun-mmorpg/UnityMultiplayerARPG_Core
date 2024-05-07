@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdUseGuildSkill(int dataId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (this.IsDead())
                 return;
 
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             {
                 if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(member.id, out memberEntity))
                 {
-                    memberEntity.ApplyBuff(dataId, BuffType.GuildSkillBuff, level, GetInfo(), null);
+                    memberEntity.ApplyBuff(dataId, BuffType.GuildSkillBuff, level, GetInfo(), CharacterItem.Empty);
                 }
             }
 #endif
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdAssignHotkey(string hotkeyId, HotkeyType type, string relateId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             CharacterHotkey characterHotkey = new CharacterHotkey();
             characterHotkey.hotkeyId = hotkeyId;
             characterHotkey.type = type;
@@ -73,7 +73,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdEnterWarp(uint objectId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (!CanDoActions())
                 return;
 

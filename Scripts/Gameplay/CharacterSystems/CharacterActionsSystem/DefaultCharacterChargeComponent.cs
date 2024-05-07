@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using LiteNetLib;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -114,7 +115,7 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 PlayChargeAnimation(isLeftHand);
-                RPC(CmdStartCharge, isLeftHand);
+                RPC(CmdStartCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -135,7 +136,7 @@ namespace MultiplayerARPG
                 return;
             _manager.ActionAccepted();
             PlayChargeAnimation(isLeftHand);
-            RPC(RpcStartCharge, isLeftHand);
+            RPC(RpcStartCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
         }
 
         [AllRpc]
@@ -154,7 +155,7 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 StopChargeAnimation();
-                RPC(CmdStopCharge);
+                RPC(CmdStopCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -172,7 +173,7 @@ namespace MultiplayerARPG
         protected void ProceedCmdStopCharge()
         {
             StopChargeAnimation();
-            RPC(RpcStopCharge);
+            RPC(RpcStopCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
         }
 
         [AllRpc]

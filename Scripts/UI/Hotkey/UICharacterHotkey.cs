@@ -30,6 +30,21 @@ namespace MultiplayerARPG
         private int _usingGuildSkillLevel;
         private bool _channeledActionStarted;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            UICharacterHotkeys = null;
+            uiCharacterHotkeyAssigner = null;
+            uiCharacterSkill = null;
+            uiCharacterItem = null;
+            uiGuildSkill = null;
+            placeHolders.Nulling();
+            placeHolders = null;
+            _usingItem = null;
+            _usingSkill = null;
+            _usingGuildSkill = null;
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
@@ -141,7 +156,7 @@ namespace MultiplayerARPG
         {
             inventoryType = InventoryType.NonEquipItems;
             itemIndex = -1;
-            characterItem = null;
+            characterItem = CharacterItem.Empty;
             if (Data.type == HotkeyType.Item)
             {
                 int dataId = BaseGameData.MakeDataId(Data.relateId);
@@ -404,7 +419,7 @@ namespace MultiplayerARPG
         {
             if (IsChanneledAbility())
                 return;
-            if (BasePlayerCharacterController.Singleton != null && Data != null)
+            if (BasePlayerCharacterController.Singleton != null && !Data.IsEmpty())
                 BasePlayerCharacterController.Singleton.UseHotkey(Data.type, Data.relateId, aimPosition);
         }
 

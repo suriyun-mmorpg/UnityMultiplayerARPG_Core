@@ -26,6 +26,19 @@ namespace MultiplayerARPG
         public Image imageIcon;
         public RawImage rawImageExternalIcon;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiGachas = null;
+            uiTextTitle = null;
+            uiTextDescription = null;
+            uiTextSingleModeOpenPrice = null;
+            uiTextMultipleModeOpenPrice = null;
+            imageIcon = null;
+            rawImageExternalIcon = null;
+            _data = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextTitle != null)

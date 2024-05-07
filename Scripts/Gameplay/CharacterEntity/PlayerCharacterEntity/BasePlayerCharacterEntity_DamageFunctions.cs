@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -91,7 +92,7 @@ namespace MultiplayerARPG
             if (IsServer)
                 GameInstance.ServerLogHandlers.LogKilled(this, lastAttacker);
 
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
                 GameInstance.ServerCharacterHandlers.Respawn(0, this);
 #endif
@@ -259,7 +260,22 @@ namespace MultiplayerARPG
                             break;
                         case DeadDropItemMode.CorpseLooting:
                             if (removingItemInstances.Count > 0)
-                                ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                            {
+                                ItemsContainerEntity prefab;
+#if !EXCLUDE_PREFAB_REFS
+                                prefab = CurrentGameInstance.playerCorpsePrefab;
+#else
+                                prefab = null;
+#endif
+                                if (prefab != null)
+                                {
+                                    ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                                }
+                                else if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
+                                {
+                                    ItemsContainerEntity.DropItems(CurrentGameInstance.addressablePlayerCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                                }
+                            }
                             break;
                     }
                 }

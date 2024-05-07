@@ -225,7 +225,8 @@ namespace MultiplayerARPG
             EntityStart();
             if (onStart != null)
                 onStart.Invoke();
-            BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
+            if (BaseGameNetworkManager.Singleton != null)
+                BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
         }
         protected virtual void EntityStart() { }
 
@@ -234,10 +235,14 @@ namespace MultiplayerARPG
             for (int i = 0; i < EntityComponents.Length; ++i)
             {
                 EntityComponents[i].EntityOnDestroy();
+                EntityComponents[i].Clean();
+                EntityComponents[i] = null;
             }
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
-            BaseGameNetworkManager.Singleton.UnregisterGameEntity(this);
+            if (BaseGameNetworkManager.Singleton != null)
+                BaseGameNetworkManager.Singleton.UnregisterGameEntity(this);
+            Clean();
         }
         protected virtual void EntityOnDestroy()
         {
@@ -560,7 +565,7 @@ namespace MultiplayerARPG
 
         public virtual void CallCmdPerformHitRegValidation(HitRegisterData hitData)
         {
-            RPC(CmdPerformHitRegValidation, hitData);
+            RPC(CmdPerformHitRegValidation, STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, hitData);
         }
 
         [ServerRpc]

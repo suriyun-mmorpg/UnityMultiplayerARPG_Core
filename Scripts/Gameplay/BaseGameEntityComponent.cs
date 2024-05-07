@@ -5,18 +5,18 @@ namespace MultiplayerARPG
     public class BaseGameEntityComponent<T> : MonoBehaviour, IGameEntityComponent
         where T : BaseGameEntity
     {
-        private bool isFoundEntity;
-        private T cacheEntity;
+        private bool _isFoundEntity;
+        private T _cacheEntity;
         public T Entity
         {
             get
             {
-                if (!isFoundEntity)
+                if (!_isFoundEntity)
                 {
-                    cacheEntity = GetComponent<T>();
-                    isFoundEntity = cacheEntity != null;
+                    _cacheEntity = GetComponent<T>();
+                    _isFoundEntity = _cacheEntity != null;
                 }
-                return cacheEntity;
+                return _cacheEntity;
             }
         }
         [System.Obsolete("Keeping this for backward compatibility, use `Entity` instead.")]
@@ -27,16 +27,16 @@ namespace MultiplayerARPG
         public BaseGameNetworkManager CurrentGameManager { get { return Entity.CurrentGameManager; } }
         public Transform CacheTransform { get { return Entity.EntityTransform; } }
 
-        private bool isEnabled;
+        private bool _isEnabled;
         public bool Enabled
         {
-            get { return isEnabled; }
+            get { return _isEnabled; }
             set
             {
-                if (isEnabled == value)
+                if (_isEnabled == value)
                     return;
-                isEnabled = value;
-                if (isEnabled)
+                _isEnabled = value;
+                if (_isEnabled)
                     ComponentOnEnable();
                 else
                     ComponentOnDisable();
@@ -71,6 +71,11 @@ namespace MultiplayerARPG
 
         public virtual void ComponentOnDisable()
         {
+        }
+
+        public virtual void Clean()
+        {
+            _cacheEntity = null;
         }
     }
 }

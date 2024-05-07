@@ -1,5 +1,6 @@
 ﻿using Cysharp.Text;
 using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -12,22 +13,24 @@ namespace MultiplayerARPG
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public int Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
-        public BaseItem Item { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() : null; } }
-        public IUsableItem UsableItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetUsableItem() : null; } }
-        public IEquipmentItem EquipmentItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
-        public IArmorItem ArmorItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
-        public IShieldItem ShieldItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
-        public IDefendEquipmentItem DefendItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetDefendItem() : null; } }
-        public IWeaponItem WeaponItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
-        public IAmmoItem AmmoItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
-        public ISocketEnhancerItem SocketEnhancerItem { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
-        public IItemWithBuffData ItemWithBuffData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithBuffData : null; } }
-        public IItemWithBuildingEntity ItemWithBuildingEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithBuildingEntity : null; } }
-        public IItemWithMonsterCharacterEntity ItemWithMonsterEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithMonsterCharacterEntity : null; } }
-        public IItemWithVehicleEntity ItemWithVehicleEntity { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithVehicleEntity : null; } }
-        public IItemWithSkillData ItemWithSkillData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithSkillData : null; } }
-        public IItemWithAttributeData ItemWithAttributeData { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithAttributeData : null; } }
-        public IItemWithStatusEffectApplyings ItemWithStatusEffectApplyings { get { return CharacterItem != null && CharacterItem.NotEmptySlot() ? CharacterItem.GetItem() as IItemWithStatusEffectApplyings : null; } }
+        public BaseItem Item { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() : null; } }
+        public IUsableItem UsableItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetUsableItem() : null; } }
+        public IPotionItem PotionItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetPotionItem() : null; } }
+        public IBuildingItem BuildingItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetBuildingItem() : null; } }
+        public IEquipmentItem EquipmentItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetEquipmentItem() : null; } }
+        public IArmorItem ArmorItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetArmorItem() : null; } }
+        public IShieldItem ShieldItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetShieldItem() : null; } }
+        public IDefendEquipmentItem DefendItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetDefendItem() : null; } }
+        public IWeaponItem WeaponItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetWeaponItem() : null; } }
+        public IAmmoItem AmmoItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetAmmoItem() : null; } }
+        public ISocketEnhancerItem SocketEnhancerItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetSocketEnhancerItem() : null; } }
+        public IItemWithBuffData ItemWithBuffData { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithBuffData : null; } }
+        public IItemWithBuildingEntity ItemWithBuildingEntity { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithBuildingEntity : null; } }
+        public IItemWithMonsterCharacterEntity ItemWithMonsterEntity { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithMonsterCharacterEntity : null; } }
+        public IItemWithVehicleEntity ItemWithVehicleEntity { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithVehicleEntity : null; } }
+        public IItemWithSkillData ItemWithSkillData { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithSkillData : null; } }
+        public IItemWithAttributeData ItemWithAttributeData { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithAttributeData : null; } }
+        public IItemWithStatusEffectApplyings ItemWithStatusEffectApplyings { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() as IItemWithStatusEffectApplyings : null; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -233,6 +236,127 @@ namespace MultiplayerARPG
         public string EquipPosition { get; private set; }
         public byte EquipSlotIndex { get; private set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            uiTextRarity = null;
+            uiTextLevel = null;
+            imageIcon = null;
+            imageRarity = null;
+            uiTextItemType = null;
+            uiTextSellPrice = null;
+            uiTextStack = null;
+            uiTextDurability = null;
+            uiGageDurability = null;
+            uiTextWeight = null;
+            uiTextExp = null;
+            uiGageExp = null;
+            uiTextExpireDuration = null;
+            uiTextExpireTime = null;
+            uiTextLockRemainsDuration = null;
+            lockObjects.Nulling();
+            noLockObjects.Nulling();
+            uiRequirement = null;
+            uiIncreaseStats = null;
+            uiIncreaseStatsRate = null;
+            uiIncreaseAttributes = null;
+            uiIncreaseAttributesRate = null;
+            uiIncreaseResistances = null;
+            uiIncreaseArmors = null;
+            uiIncreaseArmorsRate = null;
+            uiIncreaseDamages = null;
+            uiIncreaseDamagesRate = null;
+            uiStatusEffectResistances = null;
+            uiIncreaseSkillLevels = null;
+            uiEquipmentSet = null;
+            uiEquipmentSockets = null;
+            uiItemRandomBonus = null;
+            uiRefineItem = null;
+            uiDismantleItem = null;
+            uiRepairItem = null;
+            uiArmorAmount = null;
+            uiDamageAmount = null;
+            uiTextCurrentAmmo = null;
+            uiTextReserveAmmo = null;
+            uiTextSumAmmo = null;
+            requireAmmoSymbols.Nulling();
+            noRequireAmmoSymbols.Nulling();
+            gageAmmo = null;
+            uiTextBuilding = null;
+            uiTextMonster = null;
+            uiTextVehicle = null;
+            uiBuff = null;
+            uiTextSkill = null;
+            uiSkill = null;
+            uiTextAttribute = null;
+            uiAttribute = null;
+            uiStatusEffectApplyingsSelfWhenAttacking = null;
+            uiStatusEffectApplyingsEnemyWhenAttacking = null;
+            uiStatusEffectApplyingsSelfWhenAttacked = null;
+            uiStatusEffectApplyingsEnemyWhenAttacked = null;
+            uiTextCoolDownDuration = null;
+            uiTextCoolDownRemainsDuration = null;
+            imageCoolDownGage = null;
+            countDownObjects.Nulling();
+            noCountDownObjects.Nulling();
+            onSetLevelZeroData?.RemoveAllListeners();
+            onSetLevelZeroData = null;
+            onSetNonLevelZeroData?.RemoveAllListeners();
+            onSetNonLevelZeroData = null;
+            onSetEquippedData?.RemoveAllListeners();
+            onSetEquippedData = null;
+            onSetUnEquippedData?.RemoveAllListeners();
+            onSetUnEquippedData = null;
+            onSetUnEquippableData?.RemoveAllListeners();
+            onSetUnEquippableData = null;
+            onSetUsableData?.RemoveAllListeners();
+            onSetUsableData = null;
+            onSetStorageItemData?.RemoveAllListeners();
+            onSetStorageItemData = null;
+            onSetItemsContainerItemData?.RemoveAllListeners();
+            onSetItemsContainerItemData = null;
+            onSetUnknowSourceData?.RemoveAllListeners();
+            onSetUnknowSourceData = null;
+            onNpcSellItemDialogAppear?.RemoveAllListeners();
+            onNpcSellItemDialogAppear = null;
+            onNpcSellItemDialogDisappear?.RemoveAllListeners();
+            onNpcSellItemDialogDisappear = null;
+            onRefineItemDialogAppear?.RemoveAllListeners();
+            onRefineItemDialogAppear = null;
+            onRefineItemDialogDisappear?.RemoveAllListeners();
+            onRefineItemDialogDisappear = null;
+            onDismantleItemDialogAppear?.RemoveAllListeners();
+            onDismantleItemDialogAppear = null;
+            onDismantleItemDialogDisappear?.RemoveAllListeners();
+            onDismantleItemDialogDisappear = null;
+            onRepairItemDialogAppear?.RemoveAllListeners();
+            onRepairItemDialogAppear = null;
+            onRepairItemDialogDisappear?.RemoveAllListeners();
+            onRepairItemDialogDisappear = null;
+            onEnhanceSocketItemDialogAppear?.RemoveAllListeners();
+            onEnhanceSocketItemDialogAppear = null;
+            onEnhanceSocketItemDialogDisappear?.RemoveAllListeners();
+            onEnhanceSocketItemDialogDisappear = null;
+            onStorageDialogAppear?.RemoveAllListeners();
+            onStorageDialogAppear = null;
+            onStorageDialogDisappear?.RemoveAllListeners();
+            onStorageDialogDisappear = null;
+            onEnterDealingState?.RemoveAllListeners();
+            onEnterDealingState = null;
+            onExitDealingState?.RemoveAllListeners();
+            onExitDealingState = null;
+            onStartVendingDialogAppear?.RemoveAllListeners();
+            onStartVendingDialogAppear = null;
+            onStartVendingDialogDisappear?.RemoveAllListeners();
+            onStartVendingDialogDisappear = null;
+            uiDragging = null;
+            uiNextLevelItem = null;
+            uiComparingEquipments.Nulling();
+            _randomBonus = null;
+        }
+
         public void SetupAsEquipSlot(string equipPosition, byte equipSlotIndex)
         {
             IsSetupAsEquipSlot = true;
@@ -288,7 +412,7 @@ namespace MultiplayerARPG
 
             if (uiTextExpireTime != null)
             {
-                if (CharacterItem != null && CharacterItem.expireTime > 0)
+                if (!CharacterItem.IsEmptySlot() && CharacterItem.expireTime > 0)
                 {
                     System.DateTime dateTime = GenericUtils.GetDateTimeBySeconds(CharacterItem.expireTime).ToLocalTime();
                     uiTextExpireTime.SetGameObjectActive(true);
@@ -305,7 +429,7 @@ namespace MultiplayerARPG
 
         private void UpdateLockRemainsDuration(float deltaTime)
         {
-            _lockRemainsDuration = CharacterItem != null ? CharacterItem.lockRemainsDuration : 0f;
+            _lockRemainsDuration = CharacterItem.lockRemainsDuration;
 
             if (_lockRemainsDuration > 0f)
             {
@@ -600,7 +724,7 @@ namespace MultiplayerARPG
                         CharacterItem.amount.ToString("N0"),
                         Item.MaxStack);
                 }
-                uiTextStack.SetGameObjectActive(CharacterItem.NotEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
+                uiTextStack.SetGameObjectActive(!CharacterItem.IsEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
                 uiTextStack.text = stackString;
             }
 
@@ -1084,14 +1208,15 @@ namespace MultiplayerARPG
 
             if (uiEquipmentSockets != null)
             {
-                if (EquipmentItem == null || EquipmentItem.MaxSocket <= 0)
+                int maxSocket = EquipmentItem?.AvailableSocketEnhancerTypes?.Length ?? 0;
+                if (maxSocket <= 0)
                 {
                     uiEquipmentSockets.Hide();
                 }
                 else
                 {
                     uiEquipmentSockets.Show();
-                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.Sockets, EquipmentItem.MaxSocket);
+                    uiEquipmentSockets.Data = new UIEquipmentSocketsData(CharacterItem.sockets, EquipmentItem.AvailableSocketEnhancerTypes);
                 }
             }
 
@@ -1175,8 +1300,9 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (ItemWithMonsterEntity != null && ItemWithMonsterEntity.MonsterCharacterEntity != null)
+            if (ItemWithMonsterEntity != null && (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid() || ItemWithMonsterEntity.MonsterCharacterEntity != null))
             {
+                // Item's EXP (pet's EXP)
                 int[] expTree = GameInstance.Singleton.ExpTree;
                 int currentExp = 0;
                 int nextLevelExp = 0;
@@ -1218,46 +1344,73 @@ namespace MultiplayerARPG
 
             if (uiTextBuilding != null)
             {
-                if (ItemWithBuildingEntity == null || ItemWithBuildingEntity.BuildingEntity == null)
+                if (ItemWithBuildingEntity == null || (!ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid() && ItemWithBuildingEntity.BuildingEntity == null))
                 {
                     uiTextBuilding.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextBuilding.SetGameObjectActive(true);
-                    uiTextBuilding.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyBuilding),
-                        ItemWithBuildingEntity.BuildingEntity.Title);
+                    if (ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid())
+                    {
+                        uiTextBuilding.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyBuilding),
+                            ItemWithBuildingEntity.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>().Title);
+                    }
+                    else if (ItemWithBuildingEntity.BuildingEntity != null)
+                    {
+                        uiTextBuilding.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyBuilding),
+                            ItemWithBuildingEntity.BuildingEntity.Title);
+                    }
                 }
             }
 
             if (uiTextMonster != null)
             {
-                if (ItemWithMonsterEntity == null || ItemWithMonsterEntity.MonsterCharacterEntity == null)
+                if (ItemWithMonsterEntity == null || (!ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid() && ItemWithMonsterEntity.MonsterCharacterEntity == null))
                 {
                     uiTextMonster.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextMonster.SetGameObjectActive(true);
-                    uiTextMonster.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyPet),
-                        ItemWithMonsterEntity.MonsterCharacterEntity.Title);
+                    if (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid())
+                    {
+                        uiTextMonster.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyPet),
+                            ItemWithMonsterEntity.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>().Title);
+                    }
+                    else if (ItemWithMonsterEntity.MonsterCharacterEntity != null)
+                    {
+                        uiTextMonster.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyPet),
+                            ItemWithMonsterEntity.MonsterCharacterEntity.Title);
+                    }
                 }
             }
 
             if (uiTextVehicle != null)
             {
-                if (ItemWithVehicleEntity == null || ItemWithVehicleEntity.VehicleEntity == null)
+                if (ItemWithVehicleEntity == null || (!ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid() && ItemWithVehicleEntity.VehicleEntity == null))
                 {
                     uiTextVehicle.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextVehicle.SetGameObjectActive(true);
-                    uiTextVehicle.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyMount),
-                        ItemWithVehicleEntity.VehicleEntity.Title);
+                    if (ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid())
+                    {
+                        uiTextVehicle.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            ItemWithVehicleEntity.AddressableVehicleEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>().Title);
+                    }
+                    else if (ItemWithVehicleEntity.VehicleEntity != null)
+                    {
+                        uiTextVehicle.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            ItemWithVehicleEntity.VehicleEntity.Title);
+                    }
                 }
             }
 

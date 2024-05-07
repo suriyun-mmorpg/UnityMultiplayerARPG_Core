@@ -76,6 +76,19 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextAllDamages = null;
+            uiTextSumDamage = null;
+            textDamages = null;
+            uiEntryPrefab = null;
+            uiListContainer = null;
+            _cacheTextDamages?.Clear();
+            _cacheList = null;
+            _data?.Clear();
+        }
+
         protected override void UpdateData()
         {
             string zeroFormatRate = 0f.ToString(numberFormatRate);

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -52,7 +53,10 @@ namespace MultiplayerARPG
         public float maxDurability;
         [Tooltip("If this is TRUE, your equipment will be destroyed when durability = 0")]
         public bool destroyIfBroken;
-        [Range(0, 6)]
+        [Tooltip("Its length is max amount of enhancement sockets")]
+        public SocketEnhancerType[] availableSocketEnhancerTypes = new SocketEnhancerType[0];
+        [System.Obsolete("Deprecated, will be removed later")]
+        [HideInInspector]
         public byte maxSocket;
 
         [Header("Armor/Shield Settings")]
@@ -61,6 +65,7 @@ namespace MultiplayerARPG
 
         [Header("Weapon Settings")]
         public WeaponType weaponType;
+        public bool doRecoilingAsAttackAnimation = false;
         public DamageIncremental damageAmount;
         public IncrementalMinMaxFloat harvestDamageAmount;
         [Range(0f, 1f)]
@@ -146,14 +151,35 @@ namespace MultiplayerARPG
         public AmmoType ammoType;
         public int overrideAmmoCapacity;
 
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox buildingEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(2, "Building Settings")]
         public BuildingEntity buildingEntity;
+#endif
+        public AssetReferenceBuildingEntity addressableBuildingEntity;
 
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox petEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(2, "Pet Settings")]
         public BaseMonsterCharacterEntity petEntity;
+#endif
+        public AssetReferenceBaseMonsterCharacterEntity addressablePetEntity;
 
-        [Category(3, "Mount Settings")]
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox mountEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Category(2, "Mount Settings")]
         public VehicleEntity mountEntity;
+#endif
+        public AssetReferenceVehicleEntity addressableMountEntity;
+
+        [Category(2, "Socket Enhancer Settings")]
+        public SocketEnhancerType socketEnhancerType = SocketEnhancerType.Type1;
 
         [Category("Buff/Bonus Settings")]
         // For socket enhancer items
@@ -308,9 +334,9 @@ namespace MultiplayerARPG
             get { return destroyIfBroken; }
         }
 
-        public byte MaxSocket
+        public SocketEnhancerType[] AvailableSocketEnhancerTypes
         {
-            get { return maxSocket; }
+            get { return availableSocketEnhancerTypes; }
         }
 
         public EquipmentModel[] EquipmentModels
@@ -427,6 +453,12 @@ namespace MultiplayerARPG
                     weaponType = GameInstance.Singleton.DefaultWeaponType;
                 return weaponType;
             }
+        }
+
+        public bool DoRecoilingAsAttackAnimation
+        {
+            get { return doRecoilingAsAttackAnimation; }
+            set { doRecoilingAsAttackAnimation = value; }
         }
 
         public EquipmentModel[] OffHandEquipmentModels
@@ -607,8 +639,20 @@ namespace MultiplayerARPG
         {
             get
             {
+#if !EXCLUDE_PREFAB_REFS
                 if (itemType == LegacyItemType.Building)
                     return buildingEntity;
+#endif
+                return null;
+            }
+        }
+
+        public AssetReferenceBuildingEntity AddressableBuildingEntity
+        {
+            get
+            {
+                if (itemType == LegacyItemType.Building)
+                    return addressableBuildingEntity;
                 return null;
             }
         }
@@ -617,8 +661,20 @@ namespace MultiplayerARPG
         {
             get
             {
+#if !EXCLUDE_PREFAB_REFS
                 if (itemType == LegacyItemType.Pet)
                     return petEntity;
+#endif
+                return null;
+            }
+        }
+
+        public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
+        {
+            get
+            {
+                if (itemType == LegacyItemType.Pet)
+                    return addressablePetEntity;
                 return null;
             }
         }
@@ -627,8 +683,20 @@ namespace MultiplayerARPG
         {
             get
             {
+#if !EXCLUDE_PREFAB_REFS
                 if (itemType == LegacyItemType.Mount)
                     return mountEntity;
+#endif
+                return null;
+            }
+        }
+
+        public AssetReferenceVehicleEntity AddressableVehicleEntity
+        {
+            get
+            {
+                if (itemType == LegacyItemType.Mount)
+                    return addressableMountEntity;
                 return null;
             }
         }
@@ -672,9 +740,14 @@ namespace MultiplayerARPG
                 return 0;
             }
         }
-        #endregion
+#endregion
 
         #region Implement ISocketEnhancerItem
+        public SocketEnhancerType SocketEnhancerType
+        {
+            get { return socketEnhancerType; }
+        }
+
         public EquipmentBonus SocketEnhanceEffect
         {
             get { return socketEnhanceEffect; }
@@ -720,6 +793,18 @@ namespace MultiplayerARPG
                 increaseSkillLevels = null;
                 hasChanges = true;
             }
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (maxSocket > 0)
+            {
+                availableSocketEnhancerTypes = new SocketEnhancerType[maxSocket];
+                for (byte i = 0; i < maxSocket; ++i)
+                {
+                    availableSocketEnhancerTypes[i] = SocketEnhancerType.Type1;
+                }
+                maxSocket = 0;
+                hasChanges = true;
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
             return hasChanges || base.Validate();
         }
 
@@ -759,9 +844,14 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddBuildingEntities(buildingEntity);
             GameInstance.AddCharacterEntities(petEntity);
             GameInstance.AddVehicleEntities(mountEntity);
+#endif
+            GameInstance.AddAssetReferenceBuildingEntities(addressableBuildingEntity);
+            GameInstance.AddAssetReferenceCharacterEntities(addressablePetEntity);
+            GameInstance.AddAssetReferenceVehicleEntities(addressableMountEntity);
             GameInstance.AddAttributes(increaseAttributes);
             GameInstance.AddAttributes(increaseAttributesRate);
             GameInstance.AddDamageElements(increaseResistances);
@@ -846,7 +936,7 @@ namespace MultiplayerARPG
             if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             character.FillEmptySlots();
-            character.ApplyBuff(DataId, BuffType.PotionBuff, level, character.GetInfo(), null);
+            character.ApplyBuff(DataId, BuffType.PotionBuff, level, character.GetInfo(), CharacterItem.Empty);
         }
 
         protected void UseItemPet(BaseCharacterEntity character, int itemIndex, int level, int exp)
@@ -875,7 +965,7 @@ namespace MultiplayerARPG
             if (!character.CanUseItem() || level <= 0)
                 return;
 
-            character.Mount(VehicleEntity);
+            character.Mount(VehicleEntity, AddressableVehicleEntity);
         }
 
         protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)
@@ -939,7 +1029,15 @@ namespace MultiplayerARPG
                 case LegacyItemType.Potion:
                     return default;
                 case LegacyItemType.Building:
-                    return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+                    if (BuildingEntity != null)
+                    {
+                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
+                    }
+                    else if (AddressableBuildingEntity.IsDataValid())
+                    {
+                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>());
+                    }
+                    return default;
                 case LegacyItemType.Pet:
                     return default;
                 case LegacyItemType.Mount:

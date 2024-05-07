@@ -5,13 +5,18 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class CurrencyDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
+    public partial class CurrencyDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
     {
         [System.Serializable]
         public struct CurrencyAppearanceSetting
         {
             public Currency currency;
             public GameObject[] activatingObjects;
+
+            public void Clean()
+            {
+                activatingObjects.Nulling();
+            }
         }
 
         protected Currency _currency;
@@ -103,8 +108,25 @@ namespace MultiplayerARPG
 
         public static CurrencyDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, Currency currency, int amount, IEnumerable<string> looters)
         {
-            CurrencyDropEntity entity = Drop(GameInstance.Singleton.currencyDropEntityPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
-            entity.Currency = currency;
+            CurrencyDropEntity entity = null;
+            CurrencyDropEntity prefab;
+#if !EXCLUDE_PREFAB_REFS
+            prefab = GameInstance.Singleton.currencyDropEntityPrefab;
+#else
+            prefab = null;
+#endif
+            if (prefab != null)
+            {
+                entity = Drop(prefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
+            }
+            else if (GameInstance.Singleton.addressableCurrencyDropEntityPrefab.IsDataValid())
+            {
+                entity = Drop(GameInstance.Singleton.addressableCurrencyDropEntityPrefab.GetOrLoadAsset<AssetReferenceCurrencyDropEntity, CurrencyDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
+            }
+            if (entity != null)
+            {
+                entity.Currency = currency;
+            }
             return entity;
         }
 

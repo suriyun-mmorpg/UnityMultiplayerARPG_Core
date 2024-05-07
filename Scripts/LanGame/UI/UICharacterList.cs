@@ -58,6 +58,38 @@ namespace MultiplayerARPG
         protected PlayerCharacterData _selectedPlayerCharacterData;
         public PlayerCharacterData SelectedPlayerCharacterData { get { return _selectedPlayerCharacterData; } }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiCharacterPrefab = null;
+            uiCharacterContainer = null;
+            characterModelContainer = null;
+            buttonStart = null;
+            buttonDelete = null;
+            selectedCharacterObjects.Nulling();
+            selectedCharacterObjects?.Clear();
+            eventOnNoCharacter?.RemoveAllListeners();
+            eventOnNoCharacter = null;
+            eventOnAbleToCreateCharacter?.RemoveAllListeners();
+            eventOnAbleToCreateCharacter = null;
+            eventOnNotAbleToCreateCharacter?.RemoveAllListeners();
+            eventOnNotAbleToCreateCharacter = null;
+            eventOnSelectCharacter?.RemoveAllListeners();
+            eventOnSelectCharacter = null;
+            eventOnBeforeUpdateAnimation?.RemoveAllListeners();
+            eventOnBeforeUpdateAnimation = null;
+            eventOnAfterUpdateAnimation?.RemoveAllListeners();
+            eventOnAfterUpdateAnimation = null;
+            eventOnShowInstantiatedCharacter?.RemoveAllListeners();
+            eventOnShowInstantiatedCharacter = null;
+            _characterList = null;
+            _characterSelectionManager = null;
+            _characterModelById?.Clear();
+            _selectedModel = null;
+            _playerCharacterDataById?.Clear();
+            _selectedPlayerCharacterData = null;
+        }
+
         protected virtual void LoadCharacters()
         {
             CharacterSelectionManager.Clear();
@@ -83,7 +115,7 @@ namespace MultiplayerARPG
             {
                 PlayerCharacterData selectableCharacter = selectableCharacters[i];
                 if (selectableCharacter == null ||
-                    !GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) ||
+                    (!GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) && !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId)) ||
                     !GameInstance.PlayerCharacters.ContainsKey(selectableCharacter.DataId))
                 {
                     // If invalid entity id or data id, remove from selectable character list
@@ -117,7 +149,7 @@ namespace MultiplayerARPG
                     if (characterModel != null)
                     {
                         _characterModelById[characterData.Id] = characterModel;
-                        PlayerCharacterBodyPartComponent[] comps = characterModel.GetComponentInParent<BaseCharacterEntity>().GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
+                        PlayerCharacterBodyPartComponent[] comps = characterModel.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
                         for (int i = 0; i < comps.Length; ++i)
                         {
                             comps[i].SetupCharacterModelEvents(characterModel);

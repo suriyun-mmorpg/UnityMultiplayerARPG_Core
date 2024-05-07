@@ -21,6 +21,19 @@ namespace MultiplayerARPG
         public GameObject[] canKickObjects;
         public GameObject[] canUseStorageObjects;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textRoleName = null;
+            textCanInvite = null;
+            textCanKick = null;
+            textCanUseStorage = null;
+            textShareExpPercentage = null;
+            canInviteObjects.Nulling();
+            canKickObjects.Nulling();
+            canUseStorageObjects.Nulling();
+        }
+
         protected override void UpdateData()
         {
             if (textRoleName != null)

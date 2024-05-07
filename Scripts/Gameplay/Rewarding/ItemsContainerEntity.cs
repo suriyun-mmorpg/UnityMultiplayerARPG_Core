@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class ItemsContainerEntity : BaseGameEntity, IActivatableEntity
+    public partial class ItemsContainerEntity : BaseGameEntity, IActivatableEntity
     {
         public const float GROUND_DETECTION_Y_OFFSETS = 3f;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         [Category("Events")]
         [FormerlySerializedAs("onItemsContainerDestroy")]
         [SerializeField]
-        protected UnityEvent onPickedUp;
+        protected UnityEvent onPickedUp = new UnityEvent();
 
         protected SyncFieldString _dropperTitle = new SyncFieldString();
         public SyncFieldString DropperTitle
@@ -50,9 +50,13 @@ namespace MultiplayerARPG
                 {
                     return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), DropperTitle.Value);
                 }
-                if (GameInstance.MonsterCharacterEntities.ContainsKey(_dropperEntityId.Value))
+                if (GameInstance.AddressableMonsterCharacterEntities.TryGetValue(_dropperEntityId.Value, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
                 {
-                    return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), GameInstance.MonsterCharacterEntities[_dropperEntityId.Value].EntityTitle);
+                    return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), addressablePrefab.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>().EntityTitle);
+                }
+                else if (GameInstance.MonsterCharacterEntities.TryGetValue(_dropperEntityId.Value, out BaseMonsterCharacterEntity prefab))
+                {
+                    return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), prefab.EntityTitle);
                 }
                 return base.EntityTitle;
             }

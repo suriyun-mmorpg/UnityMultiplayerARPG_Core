@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public class WarpPortalEntity : BaseGameEntity, IActivatableEntity
+    public partial class WarpPortalEntity : BaseGameEntity, IActivatableEntity
     {
         [Category(5, "Warp Portal Settings")]
         [SerializeField]

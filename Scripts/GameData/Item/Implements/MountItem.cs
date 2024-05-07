@@ -36,12 +36,31 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(3, "Mount Settings")]
         [SerializeField]
         private VehicleEntity mountEntity = null;
+#endif
         public VehicleEntity VehicleEntity
         {
-            get { return mountEntity; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return mountEntity;
+#else
+                return null;
+#endif
+            }
+        }
+
+        [SerializeField]
+        private AssetReferenceVehicleEntity addressableMountEntity = null;
+        public AssetReferenceVehicleEntity AddressableVehicleEntity
+        {
+            get { return addressableMountEntity; }
         }
 
         [SerializeField]
@@ -56,7 +75,7 @@ namespace MultiplayerARPG
             if (!characterEntity.CanUseItem() || characterItem.level <= 0)
                 return;
 
-            characterEntity.Mount(VehicleEntity);
+            characterEntity.Mount(VehicleEntity, AddressableVehicleEntity);
         }
 
         public bool HasCustomAimControls()
@@ -83,6 +102,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddVehicleEntities(VehicleEntity);
+            GameInstance.AddAssetReferenceVehicleEntities(AddressableVehicleEntity);
         }
     }
 }

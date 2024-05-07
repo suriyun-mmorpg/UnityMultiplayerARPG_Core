@@ -26,6 +26,18 @@ namespace MultiplayerARPG
         public TextWrapper uiTextSimpleRequireGold;
         public UnityEvent onGuildCreate = new UnityEvent();
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            inputFieldGuildName = null;
+            uiRequireItemAmounts = null;
+            uiRequireCurrencyAmounts = null;
+            uiTextRequireGold = null;
+            uiTextSimpleRequireGold = null;
+            onGuildCreate?.RemoveAllListeners();
+            onGuildCreate = null;
+        }
+
         protected virtual void OnEnable()
         {
             IPlayerCharacterData owningCharacter = GameInstance.PlayingCharacter;

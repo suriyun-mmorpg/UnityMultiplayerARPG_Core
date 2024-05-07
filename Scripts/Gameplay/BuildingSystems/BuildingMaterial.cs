@@ -120,6 +120,22 @@ namespace MultiplayerARPG
             }
         }
 
+        private void OnDestroy()
+        {
+            canBuildMaterials.Nulling();
+            cannotBuildMaterials.Nulling();
+            meshRenderer = null;
+            spriteRenderer = null;
+            tilemap = null;
+            extraMeshRenderers.Nulling();
+            extraSpriteRenderers.Nulling();
+            extraTilemaps.Nulling();
+            BuildingEntity = null;
+            CacheNavMeshObstacle = null;
+            _buildModeHandler = null;
+            _defaultMaterials.Nulling();
+        }
+
         private void PrepareDefaultExtraMeshRenderersValues()
         {
             if (extraMeshRenderers == null || extraMeshRenderers.Length == 0)

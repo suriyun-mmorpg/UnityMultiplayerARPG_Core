@@ -1,8 +1,10 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
+using System.Threading.Tasks;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -155,11 +157,12 @@ namespace MultiplayerARPG
         }
 
         protected readonly Dictionary<int, BaseCharacterModel> _characterModelByEntityId = new Dictionary<int, BaseCharacterModel>();
+        protected List<BasePlayerCharacterEntity> _addressablePlayerCharacterEntities = null;
         protected BaseCharacterModel _selectedModel;
         public BaseCharacterModel SelectedModel { get { return _selectedModel; } }
-        protected readonly Dictionary<int, PlayerCharacter[]> _playerCharacterDataByEntityId = new Dictionary<int, PlayerCharacter[]>();
-        protected PlayerCharacter[] _selectableCharacterClasses;
-        public PlayerCharacter[] SelectableCharacterClasses { get { return _selectableCharacterClasses; } }
+        protected readonly Dictionary<int, List<PlayerCharacter>> _playerCharacterDataByEntityId = new Dictionary<int, List<PlayerCharacter>>();
+        protected List<PlayerCharacter> _selectableCharacterClasses;
+        public List<PlayerCharacter> SelectableCharacterClasses { get { return _selectableCharacterClasses; } }
         protected PlayerCharacter _selectedPlayerCharacter;
         public PlayerCharacter SelectedPlayerCharacter { get { return _selectedPlayerCharacter; } }
         protected PlayerCharacterData _selectedPlayerCharacterData;
@@ -178,6 +181,57 @@ namespace MultiplayerARPG
         {
             base.Awake();
             MigrateInputComponent();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            characterModelContainer = null;
+            uiCharacterPrefab = null;
+            uiCharacterContainer = null;
+            uiCharacterClassPrefab = null;
+            uiCharacterClassContainer = null;
+            uiFactionPrefab = null;
+            uiFactionContainer = null;
+            uiInputCharacterName = null;
+            buttonCreate = null;
+            uiBodyPartManagers.Nulling();
+            uiBlendshapeManager = null;
+            eventOnCreateCharacter?.RemoveAllListeners();
+            eventOnCreateCharacter = null;
+            eventOnSelectCharacter?.RemoveAllListeners();
+            eventOnSelectCharacter = null;
+            eventOnSelectFaction?.RemoveAllListeners();
+            eventOnSelectFaction = null;
+            eventOnSelectCharacterClass?.RemoveAllListeners();
+            eventOnSelectCharacterClass = null;
+            eventOnBeforeUpdateAnimation?.RemoveAllListeners();
+            eventOnBeforeUpdateAnimation = null;
+            eventOnAfterUpdateAnimation?.RemoveAllListeners();
+            eventOnAfterUpdateAnimation = null;
+            eventOnShowInstantiatedCharacter?.RemoveAllListeners();
+            eventOnShowInstantiatedCharacter = null;
+            firstRaceToggle = null;
+            _raceToggles?.Clear();
+            _characterList = null;
+            _characterClassList = null;
+            _factionList = null;
+            _characterSelectionManager = null;
+            _characterClassSelectionManager = null;
+            _factionSelectionManager = null;
+            _characterModelByEntityId?.Clear();
+            _addressablePlayerCharacterEntities.Nulling();
+            _addressablePlayerCharacterEntities?.Clear();
+            _selectedModel = null;
+            _playerCharacterDataByEntityId?.Clear();
+            _selectableCharacterClasses.Nulling();
+            _selectedPlayerCharacter = null;
+            _selectedPlayerCharacterData = null;
+            SelectedRaces?.Clear();
+            _selectedFaction = null;
+            PublicBools?.Clear();
+            PublicInts?.Clear();
+            PublicFloats?.Clear();
         }
 
 #if UNITY_EDITOR
@@ -205,12 +259,35 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        protected virtual List<BasePlayerCharacterEntity> GetCreatableCharacters()
+        protected virtual async Task<List<BasePlayerCharacterEntity>> GetCreatableCharacters()
         {
-            if (RaceToggles.Count == 0)
-                return GameInstance.PlayerCharacterEntities.Values.ToList();
-            else
-                return GameInstance.PlayerCharacterEntities.Values.Where((o) => SelectedRaces.Contains(o.Race)).ToList();
+            if (_addressablePlayerCharacterEntities == null)
+            {
+                _addressablePlayerCharacterEntities = new List<BasePlayerCharacterEntity>();
+                if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
+                {
+                    List<Task<BaseCharacterEntity>> loadTasks = new List<Task<BaseCharacterEntity>>();
+                    foreach (AssetReferenceBasePlayerCharacterEntity entry in GameInstance.AddressablePlayerCharacterEntities.Values)
+                    {
+                        loadTasks.Add(entry.GetOrLoadAssetAsync<AssetReferenceBasePlayerCharacterEntity, BaseCharacterEntity>());
+                    }
+                    await Task.WhenAll(loadTasks);
+                    for (int i = 0; i < loadTasks.Count; ++i)
+                    {
+                        _addressablePlayerCharacterEntities.Add(loadTasks[i].Result as BasePlayerCharacterEntity);
+                    }
+                }
+            }
+            List<BasePlayerCharacterEntity> tempPlayerCharacterEntities = new List<BasePlayerCharacterEntity>(GameInstance.PlayerCharacterEntities.Values);
+            for (int i = 0; i < _addressablePlayerCharacterEntities.Count; ++i)
+            {
+                tempPlayerCharacterEntities.Add(_addressablePlayerCharacterEntities[i]);
+            }
+            if (RaceToggles.Count > 0)
+            {
+                tempPlayerCharacterEntities = new List<BasePlayerCharacterEntity>(tempPlayerCharacterEntities.Where(o => SelectedRaces.Contains(o.Race)));
+            }
+            return tempPlayerCharacterEntities;
         }
 
         protected virtual List<Faction> GetSelectableFactions()
@@ -218,7 +295,7 @@ namespace MultiplayerARPG
             return GameInstance.Factions.Values.Where(o => !o.IsLocked).ToList();
         }
 
-        protected virtual void LoadCharacters()
+        protected virtual async void LoadCharacters()
         {
             // Remove all models
             characterModelContainer.RemoveChildren();
@@ -230,10 +307,10 @@ namespace MultiplayerARPG
             CharacterList.HideAll();
             // Show list of characters that can be created
             PlayerCharacterData firstData = null;
-            CharacterList.Generate(GetCreatableCharacters(), (index, characterEntity, ui) =>
+            CharacterList.Generate(await GetCreatableCharacters(), (index, characterEntity, ui) =>
             {
                 // Cache player character to dictionary, we will use it later
-                _playerCharacterDataByEntityId[characterEntity.EntityId] = characterEntity.CharacterDatabases;
+                _playerCharacterDataByEntityId[characterEntity.EntityId] = new List<PlayerCharacter>(characterEntity.CharacterDatabases);
                 // Prepare data
                 BaseCharacter playerCharacter = characterEntity.CharacterDatabases[0];
                 PlayerCharacterData playerCharacterData = new PlayerCharacterData();
@@ -255,9 +332,13 @@ namespace MultiplayerARPG
             });
             // Select first entry
             if (CharacterSelectionManager.Count > 0)
+            {
                 CharacterSelectionManager.Select(0);
+            }
             else
-                OnSelectCharacter(firstData);
+            {
+                SetSelectCharacter(firstData);
+            }
         }
 
         protected virtual void LoadFactions()
@@ -281,9 +362,13 @@ namespace MultiplayerARPG
             });
             // Select first entry
             if (FactionSelectionManager.Count > 0)
+            {
                 FactionSelectionManager.Select(0);
+            }
             else
-                OnSelectFaction(firstData);
+            {
+                SetSelectFaction(firstData);
+            }
         }
 
         protected virtual void OnEnable()
@@ -339,8 +424,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacter(UICharacter uiCharacter)
         {
-            // Set data
-            _selectedPlayerCharacterData = uiCharacter.Data as PlayerCharacterData;
+            SetSelectCharacter(uiCharacter.Data as PlayerCharacterData);
+        }
+
+        protected void SetSelectCharacter(PlayerCharacterData playerCharacterData)
+        {
+            _selectedPlayerCharacterData = playerCharacterData;
             SelectedDataId = _selectedPlayerCharacterData.DataId;
             SelectedEntityId = _selectedPlayerCharacterData.EntityId;
             PublicBools.Clear();
@@ -389,9 +478,13 @@ namespace MultiplayerARPG
             });
             // Select first entry
             if (CharacterClassSelectionManager.Count > 0)
+            {
                 CharacterClassSelectionManager.Select(0);
+            }
             else
-                OnSelectCharacterClass(firstData);
+            {
+                SetSelectCharacterClass(firstData);
+            }
         }
 
         protected virtual void OnSelectCharacter(IPlayerCharacterData playerCharacterData)
@@ -401,8 +494,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterClass(UICharacterClass uiCharacterClass)
         {
-            // Set data
-            _selectedPlayerCharacter = uiCharacterClass.Data as PlayerCharacter;
+            SetSelectCharacterClass(uiCharacterClass.Data as PlayerCharacter);
+        }
+
+        protected void SetSelectCharacterClass(PlayerCharacter playerCharacter)
+        {
+            _selectedPlayerCharacter = playerCharacter;
             if (SelectedPlayerCharacter != null)
             {
                 // Set creating player character data
@@ -431,7 +528,7 @@ namespace MultiplayerARPG
             }
             // Run event
             eventOnSelectCharacterClass.Invoke(_selectedPlayerCharacter);
-            OnSelectCharacterClass(uiCharacterClass.Data);
+            OnSelectCharacterClass(_selectedPlayerCharacter);
         }
 
         protected virtual void OnSelectCharacterClass(BaseCharacter baseCharacter)
@@ -441,8 +538,12 @@ namespace MultiplayerARPG
 
         protected void OnSelectFaction(UIFaction uiFaction)
         {
-            // Set data
-            _selectedFaction = uiFaction.Data;
+            SetSelectFaction(uiFaction.Data);
+        }
+
+        protected void SetSelectFaction(Faction faction)
+        {
+            _selectedFaction = faction;
             if (SelectedFaction != null)
             {
                 // Set creating player character's faction

@@ -15,6 +15,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public UICharacterItems uiAppliedSocketEnhancerItems;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiAppliedSocketEnhancerItems = null;
+        }
+
         protected override void UpdateData()
         {
             List<CharacterItem> appliedSocketEnhancerItems = new List<CharacterItem>();
@@ -23,7 +29,7 @@ namespace MultiplayerARPG
             {
                 BaseItem tempItem;
                 string tempText;
-                for (int i = 0; i < Data.maxSocket; ++i)
+                for (int i = 0; i < Data.availableSocketEnhancerTypes.Length; ++i)
                 {
                     if (i < Data.sockets.Count && GameInstance.Items.TryGetValue(Data.sockets[i], out tempItem) && tempItem.IsSocketEnhancer())
                     {

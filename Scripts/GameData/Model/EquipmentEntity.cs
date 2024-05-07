@@ -34,8 +34,9 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             if (MigrateMaterials())
                 EditorUtility.SetDirty(this);
         }
@@ -91,7 +92,7 @@ namespace MultiplayerARPG
 
         public override void OnItemChanged(CharacterItem item)
         {
-            int level = item?.level ?? 1;
+            int level = item.level;
             if (_allEffectObjects != null && _allEffectObjects.Count > 0)
             {
                 foreach (GameObject allEffectObject in _allEffectObjects)

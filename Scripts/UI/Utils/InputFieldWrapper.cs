@@ -263,12 +263,19 @@ public class InputFieldWrapper : MonoBehaviour
         }
     }
 
-    void Awake()
+    private void Awake()
     {
         if (unityInputField == null) unityInputField = GetComponent<InputField>();
         if (textMeshInputField == null) textMeshInputField = GetComponent<TMP_InputField>();
         if (_textValue != null)
             text = _textValue;
+    }
+
+    private void OnDestroy()
+    {
+        unityInputField = null;
+        textMeshInputField = null;
+        _textValue = null;
     }
 
     public void SetGameObjectActive(bool isActive)

@@ -30,12 +30,19 @@ namespace MultiplayerARPG
         [Tooltip("Delay before character change from grounded state to airborne")]
         public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
+
+        [Header("Pausing")]
         public float landedPauseMovementDuration = 0f;
         public float beforeCrawlingPauseMovementDuration = 0f;
         public float afterCrawlingPauseMovementDuration = 0f;
+
+        [Header("Swimming")]
         [Range(0.1f, 1f)]
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
+
+        [Header("Dashing")]
+        public EntityMovementForceApplier dashingForceApplier;
 
         [Header("Root Motion Settings")]
         public bool alwaysUseRootMotion;
@@ -77,6 +84,7 @@ namespace MultiplayerARPG
 
         // Input codes
         private bool _isJumping;
+        private bool _isDashing;
         private Vector3 _inputDirection;
         private MovementState _tempMovementState;
         private ExtraMovementState _tempExtraMovementState;
@@ -85,6 +93,7 @@ namespace MultiplayerARPG
         private EntityMovementInput _oldInput;
         private EntityMovementInput _currentInput;
         private bool _sendingJump;
+        private bool _sendingDash;
 
         // State simulate codes
         private float? _lagMoveSpeedRate;
@@ -94,22 +103,25 @@ namespace MultiplayerARPG
         private Transform _groundedTransform;
         private Vector3 _previousPlatformPosition;
         private Vector3 _previousPosition;
+        private Vector3 _previousMovement;
         private bool _isGrounded = true;
+        private bool _isAirborne = false;
         private bool _isUnderWater = false;
-        private bool _previouslyGrounded;
-        private bool _previouslyAirborne;
+        private bool _previouslyGrounded = false;
+        private bool _previouslyAirborne = false;
         private bool _simulatingKeyMovement = false;
         private ExtraMovementState _previouslyExtraMovementState;
 
         // Move simulate codes
         private float _pauseMovementCountDown;
         private Vector3 _moveDirection;
+        private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
 
         // Jump simulate codes
         private float _airborneElapsed;
-        private ExtraMovementState _extraMovementStateWhenJump;
         private bool _applyingJumpForce;
         private float _applyJumpForceCountDown;
+        private ExtraMovementState _extraMovementStateWhenJump;
 
         // Turn simulate codes
         private bool _lookRotationApplied;
@@ -125,8 +137,8 @@ namespace MultiplayerARPG
 
         // Peers accept codes
         private bool _acceptedJump;
+        private bool _acceptedDash;
         private long _acceptedPositionTimestamp;
-        private ExtraMovementState _acceptedExtraMovementStateWhenJump;
 
         // Server validate codes
         private float _lastServerValidateHorDistDiff;
@@ -216,6 +228,8 @@ namespace MultiplayerARPG
                     NavPaths = null;
                 if (!_isJumping && !_applyingJumpForce)
                     _isJumping = _isGrounded && _tempMovementState.Has(MovementState.IsJump);
+                if (!_isDashing)
+                    _isDashing = _isGrounded && _tempMovementState.Has(MovementState.IsDash);
             }
         }
 
@@ -285,6 +299,26 @@ namespace MultiplayerARPG
             return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
         }
 
+        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        {
+            if (!IsServer)
+                return;
+            if (mode.IsReplaceMovement())
+            {
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+            }
+            _movementForceAppliers.Add(new EntityMovementForceApplier()
+                .Apply(direction, mode, force, deceleration, duration));
+        }
+
+        public void ClearAllForces()
+        {
+            if (!IsServer)
+                return;
+            _movementForceAppliers.Clear();
+        }
+
         public bool WaterCheck(Collider waterCollider)
         {
             if (waterCollider == null)
@@ -323,7 +357,7 @@ namespace MultiplayerARPG
             _isGrounded = EntityMovement.GroundCheck();
 
             bool forceUseRootMotion = alwaysUseRootMotion || Entity.ShouldUseRootMotion;
-            bool isAirborne = !_isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
+            _isAirborne = !_isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
 
             // Update airborne elasped
             if (_isGrounded)
@@ -335,6 +369,7 @@ namespace MultiplayerARPG
             if (_isUnderWater)
                 _tempMovementState |= MovementState.IsUnderWater;
 
+            tempTargetPosition = tempCurrentPosition;
             if (HasNavPaths)
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
@@ -370,8 +405,8 @@ namespace MultiplayerARPG
             }
             else
             {
-                tempTargetPosition = tempCurrentPosition;
-                StopMove();
+                if (_previousMovement.sqrMagnitude <= 0f)
+                    StopMove();
                 ApplyRemoteTurnAngle();
             }
 
@@ -390,7 +425,14 @@ namespace MultiplayerARPG
             }
 
             if (!Entity.CanJump())
+            {
                 _isJumping = false;
+            }
+
+            if (!Entity.CanDash())
+            {
+                _isDashing = false;
+            }
 
             // Prepare movement speed
             _tempExtraMovementState = Entity.ValidateExtraMovementState(_tempMovementState, _tempExtraMovementState);
@@ -453,11 +495,42 @@ namespace MultiplayerARPG
                     Entity.OnJumpForceApplied(jumpForceVerticalVelocity);
                 }
             }
+
             // Updating horizontal movement (WASD inputs)
-            if (!isAirborne)
+            if (!_isAirborne)
                 _velocityBeforeAirborne = Vector3.zero;
+
+            // Dashing
+            if (_acceptedDash || (_pauseMovementCountDown <= 0f && _isGrounded && _isDashing))
+            {
+                _sendingDash = true;
+                dashingForceApplier.Apply(CacheTransform.forward);
+                dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+                _movementForceAppliers.Add(dashingForceApplier);
+            }
+
+            // Apply Forces
+            _movementForceAppliers.UpdateForces(deltaTime,
+                Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
+                out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
+
+            // Replace player's movement by this
+            if (replaceMovementForceApplier != null)
+            {
+                // Still dashing to add dash to movement state
+                if (replaceMovementForceApplier.Mode == ApplyMovementForceMode.Dash)
+                    _tempMovementState |= MovementState.IsDash;
+                // Force turn to dashed direction
+                _moveDirection = replaceMovementForceApplier.Direction;
+                _targetYAngle = Quaternion.LookRotation(_moveDirection).eulerAngles.y;
+                // Change move speed to dash force
+                tempMaxMoveSpeed = replaceMovementForceApplier.CurrentSpeed;
+            }
+
             // Movement updating
-            if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > 0f && (!isAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
+            if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > 0f && (!_isAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
             {
                 // Calculate only horizontal move direction
                 tempHorizontalMoveDirection = _moveDirection;
@@ -499,6 +572,7 @@ namespace MultiplayerARPG
                     _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
                 }
             }
+
             // Pause movement updating
             if (IsOwnerClientOrOwnedByServer)
             {
@@ -525,8 +599,9 @@ namespace MultiplayerARPG
                     _tempMovementState ^= MovementState.Forward | MovementState.Backward | MovementState.Left | MovementState.Right;
                 }
             }
+
             // Move by velocity before jump
-            if ((isAirborne || _airborneElapsed > 0f) && doNotChangeVelocityWhileAirborne)
+            if ((_isAirborne || _airborneElapsed > 0f) && doNotChangeVelocityWhileAirborne)
                 tempMoveVelocity = _velocityBeforeAirborne;
             // Updating vertical movement (Fall, WASD inputs under water)
             if (_isUnderWater)
@@ -545,19 +620,22 @@ namespace MultiplayerARPG
                     tempTargetDistance = Vector3.Distance(tempTargetPosition, tempCurrentPosition);
                     tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;
                     tempPredictPosition = tempCurrentPosition + (Vector3.up * _moveDirection.y * CurrentMoveSpeed * deltaTime);
-                    tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
-                    // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
-                    // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
-                    // rigidbody will reaching target and character is moving pass it,
-                    // so adjust move speed by distance and time (with physic formula: v=s/t)
-                    if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
-                        CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
-                    if (CurrentMoveSpeed < 0.01f || tempTargetDistance <= 0f)
+                    if (_moveDirection.y > 0f)
                     {
-                        CurrentMoveSpeed = 0f;
-                        // Force set move direction y to 0 to prevent swim move animation playing
-                        if (autoSwimToSurface || _tempMovementState.Has(MovementState.Up))
-                            _moveDirection.y = 0f;
+                        tempPredictSqrMagnitude = (tempPredictPosition - tempCurrentPosition).sqrMagnitude;
+                        // Check `tempSqrMagnitude` against the `tempPredictSqrMagnitude`
+                        // if `tempPredictSqrMagnitude` is greater than `tempSqrMagnitude`,
+                        // rigidbody will reaching target and character is moving pass it,
+                        // so adjust move speed by distance and time (with physic formula: v=s/t)
+                        if (tempPredictSqrMagnitude >= tempSqrMagnitude && tempTargetDistance > 0f)
+                            CurrentMoveSpeed *= tempTargetDistance / deltaTime / CurrentMoveSpeed;
+                        if (CurrentMoveSpeed < 0.01f || tempTargetDistance <= 0f)
+                        {
+                            CurrentMoveSpeed = 0f;
+                            // Force set move direction y to 0 to prevent swim move animation playing
+                            if (autoSwimToSurface || _tempMovementState.Has(MovementState.Up))
+                                _moveDirection.y = 0f;
+                        }
                     }
                     tempMoveVelocity.y = _moveDirection.y * CurrentMoveSpeed;
                     if (!HasNavPaths)
@@ -572,8 +650,8 @@ namespace MultiplayerARPG
 
             // Don't applies velocity while using root motion
             if ((_isGrounded && (forceUseRootMotion || useRootMotionForMovement)) ||
-                (isAirborne && (forceUseRootMotion || useRootMotionForAirMovement)) ||
-                (!_isGrounded && !isAirborne && (forceUseRootMotion || useRootMotionForMovement)) ||
+                (_isAirborne && (forceUseRootMotion || useRootMotionForAirMovement)) ||
+                (!_isGrounded && !_isAirborne && (forceUseRootMotion || useRootMotionForMovement)) ||
                 (_isUnderWater && (forceUseRootMotion || useRootMotionUnderWater)))
             {
                 tempMoveVelocity.x = 0;
@@ -591,13 +669,9 @@ namespace MultiplayerARPG
                 }
             }
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
-            EntityMovement.Move((tempMoveVelocity + platformMotion + stickGroundMotion) * deltaTime);
-            _currentInput = Entity.SetInputRotation(_currentInput, CacheTransform.rotation);
-            _isJumping = false;
-            _acceptedJump = false;
-            _previouslyGrounded = _isGrounded;
-            _previouslyAirborne = isAirborne;
-            _previousPosition = CacheTransform.position;
+            _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion + forceMotion) * deltaTime;
+            EntityMovement.Move(_previousMovement);
+            _currentInput = Entity.SetInputYAngle(_currentInput, CacheTransform.eulerAngles.y);
         }
 
         public void UpdateRotation(float deltaTime)
@@ -624,10 +698,17 @@ namespace MultiplayerARPG
                 MovementState = _tempMovementState;
                 // Update extra movement state
                 ExtraMovementState = Entity.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
-                if (_sendingJump)
+                if (_isJumping || _isAirborne)
                     ExtraMovementState = _extraMovementStateWhenJump;
             }
+            _previouslyGrounded = _isGrounded;
+            _previouslyAirborne = _isAirborne;
+            _previousPosition = CacheTransform.position;
             _previouslyExtraMovementState = ExtraMovementState;
+            _isJumping = false;
+            _acceptedJump = false;
+            _isDashing = false;
+            _acceptedDash = false;
         }
 
         public void FixSwimUpPosition(float deltaTime)
@@ -635,10 +716,10 @@ namespace MultiplayerARPG
             if (!CanPredictMovement())
                 return;
 
-            if (!_isGrounded && _isUnderWater)
+            if (!_isGrounded && _isUnderWater && _previousMovement.y > 0f)
             {
                 Vector3 tempTargetPosition = Vector3.up * TargetWaterSurfaceY(_waterCollider);
-                if (Mathf.Abs(CacheTransform.position.y - tempTargetPosition.y) <= 0.02f)
+                if (Mathf.Abs(CacheTransform.position.y - tempTargetPosition.y) < 0.05f)
                     CacheTransform.position = new Vector3(CacheTransform.position.x, tempTargetPosition.y, CacheTransform.position.z);
             }
         }
@@ -752,6 +833,15 @@ namespace MultiplayerARPG
                 {
                     MovementState &= ~MovementState.IsJump;
                 }
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsDash;
+                }
+                else
+                {
+                    MovementState &= ~MovementState.IsDash;
+                }
                 if (_isClientConfirmingTeleport)
                 {
                     shouldSendReliably = true;
@@ -759,6 +849,7 @@ namespace MultiplayerARPG
                 }
                 Entity.ClientWriteSyncTransform3D(writer);
                 _sendingJump = false;
+                _sendingDash = false;
                 _isClientConfirmingTeleport = false;
                 return true;
             }
@@ -773,6 +864,15 @@ namespace MultiplayerARPG
                 else
                 {
                     _currentInput = Entity.ClearInputJump(_currentInput);
+                }
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    _currentInput = Entity.SetInputDash(_currentInput);
+                }
+                else
+                {
+                    _currentInput = Entity.ClearInputDash(_currentInput);
                 }
                 if (_isClientConfirmingTeleport)
                 {
@@ -791,8 +891,9 @@ namespace MultiplayerARPG
                         // Stop should be reliably
                         shouldSendReliably = true;
                     }
-                    Entity.ClientWriteMovementInput3D(writer, inputState, _currentInput.MovementState, _currentInput.ExtraMovementState, _currentInput.Position, _currentInput.Rotation);
+                    Entity.ClientWriteMovementInput3D(writer, inputState, _currentInput);
                     _sendingJump = false;
+                    _sendingDash = false;
                     _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
@@ -815,6 +916,15 @@ namespace MultiplayerARPG
             {
                 MovementState &= ~MovementState.IsJump;
             }
+            if (_sendingDash)
+            {
+                shouldSendReliably = true;
+                MovementState |= MovementState.IsDash;
+            }
+            else
+            {
+                MovementState &= ~MovementState.IsDash;
+            }
             if (_isTeleporting)
             {
                 shouldSendReliably = true;
@@ -827,8 +937,9 @@ namespace MultiplayerARPG
             {
                 MovementState &= ~MovementState.IsTeleport;
             }
-            Entity.ServerWriteSyncTransform3D(writer);
+            Entity.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
             _sendingJump = false;
+            _sendingDash = false;
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
             return true;
@@ -854,7 +965,9 @@ namespace MultiplayerARPG
                 // Don't read and apply transform, because it was done at server
                 return;
             }
-            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            reader.ClientReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers);
+            _movementForceAppliers.Clear();
+            _movementForceAppliers.AddRange(movementForceAppliers);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
@@ -892,7 +1005,14 @@ namespace MultiplayerARPG
                 _acceptedPositionTimestamp = peerTimestamp;
             }
             if (!IsOwnerClient && movementState.Has(MovementState.IsJump))
+            {
                 _acceptedJump = true;
+            }
+            if (!IsOwnerClient && movementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+                TurnImmediately(yAngle);
+            }
         }
 
         public void ReadMovementInputAtServer(long peerTimestamp, NetDataReader reader)
@@ -907,8 +1027,8 @@ namespace MultiplayerARPG
                 // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
             }
-            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
-            if (movementState.Has(MovementState.IsTeleport))
+            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
+            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
                 _isServerWaitingTeleportConfirm = false;
@@ -934,21 +1054,29 @@ namespace MultiplayerARPG
                 long lagDeltaTime = Entity.Player.Rtt;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
-                _tempMovementState = movementState;
-                _tempExtraMovementState = extraMovementState;
+                _tempMovementState = entityMovementInput.MovementState;
+                _tempExtraMovementState = entityMovementInput.ExtraMovementState;
                 _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
                 if (inputState.Has(EntityMovementInputState.PositionChanged))
                 {
-                    if (!UseRootMotion() || movementState.HasDirectionMovement())
-                        SetMovePaths(position, !_simulatingKeyMovement);
+                    if (!UseRootMotion() || entityMovementInput.MovementState.HasDirectionMovement())
+                        SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
                 }
                 if (inputState.Has(EntityMovementInputState.RotationChanged))
                 {
-                    RemoteTurnSimulation(_simulatingKeyMovement, yAngle, unityDeltaTime);
+                    RemoteTurnSimulation(_simulatingKeyMovement, entityMovementInput.YAngle, unityDeltaTime);
                 }
-                if (movementState.Has(MovementState.IsJump))
+                if (entityMovementInput.MovementState.Has(MovementState.IsJump))
                 {
                     _acceptedJump = true;
+                }
+                if (entityMovementInput.MovementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
+                    if (_remoteTargetYAngle.HasValue)
+                        TurnImmediately(_remoteTargetYAngle.Value);
+                    else
+                        TurnImmediately(_targetYAngle);
                 }
                 if (inputState.Has(EntityMovementInputState.IsStopped))
                 {
@@ -983,7 +1111,7 @@ namespace MultiplayerARPG
                 // Movement handling at server, so don't read sync transform from client
                 return;
             }
-            reader.ReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            reader.ServerReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -1008,11 +1136,6 @@ namespace MultiplayerARPG
                 // Prepare movement state
                 MovementState = _tempMovementState = movementState;
                 ExtraMovementState = _tempExtraMovementState = extraMovementState;
-                if (movementState.Has(MovementState.IsJump))
-                {
-                    _acceptedExtraMovementStateWhenJump = ExtraMovementState;
-                    _acceptedJump = true;
-                }
                 // Skip simulation because while playing root motion animation it will also move charcter by root motion at server too, can determined that it is simulated
                 if (!IsClient)
                 {
@@ -1071,6 +1194,15 @@ namespace MultiplayerARPG
                     }
                     RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                 }
+                if (movementState.Has(MovementState.IsJump))
+                {
+                    _acceptedJump = true;
+                }
+                if (movementState.Has(MovementState.IsDash))
+                {
+                    _acceptedDash = true;
+                    TurnImmediately(yAngle);
+                }
                 _acceptedPositionTimestamp = peerTimestamp;
             }
         }
@@ -1083,8 +1215,7 @@ namespace MultiplayerARPG
             _verticalVelocity = 0;
             CacheTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
-            _yAngle = _targetYAngle = yAngle;
-            RotateY();
+            TurnImmediately(yAngle);
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
@@ -1110,8 +1241,7 @@ namespace MultiplayerARPG
                 if (isKeyMovement)
                 {
                     // Turn to target immediately
-                    _yAngle = _targetYAngle = yAngle;
-                    RotateY();
+                    TurnImmediately(yAngle);
                 }
                 else
                 {
@@ -1124,13 +1254,18 @@ namespace MultiplayerARPG
             if (!IsClient)
             {
                 // Turn to target immediately
-                _yAngle = _targetYAngle = yAngle;
-                RotateY();
+                TurnImmediately(yAngle);
                 return;
             }
             // Will turn smoothly later
             _targetYAngle = yAngle;
             _yTurnSpeed = 1f / deltaTime;
+        }
+
+        public void TurnImmediately(float yAngle)
+        {
+            _yAngle = _targetYAngle = yAngle;
+            RotateY();
         }
 
         public void ApplyRemoteTurnAngle()

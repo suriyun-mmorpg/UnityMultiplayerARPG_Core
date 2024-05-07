@@ -18,13 +18,21 @@ namespace MultiplayerARPG
         public TextWrapper uiTextLevel;
         public DropdownWrapper dropdownRoles;
 
-        private string characterId;
+        private string _characterId;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextName = null;
+            uiTextLevel = null;
+            dropdownRoles = null;
+        }
 
         public void Show(GuildRoleData[] roles, SocialCharacterData member, byte guildRole)
         {
             base.Show();
 
-            characterId = member.id;
+            _characterId = member.id;
 
             if (uiTextName != null)
             {
@@ -64,7 +72,7 @@ namespace MultiplayerARPG
             GameInstance.ClientGuildHandlers.RequestChangeMemberGuildRole(new RequestChangeMemberGuildRoleMessage()
             {
                 guildRole = (byte)dropdownRoles.value,
-                memberId = characterId,
+                memberId = _characterId,
             }, ChangeMemberGuildRoleCallback);
         }
 

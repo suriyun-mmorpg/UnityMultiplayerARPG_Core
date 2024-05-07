@@ -6,12 +6,12 @@ namespace MultiplayerARPG
 {
     public partial class DefaultServerUserHandlers : MonoBehaviour, IServerUserHandlers
     {
-        public static readonly ConcurrentDictionary<long, IPlayerCharacterData> PlayerCharacters = new ConcurrentDictionary<long, IPlayerCharacterData>(PlatformUtils.ProcessorCount, 1024);
-        public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersById = new ConcurrentDictionary<string, IPlayerCharacterData>(PlatformUtils.ProcessorCount, 1024);
-        public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersByUserId = new ConcurrentDictionary<string, IPlayerCharacterData>(PlatformUtils.ProcessorCount, 1024);
-        public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersByName = new ConcurrentDictionary<string, IPlayerCharacterData>(PlatformUtils.ProcessorCount, 1024);
-        public static readonly ConcurrentDictionary<string, long> PlayerCharacterConnectionIds = new ConcurrentDictionary<string, long>(PlatformUtils.ProcessorCount, 1024);
-        public static readonly ConcurrentDictionary<long, string> UserIds = new ConcurrentDictionary<long, string>(PlatformUtils.ProcessorCount, 1024);
+        public static readonly ConcurrentDictionary<long, IPlayerCharacterData> PlayerCharacters = new ConcurrentDictionary<long, IPlayerCharacterData>();
+        public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersById = new ConcurrentDictionary<string, IPlayerCharacterData>();
+        public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersByUserId = new ConcurrentDictionary<string, IPlayerCharacterData>();
+        public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersByName = new ConcurrentDictionary<string, IPlayerCharacterData>();
+        public static readonly ConcurrentDictionary<string, long> PlayerCharacterConnectionIds = new ConcurrentDictionary<string, long>();
+        public static readonly ConcurrentDictionary<long, string> UserIds = new ConcurrentDictionary<long, string>();
 
         public int PlayerCharactersCount
         {
@@ -134,6 +134,20 @@ namespace MultiplayerARPG
         public virtual void UnmuteCharacterByName(string characterName)
         {
             throw new System.NotImplementedException();
+        }
+
+        public virtual void ChangeUserGold(string userId, int gold)
+        {
+            if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
+                return;
+            playerCharacter.UserGold.Increase(gold);
+        }
+
+        public virtual void ChangeUserCash(string userId, int cash)
+        {
+            if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
+                return;
+            playerCharacter.UserCash.Increase(cash);
         }
     }
 }

@@ -210,6 +210,16 @@ namespace MultiplayerARPG
             }
         }
 
+        private void OnDestroy()
+        {
+            DamageableEntity = null;
+            CacheTransform = null;
+            CacheCollider = null;
+            CacheRigidbody = null;
+            CacheCollider2D = null;
+            CacheRigidbody2D = null;
+        }
+
         public virtual void Setup(byte index)
         {
             _isSetup = true;

@@ -203,6 +203,19 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public bool CanDash()
+        {
+            bool canDash = CanDash_Implementation();
+            if (onCanDashValidated != null)
+                onCanDashValidated(ref canDash);
+            return canDash;
+        }
+
+        protected virtual bool CanDash_Implementation()
+        {
+            return false;
+        }
+
         public bool CanTurn()
         {
             bool canTurn = CanTurn_Implementation();
@@ -301,6 +314,22 @@ namespace MultiplayerARPG
             if (!ActiveMovement.IsNull())
                 return ActiveMovement.FindGroundedPosition(fromPosition, findDistance, out result);
             return true;
+        }
+
+        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        {
+            if (!IsServer)
+                return;
+            if (!ActiveMovement.IsNull())
+                ActiveMovement.ApplyForce(direction, mode, force, deceleration, duration);
+        }
+
+        public void ClearAllForces()
+        {
+            if (!IsServer)
+                return;
+            if (!ActiveMovement.IsNull())
+                ActiveMovement.ClearAllForces();
         }
 
         public void OnJumpForceApplied(float verticalVelocity)

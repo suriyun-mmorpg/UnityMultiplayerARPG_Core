@@ -82,6 +82,13 @@ namespace MultiplayerARPG
         public override void EntityOnDestroy()
         {
             ClearEvents();
+            if (_models != null && _models.Length > 0)
+            {
+                for (int i = 0; i < _models.Length; ++i)
+                {
+                    _models[i] = null;
+                }
+            }
         }
 
         public void SetupEvents()

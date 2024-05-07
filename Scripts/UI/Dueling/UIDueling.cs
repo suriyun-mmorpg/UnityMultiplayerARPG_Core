@@ -14,8 +14,6 @@ namespace MultiplayerARPG
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Number}")]
         public UILocaleKeySetting formatCountDown = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
-        [Tooltip("Format => {0} = {Number}")]
-        public UILocaleKeySetting formatKeyAnotherDuelingGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public UITimer uiTimerCountDown;
@@ -23,18 +21,34 @@ namespace MultiplayerARPG
         public UICharacter uiAnotherCharacter;
 
         [Header("Other Settings")]
-        [Tooltip("")]
         public float delayBeforeHideAfterEnd = 3f;
 
         [Header("UI Events")]
-        public CountDownEvent onCountDown;
-        public UnityEvent onStart;
-        public UnityEvent onWin;
-        public UnityEvent onLose;
+        public CountDownEvent onCountDown = new CountDownEvent();
+        public UnityEvent onStart = new UnityEvent();
+        public UnityEvent onWin = new UnityEvent();
+        public UnityEvent onLose = new UnityEvent();
 
         public float CountDown { get; set; }
         public float DuelingTime { get; set; }
         private int _dirtyCountDown = -1;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTimerCountDown = null;
+            uiTimerDuelingTime = null;
+            uiAnotherCharacter = null;
+            onCountDown?.RemoveAllListeners();
+            onCountDown = null;
+            onStart?.RemoveAllListeners();
+            onStart = null;
+            onWin?.RemoveAllListeners();
+            onWin = null;
+            onLose?.RemoveAllListeners();
+            onLose = null;
+            _data = null;
+        }
 
         protected override void OnEnable()
         {
@@ -115,6 +129,15 @@ namespace MultiplayerARPG
 
             if (loser != null && loser.ObjectId == GameInstance.PlayingCharacterEntity.ObjectId)
                 onLose.Invoke();
+
+            if (loser == null)
+            {
+                if (uiTimerCountDown != null)
+                {
+                    uiTimerCountDown.UpdateTime(0f);
+                    uiTimerCountDown.gameObject.SetActive(true);
+                }
+            }
 
             await UniTask.Delay(Mathf.CeilToInt(delayBeforeHideAfterEnd * 1000));
             Hide();

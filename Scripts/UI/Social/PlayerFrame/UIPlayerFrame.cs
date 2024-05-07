@@ -11,6 +11,15 @@ namespace MultiplayerARPG
         public GameObject[] unlockedObjects = new GameObject[0];
         public bool IsLocked { get; private set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            imageIcon = null;
+            lockedObjects.Nulling();
+            unlockedObjects.Nulling();
+            _data = null;
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();

@@ -18,6 +18,7 @@
         public event CanCrouchDelegate onCanCrouchValidated;
         public event CanCrawlDelegate onCanCrawlValidated;
         public event CanJumpDelegate onCanJumpValidated;
+        public event CanDashDelegate onCanDashValidated;
         public event CanTurnDelegate onCanTurnValidated;
         public event JumpForceAppliedDelegate onJumpForceApplied;
     }

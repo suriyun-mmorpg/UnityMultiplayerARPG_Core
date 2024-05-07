@@ -27,11 +27,27 @@ namespace MultiplayerARPG
         protected float _castingSkillDuration;
         protected BasePlayerCharacterEntity _previousPlayingCharacterEntity;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextLevel = null;
+            uiGageMp = null;
+            uiSkillCastContainer = null;
+            uiTextSkillCast = null;
+            imageSkillCastGage = null;
+            sliderSkillCastGage = null;
+            uiCharacterBuffs = null;
+            if (_previousPlayingCharacterEntity != null)
+                _previousPlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
+            _previousPlayingCharacterEntity = null;
+        }
+
         protected override void AddEvents(BaseCharacterEntity entity)
         {
             if (entity == null)
                 return;
             base.AddEvents(entity);
+            entity.onRecached += OnRecached;
             entity.onLevelChange += OnLevelChange;
             entity.onCurrentMpChange += OnCurrentMpChange;
             entity.onBuffsOperation += OnBuffsOperation;
@@ -46,6 +62,7 @@ namespace MultiplayerARPG
             if (entity == null)
                 return;
             base.RemoveEvents(entity);
+            entity.onRecached -= OnRecached;
             entity.onLevelChange -= OnLevelChange;
             entity.onCurrentMpChange -= OnCurrentMpChange;
             entity.onBuffsOperation -= OnBuffsOperation;
@@ -55,27 +72,33 @@ namespace MultiplayerARPG
             GameInstance_onSetPlayingCharacter(null);
         }
 
-        private void OnLevelChange(int level)
+        protected void OnRecached()
+        {
+            UpdateHp();
+            UpdateMp();
+        }
+
+        protected void OnLevelChange(int level)
         {
             UpdateLevel();
         }
 
-        private void OnCurrentMpChange(int mp)
+        protected void OnCurrentMpChange(int mp)
         {
             UpdateMp();
         }
 
-        private void OnBuffsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
+        protected void OnBuffsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
         {
             UpdateBuffs();
         }
 
-        private void OnPkPointChange(int pkPoint)
+        protected void OnPkPointChange(int pkPoint)
         {
             UpdateTitle();
         }
 
-        private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
+        protected void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
         {
             if (_previousPlayingCharacterEntity != null)
             {
@@ -90,7 +113,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void PlayingCharacterEntity_onLevelChange(int level)
+        protected void PlayingCharacterEntity_onLevelChange(int level)
         {
             UpdateTitle();
         }
@@ -124,20 +147,21 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            Data.ForceMakeCaches();
             base.UpdateData();
             UpdateLevel();
             UpdateMp();
             UpdateBuffs();
         }
 
-        private void UpdateLevel()
+        protected void UpdateLevel()
         {
             if (uiTextLevel == null)
                 return;
             uiTextLevel.text = ZString.Format(LanguageManager.GetText(formatKeyLevel), Data == null ? "1" : Data.Level.ToString("N0"));
         }
 
-        private void UpdateMp()
+        protected void UpdateMp()
         {
             if (uiGageMp == null)
                 return;
@@ -151,7 +175,7 @@ namespace MultiplayerARPG
             uiGageMp.Update(currentMp, maxMp);
         }
 
-        private void UpdateBuffs()
+        protected void UpdateBuffs()
         {
             if (uiCharacterBuffs == null)
                 return;

@@ -35,9 +35,9 @@ namespace MultiplayerARPG
 
         public bool useUnityAutoPhysicSyncTransform = true;
         // Spawn entities events
-        public LiteNetLibLoadSceneEvent onSpawnEntitiesStart;
-        public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress;
-        public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish;
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesStart = new LiteNetLibLoadSceneEvent();
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesProgress = new LiteNetLibLoadSceneEvent();
+        public LiteNetLibLoadSceneEvent onSpawnEntitiesFinish = new LiteNetLibLoadSceneEvent();
         // Other events
         /// <summary>
         /// ConnectionID, PlayerCharacterEntity
@@ -61,8 +61,6 @@ namespace MultiplayerARPG
         protected float _serverSceneLoadedTime;
         protected float _clientSceneLoadedTime;
         protected HashSet<BaseGameEntity> _setOfGameEntity = new HashSet<BaseGameEntity>();
-        protected BaseGameEntity[] _arrayGameEntity = new BaseGameEntity[4096];
-        protected int _arrayGameEntityLength = 0;
 
         // Instantiate object allowing status
         /// <summary>
@@ -119,7 +117,7 @@ namespace MultiplayerARPG
             LiteNetLibIdentity.ForceHideFunctions.Remove(IsHideEntity);
         }
 
-        protected static bool IsHideEntity(LiteNetLibIdentity mustHideThis, LiteNetLibIdentity fromThis)
+        protected bool IsHideEntity(LiteNetLibIdentity mustHideThis, LiteNetLibIdentity fromThis)
         {
             if (!mustHideThis.TryGetComponent(out BaseGameEntity mustHideThisEntity) ||
                 !fromThis.TryGetComponent(out BaseGameEntity fromThisEntity))
@@ -160,11 +158,11 @@ namespace MultiplayerARPG
             {
                 // Update day-night time on both client and server. It will sync from server some time to make sure that clients time of day won't very difference
                 CurrentGameInstance.DayNightTimeUpdater.UpdateTimeOfDay(tempDeltaTime);
-                for (int i = 0; i < _arrayGameEntityLength; ++i)
+                foreach (BaseGameEntity entity in _setOfGameEntity)
                 {
-                    if (!_arrayGameEntity[i].enabled)
+                    if (!entity.enabled)
                         continue;
-                    _arrayGameEntity[i].DoUpdate();
+                    entity.DoUpdate();
                 }
             }
         }
@@ -173,11 +171,11 @@ namespace MultiplayerARPG
         {
             if (IsNetworkActive)
             {
-                for (int i = 0; i < _arrayGameEntityLength; ++i)
+                foreach (BaseGameEntity entity in _setOfGameEntity)
                 {
-                    if (!_arrayGameEntity[i].enabled)
+                    if (!entity.enabled)
                         continue;
-                    _arrayGameEntity[i].DoLateUpdate();
+                    entity.DoLateUpdate();
                 }
             }
         }
@@ -187,11 +185,11 @@ namespace MultiplayerARPG
             base.OnServerUpdate(updater);
             Profiler.BeginSample("BaseGameNetworkManager - SendServerState");
             long timestamp = Timestamp;
-            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            foreach (BaseGameEntity entity in _setOfGameEntity)
             {
-                if (!_arrayGameEntity[i].enabled)
+                if (!entity.enabled)
                     continue;
-                _arrayGameEntity[i].SendServerState(timestamp);
+                entity.SendServerState(timestamp);
             }
             Profiler.EndSample();
         }
@@ -203,12 +201,12 @@ namespace MultiplayerARPG
                 return;
             Profiler.BeginSample("BaseGameNetworkManager - SendClientState");
             long timestamp = Timestamp;
-            for (int i = 0; i < _arrayGameEntityLength; ++i)
+            foreach (BaseGameEntity entity in _setOfGameEntity)
             {
-                if (!_arrayGameEntity[i].enabled)
+                if (!entity.enabled)
                     continue;
-                if (_arrayGameEntity[i].IsOwnerClient)
-                    _arrayGameEntity[i].SendClientState(timestamp);
+                if (entity.IsOwnerClient)
+                    entity.SendClientState(timestamp);
             }
             Profiler.EndSample();
         }
@@ -216,17 +214,11 @@ namespace MultiplayerARPG
         public void RegisterGameEntity(BaseGameEntity gameEntity)
         {
             _setOfGameEntity.Add(gameEntity);
-            _arrayGameEntityLength = _setOfGameEntity.Count;
-            if (_setOfGameEntity.Count > _arrayGameEntity.Length)
-                System.Array.Resize(ref _arrayGameEntity, _setOfGameEntity.Count);
-            _setOfGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
         }
 
         public void UnregisterGameEntity(BaseGameEntity gameEntity)
         {
             _setOfGameEntity.Remove(gameEntity);
-            _arrayGameEntityLength = _setOfGameEntity.Count;
-            _setOfGameEntity.CopyTo(_arrayGameEntity, 0, _arrayGameEntityLength);
         }
 
         protected override void RegisterMessages()
@@ -253,7 +245,18 @@ namespace MultiplayerARPG
             _isClientReadyToInstantiateObjects = false;
             _isServerReadyToInstantiatePlayers = false;
             _setOfGameEntity.Clear();
-            _arrayGameEntityLength = 0;
+            PoolSystem.Clear();
+            ClientBankActions.Clean();
+            ClientCashShopActions.Clean();
+            ClientCharacterActions.Clean();
+            ClientFriendActions.Clean();
+            ClientGachaActions.Clean();
+            ClientGenericActions.Clean();
+            ClientGuildActions.Clean();
+            ClientInventoryActions.Clean();
+            ClientMailActions.Clean();
+            ClientPartyActions.Clean();
+            ClientStorageActions.Clean();
             // Extensions
             this.InvokeInstanceDevExtMethods("Clean");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
@@ -507,16 +510,21 @@ namespace MultiplayerARPG
         public virtual void InitPrefabs()
         {
             Assets.addressableOfflineScene = null;
+#if !EXCLUDE_PREFAB_REFS
             Assets.offlineScene = default;
-            if (CurrentGameInstance.GetHomeScene(out AssetReferenceScene addressableScene, out SceneField scene))
+#endif
+            if (CurrentGameInstance.GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
             {
                 Assets.addressableOfflineScene = addressableScene;
             }
+#if !EXCLUDE_PREFAB_REFS
             else
             {
                 Assets.offlineScene = scene;
             }
+#endif
             // Prepare networking prefabs
+#if !EXCLUDE_PREFAB_REFS
             Assets.playerPrefab = null;
             HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             if (CurrentGameInstance.itemDropEntityPrefab != null)
@@ -559,6 +567,51 @@ namespace MultiplayerARPG
             }
             Assets.spawnablePrefabs = new LiteNetLibIdentity[spawnablePrefabs.Count];
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
+#endif
+
+            Assets.addressablePlayerPrefab = null;
+            HashSet<AssetReferenceLiteNetLibIdentity> addressableSpawnablePrefabs = new HashSet<AssetReferenceLiteNetLibIdentity>(Assets.addressableSpawnablePrefabs);
+            if (CurrentGameInstance.addressableItemDropEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableItemDropEntityPrefab);
+            if (CurrentGameInstance.addressableExpDropEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableExpDropEntityPrefab);
+            if (CurrentGameInstance.addressableGoldDropEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableGoldDropEntityPrefab);
+            if (CurrentGameInstance.addressableCurrencyDropEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableCurrencyDropEntityPrefab);
+            if (CurrentGameInstance.addressableWarpPortalEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableWarpPortalEntityPrefab);
+            if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressablePlayerCorpsePrefab);
+            if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableMonsterCorpsePrefab);
+            foreach (AssetReferenceBaseCharacterEntity entry in GameInstance.AddressableCharacterEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceVehicleEntity entry in GameInstance.AddressableVehicleEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceWarpPortalEntity entry in GameInstance.AddressableWarpPortalEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceNpcEntity entry in GameInstance.AddressableNpcEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceBuildingEntity entry in GameInstance.AddressableBuildingEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceLiteNetLibIdentity identity in GameInstance.AddressableOtherNetworkObjectPrefabs.Values)
+            {
+                addressableSpawnablePrefabs.Add(identity);
+            }
+            Assets.addressableSpawnablePrefabs = new AssetReferenceLiteNetLibIdentity[addressableSpawnablePrefabs.Count];
+            addressableSpawnablePrefabs.CopyTo(Assets.addressableSpawnablePrefabs);
+
             this.InvokeInstanceDevExtMethods("InitPrefabs");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -678,16 +731,32 @@ namespace MultiplayerARPG
                 {
                     WarpPortal warpPortal;
                     WarpPortalEntity warpPortalPrefab;
+                    AssetReferenceWarpPortalEntity addressableWarpPortalPrefab;
                     WarpPortalEntity warpPortalEntity;
                     for (i = 0; i < mapWarpPortals.Count; ++i)
                     {
                         warpPortal = mapWarpPortals[i];
+#if !EXCLUDE_PREFAB_REFS
                         warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
+#else
+                        warpPortalPrefab = null;
+#endif
+                        addressableWarpPortalPrefab = warpPortal.addressableEntityPrefab.IsDataValid() ? warpPortal.addressableEntityPrefab : CurrentGameInstance.addressableWarpPortalEntityPrefab;
+                        spawnObj = null;
                         if (warpPortalPrefab != null)
                         {
                             spawnObj = Assets.GetObjectInstance(
                                 warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
                                 Quaternion.Euler(warpPortal.rotation));
+                        }
+                        else if (addressableWarpPortalPrefab.IsDataValid())
+                        {
+                            spawnObj = Assets.GetObjectInstance(
+                                addressableWarpPortalPrefab.HashAssetId, warpPortal.position,
+                                Quaternion.Euler(warpPortal.rotation));
+                        }
+                        if (spawnObj != null)
+                        {
                             warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
                             warpPortalEntity.WarpPortalType = warpPortal.warpPortalType;
                             warpPortalEntity.WarpToMapInfo = warpPortal.warpToMapInfo;
@@ -715,16 +784,32 @@ namespace MultiplayerARPG
                 {
                     Npc npc;
                     NpcEntity npcPrefab;
+                    AssetReferenceNpcEntity addressableNpcPrefab;
                     NpcEntity npcEntity;
                     for (i = 0; i < mapNpcs.Count; ++i)
                     {
                         npc = mapNpcs[i];
+#if !EXCLUDE_PREFAB_REFS
                         npcPrefab = npc.entityPrefab;
+#else
+                        npcPrefab = null;
+#endif
+                        addressableNpcPrefab = npc.addressableEntityPrefab;
+                        spawnObj = null;
                         if (npcPrefab != null)
                         {
                             spawnObj = Assets.GetObjectInstance(
                                 npcPrefab.Identity.HashAssetId, npc.position,
                                 Quaternion.Euler(npc.rotation));
+                        }
+                        else if (addressableNpcPrefab.IsDataValid())
+                        {
+                            spawnObj = Assets.GetObjectInstance(
+                                addressableNpcPrefab.HashAssetId, npc.position,
+                                Quaternion.Euler(npc.rotation));
+                        }
+                        if (spawnObj != null)
+                        {
                             npcEntity = spawnObj.GetComponent<NpcEntity>();
                             npcEntity.Title = npc.title;
                             npcEntity.StartDialog = npc.startDialog;
@@ -791,6 +876,7 @@ namespace MultiplayerARPG
                 Instantiate(GameInstance.Singleton.serverCharacterPrefab, CurrentMapInfo.StartPosition, Quaternion.identity);
             }
             await UniTask.NextFrame();
+            // Entities were spawned
             progress = 1f;
             onSpawnEntitiesFinish.Invoke(sceneName, true, progress);
             await PostSpawnEntities();
@@ -894,27 +980,43 @@ namespace MultiplayerARPG
 
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
-            if (GameInstance.BuildingEntities.ContainsKey(saveData.EntityId))
+            LiteNetLibIdentity spawnObj;
+            if (GameInstance.AddressableBuildingEntities.TryGetValue(saveData.EntityId, out AssetReferenceBuildingEntity addressablePrefab))
             {
-                LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                    GameInstance.BuildingEntities[saveData.EntityId].Identity.HashAssetId,
+                spawnObj = Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId,
                     saveData.Position, Quaternion.Euler(saveData.Rotation));
-                BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
-                buildingEntity.Id = saveData.Id;
-                buildingEntity.ParentId = saveData.ParentId;
-                buildingEntity.CurrentHp = saveData.CurrentHp;
-                buildingEntity.RemainsLifeTime = saveData.RemainsLifeTime;
-                buildingEntity.IsLocked = saveData.IsLocked;
-                buildingEntity.LockPassword = saveData.LockPassword;
-                buildingEntity.CreatorId = saveData.CreatorId;
-                buildingEntity.CreatorName = saveData.CreatorName;
-                buildingEntity.ExtraData = saveData.ExtraData;
-                Assets.NetworkSpawn(spawnObj);
-                ServerBuildingHandlers.AddBuilding(buildingEntity.Id, buildingEntity);
-                buildingEntity.CallRpcOnBuildingConstruct();
-                return buildingEntity;
             }
-            return null;
+            else if (GameInstance.BuildingEntities.TryGetValue(saveData.EntityId, out BuildingEntity prefab))
+            {
+                spawnObj = Assets.GetObjectInstance(
+                    prefab.Identity.HashAssetId,
+                    saveData.Position, Quaternion.Euler(saveData.Rotation));
+            }
+            else
+            {
+                return null;
+            }
+
+            if (spawnObj == null)
+            {
+                return null;
+            }
+
+            BuildingEntity buildingEntity = spawnObj.GetComponent<BuildingEntity>();
+            buildingEntity.Id = saveData.Id;
+            buildingEntity.ParentId = saveData.ParentId;
+            buildingEntity.CurrentHp = saveData.CurrentHp;
+            buildingEntity.RemainsLifeTime = saveData.RemainsLifeTime;
+            buildingEntity.IsLocked = saveData.IsLocked;
+            buildingEntity.LockPassword = saveData.LockPassword;
+            buildingEntity.CreatorId = saveData.CreatorId;
+            buildingEntity.CreatorName = saveData.CreatorName;
+            buildingEntity.ExtraData = saveData.ExtraData;
+            Assets.NetworkSpawn(spawnObj);
+            ServerBuildingHandlers.AddBuilding(buildingEntity.Id, buildingEntity);
+            buildingEntity.CallRpcOnBuildingConstruct();
+            return buildingEntity;
         }
 
         public virtual void DestroyBuildingEntity(string id, bool isSceneObject)

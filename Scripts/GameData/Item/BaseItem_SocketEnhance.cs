@@ -58,22 +58,22 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
                 return false;
             }
-            byte maxSocket = GameInstance.Singleton.GameplayRule.GetItemMaxSocket(character, enhancingItem);
+            int maxSocket = GameInstance.Singleton.GameplayRule.GetItemMaxSocket(character, enhancingItem);
             if (maxSocket <= 0)
             {
                 // Cannot enhance socket because equipment has no socket(s)
                 gameMessage = UITextKeys.UI_ERROR_NO_EMPTY_SOCKET;
                 return false;
             }
-            while (enhancingItem.Sockets.Count < maxSocket)
+            while (enhancingItem.sockets.Count < maxSocket)
             {
                 // Add empty slots
-                enhancingItem.Sockets.Add(0);
+                enhancingItem.sockets.Add(0);
             }
             if (socketIndex >= 0)
             {
                 // Put enhancer to target socket
-                if (socketIndex >= enhancingItem.Sockets.Count || enhancingItem.Sockets[socketIndex] != 0)
+                if (socketIndex >= enhancingItem.sockets.Count || enhancingItem.sockets[socketIndex] != 0)
                 {
                     gameMessage = UITextKeys.UI_ERROR_SOCKET_NOT_EMPTY;
                     return false;
@@ -82,14 +82,14 @@ namespace MultiplayerARPG
             else
             {
                 // Put enhancer to any empty socket
-                for (int index = 0; index < enhancingItem.Sockets.Count; ++index)
+                for (int index = 0; index < enhancingItem.sockets.Count; ++index)
                 {
-                    if (enhancingItem.Sockets[index] == 0)
+                    if (enhancingItem.sockets[index] == 0)
                     {
                         socketIndex = index;
                         break;
                     }
-                    if (index == enhancingItem.Sockets.Count - 1)
+                    if (index == enhancingItem.sockets.Count - 1)
                     {
                         gameMessage = UITextKeys.UI_ERROR_NO_EMPTY_SOCKET;
                         return false;
@@ -103,6 +103,13 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_CANNOT_ENHANCE_SOCKET;
                 return false;
             }
+            ISocketEnhancerItem castedEnhancerItem = enhancerItem as ISocketEnhancerItem;
+            if (castedEnhancerItem.SocketEnhancerType != equipmentItem.AvailableSocketEnhancerTypes[socketIndex])
+            {
+                // Cannot enhance socket because it is not a valid socket
+                gameMessage = UITextKeys.UI_ERROR_CANNOT_ENHANCE_SOCKET;
+                return false;
+            }
             if (!character.HasOneInNonEquipItems(enhancerId))
             {
                 // Cannot enhance socket because there is no item
@@ -111,7 +118,7 @@ namespace MultiplayerARPG
             }
             character.DecreaseItems(enhancerId, 1);
             character.FillEmptySlots();
-            enhancingItem.Sockets[socketIndex] = enhancerId;
+            enhancingItem.sockets[socketIndex] = enhancerId;
             onEnhanceSocket.Invoke(enhancingItem);
             GameInstance.ServerLogHandlers.LogEnhanceSocketItem(character, enhancingItem, enhancerItem);
             return true;
@@ -163,19 +170,19 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
                 return false;
             }
-            if (enhancedItem.Sockets.Count == 0 || socketIndex >= enhancedItem.Sockets.Count)
+            if (enhancedItem.sockets.Count == 0 || socketIndex >= enhancedItem.sockets.Count)
             {
                 gameMessage = UITextKeys.UI_ERROR_INVALID_ENHANCER_ITEM_INDEX;
                 return false;
             }
-            if (enhancedItem.Sockets[socketIndex] == 0)
+            if (enhancedItem.sockets[socketIndex] == 0)
             {
                 gameMessage = UITextKeys.UI_ERROR_NO_ENHANCER;
                 return false;
             }
             if (!GameInstance.Singleton.enhancerRemoval.CanRemove(character, out gameMessage))
                 return false;
-            int enhancerId = enhancedItem.Sockets[socketIndex];
+            int enhancerId = enhancedItem.sockets[socketIndex];
             BaseItem enhancerItem;
             if (!GameInstance.Items.TryGetValue(enhancerId, out enhancerItem))
             {
@@ -191,7 +198,7 @@ namespace MultiplayerARPG
                     return false;
                 }
                 character.IncreaseItems(CharacterItem.Create(enhancerId));
-                enhancedItem.Sockets[socketIndex] = 0;
+                enhancedItem.sockets[socketIndex] = 0;
                 onRemoveEnhancer.Invoke(enhancedItem);
                 inventoryChanged = true;
             }

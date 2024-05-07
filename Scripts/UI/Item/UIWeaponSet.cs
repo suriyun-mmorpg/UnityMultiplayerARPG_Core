@@ -9,6 +9,14 @@
         public byte Set { get; private set; }
         public EquipWeapons EquipWeapons { get; private set; }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiRightHandItem = null;
+            uiLeftHandItem = null;
+            UIWeaponSets = null;
+        }
+
         public void SetData(UIWeaponSets uiWeaponSets, byte set, EquipWeapons equipWeapons)
         {
             UIWeaponSets = uiWeaponSets;

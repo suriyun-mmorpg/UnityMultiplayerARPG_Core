@@ -86,6 +86,8 @@ namespace MultiplayerARPG
 
         public BaseMonsterCharacterEntity SpawnPrefab { get; protected set; }
 
+        public GameSpawnArea<BaseMonsterCharacterEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+
         public int SpawnLevel { get; protected set; }
 
         public Vector3 SpawnPosition { get; protected set; }
@@ -94,12 +96,6 @@ namespace MultiplayerARPG
         {
             get { return characterDatabase; }
             set { characterDatabase = value; }
-        }
-
-        public Faction Faction
-        {
-            get { return faction; }
-            set { faction = value; }
         }
 
         public bool IsOverrideCharacteristic
@@ -117,6 +113,12 @@ namespace MultiplayerARPG
         public MonsterCharacteristic Characteristic
         {
             get { return IsOverrideCharacteristic ? OverrideCharacteristic : CharacterDatabase.Characteristic; }
+        }
+
+        public Faction Faction
+        {
+            get { return faction; }
+            set { faction = value; }
         }
 
         public override int DataId
@@ -236,6 +238,16 @@ namespace MultiplayerARPG
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;
+            SpawnAddressablePrefab = null;
+            SpawnLevel = spawnLevel;
+            SpawnPosition = spawnPosition;
+        }
+
+        public virtual void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, GameSpawnArea<BaseMonsterCharacterEntity>.AddressablePrefab spawnAddressablePrefab, int spawnLevel, Vector3 spawnPosition)
+        {
+            SpawnArea = spawnArea;
+            SpawnPrefab = null;
+            SpawnAddressablePrefab = spawnAddressablePrefab;
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
@@ -429,15 +441,66 @@ namespace MultiplayerARPG
 
             switch (CurrentGameInstance.monsterDeadDropItemMode)
             {
-                case DeadDropItemMode.DropOnGround:
+                case RewardingItemMode.DropOnGround:
                     for (int i = 0; i < _droppingItems.Count; ++i)
                     {
                         ItemDropEntity.Drop(this, RewardGivenType.KillMonster, _droppingItems[i], _looters);
                     }
                     break;
-                case DeadDropItemMode.CorpseLooting:
+                case RewardingItemMode.CorpseLooting:
                     if (_droppingItems.Count > 0)
-                        ItemsContainerEntity.DropItems(CurrentGameInstance.monsterCorpsePrefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                    {
+                        ItemsContainerEntity prefab;
+#if !EXCLUDE_PREFAB_REFS
+                        prefab = CurrentGameInstance.monsterCorpsePrefab;
+#else
+                        prefab = null;
+#endif
+                        if (prefab != null)
+                        {
+                            ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                        }
+                        else if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
+                        {
+                            ItemsContainerEntity.DropItems(CurrentGameInstance.addressableMonsterCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                        }
+                    }
+                    break;
+                case RewardingItemMode.Immediately:
+                    // NOTE: might have to think about how the item should be sent, now it will be sent randomly to `_looters`
+                    List<string> shufflingLooters = new List<string>(_looters);
+                    shufflingLooters.Shuffle();
+                    int looterIndex = 0;
+                    for (int i = 0; i < _droppingItems.Count; ++i)
+                    {
+                        if (looterIndex >= shufflingLooters.Count)
+                        {
+                            looterIndex = 0;
+                        }
+                        BasePlayerCharacterEntity looterEntity = null;
+                        while (shufflingLooters.Count > 0 && !GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(shufflingLooters[looterIndex], out looterEntity))
+                        {
+                            shufflingLooters.RemoveAt(looterIndex);
+                            looterEntity = null;
+                            continue;
+                        }
+                        if (shufflingLooters.Count <= 0)
+                        {
+                            // Prevent no looters error
+                            break;
+                        }
+                        looterIndex++;
+                        if (looterEntity != null)
+                        {
+                            // Increase items directly to character inventory
+                            if (looterEntity.IncreasingItemsWillOverwhelming(_droppingItems[i].dataId, _droppingItems[i].amount))
+                            {
+                                GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(looterEntity.Id, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
+                                continue;
+                            }
+                            looterEntity.IncreaseItems(_droppingItems[i]);
+                        }
+                    }
                     break;
             }
 
@@ -734,7 +797,7 @@ namespace MultiplayerARPG
             NetworkDestroy(DestroyDelay);
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
+                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
         }

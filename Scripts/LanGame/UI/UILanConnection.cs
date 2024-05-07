@@ -32,42 +32,42 @@ namespace MultiplayerARPG
             get { return inputNetworkAddress == null ? DefaultNetworkAddress : inputNetworkAddress.text; }
         }
 
-        private Dictionary<string, DiscoveryData> discoveries = new Dictionary<string, DiscoveryData>();
-        private Dictionary<string, IPEndPoint> remoteEndPoints = new Dictionary<string, IPEndPoint>();
+        private Dictionary<string, DiscoveryData> _discoveries = new Dictionary<string, DiscoveryData>();
+        private Dictionary<string, IPEndPoint> _remoteEndPoints = new Dictionary<string, IPEndPoint>();
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = discoveryEntryPrefab.gameObject;
-                    cacheList.uiContainer = discoveryEntryContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = discoveryEntryPrefab.gameObject;
+                    _cacheList.uiContainer = discoveryEntryContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UIDiscoveryEntrySelectionManager cacheSelectionManager;
+        private UIDiscoveryEntrySelectionManager _cacheSelectionManager;
         public UIDiscoveryEntrySelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.AddComponent<UIDiscoveryEntrySelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.AddComponent<UIDiscoveryEntrySelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
+                return _cacheSelectionManager;
             }
         }
 
-        private LiteNetLibDiscovery cacheDiscovery;
+        private LiteNetLibDiscovery _cacheDiscovery;
         private LiteNetLibDiscovery CacheDiscovery
         {
             get
             {
-                if (cacheDiscovery == null)
+                if (_cacheDiscovery == null)
                 {
                     LanRpgNetworkManager networkManager = BaseGameNetworkManager.Singleton as LanRpgNetworkManager;
                     if (networkManager == null || networkManager.CacheDiscovery == null)
@@ -75,10 +75,24 @@ namespace MultiplayerARPG
                         Debug.LogWarning("[UIDiscoveryConnection] networkManager or its discovery is empty");
                         return null;
                     }
-                    cacheDiscovery = networkManager.CacheDiscovery;
+                    _cacheDiscovery = networkManager.CacheDiscovery;
                 }
-                return cacheDiscovery;
+                return _cacheDiscovery;
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            inputNetworkAddress = null;
+            listEmptyObject = null;
+            discoveryEntryPrefab = null;
+            discoveryEntryContainer = null;
+            _discoveries?.Clear();
+            _remoteEndPoints?.Clear();
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            _cacheDiscovery = null;
         }
 
         private void OnEnable()
@@ -104,28 +118,28 @@ namespace MultiplayerARPG
         private void OnReceivedBroadcast(IPEndPoint remoteEndPoint, string data)
         {
             DiscoveryData characterData = JsonConvert.DeserializeObject<DiscoveryData>(data);
-            discoveries[characterData.id] = characterData;
-            remoteEndPoints[characterData.id] = remoteEndPoint;
+            _discoveries[characterData.id] = characterData;
+            _remoteEndPoints[characterData.id] = remoteEndPoint;
             UpdateList();
         }
 
         private void UpdateList()
         {
             CacheSelectionManager.Clear();
-            CacheList.Generate(discoveries.Values, (index, data, ui) =>
+            CacheList.Generate(_discoveries.Values, (index, data, ui) =>
             {
                 UIDiscoveryEntry entry = ui.GetComponent<UIDiscoveryEntry>();
                 entry.Data = data;
                 CacheSelectionManager.Add(entry);
             });
             if (listEmptyObject != null)
-                listEmptyObject.SetActive(discoveries.Count == 0);
+                listEmptyObject.SetActive(_discoveries.Count == 0);
         }
 
         public IPEndPoint GetSelectedRemoteEndPoint()
         {
             UIDiscoveryEntry selectedUI = CacheSelectionManager.SelectedUI;
-            return remoteEndPoints[selectedUI.Data.id];
+            return _remoteEndPoints[selectedUI.Data.id];
         }
     }
 }

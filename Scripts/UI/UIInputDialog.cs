@@ -112,6 +112,18 @@ public class UIInputDialog : UIBase
         }
     }
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        uiTextTitle = null;
+        uiTextDescription = null;
+        uiInputField = null;
+        buttonConfirm = null;
+        _onConfirmText = null;
+        _onConfirmInteger = null;
+        _onConfirmDecimal = null;
+    }
+
     protected virtual void OnEnable()
     {
         if (buttonConfirm != null)

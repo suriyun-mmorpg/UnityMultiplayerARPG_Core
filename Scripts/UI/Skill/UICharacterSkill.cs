@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using Cysharp.Text;
+﻿using Cysharp.Text;
+using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -10,7 +11,7 @@ namespace MultiplayerARPG
     {
         public CharacterSkill CharacterSkill { get { return Data.characterSkill; } }
         public int Level { get { return Data.targetLevel; } }
-        public BaseSkill Skill { get { return CharacterSkill != null ? CharacterSkill.GetSkill() : null; } }
+        public BaseSkill Skill { get { return CharacterSkill.GetSkill(); } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -39,6 +40,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeySummon = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_SUMMON);
         [Tooltip("Format => {0} = {Mount Title}")]
         public UILocaleKeySetting formatKeyMount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_MOUNT);
+        [Tooltip("Format => {0} = {Weapon Damage Multiplicator}")]
+        public UILocaleKeySetting formatKeyWeaponDamageMultiplicator = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_ATTACK_WEAPON_DAMAGE_MULTIPLICATOR);
         [Tooltip("Format => {0} = {Skill Type Title}")]
         public UILocaleKeySetting formatKeySkillType = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SKILL_TYPE);
 
@@ -67,6 +70,7 @@ namespace MultiplayerARPG
         [Header("Skill Attack")]
         public UIDamageElementAmount uiDamageAmount;
         public UIDamageElementInflictions uiDamageInflictions;
+        public TextWrapper uiWeaponDamageMultiplicator;
         public UIDamageElementAmounts uiAdditionalDamageAmounts;
         public UIStatusEffectApplyings uiAttackStatusEffects;
 
@@ -89,6 +93,51 @@ namespace MultiplayerARPG
         protected bool _dirtyIsCountDown;
         protected bool _dirtyAbleToLevelUp;
         protected bool _dirtyAbleToUse;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            uiTextLevel = null;
+            imageIcon = null;
+            uiTextSkillType = null;
+            uiTextAvailableWeapons = null;
+            uiTextAvailableArmors = null;
+            uiTextAvailableVehicles = null;
+            uiTextConsumeHp = null;
+            uiTextConsumeMp = null;
+            uiTextConsumeStamina = null;
+            uiTextCoolDownDuration = null;
+            uiTextCoolDownRemainsDuration = null;
+            imageCoolDownGage = null;
+            countDownObjects.Nulling();
+            noCountDownObjects.Nulling();
+            uiRequirement = null;
+            uiTextSummon = null;
+            uiTextMount = null;
+            uiCraftItem = null;
+            uiDamageAmount = null;
+            uiDamageInflictions = null;
+            uiWeaponDamageMultiplicator = null;
+            uiAdditionalDamageAmounts = null;
+            uiAttackStatusEffects = null;
+            uiSkillBuff = null;
+            uiSkillDebuff = null;
+            onSetLevelZeroData?.RemoveAllListeners();
+            onSetLevelZeroData = null;
+            onSetNonLevelZeroData?.RemoveAllListeners();
+            onSetNonLevelZeroData = null;
+            onAbleToLevelUp?.RemoveAllListeners();
+            onAbleToLevelUp = null;
+            onUnableToLevelUp?.RemoveAllListeners();
+            onUnableToLevelUp = null;
+            onAbleToUse?.RemoveAllListeners();
+            onAbleToUse = null;
+            onUnableToUse?.RemoveAllListeners();
+            onUnableToUse = null;
+            uiNextLevelSkill = null;
+        }
 
         protected override void OnDisable()
         {
@@ -365,35 +414,57 @@ namespace MultiplayerARPG
 
             if (uiTextSummon != null)
             {
-                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || skillSummon.MonsterEntity == null)
+                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || (!skillSummon.AddressableMonsterCharacterEntity.IsDataValid() && skillSummon.MonsterCharacterEntity == null))
                 {
                     uiTextSummon.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextSummon.SetGameObjectActive(true);
-                    uiTextSummon.text = ZString.Format(
-                        LanguageManager.GetText(formatKeySummon),
-                        skillSummon.MonsterEntity.Title,
-                        skillSummon.Level.GetAmount(Level),
-                        skillSummon.AmountEachTime.GetAmount(Level),
-                        skillSummon.MaxStack.GetAmount(Level),
-                        skillSummon.Duration.GetAmount(Level));
+                    if (skillSummon.MonsterCharacterEntity != null)
+                    {
+                        uiTextSummon.text = ZString.Format(
+                            LanguageManager.GetText(formatKeySummon),
+                            skillSummon.MonsterCharacterEntity.Title,
+                            skillSummon.Level.GetAmount(Level),
+                            skillSummon.AmountEachTime.GetAmount(Level),
+                            skillSummon.MaxStack.GetAmount(Level),
+                            skillSummon.Duration.GetAmount(Level));
+                    }
+                    else if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
+                    {
+                        uiTextSummon.text = ZString.Format(
+                            LanguageManager.GetText(formatKeySummon),
+                            skillSummon.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseMonsterCharacterEntity>().Title,
+                            skillSummon.Level.GetAmount(Level),
+                            skillSummon.AmountEachTime.GetAmount(Level),
+                            skillSummon.MaxStack.GetAmount(Level),
+                            skillSummon.Duration.GetAmount(Level));
+                    }
                 }
             }
 
             if (uiTextMount != null)
             {
-                if (Skill == null || !Skill.TryGetMount(out SkillMount skillMount) || skillMount.MountEntity == null)
+                if (Skill == null || !Skill.TryGetMount(out SkillMount skillMount) || (!skillMount.AddressableMountEntity.IsDataValid() && skillMount.MountEntity == null))
                 {
                     uiTextMount.SetGameObjectActive(false);
                 }
                 else
                 {
                     uiTextMount.SetGameObjectActive(true);
-                    uiTextMount.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyMount),
-                        skillMount.MountEntity.Title);
+                    if (skillMount.MountEntity != null)
+                    {
+                        uiTextMount.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            skillMount.MountEntity.Title);
+                    }
+                    else if (skillMount.AddressableMountEntity.IsDataValid())
+                    {
+                        uiTextMount.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyMount),
+                            skillMount.AddressableMountEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>().Title);
+                    }
                 }
             }
 
@@ -433,6 +504,21 @@ namespace MultiplayerARPG
                 {
                     uiDamageInflictions.Show();
                     uiDamageInflictions.Data = damageInflictionRates;
+                }
+            }
+
+            if (uiWeaponDamageMultiplicator != null)
+            {
+                if (Skill == null || !Skill.TryGetAttackWeaponDamageMultiplicator(Character, Level, out float weaponDamageMultiplicator))
+                {
+                    uiWeaponDamageMultiplicator.SetGameObjectActive(false);
+                }
+                else
+                {
+                    uiWeaponDamageMultiplicator.SetGameObjectActive(true);
+                    uiWeaponDamageMultiplicator.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyWeaponDamageMultiplicator),
+                        weaponDamageMultiplicator.ToString("N2"));
                 }
             }
 

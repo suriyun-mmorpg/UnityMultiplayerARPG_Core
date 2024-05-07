@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 {
     public partial class UIRefineItem : UIBaseOwningCharacterItem
     {
-        public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
+        public IEquipmentItem EquipmentItem { get { return CharacterItem.GetEquipmentItem(); } }
         public bool CanRefine { get; private set; }
         public bool ReachedMaxLevel { get; private set; }
 
@@ -39,15 +39,30 @@ namespace MultiplayerARPG
         public UICharacterItems uiRefineEnhancerItems;
         public UICharacterItems uiAppliedRefineEnhancerItems;
 
-        protected bool activated;
-        protected string activeItemId;
-        protected List<int> enhancerDataIds = new List<int>();
+        protected bool _activated;
+        protected string _activeItemId;
+        protected List<int> _enhancerDataIds = new List<int>();
 
         protected override void Awake()
         {
             base.Awake();
             if (uiCharacterItem == null && uiRefiningItem != null)
                 uiCharacterItem = uiRefiningItem;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiRefiningItem = null;
+            uiRequireItemAmounts = null;
+            uiRequireCurrencyAmounts = null;
+            uiTextRequireGold = null;
+            uiTextSimpleRequireGold = null;
+            uiTextSuccessRate = null;
+            uiTextRefiningLevel = null;
+            uiRefineEnhancerItems = null;
+            uiAppliedRefineEnhancerItems = null;
+            _enhancerDataIds?.Clear();
         }
 
         private void OnValidate()
@@ -69,7 +84,7 @@ namespace MultiplayerARPG
             // Store data to variable so it won't lookup for data from property again
             CharacterItem characterItem = CharacterItem;
 
-            if (activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(activeItemId)))
+            if (_activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(_activeItemId)))
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
@@ -87,7 +102,7 @@ namespace MultiplayerARPG
             if (!characterItem.IsEmptySlot())
             {
                 UITextKeys gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
-                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, enhancerDataIds.ToArray(), out gameMessage);
+                CanRefine = EquipmentItem != null && characterItem.GetItem().CanRefine(GameInstance.PlayingCharacter, Level, _enhancerDataIds.ToArray(), out gameMessage);
                 if (CanRefine)
                 {
                     refineLevel = EquipmentItem.ItemRefine.Levels[Level - 1];
@@ -123,9 +138,9 @@ namespace MultiplayerARPG
                                 characterItems.Add(GameInstance.PlayingCharacter.NonEquipItems[i].Clone());
                         }
                     }
-                    for (int i = 0; i < enhancerDataIds.Count; ++i)
+                    for (int i = 0; i < _enhancerDataIds.Count; ++i)
                     {
-                        characterItems.DecreaseItems(enhancerDataIds[i], 1, false, out _);
+                        characterItems.DecreaseItems(_enhancerDataIds[i], 1, false, out _);
                     }
                 }
                 uiRefineEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
@@ -138,12 +153,12 @@ namespace MultiplayerARPG
                 List<CharacterItem> characterItems = new List<CharacterItem>();
                 if (refineLevel.HasValue)
                 {
-                    for (int i = 0; i < enhancerDataIds.Count; ++i)
+                    for (int i = 0; i < _enhancerDataIds.Count; ++i)
                     {
-                        characterItems.Add(CharacterItem.Create(enhancerDataIds[i]));
+                        characterItems.Add(CharacterItem.Create(_enhancerDataIds[i]));
                         for (int j = 0; j < refineLevel.Value.AvailableEnhancers.Length; ++j)
                         {
-                            if (refineLevel.Value.AvailableEnhancers[j].item.DataId == enhancerDataIds[i])
+                            if (refineLevel.Value.AvailableEnhancers[j].item.DataId == _enhancerDataIds[i])
                             {
                                 increaseSuccessRate += refineLevel.Value.AvailableEnhancers[j].increaseSuccessRate;
                                 decreaseRequireGoldRate += refineLevel.Value.AvailableEnhancers[j].decreaseRequireGoldRate;
@@ -256,8 +271,8 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
-            activated = false;
-            enhancerDataIds.Clear();
+            _activated = false;
+            _enhancerDataIds.Clear();
             OnUpdateCharacterItems();
         }
 
@@ -271,20 +286,20 @@ namespace MultiplayerARPG
         {
             if (CharacterItem.IsEmptySlot())
                 return;
-            activated = true;
-            activeItemId = CharacterItem.id;
+            _activated = true;
+            _activeItemId = CharacterItem.id;
             GameInstance.ClientInventoryHandlers.RequestRefineItem(new RequestRefineItemMessage()
             {
                 inventoryType = InventoryType,
                 index = IndexOfData,
-                enhancerDataIds = enhancerDataIds.ToArray(),
+                enhancerDataIds = _enhancerDataIds.ToArray(),
             }, ResponseRefineItem);
         }
 
         protected void ResponseRefineItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseRefineItemMessage response)
         {
             ClientInventoryActions.ResponseRefineItem(requestHandler, responseCode, response);
-            enhancerDataIds.Clear();
+            _enhancerDataIds.Clear();
             OnUpdateCharacterItems();
         }
 
@@ -295,12 +310,12 @@ namespace MultiplayerARPG
                 return;
             foreach (UICharacterItem selectedUI in selectedUIs)
             {
-                if (GameInstance.Singleton.refineEnhancerItemsLimit > 0 && enhancerDataIds.Count + 1 > GameInstance.Singleton.refineEnhancerItemsLimit)
+                if (GameInstance.Singleton.refineEnhancerItemsLimit > 0 && _enhancerDataIds.Count + 1 > GameInstance.Singleton.refineEnhancerItemsLimit)
                 {
                     ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_REACHED_REFINE_ENHANCER_ITEMS_LIMIT);
                     break;
                 }
-                enhancerDataIds.Add(selectedUI.CharacterItem.dataId);
+                _enhancerDataIds.Add(selectedUI.CharacterItem.dataId);
             }
             OnUpdateCharacterItems();
         }
@@ -312,7 +327,7 @@ namespace MultiplayerARPG
                 return;
             foreach (UICharacterItem selectedUI in selectedUIs)
             {
-                enhancerDataIds.Remove(selectedUI.CharacterItem.dataId);
+                _enhancerDataIds.Remove(selectedUI.CharacterItem.dataId);
             }
             OnUpdateCharacterItems();
         }

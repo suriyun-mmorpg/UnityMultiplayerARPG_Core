@@ -16,7 +16,7 @@ namespace MultiplayerARPG
 
         public void Deserialize(NetDataReader reader)
         {
-            item = reader.Get(() => new CharacterItem());
+            item = reader.Get<CharacterItem>();
             price = reader.GetPackedInt();
         }
     }

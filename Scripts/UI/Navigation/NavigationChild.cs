@@ -46,6 +46,8 @@ namespace MultiplayerARPG
         {
             if (group != null)
                 group.RemoveChild(this);
+            group = null;
+            Selectable = null;
         }
     }
 }

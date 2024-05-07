@@ -24,16 +24,7 @@ namespace MultiplayerARPG
         /// <param name="weapon"></param>
         /// <param name="skill"></param>
         /// <param name="skillLevel"></param>
-        void PrepareHitRegValidation(BaseGameEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, Dictionary<DamageElement, MinMaxFloat> damageAmounts, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel);
-        /// <summary>
-        /// This will be called to confirm hit reg validation data
-        /// </summary>
-        /// <param name="attacker"></param>
-        /// <param name="randomSeed"></param>
-        /// <param name="triggerIndex"></param>
-        /// <param name="increaseDamageAmounts"></param>
-        /// <returns></returns>
-        void ConfirmHitRegValidation(BaseGameEntity attacker, int randomSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts);
+        void PrepareHitRegValidation(BaseGameEntity attacker, int randomSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel);
         /// <summary>
         /// This will be called at server to perform hit reg validation
         /// </summary>

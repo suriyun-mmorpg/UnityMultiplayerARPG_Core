@@ -18,6 +18,14 @@ namespace MultiplayerARPG
         public UINpcDialog uiNpcDialog;
         public Image imageIcon;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiNpcDialog = null;
+            imageIcon = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextTitle != null)

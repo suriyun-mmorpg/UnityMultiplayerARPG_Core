@@ -14,6 +14,19 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseGetFriendRequestsMessage> onResponseGetFriendRequests;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseFriendRequestNotificationMessage> onResponseFriendRequestNotification;
 
+        public static void Clean()
+        {
+            onResponseFindCharacters = null;
+            onResponseGetFriends = null;
+            onResponseAddFriend = null;
+            onResponseRemoveFriend = null;
+            onResponseSendFriendRequest = null;
+            onResponseAcceptFriendRequest = null;
+            onResponseDeclineFriendRequest = null;
+            onResponseGetFriendRequests = null;
+            onResponseFriendRequestNotification = null;
+        }
+
         public static void ResponseFindCharacters(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSocialCharacterListMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);

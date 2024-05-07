@@ -34,6 +34,14 @@ namespace MultiplayerARPG
         {
             GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
+            owningIndicator = null;
+            allyIndicator = null;
+            partyMemberIndicator = null;
+            guildMemberIndicator = null;
+            enemyIndicator = null;
+            neutralIndicator = null;
+            _characterEntity = null;
+            _previousEntity = null;
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
@@ -46,18 +54,18 @@ namespace MultiplayerARPG
                 SetupUpdating();
         }
 
-        private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        private void AddEvents(BasePlayerCharacterEntity playingCharacterEntity)
         {
-            if (PlayingCharacterEntity == null)
+            if (playingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onRecached += SetupUpdating;
+            playingCharacterEntity.onRecached += SetupUpdating;
         }
 
-        private void RemoveEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        private void RemoveEvents(BasePlayerCharacterEntity playingCharacterEntity)
         {
-            if (PlayingCharacterEntity == null)
+            if (playingCharacterEntity == null)
                 return;
-            PlayingCharacterEntity.onRecached -= SetupUpdating;
+            playingCharacterEntity.onRecached -= SetupUpdating;
         }
 
         private void SetupUpdating()

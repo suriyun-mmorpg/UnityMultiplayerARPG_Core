@@ -3,6 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(int.MaxValue)]
     public class EquipmentModelBonesSetupByHumanBodyBonesUpdater : MonoBehaviour
     {
         [System.Serializable]
@@ -53,7 +54,7 @@ namespace MultiplayerARPG
                 Transform dstTransform = null;
                 try
                 {
-                    dst.GetBoneTransform((HumanBodyBones)i);
+                    dstTransform = dst.GetBoneTransform((HumanBodyBones)i);
                 }
                 catch (System.Exception)
                 {

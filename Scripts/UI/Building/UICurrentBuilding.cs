@@ -39,7 +39,32 @@ namespace MultiplayerARPG
         public Button buttonSetPassword;
         public Button buttonActivate;
 
-        private BuildingEntity buildingEntity;
+        private BuildingEntity _buildingEntity;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textTitle = null;
+            lockedObjects.Nulling();
+            unlockedObjects.Nulling();
+            lockableObjects.Nulling();
+            notLockableObjects.Nulling();
+            repairableObjects.Nulling();
+            notRepairableObjects.Nulling();
+            destroyableObjects.Nulling();
+            notDestroyableObjects.Nulling();
+            passwordDefinableObjects.Nulling();
+            notPasswordDefinableObjects.Nulling();
+            activatableObjects.Nulling();
+            notActivatableObjects.Nulling();
+            buttonLock = null;
+            buttonUnlock = null;
+            buttonRepair = null;
+            buttonDestroy = null;
+            buttonSetPassword = null;
+            buttonActivate = null;
+            _buildingEntity = null;
+        }
 
         public void Show(BuildingEntity buildingEntity)
         {
@@ -48,30 +73,30 @@ namespace MultiplayerARPG
                 // Don't show
                 return;
             }
-            this.buildingEntity = buildingEntity;
+            this._buildingEntity = buildingEntity;
             base.Show();
         }
 
         protected virtual void OnEnable()
         {
             if (textTitle != null)
-                textTitle.text = buildingEntity.Title;
+                textTitle.text = _buildingEntity.Title;
 
-            bool isCreator = buildingEntity.IsCreator(GameInstance.PlayingCharacterEntity);
-            bool lockable = !buildingEntity.IsLocked && buildingEntity.Lockable && isCreator;
-            bool unlockable = buildingEntity.IsLocked && buildingEntity.Lockable && isCreator;
-            bool repairable = buildingEntity.CanRepairByMenu() && buildingEntity.TryGetRepairAmount(GameInstance.PlayingCharacterEntity, out _, out _);
+            bool isCreator = _buildingEntity.IsCreator(GameInstance.PlayingCharacterEntity);
+            bool lockable = !_buildingEntity.IsLocked && _buildingEntity.Lockable && isCreator;
+            bool unlockable = _buildingEntity.IsLocked && _buildingEntity.Lockable && isCreator;
+            bool repairable = _buildingEntity.CanRepairByMenu() && _buildingEntity.TryGetRepairAmount(GameInstance.PlayingCharacterEntity, out _, out _);
             bool destroyable = isCreator;
-            bool passwordDefinable = buildingEntity.IsLocked && isCreator;
-            bool activatable = buildingEntity.CanActivate();
+            bool passwordDefinable = _buildingEntity.IsLocked && isCreator;
+            bool activatable = _buildingEntity.CanActivate();
 
             foreach (GameObject obj in lockedObjects)
             {
-                obj.SetActive(buildingEntity.IsLocked);
+                obj.SetActive(_buildingEntity.IsLocked);
             }
             foreach (GameObject obj in unlockedObjects)
             {
-                obj.SetActive(!buildingEntity.IsLocked);
+                obj.SetActive(!_buildingEntity.IsLocked);
             }
 
             foreach (GameObject obj in lockableObjects)
@@ -135,7 +160,7 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (IsVisible() && (buildingEntity == null || buildingEntity.IsDead()))
+            if (IsVisible() && (_buildingEntity == null || _buildingEntity.IsDead()))
                 Hide();
         }
 
@@ -147,37 +172,37 @@ namespace MultiplayerARPG
 
         public void OnClickRepair()
         {
-            Controller.RepairBuilding(buildingEntity);
+            Controller.RepairBuilding(_buildingEntity);
             Hide();
         }
 
         public void OnClickDestroy()
         {
-            Controller.DestroyBuilding(buildingEntity);
+            Controller.DestroyBuilding(_buildingEntity);
             Hide();
         }
 
         public void OnClickSetPassword()
         {
-            Controller.SetBuildingPassword(buildingEntity);
+            Controller.SetBuildingPassword(_buildingEntity);
             Hide();
         }
 
         public void OnClickLock()
         {
-            Controller.LockBuilding(buildingEntity);
+            Controller.LockBuilding(_buildingEntity);
             Hide();
         }
 
         public void OnClickUnlock()
         {
-            Controller.UnlockBuilding(buildingEntity);
+            Controller.UnlockBuilding(_buildingEntity);
             Hide();
         }
 
         public void OnClickActivate()
         {
-            Controller.ActivateBuilding(buildingEntity);
+            Controller.ActivateBuilding(_buildingEntity);
             Hide();
         }
     }

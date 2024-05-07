@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         int simulateSeed,
         byte triggerIndex,
         DamageInfo damageInfo,
-        Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+        List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
         AimPosition aimPosition);
 
     public delegate void UseSkillRoutineDelegate(
@@ -57,7 +57,7 @@ namespace MultiplayerARPG
         CharacterItem weapon,
         int simulateSeed,
         byte triggerIndex,
-        Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+        List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
         uint targetObjectId,
         AimPosition aimPosition);
 
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
         int simulateSeed,
         byte triggerIndex,
         byte spreadIndex,
-        Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+        List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
         BaseSkill skill,
         int skillLevel,
         AimPosition aimPosition);
@@ -128,6 +128,9 @@ namespace MultiplayerARPG
     public delegate void CanJumpDelegate(
         ref bool canJump);
 
+    public delegate void CanDashDelegate(
+        ref bool canDash);
+
     public delegate void CanTurnDelegate(
         ref bool canTurn);
 
@@ -152,4 +155,11 @@ namespace MultiplayerARPG
 
     public delegate void CalculatedBuffDelegate(
         CalculatedBuff calculatedBuff);
+
+    public delegate void OnInstantiatedEquipmentDelegate(
+        EquipmentModel model,
+        GameObject instantiatedObject,
+        BaseEquipmentEntity instantiatedEntity,
+        EquipmentInstantiatedObjectGroup instantiatedObjectGroup,
+        EquipmentContainer equipmentContainer);
 }

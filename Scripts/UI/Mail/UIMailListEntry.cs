@@ -20,27 +20,36 @@ namespace MultiplayerARPG
         public GameObject[] readObjects;
         public GameObject[] unreadObjects;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textSenderName = null;
+            textTitle = null;
+            textSentDate = null;
+            readObjects.Nulling();
+            unreadObjects.Nulling();
+        }
+
         protected override void UpdateData()
         {
             if (textSenderName != null)
             {
                 textSenderName.text = ZString.Format(
                     LanguageManager.GetText(formatSenderName),
-                    Data == null ? LanguageManager.GetUnknowTitle() : Data.SenderName);
+                    string.IsNullOrWhiteSpace(Data.SenderName) ? LanguageManager.GetUnknowTitle() : Data.SenderName);
             }
 
             if (textTitle != null)
             {
                 textTitle.text = ZString.Format(
                     LanguageManager.GetText(formatTitle),
-                    Data == null ? LanguageManager.GetUnknowTitle() : Data.Title);
+                    string.IsNullOrWhiteSpace(Data.Title) ? LanguageManager.GetUnknowTitle() : Data.Title);
             }
 
             if (textSentDate != null)
             {
                 System.DateTime dateTime = GenericUtils.GetStartDateTime();
-                if (Data != null)
-                    dateTime = dateTime.AddSeconds(Data.SentTimestamp).ToLocalTime();
+                dateTime = dateTime.AddSeconds(Data.SentTimestamp).ToLocalTime();
                 textSentDate.text = ZString.Format(
                     LanguageManager.GetText(formatSentDate),
                     (System.DateTime.Now - new System.DateTime(dateTime.Ticks)).GetPrettyDate());
@@ -50,7 +59,7 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < readObjects.Length; ++i)
                 {
-                    readObjects[i].SetActive(Data != null && Data.IsRead);
+                    readObjects[i].SetActive(Data.IsRead);
                 }
             }
 
@@ -58,7 +67,7 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < unreadObjects.Length; ++i)
                 {
-                    unreadObjects[i].SetActive(Data == null || !Data.IsRead);
+                    unreadObjects[i].SetActive(!Data.IsRead);
                 }
             }
         }

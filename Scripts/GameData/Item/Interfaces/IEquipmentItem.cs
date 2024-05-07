@@ -17,9 +17,9 @@ namespace MultiplayerARPG
         /// </summary>
         bool DestroyIfBroken { get; }
         /// <summary>
-        /// Max enhancement socket
+        /// Its length is max amount of enhancement sockets
         /// </summary>
-        byte MaxSocket { get; }
+        SocketEnhancerType[] AvailableSocketEnhancerTypes { get; }
         /// <summary>
         /// Equipment models, these models will be instantiated when equipping this item, for weapons it will be instantiated when equipping to main-hand (right-hand)
         /// </summary>

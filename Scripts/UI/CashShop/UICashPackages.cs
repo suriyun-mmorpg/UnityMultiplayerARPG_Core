@@ -26,34 +26,49 @@ namespace MultiplayerARPG
         public TextWrapper uiTextCash;
         public bool selectFirstEntryByDefault;
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
-        private UICashPackageSelectionManager cacheSelectionManager;
+        private UICashPackageSelectionManager _cacheSelectionManager;
         public UICashPackageSelectionManager CacheSelectionManager
         {
             get
             {
-                if (cacheSelectionManager == null)
-                    cacheSelectionManager = gameObject.GetOrAddComponent<UICashPackageSelectionManager>();
-                cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                return cacheSelectionManager;
+                if (_cacheSelectionManager == null)
+                    _cacheSelectionManager = gameObject.GetOrAddComponent<UICashPackageSelectionManager>();
+                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                return _cacheSelectionManager;
             }
         }
 
         public List<CashPackage> LoadedList { get; private set; } = new List<CashPackage>();
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            filterCategories?.Clear();
+            listEmptyObject = null;
+            uiDialog = null;
+            uiPrefab = null;
+            uiContainer = null;
+            uiTextCash = null;
+            _cacheList = null;
+            _cacheSelectionManager = null;
+            LoadedList.Nulling();
+            LoadedList?.Clear();
+        }
 
         public void Refresh()
         {

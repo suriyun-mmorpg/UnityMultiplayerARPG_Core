@@ -21,6 +21,19 @@ namespace MultiplayerARPG
         public UIResistanceAmounts uiResistances;
         public UISkillLevels uiSkills;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextTitle = null;
+            uiTextDescription = null;
+            imageIcon = null;
+            uiStats = null;
+            uiAttributes = null;
+            uiResistances = null;
+            uiSkills = null;
+            _data = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextTitle != null)

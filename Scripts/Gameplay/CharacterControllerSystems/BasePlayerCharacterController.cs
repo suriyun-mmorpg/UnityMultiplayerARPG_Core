@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -124,8 +126,20 @@ namespace MultiplayerARPG
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
-            if (CurrentGameInstance.UISceneGameplayPrefab != null)
-                UISceneGameplay = Instantiate(CurrentGameInstance.UISceneGameplayPrefab);
+            BaseUISceneGameplay prefab;
+#if !EXCLUDE_PREFAB_REFS
+            prefab = CurrentGameInstance.UISceneGameplayPrefab;
+#else
+            prefab = null;
+#endif
+            if (prefab != null)
+            {
+                UISceneGameplay = Instantiate(prefab);
+            }
+            else if (CurrentGameInstance.AddressableUISceneGameplayPrefab.IsDataValid())
+            {
+                UISceneGameplay = Instantiate(CurrentGameInstance.AddressableUISceneGameplayPrefab.GetOrLoadAsset<AssetReferenceBaseUISceneGameplay, BaseUISceneGameplay>());
+            }
             if (UISceneGameplay != null)
                 UISceneGameplay.OnControllerSetup(characterEntity);
             if (onSetup != null)
@@ -135,7 +149,10 @@ namespace MultiplayerARPG
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
         {
             if (UISceneGameplay != null)
+            {
+                UISceneGameplay.OnControllerDesetup(characterEntity);
                 Destroy(UISceneGameplay.gameObject);
+            }
             if (onDesetup != null)
                 onDesetup.Invoke(this);
         }
@@ -296,11 +313,7 @@ namespace MultiplayerARPG
 
         public void ClearQueueUsingSkill()
         {
-            _queueUsingSkill = new UsingSkillData();
-            _queueUsingSkill.aimPosition = default;
-            _queueUsingSkill.skill = null;
-            _queueUsingSkill.level = 0;
-            _queueUsingSkill.itemIndex = -1;
+            _queueUsingSkill = new UsingSkillData(default, null, 0, -1);
         }
 
         public abstract void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition);

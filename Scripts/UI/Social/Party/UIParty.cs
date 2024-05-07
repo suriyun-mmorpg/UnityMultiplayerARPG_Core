@@ -15,6 +15,15 @@ namespace MultiplayerARPG
 
         public PartyData Party { get { return GameInstance.JoinedParty; } }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            toggleShareExp = null;
+            toggleShareItem = null;
+            uiPartyCreate = null;
+            uiPartySetting = null;
+        }
+
         protected override void UpdateUIs()
         {
             if (toggleShareExp != null)

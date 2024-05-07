@@ -63,6 +63,21 @@ public class UIMessageDialog : UIBase
     private System.Action _onClickNo;
     private System.Action _onClickCancel;
 
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        uiTextTitle = null;
+        uiTextDescription = null;
+        buttonOkay = null;
+        buttonYes = null;
+        buttonNo = null;
+        buttonCancel = null;
+        _onClickOkay = null;
+        _onClickYes = null;
+        _onClickNo = null;
+        _onClickCancel = null;
+    }
+
     protected virtual void OnEnable()
     {
         // Set click events to all buttons

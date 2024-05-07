@@ -184,7 +184,7 @@ namespace MultiplayerARPG
 
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = skill.GetAttackDamages(Entity, skillLevel, isLeftHand);
+            Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts = skill.GetAttackDamages(Entity, skillLevel, isLeftHand);
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileUsingSkill = skill.moveSpeedRateWhileUsingSkill;
@@ -254,10 +254,14 @@ namespace MultiplayerARPG
                     Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, animSpeedRate, skillCancellationTokenSource.Token);
+                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token);
+
+                // Prepare damage amounts
+                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, _triggerDurations.Length);
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
-                HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, 0, skill.GetDamageInfo(Entity, isLeftHand), damageAmounts, isLeftHand, weapon, skill, skillLevel);
+                if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, 0, skill.GetDamageInfo(Entity, isLeftHand), damageAmounts, isLeftHand, weapon, skill, skillLevel);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpread, isLeftHand, weapon, skill, skillLevel);
 
@@ -298,8 +302,8 @@ namespace MultiplayerARPG
                     // Apply skill buffs, summons and attack damages
                     if ((IsServer && IsOwnerClient) || IsOwnedByServer)
                     {
-                        if (!skill.DecreaseResources(Entity, weapon, isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
-                            break;
+                        if (!skill.DecreaseResources(Entity, weapon, isLeftHand, out _))
+                            continue;
                         RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                         {
                             simulateSeed = simulateSeed,
@@ -307,11 +311,10 @@ namespace MultiplayerARPG
                             targetObjectId = targetObjectId,
                             aimPosition = aimPosition,
                         });
-                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, increaseDamageAmounts, targetObjectId, aimPosition);
+                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
                     }
                     else if (IsOwnerClient)
                     {
-                        Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = skill.GetIncreaseDamageByResources(Entity, weapon);
                         RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                         {
                             simulateSeed = simulateSeed,
@@ -319,7 +322,7 @@ namespace MultiplayerARPG
                             targetObjectId = targetObjectId,
                             aimPosition = aimPosition,
                         });
-                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, increaseDamageAmounts, targetObjectId, aimPosition);
+                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
                     }
 
                     if (_remainsDurationWithoutSpeedRate <= 0f)
@@ -373,15 +376,14 @@ namespace MultiplayerARPG
                     GameInstance.ServerLogHandlers.LogUseSkillTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NoValidateData);
                 return;
             }
-            if (!validateData.Skill.DecreaseResources(Entity, validateData.Weapon, validateData.IsLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts))
+            if (data.triggerIndex >= validateData.DamageAmounts.Count)
             {
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NotEnoughResources);
                 return;
             }
-            HitRegistrationManager.ConfirmHitRegValidation(Entity, data.simulateSeed, data.triggerIndex, increaseDamageAmounts);
             RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
-            ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.BaseDamageAmounts, increaseDamageAmounts, data.targetObjectId, data.aimPosition);
+            ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageAmounts, data.targetObjectId, data.aimPosition);
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogUseSkillTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
         }
@@ -396,17 +398,16 @@ namespace MultiplayerARPG
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
             if (validateData == null || validateData.Skill == null)
                 return;
-            Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts = validateData.Skill.GetIncreaseDamageByResources(Entity, validateData.Weapon);
-            ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.BaseDamageAmounts, increaseDamageAmounts, data.targetObjectId, data.aimPosition);
+            ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageAmounts, data.targetObjectId, data.aimPosition);
         }
 
-        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, Dictionary<DamageElement, MinMaxFloat> damageAmounts, Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, uint targetObjectId, AimPosition aimPosition)
         {
-            // Make sure it won't increase damage to the wrong collction
-            damageAmounts = damageAmounts == null ? new Dictionary<DamageElement, MinMaxFloat>() : new Dictionary<DamageElement, MinMaxFloat>(damageAmounts);
-            // Increase damage amounts
-            if (increaseDamageAmounts != null && increaseDamageAmounts.Count > 0)
-                damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, increaseDamageAmounts);
+            if (triggerIndex >= damageAmounts.Count)
+            {
+                // No damage applied (may not have enough ammo)
+                return;
+            }
 
             skill.ApplySkill(
                 Entity,
@@ -431,7 +432,7 @@ namespace MultiplayerARPG
                     return;
                 }
                 ProceedUseSkill(timestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-                RPC(CmdUseSkill, timestamp, dataId, isLeftHand, targetObjectId, aimPosition);
+                RPC(CmdUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, dataId, isLeftHand, targetObjectId, aimPosition);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -449,14 +450,11 @@ namespace MultiplayerARPG
         {
             if (!_manager.IsAcceptNewAction())
                 return;
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastUseSkillEndTime < -0.2f)
-                return;
             if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                 return;
             _manager.ActionAccepted();
             ProceedUseSkill(peerTimestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-            RPC(RpcUseSkill, peerTimestamp, dataId, skillLevel, isLeftHand, targetObjectId, aimPosition);
+            RPC(RpcUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, dataId, skillLevel, isLeftHand, targetObjectId, aimPosition);
         }
 
         [AllRpc]
@@ -498,7 +496,7 @@ namespace MultiplayerARPG
                 }
                 Entity.LastUseItemTime = Time.unscaledTime;
                 ProceedUseSkillItem(timestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-                RPC(CmdUseSkillItem, timestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
+                RPC(CmdUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -516,15 +514,11 @@ namespace MultiplayerARPG
         {
             if (!_manager.IsAcceptNewAction())
                 return;
-            // Speed hack avoidance
-            if (Time.unscaledTime - LastUseSkillEndTime < -0.2f)
-                return;
-            // Validate skill item
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
             _manager.ActionAccepted();
             ProceedUseSkillItem(peerTimestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-            RPC(RpcUseSkillItem, peerTimestamp, skillItem.DataId, isLeftHand, targetObjectId, aimPosition);
+            RPC(RpcUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, skillItem.DataId, isLeftHand, targetObjectId, aimPosition);
         }
 
         [AllRpc]
@@ -559,14 +553,14 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                RPC(CmdInterruptCastingSkill);
+                RPC(CmdInterruptCastingSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
                 return;
             }
             if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
             {
                 IsCastingSkillInterrupted = true;
                 ProceedInterruptCastingSkill();
-                RPC(RpcInterruptCastingSkill);
+                RPC(RpcInterruptCastingSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
             }
         }
 

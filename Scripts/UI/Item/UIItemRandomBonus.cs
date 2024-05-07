@@ -21,6 +21,12 @@ namespace MultiplayerARPG
         [Header("UI Elements")]
         public TextWrapper uiTextAllRandomBonus;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextAllRandomBonus = null;
+        }
+
         protected override void UpdateData()
         {
             StringBuilder builder = new StringBuilder();

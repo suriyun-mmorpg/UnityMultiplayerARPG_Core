@@ -36,6 +36,20 @@ namespace MultiplayerARPG
         public UnityEvent onIsTypeWriter = new UnityEvent();
         public UnityEvent onNotTypeWriter = new UnityEvent();
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextMessage = null;
+            uiTextSenderOnly = null;
+            uiTextMessageOnly = null;
+            uiTextTimestamp = null;
+            uiChatHandler = null;
+            onIsTypeWriter?.RemoveAllListeners();
+            onIsTypeWriter = null;
+            onNotTypeWriter?.RemoveAllListeners();
+            onNotTypeWriter = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiTextMessage != null)

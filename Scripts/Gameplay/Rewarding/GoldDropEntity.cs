@@ -1,12 +1,28 @@
+using LiteNetLibManager;
 using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public class GoldDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
+    public partial class GoldDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
     {
         public static GoldDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {
-            return Drop(GameInstance.Singleton.goldDropEntityPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as GoldDropEntity;
+            GoldDropEntity entity = null;
+            GoldDropEntity prefab;
+#if !EXCLUDE_PREFAB_REFS
+            prefab = GameInstance.Singleton.goldDropEntityPrefab;
+#else
+            prefab = null;
+#endif
+            if (prefab != null)
+            {
+                entity = Drop(prefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as GoldDropEntity;
+            }
+            else if (GameInstance.Singleton.addressableGoldDropEntityPrefab.IsDataValid())
+            {
+                entity = Drop(GameInstance.Singleton.addressableGoldDropEntityPrefab.GetOrLoadAsset<AssetReferenceGoldDropEntity, GoldDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as GoldDropEntity;
+            }
+            return entity;
         }
 
         protected override bool ProceedPickingUpAtServer_Implementation(BaseCharacterEntity characterEntity, out UITextKeys message)

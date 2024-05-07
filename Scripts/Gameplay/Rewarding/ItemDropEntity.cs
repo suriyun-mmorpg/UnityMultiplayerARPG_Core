@@ -12,7 +12,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity
+    public partial class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity
     {
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
 
@@ -31,7 +31,7 @@ namespace MultiplayerARPG
         [Category(99, "Events")]
         [FormerlySerializedAs("onItemDropDestroy")]
         [SerializeField]
-        protected UnityEvent onPickedUp;
+        protected UnityEvent onPickedUp = new UnityEvent();
 
         [Category(6, "Drop Settings")]
         public ItemDropManager itemDropManager = new ItemDropManager();
@@ -54,15 +54,32 @@ namespace MultiplayerARPG
         #endregion
 
         public bool PutOnPlaceholder { get; protected set; }
+
         public RewardGivenType GivenType { get; protected set; }
+
         public List<CharacterItem> DropItems { get; protected set; } = new List<CharacterItem>();
+
         public HashSet<string> Looters { get; protected set; } = new HashSet<string>();
+
         public GameSpawnArea<ItemDropEntity> SpawnArea { get; protected set; }
+
         public ItemDropEntity SpawnPrefab { get; protected set; }
+
+        public GameSpawnArea<ItemDropEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+
         public int SpawnLevel { get; protected set; }
+
         public Vector3 SpawnPosition { get; protected set; }
-        public float DestroyDelay { get { return destroyDelay; } }
-        public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
+
+        public float DestroyDelay
+        {
+            get { return destroyDelay; }
+        }
+
+        public float DestroyRespawnDelay
+        {
+            get { return destroyRespawnDelay; }
+        }
 
         private GameObject _dropModel;
 
@@ -220,6 +237,16 @@ namespace MultiplayerARPG
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;
+            SpawnAddressablePrefab = null;
+            SpawnLevel = spawnLevel;
+            SpawnPosition = spawnPosition;
+        }
+
+        public virtual void SetSpawnArea(GameSpawnArea<ItemDropEntity> spawnArea, GameSpawnArea<ItemDropEntity>.AddressablePrefab spawnAddressablePrefab, int spawnLevel, Vector3 spawnPosition)
+        {
+            SpawnArea = spawnArea;
+            SpawnPrefab = null;
+            SpawnAddressablePrefab = spawnAddressablePrefab;
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
@@ -281,7 +308,7 @@ namespace MultiplayerARPG
             CallRpcOnPickedUp();
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
+                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
             // Destroy this entity
@@ -306,7 +333,22 @@ namespace MultiplayerARPG
 
         public static ItemDropEntity Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
         {
-            return Drop(GameInstance.Singleton.itemDropEntityPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+            ItemDropEntity entity = null;
+            ItemDropEntity prefab;
+#if !EXCLUDE_PREFAB_REFS
+            prefab = GameInstance.Singleton.itemDropEntityPrefab;
+#else
+            prefab = null;
+#endif
+            if (prefab != null)
+            {
+                entity = Drop(prefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+            }
+            else if (GameInstance.Singleton.addressableItemDropEntityPrefab.IsDataValid())
+            {
+                entity = Drop(GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAsset<AssetReferenceItemDropEntity, ItemDropEntity>(), dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+            }
+            return entity;
         }
 
         public static ItemDropEntity Drop(ItemDropEntity prefab, BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters, float appearDuration)

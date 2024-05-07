@@ -160,6 +160,44 @@ namespace MultiplayerARPG
             }
         }
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiGuildCreate = null;
+            uiGuildRoleSetting = null;
+            uiGuildMemberRoleSetting = null;
+            uiRoleDialog = null;
+            uiRolePrefab = null;
+            uiRoleContainer = null;
+            uiSkillDialog = null;
+            uiSkillPrefab = null;
+            uiSkillContainer = null;
+            uiGuildIcon = null;
+            textGuildName = null;
+            textLeaderName = null;
+            textLevel = null;
+            uiGageExp = null;
+            textSkillPoint = null;
+            textMessage = null;
+            inputFieldMessage = null;
+            textMessage2 = null;
+            inputFieldMessage2 = null;
+            toggleAutoAcceptRequests = null;
+            toggleNotAutoAcceptRequests = null;
+            textScore = null;
+            textRank = null;
+            autoAcceptRequestsObjects.Nulling();
+            notAutoAcceptRequestsObjects.Nulling();
+            _roleList = null;
+            _roleSelectionManager = null;
+            _skillList = null;
+            _skillSelectionManager = null;
+            _guildMessageUpdater = null;
+            _guildMessage2Updater = null;
+            _guildAutoAcceptRequestUpdater = null;
+            _guildIconUpdater = null;
+        }
+
         protected override void UpdateUIs()
         {
             GuildOptions options = new GuildOptions();

@@ -18,19 +18,28 @@ namespace MultiplayerARPG
         public TextWrapper uiTextReturnGold;
         public TextWrapper uiTextDismantleAmount;
 
-        protected bool activated;
-        protected string activeItemId;
+        protected bool _activated;
+        protected string _activeItemId;
 
-        private int dismantleAmount;
+        private int _dismantleAmount;
         public int DismantleAmount
         {
-            get { return dismantleAmount; }
+            get { return _dismantleAmount; }
             private set
             {
-                dismantleAmount = value;
+                _dismantleAmount = value;
                 if (uiTextDismantleAmount != null)
-                    uiTextDismantleAmount.text = ZString.Format(LanguageManager.GetText(formatKeyDismantleAmount), dismantleAmount.ToString("N0"));
+                    uiTextDismantleAmount.text = ZString.Format(LanguageManager.GetText(formatKeyDismantleAmount), _dismantleAmount.ToString("N0"));
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiReturnItems = null;
+            uiReturnCurrencies = null;
+            uiTextReturnGold = null;
+            uiTextDismantleAmount = null;
         }
 
         protected override void UpdateData()
@@ -47,7 +56,7 @@ namespace MultiplayerARPG
             // Store data to variable so it won't lookup for data from property again
             CharacterItem characterItem = CharacterItem;
 
-            if (activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(activeItemId)))
+            if (_activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(_activeItemId)))
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
@@ -120,7 +129,7 @@ namespace MultiplayerARPG
         public override void Show()
         {
             base.Show();
-            activated = false;
+            _activated = false;
             OnUpdateCharacterItems();
         }
 
@@ -134,8 +143,8 @@ namespace MultiplayerARPG
         {
             if (InventoryType != InventoryType.NonEquipItems || CharacterItem.IsEmptySlot())
                 return;
-            activated = true;
-            activeItemId = CharacterItem.id;
+            _activated = true;
+            _activeItemId = CharacterItem.id;
             GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
             {
                 index = IndexOfData,

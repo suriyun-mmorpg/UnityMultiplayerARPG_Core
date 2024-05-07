@@ -128,38 +128,42 @@ namespace MultiplayerARPG
             if (DealingCharacter == null)
                 return;
             List<CharacterItem> tempDealingItems = new List<CharacterItem>(DealingItems);
-            CharacterItem nonEquipItem;
-            CharacterItem dealingItem;
+            CharacterItem tempNonEquipItem;
+            CharacterItem tempDealingItem;
             int i, j;
             for (i = Entity.NonEquipItems.Count - 1; i >= 0; --i)
             {
-                nonEquipItem = Entity.NonEquipItems[i];
+                tempNonEquipItem = Entity.NonEquipItems[i];
                 for (j = tempDealingItems.Count - 1; j >= 0; --j)
                 {
-                    dealingItem = tempDealingItems[j];
-                    if (nonEquipItem.id != dealingItem.id || nonEquipItem.amount < dealingItem.amount)
+                    tempDealingItem = tempDealingItems[j];
+                    if (tempDealingItem.id != tempNonEquipItem.id || tempDealingItem.amount > tempNonEquipItem.amount)
                     {
-                        if (DealingCharacter.IncreaseItems(dealingItem, characterItem => DealingCharacter.OnRewardItem(RewardGivenType.Dealing, characterItem)))
-                        {
-                            // Reduce item amount when able to increase item to co character
-                            nonEquipItem.amount -= dealingItem.amount;
-                            if (nonEquipItem.amount == 0)
-                            {
-                                // Amount is 0, remove it from inventory
-                                if (CurrentGameInstance.IsLimitInventorySlot)
-                                    Entity.NonEquipItems[i] = CharacterItem.Empty;
-                                else
-                                    Entity.NonEquipItems.RemoveAt(i);
-                            }
-                            else
-                            {
-                                // Update amount
-                                Entity.NonEquipItems[i] = nonEquipItem;
-                            }
-                        }
-                        tempDealingItems.RemoveAt(j);
-                        break;
+                        // Not a item player wish to offer, or its amount more than in inventory
+                        continue;
                     }
+                    if (!DealingCharacter.IncreaseItems(tempDealingItem, characterItem => DealingCharacter.OnRewardItem(RewardGivenType.Dealing, characterItem)))
+                    {
+                        // Another character cannot increase an items
+                        continue;
+                    }
+                    // Reduce item amount when able to increase item to co character
+                    tempNonEquipItem.amount -= tempDealingItem.amount;
+                    if (tempNonEquipItem.amount == 0)
+                    {
+                        // Amount is 0, remove it from inventory
+                        if (CurrentGameInstance.IsLimitInventorySlot)
+                            Entity.NonEquipItems[i] = CharacterItem.Empty;
+                        else
+                            Entity.NonEquipItems.RemoveAt(i);
+                    }
+                    else
+                    {
+                        // Update amount
+                        Entity.NonEquipItems[i] = tempNonEquipItem;
+                    }
+                    tempDealingItems.RemoveAt(j);
+                    break;
                 }
             }
             Entity.FillEmptySlots();
@@ -206,7 +210,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSendDealingRequest(uint objectId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DisableDealing)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
@@ -259,7 +263,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdAcceptDealingRequest()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingCharacter == null)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCEPT_DEALING_REQUEST);
@@ -292,7 +296,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdDeclineDealingRequest()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingCharacter != null)
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_DEALING_REQUEST_DECLINED);
             GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_DEALING_REQUEST_DECLINED);
@@ -331,7 +335,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSetDealingItem(string id, int amount)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingState != DealingState.Dealing)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
@@ -385,7 +389,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSetDealingGold(int gold)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingState != DealingState.Dealing)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
@@ -408,7 +412,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdLockDealing()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingState != DealingState.Dealing)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
@@ -427,7 +431,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdConfirmDealing()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingState != DealingState.LockDealing || !(DealingCharacter.Dealing.DealingState == DealingState.LockDealing || DealingCharacter.Dealing.DealingState == DealingState.ConfirmDealing))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
@@ -465,7 +469,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdCancelDealing()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DealingCharacter != null && DealingCharacter.Dealing.DealingState != DealingState.None)
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);
             if (DealingState != DealingState.None)

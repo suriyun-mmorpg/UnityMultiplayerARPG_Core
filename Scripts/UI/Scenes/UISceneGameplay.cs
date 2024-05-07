@@ -134,8 +134,63 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("Awake");
         }
 
-        protected void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            uiTargetCharacter = null;
+            uiTargetNpc = null;
+            uiTargetItemDrop = null;
+            uiTargetItemsContainer = null;
+            uiTargetBuilding = null;
+            uiTargetHarvestable = null;
+            uiTargetVehicle = null;
+            uiNpcDialog = null;
+            uiQuestRewardItemSelection = null;
+            uiRefineItem = null;
+            uiDismantleItem = null;
+            uiBulkDismantleItems = null;
+            uiRepairItem = null;
+            uiEnhanceSocketItem = null;
+            uiConstructBuilding = null;
+            uiCurrentBuilding = null;
+            uiCurrentDoor = null;
+            uiCurrentStorage = null;
+            uiCurrentWorkbench = null;
+            uiCurrentQueuedWorkbench = null;
+            uiPlayerActivateMenu = null;
+            uiDealingRequest = null;
+            uiDealing = null;
+            uiStartVending = null;
+            uiVending = null;
+            uiDuelingRequest = null;
+            uiDueling = null;
+            uiPartyInvitation = null;
+            uiGuildInvitation = null;
+            uiPlayerStorageItems = null;
+            uiGuildStorageItems = null;
+            uiBuildingStorageItems = null;
+            uiBuildingCampfireItems = null;
+            uiBuildingCraftItems = null;
+            uiCraftingQueueItems = null;
+            uiItemsContainer = null;
+            uiIsWarping = null;
+            toggleUis?.Clear();
+            ignorePointerOverUITags?.Clear();
+            ignorePointerOverUIObjects.Nulling();
+            ignorePointerOverUIObjects?.Clear();
+            blockControllerUis.Nulling();
+            blockControllerUis?.Clear();
+            onCharacterDead?.RemoveAllListeners();
+            onCharacterDead = null;
+            onCharacterRespawn?.RemoveAllListeners();
+            onCharacterRespawn = null;
+            onShowConstructBuildingDialog = null;
+            onHideConstructBuildingDialog = null;
+            onShowCurrentBuildingDialog = null;
+            onHideCurrentBuildingDialog = null;
+            _openedNpcDialogs.Nulling();
+            _openedNpcDialogs?.Clear();
+            _pointerOverUIResults?.Clear();
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 
@@ -838,36 +893,42 @@ namespace MultiplayerARPG
 
         public override void OnControllerSetup(BasePlayerCharacterEntity playerCharacter)
         {
-            playerCharacter.NpcAction.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
-            playerCharacter.NpcAction.onShowNpcDialog += ShowNpcDialog;
-            playerCharacter.NpcAction.onShowNpcRefineItem += OnShowNpcRefineItem;
-            playerCharacter.NpcAction.onShowNpcDismantleItem += OnShowNpcDismantleItem;
-            playerCharacter.NpcAction.onShowNpcRepairItem += OnShowNpcRepairItem;
-            playerCharacter.Dealing.onRequestDealing += OnShowDealingRequest;
-            playerCharacter.Dealing.onStartDealing += OnShowDealing;
-            playerCharacter.Dueling.onRequestDueling += OnShowDuelingRequest;
-            playerCharacter.Dueling.onStartDueling += OnShowDueling;
-            playerCharacter.onIsWarpingChange += OnIsWarpingChange;
-            playerCharacter.onDead.AddListener(OnCharacterDead);
-            playerCharacter.onRespawn.AddListener(OnCharacterRespawn);
+            if (playerCharacter != null)
+            {
+                playerCharacter.NpcAction.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
+                playerCharacter.NpcAction.onShowNpcDialog += ShowNpcDialog;
+                playerCharacter.NpcAction.onShowNpcRefineItem += OnShowNpcRefineItem;
+                playerCharacter.NpcAction.onShowNpcDismantleItem += OnShowNpcDismantleItem;
+                playerCharacter.NpcAction.onShowNpcRepairItem += OnShowNpcRepairItem;
+                playerCharacter.Dealing.onRequestDealing += OnShowDealingRequest;
+                playerCharacter.Dealing.onStartDealing += OnShowDealing;
+                playerCharacter.Dueling.onRequestDueling += OnShowDuelingRequest;
+                playerCharacter.Dueling.onStartDueling += OnShowDueling;
+                playerCharacter.onIsWarpingChange += OnIsWarpingChange;
+                playerCharacter.onDead.AddListener(OnCharacterDead);
+                playerCharacter.onRespawn.AddListener(OnCharacterRespawn);
+            }
             ClientPartyActions.onNotifyPartyInvitation += OnNotifyPartyInvitation;
             ClientGuildActions.onNotifyGuildInvitation += OnNotifyGuildInvitation;
         }
 
         public override void OnControllerDesetup(BasePlayerCharacterEntity playerCharacter)
         {
-            playerCharacter.NpcAction.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
-            playerCharacter.NpcAction.onShowNpcDialog -= ShowNpcDialog;
-            playerCharacter.NpcAction.onShowNpcRefineItem -= OnShowNpcRefineItem;
-            playerCharacter.NpcAction.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
-            playerCharacter.NpcAction.onShowNpcRepairItem -= OnShowNpcRepairItem;
-            playerCharacter.Dealing.onRequestDealing -= OnShowDealingRequest;
-            playerCharacter.Dealing.onStartDealing -= OnShowDealing;
-            playerCharacter.Dueling.onRequestDueling -= OnShowDuelingRequest;
-            playerCharacter.Dueling.onStartDueling -= OnShowDueling;
-            playerCharacter.onIsWarpingChange -= OnIsWarpingChange;
-            playerCharacter.onDead.RemoveListener(OnCharacterDead);
-            playerCharacter.onRespawn.RemoveListener(OnCharacterRespawn);
+            if (playerCharacter != null)
+            {
+                playerCharacter.NpcAction.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
+                playerCharacter.NpcAction.onShowNpcDialog -= ShowNpcDialog;
+                playerCharacter.NpcAction.onShowNpcRefineItem -= OnShowNpcRefineItem;
+                playerCharacter.NpcAction.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
+                playerCharacter.NpcAction.onShowNpcRepairItem -= OnShowNpcRepairItem;
+                playerCharacter.Dealing.onRequestDealing -= OnShowDealingRequest;
+                playerCharacter.Dealing.onStartDealing -= OnShowDealing;
+                playerCharacter.Dueling.onRequestDueling -= OnShowDuelingRequest;
+                playerCharacter.Dueling.onStartDueling -= OnShowDueling;
+                playerCharacter.onIsWarpingChange -= OnIsWarpingChange;
+                playerCharacter.onDead.RemoveListener(OnCharacterDead);
+                playerCharacter.onRespawn.RemoveListener(OnCharacterRespawn);
+            }
             ClientPartyActions.onNotifyPartyInvitation -= OnNotifyPartyInvitation;
             ClientGuildActions.onNotifyGuildInvitation -= OnNotifyGuildInvitation;
         }

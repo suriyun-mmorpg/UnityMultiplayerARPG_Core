@@ -29,6 +29,19 @@ namespace MultiplayerARPG
         public UIItemAmounts uiRequireItemAmounts;
         public GameObject[] disallowStateObjects = new GameObject[0];
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiTextRequireLevel = null;
+            uiTextRequireSkillPoint = null;
+            uiTextRequireGold = null;
+            uiRequireAttributeAmounts = null;
+            uiRequireSkillLevels = null;
+            uiRequireCurrencyAmounts = null;
+            uiRequireItemAmounts = null;
+            disallowStateObjects.Nulling();
+        }
+
         protected override void UpdateData()
         {
             BaseSkill skill = Data.characterSkill.GetSkill();

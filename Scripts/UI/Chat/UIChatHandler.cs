@@ -61,31 +61,46 @@ namespace MultiplayerARPG
             set { if (uiMessageField != null) uiMessageField.text = value; }
         }
 
-        private UIList cacheList;
+        private UIList _cacheList;
         public UIList CacheList
         {
             get
             {
-                if (cacheList == null)
+                if (_cacheList == null)
                 {
-                    cacheList = gameObject.AddComponent<UIList>();
-                    cacheList.uiPrefab = uiPrefab.gameObject;
-                    cacheList.uiContainer = uiContainer;
+                    _cacheList = gameObject.AddComponent<UIList>();
+                    _cacheList.uiPrefab = uiPrefab.gameObject;
+                    _cacheList.uiContainer = uiContainer;
                 }
-                return cacheList;
+                return _cacheList;
             }
         }
 
         public event System.Action<UIChatMessage> onClickChatEntry;
 
-        private bool aleradySetupReceiveEvent;
-        private bool movingToEnd;
-        private ChatChannel dirtyChatChannel;
+        private bool _aleradySetupReceiveEvent;
+        private bool _movingToEnd;
+        private ChatChannel _dirtyChatChannel;
 
         protected override void Awake()
         {
             base.Awake();
             SetOnClientReceiveChatMessage();
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            RemoveOnClientReceiveChatMessage();
+            ChannelBasedChatMessages?.Clear();
+            enterChatActiveObjects.Nulling();
+            uiReceiverField = null;
+            uiMessageField = null;
+            uiPrefab = null;
+            uiContainer = null;
+            scrollRect = null;
+            _cacheList = null;
+            onClickChatEntry = null;
         }
 
         private void Start()
@@ -104,14 +119,9 @@ namespace MultiplayerARPG
             StartCoroutine(VerticalScroll(0f));
         }
 
-        private void OnDestroy()
-        {
-            RemoveOnClientReceiveChatMessage();
-        }
-
         public void SetOnClientReceiveChatMessage()
         {
-            if (aleradySetupReceiveEvent)
+            if (_aleradySetupReceiveEvent)
                 return;
             RemoveOnClientReceiveChatMessage();
             CacheList.HideAll();
@@ -125,26 +135,26 @@ namespace MultiplayerARPG
                 index++;
             }
             ClientGenericActions.onClientReceiveChatMessage += OnReceiveChat;
-            aleradySetupReceiveEvent = true;
+            _aleradySetupReceiveEvent = true;
         }
 
         public void RemoveOnClientReceiveChatMessage()
         {
             ClientGenericActions.onClientReceiveChatMessage -= OnReceiveChat;
-            aleradySetupReceiveEvent = false;
+            _aleradySetupReceiveEvent = false;
         }
 
         private void Update()
         {
-            if (dirtyChatChannel != chatChannel)
+            if (_dirtyChatChannel != chatChannel)
             {
-                dirtyChatChannel = chatChannel;
+                _dirtyChatChannel = chatChannel;
                 if (!showingMessagesFromAllChannels)
                     FillChatMessages();
             }
-            if (movingToEnd)
+            if (_movingToEnd)
             {
-                movingToEnd = false;
+                _movingToEnd = false;
                 uiMessageField.MoveTextEnd(false);
             }
             if (InputManager.GetKeyUp(enterChatKey))
@@ -176,7 +186,7 @@ namespace MultiplayerARPG
                 uiMessageField.ActivateInputField();
                 if (EventSystem.current != null)
                     EventSystem.current.SetSelectedGameObject(uiMessageField.gameObject);
-                movingToEnd = true;
+                _movingToEnd = true;
             }
             EnterChatFieldVisible = true;
         }

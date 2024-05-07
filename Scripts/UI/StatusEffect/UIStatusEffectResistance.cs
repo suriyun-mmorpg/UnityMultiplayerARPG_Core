@@ -19,6 +19,14 @@ namespace MultiplayerARPG
         public TextWrapper uiTextEntriesOnly;
         public TextWrapper uiTextTitleWithEntries;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiGameDataElements = null;
+            uiTextEntriesOnly = null;
+            uiTextTitleWithEntries = null;
+        }
+
         protected override void UpdateData()
         {
             if (uiGameDataElements != null)

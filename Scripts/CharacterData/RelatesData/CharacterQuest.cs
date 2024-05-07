@@ -2,48 +2,13 @@
 
 namespace MultiplayerARPG
 {
-    public partial class CharacterQuest
+    public partial struct CharacterQuest
     {
-        [System.NonSerialized]
-        private int _dirtyDataId;
-
-        [System.NonSerialized]
-        private Quest _cacheQuest;
-
-        ~CharacterQuest()
-        {
-            ClearCachedData();
-        }
-
-        private void ClearCachedData()
-        {
-            _cacheQuest = null;
-        }
-
-        private bool IsRecaching()
-        {
-            return _dirtyDataId != dataId;
-        }
-
-        private void MakeAsCached()
-        {
-            _dirtyDataId = dataId;
-        }
-
-        private void MakeCache()
-        {
-            if (!IsRecaching())
-                return;
-            MakeAsCached();
-            ClearCachedData();
-            if (!GameInstance.Quests.TryGetValue(dataId, out _cacheQuest))
-                _cacheQuest = null;
-        }
-
         public Quest GetQuest()
         {
-            MakeCache();
-            return _cacheQuest;
+            if (GameInstance.Quests.TryGetValue(dataId, out Quest result))
+                return result;
+            return null;
         }
 
         public bool IsAllTasksDone(IPlayerCharacterData character, out bool hasCompleteAfterTalkedTask)
@@ -119,7 +84,7 @@ namespace MultiplayerARPG
                     if (task.completeAfterTalked)
                         progress = 1;
                     else
-                        progress = CompletedTasks.Contains(taskIndex) ? 1 : 0;
+                        progress = completedTasks.Contains(taskIndex) ? 1 : 0;
                     targetProgress = 1;
                     isComplete = progress >= targetProgress;
                     return progress;
@@ -142,17 +107,17 @@ namespace MultiplayerARPG
             Quest quest = GetQuest();
             if (quest == null || !quest.CacheKillMonsterIds.Contains(monsterDataId))
                 return false;
-            if (!KilledMonsters.ContainsKey(monsterDataId))
-                KilledMonsters.Add(monsterDataId, 0);
-            KilledMonsters[monsterDataId] += killCount;
+            if (!killedMonsters.ContainsKey(monsterDataId))
+                killedMonsters.Add(monsterDataId, 0);
+            killedMonsters[monsterDataId] += killCount;
             return true;
         }
 
         public int CountKillMonster(int monsterDataId)
         {
-            if (!KilledMonsters.ContainsKey(monsterDataId))
+            if (!killedMonsters.ContainsKey(monsterDataId))
                 return 0;
-            return KilledMonsters[monsterDataId];
+            return killedMonsters[monsterDataId];
         }
 
         public static CharacterQuest Create(Quest quest)

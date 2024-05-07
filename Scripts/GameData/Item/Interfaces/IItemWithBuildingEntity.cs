@@ -6,5 +6,6 @@ namespace MultiplayerARPG
         /// Building entity for this item
         /// </summary>
         BuildingEntity BuildingEntity { get; }
+        AssetReferenceBuildingEntity AddressableBuildingEntity { get; }
     }
 }

@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextTitle;
 
         [Header("Events")]
-        public Event onSetEntity;
+        public Event onSetEntity = new Event();
 
         [Header("Visible Options")]
         public Visibility visibility;
@@ -52,9 +52,16 @@ namespace MultiplayerARPG
             CacheCanvas.enabled = false;
         }
 
-        protected virtual void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             RemoveEvents(_previousEntity);
+            uiTextTitle = null;
+            onSetEntity?.RemoveAllListeners();
+            onSetEntity = null;
+            _cacheCanvas = null;
+            _previousEntity = null;
+            _data = null;
         }
 
         protected virtual void AddEvents(T entity)
@@ -71,7 +78,7 @@ namespace MultiplayerARPG
             entity.SyncTitle.onChange -= OnSyncTitleChanged;
         }
 
-        private void OnSyncTitleChanged(bool isInitial, string value)
+        protected void OnSyncTitleChanged(bool isInitial, string value)
         {
             UpdateTitle();
         }

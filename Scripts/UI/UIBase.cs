@@ -17,7 +17,7 @@ public class UIBase : MonoBehaviour
     public UIBaseEvent onShowWithObject = new UIBaseEvent();
     public UIBaseEvent onHideWithObject = new UIBaseEvent();
 
-    private bool isAwaken;
+    private bool _isAwaken;
 
     public GameObject CacheRoot
     {
@@ -32,14 +32,34 @@ public class UIBase : MonoBehaviour
 
     protected virtual void Awake()
     {
-        if (isAwaken)
+        if (_isAwaken)
             return;
-        isAwaken = true;
+        _isAwaken = true;
+
+        // Force call events
+        bool isVisible = IsVisible();
+        if (hideOnAwake && !isVisible)
+            CallHideEvents();
+        else if (!hideOnAwake && isVisible)
+            CallShowEvents();
 
         if (hideOnAwake)
             Hide();
         else
             Show();
+    }
+
+    protected virtual void OnDestroy()
+    {
+        root = null;
+        onShow?.RemoveAllListeners();
+        onShow = null;
+        onHide?.RemoveAllListeners();
+        onHide = null;
+        onShowWithObject?.RemoveAllListeners();
+        onShowWithObject = null;
+        onHideWithObject?.RemoveAllListeners();
+        onHideWithObject = null;
     }
 
     protected virtual void CacheComponents()
@@ -60,15 +80,20 @@ public class UIBase : MonoBehaviour
     {
         if (IsVisible())
             return;
-        isAwaken = true;
+        _isAwaken = true;
         CacheComponents();
         if (!CacheRoot.activeSelf)
             CacheRoot.SetActive(true);
+        if (moveToLastSiblingOnShow)
+            CacheRoot.transform.SetAsLastSibling();
+        CallShowEvents();
+    }
+
+    private void CallShowEvents()
+    {
         onShow.Invoke();
         onShowWithObject.Invoke(this);
         OnShow();
-        if (moveToLastSiblingOnShow)
-            CacheRoot.transform.SetAsLastSibling();
         this.InvokeInstanceDevExtMethods("Show");
     }
 
@@ -81,9 +106,14 @@ public class UIBase : MonoBehaviour
     {
         if (!IsVisible())
             return;
-        isAwaken = true;
+        _isAwaken = true;
         CacheComponents();
         CacheRoot.SetActive(false);
+        CallHideEvents();
+    }
+
+    private void CallHideEvents()
+    {
         onHide.Invoke();
         onHideWithObject.Invoke(this);
         OnHide();

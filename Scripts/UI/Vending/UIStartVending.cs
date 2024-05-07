@@ -39,6 +39,18 @@ namespace MultiplayerARPG
         private UISelectionManagerShowOnSelectEventManager<VendingItem, UIVendingItem> _itemListEventSetupManager = new UISelectionManagerShowOnSelectEventManager<VendingItem, UIVendingItem>();
         private StartVendingItems _items = new StartVendingItems();
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            inputTitle = null;
+            uiSelectedItem = null;
+            uiItemPrefab = null;
+            uiItemContainer = null;
+            _itemList = null;
+            _itemSelectionManager = null;
+            _itemListEventSetupManager = null;
+        }
+
         private void OnEnable()
         {
             _itemListEventSetupManager.OnEnable(ItemSelectionManager, uiSelectedItem);

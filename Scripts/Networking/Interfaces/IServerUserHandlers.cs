@@ -140,5 +140,19 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="characterName"></param>
         void UnmuteCharacterByName(string characterName);
+
+        /// <summary>
+        /// Change user gold, we will use this to change user gold to database
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="gold"></param>
+        void ChangeUserGold(string userId, int gold);
+
+        /// <summary>
+        /// Change user cash, we will use this to change user cash to database
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="cash"></param>
+        void ChangeUserCash(string userId, int cash);
     }
 }

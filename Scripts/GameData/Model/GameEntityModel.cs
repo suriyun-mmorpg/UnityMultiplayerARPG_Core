@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
 using UtilsComponents;
-using System.Collections;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,26 +16,6 @@ namespace MultiplayerARPG
             Visible,
             Invisible,
             Fps
-        }
-
-        internal static int GeneratingId { get; set; } = 0;
-
-        [SerializeField]
-        [ReadOnlyField]
-        protected int _id;
-
-        public int Id
-        {
-            get
-            {
-                if (_id <= 0)
-                    _id = ++GeneratingId;
-                return _id;
-            }
-            protected set
-            {
-                _id = value;
-            }
         }
 
         public EVisibleState VisibleState { get; protected set; }
@@ -146,7 +125,7 @@ namespace MultiplayerARPG
 
         public virtual BaseGameEntity Entity { get; set; }
         public Transform CacheTransform { get; protected set; }
-        public BaseModelHiddingUpdater ModelHiddingUpdater { get; protected set; }
+        public ModelHiddingUpdater ModelHiddingUpdater { get; protected set; }
 
         protected Dictionary<string, EffectContainer> _cacheEffectContainers = null;
         /// <summary>
@@ -159,19 +138,11 @@ namespace MultiplayerARPG
 
         protected bool _isCacheDataInitialized = false;
 
-        internal void AssignId()
-        {
-            Id = ++GeneratingId;
-        }
-
-        internal void UnassignId()
-        {
-            Id = 0;
-        }
-
         protected virtual void Awake()
         {
-            Entity = GetComponentInParent<BaseGameEntity>();
+            Entity = GetComponent<BaseGameEntity>();
+            if (Entity == null)
+                Entity = GetComponentInParent<BaseGameEntity>();
             InitCacheData();
         }
 
@@ -183,7 +154,7 @@ namespace MultiplayerARPG
             // Prepare cache transform
             CacheTransform = transform;
             // Prepare hidding renderers updater
-            ModelHiddingUpdater = gameObject.GetOrAddComponent<BaseModelHiddingUpdater>();
+            ModelHiddingUpdater = gameObject.GetOrAddComponent<ModelHiddingUpdater>();
             // Prepare audio source if it is not set
             if (genericAudioSource == null)
             {
@@ -220,6 +191,10 @@ namespace MultiplayerARPG
                     Gizmos.DrawWireSphere(effectContainer.transform.position, 0.1f);
                     Gizmos.DrawSphere(effectContainer.transform.position, 0.03f);
                     Handles.Label(effectContainer.transform.position, effectContainer.effectSocket + "(Effect)");
+                    Gizmos.color = new Color(0, 0, 1, 0.5f);
+                    DrawArrow.ForGizmo(effectContainer.transform.position, effectContainer.transform.forward, 0.5f, 0.1f);
+                    Gizmos.color = new Color(0, 1, 0, 0.5f);
+                    DrawArrow.ForGizmo(effectContainer.transform.position, -effectContainer.transform.up, 0.5f, 0.1f);
                 }
             }
         }

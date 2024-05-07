@@ -72,7 +72,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdStartVending(string title, StartVendingItems items)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (DisableVending)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdStopVending()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             StopVending();
 #endif
         }
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSubscribe(uint objectId)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
@@ -178,7 +178,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdUnsubscribe()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (_store == null)
                 return;
             _store.RemoveCustomer(this);
@@ -222,7 +222,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdBuyItem(int index)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             _store.SellItem(this, index);
 #endif
         }

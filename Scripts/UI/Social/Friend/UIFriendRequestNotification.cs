@@ -8,6 +8,13 @@ namespace MultiplayerARPG
         public GameObject[] notificationObjects = new GameObject[0];
         public TextWrapper[] notificationCountTexts = new TextWrapper[0];
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            notificationObjects.Nulling();
+            notificationCountTexts.Nulling();
+        }
+
         private void OnEnable()
         {
             Refresh();

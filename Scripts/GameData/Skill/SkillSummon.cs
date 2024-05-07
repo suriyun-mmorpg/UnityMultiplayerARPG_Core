@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -6,10 +7,33 @@ namespace MultiplayerARPG
     public partial struct SkillSummon
     {
         public static readonly SkillSummon Empty = new SkillSummon();
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
         [SerializeField]
-        private BaseMonsterCharacterEntity monsterEntity;
-        public BaseMonsterCharacterEntity MonsterEntity { get { return monsterEntity; } }
+        [FormerlySerializedAs("monsterEntity")]
+        private BaseMonsterCharacterEntity monsterCharacterEntity;
+#endif
+        public BaseMonsterCharacterEntity MonsterCharacterEntity
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return monsterCharacterEntity;
+#else
+                return null;
+#endif
+            }
+        }
+
+        [SerializeField]
+        private AssetReferenceBaseMonsterCharacterEntity addressableMonsterCharacterEntity;
+        public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
+        {
+            get
+            {
+                return addressableMonsterCharacterEntity;
+            }
+        }
 
         [Tooltip("If duration less than or equals to 0, summoned monster will die")]
         [SerializeField]
@@ -29,13 +53,17 @@ namespace MultiplayerARPG
         public IncrementalInt Level { get { return level; } }
 
         public SkillSummon(
-            BaseMonsterCharacterEntity monsterEntity,
+            BaseMonsterCharacterEntity monsterCharacterEntity,
+            AssetReferenceBaseMonsterCharacterEntity addressableMonsterCharacterEntity,
             IncrementalFloat duration,
             IncrementalInt amountEachTime,
             IncrementalInt maxStack,
             IncrementalInt level)
         {
-            this.monsterEntity = monsterEntity;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+            this.monsterCharacterEntity = monsterCharacterEntity;
+#endif
+            this.addressableMonsterCharacterEntity = addressableMonsterCharacterEntity;
             this.duration = duration;
             this.amountEachTime = amountEachTime;
             this.maxStack = maxStack;

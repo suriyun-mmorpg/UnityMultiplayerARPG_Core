@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRewardGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_GOLD);
         [Tooltip("Format => {0} = {Cash Amount}")]
         public UILocaleKeySetting formatKeyRewardCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REWARD_CASH);
+        
         public GameObject textRewardExpRoot;
         public TextWrapper textRewardExp;
         public GameObject textRewardGoldRoot;
@@ -18,6 +19,18 @@ namespace MultiplayerARPG
         public GameObject textRewardCashRoot;
         public TextWrapper textRewardCash;
         public UICharacterItems uiRewardItems;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            textRewardExpRoot = null;
+            textRewardExp = null;
+            textRewardGoldRoot = null;
+            textRewardGold = null;
+            textRewardCashRoot = null;
+            textRewardCash = null;
+            uiRewardItems = null;
+        }
 
         protected override void UpdateData()
         {

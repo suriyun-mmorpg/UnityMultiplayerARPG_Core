@@ -153,7 +153,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdEnterVehicle(uint objectId, byte seatIndex)
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
                 return;
             IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdExitVehicle()
         {
-#if UNITY_EDITOR || UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             ExitVehicle();
 #endif
         }

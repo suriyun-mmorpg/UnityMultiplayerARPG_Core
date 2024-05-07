@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     {
         public static readonly MovementRestriction None = new MovementRestriction();
         public bool jumpRestricted;
+        public bool dashRestricted;
         public bool turnRestricted;
     }
 }

@@ -7,19 +7,7 @@ namespace MultiplayerARPG
 {
     public class UIEnhanceSocketItem : UIBaseOwningCharacterItem
     {
-        public IEquipmentItem EquipmentItem { get { return CharacterItem != null ? CharacterItem.GetEquipmentItem() : null; } }
-        public byte MaxSocket { get { return GameInstance.Singleton.GameplayRule.GetItemMaxSocket(GameInstance.PlayingCharacter, CharacterItem); } }
-        public bool CanEnhance { get { return MaxSocket > 0 && CharacterItem.Sockets.Count < MaxSocket; } }
-        public int SelectedEnhancerId
-        {
-            get
-            {
-                if (uiSocketEnhancerItems.CacheSelectionManager.SelectedUI != null &&
-                    uiSocketEnhancerItems.CacheSelectionManager.SelectedUI.SocketEnhancerItem != null)
-                    return uiSocketEnhancerItems.CacheSelectionManager.SelectedUI.SocketEnhancerItem.DataId;
-                return 0;
-            }
-        }
+        public IEquipmentItem EquipmentItem { get { return CharacterItem.GetEquipmentItem(); } }
 
         public int SelectedSocketIndex
         {
@@ -28,6 +16,28 @@ namespace MultiplayerARPG
                 if (uiAppliedSocketEnhancerItems.CacheSelectionManager.SelectedUI != null)
                     return uiAppliedSocketEnhancerItems.CacheSelectionManager.SelectedUI.IndexOfData;
                 return -1;
+            }
+        }
+
+        public SocketEnhancerType? SelectedSocketEnhancerType
+        {
+            get
+            {
+                int index = SelectedSocketIndex;
+                if (index >= 0 && index < EquipmentItem.AvailableSocketEnhancerTypes.Length)
+                    return EquipmentItem.AvailableSocketEnhancerTypes[index];
+                return null;
+            }
+        }
+
+        public int SelectedEnhancerId
+        {
+            get
+            {
+                if (uiSocketEnhancerItems.CacheSelectionManager.SelectedUI != null &&
+                    uiSocketEnhancerItems.CacheSelectionManager.SelectedUI.SocketEnhancerItem != null)
+                    return uiSocketEnhancerItems.CacheSelectionManager.SelectedUI.SocketEnhancerItem.DataId;
+                return 0;
             }
         }
 
@@ -50,8 +60,19 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRequireGold;
         public TextWrapper uiTextSimpleRequireGold;
 
-        protected bool activated;
-        protected string activeItemId;
+        protected bool _activated;
+        protected string _activeItemId;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiSocketEnhancerItems = null;
+            uiAppliedSocketEnhancerItems = null;
+            uiRequireItemAmounts = null;
+            uiRequireCurrencyAmounts = null;
+            uiTextRequireGold = null;
+            uiTextSimpleRequireGold = null;
+        }
 
         protected override void Update()
         {
@@ -117,7 +138,7 @@ namespace MultiplayerARPG
             // Store data to variable so it won't lookup for data from property again
             CharacterItem characterItem = CharacterItem;
 
-            if (activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(activeItemId)))
+            if (_activated && (characterItem.IsEmptySlot() || !characterItem.id.Equals(_activeItemId)))
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
@@ -138,37 +159,63 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (uiSocketEnhancerItems != null)
-            {
-                uiSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
-                uiSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                uiSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter);
-            }
+            UpdateAppliedSocketEnhancerItems();
+            UpdateSocketEnhancerItems();
+        }
 
-            if (uiAppliedSocketEnhancerItems != null)
+        public virtual void UpdateAppliedSocketEnhancerItems()
+        {
+            if (uiAppliedSocketEnhancerItems == null)
+                return;
+
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnSelected.RemoveListener(OnUiAppliedSocketEnhancerItemsSelected);
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+            uiAppliedSocketEnhancerItems.inventoryType = InventoryType.Unknow;
+            uiAppliedSocketEnhancerItems.filterItemTypes.Clear();
+            uiAppliedSocketEnhancerItems.filterItemTypes.Add(ItemType.SocketEnhancer);
+
+            CharacterItem characterItem = CharacterItem;
+            List<CharacterItem> characterItems = new List<CharacterItem>();
+            if (EquipmentItem != null)
             {
-                uiAppliedSocketEnhancerItems.inventoryType = InventoryType.Unknow;
-                uiAppliedSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-                uiAppliedSocketEnhancerItems.filterItemTypes = new List<ItemType>() { ItemType.SocketEnhancer };
-                List<CharacterItem> characterItems = new List<CharacterItem>();
-                if (EquipmentItem != null)
+                for (int i = 0; i < EquipmentItem.AvailableSocketEnhancerTypes.Length; ++i)
                 {
-                    for (int i = 0; i < characterItem.Sockets.Count; ++i)
-                    {
-                        if (characterItem.Sockets[i] == 0)
-                            characterItems.Add(CharacterItem.CreateEmptySlot());
-                        else
-                            characterItems.Add(CharacterItem.Create(characterItem.Sockets[i]));
-                    }
+                    if (i >= characterItem.sockets.Count || characterItem.sockets[i] == 0)
+                        characterItems.Add(CharacterItem.CreateEmptySlot());
+                    else
+                        characterItems.Add(CharacterItem.Create(characterItem.sockets[i]));
                 }
-                uiAppliedSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
             }
+            uiAppliedSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnSelected.AddListener(OnUiAppliedSocketEnhancerItemsSelected);
+        }
+
+        private void OnUiAppliedSocketEnhancerItemsSelected(UICharacterItem ui)
+        {
+            UpdateSocketEnhancerItems();
+        }
+
+        public virtual void UpdateSocketEnhancerItems()
+        {
+            if (uiSocketEnhancerItems == null)
+                return;
+
+            uiSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+            uiSocketEnhancerItems.filterItemTypes.Clear();
+            uiSocketEnhancerItems.filterItemTypes.Add(ItemType.SocketEnhancer);
+            SocketEnhancerType? selectedSocketEnhancerType = SelectedSocketEnhancerType;
+            if (selectedSocketEnhancerType.HasValue)
+            {
+                uiSocketEnhancerItems.filterSocketEnhancerTypes.Clear();
+                uiSocketEnhancerItems.filterSocketEnhancerTypes.Add(selectedSocketEnhancerType.Value);
+            }
+            uiSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter);
         }
 
         public override void Show()
         {
             base.Show();
-            activated = false;
+            _activated = false;
             OnUpdateCharacterItems();
         }
 
@@ -178,33 +225,33 @@ namespace MultiplayerARPG
             Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
         }
 
-        public void OnClickEnhanceSocket()
-        {
-            if (CharacterItem.IsEmptySlot() || SelectedEnhancerId == 0)
-                return;
-            activated = true;
-            activeItemId = CharacterItem.id;
-            GameInstance.ClientInventoryHandlers.RequestEnhanceSocketItem(new RequestEnhanceSocketItemMessage()
-            {
-                inventoryType = InventoryType,
-                index = IndexOfData,
-                enhancerId = SelectedEnhancerId,
-                socketIndex = -1,
-            }, ClientInventoryActions.ResponseEnhanceSocketItem);
-        }
-
         public void OnClickRemoveEnhancer()
         {
             if (CharacterItem.IsEmptySlot() || SelectedSocketIndex < 0)
                 return;
-            activated = true;
-            activeItemId = CharacterItem.id;
+            _activated = true;
+            _activeItemId = CharacterItem.id;
             GameInstance.ClientInventoryHandlers.RequestRemoveEnhancerFromItem(new RequestRemoveEnhancerFromItemMessage()
             {
                 inventoryType = InventoryType,
                 index = IndexOfData,
                 socketIndex = SelectedSocketIndex,
             }, ClientInventoryActions.ResponseRemoveEnhancerFromItem);
+        }
+
+        public void OnClickEnhanceSocket()
+        {
+            if (CharacterItem.IsEmptySlot() || SelectedEnhancerId == 0)
+                return;
+            _activated = true;
+            _activeItemId = CharacterItem.id;
+            GameInstance.ClientInventoryHandlers.RequestEnhanceSocketItem(new RequestEnhanceSocketItemMessage()
+            {
+                inventoryType = InventoryType,
+                index = IndexOfData,
+                enhancerId = SelectedEnhancerId,
+                socketIndex = SelectedSocketIndex,
+            }, ClientInventoryActions.ResponseEnhanceSocketItem);
         }
     }
 }

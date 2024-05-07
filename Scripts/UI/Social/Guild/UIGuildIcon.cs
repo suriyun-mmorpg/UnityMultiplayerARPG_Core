@@ -8,6 +8,13 @@ namespace MultiplayerARPG
     {
         public Image imageIcon;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            imageIcon = null;
+            _data = null;
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();

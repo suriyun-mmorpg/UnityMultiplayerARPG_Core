@@ -29,6 +29,34 @@ namespace MultiplayerARPG
         public static event System.Action<UpdateGuildMessage.UpdateType, GuildData> onNotifyGuildUpdated;
         public static event System.Action<UpdateSocialMemberMessage.UpdateType, int, SocialCharacterData> onNotifyGuildMemberUpdated;
 
+        public static void Clean()
+        {
+            onResponseSendGuildInvitation = null;
+            onResponseAcceptGuildInvitation = null;
+            onResponseDeclineGuildInvitation = null;
+            onResponseCreateGuild = null;
+            onResponseChangeGuildLeader = null;
+            onResponseKickMemberFromGuild = null;
+            onResponseLeaveGuild = null;
+            onResponseChangeGuildMessage = null;
+            onResponseChangeGuildMessage2 = null;
+            onResponseChangeGuildOptions = null;
+            onResponseChangeGuildAutoAcceptRequests = null;
+            onResponseChangeGuildRole = null;
+            onResponseChangeMemberGuildRole = null;
+            onResponseIncreaseGuildSkillLevel = null;
+            onResponseSendGuildRequest = null;
+            onResponseAcceptGuildRequest = null;
+            onResponseDeclineGuildRequest = null;
+            onResponseGetGuildRequests = null;
+            onResponseFindGuilds = null;
+            onResponseGetGuildInfo = null;
+            onResponseGuildRequestNotification = null;
+            onNotifyGuildInvitation = null;
+            onNotifyGuildUpdated = null;
+            onNotifyGuildMemberUpdated = null;
+        }
+
         public static void ResponseSendGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);

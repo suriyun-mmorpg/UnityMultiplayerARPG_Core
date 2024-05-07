@@ -7,14 +7,6 @@
         IsWalking,
         IsCrouching,
         IsCrawling,
-        IsStandToCrouchChanging,
-        IsCrouchToStandChanging,
-        IsStandToCrawlChanging,
-        IsCrawlToStandChanging,
-        IsCrouchToCrawlChanging,
-        IsCrawlToCrouchChanging,
         IsFlying,
-        IsStandToFlyChanging,
-        IsFlyToStandChanging,
     }
 }

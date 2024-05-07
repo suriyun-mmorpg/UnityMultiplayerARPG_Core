@@ -35,6 +35,13 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
 #endif
             }
+            if (prefab != null && harvestableEntity != null)
+            {
+                harvestableEntity = null;
+#if UNITY_EDITOR
+                EditorUtility.SetDirty(this);
+#endif
+            }
         }
 
         public override void RegisterPrefabs()
@@ -43,69 +50,102 @@ namespace MultiplayerARPG
             GameInstance.AddHarvestableEntities(prefab);
         }
 
-        protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, int level)
+        protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, AddressablePrefab addressablePrefab, int level)
         {
-            if (GetRandomPosition(out Vector3 spawnPosition))
+            if (!GetRandomPosition(out Vector3 spawnPosition))
             {
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                {
-                    Collider2D[] overlaps = Physics2D.OverlapCircleAll(spawnPosition, prefab.ColliderDetectionRadius);
-                    foreach (Collider2D overlap in overlaps)
-                    {
-                        if (overlap.gameObject.layer == CurrentGameInstance.playerLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.playingLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.monsterLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.npcLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.vehicleLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
-                        {
-                            // Don't spawn because it will hitting other entities
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
+                Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it cannot find grounded position, pending harvestable amount {_pending.Count}");
 #endif
-                            return null;
-                        }
-                    }
-                }
-                else
-                {
-                    Collider[] overlaps = Physics.OverlapSphere(spawnPosition, prefab.ColliderDetectionRadius);
-                    foreach (Collider overlap in overlaps)
-                    {
-                        if (overlap.gameObject.layer == CurrentGameInstance.playerLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.playingLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.monsterLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.npcLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.vehicleLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
-                            overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
-                        {
-                            // Don't spawn because it will hitting other entities
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
-                            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
-#endif
-                            return null;
-                        }
-                    }
-                }
+                return null;
+            }
 
-                Quaternion spawnRotation = GetRandomRotation();
-                LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+            Quaternion spawnRotation = GetRandomRotation();
+            LiteNetLibIdentity spawnObj = null;
+            HarvestableEntity entity = null;
+            if (prefab != null)
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId,
                     spawnPosition, spawnRotation);
-                HarvestableEntity entity = spawnObj.GetComponent<HarvestableEntity>();
+                if (spawnObj == null)
+                    return null;
+                entity = spawnObj.GetComponent<HarvestableEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
-                entity.InitStats();
-                BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
-                return entity;
             }
+            else if (addressablePrefab.IsDataValid())
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId,
+                    spawnPosition, spawnRotation);
+                if (spawnObj == null)
+                    return null;
+                entity = spawnObj.GetComponent<HarvestableEntity>();
+                entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
+            }
+
+            if (IsOverlapSomethingNearby(spawnPosition, entity))
+            {
+                // Destroy the entity (because it is hitting something)
+                BaseGameNetworkManager.Singleton.Assets.DestroyObjectInstance(spawnObj);
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it cannot find grounded position, pending harvestable amount {_pending.Count}");
+                Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is hitting something nearby, pending monster amount {_pending.Count}");
 #endif
-            return null;
+                return null;
+            }
+
+            entity.InitStats();
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            return entity;
+        }
+
+        public bool IsOverlapSomethingNearby(Vector3 position, HarvestableEntity entity)
+        {
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+            {
+                Collider2D[] overlaps = Physics2D.OverlapCircleAll(position, entity.ColliderDetectionRadius);
+                foreach (Collider2D overlap in overlaps)
+                {
+                    if (overlap.gameObject.layer == CurrentGameInstance.playerLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.playingLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.monsterLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.npcLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.vehicleLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
+                    {
+                        // Don't spawn because it will hitting other entities
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                        Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
+#endif
+                        return true;
+                    }
+                }
+            }
+            else
+            {
+                Collider[] overlaps = Physics.OverlapSphere(position, entity.ColliderDetectionRadius);
+                foreach (Collider overlap in overlaps)
+                {
+                    if (overlap.gameObject.layer == CurrentGameInstance.playerLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.playingLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.monsterLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.npcLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.vehicleLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.itemDropLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.buildingLayer ||
+                        overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
+                    {
+                        // Don't spawn because it will hitting other entities
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                        Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
+#endif
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
 
         public override int GroundLayerMask

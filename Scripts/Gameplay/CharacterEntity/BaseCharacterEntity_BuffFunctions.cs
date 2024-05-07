@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        private List<string> restrictBuffTags = new List<string>();
+        private List<string> _restrictBuffTags = new List<string>();
 
         public virtual void ApplyBuff(int dataId, BuffType type, int level, EntityInfo buffApplier, CharacterItem buffApplierWeapon)
         {
@@ -58,16 +58,16 @@ namespace MultiplayerARPG
                 return;
             }
 
-            restrictBuffTags.Clear();
+            _restrictBuffTags.Clear();
             string[] tempRestrictTags;
             for (int i = 0; i < Buffs.Count; ++i)
             {
                 tempRestrictTags = Buffs[i].GetBuff().GetBuff().restrictTags;
                 if (tempRestrictTags != null && tempRestrictTags.Length > 0)
-                    restrictBuffTags.AddRange(tempRestrictTags);
+                    _restrictBuffTags.AddRange(tempRestrictTags);
             }
 
-            if (!string.IsNullOrEmpty(tempBuff.tag) && restrictBuffTags.Contains(tempBuff.tag))
+            if (!string.IsNullOrEmpty(tempBuff.tag) && _restrictBuffTags.Contains(tempBuff.tag))
             {
                 // Restricted, so don't applies the buff
                 return;

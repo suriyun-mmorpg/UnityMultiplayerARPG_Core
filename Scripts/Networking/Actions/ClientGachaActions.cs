@@ -7,6 +7,12 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseGachaInfoMessage> onResponseGachaInfo;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseOpenGachaMessage> onResponseOpenGacha;
 
+        public static void Clean()
+        {
+            onResponseGachaInfo = null;
+            onResponseOpenGacha = null;
+        }
+
         public static void ResponseGachaInfo(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGachaInfoMessage response)
         {
             ClientGenericActions.ClientReceiveGameMessage(response.message);

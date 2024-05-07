@@ -15,6 +15,13 @@ namespace MultiplayerARPG
         public UINonEquipItems uiNonEquipItems;
         public TextWrapper uiTextReturnGold;
 
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            uiNonEquipItems = null;
+            uiTextReturnGold = null;
+        }
+
         private void OnEnable()
         {
             if (uiNonEquipItems == null)

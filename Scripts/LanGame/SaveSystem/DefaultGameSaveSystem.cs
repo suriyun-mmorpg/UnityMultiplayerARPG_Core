@@ -165,7 +165,7 @@ namespace MultiplayerARPG
 
         public override void SaveWorld(IPlayerCharacterData hostPlayerCharacterData, IEnumerable<IBuildingSaveData> buildings)
         {
-            if (!isReadyToSave)
+            if (!isReadyToSave || BaseGameNetworkManager.CurrentMapInfo == null)
                 return;
 
             // Save building entities / Tree / Rocks
@@ -190,7 +190,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < summons.Count; ++i)
             {
                 tempSummon = summons[i];
-                if (tempSummon == null || tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
+                if (tempSummon.CacheEntity == null || tempSummon.CacheEntity.Buffs == null || tempSummon.CacheEntity.Buffs.Count == 0) continue;
                 for (int j = 0; j < tempSummon.CacheEntity.Buffs.Count; ++j)
                 {
                     tempBuff = tempSummon.CacheEntity.Buffs[j];

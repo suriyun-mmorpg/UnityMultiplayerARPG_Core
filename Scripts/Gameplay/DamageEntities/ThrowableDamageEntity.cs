@@ -9,8 +9,8 @@ namespace MultiplayerARPG
         public bool canApplyDamageToUser;
         public bool canApplyDamageToAllies;
         public float destroyDelay;
-        public UnityEvent onExploded;
-        public UnityEvent onDestroy;
+        public UnityEvent onExploded = new UnityEvent();
+        public UnityEvent onDestroy = new UnityEvent();
         public float explodeDistance;
 
         public Rigidbody CacheRigidbody { get; private set; }
@@ -56,6 +56,20 @@ namespace MultiplayerARPG
                 _colliders2D[i].isTrigger = !isReady;
             }
             _readyToHitWalls = isReady;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            onExploded?.RemoveAllListeners();
+            onExploded = null;
+            onDestroy?.RemoveAllListeners();
+            onDestroy = null;
+            CacheRigidbody = null;
+            CacheRigidbody2D = null;
+            _alreadyHitObjects?.Clear();
+            _colliders.Nulling();
+            _colliders2D.Nulling();
         }
 
         /// <summary>

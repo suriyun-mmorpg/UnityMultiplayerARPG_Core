@@ -38,14 +38,14 @@ namespace MultiplayerARPG
         }
         
         public Transform CacheTransform { get; private set; }
-        private FxCollection fxCollection;
+        private FxCollection _fxCollection;
         public FxCollection FxCollection
         {
             get
             {
-                if (fxCollection == null)
-                    fxCollection = new FxCollection(gameObject);
-                return fxCollection;
+                if (_fxCollection == null)
+                    _fxCollection = new FxCollection(gameObject);
+                return _fxCollection;
             }
         }
         private bool _playFxOnEnable;
@@ -53,6 +53,13 @@ namespace MultiplayerARPG
         protected virtual void Awake()
         {
             CacheTransform = transform;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            _skill = null;
+            _fxCollection = null;
+            CacheTransform = null;
         }
 
         protected virtual void OnEnable()
@@ -67,17 +74,17 @@ namespace MultiplayerARPG
             int skillLevel,
             bool applyBuffToEveryone)
         {
-            this._buffApplier = buffApplier;
-            this._skill = skill;
-            this._skillLevel = skillLevel;
-            this._applyBuffToEveryone = applyBuffToEveryone;
+            _buffApplier = buffApplier;
+            _skill = skill;
+            _skillLevel = skillLevel;
+            _applyBuffToEveryone = applyBuffToEveryone;
         }
 
         public virtual void ApplyBuffTo(BaseCharacterEntity target)
         {
             if (!IsServer || target == null || target.IsDead() || (!_applyBuffToEveryone && !target.IsAlly(_buffApplier)))
                 return;
-            target.ApplyBuff(_skill.DataId, BuffType.SkillBuff, _skillLevel, _buffApplier, null);
+            target.ApplyBuff(_skill.DataId, BuffType.SkillBuff, _skillLevel, _buffApplier, CharacterItem.Empty);
         }
 
         public override void InitPrefab()

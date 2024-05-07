@@ -49,7 +49,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         protected WeaponType _equippedWeaponType = null;
         protected Coroutine _actionCoroutine = null;
         protected bool _isDoingAction = false;
-        protected EquipWeapons _oldEquipWeapons = null;
+        protected EquipWeapons? _oldEquipWeapons = null;
         protected System.Action _onStopAction = null;
         protected int _latestCustomAnimationActionId = 0;
 
@@ -130,6 +130,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private void OnDestroy()
         {
             Entity.onIsUpdateEntityComponentsChanged -= CacheEntity_onUpdateEntityComponentsChanged;
+            Template?.Desetup(this);
             DestroyGraph();
         }
 
@@ -215,7 +216,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                         selectableWeaponSets.Add(new EquipWeapons());
                     }
                 }
-                newEquipWeapons = selectableWeaponSets[equipWeaponSet];
+                newEquipWeapons = selectableWeaponSets[equipWeaponSet].Clone();
             }
             // Get one equipped weapon from right-hand or left-hand
             IWeaponItem rightWeaponItem = newEquipWeapons.GetRightHandWeaponItem();
@@ -231,7 +232,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // Player draw/holster animation
             if (_oldEquipWeapons == null)
                 _oldEquipWeapons = newEquipWeapons;
-            if (Time.unscaledTime - SwitchedTime < 1f || !newEquipWeapons.IsDiffer(_oldEquipWeapons, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (Time.unscaledTime - SwitchedTime < 1f || !newEquipWeapons.IsDiffer(_oldEquipWeapons.Value, out bool rightIsDiffer, out bool leftIsDiffer))
             {
                 SetNewEquipWeapons(newEquipWeapons, equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;
@@ -241,8 +242,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private void SetNewEquipWeapons(EquipWeapons newEquipWeapons, IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
-            if (newEquipWeapons != null)
-                _oldEquipWeapons = newEquipWeapons.Clone();
+            _oldEquipWeapons = newEquipWeapons.Clone();
             base.SetEquipItems(equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
         }
 
@@ -299,8 +299,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public void GetLeftHandUnsheathActionState(EquipWeapons newEquipWeapons, out ActionState actionState, out float triggeredDurationRate)
         {
-            IWeaponItem tempWeaponItem = _oldEquipWeapons.GetLeftHandWeaponItem();
-            IShieldItem tempShieldItem = _oldEquipWeapons.GetLeftHandShieldItem();
+            IWeaponItem tempWeaponItem = _oldEquipWeapons.Value.GetLeftHandWeaponItem();
+            IShieldItem tempShieldItem = _oldEquipWeapons.Value.GetLeftHandShieldItem();
             if (tempWeaponItem != null && TryGetWeaponAnimations(tempWeaponItem.WeaponType.DataId, out WeaponAnimations anims) && anims.leftHandWeaponSheathingAnimation.sheathState.clip != null)
             {
                 actionState = anims.leftHandWeaponSheathingAnimation.unsheathState;
@@ -322,51 +322,80 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             _isDoingAction = true;
 
-            ActionState actionState = new ActionState();
-            float triggeredDurationRate = 0f;
+            ActionState actionState1 = default;
+            float triggeredDurationRate1 = 0f;
+            ActionState actionState2 = default;
+            float triggeredDurationRate2 = 0f;
             if (isWeaponsSheathed)
             {
-                if (_oldEquipWeapons != null)
+                if (leftIsDiffer && rightIsDiffer)
                 {
-                    if (rightIsDiffer)
-                    {
-                        GetRightHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
-                    }
-                    else if (leftIsDiffer)
-                    {
-                        GetLeftHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
-                    }
+                    GetLeftHandSheathActionState(_oldEquipWeapons.Value, out actionState1, out triggeredDurationRate1);
+                    GetRightHandSheathActionState(_oldEquipWeapons.Value, out actionState2, out triggeredDurationRate2);
+                }
+                if (rightIsDiffer)
+                {
+                    GetRightHandSheathActionState(_oldEquipWeapons.Value, out actionState1, out triggeredDurationRate1);
+                }
+                else if (leftIsDiffer)
+                {
+                    GetLeftHandSheathActionState(_oldEquipWeapons.Value, out actionState1, out triggeredDurationRate1);
                 }
             }
             else
             {
-                if (newEquipWeapons != null)
+                if (leftIsDiffer && rightIsDiffer)
                 {
-                    if (rightIsDiffer)
-                    {
-                        if (newEquipWeapons.IsEmptyRightHandSlot())
-                            GetRightHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
-                        else
-                            GetRightHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
-                    }
-                    else if (leftIsDiffer)
-                    {
-                        if (newEquipWeapons.IsEmptyLeftHandSlot())
-                            GetLeftHandSheathActionState(_oldEquipWeapons, out actionState, out triggeredDurationRate);
-                        else
-                            GetLeftHandUnsheathActionState(newEquipWeapons, out actionState, out triggeredDurationRate);
-                    }
+                    if (newEquipWeapons.IsEmptyLeftHandSlot())
+                        GetLeftHandSheathActionState(_oldEquipWeapons.Value, out actionState1, out triggeredDurationRate1);
+                    else
+                        GetLeftHandUnsheathActionState(newEquipWeapons, out actionState1, out triggeredDurationRate1);
+
+                    if (newEquipWeapons.IsEmptyRightHandSlot())
+                        GetRightHandSheathActionState(_oldEquipWeapons.Value, out actionState2, out triggeredDurationRate2);
+                    else
+                        GetRightHandUnsheathActionState(newEquipWeapons, out actionState2, out triggeredDurationRate2);
+                }
+                else if (rightIsDiffer)
+                {
+                    if (newEquipWeapons.IsEmptyRightHandSlot())
+                        GetRightHandSheathActionState(_oldEquipWeapons.Value, out actionState1, out triggeredDurationRate1);
+                    else
+                        GetRightHandUnsheathActionState(newEquipWeapons, out actionState1, out triggeredDurationRate1);
+                }
+                else if (leftIsDiffer)
+                {
+                    if (newEquipWeapons.IsEmptyLeftHandSlot())
+                        GetLeftHandSheathActionState(_oldEquipWeapons.Value, out actionState1, out triggeredDurationRate1);
+                    else
+                        GetLeftHandUnsheathActionState(newEquipWeapons, out actionState1, out triggeredDurationRate1);
                 }
             }
 
             float animationDelay = 0f;
             float triggeredDelay = 0f;
-            if (actionState.clip != null)
+            if (actionState1.clip != null)
             {
                 // Setup animation playing duration
-                animationDelay = Behaviour.PlayAction(actionState, 1f);
-                triggeredDelay = animationDelay * triggeredDurationRate;
+                animationDelay = Behaviour.PlayAction(0, actionState1, 1f);
+                triggeredDelay = animationDelay * triggeredDurationRate1;
             }
+
+            float animationDelay2 = 0f;
+            float triggeredDelay2 = 0f;
+            if (actionState2.clip != null)
+            {
+                // Setup animation playing duration
+                animationDelay2 = Behaviour.PlayAction(1, actionState2, 1f);
+                triggeredDelay2 = animationDelay2 * triggeredDurationRate2;
+            }
+
+            // There are 2 clips, use the one which has a highest duration
+            if (animationDelay2 > animationDelay)
+                animationDelay = animationDelay2;
+
+            if (triggeredDelay2 > triggeredDelay)
+                triggeredDelay = triggeredDelay2;
 
             if (triggeredDelay > 0f)
                 yield return new WaitForSecondsRealtime(triggeredDelay);
@@ -686,7 +715,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             StopActionCoroutine();
             _isDoingAction = true;
             _actionCoroutine = StartCoroutine(routine);
-            this._onStopAction = onStopAction;
+            _onStopAction = onStopAction;
             return _actionCoroutine;
         }
 

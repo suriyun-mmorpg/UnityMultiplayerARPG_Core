@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLibManager;
 using LiteNetLib;
+using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -82,7 +82,28 @@ namespace MultiplayerARPG
         public override int FactionId { get { return factionId.Value; } set { factionId.Value = value; } }
         public float StatPoint { get { return statPoint.Value; } set { statPoint.Value = value; } }
         public float SkillPoint { get { return skillPoint.Value; } set { skillPoint.Value = value; } }
-        public int Gold { get { return gold.Value; } set { gold.Value = value; } }
+        public int Gold
+        {
+            get
+            {
+                if (CurrentGameInstance.goldStoreMode == GoldStoreMode.UserGoldOnly)
+                    return UserGold;
+                return gold.Value;
+            }
+            set
+            {
+                if (!IsServer)
+                {
+                    return;
+                }
+                if (CurrentGameInstance.goldStoreMode == GoldStoreMode.UserGoldOnly)
+                {
+                    GameInstance.ServerUserHandlers.ChangeUserGold(UserId, value - UserCash);
+                    return;
+                }
+                gold.Value = value;
+            }
+        }
         public int UserGold { get { return userGold.Value; } set { userGold.Value = value; } }
         public int UserCash { get { return userCash.Value; } set { userCash.Value = value; } }
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
@@ -451,7 +472,8 @@ namespace MultiplayerARPG
             // Setup relates elements
             if (IsOwnerClient)
             {
-                BasePlayerCharacterController prefab;
+                BasePlayerCharacterController prefab = null;
+#if !EXCLUDE_PREFAB_REFS
                 if (ControllerPrefab != null)
                 {
                     prefab = ControllerPrefab;
@@ -459,6 +481,19 @@ namespace MultiplayerARPG
                 else if (CurrentGameInstance.defaultControllerPrefab != null)
                 {
                     prefab = CurrentGameInstance.defaultControllerPrefab;
+                }
+#endif
+                if (prefab != null)
+                {
+                    // Do nothing, just have it to make it able to compile properly (it have compile condition above)
+                }
+                else if (AddressableControllerPrefab.IsDataValid())
+                {
+                    prefab = AddressableControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
+                }
+                else if (CurrentGameInstance.addressableDefaultControllerPrefab.IsDataValid())
+                {
+                    prefab = CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
                 }
                 else if (BasePlayerCharacterController.Singleton != null)
                 {
