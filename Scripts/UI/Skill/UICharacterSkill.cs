@@ -483,7 +483,7 @@ namespace MultiplayerARPG
 
             if (uiDamageAmount != null)
             {
-                if (Skill == null || !Skill.TryGetBaseAttackDamageAmount(Character, Level, false, out KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount))
+                if (Skill == null || !Skill.TryGetBaseAttackDamageAmount(Character, Level, false, out KeyValuePair<DamageElement, MinMaxFloat> baseAttackDamageAmount) || (baseAttackDamageAmount.Value.min <= 0 && baseAttackDamageAmount.Value.max <= 0))
                 {
                     uiDamageAmount.Hide();
                 }
@@ -509,7 +509,7 @@ namespace MultiplayerARPG
 
             if (uiWeaponDamageMultiplicator != null)
             {
-                if (Skill == null || !Skill.TryGetAttackWeaponDamageMultiplicator(Character, Level, out float weaponDamageMultiplicator))
+                if (Skill == null || !Skill.TryGetAttackWeaponDamageMultiplicator(Character, Level, out float weaponDamageMultiplicator) || weaponDamageMultiplicator == 0)
                 {
                     uiWeaponDamageMultiplicator.SetGameObjectActive(false);
                 }
