@@ -33,6 +33,7 @@ namespace MultiplayerARPG
         public UICharacterItems uiItems;
         public TextWrapper textSentDate;
         public UIMailList uiMailList;
+        public GameObject[] noRewardObjects;
         public GameObject[] hasGoldObjects;
         public GameObject[] hasCashObjects;
         public GameObject[] readObjects;
@@ -72,6 +73,7 @@ namespace MultiplayerARPG
             uiItems = null;
             textSentDate = null;
             uiMailList = null;
+            noRewardObjects.Nulling();
             hasGoldObjects.Nulling();
             hasCashObjects.Nulling();
             readObjects.Nulling();
@@ -227,6 +229,17 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatSentDate),
                     (System.DateTime.Now - new System.DateTime(dateTime.Ticks)).GetPrettyDate());
                 textSentDate.SetGameObjectActive(mail != null);
+            }
+
+            if (noRewardObjects != null && noRewardObjects.Length > 0)
+            {
+                for (int i = 0; i < noRewardObjects.Length; ++i)
+                {
+                    noRewardObjects[i].SetActive(mail == null ||
+                        (mail.Gold == 0 && mail.Cash == 0 &&
+                        (mail.Items == null || mail.Items.Count == 0) &&
+                        (mail.Currencies == null || mail.Currencies.Count == 0)));
+                }
             }
 
             if (hasGoldObjects != null && hasGoldObjects.Length > 0)
