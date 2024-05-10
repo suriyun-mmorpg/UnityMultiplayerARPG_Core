@@ -42,6 +42,7 @@ namespace MultiplayerARPG
         public GameObject[] unclaimObjects;
 
         [Header("Events")]
+        public UnityEvent onMailEmpty = new UnityEvent();
         public UnityEvent onReadMail = new UnityEvent();
         public UnityEvent onClaimMailItems = new UnityEvent();
         public UnityEvent onDeleteMail = new UnityEvent();
@@ -80,6 +81,8 @@ namespace MultiplayerARPG
             unreadObjects.Nulling();
             claimObjects.Nulling();
             unclaimObjects.Nulling();
+            onMailEmpty?.RemoveAllListeners();
+            onMailEmpty = null;
             onReadMail?.RemoveAllListeners();
             onReadMail = null;
             onClaimMailItems?.RemoveAllListeners();
@@ -288,6 +291,11 @@ namespace MultiplayerARPG
                 {
                     unclaimObjects[i].SetActive(mail != null && mail.HaveItemsToClaim() && !mail.IsClaim);
                 }
+            }
+
+            if (mail == null || string.IsNullOrWhiteSpace(mail.Id))
+            {
+                onMailEmpty.Invoke();
             }
         }
     }
