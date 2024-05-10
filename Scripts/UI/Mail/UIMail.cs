@@ -93,7 +93,6 @@ namespace MultiplayerARPG
 
         private void ReadMail()
         {
-            UpdateData(null);
             GameInstance.ClientMailHandlers.RequestReadMail(new RequestReadMailMessage()
             {
                 id = MailId,
