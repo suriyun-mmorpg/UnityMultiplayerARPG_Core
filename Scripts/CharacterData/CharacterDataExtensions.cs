@@ -72,6 +72,7 @@ namespace MultiplayerARPG
             result.gameObject.SetLayerRecursively(GameInstance.Singleton.playerLayer, true);
             result.gameObject.SetActive(true);
             result.transform.localPosition = Vector3.zero;
+            result.transform.localEulerAngles = Vector3.zero;
             return result.CharacterModel;
         }
 
