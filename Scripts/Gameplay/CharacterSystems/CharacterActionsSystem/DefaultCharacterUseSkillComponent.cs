@@ -300,9 +300,11 @@ namespace MultiplayerARPG
                     Entity.OnUseSkillRoutine(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
 
                     // Apply skill buffs, summons and attack damages
-                    if ((IsServer && IsOwnerClient) || IsOwnedByServer)
+                    if (IsServer)
                     {
                         if (!skill.DecreaseResources(Entity, weapon, isLeftHand, out _))
+                            continue;
+                        if (!IsOwnerClient && !IsOwnedByServer)
                             continue;
                         RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                         {

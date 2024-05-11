@@ -875,7 +875,6 @@ namespace MultiplayerARPG
                     break;
                 result.Add(GameDataHelpers.CombineDamages(new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts), tempIncreaseDamageAmounts));
             }
-            data.EquipWeapons = equipWeapons;
             return result;
         }
         #endregion

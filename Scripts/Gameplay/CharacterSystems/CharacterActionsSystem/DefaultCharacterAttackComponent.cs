@@ -258,9 +258,11 @@ namespace MultiplayerARPG
                         Entity.OnAttackRoutine(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
 
                         // Apply attack damages
-                        if ((IsServer && IsOwnerClient) || IsOwnedByServer)
+                        if (IsServer)
                         {
                             if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out _))
+                                continue;
+                            if (!IsOwnerClient && !IsOwnedByServer)
                                 continue;
                             RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
                             {
