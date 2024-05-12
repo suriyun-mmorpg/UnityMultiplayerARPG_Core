@@ -713,42 +713,27 @@ namespace MultiplayerARPG
             {
                 // Swap with equipped item
                 character.NonEquipItems[nonEquipIndex] = character.NonEquipItems[unEquippedIndexRightHand];
-                if (GameInstance.Singleton.IsLimitInventorySlot)
-                    character.NonEquipItems[unEquippedIndexRightHand] = CharacterItem.Empty;
-                else
-                    character.NonEquipItems.RemoveAt(unEquippedIndexRightHand);
+                character.NonEquipItems.RemoveOrPlaceEmptySlot(unEquippedIndexRightHand);
                 // Find empty slot for unequipped left-hand weapon to swap with empty slot
                 if (GameInstance.Singleton.IsLimitInventorySlot)
-                {
-                    character.NonEquipItems[character.IndexOfEmptyNonEquipItemSlot()] = character.NonEquipItems[unEquippedIndexLeftHand];
-                    character.NonEquipItems[unEquippedIndexLeftHand] = CharacterItem.Empty;
-                }
+                    character.NonEquipItems.MoveItemToEmptySlot(unEquippedIndexLeftHand);
             }
             else if (unEquippedIndexRightHand >= 0)
             {
                 // Swap with equipped item
                 character.NonEquipItems[nonEquipIndex] = character.NonEquipItems[unEquippedIndexRightHand];
-                if (GameInstance.Singleton.IsLimitInventorySlot)
-                    character.NonEquipItems[unEquippedIndexRightHand] = CharacterItem.Empty;
-                else
-                    character.NonEquipItems.RemoveAt(unEquippedIndexRightHand);
+                character.NonEquipItems.RemoveOrPlaceEmptySlot(unEquippedIndexRightHand);
             }
             else if (unEquippedIndexLeftHand >= 0)
             {
                 // Swap with equipped item
                 character.NonEquipItems[nonEquipIndex] = character.NonEquipItems[unEquippedIndexLeftHand];
-                if (GameInstance.Singleton.IsLimitInventorySlot)
-                    character.NonEquipItems[unEquippedIndexLeftHand] = CharacterItem.Empty;
-                else
-                    character.NonEquipItems.RemoveAt(unEquippedIndexLeftHand);
+                character.NonEquipItems.RemoveOrPlaceEmptySlot(unEquippedIndexLeftHand);
             }
             else
             {
                 // Remove equipped item
-                if (GameInstance.Singleton.IsLimitInventorySlot)
-                    character.NonEquipItems[nonEquipIndex] = CharacterItem.Empty;
-                else
-                    character.NonEquipItems.RemoveAt(nonEquipIndex);
+                character.NonEquipItems.RemoveOrPlaceEmptySlot(nonEquipIndex);
             }
             character.FillEmptySlots(true);
             gameMessage = UITextKeys.NONE;
@@ -824,18 +809,12 @@ namespace MultiplayerARPG
             {
                 // Swap with equipped item
                 character.NonEquipItems[nonEquipIndex] = character.NonEquipItems[unEquippedIndex];
-                if (GameInstance.Singleton.IsLimitInventorySlot)
-                    character.NonEquipItems[unEquippedIndex] = CharacterItem.Empty;
-                else
-                    character.NonEquipItems.RemoveAt(unEquippedIndex);
+                character.NonEquipItems.RemoveOrPlaceEmptySlot(unEquippedIndex);
             }
             else
             {
                 // Remove equipped item
-                if (GameInstance.Singleton.IsLimitInventorySlot)
-                    character.NonEquipItems[nonEquipIndex] = CharacterItem.Empty;
-                else
-                    character.NonEquipItems.RemoveAt(nonEquipIndex);
+                character.NonEquipItems.RemoveOrPlaceEmptySlot(nonEquipIndex);
             }
             character.FillEmptySlots(true);
             gameMessage = UITextKeys.NONE;
@@ -889,10 +868,7 @@ namespace MultiplayerARPG
                 {
                     toItem.amount += fromItem.amount;
                     character.NonEquipItems[toIndex] = toItem;
-                    if (GameInstance.Singleton.IsLimitInventorySlot)
-                        character.NonEquipItems[fromIndex] = CharacterItem.Empty;
-                    else
-                        character.NonEquipItems.RemoveAt(fromIndex);
+                    character.NonEquipItems.RemoveOrPlaceEmptySlot(fromIndex);
                     character.FillEmptySlots();
                 }
                 else

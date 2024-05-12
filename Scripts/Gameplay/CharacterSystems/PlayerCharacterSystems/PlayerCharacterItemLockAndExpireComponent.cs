@@ -37,10 +37,7 @@ namespace MultiplayerARPG
                     }
                     if (tempItem.ShouldRemove(currentTime))
                     {
-                        if (CurrentGameInstance.IsLimitInventorySlot)
-                            Entity.NonEquipItems[i] = CharacterItem.Empty;
-                        else
-                            Entity.NonEquipItems.RemoveAt(i);
+                        Entity.NonEquipItems.RemoveOrPlaceEmptySlot(i);
                         haveRemovedItems = true;
                     }
                     else if (tempItem.IsLocked())

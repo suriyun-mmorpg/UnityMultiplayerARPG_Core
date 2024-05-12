@@ -97,10 +97,7 @@ namespace MultiplayerARPG
                 list[itemIndex] = refinedItem;
             }, () =>
             {
-                if (GameInstance.Singleton.IsLimitInventorySlot)
-                    list[itemIndex] = CharacterItem.Empty;
-                else
-                    list.RemoveAt(itemIndex);
+                list.RemoveOrPlaceEmptySlot(itemIndex);
             }, out gameMessageType);
         }
 

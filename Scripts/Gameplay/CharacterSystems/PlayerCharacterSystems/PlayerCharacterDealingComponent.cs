@@ -152,10 +152,7 @@ namespace MultiplayerARPG
                     if (tempNonEquipItem.amount == 0)
                     {
                         // Amount is 0, remove it from inventory
-                        if (CurrentGameInstance.IsLimitInventorySlot)
-                            Entity.NonEquipItems[i] = CharacterItem.Empty;
-                        else
-                            Entity.NonEquipItems.RemoveAt(i);
+                        Entity.NonEquipItems.RemoveOrPlaceEmptySlot(i);
                     }
                     else
                     {

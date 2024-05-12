@@ -115,126 +115,26 @@ namespace MultiplayerARPG
         #region Fill Empty Slots
         public static void FillEmptySlots(this IList<CharacterItem> itemList, bool isLimitSlot, int slotLimit)
         {
-            int i;
-            if (!isLimitSlot || GameInstance.Singleton.doNotFillEmptySlots)
-            {
-                // If it is not limit slots, don't fill it, and also remove empty slots
-                for (i = itemList.Count - 1; i >= 0; --i)
-                {
-                    if (itemList[i].IsEmpty() || itemList[i].IsEmptySlot())
-                        itemList.RemoveAt(i);
-                }
-                return;
-            }
-
-            // Place empty slots
-            for (i = 0; i < itemList.Count; ++i)
-            {
-                if (itemList[i].IsEmpty())
-                    itemList[i] = CharacterItem.CreateEmptySlot();
-            }
-
-            // Fill empty slots
-            for (i = itemList.Count; i < slotLimit; ++i)
-            {
-                itemList.Add(CharacterItem.CreateEmptySlot());
-            }
-
-            // Remove empty slots if it's over limit
-            for (i = itemList.Count - 1; itemList.Count > slotLimit && i >= 0; --i)
-            {
-                if (itemList[i].IsEmptySlot())
-                    itemList.RemoveAt(i);
-            }
+            GameInstance.Singleton.InventoryManager.FillEmptySlots(itemList, isLimitSlot, slotLimit);
         }
 
         public static void FillEmptySlots(this ICharacterData data, bool recacheStats = false)
         {
             if (recacheStats)
                 data.MarkToMakeCaches();
-            data.NonEquipItems.FillEmptySlots(GameInstance.Singleton.IsLimitInventorySlot, data.GetCaches().LimitItemSlot);
+            FillEmptySlots(data.NonEquipItems, GameInstance.Singleton.IsLimitInventorySlot, data.GetCaches().LimitItemSlot);
         }
         #endregion
 
         #region Increasing Items Will Overwhelming
         public static bool UnEquipItemWillOverwhelming(this ICharacterData data, int unEquipCount = 1)
         {
-            if (!GameInstance.Singleton.IsLimitInventorySlot)
-                return false;
-            return data.GetCaches().TotalItemSlot + unEquipCount > data.GetCaches().LimitItemSlot;
+            return GameInstance.Singleton.InventoryManager.UnEquipItemWillOverwhelming(data, unEquipCount);
         }
 
         public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, int dataId, int amount, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, int slotLimit)
         {
-            BaseItem itemData;
-            if (amount <= 0 || !GameInstance.Items.TryGetValue(dataId, out itemData))
-            {
-                // If item not valid
-                return false;
-            }
-
-            if (isLimitWeight && totalItemWeight > weightLimit)
-            {
-                // If overwhelming
-                return true;
-            }
-
-            if (!isLimitSlot)
-            {
-                // If not limit slot then don't checking for slot amount
-                return false;
-            }
-
-            int maxStack = itemData.MaxStack;
-            // Loop to all slots to add amount to any slots that item amount not max in stack
-            CharacterItem tempItem;
-            for (int i = 0; i < itemList.Count; ++i)
-            {
-                tempItem = itemList[i];
-                if (tempItem.IsEmptySlot())
-                {
-                    // If current entry is not valid, assume that it is empty slot, so reduce amount of adding item here
-                    if (amount <= maxStack)
-                    {
-                        // Can add all items, so assume that it is not overwhelming 
-                        return false;
-                    }
-                    else
-                        amount -= maxStack;
-                }
-                else if (tempItem.dataId == itemData.DataId)
-                {
-                    // If same item id, increase its amount
-                    if (tempItem.amount + amount <= maxStack)
-                    {
-                        // Can add all items, so assume that it is not overwhelming 
-                        return false;
-                    }
-                    else if (maxStack - tempItem.amount >= 0)
-                        amount -= maxStack - tempItem.amount;
-                }
-            }
-
-            int slotCount = itemList.Count;
-            // Count adding slot here
-            while (amount > 0)
-            {
-                if (slotCount + 1 > slotLimit)
-                {
-                    // If adding slot is more than slot limit, assume that it is overwhelming 
-                    return true;
-                }
-                ++slotCount;
-                if (amount <= maxStack)
-                {
-                    // Can add all items, so assume that it is not overwhelming 
-                    return false;
-                }
-                else
-                    amount -= maxStack;
-            }
-
-            return true;
+            return GameInstance.Singleton.InventoryManager.IncreasingItemsWillOverwhelming(itemList, dataId, amount, isLimitWeight, weightLimit, totalItemWeight, isLimitSlot, slotLimit);
         }
 
         public static bool IncreasingItemsWillOverwhelming(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, bool isLimitWeight, float weightLimit, float totalItemWeight, bool isLimitSlot, int slotLimit)
@@ -326,7 +226,8 @@ namespace MultiplayerARPG
 
         public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, int dataId, int amount)
         {
-            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+            return IncreasingItemsWillOverwhelming(
+                data.NonEquipItems,
                 dataId,
                 amount,
                 GameInstance.Singleton.IsLimitInventoryWeight,
@@ -338,7 +239,8 @@ namespace MultiplayerARPG
 
         public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<ItemAmount> increasingItems)
         {
-            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+            return IncreasingItemsWillOverwhelming(
+                data.NonEquipItems,
                 increasingItems,
                 GameInstance.Singleton.IsLimitInventoryWeight,
                 data.GetCaches().LimitItemWeight,
@@ -349,7 +251,8 @@ namespace MultiplayerARPG
 
         public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<RewardedItem> increasingItems)
         {
-            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+            return IncreasingItemsWillOverwhelming(
+                data.NonEquipItems,
                 increasingItems,
                 GameInstance.Singleton.IsLimitInventoryWeight,
                 data.GetCaches().LimitItemWeight,
@@ -360,7 +263,8 @@ namespace MultiplayerARPG
 
         public static bool IncreasingItemsWillOverwhelming(this ICharacterData data, IEnumerable<CharacterItem> increasingItems)
         {
-            return data.NonEquipItems.IncreasingItemsWillOverwhelming(
+            return IncreasingItemsWillOverwhelming(
+                data.NonEquipItems,
                 increasingItems,
                 GameInstance.Singleton.IsLimitInventoryWeight,
                 data.GetCaches().LimitItemWeight,
@@ -373,97 +277,7 @@ namespace MultiplayerARPG
         #region Increase Items
         public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem increasingItem)
         {
-            // If item not valid
-            if (increasingItem.IsEmptySlot()) return false;
-
-            BaseItem itemData = increasingItem.GetItem();
-            int amount = increasingItem.amount;
-
-            int maxStack = itemData.MaxStack;
-            Dictionary<int, CharacterItem> emptySlots = new Dictionary<int, CharacterItem>();
-            Dictionary<int, CharacterItem> changes = new Dictionary<int, CharacterItem>();
-            // Loop to all slots to add amount to any slots that item amount not max in stack
-            CharacterItem item;
-            for (int i = 0; i < itemList.Count; ++i)
-            {
-                item = itemList[i];
-                if (item.IsEmptySlot())
-                {
-                    // If current entry is not valid, add it to empty list, going to replacing it later
-                    emptySlots[i] = item;
-                }
-                else if (item.dataId == increasingItem.dataId && item.level == increasingItem.level)
-                {
-                    // If same item id, increase its amount
-                    if (item.amount + amount <= maxStack)
-                    {
-                        item.amount += amount;
-                        changes[i] = item;
-                        amount = 0;
-                        break;
-                    }
-                    else if (maxStack - item.amount >= 0)
-                    {
-                        amount -= maxStack - item.amount;
-                        item.amount = maxStack;
-                        changes[i] = item;
-                    }
-                }
-            }
-
-            // Adding item to new slots or empty slots if needed
-            CharacterItem tempNewItem;
-            if (changes.Count == 0 && emptySlots.Count > 0)
-            {
-                // If there are no changes and there are an empty entries, fill them
-                foreach (int emptySlotIndex in emptySlots.Keys)
-                {
-                    tempNewItem = increasingItem.Clone(true);
-                    int addAmount = 0;
-                    if (amount - maxStack >= 0)
-                    {
-                        addAmount = maxStack;
-                        amount -= maxStack;
-                    }
-                    else
-                    {
-                        addAmount = amount;
-                        amount = 0;
-                    }
-                    tempNewItem.amount = addAmount;
-                    changes[emptySlotIndex] = tempNewItem;
-                    if (amount == 0)
-                        break;
-                }
-            }
-
-            // Apply all changes
-            foreach (KeyValuePair<int, CharacterItem> change in changes)
-            {
-                itemList[change.Key] = change.Value;
-            }
-
-            // Add new items to new slots
-            while (amount > 0)
-            {
-                tempNewItem = increasingItem.Clone(true);
-                int addAmount;
-                if (amount - maxStack >= 0)
-                {
-                    addAmount = maxStack;
-                    amount -= maxStack;
-                }
-                else
-                {
-                    addAmount = amount;
-                    amount = 0;
-                }
-                tempNewItem.amount = addAmount;
-                itemList.AddOrSetItems(tempNewItem);
-                if (amount == 0)
-                    break;
-            }
-            return true;
+            return GameInstance.Singleton.InventoryManager.IncreaseItems(itemList, increasingItem);
         }
 
         public static void IncreaseItems(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> increasingItems, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
@@ -473,7 +287,7 @@ namespace MultiplayerARPG
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount);
-                if (itemList.IncreaseItems(increasedItem))
+                if (IncreaseItems(itemList, increasedItem))
                 {
                     if (onIncrease != null)
                         onIncrease.Invoke(increasedItem);
@@ -493,7 +307,7 @@ namespace MultiplayerARPG
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 increasedItem = CharacterItem.Create(increasingItem.item.DataId, increasingItem.level, increasingItem.amount, increasingItem.randomSeed);
-                if (itemList.IncreaseItems(increasedItem))
+                if (IncreaseItems(itemList, increasedItem))
                 {
                     if (onIncrease != null)
                         onIncrease.Invoke(increasedItem);
@@ -513,7 +327,7 @@ namespace MultiplayerARPG
             {
                 if (increasingItem.IsEmptySlot()) continue;
                 increasedItem = increasingItem.Clone();
-                if (itemList.IncreaseItems(increasedItem))
+                if (IncreaseItems(itemList, increasedItem))
                 {
                     if (onIncrease != null)
                         onIncrease.Invoke(increasedItem);
@@ -528,7 +342,7 @@ namespace MultiplayerARPG
 
         public static bool IncreaseItems(this ICharacterData data, CharacterItem increasingItem, System.Action<CharacterItem> onIncrease = null, System.Action<CharacterItem> onFail = null)
         {
-            if (data.NonEquipItems.IncreaseItems(increasingItem))
+            if (IncreaseItems(data.NonEquipItems, increasingItem))
             {
                 if (onIncrease != null)
                     onIncrease.Invoke(increasingItem);
@@ -546,7 +360,7 @@ namespace MultiplayerARPG
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount);
-                if (data.NonEquipItems.IncreaseItems(increasedItem))
+                if (IncreaseItems(data.NonEquipItems, increasedItem))
                 {
                     if (onIncrease != null)
                         onIncrease.Invoke(increasedItem);
@@ -566,7 +380,7 @@ namespace MultiplayerARPG
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
                 increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed);
-                if (data.NonEquipItems.IncreaseItems(increasedItem))
+                if (IncreaseItems(data.NonEquipItems, increasedItem))
                 {
                     if (onIncrease != null)
                         onIncrease.Invoke(increasedItem);
@@ -584,7 +398,7 @@ namespace MultiplayerARPG
             foreach (CharacterItem increasingItem in increasingItems)
             {
                 if (increasingItem.IsEmptySlot()) continue;
-                if (data.NonEquipItems.IncreaseItems(increasingItem))
+                if (IncreaseItems(data.NonEquipItems, increasingItem))
                 {
                     if (onIncrease != null)
                         onIncrease.Invoke(increasingItem);
@@ -601,33 +415,7 @@ namespace MultiplayerARPG
         #region Decrease Items
         public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, int amount, bool isLimitInventorySlot, out Dictionary<int, int> decreaseItems)
         {
-            decreaseItems = new Dictionary<int, int>();
-            Dictionary<int, int> decreasingItemIndexes = new Dictionary<int, int>();
-            int tempDecresingAmount;
-            CharacterItem tempItem;
-            for (int i = itemList.Count - 1; i >= 0; --i)
-            {
-                tempItem = itemList[i];
-                if (tempItem.dataId == dataId)
-                {
-                    if (amount - tempItem.amount > 0)
-                        tempDecresingAmount = tempItem.amount;
-                    else
-                        tempDecresingAmount = amount;
-                    amount -= tempDecresingAmount;
-                    decreasingItemIndexes[i] = tempDecresingAmount;
-                }
-                if (amount == 0)
-                    break;
-            }
-            if (amount > 0)
-                return false;
-            foreach (KeyValuePair<int, int> decreasingItem in decreasingItemIndexes)
-            {
-                decreaseItems.Add(decreasingItem.Key, decreasingItem.Value);
-                itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value, isLimitInventorySlot, true);
-            }
-            return true;
+            return GameInstance.Singleton.InventoryManager.DecreaseItems(itemList, dataId, amount, isLimitInventorySlot, out decreaseItems);
         }
 
         public static bool DecreaseItems(this IList<CharacterItem> itemList, int dataId, int amount, bool isLimitInventorySlot)
@@ -637,7 +425,7 @@ namespace MultiplayerARPG
 
         public static bool DecreaseItems(this ICharacterData data, int dataId, int amount, out Dictionary<int, int> decreaseItems)
         {
-            if (data.NonEquipItems.DecreaseItems(dataId, amount, GameInstance.Singleton.IsLimitInventorySlot, out decreaseItems))
+            if (DecreaseItems(data.NonEquipItems, dataId, amount, GameInstance.Singleton.IsLimitInventorySlot, out decreaseItems))
                 return true;
             return false;
         }
@@ -653,7 +441,7 @@ namespace MultiplayerARPG
                 return;
             foreach (KeyValuePair<BaseItem, int> itemAmount in itemAmounts)
             {
-                character.DecreaseItems(itemAmount.Key.DataId, Mathf.CeilToInt(itemAmount.Value * multiplier), out _);
+                DecreaseItems(character, itemAmount.Key.DataId, Mathf.CeilToInt(itemAmount.Value * multiplier), out _);
             }
         }
 
@@ -663,7 +451,7 @@ namespace MultiplayerARPG
                 return;
             foreach (ItemAmount itemAmount in itemAmounts)
             {
-                character.DecreaseItems(itemAmount.item.DataId, Mathf.CeilToInt(itemAmount.amount * multiplier), out _);
+                DecreaseItems(character, itemAmount.item.DataId, Mathf.CeilToInt(itemAmount.amount * multiplier), out _);
             }
         }
 
@@ -673,8 +461,22 @@ namespace MultiplayerARPG
                 return;
             foreach (CharacterItem characterItem in characterItems)
             {
-                character.DecreaseItems(characterItem.dataId, Mathf.CeilToInt(characterItem.amount * multiplier), out _);
+                DecreaseItems(character, characterItem.dataId, Mathf.CeilToInt(characterItem.amount * multiplier), out _);
             }
+        }
+        #endregion
+
+        #region Decrease Items By Index
+        public static bool DecreaseItemsByIndex(this IList<CharacterItem> itemList, int index, int amount, bool isLimitInventorySlot, bool adjustMaxAmount)
+        {
+            return GameInstance.Singleton.InventoryManager.DecreaseItemsByIndex(itemList, index, amount, isLimitInventorySlot, adjustMaxAmount);
+        }
+
+        public static bool DecreaseItemsByIndex(this ICharacterData data, int index, int amount, bool adjustMaxAmount)
+        {
+            if (DecreaseItemsByIndex(data.NonEquipItems, index, amount, GameInstance.Singleton.IsLimitInventorySlot, adjustMaxAmount))
+                return true;
+            return false;
         }
         #endregion
 
@@ -749,42 +551,6 @@ namespace MultiplayerARPG
             return data.NonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts);
         }
 
-        public static bool ValidateAmmo(this ICharacterData data, CharacterItem weapon, int amount, bool validIfNoRequireAmmoType = true)
-        {
-            // Avoid null data
-            if (weapon.IsEmptySlot())
-                return validIfNoRequireAmmoType;
-
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
-            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
-            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
-            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
-            {
-                // Ammo capacity more than 0 reduce loaded ammo
-                if (weapon.ammo < amount)
-                    return false;
-            }
-            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
-            {
-                // Ammo capacity is 0 so reduce ammo from inventory
-                if (data.CountAmmos(weaponItem.WeaponType.AmmoType, out _) >= amount)
-                    return true;
-                return false;
-            }
-            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
-            {
-                // Ammo capacity is 0 so reduce ammo from inventory
-                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
-                {
-                    if (data.CountNonEquipItems(weaponItem.AmmoItems[i].DataId) >= amount)
-                        return true;
-                }
-                return false;
-            }
-
-            return validIfNoRequireAmmoType;
-        }
-
         public static bool DecreaseAmmos(ref EquipWeapons equipWeapons, IList<CharacterItem> nonEquipItems, bool isLimitSlot, int slotLimit, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
         {
             increaseDamages = null;
@@ -850,71 +616,22 @@ namespace MultiplayerARPG
             return validIfNoRequireAmmoType;
         }
 
-        public static bool DecreaseAmmos(this ICharacterData data, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
+        public static bool DecreaseAmmos(this ICharacterData data, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true, bool applyChanges = true)
         {
             EquipWeapons equipWeapons = data.EquipWeapons.Clone();
-            if (DecreaseAmmos(ref equipWeapons, data.NonEquipItems, GameInstance.Singleton.IsLimitInventorySlot, data.GetCaches().LimitItemSlot, weapon, isLeftHand, amount, out increaseDamages, validIfNoRequireAmmoType))
-            {
+            IList<CharacterItem> nonEquipItems = applyChanges ? data.NonEquipItems : new List<CharacterItem>(data.NonEquipItems);
+            if (!DecreaseAmmos(ref equipWeapons, nonEquipItems, GameInstance.Singleton.IsLimitInventorySlot, data.GetCaches().LimitItemSlot, weapon, isLeftHand, amount, out increaseDamages, validIfNoRequireAmmoType))
+                return false;
+            if (applyChanges)
                 data.EquipWeapons = equipWeapons;
-                return true;
-            }
-            return false;
-        }
-
-        public static List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(this ICharacterData data, CharacterItem weapon, bool isLeftHand, Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts, int triggerCount, int ammoAmountEachTrigger, bool validIfNoRequireAmmoType = true)
-        {
-            List<Dictionary<DamageElement, MinMaxFloat>> result = new List<Dictionary<DamageElement, MinMaxFloat>>();
-            EquipWeapons equipWeapons = data.EquipWeapons.Clone();
-            List<CharacterItem> nonEquipItems = new List<CharacterItem>(data.NonEquipItems);
-            bool isLimitSlot = GameInstance.Singleton.IsLimitInventorySlot;
-            int slotLimit = data.GetCaches().LimitItemSlot;
-            Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamageAmounts;
-            for (int i = 0; i < triggerCount; ++i)
-            {
-                if (!DecreaseAmmos(ref equipWeapons, nonEquipItems, isLimitSlot, slotLimit, weapon, isLeftHand, ammoAmountEachTrigger, out tempIncreaseDamageAmounts, validIfNoRequireAmmoType))
-                    break;
-                result.Add(GameDataHelpers.CombineDamages(new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts), tempIncreaseDamageAmounts));
-            }
-            return result;
-        }
-        #endregion
-
-        #region Decrease Items By Index
-        public static bool DecreaseItemsByIndex(this IList<CharacterItem> itemList, int index, int amount, bool isLimitInventorySlot, bool adjustMaxAmount)
-        {
-            if (index < 0 || index >= itemList.Count)
-                return false;
-            CharacterItem item = itemList[index];
-            if (item.IsEmptySlot())
-                return false;
-            if (amount > item.amount)
-            {
-                if (!adjustMaxAmount)
-                    return false;
-                amount = item.amount;
-            }
-            if (item.amount - amount == 0)
-            {
-                if (isLimitInventorySlot)
-                    itemList[index] = CharacterItem.Empty;
-                else
-                    itemList.RemoveAt(index);
-            }
-            else
-            {
-                item.amount -= amount;
-                itemList[index] = item;
-            }
             return true;
         }
-
-        public static bool DecreaseItemsByIndex(this ICharacterData data, int index, int amount, bool adjustMaxAmount)
-        {
-            if (data.NonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, adjustMaxAmount))
-                return true;
-            return false;
-        }
         #endregion
+
+        public static void RemoveOrPlaceEmptySlot(this IList<CharacterItem> nonEquipItems, int index)
+        {
+            GameInstance.Singleton.InventoryManager.RemoveOrPlaceEmptySlot(nonEquipItems, index);
+        }
 
         public static bool HasOneInNonEquipItems(this ICharacterData data, int dataId)
         {
@@ -1233,14 +950,9 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, int expectedIndex = -1)
+        public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, out int index, int expectedIndex = -1)
         {
-            data.AddOrSetNonEquipItems(characterItem, out _, expectedIndex);
-        }
-
-        public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, out int index, int expectedIndex = -1)
-        {
-            data.NonEquipItems.AddOrSetItems(characterItem, out index, expectedIndex);
+            GameInstance.Singleton.InventoryManager.AddOrSetItems(itemList, characterItem, out index, expectedIndex);
         }
 
         public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, int expectedIndex = -1)
@@ -1248,27 +960,19 @@ namespace MultiplayerARPG
             itemList.AddOrSetItems(characterItem, out _, expectedIndex);
         }
 
-        public static void AddOrSetItems(this IList<CharacterItem> itemList, CharacterItem characterItem, out int index, int expectedIndex = -1)
+        public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, out int index, int expectedIndex = -1)
         {
-            index = expectedIndex;
-            if (index < 0 || index >= itemList.Count || !itemList[index].IsEmptySlot())
-                index = itemList.IndexOfEmptyItemSlot();
-            if (index >= 0)
-            {
-                // Insert to empty slot
-                itemList[index] = characterItem;
-            }
-            else
-            {
-                // Add to last index
-                itemList.Add(characterItem);
-                index = itemList.Count - 1;
-            }
+            data.NonEquipItems.AddOrSetItems(characterItem, out index, expectedIndex);
         }
 
-        public static int IndexOfEmptyNonEquipItemSlot(this ICharacterData data)
+        public static void AddOrSetNonEquipItems(this ICharacterData data, CharacterItem characterItem, int expectedIndex = -1)
         {
-            return data.NonEquipItems.IndexOfEmptyItemSlot();
+            data.AddOrSetNonEquipItems(characterItem, out _, expectedIndex);
+        }
+
+        public static void MoveItemToEmptySlot(this IList<CharacterItem> itemList, int movingIndex)
+        {
+            GameInstance.Singleton.InventoryManager.MoveItemToEmptySlot(itemList, movingIndex);
         }
 
         public static int IndexOfAmmoItem(this ICharacterData data, AmmoType ammoType)
@@ -1384,7 +1088,6 @@ namespace MultiplayerARPG
         public static bool ValidateUsableItemToUse(this BaseCharacterEntity character, int itemIndex, out IUsableItem usableItem, out UITextKeys gameMessage)
         {
             usableItem = null;
-            gameMessage = UITextKeys.NONE;
 
             if (itemIndex < 0 || itemIndex >= character.NonEquipItems.Count)
             {
@@ -1429,7 +1132,57 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            gameMessage = UITextKeys.NONE;
             return true;
+        }
+
+        public static bool ValidateAmmo(this ICharacterData data, CharacterItem weapon, int amount, bool validIfNoRequireAmmoType = true)
+        {
+            // Avoid null data
+            if (weapon.IsEmptySlot())
+                return validIfNoRequireAmmoType;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
+            {
+                // Ammo capacity more than 0 reduce loaded ammo
+                if (weapon.ammo < amount)
+                    return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                if (data.CountAmmos(weaponItem.WeaponType.AmmoType, out _) >= amount)
+                    return true;
+                return false;
+            }
+            else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
+            {
+                // Ammo capacity is 0 so reduce ammo from inventory
+                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
+                {
+                    if (data.CountNonEquipItems(weaponItem.AmmoItems[i].DataId) >= amount)
+                        return true;
+                }
+                return false;
+            }
+
+            return validIfNoRequireAmmoType;
+        }
+
+        public static List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(this ICharacterData data, CharacterItem weapon, bool isLeftHand, Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts, int triggerCount, int ammoAmountEachTrigger, bool validIfNoRequireAmmoType = true)
+        {
+            List<Dictionary<DamageElement, MinMaxFloat>> result = new List<Dictionary<DamageElement, MinMaxFloat>>();
+            Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamageAmounts;
+            for (int i = 0; i < triggerCount; ++i)
+            {
+                if (!DecreaseAmmos(data, weapon, isLeftHand, ammoAmountEachTrigger, out tempIncreaseDamageAmounts, validIfNoRequireAmmoType, false))
+                    break;
+                result.Add(GameDataHelpers.CombineDamages(new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts), tempIncreaseDamageAmounts));
+            }
+            return result;
         }
     }
 }

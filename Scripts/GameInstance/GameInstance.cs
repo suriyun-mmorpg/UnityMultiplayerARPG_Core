@@ -127,6 +127,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private BaseGameplayRule gameplayRule = null;
         [SerializeField]
+        private BaseInventoryManager inventoryManager = null;
+        [SerializeField]
         private BaseDayNightTimeUpdater dayNightTimeUpdater = null;
         [SerializeField]
         private BaseGMCommands gmCommands = null;
@@ -475,6 +477,11 @@ namespace MultiplayerARPG
             get { return gameplayRule; }
         }
 
+        public BaseInventoryManager InventoryManager
+        {
+            get { return inventoryManager; }
+        }
+
         public BaseDayNightTimeUpdater DayNightTimeUpdater
         {
             get { return dayNightTimeUpdater; }
@@ -685,6 +692,10 @@ namespace MultiplayerARPG
             // Reset gold and exp rate
             gameplayRule.GoldRate = 1f;
             gameplayRule.ExpRate = 1f;
+
+            // Setup inventory manager
+            if (inventoryManager == null)
+                inventoryManager = ScriptableObject.CreateInstance<DefaultInventoryManager>();
 
             // Setup day night time updater if not existed
             if (dayNightTimeUpdater == null)
