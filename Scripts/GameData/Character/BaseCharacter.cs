@@ -5,6 +5,19 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseCharacter : BaseGameData
     {
+        [Category("Generic Settings")]
+        [SerializeField]
+        protected ExpTable expTable;
+        public ExpTable ExpTable
+        {
+            get
+            {
+                if (expTable == null)
+                    return GameInstance.Singleton.ExpTable;
+                return expTable;
+            }
+        }
+        
         [Category(3, "Character Stats")]
         [SerializeField]
         private CharacterStatsIncremental stats;

@@ -215,9 +215,11 @@ namespace MultiplayerARPG
         private GameEffect[] freezeEffects = new GameEffect[0];
 
         [Header("Gameplay Database and Default Data")]
-        [Tooltip("Exp tree for both player character and monster character")]
+        [Tooltip("Exp tree for both player character, monster character and item, this may be deprecated in the future, you should setup `Exp Table` instead.")]
         [SerializeField]
         private int[] expTree = new int[0];
+        [SerializeField]
+        private ExpTable expTable = null;
         [Tooltip("You should add game data to game database and set the game database to this. If you leave this empty, it will load game data from `Resources` folders")]
         [SerializeField]
         private BaseGameDatabase gameDatabase = null;
@@ -538,19 +540,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public int[] ExpTree
+        public ExpTable ExpTable
         {
-            get
-            {
-                if (expTree == null)
-                    expTree = new int[] { 0 };
-                return expTree;
-            }
-            set
-            {
-                if (value != null)
-                    expTree = value;
-            }
+            get { return expTable; }
         }
 
         public GameEffect[] LevelUpEffects
@@ -713,13 +705,23 @@ namespace MultiplayerARPG
             if (networkSetting == null)
                 networkSetting = ScriptableObject.CreateInstance<NetworkSetting>();
 
+            // Setup exp table if not existed, and use exp tree
+            if (expTable == null)
+            {
+                expTable = ScriptableObject.CreateInstance<ExpTable>();
+                expTable.expTree = expTree;
+            }
+
             // Setup game database if not existed
             if (gameDatabase == null)
                 gameDatabase = ScriptableObject.CreateInstance<ResourcesFolderGameDatabase>();
 
             // Setup social system setting if not existed
             if (socialSystemSetting == null)
+            {
                 socialSystemSetting = ScriptableObject.CreateInstance<SocialSystemSetting>();
+                socialSystemSetting.Migrate();
+            }
 
             // Setup non target layers
             IgnoreRaycastLayersValues = new HashSet<int>();

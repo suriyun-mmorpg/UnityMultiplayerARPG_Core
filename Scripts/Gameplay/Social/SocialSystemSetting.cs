@@ -59,15 +59,10 @@ namespace MultiplayerARPG
         [SerializeField]
         private int createGuildRequiredGold = 1000;
         [SerializeField]
+        [Tooltip("Exp tree for guild, this may be deprecated in the future, you should setup `Exp Table` instead.")]
         private int[] guildExpTree;
-
-        [Header("Exp Calculator Tool")]
         [SerializeField]
-        private int guildMaxLevel;
-        [SerializeField]
-        private Int32GraphCalculator guildExpCalculator;
-        [SerializeField]
-        private bool guildCalculateExp;
+        private ExpTable guildExpTable;
 
         public int MaxGuildMember { get { return maxGuildMember; } }
         public int MinGuildNameLength { get { return minGuildNameLength; } }
@@ -105,19 +100,10 @@ namespace MultiplayerARPG
 
         public int CreateGuildRequiredGold { get { return createGuildRequiredGold; } }
 
-        public int[] GuildExpTree
+        public ExpTable GuildExpTable
         {
-            get
-            {
-                if (guildExpTree == null)
-                    guildExpTree = new int[] { 0 };
-                return guildExpTree;
-            }
-            set
-            {
-                if (value != null)
-                    guildExpTree = value;
-            }
+            get { return guildExpTable; }
+            set { guildExpTable = value; }
         }
 
         public bool CanCreateGuild(IPlayerCharacterData character)
@@ -164,6 +150,15 @@ namespace MultiplayerARPG
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenCreateGuild(character, this);
         }
 
+        public void Migrate()
+        {
+            if (guildExpTable == null)
+            {
+                guildExpTable = CreateInstance<ExpTable>();
+                guildExpTable.expTree = guildExpTree;
+            }
+        }
+
 #if UNITY_EDITOR
         void OnValidate()
         {
@@ -183,18 +178,6 @@ namespace MultiplayerARPG
                     new GuildRoleData() { roleName = "Master", canInvite = true, canKick = true, canUseStorage = true },
                     new GuildRoleData() { roleName = "Member 1", canInvite = false, canKick = false, canUseStorage = false },
                 };
-                EditorUtility.SetDirty(this);
-            }
-            // Calculate Exp tool
-            if (guildCalculateExp)
-            {
-                guildCalculateExp = false;
-                int[] guildExpTree = new int[guildMaxLevel];
-                for (int i = 1; i <= guildMaxLevel; ++i)
-                {
-                    guildExpTree[i - 1] = guildExpCalculator.Calculate(i, guildMaxLevel);
-                }
-                GuildExpTree = guildExpTree;
                 EditorUtility.SetDirty(this);
             }
             // Clear cache

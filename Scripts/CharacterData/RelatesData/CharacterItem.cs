@@ -151,16 +151,6 @@ namespace MultiplayerARPG
             return GameInstance.Singleton.GameplayRule.GetEquipmentStatsRate(this);
         }
 
-        public int GetNextLevelExp()
-        {
-            if (GetPetItem() == null || level <= 0)
-                return 0;
-            int[] expTree = GameInstance.Singleton.ExpTree;
-            if (level > expTree.Length)
-                return 0;
-            return expTree[level - 1];
-        }
-
         public KeyValuePair<DamageElement, float> GetArmorAmount()
         {
             IDefendEquipmentItem item = GetDefendItem();

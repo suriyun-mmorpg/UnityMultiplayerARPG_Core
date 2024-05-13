@@ -160,10 +160,5 @@ namespace MultiplayerARPG
         {
             return GetRole(GetMemberRole(characterId)).shareExpPercentage;
         }
-
-        public int GetNextLevelExp()
-        {
-            return GetNextLevelExp(SystemSetting.GuildExpTree, level);
-        }
     }
 }

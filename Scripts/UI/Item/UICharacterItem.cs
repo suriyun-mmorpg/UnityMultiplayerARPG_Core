@@ -1300,23 +1300,41 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (ItemWithMonsterEntity != null && (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid() || ItemWithMonsterEntity.MonsterCharacterEntity != null))
+            if (ItemWithMonsterEntity == null || (!ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid() && ItemWithMonsterEntity.MonsterCharacterEntity == null))
             {
+                if (uiTextMonster != null)
+                    uiTextMonster.SetGameObjectActive(false);
+
+                if (uiTextExp != null)
+                    uiTextExp.SetGameObjectActive(false);
+
+                if (uiGageExp != null)
+                    uiGageExp.SetVisible(false);
+            }
+            else
+            {
+                BaseMonsterCharacterEntity tempEntity = null;
+                if (ItemWithMonsterEntity.MonsterCharacterEntity != null)
+                {
+                    tempEntity = ItemWithMonsterEntity.MonsterCharacterEntity;
+                }
+                else if (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid())
+                {
+                    tempEntity = ItemWithMonsterEntity.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseMonsterCharacterEntity>();
+                }
+
+                if (uiTextMonster != null)
+                {
+                    uiTextMonster.SetGameObjectActive(true);
+                    uiTextMonster.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyPet),
+                        tempEntity.Title);
+                }
+
                 // Item's EXP (pet's EXP)
-                int[] expTree = GameInstance.Singleton.ExpTree;
-                int currentExp = 0;
-                int nextLevelExp = 0;
-                if (CharacterItem.GetNextLevelExp() > 0)
-                {
-                    currentExp = CharacterItem.exp;
-                    nextLevelExp = CharacterItem.GetNextLevelExp();
-                }
-                else if (Level - 2 > 0 && Level - 2 < expTree.Length)
-                {
-                    int maxExp = expTree[Level - 2];
-                    currentExp = maxExp;
-                    nextLevelExp = maxExp;
-                }
+                int currentExp;
+                int nextLevelExp;
+                tempEntity.GetProperCurrentByNextLevelExp(out currentExp, out nextLevelExp);
 
                 if (uiTextExp != null)
                 {
@@ -1333,84 +1351,56 @@ namespace MultiplayerARPG
                     uiGageExp.Update(currentExp, nextLevelExp);
                 }
             }
+
+            if (ItemWithBuildingEntity == null || (!ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid() && ItemWithBuildingEntity.BuildingEntity == null))
+            {
+                if (uiTextBuilding != null)
+                    uiTextBuilding.SetGameObjectActive(false);
+            }
             else
             {
-                if (uiTextExp != null)
-                    uiTextExp.SetGameObjectActive(false);
-
-                if (uiGageExp != null)
-                    uiGageExp.SetVisible(false);
-            }
-
-            if (uiTextBuilding != null)
-            {
-                if (ItemWithBuildingEntity == null || (!ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid() && ItemWithBuildingEntity.BuildingEntity == null))
+                BuildingEntity tempEntity = null;
+                if (ItemWithBuildingEntity.BuildingEntity != null)
                 {
-                    uiTextBuilding.SetGameObjectActive(false);
+                    tempEntity = ItemWithBuildingEntity.BuildingEntity;
                 }
-                else
+                else if (ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid())
+                {
+                    tempEntity = ItemWithBuildingEntity.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>();
+                }
+
+                if (uiTextBuilding != null)
                 {
                     uiTextBuilding.SetGameObjectActive(true);
-                    if (ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid())
-                    {
-                        uiTextBuilding.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyBuilding),
-                            ItemWithBuildingEntity.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>().Title);
-                    }
-                    else if (ItemWithBuildingEntity.BuildingEntity != null)
-                    {
-                        uiTextBuilding.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyBuilding),
-                            ItemWithBuildingEntity.BuildingEntity.Title);
-                    }
+                    uiTextBuilding.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyBuilding),
+                        tempEntity.Title);
                 }
             }
 
-            if (uiTextMonster != null)
+            if (ItemWithVehicleEntity == null || (!ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid() && ItemWithVehicleEntity.VehicleEntity == null))
             {
-                if (ItemWithMonsterEntity == null || (!ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid() && ItemWithMonsterEntity.MonsterCharacterEntity == null))
-                {
-                    uiTextMonster.SetGameObjectActive(false);
-                }
-                else
-                {
-                    uiTextMonster.SetGameObjectActive(true);
-                    if (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid())
-                    {
-                        uiTextMonster.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyPet),
-                            ItemWithMonsterEntity.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>().Title);
-                    }
-                    else if (ItemWithMonsterEntity.MonsterCharacterEntity != null)
-                    {
-                        uiTextMonster.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyPet),
-                            ItemWithMonsterEntity.MonsterCharacterEntity.Title);
-                    }
-                }
-            }
-
-            if (uiTextVehicle != null)
-            {
-                if (ItemWithVehicleEntity == null || (!ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid() && ItemWithVehicleEntity.VehicleEntity == null))
-                {
+                if (uiTextVehicle != null)
                     uiTextVehicle.SetGameObjectActive(false);
+            }
+            else
+            {
+                VehicleEntity tempEntity = null;
+                if (ItemWithVehicleEntity.VehicleEntity != null)
+                {
+                    tempEntity = ItemWithVehicleEntity.VehicleEntity;
                 }
-                else
+                else if (ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid())
+                {
+                    tempEntity = ItemWithVehicleEntity.AddressableVehicleEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>();
+                }
+
+                if (uiTextVehicle != null)
                 {
                     uiTextVehicle.SetGameObjectActive(true);
-                    if (ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid())
-                    {
-                        uiTextVehicle.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyMount),
-                            ItemWithVehicleEntity.AddressableVehicleEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>().Title);
-                    }
-                    else if (ItemWithVehicleEntity.VehicleEntity != null)
-                    {
-                        uiTextVehicle.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyMount),
-                            ItemWithVehicleEntity.VehicleEntity.Title);
-                    }
+                    uiTextVehicle.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyMount),
+                        tempEntity.Title);
                 }
             }
 

@@ -310,20 +310,9 @@ namespace MultiplayerARPG
                     Data == null ? "1" : Data.Level.ToString("N0"));
             }
 
-            int[] expTree = GameInstance.Singleton.ExpTree;
-            int currentExp = 0;
-            int nextLevelExp = 0;
-            if (Data != null && Data.GetNextLevelExp() > 0)
-            {
-                currentExp = Data.Exp;
-                nextLevelExp = Data.GetNextLevelExp();
-            }
-            else if (Data != null && Data.Level - 2 > 0 && Data.Level - 2 < expTree.Length)
-            {
-                int maxExp = expTree[Data.Level - 2];
-                currentExp = maxExp;
-                nextLevelExp = maxExp;
-            }
+            int currentExp;
+            int nextLevelExp;
+            Data.GetProperCurrentByNextLevelExp(out currentExp, out nextLevelExp);
             if (uiGageExp != null)
                 uiGageExp.Update(currentExp, nextLevelExp);
 

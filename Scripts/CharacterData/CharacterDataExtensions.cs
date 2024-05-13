@@ -79,13 +79,24 @@ namespace MultiplayerARPG
 
         public static int GetNextLevelExp(this ICharacterData data)
         {
-            int level = data.Level;
-            if (level <= 0)
+            if (data == null)
                 return 0;
-            int[] expTree = GameInstance.Singleton.ExpTree;
-            if (level > expTree.Length)
+            BaseCharacter characterData = data.GetDatabase();
+            if (characterData == null || characterData.ExpTable == null)
                 return 0;
-            return expTree[level - 1];
+            return characterData.ExpTable.GetNextLevelExp(data.Level);
+        }
+
+        public static void GetProperCurrentByNextLevelExp(this ICharacterData data, out int properCurrentExp, out int properNextLevelExp)
+        {
+            properCurrentExp = 0;
+            properNextLevelExp = 0;
+            if (data == null)
+                return;
+            BaseCharacter characterData = data.GetDatabase();
+            if (characterData == null || characterData.ExpTable == null)
+                return;
+            characterData.ExpTable.GetProperCurrentByNextLevelExp(data.Level, data.Exp, out properCurrentExp, out properNextLevelExp);
         }
 
         #region Stats calculation, make saperate stats for buffs calculation

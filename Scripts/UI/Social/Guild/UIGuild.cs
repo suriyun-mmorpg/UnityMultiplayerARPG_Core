@@ -228,20 +228,9 @@ namespace MultiplayerARPG
                     Guild == null ? "0" : Guild.level.ToString("N0"));
             }
 
-            int[] expTree = GameInstance.Singleton.SocialSystemSetting.GuildExpTree;
-            int currentExp = 0;
-            int nextLevelExp = 0;
-            if (Guild != null && Guild.GetNextLevelExp() > 0)
-            {
-                currentExp = Guild.exp;
-                nextLevelExp = Guild.GetNextLevelExp();
-            }
-            else if (Guild != null && Guild.level - 2 > 0 && Guild.level - 2 < expTree.Length)
-            {
-                int maxExp = expTree[Guild.level - 2];
-                currentExp = maxExp;
-                nextLevelExp = maxExp;
-            }
+            int currentExp = Guild.exp;
+            int nextLevelExp;
+            GameInstance.Singleton.SocialSystemSetting.GuildExpTable.GetProperCurrentByNextLevelExp(Guild.level, currentExp, out currentExp, out nextLevelExp);
             if (uiGageExp != null)
                 uiGageExp.Update(currentExp, nextLevelExp);
 
