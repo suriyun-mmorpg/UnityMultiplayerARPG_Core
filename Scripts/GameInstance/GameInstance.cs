@@ -718,10 +718,8 @@ namespace MultiplayerARPG
 
             // Setup social system setting if not existed
             if (socialSystemSetting == null)
-            {
                 socialSystemSetting = ScriptableObject.CreateInstance<SocialSystemSetting>();
-                socialSystemSetting.Migrate();
-            }
+            socialSystemSetting.Migrate();
 
             // Setup non target layers
             IgnoreRaycastLayersValues = new HashSet<int>();
