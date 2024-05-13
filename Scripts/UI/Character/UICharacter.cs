@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Cysharp.Text;
 using LiteNetLibManager;
 using UnityEngine;
@@ -359,25 +360,31 @@ namespace MultiplayerARPG
             // Icon
             if (uiPlayerIcon != null)
             {
-                if (playerCharacter != null)
+                if (playerCharacter != null && GameInstance.PlayerIcons.ContainsKey(playerCharacter.IconDataId))
                     uiPlayerIcon.SetDataByDataId(playerCharacter.IconDataId);
-                uiPlayerIcon.SetVisible(playerCharacter != null);
+                else
+                    uiPlayerIcon.SetDataByDataId(GameInstance.PlayerIcons.Keys.FirstOrDefault());
+                uiPlayerIcon.SetVisible(true);
             }
 
             // Frame
             if (uiPlayerFrame != null)
             {
-                if (playerCharacter != null)
+                if (playerCharacter != null && GameInstance.PlayerFrames.ContainsKey(playerCharacter.FrameDataId))
                     uiPlayerFrame.SetDataByDataId(playerCharacter.FrameDataId);
-                uiPlayerFrame.SetVisible(playerCharacter != null);
+                else
+                    uiPlayerFrame.SetDataByDataId(GameInstance.PlayerFrames.Keys.FirstOrDefault());
+                uiPlayerFrame.SetVisible(true);
             }
 
             // Title
             if (uiPlayerTitle != null)
             {
-                if (playerCharacter != null)
+                if (playerCharacter != null && GameInstance.PlayerTitles.ContainsKey(playerCharacter.TitleDataId))
                     uiPlayerTitle.SetDataByDataId(playerCharacter.TitleDataId);
-                uiPlayerTitle.SetVisible(playerCharacter != null);
+                else
+                    uiPlayerTitle.SetDataByDataId(GameInstance.PlayerTitles.Keys.FirstOrDefault());
+                uiPlayerTitle.SetVisible(true);
             }
 
             // Faction
