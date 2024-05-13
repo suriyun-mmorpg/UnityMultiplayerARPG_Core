@@ -310,9 +310,7 @@ namespace MultiplayerARPG
                     Data == null ? "1" : Data.Level.ToString("N0"));
             }
 
-            int currentExp;
-            int nextLevelExp;
-            Data.GetProperCurrentByNextLevelExp(out currentExp, out nextLevelExp);
+            Data.GetProperCurrentByNextLevelExp(out int currentExp, out int nextLevelExp);
             if (uiGageExp != null)
                 uiGageExp.Update(currentExp, nextLevelExp);
 
