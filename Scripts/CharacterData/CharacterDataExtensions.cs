@@ -40,13 +40,13 @@ namespace MultiplayerARPG
             BaseCharacterEntity result;
             if (data.TryGetEntityAddressablePrefab(out AssetReferenceBaseCharacterEntity assetRef))
             {
-                AsyncOperationHandle<BaseCharacterEntity> handler = assetRef.InstantiateAsync(parent);
+                AsyncOperationHandle<BaseCharacterEntity> handler = assetRef.InstantiateAsync();
                 result = handler.WaitForCompletion();
                 result.gameObject.AddComponent<AssetReferenceReleaser>().Setup(handler);
             }
             else if (data.TryGetEntityPrefab(out BaseCharacterEntity prefab))
             {
-                result = Object.Instantiate(prefab, parent);
+                result = Object.Instantiate(prefab);
             }
             else
             {
@@ -71,6 +71,7 @@ namespace MultiplayerARPG
             }
             result.gameObject.SetLayerRecursively(GameInstance.Singleton.playerLayer, true);
             result.gameObject.SetActive(true);
+            result.transform.SetParent(parent);
             result.transform.localPosition = Vector3.zero;
             result.transform.localEulerAngles = Vector3.zero;
             return result.CharacterModel;
