@@ -92,11 +92,7 @@ namespace MultiplayerARPG
             }
             set
             {
-                if (!IsServer)
-                {
-                    return;
-                }
-                if (CurrentGameInstance.goldStoreMode == GoldStoreMode.UserGoldOnly)
+                if (IsServer && CurrentGameInstance.goldStoreMode == GoldStoreMode.UserGoldOnly)
                 {
                     GameInstance.ServerUserHandlers.ChangeUserGold(UserId, value - UserCash);
                     return;
