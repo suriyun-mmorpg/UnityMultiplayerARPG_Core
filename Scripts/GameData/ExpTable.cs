@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         {
             properCurrentExp = currentExp;
             properNextLevelExp = GetNextLevelExp(currentLevel);
-            if (currentLevel - 2 > 0 && currentLevel - 2 < expTree.Length)
+            if (currentLevel >= expTree.Length && currentLevel - 2 > 0 && currentLevel - 2 < expTree.Length)
             {
                 int maxExp = expTree[currentLevel - 2];
                 properCurrentExp = maxExp;
