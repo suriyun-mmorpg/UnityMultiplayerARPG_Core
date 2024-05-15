@@ -133,7 +133,8 @@ namespace MultiplayerARPG
             CacheSelectionManager.Clear();
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(true);
-            if (responseCode == AckResponseCode.Unimplemented ||
+            if (responseCode == AckResponseCode.Exception ||
+                responseCode == AckResponseCode.Unimplemented ||
                 responseCode == AckResponseCode.Timeout)
                 return;
             UIMailListEntry tempUI;
