@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             message = (UITextKeys)reader.GetPackedUShort();
-            if (message == UITextKeys.NONE)
+            if (!message.IsError())
             {
                 dataId = reader.GetPackedInt();
                 cash = reader.GetPackedInt();
@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUShort((ushort)message);
-            if (message == UITextKeys.NONE)
+            if (!message.IsError())
             {
                 writer.PutPackedInt(dataId);
                 writer.PutPackedInt(cash);

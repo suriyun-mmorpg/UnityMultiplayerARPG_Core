@@ -10,15 +10,15 @@ namespace MultiplayerARPG
         public void Deserialize(NetDataReader reader)
         {
             message = (UITextKeys)reader.GetPackedUShort();
-            if (message == UITextKeys.NONE)
-                notificationCount = reader.GetInt();
+            if (!message.IsError())
+                notificationCount = reader.GetPackedInt();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.PutPackedUShort((ushort)message);
-            if (message == UITextKeys.NONE)
-                writer.Put(notificationCount);
+            if (!message.IsError())
+                writer.PutPackedInt(notificationCount);
         }
     }
 }

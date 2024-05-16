@@ -129,7 +129,7 @@ namespace MultiplayerARPG
         public void ShowDisconnectDialog(DisconnectReason reason, SocketError socketError, UITextKeys message)
         {
             string errorMessage = LanguageManager.GetUnknowTitle();
-            if (message != UITextKeys.NONE)
+            if (message.IsError())
             {
                 errorMessage = LanguageManager.GetText(message.ToString());
             }
