@@ -42,15 +42,15 @@ namespace MultiplayerARPG
         public bool instantiateDisappear = false;
         public GameObject disappearEffect;
 
-        private FxCollection _projectileFx;
-        private FxCollection _impactFx;
-        private FxCollection _disappearFx;
+        protected FxCollection _projectileFx;
+        protected FxCollection _impactFx;
+        protected FxCollection _disappearFx;
 
-        private Vector3 _initialPosition;
-        private Vector3 _defaultImpactEffectPosition;
-        private Vector3 _bulletVelocity;
-        private Vector3 _normal;
-        private Vector3 _hitPos;
+        protected Vector3 _initialPosition;
+        protected Vector3 _defaultImpactEffectPosition;
+        protected Vector3 _bulletVelocity;
+        protected Vector3 _normal;
+        protected Vector3 _hitPos;
 
         protected override void OnDestroy()
         {
