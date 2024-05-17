@@ -259,7 +259,7 @@ namespace MultiplayerARPG
             if (IsAttack)
             {
                 result = weaponDamageMultiplicator.GetAmount(skillLevel);
-                return true;
+                return result > 0f;
             }
             return base.TryGetAttackWeaponDamageMultiplicator(skillUser, skillLevel, out result);
         }
