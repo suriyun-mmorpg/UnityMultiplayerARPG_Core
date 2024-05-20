@@ -13,7 +13,6 @@ namespace MultiplayerARPG
 			int index = indexProp.index;
 			if (index >= 0 && index < EditorGlobalData.SocketEnhancerTypeTitles.Length)
 				title = EditorGlobalData.SocketEnhancerTypeTitles[index];
-			Debug.LogError("here " + title);
 			EditorGUI.PropertyField(position, property, new GUIContent(title));
 		}
 	}
