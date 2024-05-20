@@ -2,69 +2,37 @@ namespace MultiplayerARPG
 {
     public enum SocketEnhancerType : byte
     {
-        [SocketEnhancerTypeTitle(0)]
         Type1,
-        [SocketEnhancerTypeTitle(1)]
         Type2,
-        [SocketEnhancerTypeTitle(2)]
         Type3,
-        [SocketEnhancerTypeTitle(3)]
         Type4,
-        [SocketEnhancerTypeTitle(4)]
         Type5,
-        [SocketEnhancerTypeTitle(5)]
         Type6,
-        [SocketEnhancerTypeTitle(6)]
         Type7,
-        [SocketEnhancerTypeTitle(7)]
         Type8,
-        [SocketEnhancerTypeTitle(8)]
         Type9,
-        [SocketEnhancerTypeTitle(9)]
         Type10,
-        [SocketEnhancerTypeTitle(10)]
         Type11,
-        [SocketEnhancerTypeTitle(11)]
         Type12,
-        [SocketEnhancerTypeTitle(12)]
         Type13,
-        [SocketEnhancerTypeTitle(13)]
         Type14,
-        [SocketEnhancerTypeTitle(14)]
         Type15,
-        [SocketEnhancerTypeTitle(15)]
         Type16,
-        [SocketEnhancerTypeTitle(16)]
         Type17,
-        [SocketEnhancerTypeTitle(17)]
         Type18,
-        [SocketEnhancerTypeTitle(18)]
         Type19,
-        [SocketEnhancerTypeTitle(19)]
         Type20,
-        [SocketEnhancerTypeTitle(20)]
         Type21,
-        [SocketEnhancerTypeTitle(21)]
         Type22,
-        [SocketEnhancerTypeTitle(22)]
         Type23,
-        [SocketEnhancerTypeTitle(23)]
         Type24,
-        [SocketEnhancerTypeTitle(24)]
         Type25,
-        [SocketEnhancerTypeTitle(25)]
         Type26,
-        [SocketEnhancerTypeTitle(26)]
         Type27,
-        [SocketEnhancerTypeTitle(27)]
         Type28,
-        [SocketEnhancerTypeTitle(28)]
         Type29,
-        [SocketEnhancerTypeTitle(29)]
         Type30,
-        [SocketEnhancerTypeTitle(30)]
         Type31,
-        [SocketEnhancerTypeTitle(31)]
         Type32,
     }
 }
