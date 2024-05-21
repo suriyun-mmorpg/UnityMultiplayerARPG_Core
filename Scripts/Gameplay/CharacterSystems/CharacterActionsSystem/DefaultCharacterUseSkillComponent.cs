@@ -363,7 +363,7 @@ namespace MultiplayerARPG
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillEnd(_playerCharacterEntity, simulateSeed);
             }
-            await UniTask.DelayFrame(1, PlayerLoopTiming.Update);
+            await UniTask.Yield();
             // Clear action states at clients and server
             ClearUseSkillStates();
         }
