@@ -712,7 +712,7 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid SpawnEntities()
         {
-            await UniTask.WaitUntil(IsServerReadyToInstantiateObjects);
+            do { await UniTask.Delay(100); } while (!IsServerReadyToInstantiateObjects());
             float progress = 0f;
             string sceneName = SceneManager.GetActiveScene().name;
             await UniTask.NextFrame();
@@ -918,7 +918,7 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid ProceedUntilClientReady()
         {
-            await UniTask.WaitUntil(IsClientReadyToInstantiateObjects);
+            do { await UniTask.Delay(100); } while (!IsClientReadyToInstantiateObjects());
             SendClientReady();
         }
 
