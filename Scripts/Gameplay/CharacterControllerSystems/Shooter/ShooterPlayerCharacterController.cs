@@ -1423,7 +1423,7 @@ namespace MultiplayerARPG
             while (!SetTargetLookDirectionWhileDoingAction())
             {
                 _lastAimmingTime = Time.unscaledTime;
-                await UniTask.Yield();
+                await UniTask.DelayFrame(1, PlayerLoopTiming.PreLateUpdate);
             }
         }
 
@@ -1628,7 +1628,7 @@ namespace MultiplayerARPG
             do
             {
                 allReload = true;
-                await UniTask.Yield();
+                await UniTask.DelayFrame(1, PlayerLoopTiming.PreLateUpdate);
                 // Reload right-hand weapon
                 if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity))
                 {
