@@ -22,6 +22,11 @@ namespace MultiplayerARPG
 
         public void SetupRefToPrefab(GameObject prefab)
         {
+            if (prefab == null)
+            {
+                refToPrefab = null;
+                return;
+            }
             refToPrefab = prefab.GetComponent<T>();
         }
 
