@@ -1,5 +1,6 @@
-using UnityEngine;
 using System.IO;
+using UnityEngine;
+using UnityEngine.SceneManagement;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -76,54 +77,66 @@ namespace MultiplayerARPG
             // Find bounds
             Bounds bounds = default;
             bool setBoundsOnce = false;
-            if (makeByTerrain)
+            for (int i = 0; i < SceneManager.sceneCount; ++i)
             {
-                TerrainCollider[] objects = FindObjectsOfType<TerrainCollider>();
-                foreach (var obj in objects)
+                Scene scene = SceneManager.GetSceneAt(i);
+                if (!scene.isLoaded)
                 {
-                    if (!setBoundsOnce)
-                        bounds = obj.bounds;
-                    else
-                        bounds.Encapsulate(obj.bounds);
-                    setBoundsOnce = true;
+                    continue;
                 }
-            }
-            if (makeByCollider)
-            {
-                Collider[] objects = FindObjectsOfType<Collider>();
-                foreach (var obj in objects)
+                GameObject[] rootGameObjects = scene.GetRootGameObjects();
+                for (int j = 0; j < rootGameObjects.Length; ++j)
                 {
-                    if (obj is TerrainCollider)
-                        continue;
-                    if (!setBoundsOnce)
-                        bounds = obj.bounds;
-                    else
-                        bounds.Encapsulate(obj.bounds);
-                    setBoundsOnce = true;
-                }
-            }
-            if (makeByCollider2D)
-            {
-                Collider2D[] objects = FindObjectsOfType<Collider2D>();
-                foreach (var obj in objects)
-                {
-                    if (!setBoundsOnce)
-                        bounds = obj.bounds;
-                    else
-                        bounds.Encapsulate(obj.bounds);
-                    setBoundsOnce = true;
-                }
-            }
-            if (makeByRenderer)
-            {
-                Renderer[] objects = FindObjectsOfType<Renderer>();
-                foreach (var obj in objects)
-                {
-                    if (!setBoundsOnce)
-                        bounds = obj.bounds;
-                    else
-                        bounds.Encapsulate(obj.bounds);
-                    setBoundsOnce = true;
+                    if (makeByTerrain)
+                    {
+                        TerrainCollider[] objects = rootGameObjects[j].GetComponentsInChildren<TerrainCollider>();
+                        foreach (var obj in objects)
+                        {
+                            if (!setBoundsOnce)
+                                bounds = obj.bounds;
+                            else
+                                bounds.Encapsulate(obj.bounds);
+                            setBoundsOnce = true;
+                        }
+                    }
+                    if (makeByCollider)
+                    {
+                        Collider[] objects = rootGameObjects[j].GetComponentsInChildren<Collider>();
+                        foreach (var obj in objects)
+                        {
+                            if (obj is TerrainCollider)
+                                continue;
+                            if (!setBoundsOnce)
+                                bounds = obj.bounds;
+                            else
+                                bounds.Encapsulate(obj.bounds);
+                            setBoundsOnce = true;
+                        }
+                    }
+                    if (makeByCollider2D)
+                    {
+                        Collider2D[] objects = rootGameObjects[j].GetComponentsInChildren<Collider2D>();
+                        foreach (var obj in objects)
+                        {
+                            if (!setBoundsOnce)
+                                bounds = obj.bounds;
+                            else
+                                bounds.Encapsulate(obj.bounds);
+                            setBoundsOnce = true;
+                        }
+                    }
+                    if (makeByRenderer)
+                    {
+                        Renderer[] objects = rootGameObjects[j].GetComponentsInChildren<Renderer>();
+                        foreach (var obj in objects)
+                        {
+                            if (!setBoundsOnce)
+                                bounds = obj.bounds;
+                            else
+                                bounds.Encapsulate(obj.bounds);
+                            setBoundsOnce = true;
+                        }
+                    }
                 }
             }
 
