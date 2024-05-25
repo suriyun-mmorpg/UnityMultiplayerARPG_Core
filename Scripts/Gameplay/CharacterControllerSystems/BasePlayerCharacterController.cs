@@ -80,7 +80,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (SelectedEntity is IGameEntity castedEntity)
+                if (SelectedEntity is IGameEntity castedEntity && !castedEntity.IsNull())
                     return castedEntity.Entity;
                 return null;
             }
