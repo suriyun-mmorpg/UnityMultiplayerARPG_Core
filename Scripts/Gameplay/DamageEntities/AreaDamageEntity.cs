@@ -37,7 +37,8 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            Identity.onGetInstance.RemoveListener(OnGetInstance);
+            if (Identity != null && Identity.onGetInstance != null)
+                Identity.onGetInstance.RemoveListener(OnGetInstance);
             _identity = null;
             _receivingDamageHitBoxes?.Clear();
             onDestroy?.RemoveAllListeners();
