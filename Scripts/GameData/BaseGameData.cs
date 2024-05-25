@@ -89,6 +89,18 @@ namespace MultiplayerARPG
             }
         }
 
+        [NonSerialized]
+        protected int? hashCode;
+        public int HashCode
+        {
+            get
+            {
+                if (!hashCode.HasValue)
+                    hashCode = $"{GetType()}_{Id}".GetHashCode();
+                return hashCode.Value;
+            }
+        }
+
         public static int MakeDataId(string id)
         {
             return id.GenerateHashId();
@@ -128,6 +140,16 @@ namespace MultiplayerARPG
         public override string ToString()
         {
             return Id;
+        }
+
+        public override int GetHashCode()
+        {
+            return HashCode;
+        }
+
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj.GetHashCode();
         }
     }
 }

@@ -37,6 +37,11 @@ namespace MultiplayerARPG
             return source.GetHashCode();
         }
 
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj.GetHashCode();
+        }
+
         public override string ToString()
         {
             return source.ToString();
