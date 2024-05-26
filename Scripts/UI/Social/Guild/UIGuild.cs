@@ -227,8 +227,11 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeyLevel),
                     Guild == null ? "0" : Guild.level.ToString("N0"));
             }
+            int currentExp = 0;
+            int nextLevelExp = 0;
+            if (Guild != null)
+                GameInstance.Singleton.SocialSystemSetting.GuildExpTable.GetProperCurrentByNextLevelExp(Guild.level, Guild.exp, out currentExp, out nextLevelExp);
 
-            GameInstance.Singleton.SocialSystemSetting.GuildExpTable.GetProperCurrentByNextLevelExp(Guild.level, Guild.exp, out int currentExp, out int nextLevelExp);
             if (uiGageExp != null)
                 uiGageExp.Update(currentExp, nextLevelExp);
 
