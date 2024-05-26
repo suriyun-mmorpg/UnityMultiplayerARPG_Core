@@ -35,12 +35,18 @@ namespace MultiplayerARPG
         {
             prefab = null;
             addressablePrefab = null;
-            return GetOrMakeCache(data.id, in data)?.GetPrefab(out prefab, out addressablePrefab) ?? false;
+            CharacterSummonCacheData cachedData = GetOrMakeCache(data.id, in data);
+            if (cachedData != null)
+                return cachedData.GetPrefab(out prefab, out addressablePrefab);
+            return false;
         }
 
         public CalculatedBuff GetBuff(in CharacterSummon data)
         {
-            return GetOrMakeCache(data.id, in data)?.GetBuff();
+            CharacterSummonCacheData cachedData = GetOrMakeCache(data.id, in data);
+            if (cachedData != null)
+                return cachedData.GetBuff();
+            return null;
         }
     }
 }
