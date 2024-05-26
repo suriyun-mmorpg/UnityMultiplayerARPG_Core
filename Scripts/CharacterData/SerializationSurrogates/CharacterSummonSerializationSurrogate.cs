@@ -10,6 +10,7 @@ namespace MultiplayerARPG
             StreamingContext context)
         {
             CharacterSummon data = (CharacterSummon)obj;
+            info.AddValue("id", data.id);
             info.AddValue("type", (byte)data.type);
             info.AddValue("dataId", data.dataId);
             info.AddValue("summonRemainsDuration", data.summonRemainsDuration);
@@ -26,6 +27,15 @@ namespace MultiplayerARPG
             ISurrogateSelector selector)
         {
             CharacterSummon data = (CharacterSummon)obj;
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.id = info.GetString("id");
+            }
+            catch
+            {
+                data.id = GenericUtils.GetUniqueId();
+            }
             data.type = (SummonType)info.GetByte("type");
             data.dataId = info.GetInt32("dataId");
             data.summonRemainsDuration = info.GetSingle("summonRemainsDuration");

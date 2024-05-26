@@ -24,6 +24,7 @@ namespace MultiplayerARPG
             ISurrogateSelector selector)
         {
             CharacterBuff data = (CharacterBuff)obj;
+            // TODO: Backward compatible, this will be removed in future version
             try
             {
                 data.id = info.GetString("id");
