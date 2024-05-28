@@ -75,91 +75,91 @@ namespace MultiplayerARPG
         {
             StringBuilder statsStringBuilder = new StringBuilder();
             // Hp
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(hpStatsFormat), data.hp, uiTextHp);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(hpStatsFormat), data.hp, uiTextHp);
 
             // Hp Recovery
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(hpRecoveryStatsFormat), data.hpRecovery, uiTextHpRecovery);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(hpRecoveryStatsFormat), data.hpRecovery, uiTextHpRecovery);
 
             // Hp Leech Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(hpLeechRateStatsFormat), data.hpLeechRate, uiTextHpLeechRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(hpLeechRateStatsFormat), data.hpLeechRate, uiTextHpLeechRate);
 
             // Mp
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(mpStatsFormat), data.mp, uiTextMp);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(mpStatsFormat), data.mp, uiTextMp);
 
             // Mp Recovery
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(mpRecoveryStatsFormat), data.mpRecovery, uiTextMpRecovery);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(mpRecoveryStatsFormat), data.mpRecovery, uiTextMpRecovery);
 
             // Mp Leech Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(mpLeechRateStatsFormat), data.mpLeechRate, uiTextMpLeechRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(mpLeechRateStatsFormat), data.mpLeechRate, uiTextMpLeechRate);
 
             // Stamina
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(staminaStatsFormat), data.stamina, uiTextStamina);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(staminaStatsFormat), data.stamina, uiTextStamina);
 
             // Stamina Recovery
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(staminaRecoveryStatsFormat), data.staminaRecovery, uiTextStaminaRecovery);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(staminaRecoveryStatsFormat), data.staminaRecovery, uiTextStaminaRecovery);
 
             // Stamina Leech Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(staminaLeechRateStatsFormat), data.staminaLeechRate, uiTextStaminaLeechRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(staminaLeechRateStatsFormat), data.staminaLeechRate, uiTextStaminaLeechRate);
 
             // Food
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(foodStatsFormat), data.food, uiTextFood);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(foodStatsFormat), data.food, uiTextFood);
 
             // Water
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(waterStatsFormat), data.water, uiTextWater);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(waterStatsFormat), data.water, uiTextWater);
 
             // Accuracy
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(accuracyStatsFormat), data.accuracy, uiTextAccuracy);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(accuracyStatsFormat), data.accuracy, uiTextAccuracy);
 
             // Evasion
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(evasionStatsFormat), data.evasion, uiTextEvasion);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(evasionStatsFormat), data.evasion, uiTextEvasion);
 
             // Cri Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(criRateStatsFormat), data.criRate, uiTextCriRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(criRateStatsFormat), data.criRate, uiTextCriRate);
 
             // Cri Dmg Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(criDmgRateStatsFormat), data.criDmgRate, uiTextCriDmgRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(criDmgRateStatsFormat), data.criDmgRate, uiTextCriDmgRate);
 
             // Block Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(blockRateStatsFormat), data.blockRate, uiTextBlockRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(blockRateStatsFormat), data.blockRate, uiTextBlockRate);
 
             // Block Dmg Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(blockDmgRateStatsFormat), data.blockDmgRate, uiTextBlockDmgRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(blockDmgRateStatsFormat), data.blockDmgRate, uiTextBlockDmgRate);
 
             // Move Speed
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(moveSpeedStatsFormat), data.moveSpeed, uiTextMoveSpeed);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(moveSpeedStatsFormat), data.moveSpeed, uiTextMoveSpeed);
 
             // Attack Speed
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(atkSpeedStatsFormat), data.atkSpeed, uiTextAtkSpeed);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(atkSpeedStatsFormat), data.atkSpeed, uiTextAtkSpeed);
 
             // Weight
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(weightLimitStatsFormat), data.weightLimit, uiTextWeightLimit);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(weightLimitStatsFormat), data.weightLimit, uiTextWeightLimit);
 
             // Slot
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(slotLimitStatsFormat), data.slotLimit, uiTextSlotLimit);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(slotLimitStatsFormat), data.slotLimit, uiTextSlotLimit);
 
             // Gold Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(goldRateStatsFormat), data.goldRate, uiTextGoldRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(goldRateStatsFormat), data.goldRate, uiTextGoldRate);
 
             // Exp Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(expRateStatsFormat), data.expRate, uiTextExpRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(expRateStatsFormat), data.expRate, uiTextExpRate);
 
             // Item Drop Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(itemDropRateStatsFormat), data.itemDropRate, uiTextItemDropRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(itemDropRateStatsFormat), data.itemDropRate, uiTextItemDropRate);
 
             // Jump Height
-            GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(jumpHeightStatsFormat), data.jumpHeight, uiTextJumpHeight);
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(jumpHeightStatsFormat), data.jumpHeight, uiTextJumpHeight);
 
             // Head Damage Absorbs
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(headDamageAbsorbsStatsFormat), data.headDamageAbsorbs, uiTextHeadDamageAbsorbs);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(headDamageAbsorbsStatsFormat), data.headDamageAbsorbs, uiTextHeadDamageAbsorbs);
 
             // Body Damage Absorbs
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(bodyDamageAbsorbsStatsFormat), data.bodyDamageAbsorbs, uiTextBodyDamageAbsorbs);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(bodyDamageAbsorbsStatsFormat), data.bodyDamageAbsorbs, uiTextBodyDamageAbsorbs);
 
             // Fall Damage Absorbs
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(fallDamageAbsorbsStatsFormat), data.fallDamageAbsorbs, uiTextFallDamageAbsorbs);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(fallDamageAbsorbsStatsFormat), data.fallDamageAbsorbs, uiTextFallDamageAbsorbs);
 
             // Gravity Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(gravityRateStatsFormat), data.gravityRate, uiTextGravityRate);
+            GetSingleStatsText(statsStringBuilder, isRate || true, LanguageManager.GetText(gravityRateStatsFormat), data.gravityRate, uiTextGravityRate);
 
             // Dev Extension
             // How to implement it?:
