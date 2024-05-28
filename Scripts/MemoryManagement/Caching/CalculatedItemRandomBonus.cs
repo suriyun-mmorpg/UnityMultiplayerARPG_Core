@@ -75,6 +75,7 @@ namespace MultiplayerARPG
             _level = level;
             _randomSeed = randomSeed;
             _version = version;
+            _appliedAmount = 0;
 
             Clear();
 
