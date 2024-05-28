@@ -71,6 +71,10 @@ namespace MultiplayerARPG
 
         public void Build(IEquipmentItem item, int level, int randomSeed, byte version)
         {
+            // Don't rebuild if it has no difference
+            if (_item != null && _item.DataId == item.DataId && _level == level && _randomSeed == randomSeed && _version == version)
+                return;
+
             _item = item;
             _level = level;
             _randomSeed = randomSeed;
