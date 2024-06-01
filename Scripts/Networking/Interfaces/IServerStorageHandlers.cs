@@ -19,8 +19,9 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="connectionId">Client who open the storage</param>
         /// <param name="playerCharacter">Character which open the storage</param>
+        /// <param name="storageEntity">The storage entity</param>
         /// <param name="storageId">Opening storage ID</param>
-        UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, StorageId storageId);
+        UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, IActivatableEntity storageEntity, StorageId storageId);
 
         /// <summary>
         /// Close storage

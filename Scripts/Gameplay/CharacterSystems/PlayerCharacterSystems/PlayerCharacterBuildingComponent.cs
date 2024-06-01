@@ -215,7 +215,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            GameInstance.ServerStorageHandlers.OpenStorage(ConnectionId, Entity, storageId);
+            GameInstance.ServerStorageHandlers.OpenStorage(ConnectionId, Entity, storageEntity, storageId);
 #endif
         }
 
