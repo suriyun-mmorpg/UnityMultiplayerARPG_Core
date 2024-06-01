@@ -8,8 +8,25 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class PlayerCharacterNpcActionComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
+        protected NpcEntity _currentNpc;
+        public NpcEntity CurrentNpc
+        {
+            get => _currentNpc;
+        }
         protected BaseNpcDialog _currentNpcDialog;
-        public BaseNpcDialog CurrentNpcDialog { get => _currentNpcDialog; }
+        public BaseNpcDialog CurrentNpcDialog
+        {
+            get => _currentNpcDialog;
+            set
+            {
+                if (value == null)
+                {
+                    _currentNpc = null;
+                    _currentNpcDialog = null;
+                }
+                _currentNpcDialog = value;
+            }
+        }
         public Quest CompletingQuest { get; set; }
         public BaseNpcDialog NpcDialogAfterSelectRewardItem { get; set; }
 
@@ -36,12 +53,12 @@ namespace MultiplayerARPG
                 else
                     npcDialog = null;
             }
-            _currentNpcDialog = npcDialog;
+            CurrentNpcDialog = npcDialog;
         }
 
         public void ClearNpcDialogData()
         {
-            _currentNpcDialog = null;
+            CurrentNpcDialog = null;
             CompletingQuest = null;
             NpcDialogAfterSelectRewardItem = null;
         }
@@ -80,6 +97,8 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
+            _currentNpc = null;
+
             if (!Manager.TryGetEntityByObjectId(objectId, out NpcEntity npcEntity))
             {
                 // Can't find the entity
@@ -93,6 +112,7 @@ namespace MultiplayerARPG
             }
 
             // Show start dialog
+            _currentNpc = npcEntity;
             await SetServerCurrentDialog(npcEntity.StartDialog);
 
             // Update task
