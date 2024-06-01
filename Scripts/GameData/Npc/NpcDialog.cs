@@ -562,6 +562,7 @@ namespace MultiplayerARPG
 
         public override async UniTask GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
         {
+            NpcEntity currentNpc = characterEntity.NpcAction.CurrentNpc;
             characterEntity.NpcAction.ClearNpcDialogData();
             // This dialog is current NPC dialog
             switch (type)
@@ -694,7 +695,7 @@ namespace MultiplayerARPG
                     {
                         case CONFIRM_MENU_INDEX:
                             if (characterEntity.GetStorageId(StorageType.Player, 0, out StorageId storageId))
-                                GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, characterEntity.NpcAction.CurrentNpc, storageId);
+                                GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, currentNpc, storageId);
                             else
                                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                             return;
@@ -708,7 +709,7 @@ namespace MultiplayerARPG
                     {
                         case CONFIRM_MENU_INDEX:
                             if (characterEntity.GetStorageId(StorageType.Guild, 0, out StorageId storageId))
-                                GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, characterEntity.NpcAction.CurrentNpc, storageId);
+                                GameInstance.ServerStorageHandlers.OpenStorage(characterEntity.ConnectionId, characterEntity, currentNpc, storageId);
                             else
                                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                             return;
