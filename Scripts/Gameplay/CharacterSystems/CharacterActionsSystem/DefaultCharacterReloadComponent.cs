@@ -43,6 +43,15 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void EntityOnDestroy()
+        {
+            CancelReload();
+            ClearReloadStates();
+            _manager = null;
+            _entityIsPlayer = false;
+            _playerCharacterEntity = null;
+        }
+
         protected virtual void SetReloadActionStates(AnimActionType animActionType, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
             ClearReloadStates();

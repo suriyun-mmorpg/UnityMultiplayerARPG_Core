@@ -87,6 +87,15 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void EntityOnDestroy()
+        {
+            CancelSkill();
+            ClearUseSkillStates();
+            _manager = null;
+            _entityIsPlayer = false;
+            _playerCharacterEntity = null;
+        }
+
         public override void EntityUpdate()
         {
             // Update casting skill count down, will show gage at clients

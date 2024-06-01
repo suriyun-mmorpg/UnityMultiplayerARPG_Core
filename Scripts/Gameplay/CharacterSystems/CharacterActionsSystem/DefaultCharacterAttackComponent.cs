@@ -64,6 +64,15 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void EntityOnDestroy()
+        {
+            CancelAttack();
+            ClearAttackStates();
+            _manager = null;
+            _entityIsPlayer = false;
+            _playerCharacterEntity = null;
+        }
+
         protected virtual void SetAttackActionStates(AnimActionType animActionType, int animActionDataId, AttackState simulateState)
         {
             ClearAttackStates();

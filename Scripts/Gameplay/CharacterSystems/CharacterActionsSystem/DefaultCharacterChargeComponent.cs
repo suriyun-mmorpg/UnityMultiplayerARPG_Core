@@ -46,6 +46,14 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void EntityOnDestroy()
+        {
+            ClearChargeStates();
+            _manager = null;
+            _entityIsPlayer = false;
+            _playerCharacterEntity = null;
+        }
+
         public virtual void ClearChargeStates()
         {
             IsCharging = false;
