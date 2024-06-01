@@ -22,68 +22,137 @@ namespace MultiplayerARPG
         protected HitBoxPosition position;
         public HitBoxPosition Position
         {
-            get { return position; }
-            set { position = value; }
+            get
+            {
+                return position;
+            }
+            set
+            {
+                position = value;
+            }
         }
 
         [SerializeField]
         protected float damageRate = 1f;
         public float DamageRate
         {
-            get { return damageRate; }
-            set { damageRate = value; }
+            get
+            {
+                return damageRate;
+            }
+            set
+            {
+                damageRate = value;
+            }
         }
 
-        public DamageableEntity DamageableEntity { get; private set; }
+        public bool IsSetDamageableEntity { get; private set; }
+        private DamageableEntity _damageableEntity;
+        public DamageableEntity DamageableEntity
+        {
+            get
+            {
+                if (!IsSetDamageableEntity || _damageableEntity == null)
+                {
+                    IsSetDamageableEntity = false;
+                    return null;
+                }
+                return _damageableEntity;
+            }
+        }
         public BaseGameEntity Entity
         {
-            get { return DamageableEntity.Entity; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity.Entity;
+            }
         }
         public Transform EntityTransform
         {
-            get { return DamageableEntity.EntityTransform; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity.EntityTransform;
+            }
         }
         public GameObject EntityGameObject
         {
-            get { return DamageableEntity.EntityGameObject; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity.EntityGameObject;
+            }
         }
         public IBaseActivatableEntity BaseActivatableEntity
         {
-            get { return DamageableEntity as IBaseActivatableEntity; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity as IBaseActivatableEntity;
+            }
         }
         public IActivatableEntity ActivatableEntity
         {
-            get { return DamageableEntity as IActivatableEntity; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity as IActivatableEntity;
+            }
         }
         public IHoldActivatableEntity HoldActivatableEntity
         {
-            get { return DamageableEntity as IHoldActivatableEntity; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity as IHoldActivatableEntity;
+            }
         }
         public bool IsImmune
         {
-            get { return DamageableEntity.IsImmune; }
+            get
+            {
+                return DamageableEntity == null ? false : DamageableEntity.IsImmune;
+            }
         }
         public int CurrentHp
         {
-            get { return DamageableEntity.CurrentHp; }
-            set { DamageableEntity.CurrentHp = value; }
+            get
+            {
+                return DamageableEntity == null ? 0 : DamageableEntity.CurrentHp;
+            }
+            set
+            {
+                if (DamageableEntity != null)
+                    DamageableEntity.CurrentHp = value;
+            }
         }
         public SafeArea SafeArea
         {
-            get { return DamageableEntity.SafeArea; }
-            set { DamageableEntity.SafeArea = value; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity.SafeArea;
+            }
+            set
+            {
+                if (DamageableEntity != null)
+                    DamageableEntity.SafeArea = value;
+            }
         }
         public bool IsInSafeArea
         {
-            get { return DamageableEntity.IsInSafeArea; }
+            get
+            {
+                return DamageableEntity == null ? false : DamageableEntity.IsInSafeArea;
+            }
         }
         public Transform OpponentAimTransform
         {
-            get { return DamageableEntity.OpponentAimTransform; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity.OpponentAimTransform;
+            }
         }
         public LiteNetLibIdentity Identity
         {
-            get { return DamageableEntity.Identity; }
+            get
+            {
+                return DamageableEntity == null ? null : DamageableEntity.Identity;
+            }
         }
         public Transform CacheTransform { get; private set; }
         public Collider CacheCollider { get; private set; }
@@ -121,7 +190,8 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            DamageableEntity = GetComponentInParent<DamageableEntity>();
+            _damageableEntity = GetComponentInParent<DamageableEntity>();
+            IsSetDamageableEntity = _damageableEntity != null;
             CacheTransform = transform;
             CacheCollider = GetComponent<Collider>();
             if (CacheCollider != null)
@@ -212,7 +282,8 @@ namespace MultiplayerARPG
 
         private void OnDestroy()
         {
-            DamageableEntity = null;
+            _damageableEntity = null;
+            IsSetDamageableEntity = false;
             CacheTransform = null;
             CacheCollider = null;
             CacheRigidbody = null;
@@ -247,7 +318,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
         {
-            return DamageableEntity.CanReceiveDamageFrom(instigator);
+            return DamageableEntity == null ? false : DamageableEntity.CanReceiveDamageFrom(instigator);
         }
 
         public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
@@ -277,22 +348,22 @@ namespace MultiplayerARPG
 
         public EntityInfo GetInfo()
         {
-            return DamageableEntity.GetInfo();
+            return DamageableEntity == null ? default : DamageableEntity.GetInfo();
         }
 
         public bool IsHide()
         {
-            return DamageableEntity.IsHide();
+            return DamageableEntity == null ? false : DamageableEntity.IsHide();
         }
 
         public bool IsRevealsHide()
         {
-            return DamageableEntity.IsRevealsHide();
+            return DamageableEntity == null ? false : DamageableEntity.IsRevealsHide();
         }
 
         public bool IsBlind()
         {
-            return DamageableEntity.IsBlind();
+            return DamageableEntity == null ? false : DamageableEntity.IsBlind();
         }
 
         public TransformHistory GetTransformHistory(long currentTime, long rewindTime)
