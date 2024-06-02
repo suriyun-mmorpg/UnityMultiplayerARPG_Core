@@ -562,7 +562,7 @@ namespace MultiplayerARPG
 
         public override async UniTask GoToNextDialog(BasePlayerCharacterEntity characterEntity, byte menuIndex)
         {
-            NpcEntity currentNpc = characterEntity.NpcAction.CurrentNpc;
+            NpcEntity currentNpc = characterEntity.NpcAction.CurrentNpcEntity;
             characterEntity.NpcAction.ClearNpcDialogData();
             // This dialog is current NPC dialog
             switch (type)
@@ -571,7 +571,7 @@ namespace MultiplayerARPG
                     if (menuIndex >= menus.Length)
                     {
                         // Invalid menu, so no next dialog, so return itself
-                        await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(this, characterEntity));
+                        await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(this, characterEntity));
                         return;
                     }
                     // Changing current npc dialog
@@ -581,21 +581,21 @@ namespace MultiplayerARPG
                         // Close dialog, so return null
                         return;
                     }
-                    await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(selectedMenu.dialog, characterEntity));
+                    await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(selectedMenu.dialog, characterEntity));
                     return;
                 case NpcDialogType.Quest:
                     switch (menuIndex)
                     {
                         case QUEST_ACCEPT_MENU_INDEX:
                             characterEntity.AcceptQuest(quest.DataId);
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(questAcceptedDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(questAcceptedDialog, characterEntity));
                             return;
                         case QUEST_DECLINE_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(questDeclinedDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(questDeclinedDialog, characterEntity));
                             return;
                         case QUEST_ABANDON_MENU_INDEX:
                             characterEntity.AbandonQuest(quest.DataId);
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(questAbandonedDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(questAbandonedDialog, characterEntity));
                             return;
                         case QUEST_COMPLETE_MENU_INDEX:
                             if (quest.selectableRewardItems != null &&
@@ -603,14 +603,14 @@ namespace MultiplayerARPG
                             {
                                 // Show quest reward dialog at client
                                 characterEntity.NpcAction.CallOwnerShowQuestRewardItemSelection(quest.DataId);
+                                characterEntity.NpcAction.SetServerDialogAfterSelectRewardItem(currentNpc, GetValidatedDialogOrNull(questCompletedDialog, characterEntity));
                                 characterEntity.NpcAction.CompletingQuest = quest;
-                                characterEntity.NpcAction.NpcDialogAfterSelectRewardItem = GetValidatedDialogOrNull(questCompletedDialog, characterEntity);
                             }
                             else
                             {
                                 // No selectable reward items, complete the quest immediately
                                 if (characterEntity.CompleteQuest(quest.DataId, 0))
-                                    await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(questCompletedDialog, characterEntity));
+                                    await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(questCompletedDialog, characterEntity));
                             }
                             return;
                     }
@@ -623,21 +623,21 @@ namespace MultiplayerARPG
                             if (itemCraft.CanCraft(characterEntity, out gameMessage))
                             {
                                 itemCraft.CraftItem(characterEntity);
-                                await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(craftDoneDialog, characterEntity));
+                                await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(craftDoneDialog, characterEntity));
                                 return;
                             }
                             // Cannot craft item
                             switch (gameMessage)
                             {
                                 case UITextKeys.UI_ERROR_WILL_OVERWHELMING:
-                                    await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(craftItemWillOverwhelmingDialog, characterEntity));
+                                    await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(craftItemWillOverwhelmingDialog, characterEntity));
                                     return;
                                 default:
-                                    await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(craftNotMeetRequirementsDialog, characterEntity));
+                                    await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(craftNotMeetRequirementsDialog, characterEntity));
                                     return;
                             }
                         case CANCEL_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(craftCancelDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(craftCancelDialog, characterEntity));
                             return;
                     }
                     return;
@@ -649,7 +649,7 @@ namespace MultiplayerARPG
                             {
                                 characterEntity.RespawnMapName = saveRespawnMap.Id;
                                 characterEntity.RespawnPosition = saveRespawnPosition;
-                                await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(saveRespawnConfirmDialog, characterEntity));
+                                await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(saveRespawnConfirmDialog, characterEntity));
                             }
                             else
                             {
@@ -657,7 +657,7 @@ namespace MultiplayerARPG
                             }
                             return;
                         case CANCEL_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(saveRespawnCancelDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(saveRespawnCancelDialog, characterEntity));
                             return;
                     }
                     return;
@@ -675,7 +675,7 @@ namespace MultiplayerARPG
                             }
                             return;
                         case CANCEL_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(warpCancelDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(warpCancelDialog, characterEntity));
                             return;
                     }
                     return;
@@ -686,7 +686,7 @@ namespace MultiplayerARPG
                             characterEntity.NpcAction.CallOwnerShowNpcRefineItem();
                             return;
                         case CANCEL_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(refineItemCancelDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(refineItemCancelDialog, characterEntity));
                             return;
                     }
                     return;
@@ -700,7 +700,7 @@ namespace MultiplayerARPG
                                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                             return;
                         case CANCEL_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(storageCancelDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(storageCancelDialog, characterEntity));
                             return;
                     }
                     return;
@@ -714,7 +714,7 @@ namespace MultiplayerARPG
                                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_CANNOT_ACCESS_STORAGE);
                             return;
                         case CANCEL_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(storageCancelDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(storageCancelDialog, characterEntity));
                             return;
                     }
                     return;
@@ -725,7 +725,7 @@ namespace MultiplayerARPG
                             characterEntity.NpcAction.CallOwnerShowNpcDismantleItem();
                             return;
                         case CANCEL_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(dismantleItemCancelDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(dismantleItemCancelDialog, characterEntity));
                             return;
                     }
                     return;
@@ -736,7 +736,7 @@ namespace MultiplayerARPG
                             characterEntity.NpcAction.CallOwnerShowNpcRepairItem();
                             return;
                         case CANCEL_MENU_INDEX:
-                            await characterEntity.NpcAction.SetServerCurrentDialog(GetValidatedDialogOrNull(repairItemCancelDialog, characterEntity));
+                            await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(repairItemCancelDialog, characterEntity));
                             return;
                     }
                     return;

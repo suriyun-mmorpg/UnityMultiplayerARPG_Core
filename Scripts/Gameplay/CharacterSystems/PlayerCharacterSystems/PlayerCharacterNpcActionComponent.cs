@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -8,11 +7,13 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class PlayerCharacterNpcActionComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
-        protected NpcEntity _currentNpc;
-        public NpcEntity CurrentNpc
+        protected NpcEntity _currentNpcEntity;
+        public NpcEntity CurrentNpcEntity
         {
-            get => _currentNpc;
+            get => _currentNpcEntity;
+            set => _currentNpcEntity = value;
         }
+
         protected BaseNpcDialog _currentNpcDialog;
         public BaseNpcDialog CurrentNpcDialog
         {
@@ -21,14 +22,38 @@ namespace MultiplayerARPG
             {
                 if (value == null)
                 {
-                    _currentNpc = null;
+                    _currentNpcEntity = null;
                     _currentNpcDialog = null;
+                    return;
                 }
                 _currentNpcDialog = value;
             }
         }
+
+        protected NpcEntity _npcEntityAfterSelectRewardItem;
+        public NpcEntity NpcEntityAfterSelectRewardItem
+        {
+            get => _npcEntityAfterSelectRewardItem;
+            set => _npcEntityAfterSelectRewardItem = value;
+        }
+
+        protected BaseNpcDialog _npcDialogAfterSelectRewardItem;
+        public BaseNpcDialog NpcDialogAfterSelectRewardItem
+        {
+            get => _npcDialogAfterSelectRewardItem;
+            set
+            {
+                if (value == null)
+                {
+                    _npcEntityAfterSelectRewardItem = null;
+                    _npcDialogAfterSelectRewardItem = null;
+                    return;
+                }
+                _npcDialogAfterSelectRewardItem = value;
+            }
+        }
+
         public Quest CompletingQuest { get; set; }
-        public BaseNpcDialog NpcDialogAfterSelectRewardItem { get; set; }
 
         /// <summary>
         /// Action: int questDataId
@@ -42,7 +67,7 @@ namespace MultiplayerARPG
         public event System.Action onShowNpcDismantleItem;
         public event System.Action onShowNpcRepairItem;
 
-        public async UniTask SetServerCurrentDialog(BaseNpcDialog npcDialog)
+        public async UniTask SetServerCurrentDialog(NpcEntity npc, BaseNpcDialog npcDialog)
         {
             if (!IsServer)
                 return;
@@ -53,14 +78,23 @@ namespace MultiplayerARPG
                 else
                     npcDialog = null;
             }
+            CurrentNpcEntity = npc;
             CurrentNpcDialog = npcDialog;
+        }
+
+        public void SetServerDialogAfterSelectRewardItem(NpcEntity npc, BaseNpcDialog npcDialog)
+        {
+            if (!IsServer)
+                return;
+            NpcEntityAfterSelectRewardItem = npc;
+            NpcDialogAfterSelectRewardItem = npcDialog;
         }
 
         public void ClearNpcDialogData()
         {
             CurrentNpcDialog = null;
-            CompletingQuest = null;
             NpcDialogAfterSelectRewardItem = null;
+            CompletingQuest = null;
         }
 
         public bool AccessingNpcShopDialog(out NpcDialog dialog)
@@ -97,7 +131,7 @@ namespace MultiplayerARPG
             if (!Entity.CanDoActions())
                 return;
 
-            _currentNpc = null;
+            _currentNpcEntity = null;
 
             if (!Manager.TryGetEntityByObjectId(objectId, out NpcEntity npcEntity))
             {
@@ -112,8 +146,8 @@ namespace MultiplayerARPG
             }
 
             // Show start dialog
-            _currentNpc = npcEntity;
-            await SetServerCurrentDialog(npcEntity.StartDialog);
+            _currentNpcEntity = npcEntity;
+            await SetServerCurrentDialog(npcEntity, npcEntity.StartDialog);
 
             // Update task
             CharacterQuest tempCharacterQuest;
@@ -129,7 +163,7 @@ namespace MultiplayerARPG
                 tempQuest = tempCharacterQuest.GetQuest();
                 if (tempQuest == null || !tempQuest.HaveToTalkToNpc(Entity, npcEntity, tempCharacterQuest.randomTasksIndex, out tempTaskIndex, out tempTalkToNpcTaskDialog, out tempCompleteAfterTalked))
                     continue;
-                await SetServerCurrentDialog(tempTalkToNpcTaskDialog);
+                await SetServerCurrentDialog(npcEntity, tempTalkToNpcTaskDialog);
                 if (!tempCharacterQuest.completedTasks.Contains(tempTaskIndex))
                     tempCharacterQuest.completedTasks.Add(tempTaskIndex);
                 Entity.Quests[i] = tempCharacterQuest;
@@ -141,14 +175,14 @@ namespace MultiplayerARPG
                         // Show quest reward dialog at client
                         CallOwnerShowQuestRewardItemSelection(tempQuest.DataId);
                         CompletingQuest = tempQuest;
-                        NpcDialogAfterSelectRewardItem = tempTalkToNpcTaskDialog;
-                        await SetServerCurrentDialog(null);
+                        await SetServerCurrentDialog(null, null);
+                        SetServerDialogAfterSelectRewardItem(npcEntity, tempTalkToNpcTaskDialog);
                     }
                     else
                     {
                         // No selectable reward items, complete the quest immediately
                         if (!Entity.CompleteQuest(tempQuest.DataId, 0))
-                            await SetServerCurrentDialog(null);
+                            await SetServerCurrentDialog(null, null);
                     }
                     break;
                 }
@@ -382,7 +416,7 @@ namespace MultiplayerARPG
             if (!Entity.CompleteQuest(CompletingQuest.DataId, index))
                 return;
 
-            await SetServerCurrentDialog(NpcDialogAfterSelectRewardItem);
+            await SetServerCurrentDialog(NpcEntityAfterSelectRewardItem, NpcDialogAfterSelectRewardItem);
             if (CurrentNpcDialog != null)
             {
                 // Show Npc dialog on client
