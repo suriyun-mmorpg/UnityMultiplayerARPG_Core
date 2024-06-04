@@ -37,6 +37,8 @@ namespace MultiplayerARPG
         public bool aggressiveWhileSummoned = false;
         [Tooltip("Delay before it can switch target again")]
         public float switchTargetDelay = 3;
+        public ExtraMovementState stateWhileAggressive = ExtraMovementState.None;
+        public ExtraMovementState stateWhileWander = ExtraMovementState.IsWalking;
 
         protected readonly List<DamageableEntity> _enemies = new List<DamageableEntity>();
         protected float _findEnemyCountDown;
@@ -345,7 +347,7 @@ namespace MultiplayerARPG
             _lastSetDestinationTime = time;
             Vector3 direction = (destination - Entity.MovementTransform.position).normalized;
             Vector3 position = destination - (direction * (distance - Entity.StoppingDistance));
-            Entity.SetExtraMovementState(ExtraMovementState.None);
+            Entity.SetExtraMovementState(stateWhileAggressive);
             Entity.PointClickMovement(position);
         }
 
@@ -355,7 +357,7 @@ namespace MultiplayerARPG
             if (time - _lastSetDestinationTime <= 0.1f)
                 return false;
             _lastSetDestinationTime = time;
-            Entity.SetExtraMovementState(ExtraMovementState.IsWalking);
+            Entity.SetExtraMovementState(stateWhileWander);
             Entity.PointClickMovement(destination);
             return true;
         }
