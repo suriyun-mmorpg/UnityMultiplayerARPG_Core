@@ -100,8 +100,13 @@ namespace MultiplayerARPG
 
         [Header("Item Locking")]
         public TextWrapper uiTextLockRemainsDuration;
-        public GameObject[] lockObjects;
-        public GameObject[] noLockObjects;
+        public GameObject[] lockObjects = new GameObject[0];
+        [FormerlySerializedAs("noLockObjects")]
+        public GameObject[] notLockObjects = new GameObject[0];
+
+        [Header("Data Emptiness")]
+        public GameObject[] emptyObjects = new GameObject[0];
+        public GameObject[] notEmptyObjects = new GameObject[0];
 
         [Header("Equipment - UI Elements")]
         public UIItemRequirement uiRequirement;
@@ -176,8 +181,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextCoolDownDuration;
         public TextWrapper uiTextCoolDownRemainsDuration;
         public Image imageCoolDownGage;
-        public GameObject[] countDownObjects;
-        public GameObject[] noCountDownObjects;
+        public GameObject[] countDownObjects = new GameObject[0];
+        public GameObject[] noCountDownObjects = new GameObject[0];
 
         [Header("Events")]
         public UnityEvent onSetLevelZeroData = new UnityEvent();
@@ -257,7 +262,9 @@ namespace MultiplayerARPG
             uiTextExpireTime = null;
             uiTextLockRemainsDuration = null;
             lockObjects.Nulling();
-            noLockObjects.Nulling();
+            notLockObjects.Nulling();
+            emptyObjects.Nulling();
+            notEmptyObjects.Nulling();
             uiRequirement = null;
             uiIncreaseStats = null;
             uiIncreaseStatsRate = null;
@@ -454,19 +461,13 @@ namespace MultiplayerARPG
             if (_dirtyIsLock != isLock)
             {
                 _dirtyIsLock = isLock;
-                if (lockObjects != null)
+                foreach (GameObject obj in lockObjects)
                 {
-                    foreach (GameObject obj in lockObjects)
-                    {
-                        obj.SetActive(isLock);
-                    }
+                    obj.SetActive(isLock);
                 }
-                if (noLockObjects != null)
+                foreach (GameObject obj in notLockObjects)
                 {
-                    foreach (GameObject obj in noLockObjects)
-                    {
-                        obj.SetActive(!isLock);
-                    }
+                    obj.SetActive(!isLock);
                 }
             }
         }
@@ -516,19 +517,13 @@ namespace MultiplayerARPG
             if (_dirtyIsCountDown != isCountDown)
             {
                 _dirtyIsCountDown = isCountDown;
-                if (countDownObjects != null)
+                foreach (GameObject obj in countDownObjects)
                 {
-                    foreach (GameObject obj in countDownObjects)
-                    {
-                        obj.SetActive(isCountDown);
-                    }
+                    obj.SetActive(isCountDown);
                 }
-                if (noCountDownObjects != null)
+                foreach (GameObject obj in noCountDownObjects)
                 {
-                    foreach (GameObject obj in noCountDownObjects)
-                    {
-                        obj.SetActive(!isCountDown);
-                    }
+                    obj.SetActive(!isCountDown);
                 }
             }
         }
@@ -565,6 +560,16 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
+            bool isEmpty = Item == null;
+            foreach (GameObject obj in emptyObjects)
+            {
+                obj.SetActive(isEmpty);
+            }
+            foreach (GameObject obj in notEmptyObjects)
+            {
+                obj.SetActive(!isEmpty);
+            }
+
             _randomBonus = null;
             UpdateCoolDownRemainsDuration(1f);
 
@@ -612,12 +617,12 @@ namespace MultiplayerARPG
             {
                 string str = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
-                    Item == null ? LanguageManager.GetUnknowTitle() : Item.Title);
+                    isEmpty ? LanguageManager.GetUnknowTitle() : Item.Title);
                 if (!dontAppendRefineLevelToTitle && EquipmentItem != null && Level > 1)
                 {
                     str = ZString.Format(
                         LanguageManager.GetText(formatKeyTitleWithRefineLevel),
-                        Item == null ? LanguageManager.GetUnknowTitle() : Item.Title,
+                        isEmpty ? LanguageManager.GetUnknowTitle() : Item.Title,
                         (Level - 1).ToString("N0"));
                 }
                 uiTextTitle.text = str;
@@ -627,14 +632,14 @@ namespace MultiplayerARPG
             {
                 uiTextDescription.text = ZString.Format(
                     LanguageManager.GetText(formatKeyDescription),
-                    Item == null ? LanguageManager.GetUnknowDescription() : Item.Description);
+                    isEmpty ? LanguageManager.GetUnknowDescription() : Item.Description);
             }
 
             if (uiTextRarity != null)
             {
                 uiTextRarity.text = ZString.Format(
                     LanguageManager.GetText(formatKeyRarityTitle),
-                    Item == null ? LanguageManager.GetUnknowTitle() : Item.RarityTitle);
+                    isEmpty ? LanguageManager.GetUnknowTitle() : Item.RarityTitle);
             }
 
             if (uiTextLevel != null)
@@ -665,7 +670,7 @@ namespace MultiplayerARPG
 
             if (imageIcon != null)
             {
-                Sprite iconSprite = Item == null ? null : Item.Icon;
+                Sprite iconSprite = isEmpty ? null : Item.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
                 imageIcon.preserveAspect = true;
@@ -673,7 +678,7 @@ namespace MultiplayerARPG
 
             if (imageRarity != null)
             {
-                Sprite iconSprite = Item == null || Item.ItemRefine == null ? null : Item.ItemRefine.Icon;
+                Sprite iconSprite = isEmpty || Item.ItemRefine == null ? null : Item.ItemRefine.Icon;
                 imageRarity.gameObject.SetActive(iconSprite != null);
                 imageRarity.sprite = iconSprite;
             }
@@ -682,7 +687,7 @@ namespace MultiplayerARPG
             {
                 uiTextItemType.text = ZString.Format(
                     LanguageManager.GetText(formatKeyItemType),
-                    Item == null ? LanguageManager.GetUnknowTitle() : Item.TypeTitle);
+                    isEmpty ? LanguageManager.GetUnknowTitle() : Item.TypeTitle);
             }
 
             if (uiTextExpireDuration != null)
@@ -704,13 +709,13 @@ namespace MultiplayerARPG
             {
                 uiTextSellPrice.text = ZString.Format(
                     LanguageManager.GetText(formatKeySellPrice),
-                    Item == null ? "0" : Item.SellPrice.ToString("N0"));
+                    isEmpty ? "0" : Item.SellPrice.ToString("N0"));
             }
 
             if (uiTextStack != null)
             {
                 string stackString;
-                if (Item == null)
+                if (isEmpty)
                 {
                     stackString = ZString.Format(
                         LanguageManager.GetText(formatKeyStack),
@@ -836,7 +841,7 @@ namespace MultiplayerARPG
             {
                 uiTextWeight.text = ZString.Format(
                     LanguageManager.GetText(formatKeyWeight),
-                    Item == null ? 0f.ToString("N2") : Item.Weight.ToString("N2"));
+                    isEmpty ? 0f.ToString("N2") : Item.Weight.ToString("N2"));
             }
 
             if (uiRequirement != null)
