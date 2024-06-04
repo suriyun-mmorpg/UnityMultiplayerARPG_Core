@@ -33,6 +33,8 @@ namespace MultiplayerARPG
         public TextWrapper uiTextMessageOnly;
         public TextWrapper uiTextTimestamp;
         public UIChatHandler uiChatHandler;
+        public GameObject[] signOnlines = new GameObject[0];
+        public GameObject[] signOfflines = new GameObject[0];
         public UnityEvent onIsTypeWriter = new UnityEvent();
         public UnityEvent onNotTypeWriter = new UnityEvent();
 
