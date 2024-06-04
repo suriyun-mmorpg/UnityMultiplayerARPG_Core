@@ -43,6 +43,8 @@ namespace MultiplayerARPG
         public InputFieldWrapper uiMessageField;
         [FormerlySerializedAs("uiChatMessagePrefab")]
         public UIChatMessage uiPrefab;
+        public UIChatMessage uiPrefabOther;
+        public UIChatMessage uiPrefabMine;
         [FormerlySerializedAs("uiChatMessageContainer")]
         public Transform uiContainer;
         public ScrollRect scrollRect;
@@ -69,7 +71,6 @@ namespace MultiplayerARPG
                 if (_cacheList == null)
                 {
                     _cacheList = gameObject.AddComponent<UIList>();
-                    _cacheList.uiPrefab = uiPrefab.gameObject;
                     _cacheList.uiContainer = uiContainer;
                 }
                 return _cacheList;
@@ -290,29 +291,30 @@ namespace MultiplayerARPG
         private void FillChatMessages()
         {
             if (showingMessagesFromAllChannels)
-            {
-                UIChatMessage tempUiChatMessage;
-                CacheList.Generate(ChatMessages, (index, message, ui) =>
-                {
-                    tempUiChatMessage = ui.GetComponent<UIChatMessage>();
-                    tempUiChatMessage.uiChatHandler = this;
-                    tempUiChatMessage.Data = message;
-                    tempUiChatMessage.Show();
-                });
-            }
+                CacheList.Generate(ChatMessages, GenerateChatEntry, ValidateChatEntryPrefab);
             else if (ChannelBasedChatMessages.ContainsKey(chatChannel))
-            {
-                UIChatMessage tempUiChatMessage;
-                CacheList.Generate(ChannelBasedChatMessages[chatChannel], (index, message, ui) =>
-                {
-                    tempUiChatMessage = ui.GetComponent<UIChatMessage>();
-                    tempUiChatMessage.uiChatHandler = this;
-                    tempUiChatMessage.Data = message;
-                    tempUiChatMessage.Show();
-                });
-            }
+                CacheList.Generate(ChannelBasedChatMessages[chatChannel], GenerateChatEntry, ValidateChatEntryPrefab);
             if (gameObject.activeInHierarchy)
                 StartCoroutine(VerticalScroll(0f));
+        }
+
+        private void GenerateChatEntry(int index, ChatMessage message, GameObject ui)
+        {
+            UIChatMessage tempUiChatMessage = ui.GetComponent<UIChatMessage>();
+            tempUiChatMessage.uiChatHandler = this;
+            tempUiChatMessage.Data = message;
+            tempUiChatMessage.Show();
+        }
+
+        private GameObject ValidateChatEntryPrefab(ChatMessage entry)
+        {
+            if (uiPrefabOther != null && uiPrefabMine != null)
+            {
+                if (string.Equals(entry.senderUserId, GameInstance.UserId))
+                    return uiPrefabMine.gameObject;
+                return uiPrefabOther.gameObject;
+            }
+            return uiPrefab.gameObject;
         }
 
         private void OnMessageFieldValueChange(string text)
