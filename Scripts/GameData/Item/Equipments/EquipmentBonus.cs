@@ -1,27 +1,27 @@
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct EquipmentBonus
+    public class EquipmentBonus
     {
-        public CharacterStats stats;
-        public CharacterStats statsRate;
+        public CharacterStats stats = default;
+        public CharacterStats statsRate = default;
         [ArrayElementTitle("attribute")]
-        public AttributeAmount[] attributes;
+        public AttributeAmount[] attributes = new AttributeAmount[0];
         [ArrayElementTitle("attribute")]
-        public AttributeAmount[] attributesRate;
+        public AttributeAmount[] attributesRate = new AttributeAmount[0];
         [ArrayElementTitle("damageElement")]
-        public ResistanceAmount[] resistances;
+        public ResistanceAmount[] resistances = new ResistanceAmount[0];
         [ArrayElementTitle("damageElement")]
-        public ArmorAmount[] armors;
+        public ArmorAmount[] armors = new ArmorAmount[0];
         [ArrayElementTitle("damageElement")]
-        public ArmorAmount[] armorsRate;
+        public ArmorAmount[] armorsRate = new ArmorAmount[0];
         [ArrayElementTitle("damageElement")]
-        public DamageAmount[] damages;
+        public DamageAmount[] damages = new DamageAmount[0];
         [ArrayElementTitle("damageElement")]
-        public DamageAmount[] damagesRate;
+        public DamageAmount[] damagesRate = new DamageAmount[0];
         [ArrayElementTitle("skill")]
-        public SkillLevel[] skills;
+        public SkillLevel[] skills = new SkillLevel[0];
         [ArrayElementTitle("statusEffect")]
-        public StatusEffectResistanceAmount[] statusEffectResistances;
+        public StatusEffectResistanceAmount[] statusEffectResistances = new StatusEffectResistanceAmount[0];
     }
 }
