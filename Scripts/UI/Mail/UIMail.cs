@@ -47,6 +47,20 @@ namespace MultiplayerARPG
         public UnityEvent onClaimMailItems = new UnityEvent();
         public UnityEvent onDeleteMail = new UnityEvent();
 
+        [Header("Default Messages")]
+        public LanguageTextSetting noSelectedMailSender = new LanguageTextSetting()
+        {
+            defaultText = "N/A",
+        };
+        public LanguageTextSetting noSelectedMailTitle = new LanguageTextSetting()
+        {
+            defaultText = "NO SELECTED MAIL",
+        };
+        public LanguageTextSetting noSelectedMailContent = new LanguageTextSetting()
+        {
+            defaultText = "Please select a mail to read",
+        };
+
         private string _mailId;
         public string MailId
         {
@@ -153,7 +167,7 @@ namespace MultiplayerARPG
             {
                 textSenderName.text = ZString.Format(
                     LanguageManager.GetText(formatSenderName),
-                    mail == null ? LanguageManager.GetUnknowTitle() : mail.SenderName);
+                    mail == null ? noSelectedMailSender.Text : mail.SenderName);
                 textSenderName.SetGameObjectActive(mail != null);
             }
 
@@ -161,7 +175,7 @@ namespace MultiplayerARPG
             {
                 textTitle.text = ZString.Format(
                     LanguageManager.GetText(formatTitle),
-                    mail == null ? LanguageManager.GetUnknowTitle() : mail.Title);
+                    mail == null ? noSelectedMailTitle.Text : mail.Title);
                 textTitle.SetGameObjectActive(mail != null);
             }
 
@@ -169,7 +183,7 @@ namespace MultiplayerARPG
             {
                 textContent.text = ZString.Format(
                     LanguageManager.GetText(formatContent),
-                    mail == null ? string.Empty : mail.Content);
+                    mail == null ? noSelectedMailContent.Text : mail.Content);
                 textContent.SetGameObjectActive(mail != null);
             }
 
