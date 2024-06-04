@@ -375,6 +375,8 @@ namespace MultiplayerARPG
                 return DefaultLocale.Texts[key];
             if (key.StartsWith(RETURN_KEY_AS_DEFAULT_VALUE_PREFIX))
                 return key.Substring(RETURN_KEY_AS_DEFAULT_VALUE_PREFIX.Length);
+            if (string.IsNullOrWhiteSpace(defaultValue))
+                return key;
             return defaultValue;
         }
 
