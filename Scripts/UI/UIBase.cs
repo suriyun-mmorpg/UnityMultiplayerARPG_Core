@@ -16,6 +16,8 @@ public class UIBase : MonoBehaviour
     public UnityEvent onHide = new UnityEvent();
     public UIBaseEvent onShowWithObject = new UIBaseEvent();
     public UIBaseEvent onHideWithObject = new UIBaseEvent();
+    public System.Action<UIBase> overrideShow;
+    public System.Action<UIBase> overrideHide;
 
     private bool _isAwaken;
 
@@ -82,7 +84,9 @@ public class UIBase : MonoBehaviour
             return;
         _isAwaken = true;
         CacheComponents();
-        if (!CacheRoot.activeSelf)
+        if (overrideShow != null)
+            overrideShow.Invoke(this);
+        else
             CacheRoot.SetActive(true);
         if (moveToLastSiblingOnShow)
             CacheRoot.transform.SetAsLastSibling();
@@ -108,7 +112,10 @@ public class UIBase : MonoBehaviour
             return;
         _isAwaken = true;
         CacheComponents();
-        CacheRoot.SetActive(false);
+        if (overrideHide != null)
+            overrideHide.Invoke(this);
+        else
+            CacheRoot.SetActive(false);
         CallHideEvents();
     }
 
