@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         public bool IsActiveModel { get; protected set; } = false;
         public bool IsTpsModel { get; internal set; }
         public bool IsFpsModel { get; internal set; }
+        public bool DisableIKs { get; set; }
+        public bool UpdateEquipmentImmediately { get; set; }
 
         [Header("Model Switching Settings")]
         [SerializeField]

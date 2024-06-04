@@ -59,6 +59,9 @@ namespace MultiplayerARPG
             {
                 networkBehaviour.enabled = false;
             }
+            IEntityMovementComponent movementComponent = result.GetComponent<IEntityMovementComponent>();
+            if (!movementComponent.IsNull())
+                movementComponent.Enabled = false;
             GameObject[] ownerObjects = result.OwnerObjects;
             foreach (GameObject ownerObject in ownerObjects)
             {
@@ -74,6 +77,7 @@ namespace MultiplayerARPG
             result.transform.SetParent(parent);
             result.transform.localPosition = Vector3.zero;
             result.transform.localEulerAngles = Vector3.zero;
+            result.CharacterModel.DisableIKs = true;
             return result.CharacterModel;
         }
 
