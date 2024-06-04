@@ -116,8 +116,11 @@ namespace MultiplayerARPG
         public FireType fireType;
         public float rateOfFire;
         public float reloadDuration;
-        public Vector2 fireStagger;
-        public byte fireSpread;
+        [FormerlySerializedAs("fireStagger")]
+        public Vector2 fireSpreadRange;
+        [FormerlySerializedAs("fireSpread")]
+        public byte fireSpreadAmount;
+        public float recoil = 0f;
         public float chargeDuration;
         public bool destroyImmediatelyAfterFired;
 
@@ -603,14 +606,19 @@ namespace MultiplayerARPG
             get { return reloadDuration; }
         }
 
-        public Vector2 FireStagger
+        public Vector2 FireSpreadRange
         {
-            get { return fireStagger; }
+            get { return fireSpreadRange; }
         }
 
-        public byte FireSpread
+        public byte FireSpreadAmount
         {
-            get { return fireSpread; }
+            get { return fireSpreadAmount; }
+        }
+
+        public float Recoil
+        {
+            get { return recoil; }
         }
 
         public float ChargeDuration

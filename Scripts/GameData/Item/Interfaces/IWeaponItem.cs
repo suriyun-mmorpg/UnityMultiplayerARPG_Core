@@ -103,6 +103,10 @@ namespace MultiplayerARPG
         /// </summary>
         byte FireSpread { get; }
         /// <summary>
+        /// Recoiling
+        /// </summary>
+        float Recoil { get; }
+        /// <summary>
         /// Minimum charge duration to attack
         /// </summary>
         float ChargeDuration { get; }

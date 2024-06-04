@@ -13,13 +13,16 @@ namespace MultiplayerARPG
         public float shrinkPerFrameWhenAttacked;
         public float minSpread;
         public float maxSpread;
+        [System.Obsolete("Use weapon's recoil instead.")]
         [FormerlySerializedAs("recoil")]
         [FormerlySerializedAs("recoilY")]
         [Tooltip("X axis rotation")]
         public float recoilPitch;
+        [System.Obsolete("Use weapon's recoil instead.")]
         [FormerlySerializedAs("recoilX")]
         [Tooltip("Y axis rotation")]
         public float recoilYaw;
+        [System.Obsolete("Use weapon's recoil instead.")]
         [Tooltip("Z axis rotation")]
         public float recoilRoll;
     }

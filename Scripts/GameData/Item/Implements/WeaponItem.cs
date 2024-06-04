@@ -301,6 +301,13 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private float recoil = 0f;
+        public float Recoil
+        {
+            get { return recoil; }
+        }
+
+        [SerializeField]
         [Tooltip("Minimum charge duration to attack")]
         private float chargeDuration = 0;
         public float ChargeDuration

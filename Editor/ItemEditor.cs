@@ -84,8 +84,9 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.fireType));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.rateOfFire));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.reloadDuration));
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.fireStagger));
-            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.fireSpread));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.fireSpreadRange));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.fireSpreadAmount));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.recoil));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.chargeDuration));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.destroyImmediatelyAfterFired));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Weapon), nameof(item.maxDurability));
