@@ -13,7 +13,7 @@ namespace MultiplayerARPG
 
         public void DoAction()
         {
-            if (GameInstance.PlayingCharacter.CurrentHp > 0)
+            if (GameInstance.PlayingCharacter != null && GameInstance.PlayingCharacter.CurrentHp > 0)
             {
                 onAbleToDoAction.Invoke();
             }
