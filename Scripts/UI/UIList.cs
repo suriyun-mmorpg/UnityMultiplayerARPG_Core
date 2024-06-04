@@ -34,7 +34,12 @@ public class UIList : MonoBehaviour
         }
     }
 
-    public void Generate<T>(IEnumerable<T> list, System.Action<int, T, GameObject> onGenerateEntry)
+    public virtual GameObject ValidatePrefab<T>(T entry)
+    {
+        return uiPrefab;
+    }
+
+    public void Generate<T>(IEnumerable<T> list, System.Action<int, T, GameObject> onGenerateEntry, System.Func<T, GameObject> overridePrefabValidation = null)
     {
         RemoveContainerChildren();
 
@@ -52,9 +57,14 @@ public class UIList : MonoBehaviour
             }
             else
             {
-                if (uiPrefab != null && uiContainer != null)
+                GameObject prefab = null;
+                if (overridePrefabValidation != null)
+                    prefab = overridePrefabValidation.Invoke(entry);
+                else
+                    prefab = ValidatePrefab(entry);
+                if (prefab != null && uiContainer != null)
                 {
-                    ui = Instantiate(uiPrefab);
+                    ui = Instantiate(prefab);
                     ui.transform.SetParent(uiContainer);
                     ui.transform.localPosition = Vector3.zero;
                     ui.transform.localRotation = Quaternion.identity;
