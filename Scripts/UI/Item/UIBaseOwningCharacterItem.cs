@@ -50,19 +50,14 @@ namespace MultiplayerARPG
         {
             base.OnEnable();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onRecached += OnUpdateCharacterItems;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
-        }
-
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
-        {
-            OnUpdateCharacterItems();
+            GameInstance.PlayingCharacterEntity.onRecached -= OnUpdateCharacterItems;
         }
 
         protected override void Update()
