@@ -95,13 +95,13 @@ namespace MultiplayerARPG
         /// </summary>
         float ReloadDuration { get; }
         /// <summary>
-        /// Random stagger from aiming position, then when shoot actual shot position will be {aim position} + {randomed stagger}
+        /// Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}
         /// </summary>
-        Vector2 FireStagger { get; }
+        Vector2 FireSpreadRange { get; }
         /// <summary>
-        /// Amount of bullets that will be launched when fire onnce, will be used for shotgun items
+        /// Amount of bullets that will be launched when fire once, will be used for shotgun items
         /// </summary>
-        byte FireSpread { get; }
+        byte FireSpreadAmount { get; }
         /// <summary>
         /// Recoiling
         /// </summary>

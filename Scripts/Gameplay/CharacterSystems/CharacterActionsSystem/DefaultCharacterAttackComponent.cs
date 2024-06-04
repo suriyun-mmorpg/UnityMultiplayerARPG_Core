@@ -220,9 +220,9 @@ namespace MultiplayerARPG
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpread, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpreadAmount, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
                 if (_entityIsPlayer && IsServer)
-                    GameInstance.ServerLogHandlers.LogAttackStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpread, isLeftHand, weapon);
+                    GameInstance.ServerLogHandlers.LogAttackStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon);
 
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
@@ -383,17 +383,17 @@ namespace MultiplayerARPG
                 return;
             }
 
-            byte fireSpread = 0;
-            Vector3 fireStagger = Vector3.zero;
+            byte fireSpreadAmount = 0;
+            Vector3 fireSpreadRange = Vector3.zero;
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             if (weaponItem != null)
             {
                 // For monsters, their weapon can be null so have to avoid null exception
-                fireSpread = weaponItem.FireSpread;
-                fireStagger = weaponItem.FireStagger;
+                fireSpreadAmount = weaponItem.FireSpreadAmount;
+                fireSpreadRange = weaponItem.FireSpreadRange;
             }
             // Make sure it won't increase damage to the wrong collction
-            for (byte spreadIndex = 0; spreadIndex < fireSpread + 1; ++spreadIndex)
+            for (byte spreadIndex = 0; spreadIndex < fireSpreadAmount + 1; ++spreadIndex)
             {
                 damageInfo.LaunchDamageEntity(
                     Entity,
@@ -402,7 +402,7 @@ namespace MultiplayerARPG
                     simulateSeed,
                     triggerIndex,
                     spreadIndex,
-                    fireStagger,
+                    fireSpreadRange,
                     damageAmounts,
                     null,
                     0,

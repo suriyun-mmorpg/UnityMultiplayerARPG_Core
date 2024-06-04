@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -285,19 +286,21 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        [Tooltip("Random stagger from aiming position, then when shoot actual shot position will be {aim position} + {randomed stagger}")]
-        private Vector2 fireStagger = Vector2.zero;
-        public Vector2 FireStagger
+        [FormerlySerializedAs("fireStagger")]
+        [Tooltip("Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}")]
+        private Vector2 fireSpreadRange = Vector2.zero;
+        public Vector2 FireSpreadRange
         {
-            get { return fireStagger; }
+            get { return fireSpreadRange; }
         }
 
         [SerializeField]
+        [FormerlySerializedAs("fireSpread")]
         [Tooltip("Amount of bullets that will be launched when fire onnce, will be used for shotgun items")]
-        private byte fireSpread = 0;
-        public byte FireSpread
+        private byte fireSpreadAmount = 0;
+        public byte FireSpreadAmount
         {
-            get { return fireSpread; }
+            get { return fireSpreadAmount; }
         }
 
         [SerializeField]
