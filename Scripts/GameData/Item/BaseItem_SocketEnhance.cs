@@ -117,7 +117,9 @@ namespace MultiplayerARPG
                 return false;
             }
             character.DecreaseItems(enhancerId, 1);
+            // Fill empty slots
             character.FillEmptySlots();
+            // Update enhanced item
             enhancingItem.sockets[socketIndex] = enhancerId;
             onEnhanceSocket.Invoke(enhancingItem);
             GameInstance.ServerLogHandlers.LogEnhanceSocketItem(character, enhancingItem, enhancerItem);
@@ -198,8 +200,6 @@ namespace MultiplayerARPG
                     return false;
                 }
                 character.IncreaseItems(CharacterItem.Create(enhancerId));
-                enhancedItem.sockets[socketIndex] = 0;
-                onRemoveEnhancer.Invoke(enhancedItem);
                 inventoryChanged = true;
             }
             if (GameInstance.Singleton.enhancerRemoval.RequireItems != null)
@@ -213,6 +213,9 @@ namespace MultiplayerARPG
                 character.FillEmptySlots();
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRemoveEnhancer(character);
+            // Update enhanced item
+            enhancedItem.sockets[socketIndex] = 0;
+            onRemoveEnhancer.Invoke(enhancedItem);
             GameInstance.ServerLogHandlers.LogRemoveEnhancerFromItem(character, enhancedItem, enhancerItem);
             return true;
         }
