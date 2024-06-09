@@ -173,7 +173,7 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<RequestSendGuildRequestMessage, ResponseSendGuildRequestMessage>(GameNetworkingConsts.SendGuildRequest, ServerGuildMessageHandlers.HandleRequestSendGuildRequest);
                 RegisterRequestToServer<RequestAcceptGuildRequestMessage, ResponseAcceptGuildRequestMessage>(GameNetworkingConsts.AcceptGuildRequest, ServerGuildMessageHandlers.HandleRequestAcceptGuildRequest);
                 RegisterRequestToServer<RequestDeclineGuildRequestMessage, ResponseDeclineGuildRequestMessage>(GameNetworkingConsts.DeclineGuildRequest, ServerGuildMessageHandlers.HandleRequestDeclineGuildRequest);
-                RegisterRequestToServer<EmptyMessage, ResponseGetGuildRequestsMessage>(GameNetworkingConsts.GetGuildRequests, ServerGuildMessageHandlers.HandleRequestGetGuildRequests);
+                RegisterRequestToServer<RequestGetGuildRequestsMessage, ResponseGetGuildRequestsMessage>(GameNetworkingConsts.GetGuildRequests, ServerGuildMessageHandlers.HandleRequestGetGuildRequests);
                 RegisterRequestToServer<RequestFindGuildsMessage, ResponseFindGuildsMessage>(GameNetworkingConsts.FindGuilds, ServerGuildMessageHandlers.HandleRequestFindGuilds);
                 RegisterRequestToServer<RequestGetGuildInfoMessage, ResponseGetGuildInfoMessage>(GameNetworkingConsts.GetGuildInfo, ServerGuildMessageHandlers.HandleRequestGetGuildInfo);
                 RegisterRequestToServer<EmptyMessage, ResponseGuildRequestNotificationMessage>(GameNetworkingConsts.GuildRequestNotification, ServerGuildMessageHandlers.HandleRequestGuildRequestNotification);
@@ -188,13 +188,13 @@ namespace MultiplayerARPG
             if (ServerFriendMessageHandlers != null)
             {
                 RegisterRequestToServer<RequestFindCharactersMessage, ResponseSocialCharacterListMessage>(GameNetworkingConsts.FindCharacters, ServerFriendMessageHandlers.HandleRequestFindCharacters);
-                RegisterRequestToServer<EmptyMessage, ResponseGetFriendsMessage>(GameNetworkingConsts.GetFriends, ServerFriendMessageHandlers.HandleRequestGetFriends);
+                RegisterRequestToServer<RequestGetFriendsMessage, ResponseGetFriendsMessage>(GameNetworkingConsts.GetFriends, ServerFriendMessageHandlers.HandleRequestGetFriends);
                 RegisterRequestToServer<RequestAddFriendMessage, ResponseAddFriendMessage>(GameNetworkingConsts.AddFriend, ServerFriendMessageHandlers.HandleRequestAddFriend);
                 RegisterRequestToServer<RequestRemoveFriendMessage, ResponseRemoveFriendMessage>(GameNetworkingConsts.RemoveFriend, ServerFriendMessageHandlers.HandleRequestRemoveFriend);
                 RegisterRequestToServer<RequestSendFriendRequestMessage, ResponseSendFriendRequestMessage>(GameNetworkingConsts.SendFriendRequest, ServerFriendMessageHandlers.HandleRequestSendFriendRequest);
                 RegisterRequestToServer<RequestAcceptFriendRequestMessage, ResponseAcceptFriendRequestMessage>(GameNetworkingConsts.AcceptFriendRequest, ServerFriendMessageHandlers.HandleRequestAcceptFriendRequest);
                 RegisterRequestToServer<RequestDeclineFriendRequestMessage, ResponseDeclineFriendRequestMessage>(GameNetworkingConsts.DeclineFriendRequest, ServerFriendMessageHandlers.HandleRequestDeclineFriendRequest);
-                RegisterRequestToServer<EmptyMessage, ResponseGetFriendRequestsMessage>(GameNetworkingConsts.GetFriendRequests, ServerFriendMessageHandlers.HandleRequestGetFriendRequests);
+                RegisterRequestToServer<RequestGetFriendRequestsMessage, ResponseGetFriendRequestsMessage>(GameNetworkingConsts.GetFriendRequests, ServerFriendMessageHandlers.HandleRequestGetFriendRequests);
                 RegisterRequestToServer<EmptyMessage, ResponseFriendRequestNotificationMessage>(GameNetworkingConsts.FriendRequestNotification, ServerFriendMessageHandlers.HandleRequestFriendRequestNotification);
             }
             // Bank
