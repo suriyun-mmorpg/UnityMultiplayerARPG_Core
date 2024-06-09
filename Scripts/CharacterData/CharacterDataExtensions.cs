@@ -81,6 +81,18 @@ namespace MultiplayerARPG
             return result.CharacterModel;
         }
 
+        public static void SetupModelBodyParts(this BaseCharacterModel characterModel, ICharacterData data)
+        {
+#if !DISABLE_CUSTOM_CHARACTER_DATA
+            PlayerCharacterBodyPartComponent[] comps = characterModel.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
+            for (int i = 0; i < comps.Length; ++i)
+            {
+                comps[i].SetupCharacterModelEvents(characterModel);
+                comps[i].ApplyModelAndColorBySavedData(data.PublicInts);
+            }
+#endif
+        }
+
         public static int GetNextLevelExp(this ICharacterData data)
         {
             if (data == null)
