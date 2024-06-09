@@ -22,6 +22,7 @@ namespace MultiplayerARPG
             info.AddValue("expireTime", data.expireTime);
             info.AddValue("randomSeed", data.randomSeed);
             info.AddValue("ammo", data.ammo);
+            info.AddValue("ammoDataId", data.ammoDataId);
             info.AddValue("sockets", data.sockets);
             info.AddValue("version", data.version);
         }
@@ -64,6 +65,11 @@ namespace MultiplayerARPG
             try
             {
                 data.version = info.GetByte("version");
+            }
+            catch { }
+            try
+            {
+                data.ammoDataId = info.GetInt32("ammoDataId");
             }
             catch { }
             if (string.IsNullOrEmpty(data.id))
