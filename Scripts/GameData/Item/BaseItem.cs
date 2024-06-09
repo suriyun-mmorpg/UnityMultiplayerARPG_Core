@@ -18,6 +18,9 @@ namespace MultiplayerARPG
         [Min(1)]
         protected int maxStack = 1;
         [SerializeField]
+        [Tooltip("If this value > 0 it will override weapon's ammo capacity when reload (if the weapon use this as ammo)")]
+        private int overrideAmmoCapacity = 0;
+        [SerializeField]
         protected ItemRefine itemRefine = null;
         [SerializeField]
         [Tooltip("This is duration to lock item at first time when pick up dropped item or bought it from NPC or IAP system")]
@@ -79,35 +82,37 @@ namespace MultiplayerARPG
 
         public abstract ItemType ItemType { get; }
 
-        public int SellPrice { get { return sellPrice; } }
+        public int SellPrice { get => sellPrice; set => sellPrice = value; }
 
-        public float Weight { get { return weight; } }
+        public float Weight { get => weight; set => weight = value; }
 
-        public bool NoSlotUsage { get { return noSlotUsage; } }
+        public bool NoSlotUsage { get => noSlotUsage; set => noSlotUsage = value; }
 
-        public int MaxStack { get { return maxStack; } }
+        public int MaxStack { get => maxStack; set => maxStack = value; }
 
-        public ItemRefine ItemRefine { get { return itemRefine; } }
+        public int OverrideAmmoCapacity { get => overrideAmmoCapacity; set => overrideAmmoCapacity = value; }
 
-        public float LockDuration { get { return lockDuration; } }
+        public ItemRefine ItemRefine { get => itemRefine; set => itemRefine = value; }
 
-        public ETimeUnits ExpireDurationUnit { get { return expireDurationUnit; } }
+        public float LockDuration { get => lockDuration; set => lockDuration = value; }
 
-        public int ExpireDuration { get { return expireDuration; } }
+        public ETimeUnits ExpireDurationUnit { get => expireDurationUnit; set => expireDurationUnit = value; }
 
-        public GameObject DropModel { get { return dropModel; } set { dropModel = value; } }
+        public int ExpireDuration { get => expireDuration; set => expireDuration = value; }
 
-        public int DismantleReturnGold { get { return dismantleReturnGold; } }
+        public GameObject DropModel { get => dropModel; set => dropModel = value; }
 
-        public ItemAmount[] DismantleReturnItems { get { return dismantleReturnItems; } }
+        public int DismantleReturnGold { get => dismantleReturnGold; set => dismantleReturnGold = value; }
 
-        public CurrencyAmount[] DismantleReturnCurrencies { get { return dismantleReturnCurrencies; } }
+        public ItemAmount[] DismantleReturnItems { get => dismantleReturnItems; set => dismantleReturnItems = value; }
 
-        public bool RestrictDealing { get { return restrictDealing; } }
+        public CurrencyAmount[] DismantleReturnCurrencies { get => dismantleReturnCurrencies; set => dismantleReturnCurrencies = value; }
 
-        public bool RestrictDropping { get { return restrictDropping; } }
+        public bool RestrictDealing { get => restrictDealing; set => restrictDealing = value; }
 
-        public bool RestrictSelling { get { return restrictSelling; } }
+        public bool RestrictDropping  { get => restrictDropping; set => restrictDropping = value; }
+
+        public bool RestrictSelling { get => restrictSelling; set => restrictSelling = value; }
 
         public int MaxLevel
         {

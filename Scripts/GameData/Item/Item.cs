@@ -152,7 +152,6 @@ namespace MultiplayerARPG
 
         [Category(2, "Ammo Settings")]
         public AmmoType ammoType;
-        public int overrideAmmoCapacity;
 
 #if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
         public UnityHelpBox buildingEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
@@ -296,11 +295,6 @@ namespace MultiplayerARPG
         public AmmoType AmmoType
         {
             get { return ammoType; }
-        }
-
-        public int OverrideAmmoCapacity
-        {
-            get { return overrideAmmoCapacity; }
         }
         #endregion
 

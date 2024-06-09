@@ -32,14 +32,6 @@ namespace MultiplayerARPG
             get { return increaseDamages; }
         }
 
-        [SerializeField]
-        [Tooltip("If this value > 0 it will override weapon's ammo capacity when reload")]
-        private int overrideAmmoCapacity = 0;
-        public int OverrideAmmoCapacity
-        {
-            get { return overrideAmmoCapacity; }
-        }
-
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();

@@ -278,25 +278,49 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (!_manager.IsAcceptNewAction())
                 return;
+
             CharacterItem reloadingWeapon = isLeftHand ? Entity.EquipWeapons.leftHand : Entity.EquipWeapons.rightHand;
             if (reloadingWeapon.IsEmptySlot())
+            {
+                // Invalid item data
                 return;
+            }
             IWeaponItem reloadingWeaponItem = reloadingWeapon.GetWeaponItem();
-            if (reloadingWeaponItem == null || reloadingWeaponItem.AmmoCapacity <= 0 || reloadingWeapon.ammo >= reloadingWeaponItem.AmmoCapacity)
+            if (reloadingWeaponItem == null || reloadingWeaponItem.AmmoCapacity <= 0)
+            {
+                // This is not an items that have something like gun's magazine, it might be bow or crossbow :P
                 return;
+            }
             bool hasAmmoType = reloadingWeaponItem.WeaponType.AmmoType != null;
             bool hasAmmoItems = reloadingWeaponItem.AmmoItems != null && reloadingWeaponItem.AmmoItems.Length > 0;
             if (!hasAmmoType && !hasAmmoItems)
+            {
+                // This is not an items that have something like gun's magazine, it might be bow or crossbow :P
                 return;
+            }
+
+            // Check that it should reload or not, if it is full, then it should not
+            int prevAmmoCapacity = reloadingWeaponItem.AmmoCapacity;
+            if (reloadingWeaponItem.DataId != 0 &&
+                GameInstance.Items.TryGetValue(reloadingWeaponItem.DataId, out BaseItem prevAmmoItem) &&
+                prevAmmoItem.OverrideAmmoCapacity > 0)
+            {
+                // Previous reloaded ammo is override ammo capacity
+                prevAmmoCapacity = prevAmmoItem.OverrideAmmoCapacity;
+            }
+
+            if (reloadingWeapon.ammo >= prevAmmoCapacity)
+            {
+                // Ammo is full, cannot be reloaded
+                return;
+            }
+
             // Prepare reload data
             int reloadingAmmoDataId = 0;
             int inventoryAmount = 0;
-            if (hasAmmoType)
+            if (hasAmmoItems)
             {
-                inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.AmmoType, out reloadingAmmoDataId);
-            }
-            else if (hasAmmoItems)
-            {
+                // Looking for items in inventory
                 for (int indexOfAmmoItem = 0; indexOfAmmoItem < reloadingWeaponItem.AmmoItems.Length; ++indexOfAmmoItem)
                 {
                     int tempAmmoDataId = reloadingWeaponItem.AmmoItems[indexOfAmmoItem].DataId;
@@ -309,18 +333,45 @@ namespace MultiplayerARPG
                     }
                 }
             }
-            int reloadingAmmoAmount = 0;
+            else if (hasAmmoType)
+            {
+                inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.AmmoType, out reloadingAmmoDataId);
+            }
+
             int ammoCapacity = reloadingWeaponItem.AmmoCapacity;
-            if (GameInstance.Items.TryGetValue(reloadingAmmoDataId, out BaseItem tempItem) && tempItem is IAmmoItem tempAmmoItem && tempAmmoItem.OverrideAmmoCapacity > 0)
-                ammoCapacity = tempAmmoItem.OverrideAmmoCapacity;
-            if (reloadingWeapon.ammoDataId != 0 && reloadingWeapon.ammoDataId == reloadingAmmoDataId)
-                reloadingAmmoAmount = ammoCapacity - reloadingWeapon.ammo;
-            else
+            if (GameInstance.Items.TryGetValue(reloadingAmmoDataId, out BaseItem tempItem) &&
+                tempItem.OverrideAmmoCapacity > 0)
+            {
+                // Override capacity by the item
+                ammoCapacity = tempItem.OverrideAmmoCapacity;
+            }
+
+            int reloadingAmmoAmount = 0;
+            if (reloadingWeapon.ammoDataId != reloadingAmmoDataId)
+            {
+                // If ammo that stored in the weapon is difference
+                // Then it will return ammo in the weapon, and replace amount with the new one
+                Entity.IncreaseItems(CharacterItem.Create(reloadingWeapon.ammoDataId, 1, reloadingWeapon.ammo));
+                Entity.FillEmptySlots();
                 reloadingAmmoAmount = ammoCapacity;
+            }
+            else
+            {
+                reloadingAmmoAmount = ammoCapacity - reloadingWeapon.ammo;
+            }
+
             if (inventoryAmount < reloadingAmmoAmount)
+            {
+                // Ammo in inventory less than reloading amount, so use amount of ammo in inventory
                 reloadingAmmoAmount = inventoryAmount;
+            }
+
             if (reloadingAmmoAmount <= 0)
+            {
+                // No ammo to reload
                 return;
+            }
+
             _manager.ActionAccepted();
             ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
             RPC(RpcReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
