@@ -33,7 +33,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [Tooltip("Example: If you want to make ASR to be equippable on 1st and 2nd weapon sets, set this to [0, 1].\r\nIf you want to make Pistol to be equippable on 3rd weapon set, set this to [2]. \r\nEach weapon set contains slots for right-hand and left-hand. Useful for shooter game, for an RPG games, set it to be empty.")]
-        [Range(1, 16)]
+        [Range(0, 15)]
         private List<byte> equippableSetIndexes = new List<byte>();
         public List<byte> EquippableSetIndexes { get { return equippableSetIndexes; } }
 
