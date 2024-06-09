@@ -577,7 +577,7 @@ namespace MultiplayerARPG
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
-            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            bool hasAmmoItems = weaponItem.AmmoItemIds.Count > 0;
             if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
             {
                 // Ammo capacity >= `amount` reduce loaded ammo
@@ -610,13 +610,10 @@ namespace MultiplayerARPG
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
                 BaseItem tempItemData;
-                int tempAmmoDataId;
-                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
+                foreach (int tempAmmoDataId in weaponItem.AmmoItemIds)
                 {
-                    tempItemData = weaponItem.AmmoItems[i];
-                    if (tempItemData == null)
+                    if (!GameInstance.Items.TryGetValue(tempAmmoDataId, out tempItemData))
                         continue;
-                    tempAmmoDataId = tempItemData.DataId;
                     if (nonEquipItems.DecreaseItems(tempAmmoDataId, amount, isLimitSlot))
                     {
                         nonEquipItems.FillEmptySlots(isLimitSlot, slotLimit);
@@ -1160,7 +1157,7 @@ namespace MultiplayerARPG
 
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
-            bool hasAmmoItems = weaponItem.AmmoItems != null && weaponItem.AmmoItems.Length > 0;
+            bool hasAmmoItems = weaponItem.AmmoItemIds.Count > 0;
             if (weaponItem.AmmoCapacity > 0 && (hasAmmoType || hasAmmoItems))
             {
                 // Ammo capacity more than 0 reduce loaded ammo
@@ -1177,9 +1174,9 @@ namespace MultiplayerARPG
             else if (weaponItem.AmmoCapacity <= 0 && hasAmmoItems)
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
-                for (int i = 0; i < weaponItem.AmmoItems.Length; ++i)
+                foreach (int tempAmmoDataId in weaponItem.AmmoItemIds)
                 {
-                    if (data.CountNonEquipItems(weaponItem.AmmoItems[i].DataId) >= amount)
+                    if (data.CountNonEquipItems(tempAmmoDataId) >= amount)
                         return true;
                 }
                 return false;

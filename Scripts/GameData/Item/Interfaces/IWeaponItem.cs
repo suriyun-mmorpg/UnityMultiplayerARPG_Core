@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -53,7 +54,7 @@ namespace MultiplayerARPG
         /// You can set ammo items into this list to use it as weapon instead of the one which setup on weapon type's require ammo type
         /// This setting is useful for shooter games which can have the same type of weapon (eg. machine-gun for 20 guns) but can be reloaded by differences ammo items
         /// </summary>
-        BaseItem[] AmmoItems { get; }
+        HashSet<int> AmmoItemIds { get; }
         /// <summary>
         /// How many ammo can store in the gun's magazine
         /// </summary>

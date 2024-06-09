@@ -294,7 +294,7 @@ namespace MultiplayerARPG
                 return;
             }
             bool hasAmmoType = reloadingWeaponItem.WeaponType.AmmoType != null;
-            bool hasAmmoItems = reloadingWeaponItem.AmmoItems != null && reloadingWeaponItem.AmmoItems.Length > 0;
+            bool hasAmmoItems = reloadingWeaponItem.AmmoItemIds.Count > 0;
             if (!hasAmmoType && !hasAmmoItems)
             {
                 // This is not an items that have something like gun's magazine, it might be bow or crossbow :P
@@ -313,16 +313,18 @@ namespace MultiplayerARPG
             if (hasAmmoItems)
             {
                 // Looking for items in inventory
-                for (int indexOfAmmoItem = 0; indexOfAmmoItem < reloadingWeaponItem.AmmoItems.Length; ++indexOfAmmoItem)
+                CharacterItem tempCharacterItem;
+                for (int i = 0; i < Entity.NonEquipItems.Count; ++i)
                 {
-                    int tempAmmoDataId = reloadingWeaponItem.AmmoItems[indexOfAmmoItem].DataId;
-                    int tempAmmoAmount = Entity.CountNonEquipItems(tempAmmoDataId);
-                    if (tempAmmoAmount > 0)
-                    {
-                        reloadingAmmoDataId = tempAmmoDataId;
-                        inventoryAmount = tempAmmoAmount;
-                        break;
-                    }
+                    tempCharacterItem = Entity.NonEquipItems[i];
+                    if (tempCharacterItem.IsEmptySlot())
+                        continue;
+                    if (!reloadingWeaponItem.AmmoItemIds.Contains(tempCharacterItem.dataId))
+                        continue;
+                    if (reloadingAmmoDataId == 0)
+                        reloadingAmmoDataId = tempCharacterItem.dataId;
+                    if (reloadingAmmoDataId == tempCharacterItem.dataId)
+                        inventoryAmount += tempCharacterItem.amount;
                 }
             }
             else if (hasAmmoType)

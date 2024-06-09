@@ -128,12 +128,15 @@ namespace MultiplayerARPG
             IWeaponItem item = GetWeaponItem();
             if (item == null)
                 return false;
-            if (item.AmmoItems != null && item.AmmoItems.Length > 0)
+            if (item.AmmoItemIds.Count > 0)
             {
-                for (int indexOfAmmoItem = 0; indexOfAmmoItem < item.AmmoItems.Length; ++indexOfAmmoItem)
+                CharacterItem tempCharacterItem;
+                for (int i = 0; i < character.NonEquipItems.Count; ++i)
                 {
-                    int tempAmmoDataId = item.AmmoItems[indexOfAmmoItem].DataId;
-                    if (character.CountNonEquipItems(tempAmmoDataId) > 0)
+                    tempCharacterItem = character.NonEquipItems[i];
+                    if (tempCharacterItem.IsEmptySlot())
+                        continue;
+                    if (item.AmmoItemIds.Contains(tempCharacterItem.dataId))
                         return true;
                 }
             }

@@ -525,9 +525,24 @@ namespace MultiplayerARPG
             get { return reloadRestriction; }
         }
 
-        public BaseItem[] AmmoItems
+        [System.NonSerialized]
+        private HashSet<int> _cacheAmmoItemIds = null;
+        public HashSet<int> AmmoItemIds
         {
-            get { return ammoItems; }
+            get
+            {
+                if (_cacheAmmoItemIds == null)
+                {
+                    _cacheAmmoItemIds = new HashSet<int>();
+                    for (int i = 0; i < ammoItems.Length; ++i)
+                    {
+                        if (ammoItems[i] == null)
+                            continue;
+                        _cacheAmmoItemIds.Add(ammoItems[i].DataId);
+                    }
+                }
+                return _cacheAmmoItemIds;
+            }
         }
 
         public int AmmoCapacity

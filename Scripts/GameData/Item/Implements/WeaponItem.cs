@@ -153,9 +153,24 @@ namespace MultiplayerARPG
         [SerializeField]
         [Tooltip("You can set ammo items into this list to use it as weapon instead of the one which setup on weapon type's require ammo type\r\nThis setting is useful for shooter games which can have the same type of weapon (eg. machine-gun for 20 guns) but can be reloaded by differences ammo items")]
         private BaseItem[] ammoItems = new BaseItem[0];
-        public BaseItem[] AmmoItems
+        [System.NonSerialized]
+        private HashSet<int> _cacheAmmoItemIds = null;
+        public HashSet<int> AmmoItemIds
         {
-            get { return ammoItems; }
+            get
+            {
+                if (_cacheAmmoItemIds == null)
+                {
+                    _cacheAmmoItemIds = new HashSet<int>();
+                    for (int i = 0; i < ammoItems.Length; ++i)
+                    {
+                        if (ammoItems[i] == null)
+                            continue;
+                        _cacheAmmoItemIds.Add(ammoItems[i].DataId);
+                    }
+                }
+                return _cacheAmmoItemIds;
+            }
         }
 
         [SerializeField]
