@@ -11,6 +11,8 @@ namespace MultiplayerARPG
         public UIPlayerFrame uiPrefab;
         public Transform uiContainer;
         public UIPlayerFrame[] selectedFrames;
+        public GameObject[] selectedSignObjects = new GameObject[0];
+        public GameObject[] notSelectedSignObjects = new GameObject[0];
 
         [Header("Options")]
         public bool updateSelectedFrameOnSelect;
@@ -40,10 +42,12 @@ namespace MultiplayerARPG
             {
                 if (_cacheSelectionManager == null)
                     _cacheSelectionManager = gameObject.GetOrAddComponent<UIPlayerFrameSelectionManager>();
-                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                _cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return _cacheSelectionManager;
             }
         }
+
+        private int _selectedDataId;
 
         protected override void OnDestroy()
         {
@@ -113,6 +117,8 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(int selectedDataId)
         {
+            _selectedDataId = selectedDataId;
+
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
@@ -146,12 +152,18 @@ namespace MultiplayerARPG
         public virtual void UpdateSelectedFrames()
         {
             PlayerFrame playerFrame = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data : null;
-            if (selectedFrames != null && selectedFrames.Length > 0)
+            for (int i = 0; i < selectedFrames.Length; ++i)
             {
-                foreach (UIPlayerFrame selectedFrame in selectedFrames)
-                {
-                    selectedFrame.Data = playerFrame;
-                }
+                selectedFrames[i].Data = playerFrame;
+            }
+            bool selected = playerFrame != null && _selectedDataId == playerFrame.DataId;
+            for (int i = 0; i < selectedSignObjects.Length; ++i)
+            {
+                selectedSignObjects[i].SetActive(selected);
+            }
+            for (int i = 0; i < notSelectedSignObjects.Length; ++i)
+            {
+                notSelectedSignObjects[i].SetActive(!selected);
             }
         }
 
@@ -167,6 +179,11 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedFrame(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetFrameMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            _selectedDataId = response.dataId;
+            UserHandleData userHandle = GameInstance.UserHandle;
+            userHandle.frameDataId = _selectedDataId;
+            GameInstance.UserHandle = userHandle;
+            UpdateSelectedFrames();
         }
     }
 }

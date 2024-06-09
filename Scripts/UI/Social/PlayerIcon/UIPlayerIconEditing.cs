@@ -10,7 +10,9 @@ namespace MultiplayerARPG
         public GameObject listEmptyObject;
         public UIPlayerIcon uiPrefab;
         public Transform uiContainer;
-        public UIPlayerIcon[] selectedIcons;
+        public UIPlayerIcon[] selectedIcons = new UIPlayerIcon[0];
+        public GameObject[] selectedSignObjects = new GameObject[0];
+        public GameObject[] notSelectedSignObjects = new GameObject[0];
 
         [Header("Options")]
         public bool updateSelectedIconOnSelect;
@@ -40,10 +42,12 @@ namespace MultiplayerARPG
             {
                 if (_cacheSelectionManager == null)
                     _cacheSelectionManager = gameObject.GetOrAddComponent<UIPlayerIconSelectionManager>();
-                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                _cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return _cacheSelectionManager;
             }
         }
+
+        private int _selectedDataId;
 
         protected override void OnDestroy()
         {
@@ -113,6 +117,8 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(int selectedDataId)
         {
+            _selectedDataId = selectedDataId;
+
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
@@ -146,12 +152,18 @@ namespace MultiplayerARPG
         public virtual void UpdateSelectedIcons()
         {
             PlayerIcon playerIcon = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data : null;
-            if (selectedIcons != null && selectedIcons.Length > 0)
+            for (int i = 0; i < selectedIcons.Length; ++i)
             {
-                foreach (UIPlayerIcon selectedIcon in selectedIcons)
-                {
-                    selectedIcon.Data = playerIcon;
-                }
+                selectedIcons[i].Data = playerIcon;
+            }
+            bool selected = playerIcon != null && _selectedDataId == playerIcon.DataId;
+            for (int i = 0; i < selectedSignObjects.Length; ++i)
+            {
+                selectedSignObjects[i].SetActive(selected);
+            }
+            for (int i = 0; i < notSelectedSignObjects.Length; ++i)
+            {
+                notSelectedSignObjects[i].SetActive(!selected);
             }
         }
 
@@ -167,6 +179,11 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedIcon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetIconMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            _selectedDataId = response.dataId;
+            UserHandleData userHandle = GameInstance.UserHandle;
+            userHandle.iconDataId = _selectedDataId;
+            GameInstance.UserHandle = userHandle;
+            UpdateSelectedIcons();
         }
     }
 }

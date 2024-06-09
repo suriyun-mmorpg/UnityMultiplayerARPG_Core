@@ -1,5 +1,4 @@
 ﻿using Newtonsoft.Json;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -40,7 +39,7 @@ namespace MultiplayerARPG
             {
                 if (_cacheSelectionManager == null)
                     _cacheSelectionManager = gameObject.GetOrAddComponent<UIGuildIconSelectionManager>();
-                _cacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+                _cacheSelectionManager.selectionMode = UISelectionMode.Toggle;
                 return _cacheSelectionManager;
             }
         }
