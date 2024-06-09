@@ -32,7 +32,7 @@ namespace MultiplayerARPG
             this._guildRole = guildRole;
             if (inputFieldRoleName != null)
             {
-                inputFieldRoleName.unityInputField.contentType = InputField.ContentType.Standard;
+                inputFieldRoleName.contentType = InputField.ContentType.Standard;
                 inputFieldRoleName.text = guildRoleData.roleName;
             }
 
@@ -47,7 +47,7 @@ namespace MultiplayerARPG
 
             if (inputFieldShareExpPercentage != null)
             {
-                inputFieldShareExpPercentage.unityInputField.contentType = InputField.ContentType.IntegerNumber;
+                inputFieldShareExpPercentage.contentType = InputField.ContentType.IntegerNumber;
                 inputFieldShareExpPercentage.text = guildRoleData.shareExpPercentage.ToString("N0");
             }
         }
