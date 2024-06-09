@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using Cysharp.Text;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,6 +7,15 @@ namespace MultiplayerARPG
 {
     public partial class UIPlayerTitle : UISelectionEntry<PlayerTitle>
     {
+        [Header("String Formats")]
+        [Tooltip("Format => {0} = {Title}")]
+        public UILocaleKeySetting formatKeyTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Description}")]
+        public UILocaleKeySetting formatKeyDescription = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+
+        [Header("UI Elements")]
+        public TextWrapper uiTextTitle;
+        public TextWrapper uiTextDescription;
         public Image imageIcon;
         public GameObject[] lockedObjects = new GameObject[0];
         public GameObject[] unlockedObjects = new GameObject[0];
@@ -31,6 +41,21 @@ namespace MultiplayerARPG
             PlayerTitle title = Data;
             if (title == null)
                 title = GameInstance.PlayerTitles.Values.FirstOrDefault();
+
+            if (uiTextTitle != null)
+            {
+                uiTextTitle.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyTitle),
+                    title == null ? LanguageManager.GetUnknowTitle() : title.Title);
+            }
+
+            if (uiTextDescription != null)
+            {
+                uiTextDescription.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyDescription),
+                    title == null ? LanguageManager.GetUnknowDescription() : title.Description);
+            }
+
             if (imageIcon != null)
             {
                 Sprite iconSprite = title == null ? null : title.Icon;
