@@ -1,4 +1,3 @@
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,78 +7,42 @@ using UnityEditor;
 
 namespace UtilsComponents
 {
-    public class CanvasScalerSetupByAspectRatio : MonoBehaviour
+    [System.Serializable]
+    public class SetupByAspectRatioCanvasScalerSetting : SetupByAspectRatioSetting
     {
-        [System.Serializable]
-        public struct Setting : System.IComparable
-        {
-            public int width;
-            public int height;
-            public float matchWidthOrHeight;
+        public float matchWidthOrHeight = 0;
+        public CanvasScaler.ScreenMatchMode screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
+    }
 
-            public float Aspect()
-            {
-                return (float)width / (float)height;
-            }
-
-            public int CompareTo(object obj)
-            {
-                if (obj is Setting setting)
-                    return Aspect().CompareTo(setting.Aspect());
-                return 0;
-            }
-        }
-        public float defaultMatchWidthOrHeight = 1f;
-        public List<Setting> settings = new List<Setting>();
+    public class CanvasScalerSetupByAspectRatio : BaseSetupByAspectRatio<SetupByAspectRatioCanvasScalerSetting>
+    {
         public List<CanvasScaler> scalers = new List<CanvasScaler>();
-        private int _dirtyWidth;
-        private int _dirtyHeight;
 
-        public void Update()
+        public override void Apply()
         {
-            if (_dirtyWidth != Screen.width ||
-                _dirtyHeight != Screen.height)
+            currentWidth = Screen.width;
+            currentHeight = Screen.height;
+            int aspect = GetCurrentAspectAsInt();
+            int indexOf = IndexOfAspect(aspect);
+            if (indexOf < 0)
+                indexOf = 0;
+            if (settings.Count <= 0)
+                return;
+            for (int i = 0; i < scalers.Count; ++i)
             {
-                _dirtyWidth = Screen.width;
-                _dirtyHeight = Screen.height;
-                UpdateCanvasScalers();
+                UpdateCanvasScaler(scalers[i], settings[indexOf]);
             }
         }
 
-        public float GetSetting(float aspect)
-        {
-            settings.Sort();
-            foreach (Setting setting in settings)
-            {
-                if (aspect + aspect * 0.025f > setting.Aspect() &&
-                    aspect - aspect * 0.025f < setting.Aspect())
-                    return setting.matchWidthOrHeight;
-            }
-            return defaultMatchWidthOrHeight;
-        }
-
-        public void UpdateCanvasScaler(CanvasScaler scaler, float matchWidthOrHeight)
+        public void UpdateCanvasScaler(CanvasScaler scaler, SetupByAspectRatioCanvasScalerSetting setting)
         {
             if (scaler == null || scaler.uiScaleMode != CanvasScaler.ScaleMode.ScaleWithScreenSize)
                 return;
-            scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-            scaler.matchWidthOrHeight = matchWidthOrHeight;
+            scaler.screenMatchMode = setting.screenMatchMode;
+            scaler.matchWidthOrHeight = setting.matchWidthOrHeight;
 #if UNITY_EDITOR
             EditorUtility.SetDirty(scaler);
 #endif
-        }
-
-        [ContextMenu("Update Canvas Scalers")]
-        public void UpdateCanvasScalers()
-        {
-            float width = (float)Screen.width;
-            float height = (float)Screen.height;
-            float aspect = width / height;
-            float matchWidthOrHeight = GetSetting(aspect);
-            for (int i = 0; i < scalers.Count; ++i)
-            {
-                UpdateCanvasScaler(scalers[i], matchWidthOrHeight);
-            }
         }
 
 #if UNITY_EDITOR
