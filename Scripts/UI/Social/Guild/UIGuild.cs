@@ -26,16 +26,22 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Rank}")]
         public UILocaleKeySetting formatKeyRank = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
-        [Header("UI Elements")]
+        [Header("UI Elements - Guild Dialogs")]
         public UIGuildCreate uiGuildCreate;
         public UIGuildRoleSetting uiGuildRoleSetting;
         public UIGuildMemberRoleSetting uiGuildMemberRoleSetting;
+
+        [Header("UI Elements - Guild Roles")]
         public UIGuildRole uiRoleDialog;
         public UIGuildRole uiRolePrefab;
         public Transform uiRoleContainer;
+
+        [Header("UI Elements - Guild Skills")]
         public UIGuildSkill uiSkillDialog;
         public UIGuildSkill uiSkillPrefab;
         public Transform uiSkillContainer;
+
+        [Header("UI Elements - Guild Information")]
         public UIGuildIcon uiGuildIcon;
         public TextWrapper textGuildName;
         public TextWrapper textLeaderName;
@@ -43,20 +49,23 @@ namespace MultiplayerARPG
         public UIGageValue uiGageExp;
         public TextWrapper textSkillPoint;
         public TextWrapper textMessage;
-        public InputFieldWrapper inputFieldMessage;
         public TextWrapper textMessage2;
+        public TextWrapper textScore;
+        public TextWrapper textRank;
+        public GameObject[] autoAcceptRequestsObjects = new GameObject[0];
+        public GameObject[] notAutoAcceptRequestsObjects = new GameObject[0];
+
+        [Header("UI Elements - Guild Settings")]
+        public InputFieldWrapper inputFieldMessage;
         public InputFieldWrapper inputFieldMessage2;
         public Toggle toggleAutoAcceptRequests;
         public Toggle toggleNotAutoAcceptRequests;
-        public TextWrapper textScore;
-        public TextWrapper textRank;
-        public GameObject[] autoAcceptRequestsObjects;
-        public GameObject[] notAutoAcceptRequestsObjects;
 
         public GuildData Guild { get { return GameInstance.JoinedGuild; } }
 
         private string _guildMessage;
         private string _guildMessage2;
+        private bool _isAutoAcceptRequests;
 
         private UIList _roleList;
         public UIList RoleList
@@ -282,16 +291,30 @@ namespace MultiplayerARPG
                     inputFieldMessage2.text = _guildMessage2;
             }
 
-            if (toggleAutoAcceptRequests != null)
-                toggleAutoAcceptRequests.isOn = Guild != null && Guild.autoAcceptRequests;
+            if (Guild == null)
+            {
+                if (toggleAutoAcceptRequests != null)
+                    toggleAutoAcceptRequests.SetIsOnWithoutNotify(false);
 
-            if (toggleNotAutoAcceptRequests != null)
-                toggleNotAutoAcceptRequests.isOn = Guild == null || !Guild.autoAcceptRequests;
+                if (toggleNotAutoAcceptRequests != null)
+                    toggleNotAutoAcceptRequests.SetIsOnWithoutNotify(true);
+            }
+
+            if (Guild != null && Guild.autoAcceptRequests != _isAutoAcceptRequests)
+            {
+                _isAutoAcceptRequests = Guild.autoAcceptRequests;
+
+                if (toggleAutoAcceptRequests != null)
+                    toggleAutoAcceptRequests.SetIsOnWithoutNotify(_isAutoAcceptRequests);
+
+                if (toggleNotAutoAcceptRequests != null)
+                    toggleNotAutoAcceptRequests.SetIsOnWithoutNotify(!_isAutoAcceptRequests);
+            }
 
             if (textScore != null)
             {
                 textScore.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyScore), 
+                    LanguageManager.GetText(formatKeyScore),
                     Guild == null ? "0" : Guild.score.ToString("N0"));
             }
 
@@ -420,49 +443,56 @@ namespace MultiplayerARPG
             SocialCharacterData[] members;
             byte[] memberRoles;
             guild.GetSortedMembers(out members, out memberRoles);
-            MemberList.Generate(members, (index, data, ui) =>
+            if (uiMemberPrefab != null)
             {
-                UIGuildCharacter uiGuildMember = ui.GetComponent<UIGuildCharacter>();
-                uiGuildMember.uiSocialGroup = this;
-                uiGuildMember.Setup(data, memberRoles[index], guild.GetRole(memberRoles[index]));
-                uiGuildMember.Show();
-                MemberSelectionManager.Add(uiGuildMember);
-                if (selectedId.Equals(data.id))
-                    uiGuildMember.SelectByManager();
-            });
+                MemberList.Generate(members, (index, data, ui) =>
+                {
+                    UIGuildCharacter uiGuildMember = ui.GetComponent<UIGuildCharacter>();
+                    uiGuildMember.uiSocialGroup = this;
+                    uiGuildMember.Setup(data, memberRoles[index], guild.GetRole(memberRoles[index]));
+                    uiGuildMember.Show();
+                    MemberSelectionManager.Add(uiGuildMember);
+                    if (selectedId.Equals(data.id))
+                        uiGuildMember.SelectByManager();
+                });
+            }
 
             // Roles
             int selectedIdx = RoleSelectionManager.SelectedUI != null ? RoleSelectionManager.IndexOf(RoleSelectionManager.SelectedUI) : -1;
             RoleSelectionManager.DeselectSelectedUI();
             RoleSelectionManager.Clear();
-
-            RoleList.Generate(guild.GetRoles(), (index, guildRole, ui) =>
+            if (uiRolePrefab != null)
             {
-                UIGuildRole uiGuildRole = ui.GetComponent<UIGuildRole>();
-                uiGuildRole.Data = guildRole;
-                uiGuildRole.Show();
-                RoleSelectionManager.Add(uiGuildRole);
-                if (selectedIdx == index)
-                    uiGuildRole.SelectByManager();
-            });
+                RoleList.Generate(guild.GetRoles(), (index, guildRole, ui) =>
+                {
+                    UIGuildRole uiGuildRole = ui.GetComponent<UIGuildRole>();
+                    uiGuildRole.Data = guildRole;
+                    uiGuildRole.Show();
+                    RoleSelectionManager.Add(uiGuildRole);
+                    if (selectedIdx == index)
+                        uiGuildRole.SelectByManager();
+                });
+            }
 
             // Skills
             int selectedDataId = SkillSelectionManager.SelectedUI != null ? SkillSelectionManager.SelectedUI.Data.guildSkill.DataId : 0;
             SkillSelectionManager.DeselectSelectedUI();
             SkillSelectionManager.Clear();
-
-            SkillList.Generate(GameInstance.GuildSkills.Values, (index, guildSkill, ui) =>
+            if (uiSkillPrefab != null)
             {
-                UIGuildSkill uiGuildSkill = ui.GetComponent<UIGuildSkill>();
-                uiGuildSkill.Data = new UIGuildSkillData(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
-                uiGuildSkill.Show();
-                UIGuildSkillDragHandler dragHandler = uiGuildSkill.GetComponentInChildren<UIGuildSkillDragHandler>();
-                if (dragHandler != null)
-                    dragHandler.SetupForSkills(uiGuildSkill);
-                SkillSelectionManager.Add(uiGuildSkill);
-                if (selectedDataId == guildSkill.DataId)
-                    uiGuildSkill.SelectByManager();
-            });
+                SkillList.Generate(GameInstance.GuildSkills.Values, (index, guildSkill, ui) =>
+                {
+                    UIGuildSkill uiGuildSkill = ui.GetComponent<UIGuildSkill>();
+                    uiGuildSkill.Data = new UIGuildSkillData(guildSkill, guild.GetSkillLevel(guildSkill.DataId));
+                    uiGuildSkill.Show();
+                    UIGuildSkillDragHandler dragHandler = uiGuildSkill.GetComponentInChildren<UIGuildSkillDragHandler>();
+                    if (dragHandler != null)
+                        dragHandler.SetupForSkills(uiGuildSkill);
+                    SkillSelectionManager.Add(uiGuildSkill);
+                    if (selectedDataId == guildSkill.DataId)
+                        uiGuildSkill.SelectByManager();
+                });
+            }
         }
 
         public bool IsRoleAvailable(byte guildRole)

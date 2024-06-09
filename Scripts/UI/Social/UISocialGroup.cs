@@ -31,15 +31,17 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Current Amount}, {1} = {Max Amount}")]
         public UILocaleKeySetting formatKeyOnlineMemberAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SOCIAL_MEMBER_AMOUNT);
 
-        [Header("UI Elements")]
+        [Header("UI Elements - Group Information")]
+        public TextWrapper textSocialId;
+        public TextWrapper textMemberAmount;
+        public TextWrapper textOnlineMemberAmount;
+        [Header("UI Elements - Group Members")]
         [FormerlySerializedAs("listEmptyObject")]
         public GameObject memberListEmptyObject;
         public T uiMemberDialog;
         public T uiMemberPrefab;
         public Transform uiMemberContainer;
-        public TextWrapper textSocialId;
-        public TextWrapper textMemberAmount;
-        public TextWrapper textOnlineMemberAmount;
+        [Header("UI Elements - Signs")]
         [Tooltip("These objects will be activated when owning character is in social group")]
         public GameObject[] owningCharacterIsInGroupObjects;
         [Tooltip("These objects will be activated when owning character is not in social group")]
@@ -148,7 +150,7 @@ namespace MultiplayerARPG
                 UpdateUIs();
 
                 // Refresh guild info
-                if (currentSocialId <= 0)
+                if (currentSocialId <= 0 && uiMemberPrefab != null)
                     MemberList.HideAll();
             }
 
