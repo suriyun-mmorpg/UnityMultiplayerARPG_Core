@@ -15,12 +15,12 @@
             Guild = null;
         }
 
-        public ValidateGuildRequestResult(bool isSuccess, UITextKeys gameMessageType, int partyId, GuildData party)
+        public ValidateGuildRequestResult(bool isSuccess, UITextKeys gameMessageType, int guildId, GuildData guild)
         {
             IsSuccess = isSuccess;
             GameMessage = gameMessageType;
-            GuildId = partyId;
-            Guild = party;
+            GuildId = guildId;
+            Guild = guild;
         }
     }
 }
