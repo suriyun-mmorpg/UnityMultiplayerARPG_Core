@@ -36,6 +36,11 @@ namespace MultiplayerARPG
             return localeKey.ToString();
         }
 
+        public string GetText()
+        {
+            return LanguageManager.GetText(this);
+        }
+
         public static implicit operator string(UILocaleKeySetting keySetting)
         {
             return keySetting.ToString();
