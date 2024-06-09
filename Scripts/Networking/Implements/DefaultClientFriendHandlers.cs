@@ -12,15 +12,16 @@ namespace MultiplayerARPG
             Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
         }
 
-        public bool RequestGetFriends(ResponseDelegate<ResponseGetFriendsMessage> callback)
-        {
-            return Manager.ClientSendRequest(GameNetworkingConsts.GetFriends, EmptyMessage.Value, responseDelegate: callback);
-        }
-
         public bool RequestFindCharacters(RequestFindCharactersMessage data, ResponseDelegate<ResponseSocialCharacterListMessage> callback)
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.FindCharacters, data, responseDelegate: callback);
         }
+
+        public bool RequestGetFriends(RequestGetFriendsMessage data, ResponseDelegate<ResponseGetFriendsMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.GetFriends, data, responseDelegate: callback);
+        }
+
         public bool RequestAddFriend(RequestAddFriendMessage data, ResponseDelegate<ResponseAddFriendMessage> callback)
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.AddFriend, data, responseDelegate: callback);
@@ -46,9 +47,9 @@ namespace MultiplayerARPG
             return Manager.ClientSendRequest(GameNetworkingConsts.DeclineFriendRequest, data, responseDelegate: callback);
         }
 
-        public bool RequestGetFriendRequests(ResponseDelegate<ResponseGetFriendRequestsMessage> callback)
+        public bool RequestGetFriendRequests(RequestGetFriendRequestsMessage data, ResponseDelegate<ResponseGetFriendRequestsMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.GetFriendRequests, EmptyMessage.Value, responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.GetFriendRequests, data, responseDelegate: callback);
         }
 
         public bool RequestFriendRequestNotification(ResponseDelegate<ResponseFriendRequestNotificationMessage> callback)

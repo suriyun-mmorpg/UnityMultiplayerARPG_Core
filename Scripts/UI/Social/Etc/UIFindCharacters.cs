@@ -1,15 +1,18 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
     public class UIFindCharacters : UISocialGroup<UISocialCharacter>
     {
         public InputFieldWrapper inputCharacterName;
+        public Button buttonFind;
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            buttonFind = null;
             inputCharacterName = null;
         }
 
@@ -20,6 +23,11 @@ namespace MultiplayerARPG
             onFriendRequested.AddListener(OnClickFindCharacters);
             onFriendAdded.RemoveListener(OnClickFindCharacters);
             onFriendAdded.AddListener(OnClickFindCharacters);
+            if (buttonFind)
+            {
+                buttonFind.onClick.RemoveListener(OnClickFindCharacters);
+                buttonFind.onClick.AddListener(OnClickFindCharacters);
+            }
             if (inputCharacterName)
                 inputCharacterName.text = string.Empty;
             OnClickFindCharacters();
@@ -94,14 +102,16 @@ namespace MultiplayerARPG
             GameInstance.ClientFriendHandlers.RequestFindCharacters(new RequestFindCharactersMessage()
             {
                 characterName = characterName,
+                skip = 0,
+                limit = 50,
             }, FindCharactersCallback);
         }
 
         private void FindCharactersCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseSocialCharacterListMessage response)
         {
             ClientFriendActions.ResponseFindCharacters(responseHandler, responseCode, response);
-            if (responseCode == AckResponseCode.Success)
-                UpdateFoundCharactersUIs(response.characters);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            UpdateFoundCharactersUIs(response.characters);
         }
     }
 }

@@ -98,9 +98,9 @@ namespace MultiplayerARPG
             return Manager.ClientSendRequest(GameNetworkingConsts.DeclineGuildRequest, data, responseDelegate: callback);
         }
 
-        public bool RequestGetGuildRequests(ResponseDelegate<ResponseGetGuildRequestsMessage> callback)
+        public bool RequestGetGuildRequests(RequestGetGuildRequestsMessage data, ResponseDelegate<ResponseGetGuildRequestsMessage> callback)
         {
-            return Manager.ClientSendRequest(GameNetworkingConsts.GetGuildRequests, EmptyMessage.Value, responseDelegate: callback);
+            return Manager.ClientSendRequest(GameNetworkingConsts.GetGuildRequests, data, responseDelegate: callback);
         }
 
         public bool RequestFindGuilds(RequestFindGuildsMessage data, ResponseDelegate<ResponseFindGuildsMessage> callback)

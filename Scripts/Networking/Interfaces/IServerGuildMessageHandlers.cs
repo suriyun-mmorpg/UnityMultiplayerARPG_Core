@@ -74,7 +74,7 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseDeclineGuildRequestMessage> result);
 
         UniTaskVoid HandleRequestGetGuildRequests(
-            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestHandlerData requestHandler, RequestGetGuildRequestsMessage request,
             RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result);
 
         UniTaskVoid HandleRequestFindGuilds(

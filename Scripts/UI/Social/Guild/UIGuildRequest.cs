@@ -17,7 +17,11 @@ namespace MultiplayerARPG
 
         public void Refresh()
         {
-            GameInstance.ClientGuildHandlers.RequestGetGuildRequests(GetGuildRequestsCallback);
+            GameInstance.ClientGuildHandlers.RequestGetGuildRequests(new RequestGetGuildRequestsMessage()
+            {
+                skip = 0,
+                limit = 50,
+            }, GetGuildRequestsCallback);
             // Update notification count
             UIGuildRequestNotification[] notifications = FindObjectsOfType<UIGuildRequestNotification>();
             for (int i = 0; i < notifications.Length; ++i)

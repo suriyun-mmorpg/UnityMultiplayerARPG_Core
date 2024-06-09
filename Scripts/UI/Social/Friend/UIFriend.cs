@@ -1,21 +1,45 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Linq;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
     public class UIFriend : UISocialGroup<UISocialCharacter>
     {
+        // TODO: should send character name to find at server
+        public InputFieldWrapper inputCharacterName;
+        public Button buttonRefresh;
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            buttonRefresh = null;
+            inputCharacterName = null;
+        }
+
         protected override void OnEnable()
         {
             base.OnEnable();
             onFriendRemoved.RemoveListener(Refresh);
             onFriendRemoved.AddListener(Refresh);
+            if (buttonRefresh)
+            {
+                buttonRefresh.onClick.RemoveListener(Refresh);
+                buttonRefresh.onClick.AddListener(Refresh);
+            }
+            if (inputCharacterName)
+                inputCharacterName.text = string.Empty;
             Refresh();
         }
 
         public void Refresh()
         {
-            GameInstance.ClientFriendHandlers.RequestGetFriends(GetFriendsCallback);
+            GameInstance.ClientFriendHandlers.RequestGetFriends(new RequestGetFriendsMessage()
+            {
+                skip = 0,
+                limit = 50,
+            }, GetFriendsCallback);
         }
 
         private void GetFriendsCallback(ResponseHandlerData responseHandler, AckResponseCode responseCode, ResponseGetFriendsMessage response)
@@ -23,6 +47,13 @@ namespace MultiplayerARPG
             ClientFriendActions.ResponseGetFriends(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             UpdateFriendsUIs(response.friends);
+        }
+
+        private bool Fillter(SocialCharacterData data)
+        {
+            string filterText = inputCharacterName.text;
+            return (!string.IsNullOrWhiteSpace(data.characterName) && data.characterName.ToLower().Contains(filterText.ToLower())) ||
+                (!string.IsNullOrWhiteSpace(data.id) && data.id.ToLower().Contains(filterText.ToLower()));
         }
 
         private void UpdateFriendsUIs(List<SocialCharacterData> friends)

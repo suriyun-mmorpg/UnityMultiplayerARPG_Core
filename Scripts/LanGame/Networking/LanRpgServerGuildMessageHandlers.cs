@@ -461,7 +461,7 @@ namespace MultiplayerARPG
             return default;
         }
 
-        public UniTaskVoid HandleRequestGetGuildRequests(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result)
+        public UniTaskVoid HandleRequestGetGuildRequests(RequestHandlerData requestHandler, RequestGetGuildRequestsMessage request, RequestProceedResultDelegate<ResponseGetGuildRequestsMessage> result)
         {
             result.Invoke(AckResponseCode.Unimplemented, new ResponseGetGuildRequestsMessage());
             return default;

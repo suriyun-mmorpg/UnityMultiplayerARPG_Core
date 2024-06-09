@@ -13,7 +13,7 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseSocialCharacterListMessage> result);
 
         UniTaskVoid HandleRequestGetFriends(
-            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestHandlerData requestHandler, RequestGetFriendsMessage request,
             RequestProceedResultDelegate<ResponseGetFriendsMessage> result);
 
         UniTaskVoid HandleRequestAddFriend(
@@ -37,7 +37,7 @@ namespace MultiplayerARPG
             RequestProceedResultDelegate<ResponseDeclineFriendRequestMessage> result);
 
         UniTaskVoid HandleRequestGetFriendRequests(
-            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestHandlerData requestHandler, RequestGetFriendRequestsMessage request,
             RequestProceedResultDelegate<ResponseGetFriendRequestsMessage> result);
 
         UniTaskVoid HandleRequestFriendRequestNotification(
