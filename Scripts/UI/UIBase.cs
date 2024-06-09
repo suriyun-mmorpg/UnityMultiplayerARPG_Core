@@ -18,6 +18,7 @@ public class UIBase : MonoBehaviour
     public UIBaseEvent onHideWithObject = new UIBaseEvent();
     public System.Action<UIBase> overrideShow;
     public System.Action<UIBase> overrideHide;
+    public System.Func<UIBase, bool> overrideIsVisible;
 
     private bool _isAwaken;
 
@@ -75,6 +76,8 @@ public class UIBase : MonoBehaviour
 
     public virtual bool IsVisible()
     {
+        if (overrideIsVisible != null)
+            return overrideIsVisible.Invoke(this);
         return CacheRoot.activeSelf;
     }
 
