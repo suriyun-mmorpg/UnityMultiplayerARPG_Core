@@ -152,7 +152,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [Tooltip("You can set ammo items into this list to use it as weapon instead of the one which setup on weapon type's require ammo type\r\nThis setting is useful for shooter games which can have the same type of weapon (eg. machine-gun for 20 guns) but can be reloaded by differences ammo items")]
-        private BaseItem[] ammoItems;
+        private BaseItem[] ammoItems = new BaseItem[0];
         public BaseItem[] AmmoItems
         {
             get { return ammoItems; }

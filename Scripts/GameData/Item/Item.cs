@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         public MovementRestriction movementRestrictionWhileAttacking = default;
         public ActionRestriction attackRestriction = default;
         public ActionRestriction reloadRestriction = default;
-        public BaseItem[] ammoItems;
+        public BaseItem[] ammoItems = new BaseItem[0];
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
         public int ammoCapacity;
         public BaseWeaponAbility weaponAbility;
