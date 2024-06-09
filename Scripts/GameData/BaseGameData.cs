@@ -29,10 +29,12 @@ namespace MultiplayerARPG
         public string DefaultTitle
         {
             get { return defaultTitle; }
+            set { defaultTitle = value; }
         }
         public LanguageData[] LanguageSpecificTitles
         {
             get { return languageSpecificTitles; }
+            set { languageSpecificTitles = value; }
         }
         [JsonIgnore]
         public virtual string Title
@@ -50,10 +52,12 @@ namespace MultiplayerARPG
         public string DefaultDescription
         {
             get { return defaultDescription; }
+            set { defaultDescription = value; }
         }
         public LanguageData[] LanguageSpecificDescriptions
         {
             get { return languageSpecificDescriptions; }
+            set { languageSpecificDescriptions = value; }
         }
         [JsonIgnore]
         public virtual string Description
@@ -66,6 +70,7 @@ namespace MultiplayerARPG
         public string Category
         {
             get { return category; }
+            set { category = value; }
         }
 
         [SerializeField]
@@ -74,6 +79,7 @@ namespace MultiplayerARPG
         public Sprite Icon
         {
             get { return icon; }
+            set { icon = value; }
         }
 
 
