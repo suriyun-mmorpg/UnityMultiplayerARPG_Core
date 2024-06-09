@@ -2,6 +2,10 @@
 using UnityEngine;
 using UnityEngine.Serialization;
 
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
+
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.WEAPON_ITEM_FILE, menuName = GameDataMenuConsts.WEAPON_ITEM_MENU, order = GameDataMenuConsts.WEAPON_ITEM_ORDER)]
@@ -57,6 +61,10 @@ namespace MultiplayerARPG
             }
             set { weaponType = value; }
         }
+#if UNITY_EDITOR
+        [InspectorButton("CreateWeaponType")]
+        public bool createWeaponType;
+#endif
 
         [SerializeField]
         [Tooltip("This value will being used by character model's animator to set its `WeaponType` value")]
@@ -296,7 +304,7 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [FormerlySerializedAs("fireSpread")]
-        [Tooltip("Amount of bullets that will be launched when fire onnce, will be used for shotgun items")]
+        [Tooltip("Amount of bullets that will be launched when fire once, will be used for shotgun items")]
         private byte fireSpreadAmount = 0;
         public byte FireSpreadAmount
         {
@@ -396,5 +404,32 @@ namespace MultiplayerARPG
             // Data migration
             GameInstance.MigrateEquipmentEntities(OffHandEquipmentModels);
         }
+
+#if UNITY_EDITOR
+        public void CreateWeaponType()
+        {
+            string path = AssetDatabase.GetAssetPath(this);
+            List<string> splitedPaths = new List<string>(path.Split('/'));
+            splitedPaths.RemoveAt(splitedPaths.Count - 1);
+            path = string.Join('/', splitedPaths);
+            string fileName = $"{name}_TYPE";
+            path = EditorUtility.SaveFilePanel("Save data to ...", path, fileName, "asset");
+
+            WeaponType weaponType = CreateInstance<WeaponType>();
+            weaponType.DefaultTitle = DefaultTitle;
+            weaponType.LanguageSpecificTitles = LanguageSpecificTitles;
+            weaponType.DefaultDescription = DefaultDescription;
+            weaponType.LanguageSpecificDescriptions = LanguageSpecificDescriptions;
+            weaponType.Category = Category;
+            weaponType.Icon = Icon;
+
+            path = path.Substring(path.IndexOf("Assets"));
+            AssetDatabase.DeleteAsset(path);
+            AssetDatabase.CreateAsset(weaponType, path);
+
+            this.weaponType = weaponType;
+            EditorUtility.SetDirty(this);
+        }
+#endif
     }
 }
