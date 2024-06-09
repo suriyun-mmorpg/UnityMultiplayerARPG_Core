@@ -12,6 +12,7 @@ public enum UISelectionMode
 public abstract class UISelectionManager : MonoBehaviour
 {
     public UISelectionMode selectionMode;
+    public bool interactable = true;
     public abstract object GetSelectedUI();
     public abstract void Select(int index);
     public abstract void Deselect(int index);
@@ -106,6 +107,9 @@ public abstract class UISelectionManager<TData, TUI> : UISelectionManager
 
     public override sealed void Select(object ui)
     {
+        if (!interactable)
+            return;
+
         if (ui == null)
             return;
 
@@ -143,6 +147,9 @@ public abstract class UISelectionManager<TData, TUI> : UISelectionManager
 
     public override sealed void Deselect(object ui)
     {
+        if (!interactable)
+            return;
+
         if (ui == null)
             return;
 
@@ -177,6 +184,9 @@ public abstract class UISelectionManager<TData, TUI> : UISelectionManager
 
     public override sealed void DeselectAll()
     {
+        if (!interactable)
+            return;
+
         SelectedUI = null;
         foreach (TUI deselectUI in uis)
         {
@@ -186,6 +196,9 @@ public abstract class UISelectionManager<TData, TUI> : UISelectionManager
 
     public override sealed void DeselectSelectedUI()
     {
+        if (!interactable)
+            return;
+
         if (SelectedUI != null)
             Deselect(SelectedUI);
     }
@@ -270,6 +283,9 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
 
     public override sealed void Select(object ui)
     {
+        if (!interactable)
+            return;
+
         if (ui == null)
             return;
 
@@ -307,6 +323,9 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
 
     public override sealed void Deselect(object ui)
     {
+        if (!interactable)
+            return;
+
         if (ui == null)
             return;
 
@@ -341,6 +360,9 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
 
     public override sealed void DeselectAll()
     {
+        if (!interactable)
+            return;
+
         SelectedUI = null;
         foreach (TUI deselectUI in uis)
         {
@@ -350,6 +372,9 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
 
     public override sealed void DeselectSelectedUI()
     {
+        if (!interactable)
+            return;
+
         if (SelectedUI != null)
             Deselect(SelectedUI);
     }
