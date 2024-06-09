@@ -222,7 +222,7 @@ namespace MultiplayerARPG
             Dictionary<int, int> decreasingItemIndexes = new Dictionary<int, int>();
             int tempDecresingAmount;
             CharacterItem tempItem;
-            for (int i = itemList.Count - 1; i >= 0; --i)
+            for (int i = 0; i < itemList.Count; ++i)
             {
                 tempItem = itemList[i];
                 if (tempItem.dataId == dataId)
