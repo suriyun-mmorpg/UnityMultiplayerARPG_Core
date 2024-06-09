@@ -179,10 +179,6 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedFrame(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetFrameMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            _selectedDataId = response.dataId;
-            UserHandleData userHandle = GameInstance.UserHandle;
-            userHandle.frameDataId = _selectedDataId;
-            GameInstance.UserHandle = userHandle;
             UpdateSelectedFrames();
         }
     }

@@ -179,10 +179,6 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedIcon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetIconMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            _selectedDataId = response.dataId;
-            UserHandleData userHandle = GameInstance.UserHandle;
-            userHandle.iconDataId = _selectedDataId;
-            GameInstance.UserHandle = userHandle;
             UpdateSelectedIcons();
         }
     }
