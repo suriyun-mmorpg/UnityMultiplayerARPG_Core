@@ -149,15 +149,8 @@ namespace MultiplayerARPG
                     if (characterModel != null)
                     {
                         _characterModelById[characterData.Id] = characterModel;
-                        PlayerCharacterBodyPartComponent[] comps = characterModel.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
-                        for (int i = 0; i < comps.Length; ++i)
-                        {
-                            comps[i].SetupCharacterModelEvents(characterModel);
-                            comps[i].ApplyModelAndColorBySavedData(characterData.PublicInts);
-                        }
-                        characterModel.UpdateEquipmentImmediately = true;
-                        characterModel.SetEquipItems(characterData.EquipItems, characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
-                        characterModel.UpdateEquipmentImmediately = false;
+                        characterModel.SetupModelBodyParts(characterData);
+                        characterModel.SetEquipItemsImmediately(characterData.EquipItems, characterData.SelectableWeaponSets, characterData.EquipWeaponSet, false);
                         characterModel.gameObject.SetActive(false);
                         CharacterSelectionManager.Add(uiCharacter);
                     }

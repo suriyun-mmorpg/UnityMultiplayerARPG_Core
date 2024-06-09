@@ -524,9 +524,7 @@ namespace MultiplayerARPG
                     equipWeapons
                 };
                 // Set model equip items
-                SelectedModel.UpdateEquipmentImmediately = true;
-                SelectedModel.SetEquipItems(equipItems, selectableWeaponSets, 0, false);
-                SelectedModel.UpdateEquipmentImmediately = false;
+                SelectedModel.SetEquipItemsImmediately(equipItems, selectableWeaponSets, 0, false);
             }
             // Run event
             eventOnSelectCharacterClass.Invoke(_selectedPlayerCharacter);
