@@ -62,7 +62,7 @@ namespace MultiplayerARPG
             set { weaponType = value; }
         }
 #if UNITY_EDITOR
-        [InspectorButton("CreateWeaponType")]
+        [InspectorButton(nameof(CreateWeaponType))]
         public bool createWeaponType;
 #endif
 
