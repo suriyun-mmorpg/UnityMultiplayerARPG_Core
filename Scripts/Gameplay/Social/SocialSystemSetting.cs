@@ -58,6 +58,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private int createGuildRequiredGold = 1000;
         [SerializeField]
+        private int createGuildRequiredCash = 0;
+        [SerializeField]
         [Tooltip("Exp tree for guild, this may be deprecated in the future, you should setup `Exp Table` instead.")]
         private int[] guildExpTree;
         [SerializeField]
@@ -97,7 +99,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public int CreateGuildRequiredGold { get { return createGuildRequiredGold; } }
+        public int CreateGuildRequiredGold => createGuildRequiredGold;
+
+        public int CreateGuildRequiredCash => createGuildRequiredCash;
 
         public ExpTable GuildExpTable
         {

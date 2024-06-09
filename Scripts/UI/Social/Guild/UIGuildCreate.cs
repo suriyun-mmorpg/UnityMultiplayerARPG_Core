@@ -15,6 +15,12 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyRequireGoldNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_GOLD_NOT_ENOUGH);
         [Tooltip("Format => {0} = {Target Amount}")]
         public UILocaleKeySetting formatKeySimpleRequireGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+        [Tooltip("Format => {0} = {Current Cash Amount}, {1} = {Target Amount}")]
+        public UILocaleKeySetting formatKeyRequireCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_CASH);
+        [Tooltip("Format => {0} = {Current Cash Amount}, {1} = {Target Amount}")]
+        public UILocaleKeySetting formatKeyRequireCashNotEnough = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_CASH_NOT_ENOUGH);
+        [Tooltip("Format => {0} = {Target Amount}")]
+        public UILocaleKeySetting formatKeySimpleRequireCash = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public InputFieldWrapper inputFieldGuildName;
@@ -24,6 +30,9 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("textRequireGold")]
         public TextWrapper uiTextRequireGold;
         public TextWrapper uiTextSimpleRequireGold;
+        [FormerlySerializedAs("textRequireCash")]
+        public TextWrapper uiTextRequireCash;
+        public TextWrapper uiTextSimpleRequireCash;
         public UnityEvent onGuildCreate = new UnityEvent();
 
         protected override void OnDestroy()
@@ -34,6 +43,8 @@ namespace MultiplayerARPG
             uiRequireCurrencyAmounts = null;
             uiTextRequireGold = null;
             uiTextSimpleRequireGold = null;
+            uiTextRequireCash = null;
+            uiTextSimpleRequireCash = null;
             onGuildCreate?.RemoveAllListeners();
             onGuildCreate = null;
         }
@@ -55,6 +66,20 @@ namespace MultiplayerARPG
 
             if (uiTextSimpleRequireGold != null)
                 uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), systemSetting.CreateGuildRequiredGold.ToString("N0"));
+
+            if (uiTextRequireCash != null)
+            {
+                int cash = owningCharacter.UserCash;
+                uiTextRequireCash.text = ZString.Format(
+                    cash >= systemSetting.CreateGuildRequiredCash ?
+                        LanguageManager.GetText(formatKeyRequireCash) :
+                        LanguageManager.GetText(formatKeyRequireCashNotEnough),
+                    cash.ToString("N0"),
+                    systemSetting.CreateGuildRequiredCash.ToString("N0"));
+            }
+
+            if (uiTextSimpleRequireCash != null)
+                uiTextSimpleRequireCash.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireCash), systemSetting.CreateGuildRequiredCash.ToString("N0"));
 
             if (uiRequireItemAmounts != null)
             {
