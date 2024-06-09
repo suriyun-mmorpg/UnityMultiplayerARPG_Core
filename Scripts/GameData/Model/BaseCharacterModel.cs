@@ -418,6 +418,13 @@ namespace MultiplayerARPG
             UpdateEquipmentModels();
         }
 
+        public void SetEquipItemsImmediately(IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
+        {
+            UpdateEquipmentImmediately = true;
+            SetEquipItems(equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
+            UpdateEquipmentImmediately = false;
+        }
+
         public void UpdateEquipmentModels()
         {
             // Prepared data
