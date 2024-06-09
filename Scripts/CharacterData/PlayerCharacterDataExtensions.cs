@@ -599,5 +599,15 @@ namespace MultiplayerARPG
         {
             return character.UnmuteTime > 0 && character.UnmuteTime > (BaseGameNetworkManager.Singleton.ServerTimestamp / 1000);
         }
+
+        public static void SetupModelBodyParts(this BaseCharacterModel characterModel, IPlayerCharacterData data)
+        {
+            PlayerCharacterBodyPartComponent[] comps = characterModel.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
+            for (int i = 0; i < comps.Length; ++i)
+            {
+                comps[i].SetupCharacterModelEvents(characterModel);
+                comps[i].ApplyModelAndColorBySavedData(data.PublicInts);
+            }
+        }
     }
 }
