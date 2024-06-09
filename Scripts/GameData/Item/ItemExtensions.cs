@@ -319,6 +319,14 @@ namespace MultiplayerARPG
                 return GameInstance.Singleton.DefaultWeaponType;
             return weaponItem.WeaponType;
         }
+
+        public static bool IsReloadable<T>(this T weaponItem)
+            where T : IWeaponItem
+        {
+            if (weaponItem == null || !weaponItem.IsWeapon())
+                return false;
+            return weaponItem.AmmoCapacity > 0;
+        }
         #endregion
 
         #region Socket Enhancer Extension

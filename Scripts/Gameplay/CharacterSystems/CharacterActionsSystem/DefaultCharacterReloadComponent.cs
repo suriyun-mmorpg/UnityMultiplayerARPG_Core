@@ -228,6 +228,8 @@ namespace MultiplayerARPG
             }
             if (weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
             {
+                // If ammo that stored in the weapon is difference
+                // Then it will return ammo in the weapon, and replace amount with the new one
                 Entity.IncreaseItems(CharacterItem.Create(reloadingAmmoDataId, 1, weapon.ammo));
                 weapon.ammo = 0;
             }
@@ -299,19 +301,9 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // Check that it should reload or not, if it is full, then it should not
-            int prevAmmoCapacity = reloadingWeaponItem.AmmoCapacity;
-            if (reloadingWeaponItem.DataId != 0 &&
-                GameInstance.Items.TryGetValue(reloadingWeaponItem.DataId, out BaseItem prevAmmoItem) &&
-                prevAmmoItem.OverrideAmmoCapacity > 0)
+            if (reloadingWeapon.IsAmmoFull())
             {
-                // Previous reloaded ammo is override ammo capacity
-                prevAmmoCapacity = prevAmmoItem.OverrideAmmoCapacity;
-            }
-
-            if (reloadingWeapon.ammo >= prevAmmoCapacity)
-            {
-                // Ammo is full, cannot be reloaded
+                // Full, don't reload
                 return;
             }
 
@@ -351,8 +343,6 @@ namespace MultiplayerARPG
             {
                 // If ammo that stored in the weapon is difference
                 // Then it will return ammo in the weapon, and replace amount with the new one
-                Entity.IncreaseItems(CharacterItem.Create(reloadingWeapon.ammoDataId, 1, reloadingWeapon.ammo));
-                Entity.FillEmptySlots();
                 reloadingAmmoAmount = ammoCapacity;
             }
             else

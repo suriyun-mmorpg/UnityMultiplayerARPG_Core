@@ -17,8 +17,7 @@ namespace MultiplayerARPG
 
         private bool IsReloadable(CharacterItem characterItem)
         {
-            IWeaponItem weaponItem = characterItem.GetWeaponItem();
-            return weaponItem != null && weaponItem.WeaponType.AmmoType != null;
+            return characterItem.GetWeaponItem().IsReloadable();
         }
     }
 }

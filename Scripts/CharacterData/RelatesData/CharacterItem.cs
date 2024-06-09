@@ -110,25 +110,50 @@ namespace MultiplayerARPG
         public bool IsAmmoEmpty()
         {
             IWeaponItem item = GetWeaponItem();
-            if (item != null && item.AmmoCapacity > 0)
-                return ammo == 0;
-            return false;
+            if (item == null || item.AmmoCapacity <= 0)
+                return false;
+            return ammo <= 0;
         }
 
         public bool IsAmmoFull()
         {
             IWeaponItem item = GetWeaponItem();
-            if (item != null && item.AmmoCapacity > 0)
-                return ammo >= item.AmmoCapacity;
-            return true;
+            if (item == null || item.AmmoCapacity <= 0)
+                return true;
+            return ammo >= GetAmmoCapacity();
         }
 
         public bool HasAmmoToReload(ICharacterData character)
         {
             IWeaponItem item = GetWeaponItem();
-            if (item != null)
+            if (item == null)
+                return false;
+            if (item.AmmoItems != null && item.AmmoItems.Length > 0)
+            {
+                for (int indexOfAmmoItem = 0; indexOfAmmoItem < item.AmmoItems.Length; ++indexOfAmmoItem)
+                {
+                    int tempAmmoDataId = item.AmmoItems[indexOfAmmoItem].DataId;
+                    if (character.CountNonEquipItems(tempAmmoDataId) > 0)
+                        return true;
+                }
+            }
+            if (item.WeaponType.AmmoType != null)
                 return character.CountAllAmmos(item.WeaponType.AmmoType) > 0;
             return false;
+        }
+
+        public int GetAmmoCapacity()
+        {
+            IWeaponItem item = GetWeaponItem();
+            if (item == null)
+                return 0;
+            if (ammoDataId != 0 &&
+                GameInstance.Items.TryGetValue(ammoDataId, out BaseItem prevAmmoItem) &&
+                prevAmmoItem.OverrideAmmoCapacity > 0)
+            {
+                return prevAmmoItem.OverrideAmmoCapacity;
+            }
+            return item.AmmoCapacity;
         }
 
         public void Lock(float duration)
@@ -223,6 +248,7 @@ namespace MultiplayerARPG
             newItem.exp = 0;
             newItem.lockRemainsDuration = 0f;
             newItem.ammo = 0;
+            newItem.ammoDataId = 0;
             newItem.sockets = new List<int>();
             if (GameInstance.Items.TryGetValue(dataId, out BaseItem tempItem))
             {
