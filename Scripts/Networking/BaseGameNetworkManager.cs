@@ -716,7 +716,7 @@ namespace MultiplayerARPG
             float progress = 0f;
             string sceneName = SceneManager.GetActiveScene().name;
             await UniTask.NextFrame();
-            onSpawnEntitiesStart.Invoke(sceneName, true, progress);
+            onSpawnEntitiesStart.Invoke(sceneName, false, true, progress);
             await PreSpawnEntities();
             RegisterEntities();
             await UniTask.NextFrame();
@@ -768,13 +768,13 @@ namespace MultiplayerARPG
                         }
                         await UniTask.NextFrame();
                         progress = 0f + ((float)i / (float)mapWarpPortals.Count * 0.25f);
-                        onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+                        onSpawnEntitiesProgress.Invoke(sceneName, false, true, progress);
                     }
                 }
             }
             await UniTask.NextFrame();
             progress = 0.25f;
-            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+            onSpawnEntitiesProgress.Invoke(sceneName, false, true, progress);
             // Spawn Npcs
             if (LogInfo)
                 Logging.Log(LogTag, "Spawning NPCs");
@@ -818,55 +818,27 @@ namespace MultiplayerARPG
                         }
                         await UniTask.NextFrame();
                         progress = 0.25f + ((float)i / (float)mapNpcs.Count * 0.25f);
-                        onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+                        onSpawnEntitiesProgress.Invoke(sceneName, false, true, progress);
                     }
                 }
             }
             await UniTask.NextFrame();
             progress = 0.5f;
-            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
-            // Spawn monsters
+            onSpawnEntitiesProgress.Invoke(sceneName, false, true, progress);
+            // Spawn entities
             if (LogInfo)
-                Logging.Log(LogTag, "Spawning monsters");
-            MonsterSpawnArea[] monsterSpawnAreas = FindObjectsOfType<MonsterSpawnArea>();
-            for (i = 0; i < monsterSpawnAreas.Length; ++i)
+                Logging.Log(LogTag, "Spawning entities");
+            List<GameSpawnArea> gameSpawnAreas = GenericUtils.GetComponentsFromAllLoadedScenes<GameSpawnArea>(false);
+            for (i = 0; i < gameSpawnAreas.Count; ++i)
             {
-                monsterSpawnAreas[i].SpawnAll();
+                gameSpawnAreas[i].SpawnAll();
                 await UniTask.NextFrame();
-                progress = 0.5f + ((float)i / (float)monsterSpawnAreas.Length * 0.25f);
-                onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
-            }
-            await UniTask.NextFrame();
-            progress = 0.75f;
-            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
-            // Spawn harvestables
-            if (LogInfo)
-                Logging.Log(LogTag, "Spawning harvestables");
-            HarvestableSpawnArea[] harvestableSpawnAreas = FindObjectsOfType<HarvestableSpawnArea>();
-            for (i = 0; i < harvestableSpawnAreas.Length; ++i)
-            {
-                harvestableSpawnAreas[i].SpawnAll();
-                await UniTask.NextFrame();
-                progress = 0.75f + ((float)i / (float)harvestableSpawnAreas.Length * 0.125f);
-                onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
-            }
-            await UniTask.NextFrame();
-            progress = 0.875f;
-            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
-            // Spawn item drop entities
-            if (LogInfo)
-                Logging.Log(LogTag, "Spawning item drop entities");
-            ItemDropSpawnArea[] itemDropSpawnAreas = FindObjectsOfType<ItemDropSpawnArea>();
-            for (i = 0; i < itemDropSpawnAreas.Length; ++i)
-            {
-                itemDropSpawnAreas[i].SpawnAll();
-                await UniTask.NextFrame();
-                progress = 0.875f + ((float)i / (float)itemDropSpawnAreas.Length * 0.125f);
-                onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+                progress = 0.5f + ((float)i / (float)gameSpawnAreas.Count * 0.5f);
+                onSpawnEntitiesProgress.Invoke(sceneName, false, true, progress);
             }
             await UniTask.NextFrame();
             progress = 1f;
-            onSpawnEntitiesProgress.Invoke(sceneName, true, progress);
+            onSpawnEntitiesProgress.Invoke(sceneName, false, true, progress);
             // If it's server (not host) spawn simple camera controller
             if (!IsClient && GameInstance.Singleton.serverCharacterPrefab != null &&
                 SystemInfo.graphicsDeviceType != GraphicsDeviceType.Null)
@@ -878,7 +850,7 @@ namespace MultiplayerARPG
             await UniTask.NextFrame();
             // Entities were spawned
             progress = 1f;
-            onSpawnEntitiesFinish.Invoke(sceneName, true, progress);
+            onSpawnEntitiesFinish.Invoke(sceneName, false, true, progress);
             await PostSpawnEntities();
             _isServerReadyToInstantiatePlayers = true;
         }
