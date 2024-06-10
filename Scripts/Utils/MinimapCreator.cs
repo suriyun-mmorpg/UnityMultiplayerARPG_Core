@@ -193,7 +193,7 @@ namespace MultiplayerARPG
             {
                 path = EditorUtility.SaveFilePanel("Save texture as", "Assets", "minimap", "png");
             }
-            Debug.Log("Saving character data to " + path);
+            Debug.Log("Saving mini-map data to " + path);
             AssetDatabase.DeleteAsset(path);
             var pngData = texture.EncodeToPNG();
             if (pngData != null)
