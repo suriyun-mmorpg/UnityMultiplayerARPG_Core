@@ -6,7 +6,12 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public abstract class GameSpawnArea<T> : GameArea where T : LiteNetLibBehaviour
+    public abstract class GameSpawnArea : GameArea
+    {
+        public abstract void SpawnAll();
+    }
+
+    public abstract class GameSpawnArea<T> : GameSpawnArea where T : LiteNetLibBehaviour
     {
         [System.Serializable]
         public class AddressablePrefab : AssetReferenceLiteNetLibBehaviour<T>
@@ -105,7 +110,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SpawnAll()
+        public override void SpawnAll()
         {
             for (int i = 0; i < amount; ++i)
             {
