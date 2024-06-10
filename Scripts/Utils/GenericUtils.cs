@@ -6,6 +6,7 @@ using TMPro;
 using UnityEngine.EventSystems;
 using Cysharp.Text;
 using System.Linq;
+using UnityEngine.SceneManagement;
 
 public static partial class GenericUtils
 {
@@ -194,6 +195,26 @@ public static partial class GenericUtils
         }
     }
 
+    public static List<T> GetComponentsFromAllLoadedScenes<T>(bool includeInactive)
+        where T : Component
+    {
+        List<T> result = new List<T>();
+        for (int i = 0; i < SceneManager.sceneCount; ++i)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            if (!scene.isLoaded)
+            {
+                continue;
+            }
+            GameObject[] rootGameObjects = scene.GetRootGameObjects();
+            for (int j = 0; j < rootGameObjects.Length; ++j)
+            {
+                result.AddRange(rootGameObjects[j].GetComponentsInChildren<T>(includeInactive));
+            }
+        }
+        return result;
+    }
+
     public static int GetNegativePositive()
     {
         return Random.value > 0.5f ? 1 : -1;
@@ -365,10 +386,10 @@ public static partial class GenericUtils
     public static bool IsError(this UnityWebRequest unityWebRequest)
     {
 #if UNITY_2020_2_OR_NEWER
-            UnityWebRequest.Result result = unityWebRequest.result;
-            return (result == UnityWebRequest.Result.ConnectionError)
-                || (result == UnityWebRequest.Result.DataProcessingError)
-                || (result == UnityWebRequest.Result.ProtocolError);
+        UnityWebRequest.Result result = unityWebRequest.result;
+        return (result == UnityWebRequest.Result.ConnectionError)
+            || (result == UnityWebRequest.Result.DataProcessingError)
+            || (result == UnityWebRequest.Result.ProtocolError);
 #else
         return unityWebRequest.isHttpError || unityWebRequest.isNetworkError;
 #endif
