@@ -29,7 +29,7 @@ namespace MultiplayerARPG
                 rootObject.SetActive(false);
         }
 
-        public virtual void OnLoadSceneStart(string sceneName, bool isOnline, float progress)
+        public virtual void OnLoadSceneStart(string sceneName, bool isAdditive, bool isOnline, float progress)
         {
             if (rootObject != null)
                 rootObject.SetActive(true);
@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                 sliderGage.value = 0;
         }
 
-        public virtual void OnLoadSceneProgress(string sceneName, bool isOnline, float progress)
+        public virtual void OnLoadSceneProgress(string sceneName, bool isAdditive, bool isOnline, float progress)
         {
             if (uiTextProgress != null)
                 uiTextProgress.text = (progress * 100f).ToString("N2") + "%";
@@ -51,7 +51,7 @@ namespace MultiplayerARPG
                 sliderGage.value = progress;
         }
 
-        public virtual void OnLoadSceneFinish(string sceneName, bool isOnline, float progress)
+        public virtual void OnLoadSceneFinish(string sceneName, bool isAdditive, bool isOnline, float progress)
         {
             StartCoroutine(OnLoadSceneFinishRoutine());
         }
