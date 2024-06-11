@@ -33,15 +33,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            BaseGameEntity sourceEntity;
-            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.sourceObjectId, out sourceEntity))
+            BaseGameEntity realSourceEntity;
+            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.sourceObjectId, out realSourceEntity))
             {
                 // Crafting source might be destroyed
                 source.QueueItems.RemoveAt(0);
                 return;
             }
 
-            if (!source.IsInCraftDistance(crafter.EntityTransform.position))
+            if (!(realSourceEntity is ICraftingQueueSource realSource) || !realSource.IsInCraftDistance(crafter.EntityTransform.position))
             {
                 // Crafter too far from crafting source
                 source.QueueItems.RemoveAt(0);
@@ -87,10 +87,15 @@ namespace MultiplayerARPG
 
         public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, BasePlayerCharacterEntity crafter, int dataId, int amount, out UITextKeys errorMessage)
         {
+            return source.AppendCraftingQueueItem(source, crafter, dataId, amount, out errorMessage);
+        }
+
+        public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, ICraftingQueueSource realSource, BasePlayerCharacterEntity crafter, int dataId, int amount, out UITextKeys errorMessage)
+        {
             if (source.ObjectId != crafter.ObjectId && !source.PublicQueue)
             {
                 // Not public, so it will be updated by player's source
-                return crafter.Crafting.AppendCraftingQueueItem(crafter, dataId, amount, out errorMessage);
+                return crafter.Crafting.AppendCraftingQueueItem(source, crafter, dataId, amount, out errorMessage);
             }
             errorMessage = UITextKeys.NONE;
             if (!source.CanCraft)
@@ -108,7 +113,7 @@ namespace MultiplayerARPG
                 dataId = dataId,
                 amount = amount,
                 craftRemainsDuration = itemCraftFormula.CraftDuration,
-                sourceObjectId = source.ObjectId,
+                sourceObjectId = realSource.ObjectId,
             });
             return true;
         }
