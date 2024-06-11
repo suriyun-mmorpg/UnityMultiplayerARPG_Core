@@ -9,58 +9,58 @@ namespace MultiplayerARPG
             return source.CraftingDistance <= 0f || Vector3.Distance(crafterPosition, source.transform.position) <= source.CraftingDistance;
         }
 
-        public static void UpdateQueue(this ICraftingQueueSource source)
+        public static void UpdateQueue(this ICraftingQueueSource craftingHandler)
         {
-            if (!source.CanCraft)
+            if (!craftingHandler.CanCraft)
             {
-                if (source.QueueItems.Count > 0)
-                    source.QueueItems.Clear();
+                if (craftingHandler.QueueItems.Count > 0)
+                    craftingHandler.QueueItems.Clear();
                 return;
             }
 
-            if (source.QueueItems.Count == 0)
+            if (craftingHandler.QueueItems.Count == 0)
             {
-                source.TimeCounter = 0f;
+                craftingHandler.TimeCounter = 0f;
                 return;
             }
 
-            CraftingQueueItem craftingItem = source.QueueItems[0];
+            CraftingQueueItem craftingItem = craftingHandler.QueueItems[0];
             ItemCraftFormula formula = GameInstance.ItemCraftFormulas[craftingItem.dataId];
             if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.crafterId, out BasePlayerCharacterEntity crafter))
             {
                 // Crafter may left the game
-                source.QueueItems.RemoveAt(0);
+                craftingHandler.QueueItems.RemoveAt(0);
                 return;
             }
 
-            BaseGameEntity realSourceEntity;
-            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.sourceObjectId, out realSourceEntity))
+            BaseGameEntity craftingSourceEntity;
+            if (!BaseGameNetworkManager.Singleton.TryGetEntityByObjectId(craftingItem.sourceObjectId, out craftingSourceEntity))
             {
                 // Crafting source might be destroyed
-                source.QueueItems.RemoveAt(0);
+                craftingHandler.QueueItems.RemoveAt(0);
                 return;
             }
 
-            if (!(realSourceEntity is ICraftingQueueSource realSource) || !realSource.IsInCraftDistance(crafter.EntityTransform.position))
+            if (!(craftingSourceEntity is ICraftingQueueSource craftingSourceEntityComponent) || !craftingSourceEntityComponent.IsInCraftDistance(crafter.EntityTransform.position))
             {
                 // Crafter too far from crafting source
-                source.QueueItems.RemoveAt(0);
+                craftingHandler.QueueItems.RemoveAt(0);
                 return;
             }
 
             if (!formula.ItemCraft.CanCraft(crafter, out UITextKeys errorMessage))
             {
-                source.TimeCounter = 0f;
-                source.QueueItems.RemoveAt(0);
+                craftingHandler.TimeCounter = 0f;
+                craftingHandler.QueueItems.RemoveAt(0);
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(crafter.ConnectionId, errorMessage);
                 return;
             }
 
-            source.TimeCounter += Time.unscaledDeltaTime;
-            if (source.TimeCounter >= 1f)
+            craftingHandler.TimeCounter += Time.unscaledDeltaTime;
+            if (craftingHandler.TimeCounter >= 1f)
             {
-                craftingItem.craftRemainsDuration -= source.TimeCounter;
-                source.TimeCounter = 0f;
+                craftingItem.craftRemainsDuration -= craftingHandler.TimeCounter;
+                craftingHandler.TimeCounter = 0f;
                 if (craftingItem.craftRemainsDuration <= 0f)
                 {
                     // Reduce items and add crafting item
@@ -70,50 +70,50 @@ namespace MultiplayerARPG
                     {
                         --craftingItem.amount;
                         craftingItem.craftRemainsDuration = formula.CraftDuration;
-                        source.QueueItems[0] = craftingItem;
+                        craftingHandler.QueueItems[0] = craftingItem;
                     }
                     else
                     {
-                        source.QueueItems.RemoveAt(0);
+                        craftingHandler.QueueItems.RemoveAt(0);
                     }
                 }
                 else
                 {
                     // Update remains duration
-                    source.QueueItems[0] = craftingItem;
+                    craftingHandler.QueueItems[0] = craftingItem;
                 }
             }
         }
 
-        public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, BasePlayerCharacterEntity crafter, int dataId, int amount, out UITextKeys errorMessage)
+        public static bool AppendCraftingQueueItem(this ICraftingQueueSource craftingHandler, BasePlayerCharacterEntity crafter, int dataId, int amount, out UITextKeys errorMessage)
         {
-            return source.AppendCraftingQueueItem(source, crafter, dataId, amount, out errorMessage);
+            return craftingHandler.AppendCraftingQueueItem(craftingHandler, crafter, dataId, amount, out errorMessage);
         }
 
-        public static bool AppendCraftingQueueItem(this ICraftingQueueSource source, ICraftingQueueSource realSource, BasePlayerCharacterEntity crafter, int dataId, int amount, out UITextKeys errorMessage)
+        public static bool AppendCraftingQueueItem(this ICraftingQueueSource craftingHandler, ICraftingQueueSource craftingSourceEntity, BasePlayerCharacterEntity crafter, int dataId, int amount, out UITextKeys errorMessage)
         {
-            if (source.ObjectId != crafter.ObjectId && !source.PublicQueue)
+            if (craftingHandler.ObjectId != crafter.ObjectId && !craftingHandler.PublicQueue)
             {
                 // Not public, so it will be updated by player's source
-                return crafter.Crafting.AppendCraftingQueueItem(source, crafter, dataId, amount, out errorMessage);
+                return crafter.Crafting.AppendCraftingQueueItem(craftingHandler, crafter, dataId, amount, out errorMessage);
             }
             errorMessage = UITextKeys.NONE;
-            if (!source.CanCraft)
+            if (!craftingHandler.CanCraft)
                 return false;
             ItemCraftFormula itemCraftFormula;
             if (!GameInstance.ItemCraftFormulas.TryGetValue(dataId, out itemCraftFormula))
                 return false;
             if (!itemCraftFormula.ItemCraft.CanCraft(crafter, out errorMessage))
                 return false;
-            if (source.QueueItems.Count >= source.MaxQueueSize)
+            if (craftingHandler.QueueItems.Count >= craftingHandler.MaxQueueSize)
                 return false;
-            source.QueueItems.Add(new CraftingQueueItem()
+            craftingHandler.QueueItems.Add(new CraftingQueueItem()
             {
                 crafterId = crafter.ObjectId,
                 dataId = dataId,
                 amount = amount,
                 craftRemainsDuration = itemCraftFormula.CraftDuration,
-                sourceObjectId = realSource.ObjectId,
+                sourceObjectId = craftingSourceEntity.ObjectId,
             });
             return true;
         }
