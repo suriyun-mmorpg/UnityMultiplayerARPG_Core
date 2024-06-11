@@ -230,7 +230,7 @@ namespace MultiplayerARPG
             {
                 // If ammo that stored in the weapon is difference
                 // Then it will return ammo in the weapon, and replace amount with the new one
-                Entity.IncreaseItems(CharacterItem.Create(reloadingAmmoDataId, 1, weapon.ammo));
+                Entity.IncreaseItems(CharacterItem.Create(weapon.ammoDataId, 1, weapon.ammo));
                 weapon.ammo = 0;
             }
             Entity.FillEmptySlots();
