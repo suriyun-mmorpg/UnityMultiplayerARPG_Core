@@ -113,13 +113,19 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static void ChangeCraftingQueueItem(this ICraftingQueueSource source, uint crafterId, int index, int amount)
+        public static void ChangeCraftingQueueItem(this ICraftingQueueSource source, BasePlayerCharacterEntity crafter, int index, int amount)
         {
+            if (source.ObjectId != crafter.ObjectId && !source.PublicQueue)
+            {
+                // Not public, so it will be updated by player's source
+                crafter.Crafting.ChangeCraftingQueueItem(crafter, index, amount);
+                return;
+            }
             if (!source.CanCraft)
                 return;
             if (index < 0 || index >= source.QueueItems.Count)
                 return;
-            if (source.QueueItems[index].crafterId != crafterId)
+            if (source.QueueItems[index].crafterId != crafter.ObjectId)
                 return;
             if (amount <= 0)
             {
@@ -131,13 +137,19 @@ namespace MultiplayerARPG
             source.QueueItems[index] = craftingItem;
         }
 
-        public static void CancelCraftingQueueItem(this ICraftingQueueSource source, uint crafterId, int index)
+        public static void CancelCraftingQueueItem(this ICraftingQueueSource source, BasePlayerCharacterEntity crafter, int index)
         {
+            if (source.ObjectId != crafter.ObjectId && !source.PublicQueue)
+            {
+                // Not public, so it will be updated by player's source
+                crafter.Crafting.CancelCraftingQueueItem(crafter, index);
+                return;
+            }
             if (!source.CanCraft)
                 return;
             if (index < 0 || index >= source.QueueItems.Count)
                 return;
-            if (source.QueueItems[index].crafterId != crafterId)
+            if (source.QueueItems[index].crafterId != crafter.ObjectId)
                 return;
             source.QueueItems.RemoveAt(index);
         }

@@ -114,11 +114,11 @@ namespace MultiplayerARPG
         {
             if (sourceObjectId == ObjectId)
             {
-                Crafting.ChangeCraftingQueueItem(ObjectId, indexOfData, amount);
+                Crafting.ChangeCraftingQueueItem(this, indexOfData, amount);
             }
             else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
             {
-                source.ChangeCraftingQueueItem(ObjectId, indexOfData, amount);
+                source.ChangeCraftingQueueItem(this, indexOfData, amount);
             }
         }
 
@@ -127,11 +127,11 @@ namespace MultiplayerARPG
         {
             if (sourceObjectId == ObjectId)
             {
-                Crafting.CancelCraftingQueueItem(ObjectId, indexOfData);
+                Crafting.CancelCraftingQueueItem(this, indexOfData);
             }
             else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
             {
-                source.CancelCraftingQueueItem(ObjectId, indexOfData);
+                source.CancelCraftingQueueItem(this, indexOfData);
             }
         }
     }
