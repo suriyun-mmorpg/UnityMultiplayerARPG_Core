@@ -327,7 +327,7 @@ namespace MultiplayerARPG
                         inventoryAmount += tempCharacterItem.amount;
                 }
             }
-            else if (hasAmmoType)
+            if (hasAmmoType && inventoryAmount <= 0)
             {
                 inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.AmmoType, out reloadingAmmoDataId);
             }
