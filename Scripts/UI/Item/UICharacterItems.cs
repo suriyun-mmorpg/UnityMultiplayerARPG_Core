@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public List<ItemType> filterItemTypes = new List<ItemType>();
         public List<SocketEnhancerType> filterSocketEnhancerTypes = new List<SocketEnhancerType>();
         public bool doNotShowEmptySlots;
+        public bool canSelectEmptySlots;
 
         [Header("UI Elements")]
         public GameObject listEmptyObject;
@@ -49,6 +50,7 @@ namespace MultiplayerARPG
         }
 
         public System.Action<int, CharacterItem> onGenerateEntry = null;
+        public GetFilteredListDelegate overrideGetFilteredListFunction = null;
         public virtual ICharacterData Character { get; protected set; }
         public List<CharacterItem> LoadedList { get; private set; } = new List<CharacterItem>();
 
@@ -93,12 +95,13 @@ namespace MultiplayerARPG
 
         protected virtual void OnSelect(UICharacterItem ui)
         {
-            if (ui.Data.characterItem.IsEmptySlot())
+            if (!canSelectEmptySlots && ui.Data.characterItem.IsEmptySlot())
             {
                 CacheSelectionManager.DeselectSelectedUI();
                 return;
             }
-            if (uiDialog != null && (CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle ||
+            if (uiDialog != null && !ui.Data.characterItem.IsEmptySlot() &&
+                (CacheSelectionManager.selectionMode == UISelectionMode.SelectSingle ||
                 CacheSelectionManager.selectionMode == UISelectionMode.Toggle))
             {
                 uiDialog.selectionManager = CacheSelectionManager;
@@ -179,7 +182,11 @@ namespace MultiplayerARPG
             CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
-            List<KeyValuePair<int, CharacterItem>> filteredList = UICharacterItemsUtils.GetFilteredList(LoadedList, filterCategories, filterItemTypes, filterSocketEnhancerTypes, doNotShowEmptySlots);
+            List<KeyValuePair<int, CharacterItem>> filteredList;
+            if (overrideGetFilteredListFunction != null)
+                filteredList = overrideGetFilteredListFunction(LoadedList, filterCategories, filterItemTypes, filterSocketEnhancerTypes, doNotShowEmptySlots);
+            else
+                filteredList = UICharacterItemsUtils.GetFilteredList(LoadedList, filterCategories, filterItemTypes, filterSocketEnhancerTypes, doNotShowEmptySlots);
             if (Character == null || filteredList.Count == 0)
             {
                 if (uiDialog != null)

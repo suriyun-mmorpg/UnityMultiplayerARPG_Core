@@ -169,10 +169,11 @@ namespace MultiplayerARPG
                 return;
 
             uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnSelected.RemoveListener(OnUiAppliedSocketEnhancerItemsSelected);
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnDeselected.RemoveListener(OnUiAppliedSocketEnhancerItemsDeselected);
             uiAppliedSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
+            uiAppliedSocketEnhancerItems.overrideGetFilteredListFunction = GetFilteredAppliedSocketEnhancerItems;
             uiAppliedSocketEnhancerItems.inventoryType = InventoryType.Unknow;
-            uiAppliedSocketEnhancerItems.filterItemTypes.Clear();
-            uiAppliedSocketEnhancerItems.filterItemTypes.Add(ItemType.SocketEnhancer);
+            uiAppliedSocketEnhancerItems.canSelectEmptySlots = true;
 
             CharacterItem characterItem = CharacterItem;
             List<CharacterItem> characterItems = new List<CharacterItem>();
@@ -188,9 +189,27 @@ namespace MultiplayerARPG
             }
             uiAppliedSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter, characterItems);
             uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnSelected.AddListener(OnUiAppliedSocketEnhancerItemsSelected);
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnDeselected.AddListener(OnUiAppliedSocketEnhancerItemsDeselected);
+        }
+
+        private List<KeyValuePair<int, CharacterItem>> GetFilteredAppliedSocketEnhancerItems(List<CharacterItem> list, List<string> filterCategories, List<ItemType> filterItemTypes, List<SocketEnhancerType> filterSocketEnhancerTypes, bool doNotShowEmptySlots)
+        {
+            List<KeyValuePair<int, CharacterItem>> result = new List<KeyValuePair<int, CharacterItem>>();
+            CharacterItem entry;
+            for (int i = 0; i < list.Count; ++i)
+            {
+                entry = list[i];
+                result.Add(new KeyValuePair<int, CharacterItem>(i, entry));
+            }
+            return result;
         }
 
         private void OnUiAppliedSocketEnhancerItemsSelected(UICharacterItem ui)
+        {
+            UpdateSocketEnhancerItems();
+        }
+
+        private void OnUiAppliedSocketEnhancerItemsDeselected(UICharacterItem ui)
         {
             UpdateSocketEnhancerItems();
         }
@@ -203,10 +222,10 @@ namespace MultiplayerARPG
             uiSocketEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
             uiSocketEnhancerItems.filterItemTypes.Clear();
             uiSocketEnhancerItems.filterItemTypes.Add(ItemType.SocketEnhancer);
+            uiSocketEnhancerItems.filterSocketEnhancerTypes.Clear();
             SocketEnhancerType? selectedSocketEnhancerType = SelectedSocketEnhancerType;
             if (selectedSocketEnhancerType.HasValue)
             {
-                uiSocketEnhancerItems.filterSocketEnhancerTypes.Clear();
                 uiSocketEnhancerItems.filterSocketEnhancerTypes.Add(selectedSocketEnhancerType.Value);
             }
             uiSocketEnhancerItems.UpdateData(GameInstance.PlayingCharacter);
