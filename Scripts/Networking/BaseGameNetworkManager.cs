@@ -92,16 +92,6 @@ namespace MultiplayerARPG
             LagCompensationManager = gameObject.GetOrAddComponent<ILagCompensationManager, DefaultLagCompensationManager>();
             HitRegistrationManager = gameObject.GetOrAddComponent<IHitRegistrationManager, DefaultHitRegistrationManager>();
             ManagerComponents = GetComponents<BaseGameNetworkManagerComponent>();
-            // Get attached grid manager
-            GridManager gridManager = gameObject.GetComponent<GridManager>();
-            if (gridManager != null)
-            {
-                // Make sure that grid manager -> axis mode set correctly for current dimension type
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                    gridManager.axisMode = GridManager.EAxisMode.XZ;
-                else
-                    gridManager.axisMode = GridManager.EAxisMode.XY;
-            }
             // Force change physic auto sync transforms mode to manual
             Physics.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
             Physics2D.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
@@ -267,6 +257,16 @@ namespace MultiplayerARPG
 
         public override bool StartServer()
         {
+            // Prepare grid manager
+            GridManager gridManager = gameObject.GetComponent<GridManager>();
+            if (gridManager != null)
+            {
+                // Make sure that grid manager -> axis mode set correctly for current dimension type
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                    gridManager.axisMode = GridManager.EAxisMode.XZ;
+                else
+                    gridManager.axisMode = GridManager.EAxisMode.XY;
+            }
             InitPrefabs();
             return base.StartServer();
         }
