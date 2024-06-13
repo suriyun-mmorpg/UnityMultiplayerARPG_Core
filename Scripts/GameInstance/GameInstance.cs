@@ -439,7 +439,6 @@ namespace MultiplayerARPG
 #endif
 
         // Static events
-        public static event System.Action<UserHandleData> OnSetPlayingUserHandleEvent;
         public static event System.Action<IPlayerCharacterData> OnSetPlayingCharacterEvent;
         public static event System.Action OnGameDataLoadedEvent;
 
