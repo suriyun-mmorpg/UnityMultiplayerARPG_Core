@@ -85,6 +85,12 @@ namespace MultiplayerARPG
                 entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
             }
 
+            if (entity == null)
+            {
+                Logging.LogWarning(ToString(), $"Cannot spawn monster, entity is null");
+                return null;
+            }
+
             if (!entity.FindGroundedPosition(spawnPosition, GROUND_DETECTION_DISTANCE, out spawnPosition))
             {
                 // Destroy the entity (because it can't find ground position)

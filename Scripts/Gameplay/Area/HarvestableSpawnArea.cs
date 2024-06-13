@@ -84,6 +84,12 @@ namespace MultiplayerARPG
                 entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
             }
 
+            if (entity == null)
+            {
+                Logging.LogWarning(ToString(), $"Cannot spawn harvestable, entity is null");
+                return null;
+            }
+
             if (IsOverlapSomethingNearby(spawnPosition, entity))
             {
                 // Destroy the entity (because it is hitting something)

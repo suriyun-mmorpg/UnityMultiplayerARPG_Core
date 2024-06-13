@@ -45,6 +45,12 @@ namespace MultiplayerARPG
                 entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
             }
 
+            if (entity == null)
+            {
+                Logging.LogWarning(ToString(), $"Cannot spawn item drop, entity is null");
+                return null;
+            }
+
             entity.Init();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             return entity;
