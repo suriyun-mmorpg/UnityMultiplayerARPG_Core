@@ -41,7 +41,7 @@ namespace MultiplayerARPG
                 if (voiceSource.clip != null)
                     voiceSource.Play();
             }
-            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                 voiceSource.Stop();
                 voiceSource.clip = null;
             }
-            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
         }
 
@@ -118,7 +118,6 @@ namespace MultiplayerARPG
                 Sprite iconSprite = Data == null ? null : Data.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
-                imageIcon.preserveAspect = true;
             }
 
             if (voiceSource != null)

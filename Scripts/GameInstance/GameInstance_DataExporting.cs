@@ -39,13 +39,13 @@ namespace MultiplayerARPG
         public void ExportMinimalItemsAsJson()
         {
             ClearData();
-            onGameDataLoaded += OnGameDataLoadedToExportMinimalItemsAsJson;
+            OnGameDataLoadedEvent += OnGameDataLoadedToExportMinimalItemsAsJson;
             gameDatabase.LoadData(this).Forget();
         }
 
         private void OnGameDataLoadedToExportMinimalItemsAsJson()
         {
-            onGameDataLoaded -= OnGameDataLoadedToExportMinimalItemsAsJson;
+            OnGameDataLoadedEvent -= OnGameDataLoadedToExportMinimalItemsAsJson;
             Dictionary<int, MinimalItem> exportingItems = new Dictionary<int, MinimalItem>();
             foreach (var kv in Items)
             {
@@ -83,13 +83,13 @@ namespace MultiplayerARPG
         public void ExportCharacterCreationDataAsJson()
         {
             ClearData();
-            onGameDataLoaded += OnGameDataLoadedToExportCharacterCreationDataAsJson;
+            OnGameDataLoadedEvent += OnGameDataLoadedToExportCharacterCreationDataAsJson;
             gameDatabase.LoadData(this).Forget();
         }
 
         private void OnGameDataLoadedToExportCharacterCreationDataAsJson()
         {
-            onGameDataLoaded -= OnGameDataLoadedToExportCharacterCreationDataAsJson;
+            OnGameDataLoadedEvent -= OnGameDataLoadedToExportCharacterCreationDataAsJson;
 
             Singleton = this;
 

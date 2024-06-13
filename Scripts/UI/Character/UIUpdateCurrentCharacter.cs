@@ -8,13 +8,13 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         private void OnDestroy()
         {
-            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
             uiCharacter = null;
         }

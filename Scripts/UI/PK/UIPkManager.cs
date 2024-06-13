@@ -21,14 +21,14 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
             pkOnObjects.Nulling();
             pkOffObjects.Nulling();

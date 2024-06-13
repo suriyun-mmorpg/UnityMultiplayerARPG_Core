@@ -26,13 +26,13 @@ namespace MultiplayerARPG
         private void Start()
         {
             _characterEntity = GetComponentInParent<BaseCharacterEntity>();
-            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         private void OnDestroy()
         {
-            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
             owningIndicator = null;
             allyIndicator = null;

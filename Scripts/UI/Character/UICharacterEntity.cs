@@ -53,7 +53,7 @@ namespace MultiplayerARPG
             entity.onBuffsOperation += OnBuffsOperation;
             if (entity is BasePlayerCharacterEntity playerEntity)
                 playerEntity.onPkPointChange += OnPkPointChange;
-            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             entity.onBuffsOperation -= OnBuffsOperation;
             if (entity is BasePlayerCharacterEntity playerEntity)
                 playerEntity.onPkPointChange -= OnPkPointChange;
-            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
         }
 

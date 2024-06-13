@@ -23,13 +23,13 @@ namespace MultiplayerARPG
         {
             if (npcEntity == null)
                 npcEntity = GetComponentInParent<NpcEntity>();
-            GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
 
         private void OnDestroy()
         {
-            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
             haveTasksDoneQuestsIndicator = null;
             haveInProgressQuestsIndicator = null;

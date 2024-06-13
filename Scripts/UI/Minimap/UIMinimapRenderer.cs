@@ -78,7 +78,6 @@ namespace MultiplayerARPG
             if (imageMinimap != null)
             {
                 imageMinimap.sprite = _currentMapInfo.MinimapSprite;
-                imageMinimap.preserveAspect = true;
                 if (!imageMinimap.gameObject.activeSelf)
                     imageMinimap.gameObject.SetActive(true);
 

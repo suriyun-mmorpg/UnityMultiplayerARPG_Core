@@ -103,12 +103,9 @@ namespace MultiplayerARPG
             get { return s_playingCharacter; }
             set
             {
-                if (value != s_playingCharacter)
-                {
-                    s_playingCharacter = value;
-                    if (onSetPlayingCharacter != null)
-                        onSetPlayingCharacter.Invoke(value);
-                }
+                s_playingCharacter = value;
+                if (OnSetPlayingCharacterEvent != null)
+                    OnSetPlayingCharacterEvent.Invoke(value);
             }
         }
         public static BasePlayerCharacterEntity PlayingCharacterEntity { get { return PlayingCharacter as BasePlayerCharacterEntity; } }
@@ -442,9 +439,9 @@ namespace MultiplayerARPG
 #endif
 
         // Static events
-        public static event System.Action<IPlayerCharacterData> onSetPlayingCharacter;
-        // Events
-        public System.Action onGameDataLoaded;
+        public static event System.Action<UserHandleData> OnSetPlayingUserHandleEvent;
+        public static event System.Action<IPlayerCharacterData> OnSetPlayingCharacterEvent;
+        public static event System.Action OnGameDataLoadedEvent;
 
         #region Cache Data
         public EventSystemManager EventSystemManager { get; private set; }
@@ -602,8 +599,8 @@ namespace MultiplayerARPG
 
         public HashSet<int> IgnoreRaycastLayersValues { get; private set; }
 
-        public readonly Dictionary<string, bool> LoadHomeScenePreventions = new Dictionary<string, bool>();
-        public bool DoNotLoadHomeScene
+        public static readonly Dictionary<string, bool> LoadHomeScenePreventions = new Dictionary<string, bool>();
+        public static bool DoNotLoadHomeScene
         {
             get
             {
@@ -882,8 +879,8 @@ namespace MultiplayerARPG
 
         public void OnGameDataLoaded()
         {
-            if (onGameDataLoaded != null)
-                onGameDataLoaded.Invoke();
+            if (OnGameDataLoadedEvent != null)
+                OnGameDataLoadedEvent.Invoke();
             if (Application.isPlaying && !DoNotLoadHomeScene)
                 LoadHomeScene();
         }
