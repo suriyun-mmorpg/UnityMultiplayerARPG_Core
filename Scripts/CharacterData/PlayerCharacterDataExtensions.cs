@@ -290,6 +290,16 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public static void DeleteAllPersistentCharacterData()
+        {
+            string path = Application.persistentDataPath;
+            string[] files = Directory.GetFiles(path, "*.sav");
+            foreach (string file in files)
+            {
+                File.Delete(file);
+            }
+        }
+
         public static void DeletePersistentCharacterData(string id)
         {
             if (string.IsNullOrEmpty(id))
