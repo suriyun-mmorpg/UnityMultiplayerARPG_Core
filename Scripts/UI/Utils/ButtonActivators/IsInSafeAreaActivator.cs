@@ -12,14 +12,14 @@ namespace MultiplayerARPG {
             _damageableEntity = GetComponentInParent<DamageableEntity>();
             if (_damageableEntity == null)
             {
-                GameInstance.onSetPlayingCharacter += GameInstance_onSetPlayingCharacter;
+                GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
                 GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
             }
         }
 
         private void OnDestroy()
         {
-            GameInstance.onSetPlayingCharacter -= GameInstance_onSetPlayingCharacter;
+            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
         }
 
