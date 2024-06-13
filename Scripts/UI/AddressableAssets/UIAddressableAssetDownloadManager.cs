@@ -1,17 +1,20 @@
 using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
     public class UIAddressableAssetDownloadManager : AddressableAssetDownloadManager
     {
-        public GameObject root;
+        [FormerlySerializedAs("root")]
+        public GameObject rootObject;
         public TextWrapper uiTextStatus;
         public TextWrapper uiTextProgress;
         public TextWrapper uiTextTotalProgress;
-        public GameObject loadGageRoot;
-        public Image loadGage;
+        [FormerlySerializedAs("loadGage")]
+        public Image imageGage;
+        public Slider sliderGage;
         public LanguageTextSetting msgGetFileSize = new LanguageTextSetting()
         {
             defaultText = "Downloading...",
@@ -42,6 +45,11 @@ namespace MultiplayerARPG
             onStart.AddListener(OnStart);
             onEnd.AddListener(OnEnd);
             onDownloadedAll.AddListener(OnDownloadedAll);
+            if (sliderGage != null)
+            {
+                sliderGage.minValue = 0f;
+                sliderGage.maxValue = 1f;
+            }
         }
 
         private void OnDestroy()
@@ -56,14 +64,14 @@ namespace MultiplayerARPG
 
         private void OnStart()
         {
-            if (root != null)
-                root.SetActive(true);
+            if (rootObject != null)
+                rootObject.SetActive(true);
         }
 
         private void OnEnd()
         {
-            if (root != null)
-                root.SetActive(false);
+            if (rootObject != null)
+                rootObject.SetActive(false);
         }
 
         protected override void OnFileSizeRetrieving()
@@ -86,13 +94,15 @@ namespace MultiplayerARPG
                 uiTextTotalProgress.text = string.Format(formatLoadedFilesProgress.Text, LoadedCount, TotalCount);
             }
             // Gage
-            if (loadGage != null)
+            if (imageGage != null)
             {
-                loadGage.fillAmount = 0f;
+                imageGage.fillAmount = 0f;
             }
-            if (loadGageRoot != null)
+            if (sliderGage != null)
             {
-                loadGageRoot.SetActive(true);
+                sliderGage.minValue = 0f;
+                sliderGage.value = 0f;
+                sliderGage.maxValue = 1f;
             }
         }
 
@@ -116,9 +126,13 @@ namespace MultiplayerARPG
                 uiTextTotalProgress.text = string.Format(formatLoadedFilesProgress.Text, LoadedCount, TotalCount);
             }
             // Gage
-            if (loadGage != null)
+            if (imageGage != null)
             {
-                loadGage.fillAmount = percentComplete;
+                imageGage.fillAmount = percentComplete;
+            }
+            if (sliderGage != null)
+            {
+                sliderGage.value = percentComplete;
             }
         }
 
@@ -138,9 +152,13 @@ namespace MultiplayerARPG
                 uiTextTotalProgress.text = string.Format(formatLoadedFilesProgress.Text, LoadedCount, TotalCount);
             }
             // Gage
-            if (loadGage != null)
+            if (imageGage != null)
             {
-                loadGage.fillAmount = 1f;
+                imageGage.fillAmount = 1f;
+            }
+            if (sliderGage != null)
+            {
+                sliderGage.value = 1f;
             }
         }
 
@@ -157,11 +175,6 @@ namespace MultiplayerARPG
             if (uiTextTotalProgress != null)
             {
                 uiTextTotalProgress.gameObject.SetActive(false);
-            }
-            // Gage
-            if (loadGageRoot != null)
-            {
-                loadGageRoot.SetActive(false);
             }
         }
     }
