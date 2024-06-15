@@ -194,7 +194,14 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private CrosshairSetting crosshairSetting = default;
+        private CrosshairSetting crosshairSetting = new CrosshairSetting()
+        {
+            expandPerFrame = 3f,
+            shrinkPerFrame = 8f,
+            minSpread = 10f,
+            maxSpread = 50f,
+            addSpreadWhileAttackAndMoving = 20f,
+        };
         public CrosshairSetting CrosshairSetting
         {
             get { return crosshairSetting; }
@@ -335,7 +342,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private float recoil = 0f;
+        private float recoil = 1f;
         public float Recoil
         {
             get { return recoil; }

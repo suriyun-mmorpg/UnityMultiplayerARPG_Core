@@ -89,11 +89,11 @@ namespace MultiplayerARPG
         public BaseWeaponAbility[] weaponAbilities = new BaseWeaponAbility[0];
         public CrosshairSetting crosshairSetting = new CrosshairSetting()
         {
-            expandPerFrameWhileMoving = 3f,
-            expandPerFrameWhileAttacking = 5f,
+            expandPerFrame = 3f,
             shrinkPerFrame = 8f,
             minSpread = 10f,
-            maxSpread = 50f
+            maxSpread = 50f,
+            addSpreadWhileAttackAndMoving = 20f,
         };
 
         [HideInInspector]
@@ -121,7 +121,7 @@ namespace MultiplayerARPG
         public Vector2 fireSpreadRange;
         [FormerlySerializedAs("fireSpread")]
         public byte fireSpreadAmount;
-        public float recoil = 0f;
+        public float recoil = 1f;
         public float chargeDuration;
         public bool destroyImmediatelyAfterFired;
 

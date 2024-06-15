@@ -7,12 +7,12 @@ namespace MultiplayerARPG
     public struct CrosshairSetting
     {
         public bool hidden;
-        public float expandPerFrameWhileMoving;
-        public float expandPerFrameWhileAttacking;
+        [FormerlySerializedAs("expandPerFrameWhileMoving")]
+        public float expandPerFrame;
         public float shrinkPerFrame;
-        public float shrinkPerFrameWhenAttacked;
         public float minSpread;
         public float maxSpread;
+        public float addSpreadWhileAttackAndMoving;
         [System.Obsolete("Use weapon's recoil instead.")]
         [FormerlySerializedAs("recoil")]
         [FormerlySerializedAs("recoilY")]

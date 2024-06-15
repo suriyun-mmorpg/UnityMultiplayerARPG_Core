@@ -167,9 +167,9 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float recoilRateWhileSprinting = 2f;
         [SerializeField]
-        protected float recoilRateWhileWalking = 1f;
+        protected float recoilRateWhileWalking = 0.5f;
         [SerializeField]
-        protected float recoilRateWhileCrouching = 0.5f;
+        protected float recoilRateWhileCrouching = 1f;
         [SerializeField]
         protected float recoilRateWhileCrawling = 0.5f;
         [SerializeField]
@@ -198,11 +198,13 @@ namespace MultiplayerARPG
         public IShooterGameplayCameraController CacheGameplayCameraController { get; protected set; }
         public IMinimapCameraController CacheMinimapCameraController { get; protected set; }
         public BaseCharacterModel CacheFpsModel { get; protected set; }
-        public Vector2 CurrentCrosshairSize { get; protected set; }
-        public CrosshairSetting CurrentCrosshairSetting { get; protected set; }
+        public RectTransform CrosshairRect => crosshairRect;
+        public bool HideCrosshair { get; set; }
+        public ShooterCrosshairUpdater CrosshairUpdater { get; protected set; }
+        public ShooterRecoilUpdater RecoilUpdater { get; protected set; }
         public ShooterReloadUpdater ReloadUpdater { get; protected set; }
-        public int WeaponAbilityIndex { get; set; }
-        public BaseWeaponAbility WeaponAbility { get; set; }
+        public int WeaponAbilityIndex { get; protected set; }
+        public BaseWeaponAbility WeaponAbility { get; protected set; }
         public WeaponAbilityState WeaponAbilityState { get; set; }
 
         public ControllerMode Mode
@@ -338,8 +340,6 @@ namespace MultiplayerARPG
             set { CacheGameplayCameraController.CameraRotationSpeedScale = value; }
         }
 
-        public bool HideCrosshair { get; set; }
-
         public float CurrentTurnSpeed
         {
             get
@@ -406,8 +406,6 @@ namespace MultiplayerARPG
         protected MovementState _movementState;
         protected ExtraMovementState _extraMovementState;
         protected ShooterControllerViewMode? _viewModeBeforeDead;
-        protected bool _updateAttackingCrosshair;
-        protected bool _updateAttackedCrosshair;
         protected bool _mustReleaseFireKey;
         protected byte _pauseFireInputFrames;
         protected bool _isAimming;
@@ -459,6 +457,20 @@ namespace MultiplayerARPG
             // Initialize updater
             ReloadUpdater = gameObject.GetOrAddComponent<ShooterReloadUpdater>();
             ReloadUpdater.Controller = this;
+
+            CrosshairUpdater = gameObject.GetOrAddComponent<ShooterCrosshairUpdater>();
+            CrosshairUpdater.Controller = this;
+
+            RecoilUpdater = gameObject.GetOrAddComponent<ShooterRecoilUpdater>(comp =>
+            {
+                comp.recoilRateWhileSwimming = recoilRateWhileSwimming;
+                comp.recoilRateWhileSprinting = recoilRateWhileSprinting;
+                comp.recoilRateWhileWalking = recoilRateWhileWalking;
+                comp.recoilRateWhileMoving = recoilRateWhileMoving;
+                comp.recoilRateWhileCrouching = recoilRateWhileCrouching;
+                comp.recoilRateWhileCrawling = recoilRateWhileCrawling;
+            });
+            RecoilUpdater.Controller = this;
         }
 
         protected override async void Setup(BasePlayerCharacterEntity characterEntity)
@@ -531,11 +543,6 @@ namespace MultiplayerARPG
             IWeaponItem newRightHandWeapon = equipWeapons.GetRightHandWeaponItem();
             IWeaponItem newLeftHandWeapon = equipWeapons.GetLeftHandWeaponItem();
             bool isSameWeapons = newRightHandWeapon == _rightHandWeapon && newLeftHandWeapon == _leftHandWeapon;
-            if (!isSameWeapons)
-            {
-                CurrentCrosshairSetting = PlayingCharacterEntity.GetCrosshairSetting();
-                UpdateCrosshair(CurrentCrosshairSetting, false, -CurrentCrosshairSetting.shrinkPerFrame);
-            }
             _rightHandWeapon = newRightHandWeapon;
             _leftHandWeapon = newLeftHandWeapon;
             if (!isSameWeapons)
@@ -618,9 +625,6 @@ namespace MultiplayerARPG
 
             // Clear selected entity
             SelectedEntity = null;
-
-            // Update crosshair (with states from last update)
-            UpdateCrosshair();
 
             // Clear controlling states from last update
             _movementState = MovementState.None;
@@ -1294,115 +1298,6 @@ namespace MultiplayerARPG
             return default;
         }
 
-        protected virtual void UpdateCrosshair()
-        {
-            bool isMoving = _movementState.Has(MovementState.Forward) ||
-                _movementState.Has(MovementState.Backward) ||
-                _movementState.Has(MovementState.Left) ||
-                _movementState.Has(MovementState.Right) ||
-                _movementState.Has(MovementState.IsJump) ||
-                _movementState.Has(MovementState.IsDash);
-            if (_updateAttackingCrosshair)
-            {
-                UpdateCrosshair(CurrentCrosshairSetting, true, CurrentCrosshairSetting.expandPerFrameWhileAttacking);
-                _updateAttackingCrosshair = false;
-                _updateAttackedCrosshair = true;
-            }
-            else if (_updateAttackedCrosshair)
-            {
-                UpdateCrosshair(CurrentCrosshairSetting, true, CurrentCrosshairSetting.shrinkPerFrameWhenAttacked);
-                _updateAttackedCrosshair = false;
-            }
-            else if (isMoving)
-            {
-                UpdateCrosshair(CurrentCrosshairSetting, false, CurrentCrosshairSetting.expandPerFrameWhileMoving);
-            }
-            else
-            {
-                UpdateCrosshair(CurrentCrosshairSetting, false, -CurrentCrosshairSetting.shrinkPerFrame);
-            }
-        }
-
-        protected virtual void UpdateCrosshair(CrosshairSetting setting, bool isAttack, float power)
-        {
-            if (crosshairRect == null)
-                return;
-            // Show cross hair if weapon's crosshair setting isn't hidden or there is a constructing building
-            crosshairRect.gameObject.SetActive((!setting.hidden && !HideCrosshair) || ConstructingBuildingEntity != null);
-            // Not active?, don't update
-            if (!crosshairRect.gameObject)
-                return;
-            // Change crosshair size by power
-            Vector3 sizeDelta = CurrentCrosshairSize;
-            // Expanding
-            sizeDelta.x += power;
-            sizeDelta.y += power;
-            if (!isAttack)
-                sizeDelta = new Vector2(Mathf.Clamp(sizeDelta.x, setting.minSpread, setting.maxSpread), Mathf.Clamp(sizeDelta.y, setting.minSpread, setting.maxSpread));
-            crosshairRect.sizeDelta = CurrentCrosshairSize = sizeDelta;
-        }
-
-        protected virtual void UpdateRecoil()
-        {
-            float recoilPitch;
-            float recoilYaw;
-            float recoilRoll;
-
-            if (_movementState.Has(MovementState.Forward) ||
-                _movementState.Has(MovementState.Backward) ||
-                _movementState.Has(MovementState.Left) ||
-                _movementState.Has(MovementState.Right))
-            {
-                if (_movementState.Has(MovementState.IsUnderWater))
-                {
-                    recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileSwimming;
-                    recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileSwimming;
-                    recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileSwimming;
-                }
-                else if (_extraMovementState == ExtraMovementState.IsSprinting)
-                {
-                    recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileSprinting;
-                    recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileSprinting;
-                    recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileSprinting;
-                }
-                else if (_extraMovementState == ExtraMovementState.IsWalking)
-                {
-                    recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileWalking;
-                    recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileWalking;
-                    recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileWalking;
-                }
-                else
-                {
-                    recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileMoving;
-                    recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileMoving;
-                    recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileMoving;
-                }
-            }
-            else if (_extraMovementState == ExtraMovementState.IsCrouching)
-            {
-                recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileCrouching;
-                recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileCrouching;
-                recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileCrouching;
-            }
-            else if (_extraMovementState == ExtraMovementState.IsCrawling)
-            {
-                recoilPitch = CurrentCrosshairSetting.recoilPitch * recoilRateWhileCrawling;
-                recoilYaw = CurrentCrosshairSetting.recoilYaw * recoilRateWhileCrawling;
-                recoilRoll = CurrentCrosshairSetting.recoilRoll * recoilRateWhileCrawling;
-            }
-            else
-            {
-                recoilPitch = CurrentCrosshairSetting.recoilPitch;
-                recoilYaw = CurrentCrosshairSetting.recoilYaw;
-                recoilRoll = CurrentCrosshairSetting.recoilRoll;
-            }
-
-            if (recoilPitch > 0f || recoilYaw > 0f || recoilRoll > 0f)
-            {
-                CacheGameplayCameraController.Recoil(-recoilPitch, Random.Range(-recoilYaw, recoilYaw), Random.Range(-recoilRoll, recoilRoll));
-            }
-        }
-
         public void OnLaunchDamageEntity(
             bool isLeftHand,
             CharacterItem weapon,
@@ -1414,7 +1309,8 @@ namespace MultiplayerARPG
             int skillLevel,
             AimPosition aimPosition)
         {
-            UpdateRecoil();
+            CrosshairUpdater.Trigger(isLeftHand, weapon, simulateSeed, triggerIndex, spreadIndex, skill, skillLevel);
+            RecoilUpdater.Trigger(isLeftHand, weapon, simulateSeed, triggerIndex, spreadIndex, skill, skillLevel);
         }
 
         /// <summary>
@@ -1605,9 +1501,7 @@ namespace MultiplayerARPG
         {
             if (_pauseFireInputFrames > 0)
                 return;
-            // Set this to `TRUE` to update crosshair
-            if (PlayingCharacterEntity.Attack(ref isLeftHand))
-                _updateAttackingCrosshair = true;
+            PlayingCharacterEntity.Attack(ref isLeftHand);
         }
 
         public virtual void WeaponCharge(ref bool isLeftHand)

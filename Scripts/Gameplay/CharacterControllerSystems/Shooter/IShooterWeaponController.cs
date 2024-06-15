@@ -12,7 +12,6 @@ namespace MultiplayerARPG
         float CameraFov { get; }
         float CameraNearClipPlane { get; }
         float CameraFarClipPlane { get; }
-        CrosshairSetting CurrentCrosshairSetting { get; }
         float CurrentCameraFov { get; set; }
         float DefaultCameraRotationSpeedScale { get; }
         float CameraRotationSpeedScale { get; set; }

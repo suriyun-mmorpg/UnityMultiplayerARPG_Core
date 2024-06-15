@@ -868,11 +868,11 @@ namespace MultiplayerARPG
                 return new CrosshairSetting()
                 {
                     hidden = rightWeaponItem.CrosshairSetting.hidden || leftWeaponItem.CrosshairSetting.hidden,
-                    expandPerFrameWhileMoving = (rightWeaponItem.CrosshairSetting.expandPerFrameWhileMoving + leftWeaponItem.CrosshairSetting.expandPerFrameWhileMoving) / 2f,
-                    expandPerFrameWhileAttacking = (rightWeaponItem.CrosshairSetting.expandPerFrameWhileAttacking + leftWeaponItem.CrosshairSetting.expandPerFrameWhileAttacking) / 2f,
+                    expandPerFrame = (rightWeaponItem.CrosshairSetting.expandPerFrame + leftWeaponItem.CrosshairSetting.expandPerFrame) / 2f,
                     shrinkPerFrame = (rightWeaponItem.CrosshairSetting.shrinkPerFrame + leftWeaponItem.CrosshairSetting.shrinkPerFrame) / 2f,
                     minSpread = (rightWeaponItem.CrosshairSetting.minSpread + leftWeaponItem.CrosshairSetting.minSpread) / 2f,
-                    maxSpread = (rightWeaponItem.CrosshairSetting.maxSpread + leftWeaponItem.CrosshairSetting.maxSpread) / 2f
+                    maxSpread = (rightWeaponItem.CrosshairSetting.maxSpread + leftWeaponItem.CrosshairSetting.maxSpread) / 2f,
+                    addSpreadWhileAttackAndMoving = (rightWeaponItem.CrosshairSetting.addSpreadWhileAttackAndMoving + leftWeaponItem.CrosshairSetting.addSpreadWhileAttackAndMoving) / 2f,
                 };
             }
             if (rightWeaponItem != null)
