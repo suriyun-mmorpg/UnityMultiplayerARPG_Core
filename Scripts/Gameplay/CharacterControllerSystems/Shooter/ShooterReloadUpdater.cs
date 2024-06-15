@@ -1,5 +1,3 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -8,13 +6,13 @@ namespace MultiplayerARPG
     {
         public ShooterPlayerCharacterController Controller { get; set; }
         public BasePlayerCharacterEntity PlayingCharacterEntity => Controller.PlayingCharacterEntity;
-        protected bool _isReloading;
+        public bool IsReloading { get; set; }
 
         public virtual void Reload()
         {
-            if (_isReloading)
+            if (IsReloading)
                 return;
-            _isReloading = true;
+            IsReloading = true;
             if (Controller.WeaponAbility != null &&
                 Controller.WeaponAbility.ShouldDeactivateOnReload)
             {
@@ -23,11 +21,11 @@ namespace MultiplayerARPG
             }
         }
 
-        private void Update()
+        protected virtual void Update()
         {
             if (PlayingCharacterEntity.IsDead())
-                _isReloading = false;
-            if (!_isReloading)
+                IsReloading = false;
+            if (!IsReloading)
                 return;
             // Wait until animation end
             if (PlayingCharacterEntity.IsPlayingActionAnimation())
@@ -49,7 +47,7 @@ namespace MultiplayerARPG
             }
             // All reloaded
             if (allReload)
-                _isReloading = false;
+                IsReloading = false;
         }
     }
 }
