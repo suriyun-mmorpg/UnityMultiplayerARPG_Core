@@ -200,9 +200,10 @@ namespace MultiplayerARPG
         public BaseCharacterModel CacheFpsModel { get; protected set; }
         public Vector2 CurrentCrosshairSize { get; protected set; }
         public CrosshairSetting CurrentCrosshairSetting { get; protected set; }
-        public int WeaponAbilityIndex { get; protected set; }
-        public BaseWeaponAbility WeaponAbility { get; protected set; }
-        public WeaponAbilityState WeaponAbilityState { get; protected set; }
+        public ShooterReloadUpdater ReloadUpdater { get; protected set; }
+        public int WeaponAbilityIndex { get; set; }
+        public BaseWeaponAbility WeaponAbility { get; set; }
+        public WeaponAbilityState WeaponAbilityState { get; set; }
 
         public ControllerMode Mode
         {
@@ -411,7 +412,6 @@ namespace MultiplayerARPG
         protected byte _pauseFireInputFrames;
         protected bool _isAimming;
         protected bool _isCharging;
-        protected bool _isReloading;
 
         protected override void Awake()
         {
@@ -455,6 +455,10 @@ namespace MultiplayerARPG
             _warpPortalEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
             _warpPortalEntityDetector.detectingRadius = CurrentGameInstance.conversationDistance;
             _warpPortalEntityDetector.findWarpPortal = true;
+
+            // Initialize updater
+            ReloadUpdater = gameObject.GetOrAddComponent<ShooterReloadUpdater>();
+            ReloadUpdater.Controller = this;
         }
 
         protected override async void Setup(BasePlayerCharacterEntity characterEntity)
@@ -1613,36 +1617,9 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.StartCharge(ref isLeftHand);
         }
 
-        public virtual async void Reload()
+        public void Reload()
         {
-            if (_isReloading)
-                return;
-            _isReloading = true;
-            if (WeaponAbility != null && WeaponAbility.ShouldDeactivateOnReload)
-            {
-                WeaponAbility.ForceDeactivated();
-                WeaponAbilityState = WeaponAbilityState.Deactivated;
-            }
-            // Reload ammo at server
-            bool allReload;
-            do
-            {
-                allReload = true;
-                await UniTask.Yield();
-                // Reload right-hand weapon
-                if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity))
-                {
-                    if (!PlayingCharacterEntity.Reload(false))
-                        allReload = false;
-                }
-                // Reload left-hand weapon
-                if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull() && PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity))
-                {
-                    if (!PlayingCharacterEntity.Reload(true))
-                        allReload = false;
-                }
-            } while (!allReload);
-            _isReloading = false;
+            ReloadUpdater.Reload();
         }
 
         public virtual void ChangeWeaponAbility(int index)
