@@ -123,25 +123,54 @@ namespace MultiplayerARPG
             return ammo >= GetAmmoCapacity();
         }
 
-        public bool HasAmmoToReload(ICharacterData character)
+        public bool HasAmmoToReload(ICharacterData character, out int reloadingAmmoDataId, out int amountInInventory)
         {
+            reloadingAmmoDataId = 0;
+            amountInInventory = 0;
             IWeaponItem item = GetWeaponItem();
             if (item == null)
                 return false;
             if (item.AmmoItemIds.Count > 0)
             {
                 CharacterItem tempCharacterItem;
+                // Try find from inventory which it is the same kind with in the weapon
+                if (item.AmmoItemIds.Contains(ammoDataId))
+                {
+                    reloadingAmmoDataId = ammoDataId;
+                    for (int i = 0; i < character.NonEquipItems.Count; ++i)
+                    {
+                        tempCharacterItem = character.NonEquipItems[i];
+                        if (tempCharacterItem.IsEmptySlot())
+                            continue;
+                        if (tempCharacterItem.dataId != ammoDataId)
+                            continue;
+                        amountInInventory += tempCharacterItem.amount;
+                    }
+                    if (amountInInventory > 0)
+                        return true;
+                }
+                // Try find other ammo items from inventory
+                reloadingAmmoDataId = 0;
                 for (int i = 0; i < character.NonEquipItems.Count; ++i)
                 {
                     tempCharacterItem = character.NonEquipItems[i];
                     if (tempCharacterItem.IsEmptySlot())
                         continue;
-                    if (item.AmmoItemIds.Contains(tempCharacterItem.dataId))
-                        return true;
+                    if (!item.AmmoItemIds.Contains(tempCharacterItem.dataId))
+                        continue;
+                    if (reloadingAmmoDataId == 0)
+                        reloadingAmmoDataId = tempCharacterItem.dataId;
+                    if (reloadingAmmoDataId == tempCharacterItem.dataId)
+                        amountInInventory += tempCharacterItem.amount;
                 }
+                if (amountInInventory > 0)
+                    return true;
             }
             if (item.WeaponType.AmmoType != null)
-                return character.CountAllAmmos(item.WeaponType.AmmoType) > 0;
+            {
+                // Find ammo item by ammo type
+                amountInInventory = character.CountAmmos(item.WeaponType.AmmoType, out reloadingAmmoDataId);
+            }
             return false;
         }
 

@@ -618,7 +618,7 @@ namespace MultiplayerARPG
                 return false;
 
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
-            if (characterItem.IsAmmoFull() || !characterItem.HasAmmoToReload(this))
+            if (characterItem.IsAmmoFull() || !characterItem.HasAmmoToReload(this, out _, out _))
                 return false;
 
             if (!Entity.MovementState.Has(MovementState.IsGrounded) && weaponItem.ReloadRestriction.restrictedWhileAirborne)

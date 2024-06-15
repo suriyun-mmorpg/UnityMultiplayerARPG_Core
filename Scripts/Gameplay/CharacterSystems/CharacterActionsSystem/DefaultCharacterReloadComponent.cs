@@ -308,29 +308,7 @@ namespace MultiplayerARPG
             }
 
             // Prepare reload data
-            int reloadingAmmoDataId = 0;
-            int inventoryAmount = 0;
-            if (hasAmmoItems)
-            {
-                // Looking for items in inventory
-                CharacterItem tempCharacterItem;
-                for (int i = 0; i < Entity.NonEquipItems.Count; ++i)
-                {
-                    tempCharacterItem = Entity.NonEquipItems[i];
-                    if (tempCharacterItem.IsEmptySlot())
-                        continue;
-                    if (!reloadingWeaponItem.AmmoItemIds.Contains(tempCharacterItem.dataId))
-                        continue;
-                    if (reloadingAmmoDataId == 0)
-                        reloadingAmmoDataId = tempCharacterItem.dataId;
-                    if (reloadingAmmoDataId == tempCharacterItem.dataId)
-                        inventoryAmount += tempCharacterItem.amount;
-                }
-            }
-            if (hasAmmoType && inventoryAmount <= 0)
-            {
-                inventoryAmount = Entity.CountAmmos(reloadingWeaponItem.WeaponType.AmmoType, out reloadingAmmoDataId);
-            }
+            reloadingWeapon.HasAmmoToReload(Entity, out int reloadingAmmoDataId, out int inventoryAmount);
 
             int ammoCapacity = reloadingWeaponItem.AmmoCapacity;
             if (GameInstance.Items.TryGetValue(reloadingAmmoDataId, out BaseItem tempItem) &&
