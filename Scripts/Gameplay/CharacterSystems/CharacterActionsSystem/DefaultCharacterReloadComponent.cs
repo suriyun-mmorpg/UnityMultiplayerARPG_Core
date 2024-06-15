@@ -352,6 +352,12 @@ namespace MultiplayerARPG
                 reloadingAmmoAmount = ammoCapacity - reloadingWeapon.ammo;
             }
 
+            if (reloadingWeaponItem.MaxAmmoEachReload > 0 &&
+                reloadingAmmoAmount > reloadingWeaponItem.MaxAmmoEachReload)
+            {
+                reloadingAmmoAmount = reloadingWeaponItem.MaxAmmoEachReload;
+            }
+
             if (inventoryAmount < reloadingAmmoAmount)
             {
                 // Ammo in inventory less than reloading amount, so use amount of ammo in inventory

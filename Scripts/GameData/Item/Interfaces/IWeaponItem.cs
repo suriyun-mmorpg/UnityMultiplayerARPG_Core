@@ -84,7 +84,7 @@ namespace MultiplayerARPG
         /// </summary>
         AudioClipWithVolumeSettings EmptyClip { get; }
         /// <summary>
-        /// How to fire
+        /// How is its firing
         /// </summary>
         FireType FireType { get; }
         /// <summary>
@@ -95,6 +95,10 @@ namespace MultiplayerARPG
         /// If this value > 0, it will reload by using this duration, NOT by animation length
         /// </summary>
         float ReloadDuration { get; }
+        /// <summary>
+        /// If this is <= 0, it will fill full to amount of capacity, if > 0 it will fill by this value, made this for shotgun which will fill only 1 each reloading
+        /// </summary>
+        int MaxAmmoEachReload { get; }
         /// <summary>
         /// Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}
         /// </summary>

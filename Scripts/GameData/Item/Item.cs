@@ -116,6 +116,7 @@ namespace MultiplayerARPG
         public FireType fireType;
         public float rateOfFire;
         public float reloadDuration;
+        public int maxAmmoEachReload;
         [FormerlySerializedAs("fireStagger")]
         public Vector2 fireSpreadRange;
         [FormerlySerializedAs("fireSpread")]
@@ -613,6 +614,11 @@ namespace MultiplayerARPG
         public float ReloadDuration
         {
             get { return reloadDuration; }
+        }
+
+        public int MaxAmmoEachReload
+        {
+            get { return maxAmmoEachReload; }
         }
 
         public Vector2 FireSpreadRange

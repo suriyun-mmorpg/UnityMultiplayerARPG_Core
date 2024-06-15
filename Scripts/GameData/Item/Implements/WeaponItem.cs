@@ -285,7 +285,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        [Tooltip("How to fire")]
+        [Tooltip("How is its firing")]
         private FireType fireType = FireType.SingleFire;
         public FireType FireType
         {
@@ -306,6 +306,14 @@ namespace MultiplayerARPG
         public float ReloadDuration
         {
             get { return reloadDuration; }
+        }
+
+        [SerializeField]
+        [Tooltip("If this is <= 0, it will fill full to amount of capacity, if > 0 it will fill by this value, made this for shotgun which will fill only 1 each reloading")]
+        private int maxAmmoEachReload;
+        public int MaxAmmoEachReload
+        {
+            get { return maxAmmoEachReload; }
         }
 
         [SerializeField]
