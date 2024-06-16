@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             OnlineRequestTimes.TryRemove(characterId, out _);
             OnlineRequestTimes.TryAdd(characterId, currentTime);
 
-            Manager.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
+            Manager.ClientSendPacket(0, DeliveryMethod.Sequenced, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
             {
                 writer.Put(characterId);
             });
@@ -77,11 +77,6 @@ namespace MultiplayerARPG
         {
             OnlineRequestTimes.Clear();
             OnlineCharacterIds.Clear();
-        }
-
-        public bool RequestGetOnlineCharacterData(RequestGetOnlineCharacterDataMessage data, ResponseDelegate<ResponseGetOnlineCharacterDataMessage> callback)
-        {
-            return Manager.ClientSendRequest(GameNetworkingConsts.GetOnlineCharacterData, data, responseDelegate: callback);
         }
     }
 }

@@ -24,7 +24,6 @@ namespace MultiplayerARPG
             ServerGachaMessageHandlers = gameObject.GetOrAddComponent<IServerGachaMessageHandlers, LanRpgServerGachaMessageHandlers>();
             ServerBankMessageHandlers = gameObject.GetOrAddComponent<IServerBankMessageHandlers, LanRpgServerBankMessageHandlers>();
             ServerUserContentMessageHandlers = gameObject.GetOrAddComponent<IServerUserContentMessageHandlers, LanRpgServerUserContentMessageHandlers>();
-            ServerOnlineCharacterMessageHandlers = gameObject.GetOrAddComponent<IServerOnlineCharacterMessageHandlers, DefaultServerOnlineCharacterMessageHandlers>();
             // Client handlers
             ClientCashShopHandlers = gameObject.GetOrAddComponent<IClientCashShopHandlers, DefaultClientCashShopHandlers>();
             ClientMailHandlers = gameObject.GetOrAddComponent<IClientMailHandlers, DefaultClientMailHandlers>();

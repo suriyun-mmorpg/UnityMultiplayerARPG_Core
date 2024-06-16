@@ -9,6 +9,5 @@ namespace MultiplayerARPG
         void RequestOnlineCharacter(string characterId);
         void HandleNotifyOnlineCharacter(MessageHandlerData messageHandler);
         void ClearOnlineCharacters();
-        bool RequestGetOnlineCharacterData(RequestGetOnlineCharacterDataMessage data, ResponseDelegate<ResponseGetOnlineCharacterDataMessage> callback);
     }
 }
