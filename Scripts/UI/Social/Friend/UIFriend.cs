@@ -46,7 +46,12 @@ namespace MultiplayerARPG
         {
             ClientFriendActions.ResponseGetFriends(responseHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
-            UpdateFriendsUIs(response.friends);
+            List<SocialCharacterData> friends = new List<SocialCharacterData>();
+            if (response.friends != null && response.friends.Count > 0)
+                friends.AddRange(response.friends);
+            if (inputCharacterName != null && !string.IsNullOrWhiteSpace(inputCharacterName.text))
+                friends = friends.Where(Fillter).ToList();
+            UpdateFriendsUIs(friends);
         }
 
         private bool Fillter(SocialCharacterData data)
