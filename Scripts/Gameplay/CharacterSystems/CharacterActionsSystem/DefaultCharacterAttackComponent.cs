@@ -163,8 +163,6 @@ namespace MultiplayerARPG
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
             animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);
-            if (weaponItem.RateOfFire > 0)
-                animSpeedRate = 1f;
 
             if (IsServer)
             {
