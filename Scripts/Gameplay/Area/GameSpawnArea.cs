@@ -112,9 +112,12 @@ namespace MultiplayerARPG
 
         public override void SpawnAll()
         {
-            for (int i = 0; i < amount; ++i)
+            if (prefab != null || addressablePrefab.IsDataValid())
             {
-                Spawn(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), 0);
+                for (int i = 0; i < amount; ++i)
+                {
+                    Spawn(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), 0);
+                }
             }
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
