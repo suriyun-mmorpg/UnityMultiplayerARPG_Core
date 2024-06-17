@@ -13,7 +13,8 @@ namespace MultiplayerARPG
         float CameraNearClipPlane { get; }
         float CameraFarClipPlane { get; }
         float CurrentCameraFov { get; set; }
-        float DefaultCameraRotationSpeedScale { get; }
+        float ThirdPersonCameraRotationSpeedScale { get; }
+        float FirstPersonCameraRotationSpeedScale { get; }
         float CameraRotationSpeedScale { get; set; }
         bool HideCrosshair { get; set; }
         void UpdateCameraSettings();

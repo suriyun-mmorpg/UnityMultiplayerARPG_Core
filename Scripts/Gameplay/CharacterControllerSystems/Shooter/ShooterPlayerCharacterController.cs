@@ -72,7 +72,9 @@ namespace MultiplayerARPG
         [SerializeField]
         protected RectTransform crosshairRect;
         [SerializeField]
-        protected string defaultCameraRotationSpeedScaleSaveKey = "DEFAULT_CAMERA_ROTATION_SPEED_SCALE";
+        protected string thirdPersonCameraRotationSpeedScaleSaveKey = "3RD_PERSON_CAMERA_SCALE";
+        [SerializeField]
+        protected string firstPersonCameraRotationSpeedScaleSaveKey = "1ST_PERSON_CAMERA_SCALE";
 
         [Header("TPS Settings")]
         [SerializeField]
@@ -329,9 +331,14 @@ namespace MultiplayerARPG
             set { CacheGameplayCameraController.CameraFarClipPlane = value; }
         }
 
-        public float DefaultCameraRotationSpeedScale
+        public float ThirdPersonCameraRotationSpeedScale
         {
-            get { return CameraRotationSpeedScaleSetting.GetCameraRotationSpeedScaleByKey(defaultCameraRotationSpeedScaleSaveKey, 1f); }
+            get { return CameraRotationSpeedScaleSetting.GetCameraRotationSpeedScaleByKey(thirdPersonCameraRotationSpeedScaleSaveKey, 1f); }
+        }
+
+        public float FirstPersonCameraRotationSpeedScale
+        {
+            get { return CameraRotationSpeedScaleSetting.GetCameraRotationSpeedScaleByKey(firstPersonCameraRotationSpeedScaleSaveKey, 1f); }
         }
 
         public float CameraRotationSpeedScale
@@ -421,7 +428,15 @@ namespace MultiplayerARPG
                 castedObj.SetData(gameplayCameraPrefab);
             });
             CacheGameplayCameraController.Init();
-            CameraRotationSpeedScale = DefaultCameraRotationSpeedScale;
+            switch (ViewMode)
+            {
+                case ShooterControllerViewMode.Fps:
+                    CameraRotationSpeedScale = FirstPersonCameraRotationSpeedScale;
+                    break;
+                default:
+                    CameraRotationSpeedScale = ThirdPersonCameraRotationSpeedScale;
+                    break;
+            }
             // Initial minimap camera controller
             CacheMinimapCameraController = gameObject.GetOrAddComponent<IMinimapCameraController, DefaultMinimapCameraController>((obj) =>
             {
@@ -629,7 +644,15 @@ namespace MultiplayerARPG
             // Clear controlling states from last update
             _movementState = MovementState.None;
             _extraMovementState = ExtraMovementState.None;
-            CacheGameplayCameraController.CameraRotationSpeedScale = DefaultCameraRotationSpeedScale;
+            switch (ViewMode)
+            {
+                case ShooterControllerViewMode.Fps:
+                    CameraRotationSpeedScale = FirstPersonCameraRotationSpeedScale;
+                    break;
+                default:
+                    CameraRotationSpeedScale = ThirdPersonCameraRotationSpeedScale;
+                    break;
+            }
 
             // Prepare variables to find nearest raycasted hit point
             _centerRay = CacheGameplayCameraController.Camera.ViewportPointToRay(new Vector3(0.5f, 0.5f, 0));
