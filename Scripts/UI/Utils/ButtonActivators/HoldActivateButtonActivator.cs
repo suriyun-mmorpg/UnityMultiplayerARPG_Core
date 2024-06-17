@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public class HoldActivateButtonActivator : MonoBehaviour
     {
-        public GameObject[] activateObjects;
+        public GameObject[] activateObjects = new GameObject[0];
 
         private void LateUpdate()
         {
