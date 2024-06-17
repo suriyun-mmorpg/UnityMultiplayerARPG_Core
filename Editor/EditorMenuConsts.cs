@@ -31,12 +31,22 @@ namespace MultiplayerARPG
         public const int VEHICLE_ENTITY_CREATOR_ORDER = 202;
         #endregion
 
+        #region Player Character Save
+        public const string DELETE_ALL_PLAYER_CHARACTER_SAVES_MENU = "MMORPG KIT/Delete All Player Character Saves";
+        public const int DELETE_ALL_PLAYER_CHARACTER_SAVES_ORDER = 300;
+        #endregion
+
+        #region PlayerPrefs
+        public const string DELETE_ALL_PLAYER_PREFS_MENU = "Player Prefs/Delete All";
+        public const int DELETE_ALL_PLAYER_PREFS_ORDER = 0;
+        #endregion
+
         #region Other
         public const string ITEM_CREATOR_MENU = "MMORPG KIT/Item Creator";
-        public const int ITEM_CREATOR_ORDER = 300;
+        public const int ITEM_CREATOR_ORDER = 500;
 
         public const string MINIMAP_CREATOR_MENU = "MMORPG KIT/Minimap Creator";
-        public const int MINIMAP_CREATOR_ORDER = 301;
+        public const int MINIMAP_CREATOR_ORDER = 501;
         #endregion
     }
 }
