@@ -56,11 +56,33 @@ namespace MultiplayerARPG
             if (item.IsEmptySlot())
                 yield break;
             yield return new WaitForSecondsRealtime(delay);
-            ItemDropEntity newEntity = ItemDropEntity.Drop(null, RewardGivenType.None, item, new string[0]);
+            ItemDropEntity newEntity = null;
+            if (GetRandomPosition(out Vector3 dropPosition))
+            {
+                ItemDropEntity prefab;
+#if !EXCLUDE_PREFAB_REFS
+                prefab = GameInstance.Singleton.itemDropEntityPrefab;
+#else
+                prefab = null;
+#endif
+                Quaternion dropRotation = Quaternion.identity;
+                if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
+                {
+                    dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
+                }
+                if (prefab != null)
+                {
+                    newEntity = ItemDropEntity.Drop(prefab, dropPosition, dropRotation, RewardGivenType.None, item, new string[0], -1);
+                }
+                else if (GameInstance.Singleton.addressableItemDropEntityPrefab.IsDataValid())
+                {
+                    newEntity = ItemDropEntity.Drop(GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAsset<AssetReferenceItemDropEntity, ItemDropEntity>(), dropPosition, dropRotation, RewardGivenType.None, item, new string[0], -1);
+                }
+            }
             if (newEntity == null)
                 AddPending(item);
             else
-                newEntity.OnPickedUp.AddListener(OnPickedUp);
+                newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
         }
 
         protected virtual void AddPending(CharacterItem item)
@@ -68,7 +90,7 @@ namespace MultiplayerARPG
             _pending.Add(item);
         }
 
-        protected virtual void OnPickedUp()
+        protected virtual void NewEntity_onNetworkDestroy(byte reasons)
         {
             weightTable.RandomItem((item, amount) =>
             {
