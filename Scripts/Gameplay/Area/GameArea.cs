@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
@@ -6,6 +7,12 @@ namespace MultiplayerARPG
     {
         Radius,
         Square,
+    }
+
+    public enum GameAreaGroundFindingType
+    {
+        NavMesh,
+        Raycast,
     }
 
     public class GameArea : MonoBehaviour
@@ -20,6 +27,7 @@ namespace MultiplayerARPG
         [Header("Square Area")]
         public float squareSizeX = 10f;
         public float squareSizeZ = 10f;
+        public GameAreaGroundFindingType groundFindingType = GameAreaGroundFindingType.NavMesh;
 
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
@@ -84,7 +92,19 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GroundLayerMask, out result);
+            result = fromPosition;
+            switch (groundFindingType)
+            {
+                case GameAreaGroundFindingType.NavMesh:
+                    if (NavMesh.SamplePosition(fromPosition, out NavMeshHit navHit, findDistance, NavMesh.AllAreas))
+                    {
+                        result = navHit.position;
+                        return true;
+                    }
+                    return false;
+                default:
+                    return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GroundLayerMask, out result);
+            }
         }
 
         public virtual int GroundLayerMask { get { return -1; } }
