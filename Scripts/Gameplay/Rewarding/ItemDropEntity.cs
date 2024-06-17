@@ -32,6 +32,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("onItemDropDestroy")]
         [SerializeField]
         protected UnityEvent onPickedUp = new UnityEvent();
+        public UnityEvent OnPickedUp { get { return onPickedUp; } }
 
         [Category(6, "Drop Settings")]
         public ItemDropManager itemDropManager = new ItemDropManager();
