@@ -409,6 +409,8 @@ namespace MultiplayerARPG
         [Tooltip("Items that will be added to character when create new character")]
         [ArrayElementTitle("item")]
         public ItemAmount[] startItems = new ItemAmount[0];
+        [Tooltip("If it is running in editor, and if this is not NULL, it will use data from this setting for testing purpose")]
+        public NewCharacterSetting testingNewCharacterSetting;
 
         [Header("Scene/Maps")]
         public SceneField homeScene;
@@ -591,9 +593,16 @@ namespace MultiplayerARPG
             get { return defaultDamageHitEffects; }
         }
 
-        public bool HasNewCharacterSetting
+        public NewCharacterSetting NewCharacterSetting
         {
-            get { return newCharacterSetting != null; }
+            get
+            {
+#if UNITY_EDITOR
+                if (testingNewCharacterSetting != null)
+                    return testingNewCharacterSetting;
+#endif
+                return newCharacterSetting;
+            }
         }
 
         public HashSet<int> IgnoreRaycastLayersValues { get; private set; }
@@ -858,6 +867,11 @@ namespace MultiplayerARPG
 
             if (newCharacterSetting != null && newCharacterSetting.startItems != null)
                 AddItems(newCharacterSetting.startItems);
+
+#if UNITY_EDITOR
+            if (testingNewCharacterSetting != null && testingNewCharacterSetting.startItems != null)
+                AddItems(testingNewCharacterSetting.startItems);
+#endif
 
             if (startItems != null)
                 AddItems(startItems);

@@ -110,8 +110,8 @@ namespace MultiplayerARPG
 
         public static T SetNewPlayerCharacterData<T>(this T character, string characterName, int dataId, int entityId, int factionId) where T : IPlayerCharacterData
         {
-            int startGold = GameInstance.Singleton.newCharacterSetting != null ? GameInstance.Singleton.newCharacterSetting.startGold : GameInstance.Singleton.startGold;
-            ItemAmount[] startItems = GameInstance.Singleton.newCharacterSetting != null ? GameInstance.Singleton.newCharacterSetting.startItems : GameInstance.Singleton.startItems;
+            int startGold = GameInstance.Singleton.NewCharacterSetting != null ? GameInstance.Singleton.NewCharacterSetting.startGold : GameInstance.Singleton.startGold;
+            ItemAmount[] startItems = GameInstance.Singleton.NewCharacterSetting != null ? GameInstance.Singleton.NewCharacterSetting.startItems : GameInstance.Singleton.startItems;
             return character.SetNewPlayerCharacterData(GameInstance.PlayerCharacters, GameInstance.Attributes, startGold, startItems, characterName, dataId, entityId, factionId);
         }
 
