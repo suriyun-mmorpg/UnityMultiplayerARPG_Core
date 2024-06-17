@@ -8,6 +8,11 @@ namespace MultiplayerARPG
 {
     public abstract class GameSpawnArea : GameArea
     {
+        protected virtual void Awake()
+        {
+            gameObject.layer = PhysicLayers.IgnoreRaycast;
+        }
+
         public abstract void SpawnAll();
     }
 
@@ -54,11 +59,6 @@ namespace MultiplayerARPG
 
         protected float _respawnPendingEntitiesTimer = 0f;
         protected readonly List<SpawnPrefabData> _pending = new List<SpawnPrefabData>();
-
-        protected virtual void Awake()
-        {
-            gameObject.layer = PhysicLayers.IgnoreRaycast;
-        }
 
         protected virtual void LateUpdate()
         {
