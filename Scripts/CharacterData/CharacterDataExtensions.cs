@@ -1065,11 +1065,20 @@ namespace MultiplayerARPG
             skillLevel = 0;
             gameMessage = UITextKeys.NONE;
 
-            if (!GameInstance.Skills.TryGetValue(dataId, out skill) ||
-                !character.GetCaches().Skills.TryGetValue(skill, out skillLevel) ||
-                !skill.CanUse(character, skillLevel, isLeftHand, targetObjectId, out gameMessage))
-            {
+            if (!GameInstance.Skills.TryGetValue(dataId, out skill))
                 return false;
+
+            if (character is BaseMonsterCharacterEntity monsterCharacterEntity)
+            {
+                if (!monsterCharacterEntity.CharacterDatabase.CacheSkillLevels.TryGetValue(skill, out skillLevel) ||
+                    !skill.CanUse(character, skillLevel, isLeftHand, targetObjectId, out gameMessage))
+                    return false;
+            }
+            else
+            {
+                if (!character.GetCaches().Skills.TryGetValue(skill, out skillLevel) ||
+                    !skill.CanUse(character, skillLevel, isLeftHand, targetObjectId, out gameMessage))
+                    return false;
             }
 
             return true;
