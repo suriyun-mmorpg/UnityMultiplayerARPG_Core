@@ -15,7 +15,7 @@ namespace MultiplayerARPG
                 // Extra movement states always none while under water
                 extraMovementState = ExtraMovementState.None;
             }
-            else if (!movement.Entity.CanMove())
+            else if (!movement.Entity.CanMove() && extraMovementState == ExtraMovementState.IsSprinting)
             {
                 // Character can't move, set extra movement state to none
                 extraMovementState = ExtraMovementState.None;
