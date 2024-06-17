@@ -80,9 +80,14 @@ namespace MultiplayerARPG
                 }
             }
             if (newEntity == null)
+            {
                 AddPending(item);
+            }
             else
+            {
+                newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                 newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+            }
         }
 
         protected virtual void AddPending(CharacterItem item)
