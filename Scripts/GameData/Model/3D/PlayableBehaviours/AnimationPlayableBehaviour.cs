@@ -11,8 +11,26 @@ namespace MultiplayerARPG.GameData.Model.Playables
     /// </summary>
     public partial class AnimationPlayableBehaviour : PlayableBehaviour
     {
-        public static readonly AnimationClip EmptyClip = new AnimationClip();
-        public static readonly AvatarMask EmptyMask = new AvatarMask();
+        private static AnimationClip s_emptyClip = null;
+        public static AnimationClip EmptyClip
+        {
+            get
+            {
+                if (s_emptyClip == null)
+                    s_emptyClip = new AnimationClip();
+                return s_emptyClip;
+            }
+        }
+        private static AvatarMask s_emptyMask = null;
+        public static AvatarMask EmptyMask
+        {
+            get
+            {
+                if (s_emptyMask == null)
+                    s_emptyMask = new AvatarMask();
+                return s_emptyMask;
+            }
+        }
 
         public const int BASE_LAYER = 0;
         public const int LEFT_HAND_WIELDING_LAYER = 1;
@@ -570,6 +588,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
         }
         private static readonly Dictionary<int, CacheData> s_caches = new Dictionary<int, CacheData>();
+        public static void ClearCaches()
+        {
+            s_caches.Clear();
+        }
         private CacheData Cache
         {
             get { return s_caches[CharacterModel.Id]; }
