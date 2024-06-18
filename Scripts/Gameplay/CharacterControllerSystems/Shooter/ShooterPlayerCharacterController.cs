@@ -156,8 +156,11 @@ namespace MultiplayerARPG
         protected float aimAssistXSpeed = 20f;
         [SerializeField]
         protected float aimAssistYSpeed = 20f;
+        [FormerlySerializedAs("aimAssistCharacter")]
         [SerializeField]
-        protected bool aimAssistCharacter = true;
+        protected bool aimAssistPlayer = true;
+        [SerializeField]
+        protected bool aimAssistMonster = true;
         [SerializeField]
         protected bool aimAssistBuilding = false;
         [SerializeField]
@@ -1006,7 +1009,8 @@ namespace MultiplayerARPG
             CacheGameplayCameraController.EnableAimAssist = enableAimAssist && (_tempPressAttackRight || _tempPressAttackLeft || !aimAssistOnFireOnly) && !(SelectedGameEntity is IDamageableEntity);
             CacheGameplayCameraController.EnableAimAssistX = enableAimAssistX;
             CacheGameplayCameraController.EnableAimAssistY = enableAimAssistY;
-            CacheGameplayCameraController.AimAssistPlayer = aimAssistCharacter;
+            CacheGameplayCameraController.AimAssistPlayer = aimAssistPlayer;
+            CacheGameplayCameraController.AimAssistMonster = aimAssistMonster;
             CacheGameplayCameraController.AimAssistBuilding = aimAssistBuilding;
             CacheGameplayCameraController.AimAssistHarvestable = aimAssistHarvestable;
             CacheGameplayCameraController.AimAssistRadius = aimAssistRadius;
