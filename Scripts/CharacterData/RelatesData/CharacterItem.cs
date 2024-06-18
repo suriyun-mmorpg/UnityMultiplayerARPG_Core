@@ -170,6 +170,7 @@ namespace MultiplayerARPG
             {
                 // Find ammo item by ammo type
                 amountInInventory = character.CountAmmos(item.WeaponType.AmmoType, out reloadingAmmoDataId);
+                return true;
             }
             return false;
         }
