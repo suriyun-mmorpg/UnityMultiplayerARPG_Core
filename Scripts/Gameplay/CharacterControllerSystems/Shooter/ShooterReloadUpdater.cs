@@ -14,6 +14,8 @@ namespace MultiplayerARPG
         {
             if (PlayingCharacterEntity.IsDead())
                 return;
+            if (PlayingCharacterEntity.IsPlayingActionAnimation())
+                return;
             if (IsReloading)
                 return;
             IsReloading = true;
@@ -45,32 +47,37 @@ namespace MultiplayerARPG
             bool continueReloadingL = false;
             // Reload right-hand weapon
             if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull() &&
-                PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity, out int reloadingAmmoDataIdR, out _) &&
+                PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity, out int reloadingAmmoDataIdR, out int ammoAmountR) &&
                 (!_reloadedDataIdR.HasValue || _reloadedDataIdR.Value == reloadingAmmoDataIdR))
             {
                 _reloadedDataIdR = reloadingAmmoDataIdR;
-                continueReloadingR = true;
-                IWeaponItem weaponItem = PlayingCharacterEntity.EquipWeapons.GetRightHandWeaponItem();
-                if (!PlayingCharacterEntity.Reload(false))
-                    continueReloadingR = false;
-                else if (weaponItem == null || weaponItem.MaxAmmoEachReload <= 0)
-                    continueReloadingR = false;
+                continueReloadingR = ProceedReloading(false, PlayingCharacterEntity.EquipWeapons.GetRightHandWeaponItem(), ammoAmountR);
             }
             // Reload left-hand weapon
             if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull() &&
-                PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity, out int reloadingAmmoDataIdL, out _) &&
+                PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity, out int reloadingAmmoDataIdL, out int ammoAmountL) &&
                 (!_reloadedDataIdL.HasValue || _reloadedDataIdL.Value == reloadingAmmoDataIdL))
             {
                 _reloadedDataIdL = reloadingAmmoDataIdL;
-                continueReloadingL = true;
-                IWeaponItem weaponItem = PlayingCharacterEntity.EquipWeapons.GetLeftHandWeaponItem();
-                if (!PlayingCharacterEntity.Reload(true))
-                    continueReloadingL = false;
-                else if (weaponItem == null || weaponItem.MaxAmmoEachReload <= 0)
-                    continueReloadingL = false;
+                continueReloadingL = ProceedReloading(true, PlayingCharacterEntity.EquipWeapons.GetLeftHandWeaponItem(), ammoAmountL);
             }
             if (!continueReloadingR && !continueReloadingL)
                 IsReloading = false;
+        }
+
+        /// <summary>
+        /// Return `TRUE` if it should continue
+        /// </summary>
+        /// <param name="isLeftHand"></param>
+        /// <param name="weaponItem"></param>
+        /// <returns></returns>
+        private bool ProceedReloading(bool isLeftHand, IWeaponItem weaponItem, int ammoAmount)
+        {
+            if (weaponItem == null)
+                return false;
+            if (!PlayingCharacterEntity.Reload(isLeftHand))
+                return false;
+            return weaponItem.MaxAmmoEachReload > 0 && ammoAmount - weaponItem.MaxAmmoEachReload > 0;
         }
     }
 }
