@@ -341,7 +341,7 @@ namespace MultiplayerARPG
 
         public float FirstPersonCameraRotationSpeedScale
         {
-            get { return CameraRotationSpeedScaleSetting.GetCameraRotationSpeedScaleByKey(firstPersonCameraRotationSpeedScaleSaveKey, 1f); }
+            get { return CameraRotationSpeedScaleSetting.GetCameraRotationSpeedScaleByKey(firstPersonCameraRotationSpeedScaleSaveKey, 0.6f); }
         }
 
         public float CameraRotationSpeedScale
