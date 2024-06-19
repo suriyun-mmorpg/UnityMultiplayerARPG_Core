@@ -14,6 +14,8 @@ namespace MultiplayerARPG
         {
             UICharacterHotkey = GetComponent<UICharacterHotkey>();
             UICharacterHotkeys.RegisterHotkeyJoystick(this);
+            if (TryGetComponent(out UICharacterHotkeys hotkeys))
+                Debug.LogWarning("[UIStaticHotkeyJoystickEventHandler] this should not be in the same game object with `UICharacterHotkeys` component");
         }
 
         public void UpdateEvent()
