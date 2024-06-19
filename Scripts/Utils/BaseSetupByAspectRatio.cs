@@ -38,7 +38,7 @@ namespace UtilsComponents
         {
             currentWidth = Screen.width;
             currentHeight = Screen.height;
-            if (!Application.isPlaying || !Application.isFocused)
+            if (!Application.isPlaying)
                 return;
             int aspect = GetCurrentAspectAsInt();
             if (aspect != _prevAspect)
