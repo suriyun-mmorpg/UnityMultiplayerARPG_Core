@@ -605,6 +605,14 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool HasNewCharacterSetting
+        {
+            get
+            {
+                return NewCharacterSetting != null;
+            }
+        }
+        
         public HashSet<int> IgnoreRaycastLayersValues { get; private set; }
 
         public static readonly Dictionary<string, bool> LoadHomeScenePreventions = new Dictionary<string, bool>();
