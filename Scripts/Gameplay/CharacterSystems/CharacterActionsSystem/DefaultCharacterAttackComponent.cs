@@ -148,8 +148,6 @@ namespace MultiplayerARPG
 
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.RateOfFire > 0)
-                _totalDuration = RATE_OF_FIRE_BASE / weaponItem.RateOfFire;
             DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
             Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts;
             if (isLeftHand && Entity.CachedData.LeftHandDamages != null)
@@ -189,10 +187,7 @@ namespace MultiplayerARPG
                 {
 
                     _totalDuration = Entity.CharacterModel.CacheAttackRecoiler?.DefaultDuration ?? 1f;
-                    _triggerDurations = new float[]
-                    {
-                        0,
-                    };
+                    _triggerDurations = new float[] { 0f };
                     if (tpsModelAvailable)
                         Entity.CharacterModel.CacheAttackRecoiler?.PlayRecoiling();
                     if (vehicleModelAvailable)
@@ -208,6 +203,12 @@ namespace MultiplayerARPG
                         vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                     if (fpsModelAvailable)
                         Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                }
+
+                if (weaponItem.RateOfFire > 0)
+                {
+                    _totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire + Entity.CachedData.Stats.rateOfFire);
+                    _triggerDurations = new float[] { 0f };
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
