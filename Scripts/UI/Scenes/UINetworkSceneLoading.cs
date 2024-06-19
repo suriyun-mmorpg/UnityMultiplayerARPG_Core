@@ -27,6 +27,14 @@ namespace MultiplayerARPG
         {
             defaultText = "Downloaded",
         };
+        public LanguageTextSetting msgSceneLoading = new LanguageTextSetting()
+        {
+            defaultText = "Scene Loading...",
+        };
+        public LanguageTextSetting msgSceneLoaded = new LanguageTextSetting()
+        {
+            defaultText = "Scene Loaded",
+        };
         public LanguageTextSetting formatFileLoadingProgress = new LanguageTextSetting()
         {
             defaultText = "{0} {1}%",
@@ -64,23 +72,41 @@ namespace MultiplayerARPG
                     uiTextAdditiveScenesCount.text = string.Empty;
             }
             if (rootObject != null)
+            {
                 rootObject.SetActive(true);
+            }
             if (uiTextProgress != null)
+            {
                 uiTextProgress.text = "0.00%";
+            }
             if (imageGage != null)
+            {
                 imageGage.fillAmount = 0f;
+            }
             if (sliderGage != null)
+            {
                 sliderGage.value = 0f;
+            }
         }
 
         public virtual void OnLoadSceneProgress(string sceneName, bool isAdditive, bool isOnline, float progress)
         {
+            if (uiTextStatus != null)
+            {
+                uiTextStatus.text = msgSceneLoading.Text;
+            }
             if (uiTextProgress != null)
+            {
                 uiTextProgress.text = (progress * 100f).ToString("N2") + "%";
+            }
             if (imageGage != null)
+            {
                 imageGage.fillAmount = progress;
+            }
             if (sliderGage != null)
+            {
                 sliderGage.value = progress;
+            }
         }
 
         public virtual void OnLoadSceneFinish(string sceneName, bool isAdditive, bool isOnline, float progress)
@@ -92,15 +118,27 @@ namespace MultiplayerARPG
 
         protected virtual IEnumerator OnLoadSceneFinishRoutine()
         {
+            if (uiTextStatus != null)
+            {
+                uiTextStatus.text = msgSceneLoaded.Text;
+            }
             if (uiTextProgress != null)
+            {
                 uiTextProgress.text = "100.00%";
+            }
             if (imageGage != null)
+            {
                 imageGage.fillAmount = 1f;
+            }
             if (sliderGage != null)
+            {
                 sliderGage.value = 1f;
+            }
             yield return new WaitForSecondsRealtime(finishedDelay);
             if (rootObject != null)
+            {
                 rootObject.SetActive(false);
+            }
         }
 
         public virtual void OnSceneFileSizeRetrieving()
