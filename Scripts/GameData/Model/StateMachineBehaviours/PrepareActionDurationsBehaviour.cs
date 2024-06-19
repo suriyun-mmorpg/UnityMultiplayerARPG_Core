@@ -15,6 +15,8 @@ namespace MultiplayerARPG
         {
             if (_actionManager == null)
                 _actionManager = animator.gameObject.GetComponentInParent<CharacterActionComponentManager>();
+            if (_actionManager == null)
+                return;
             s_triggerDurations.Clear();
             if (triggerDurationRates != null && triggerDurationRates.Length > 0)
             {
