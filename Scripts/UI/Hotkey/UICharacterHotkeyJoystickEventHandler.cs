@@ -36,6 +36,8 @@ namespace MultiplayerARPG
             _joystick.Interactable = true;
             UICharacterHotkeys.RegisterHotkeyJoystick(this);
             _hotkeyCancelArea = UICharacterHotkey.UICharacterHotkeys.hotkeyCancelArea;
+            if (TryGetComponent(out UICharacterHotkeys hotkeys))
+                Debug.LogWarning("[UICharacterHotkeyJoystickEventHandler] this should not be in the same game object with `UICharacterHotkeys` component");
         }
 
         private void OnEnable()
