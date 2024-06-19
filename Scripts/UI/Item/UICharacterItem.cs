@@ -758,12 +758,12 @@ namespace MultiplayerARPG
                     uiGageDurability.SetVisible(false);
             }
 
-            if (WeaponItem != null && WeaponItem.WeaponType.AmmoType != null)
+            if (WeaponItem != null && (WeaponItem.WeaponType.AmmoType != null || WeaponItem.AmmoItemIds.Count > 0))
             {
                 int currentAmmo = CharacterItem.ammo;
                 int reserveAmmo = 0;
                 if (GameInstance.PlayingCharacter != null)
-                    reserveAmmo = GameInstance.PlayingCharacter.CountAllAmmos(WeaponItem.WeaponType.AmmoType);
+                    reserveAmmo = GameInstance.PlayingCharacter.CountAllAmmos(WeaponItem);
 
                 if (uiTextCurrentAmmo != null)
                 {
@@ -801,7 +801,7 @@ namespace MultiplayerARPG
 
                 if (gageAmmo != null)
                 {
-                    gageAmmo.SetVisible(WeaponItem.AmmoCapacity > 1);
+                    gageAmmo.SetVisible(WeaponItem.AmmoCapacity > 0);
                     gageAmmo.Update(currentAmmo, WeaponItem.AmmoCapacity);
                 }
             }

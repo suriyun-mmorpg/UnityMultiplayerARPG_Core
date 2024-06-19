@@ -708,10 +708,10 @@ namespace MultiplayerARPG
 
         public static int CountAllAmmos(this ICharacterData data, AmmoType ammoType)
         {
-            if (ammoType == null)
+            if (data == null || ammoType == null)
                 return 0;
             int count = 0;
-            if (data != null && data.NonEquipItems.Count > 0)
+            if (data.NonEquipItems.Count > 0)
             {
                 CharacterItem tempNonEquipItem;
                 IAmmoItem tempAmmoItemData;
@@ -726,6 +726,33 @@ namespace MultiplayerARPG
                         continue;
                     if (ammoType == tempAmmoItemData.AmmoType)
                         count += tempNonEquipItem.amount;
+                }
+            }
+            return count;
+        }
+
+        public static int CountAllAmmos(this ICharacterData data, IWeaponItem weaponItem)
+        {
+            if (data == null || weaponItem == null)
+                return 0;
+            int count = 0;
+            if (weaponItem.WeaponType != null)
+                count += CountAllAmmos(data, weaponItem.WeaponType.AmmoType);
+            if (weaponItem.AmmoItemIds.Count > 0 &&
+                data.NonEquipItems.Count > 0)
+            {
+                CharacterItem tempNonEquipItem;
+                IItem tempAmmoItemData;
+                int i;
+                for (i = 0; i < data.NonEquipItems.Count; ++i)
+                {
+                    tempNonEquipItem = data.NonEquipItems[i];
+                    if (!weaponItem.AmmoItemIds.Contains(tempNonEquipItem.dataId))
+                        continue;
+                    tempAmmoItemData = tempNonEquipItem.GetItem();
+                    if (tempAmmoItemData == null)
+                        continue;
+                    count += tempNonEquipItem.amount;
                 }
             }
             return count;

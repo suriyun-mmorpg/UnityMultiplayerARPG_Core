@@ -68,14 +68,14 @@ namespace MultiplayerARPG
         protected virtual void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject[] requireAmmoSymbols, GameObject[] noRequireAmmoSymbols, UIGageValue gageAmmo, CharacterItem characterItem)
         {
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
-            bool isActive = weaponItem != null && weaponItem.WeaponType.AmmoType != null;
+            bool isActive = weaponItem != null && (weaponItem.WeaponType.AmmoType != null || weaponItem.AmmoItemIds.Count > 0);
             if (root != null)
                 root.SetActive(isActive);
 
             int currentAmmo = characterItem.ammo;
             int reserveAmmo = 0;
             if (GameInstance.PlayingCharacterEntity && isActive)
-                reserveAmmo = GameInstance.PlayingCharacterEntity.CountAllAmmos(weaponItem.WeaponType.AmmoType);
+                reserveAmmo = GameInstance.PlayingCharacterEntity.CountAllAmmos(weaponItem);
 
             if (textCurrentAmmo != null)
             {
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
 
             if (gageAmmo != null)
             {
-                gageAmmo.SetVisible(isActive && weaponItem.AmmoCapacity > 1);
+                gageAmmo.SetVisible(isActive && weaponItem.AmmoCapacity > 0);
                 if (isActive)
                     gageAmmo.Update(currentAmmo, weaponItem.AmmoCapacity);
             }
