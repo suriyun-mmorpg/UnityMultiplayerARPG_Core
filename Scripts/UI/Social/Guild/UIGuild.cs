@@ -449,6 +449,7 @@ namespace MultiplayerARPG
                 {
                     UIGuildCharacter uiGuildMember = ui.GetComponent<UIGuildCharacter>();
                     uiGuildMember.uiSocialGroup = this;
+                    uiGuildMember.index = index;
                     uiGuildMember.Setup(data, memberRoles[index], guild.GetRole(memberRoles[index]));
                     uiGuildMember.Show();
                     MemberSelectionManager.Add(uiGuildMember);

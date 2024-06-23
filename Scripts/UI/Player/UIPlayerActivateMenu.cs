@@ -4,16 +4,32 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public partial class UIPlayerActivateMenu : UISelectionEntry<BasePlayerCharacterEntity>
+    public partial class UIPlayerActivateMenu : UISelectionEntry<IPlayerCharacterData>
     {
         [FormerlySerializedAs("uiCharacter")]
         public UICharacter uiAnotherCharacter;
         [Tooltip("These objects will be activated when owning character can invite to join party")]
-        public GameObject[] partyInviteObjects;
+        public GameObject[] partyInviteObjects = new GameObject[0];
         [Tooltip("These objects will be activated when owning character can invite to join guild")]
-        public GameObject[] guildInviteObjects;
+        public GameObject[] guildInviteObjects = new GameObject[0];
+        [Tooltip("These objects will be activated when owning character can invite to deal")]
+        public GameObject[] dealObjects = new GameObject[0];
+        [Tooltip("These objects will be activated when owning character can invite to duel")]
+        public GameObject[] duelObjects = new GameObject[0];
         [Tooltip("These objects will be activated when owning character can see vending")]
-        public GameObject[] vendingObjects;
+        public GameObject[] vendingObjects = new GameObject[0];
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            UIPlayerActivateMenu[] comps = FindObjectsByType<UIPlayerActivateMenu>(FindObjectsSortMode.None);
+            for (int i = 0; i < comps.Length; ++i)
+            {
+                if (comps[i] == this)
+                    continue;
+                comps[i].Hide();
+            }
+        }
 
         protected override void OnDestroy()
         {
@@ -43,10 +59,41 @@ namespace MultiplayerARPG
                 if (obj != null)
                     obj.SetActive(Data.GuildId <= 0 && GameInstance.JoinedGuild != null && GameInstance.JoinedGuild.CanInvite(GameInstance.PlayingCharacter.Id));
             }
-            foreach (GameObject obj in vendingObjects)
+            if (Data is BasePlayerCharacterEntity entity)
             {
-                if (obj != null)
-                    obj.SetActive(Data.Vending.Data.isStarted);
+                foreach (GameObject obj in dealObjects)
+                {
+                    if (obj != null)
+                        obj.SetActive(true);
+                }
+                foreach (GameObject obj in duelObjects)
+                {
+                    if (obj != null)
+                        obj.SetActive(true);
+                }
+                foreach (GameObject obj in vendingObjects)
+                {
+                    if (obj != null)
+                        obj.SetActive(entity.Vending.Data.isStarted);
+                }
+            }
+            else
+            {
+                foreach (GameObject obj in dealObjects)
+                {
+                    if (obj != null)
+                        obj.SetActive(false);
+                }
+                foreach (GameObject obj in duelObjects)
+                {
+                    if (obj != null)
+                        obj.SetActive(false);
+                }
+                foreach (GameObject obj in vendingObjects)
+                {
+                    if (obj != null)
+                        obj.SetActive(false);
+                }
             }
         }
 
@@ -61,13 +108,15 @@ namespace MultiplayerARPG
 
         public void OnClickSendDealingRequest()
         {
-            GameInstance.PlayingCharacterEntity.Dealing.CallCmdSendDealingRequest(Data.ObjectId);
+            if (Data is BasePlayerCharacterEntity entity)
+                GameInstance.PlayingCharacterEntity.Dealing.CallCmdSendDealingRequest(entity.ObjectId);
             Hide();
         }
 
         public void OnClickSendDuelingRequest()
         {
-            GameInstance.PlayingCharacterEntity.Dueling.CallCmdSendDuelingRequest(Data.ObjectId);
+            if (Data is BasePlayerCharacterEntity entity)
+                GameInstance.PlayingCharacterEntity.Dueling.CallCmdSendDuelingRequest(entity.ObjectId);
             Hide();
         }
 
@@ -105,7 +154,8 @@ namespace MultiplayerARPG
 
         public void OnClickVending()
         {
-            BaseUISceneGameplay.Singleton.ShowVending(Data);
+            if (Data is BasePlayerCharacterEntity entity)
+                BaseUISceneGameplay.Singleton.ShowVending(entity);
         }
     }
 }

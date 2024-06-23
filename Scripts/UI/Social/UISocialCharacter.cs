@@ -12,11 +12,14 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyName = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Level}")]
         public UILocaleKeySetting formatKeyLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_LEVEL);
+        [Tooltip("Format => {0} = {Index}")]
+        public UILocaleKeySetting formatKeyIndex = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
 
         [Header("UI Elements")]
         public UISocialGroup uiSocialGroup;
         public TextWrapper uiTextName;
         public TextWrapper uiTextLevel;
+        public TextWrapper uiTextIndex;
         public UIGageValue uiGageHp;
         public UIGageValue uiGageMp;
         public UIPlayerIcon uiPlayerIcon;
@@ -42,6 +45,8 @@ namespace MultiplayerARPG
         [Tooltip("These objects will be activated when owning character cannot kick")]
         public GameObject[] owningCharacterCannotKickObjects;
         public UICharacterClass uiCharacterClass;
+        public UIPlayerActivateMenu uiPlayerActivateMenu;
+        public int index = 0;
 
         [Header("Events")]
         public UnityEvent onFriendAdded = new UnityEvent();
@@ -64,6 +69,7 @@ namespace MultiplayerARPG
             uiSocialGroup = null;
             uiTextName = null;
             uiTextLevel = null;
+            uiTextIndex = null;
             uiGageHp = null;
             uiGageMp = null;
             uiPlayerIcon = null;
@@ -208,6 +214,13 @@ namespace MultiplayerARPG
                     Data.level.ToString("N0"));
             }
 
+            if (uiTextIndex != null)
+            {
+                uiTextIndex.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyIndex),
+                    (index + 1).ToString("N0"));
+            }
+
             foreach (GameObject obj in memberIsLeaderObjects)
             {
                 if (obj != null)
@@ -249,6 +262,34 @@ namespace MultiplayerARPG
             GameInstance.PlayerCharacters.TryGetValue(Data.dataId, out character);
             if (uiCharacterClass != null)
                 uiCharacterClass.Data = character;
+
+            if (uiPlayerActivateMenu != null)
+            {
+                uiPlayerActivateMenu.Data = new PlayerCharacterData()
+                {
+                    Id = Data.id,
+                    UserId = Data.userId,
+                    CharacterName = Data.characterName,
+                    DataId = Data.dataId,
+                    Level = Data.level,
+                    FactionId = Data.factionId,
+                    PartyId = Data.partyId,
+                    GuildId = Data.guildId,
+                    GuildRole = Data.guildRole,
+                    IconDataId = Data.iconDataId,
+                    FrameDataId = Data.frameDataId,
+                    TitleDataId = Data.titleDataId,
+                };
+            }
+        }
+
+        public virtual void OnClickShowPlayerActivateMenu()
+        {
+            if (uiPlayerActivateMenu == null)
+                return;
+            if (string.Equals(Data.id, GameInstance.PlayingCharacter.Id))
+                return;
+            uiPlayerActivateMenu.Show();
         }
 
         protected virtual string GetOnlineStatusText(bool isOnline, int offlineOffsets)

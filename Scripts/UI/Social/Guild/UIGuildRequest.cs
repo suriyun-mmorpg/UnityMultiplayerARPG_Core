@@ -54,6 +54,7 @@ namespace MultiplayerARPG
             {
                 tempUI = ui.GetComponent<UISocialCharacter>();
                 tempUI.uiSocialGroup = this;
+                tempUI.index = index;
                 tempUI.Data = data;
                 tempUI.Show();
                 tempUI.onGuildRequestAccepted.RemoveListener(Refresh);
