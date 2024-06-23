@@ -15,13 +15,12 @@ namespace MultiplayerARPG
         public GameObject anotherConfirmSign;
         private UIDealing ui;
 
-        private void Start()
+        private void Awake()
         {
             ui = GetComponent<UIDealing>();
             ui.onStateChangeToDealing.AddListener(OnStateChangeToDealing);
             ui.onStateChangeToLock.AddListener(OnStateChangeToLock);
             ui.onStateChangeToConfirm.AddListener(OnStateChangeToConfirm);
-            ui.onAnotherStateChangeToDealing.AddListener(OnAnotherStateChangeToDealing);
             ui.onAnotherStateChangeToLock.AddListener(OnAnotherStateChangeToLock);
             ui.onAnotherStateChangeToConfirm.AddListener(OnAnotherStateChangeToConfirm);
             ui.onBothStateChangeToLock.AddListener(OnBothStateChangeToLock);
@@ -51,7 +50,10 @@ namespace MultiplayerARPG
         {
             DeactivateAllButtons();
             if (buttonLock)
+            {
                 buttonLock.gameObject.SetActive(true);
+                buttonLock.interactable = true;
+            }
             if (buttonCancel)
                 buttonCancel.gameObject.SetActive(true);
         }
@@ -59,8 +61,11 @@ namespace MultiplayerARPG
         public void OnStateChangeToLock()
         {
             DeactivateAllButtons();
-            if (buttonConfirm)
-                buttonConfirm.gameObject.SetActive(true);
+            if (buttonLock)
+            {
+                buttonLock.gameObject.SetActive(true);
+                buttonLock.interactable = false;
+            }
             if (buttonCancel)
                 buttonCancel.gameObject.SetActive(true);
             if (owningLockSign)
@@ -69,26 +74,18 @@ namespace MultiplayerARPG
 
         public void OnStateChangeToConfirm()
         {
-            DeactivateAllButtons();
             if (owningConfirmSign)
                 owningConfirmSign.SetActive(true);
         }
 
-        public void OnAnotherStateChangeToDealing()
-        {
-            DeactivateAllButtons();
-        }
-
         public void OnAnotherStateChangeToLock()
         {
-            DeactivateAllButtons();
             if (anotherLockSign)
                 anotherLockSign.SetActive(true);
         }
 
         public void OnAnotherStateChangeToConfirm()
         {
-            DeactivateAllButtons();
             if (anotherConfirmSign)
                 anotherConfirmSign.SetActive(true);
         }
@@ -100,6 +97,10 @@ namespace MultiplayerARPG
                 buttonConfirm.gameObject.SetActive(true);
             if (buttonCancel)
                 buttonCancel.gameObject.SetActive(true);
+            if (owningLockSign)
+                owningLockSign.SetActive(true);
+            if (anotherLockSign)
+                anotherLockSign.SetActive(true);
         }
     }
 }
