@@ -19,5 +19,8 @@ namespace MultiplayerARPG
         // UIs
         public const int UI_CRAFTING_QUEUE_ITEMS = 100;
         public const int UI_ITEM_CRAFT_FORMULAS = 101;
+        public const int UI_CHARACTER_HOTKEYS = 100;
+        public const int UI_CHARACTER_HOTKEY = 101;
+        public const int UI_CHARACTER_HOTKEY_JOYSTICK = 102;
     }
 }

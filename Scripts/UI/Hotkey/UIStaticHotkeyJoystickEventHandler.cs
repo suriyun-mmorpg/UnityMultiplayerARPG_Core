@@ -2,6 +2,7 @@
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(DefaultExecutionOrders.UI_CHARACTER_HOTKEY_JOYSTICK)]
     [RequireComponent(typeof(UICharacterHotkey))]
     public class UIStaticHotkeyJoystickEventHandler : MonoBehaviour, IHotkeyJoystickEventHandler
     {
@@ -10,12 +11,12 @@ namespace MultiplayerARPG
         public bool IsDragging { get { return false; } }
         public AimPosition AimPosition { get; private set; }
 
-        private void Start()
+        private void Awake()
         {
             UICharacterHotkey = GetComponent<UICharacterHotkey>();
-            UICharacterHotkeys.RegisterHotkeyJoystick(this);
             if (TryGetComponent(out UICharacterHotkeys hotkeys))
                 Debug.LogWarning("[UIStaticHotkeyJoystickEventHandler] this should not be in the same game object with `UICharacterHotkeys` component");
+            UICharacterHotkeys.RegisterHotkeyJoystick(this);
         }
 
         public void UpdateEvent()

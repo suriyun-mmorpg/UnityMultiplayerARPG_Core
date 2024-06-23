@@ -2,6 +2,7 @@
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(DefaultExecutionOrders.UI_CHARACTER_HOTKEY_JOYSTICK)]
     [RequireComponent(typeof(UICharacterHotkey))]
     public class UICharacterHotkeyJoystickEventHandler : MonoBehaviour, IHotkeyJoystickEventHandler
     {
@@ -22,6 +23,9 @@ namespace MultiplayerARPG
         private void Awake()
         {
             UICharacterHotkey = GetComponent<UICharacterHotkey>();
+            if (TryGetComponent(out UICharacterHotkeys hotkeys))
+                Debug.LogWarning("[UICharacterHotkeyJoystickEventHandler] this should not be in the same game object with `UICharacterHotkeys` component");
+            UICharacterHotkeys.RegisterHotkeyJoystick(this);
         }
 
         private void Start()
@@ -34,10 +38,7 @@ namespace MultiplayerARPG
             _joystick.setAsLastSiblingOnDrag = true;
             _joystick.hideWhileIdle = true;
             _joystick.Interactable = true;
-            UICharacterHotkeys.RegisterHotkeyJoystick(this);
             _hotkeyCancelArea = UICharacterHotkey.UICharacterHotkeys.hotkeyCancelArea;
-            if (TryGetComponent(out UICharacterHotkeys hotkeys))
-                Debug.LogWarning("[UICharacterHotkeyJoystickEventHandler] this should not be in the same game object with `UICharacterHotkeys` component");
         }
 
         private void OnEnable()

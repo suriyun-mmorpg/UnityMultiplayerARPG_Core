@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(DefaultExecutionOrders.UI_CHARACTER_HOTKEY)]
     public partial class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
     {
         public int indexOfData { get; protected set; }

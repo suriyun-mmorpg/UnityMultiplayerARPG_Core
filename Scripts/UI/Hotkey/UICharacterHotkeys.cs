@@ -5,6 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
+    [DefaultExecutionOrder(DefaultExecutionOrders.UI_CHARACTER_HOTKEYS)]
     public partial class UICharacterHotkeys : UIBase
     {
         public List<string> filterCategories = new List<string>();
@@ -31,35 +32,40 @@ namespace MultiplayerARPG
         public static UICharacterHotkey UsingHotkey { get; private set; }
         public static AimPosition HotkeyAimPosition { get; private set; }
 
-        internal static UICharacterHotkey s_hotkeyForDialogControlling;
-        public static UICharacterHotkey HotkeyForDialogControlling
+        internal static UICharacterHotkey s_hotkeyForAimming;
+        public static UICharacterHotkey HotkeyForAimming
         {
             get
             {
                 if (GameInstance.UseMobileInput())
-                    return HotkeyJoystickForDialogControlling.UICharacterHotkey;
-                if (s_hotkeyForDialogControlling == null)
-                    s_hotkeyForDialogControlling = new GameObject("_HotkeyForDialogControlling").AddComponent<UICharacterHotkey>();
-                return s_hotkeyForDialogControlling;
+                    return HotkeyJoystickForAimming.UICharacterHotkey;
+                if (s_hotkeyForAimming == null)
+                    s_hotkeyForAimming = new GameObject("_HotkeyForDialogControlling").AddComponent<UICharacterHotkey>();
+                return s_hotkeyForAimming;
             }
         }
 
-        internal static IHotkeyJoystickEventHandler s_hotkeyJoystickForDialogControlling;
-        public static IHotkeyJoystickEventHandler HotkeyJoystickForDialogControlling
+        internal static IHotkeyJoystickEventHandler s_hotkeyJoystickForAimming;
+        public static IHotkeyJoystickEventHandler HotkeyJoystickForAimming
         {
             get
             {
-                if (s_hotkeyJoystickForDialogControlling == null && s_hotkeyJoysticks.Count > 0)
+                if (s_hotkeyJoystickForAimming == null && s_hotkeyJoysticks.Count > 0)
                 {
                     IHotkeyJoystickEventHandler prefab = s_hotkeyJoysticks[0];
-                    s_hotkeyJoystickForDialogControlling = Instantiate(prefab.gameObject, prefab.transform.parent).GetComponent<IHotkeyJoystickEventHandler>();
-                    s_hotkeyJoystickForDialogControlling.gameObject.name = "_HotkeyJoystickForDialogControlling";
-                    s_hotkeyJoystickForDialogControlling.transform.localPosition = prefab.transform.localPosition;
-                    s_hotkeyJoystickForDialogControlling.transform.localRotation = prefab.transform.localRotation;
-                    s_hotkeyJoystickForDialogControlling.transform.localScale = prefab.transform.localScale;
-                    s_hotkeyJoystickForDialogControlling.UICharacterHotkey.Setup(prefab.UICharacterHotkey.UICharacterHotkeys, null, new CharacterHotkey(), -1);
+                    if (prefab == null)
+                        return null;
+                    if (prefab.gameObject.activeSelf)
+                        prefab.gameObject.SetActive(false);
+                    s_hotkeyJoystickForAimming = Instantiate(prefab.gameObject, prefab.transform.parent).GetComponent<IHotkeyJoystickEventHandler>();
+                    s_hotkeyJoystickForAimming.gameObject.name = "_HotkeyJoystickForAimming";
+                    s_hotkeyJoystickForAimming.transform.localPosition = prefab.transform.localPosition;
+                    s_hotkeyJoystickForAimming.transform.localRotation = prefab.transform.localRotation;
+                    s_hotkeyJoystickForAimming.transform.localScale = prefab.transform.localScale;
+                    s_hotkeyJoystickForAimming.gameObject.SetActive(true);
+                    s_hotkeyJoystickForAimming.UICharacterHotkey.Setup(prefab.UICharacterHotkey.UICharacterHotkeys, null, new CharacterHotkey(), -1);
                 }
-                return s_hotkeyJoystickForDialogControlling;
+                return s_hotkeyJoystickForAimming;
             }
         }
         private static readonly List<IHotkeyJoystickEventHandler> s_hotkeyJoysticks = new List<IHotkeyJoystickEventHandler>();
@@ -270,8 +276,8 @@ namespace MultiplayerARPG
             if (UsingHotkey == null)
                 return;
             UsingHotkey.FinishAimControls(isCancel, HotkeyAimPosition);
-            if (HotkeyJoystickForDialogControlling != null && HotkeyJoystickForDialogControlling.UICharacterHotkey == UsingHotkey)
-                HotkeyJoystickForDialogControlling.gameObject.SetActive(false);
+            if (s_hotkeyJoystickForAimming != null && s_hotkeyJoystickForAimming.UICharacterHotkey == UsingHotkey)
+                s_hotkeyJoystickForAimming.gameObject.SetActive(false);
             UsingHotkey = null;
             HotkeyAimPosition = default;
         }
@@ -295,15 +301,15 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        public static void SetupHotkeyForDialogControlling(HotkeyType type, string relateId)
+        public static void SetupHotkeyForAimming(HotkeyType type, string relateId)
         {
             CharacterHotkey hotkey = new CharacterHotkey();
             hotkey.type = type;
             hotkey.relateId = relateId;
-            if (HotkeyJoystickForDialogControlling != null)
-                HotkeyJoystickForDialogControlling.gameObject.SetActive(true);
-            HotkeyForDialogControlling.Data = hotkey;
-            HotkeyForDialogControlling.OnClickUse();
+            if (HotkeyJoystickForAimming != null)
+                HotkeyJoystickForAimming.gameObject.SetActive(true);
+            HotkeyForAimming.Data = hotkey;
+            HotkeyForAimming.OnClickUse();
         }
     }
 }
