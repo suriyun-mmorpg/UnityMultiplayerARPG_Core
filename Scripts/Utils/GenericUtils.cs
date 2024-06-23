@@ -476,7 +476,7 @@ public static partial class GenericUtils
         string formatDaysAgo = "{0} Days ago";
         string formatWeeksAgo = "{0} Weeks ago";
         string formatMonthsAgo = "{0} Months ago";
-        string textUnknow = "Unknow";
+        string textUnknow = "Unknown";
 
         // Future text
         string textAFewSeconds = "a few seconds";
