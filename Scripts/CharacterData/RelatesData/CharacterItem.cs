@@ -285,14 +285,40 @@ namespace MultiplayerARPG
             newItem.sockets = new List<int>();
             if (GameInstance.Items.TryGetValue(dataId, out BaseItem tempItem))
             {
-                if (tempItem.IsEquipment())
+                if (tempItem.IsEquipment() && tempItem is IEquipmentItem equipmentItem)
                 {
-                    newItem.durability = (tempItem as IEquipmentItem).MaxDurability;
+                    newItem.durability = equipmentItem.MaxDurability;
                     newItem.lockRemainsDuration = tempItem.LockDuration;
                     if (randomSeed.HasValue)
+                    {
                         newItem.randomSeed = randomSeed.Value;
+                    }
                     else
+                    {
                         newItem.randomSeed = GenericUtils.RandomInt(int.MinValue, int.MaxValue);
+                    }
+
+                    if (tempItem.IsWeapon() && tempItem is IWeaponItem weaponItem)
+                    {
+                        // Set default ammo amount
+                        if (weaponItem.AmmoItemIds.Count > 0)
+                        {
+                            var iterator = weaponItem.AmmoItemIds.GetEnumerator();
+                            iterator.MoveNext();
+                            newItem.ammoDataId = iterator.Current;
+                            if (GameInstance.Items.TryGetValue(newItem.ammoDataId, out BaseItem ammoItem))
+                            {
+                                if (ammoItem.OverrideAmmoCapacity > 0)
+                                    newItem.ammo = ammoItem.OverrideAmmoCapacity;
+                                else
+                                    newItem.ammo = weaponItem.AmmoCapacity;
+                            }
+                        }
+                        else
+                        {
+                            newItem.ammo = weaponItem.AmmoCapacity;
+                        }
+                    }
                 }
                 if (tempItem.ExpireDuration > 0)
                 {
