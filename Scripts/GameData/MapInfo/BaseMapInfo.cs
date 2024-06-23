@@ -177,6 +177,13 @@ namespace MultiplayerARPG
         public virtual bool AutoRespawnWhenDead { get { return false; } }
         public virtual bool SaveCurrentMapPosition { get { return true; } }
 
+        public virtual void GetEnterMapPoint(IPlayerCharacterData playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation)
+        {
+            mapName = Id;
+            position = playerCharacterData.CurrentPosition;
+            rotation = playerCharacterData.CurrentRotation;
+        }
+
         public virtual void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out WarpPortalType portalType, out string mapName, out Vector3 position, out bool overrideRotation, out Vector3 rotation)
         {
             portalType = WarpPortalType.Default;
