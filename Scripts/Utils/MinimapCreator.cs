@@ -9,6 +9,7 @@ namespace MultiplayerARPG
 {
     public class MinimapCreator : MonoBehaviour
     {
+#if UNITY_EDITOR
         public const int TEXTURE_WIDTH_AND_HEIGHT = 2048;
         public const int TEXTURE_DEPTH = 24;
         public const float SPRITE_PIXELS_PER_UNIT = 100f;
@@ -30,12 +31,10 @@ namespace MultiplayerARPG
         public bool makeByRenderer = false;
         public bool doNotDestroyCamera = false;
         public Camera customCamera;
-#if UNITY_EDITOR
+
         [InspectorButton(nameof(CreateByComponent))]
         public bool create;
-#endif
 
-#if UNITY_EDITOR
         [ContextMenu("Create")]
         public void CreateByComponent()
         {
