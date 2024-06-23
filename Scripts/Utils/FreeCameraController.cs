@@ -9,7 +9,7 @@ namespace UtilsComponents
 
         private void Start()
         {
-            InputManager.useMobileInputOnNonMobile = true;
+            InputManager.UseMobileInputOnNonMobile = true;
         }
 
         void Update()
