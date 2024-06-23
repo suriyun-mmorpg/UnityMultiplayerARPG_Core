@@ -195,7 +195,7 @@ namespace MultiplayerARPG
                 return;
             foreach (ItemRandomByWeight itemDrop in itemDrops)
             {
-                AddItems(itemDrop.item);
+                AddItems(itemDrop.Item);
             }
         }
 

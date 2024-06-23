@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         public const int BUILD_SETUP_EXCLUDE_PREFAB_REFS_ORDER = 3;
         public const string BUILD_SETUP_INCLUDE_PREFAB_REFS_MENU = "MMORPG KIT/Include Prefab Refs";
         public const int BUILD_SETUP_INCLUDE_PREFAB_REFS_ORDER = 4;
+        public const string BUILD_VALIDATE_GAME_DATA_MENU = "MMORPG KIT/Game Data Validator";
+        public const int BUILD_VALIDATE_GAME_DATA_ORDER = 5;
         #endregion
 
         #region Database
@@ -43,10 +45,10 @@ namespace MultiplayerARPG
 
         #region Other
         public const string ITEM_CREATOR_MENU = "MMORPG KIT/Item Creator";
-        public const int ITEM_CREATOR_ORDER = 500;
+        public const int ITEM_CREATOR_ORDER = 600;
 
         public const string MINIMAP_CREATOR_MENU = "MMORPG KIT/Minimap Creator";
-        public const int MINIMAP_CREATOR_ORDER = 501;
+        public const int MINIMAP_CREATOR_ORDER = 601;
         #endregion
     }
 }

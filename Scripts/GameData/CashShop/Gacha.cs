@@ -52,7 +52,7 @@ namespace MultiplayerARPG
                     _cacheRandomItems = new Dictionary<ItemRandomByWeight, int>();
                     foreach (ItemRandomByWeight item in randomItems)
                     {
-                        if (item.item == null || item.maxAmount <= 0 || item.randomWeight <= 0)
+                        if (item.Item == null || item.maxAmount <= 0 || item.randomWeight <= 0)
                             continue;
                         _cacheRandomItems[item] = item.randomWeight;
                     }
@@ -71,7 +71,7 @@ namespace MultiplayerARPG
                 {
                     rewardItems.Add(new RewardedItem()
                     {
-                        item = randomedItem.item,
+                        item = randomedItem.Item,
                         level = 1,
                         amount = randomedItem.maxAmount,
                         randomSeed = Random.Range(int.MinValue, int.MaxValue),
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
                 {
                     rewardItems.Add(new RewardedItem()
                     {
-                        item = randomedItem.item,
+                        item = randomedItem.Item,
                         level = 1,
                         amount = Random.Range(randomedItem.minAmount, randomedItem.maxAmount),
                         randomSeed = Random.Range(int.MinValue, int.MaxValue),
