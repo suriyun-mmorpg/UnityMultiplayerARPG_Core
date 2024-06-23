@@ -249,6 +249,7 @@ namespace MultiplayerARPG
         protected readonly HashSet<GameObject> _triggerObjects = new HashSet<GameObject>();
         protected readonly HashSet<BuildingEntity> _children = new HashSet<BuildingEntity>();
         protected readonly HashSet<BuildingMaterial> _buildingMaterials = new HashSet<BuildingMaterial>();
+        protected int _lastAddedTriggerObjectFrame;
         protected bool _parentFound;
         protected bool _isDestroyed;
 
@@ -328,6 +329,9 @@ namespace MultiplayerARPG
                     if (!buildingMaterial) continue;
                     buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
                 }
+                // Clear all triggered, `BuildingMaterialBuildModeHandler` will try to add them later
+                if (Time.frameCount > _lastAddedTriggerObjectFrame)
+                    _triggerObjects.Clear();
             }
             // Setup parent which when it's destroying it will destroy children (chain destroy)
             if (IsServer && !_parentFound)
@@ -623,61 +627,30 @@ namespace MultiplayerARPG
             Builder = builder;
         }
 
-        public void AddTriggerObject(GameObject obj)
-        {
-            _triggerObjects.Add(obj);
-        }
-
-        public bool RemoveTriggerObject(GameObject obj)
-        {
-            return _triggerObjects.Remove(obj);
-        }
-
-        public bool TriggerEnterEntity(BaseGameEntity entity)
+        public bool AddTriggeredEntity(BaseGameEntity entity)
         {
             if (entity == null || entity.EntityGameObject == EntityGameObject)
                 return false;
-            AddTriggerObject(entity.EntityGameObject);
+            _triggerObjects.Add(entity.EntityGameObject);
+            _lastAddedTriggerObjectFrame = Time.frameCount;
             return true;
         }
 
-        public bool TriggerExitEntity(BaseGameEntity entity)
-        {
-            if (entity == null)
-                return false;
-            RemoveTriggerObject(entity.EntityGameObject);
-            return true;
-        }
-
-        public bool TriggerEnterComponent(Component component)
+        public bool AddTriggeredComponent(Component component)
         {
             if (component == null)
                 return false;
-            AddTriggerObject(component.gameObject);
+            _triggerObjects.Add(component.gameObject);
+            _lastAddedTriggerObjectFrame = Time.frameCount;
             return true;
         }
 
-        public bool TriggerExitComponent(Component component)
-        {
-            if (component == null)
-                return false;
-            RemoveTriggerObject(component.gameObject);
-            return true;
-        }
-
-        public bool TriggerEnterGameObject(GameObject other)
+        public bool AddTriggeredGameObject(GameObject other)
         {
             if (other == null)
                 return false;
-            AddTriggerObject(other);
-            return true;
-        }
-
-        public bool TriggerExitGameObject(GameObject other)
-        {
-            if (other == null)
-                return false;
-            RemoveTriggerObject(other);
+            _triggerObjects.Add(other);
+            _lastAddedTriggerObjectFrame = Time.frameCount;
             return true;
         }
 

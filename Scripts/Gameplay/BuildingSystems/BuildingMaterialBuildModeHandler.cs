@@ -19,36 +19,23 @@ namespace MultiplayerARPG
 
         private void OnTriggerStay(Collider other)
         {
-            TriggerEnter(other.gameObject, other, null);
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            TriggerExit(other.gameObject);
+            AddTriggered(other.gameObject, other, null);
         }
 
         private void OnTriggerStay2D(Collider2D other)
         {
-            TriggerEnter(other.gameObject, null, other);
+            AddTriggered(other.gameObject, null, other);
         }
 
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            TriggerExit(other.gameObject);
-        }
-
-        private void TriggerEnter(GameObject other, Collider collider, Collider2D collider2D)
+        private void AddTriggered(GameObject other, Collider collider, Collider2D collider2D)
         {
             if (!ValidateTriggerLayer(other) || SameBuildingAreaTransform(other))
-            {
-                buildingMaterial.BuildingEntity.TriggerExitGameObject(other);
-                return;
-            }
-
-            if (buildingMaterial.BuildingEntity.TriggerEnterComponent(other.GetComponent<NoConstructionArea>()))
                 return;
 
-            if (buildingMaterial.BuildingEntity.TriggerEnterComponent(other.GetComponent<TilemapCollider2D>()))
+            if (buildingMaterial.BuildingEntity.AddTriggeredComponent(other.GetComponent<NoConstructionArea>()))
+                return;
+
+            if (buildingMaterial.BuildingEntity.AddTriggeredComponent(other.GetComponent<TilemapCollider2D>()))
                 return;
 
             BuildingArea buildingArea = other.GetComponent<BuildingArea>();
@@ -59,7 +46,7 @@ namespace MultiplayerARPG
             IGameEntity gameEntity = other.GetComponent<IGameEntity>();
             if (!foundMaterial && !gameEntity.IsNull())
             {
-                buildingMaterial.BuildingEntity.TriggerEnterEntity(gameEntity.Entity);
+                buildingMaterial.BuildingEntity.AddTriggeredEntity(gameEntity.Entity);
                 return;
             }
 
@@ -70,21 +57,7 @@ namespace MultiplayerARPG
                 isMaterialOrNonTrigger = true;
 
             if (isMaterialOrNonTrigger)
-                buildingMaterial.BuildingEntity.TriggerEnterGameObject(other);
-            else
-                buildingMaterial.BuildingEntity.TriggerExitGameObject(other);
-
-        }
-
-        private void TriggerExit(GameObject other)
-        {
-            IGameEntity gameEntity = other.GetComponent<IGameEntity>();
-            if (!gameEntity.IsNull())
-            {
-                buildingMaterial.BuildingEntity.TriggerExitEntity(gameEntity.Entity);
-                return;
-            }
-            buildingMaterial.BuildingEntity.TriggerExitGameObject(other);
+                buildingMaterial.BuildingEntity.AddTriggeredGameObject(other);
         }
 
         private bool SameBuildingAreaTransform(GameObject other)
