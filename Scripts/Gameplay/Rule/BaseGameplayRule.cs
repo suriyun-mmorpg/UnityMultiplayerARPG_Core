@@ -488,6 +488,8 @@ namespace MultiplayerARPG
         {
             if (character.Gold < setting.CreateGuildRequiredGold)
                 return false;
+            if (character.UserCash < setting.CreateGuildRequiredCash)
+                return false;
             if (setting.CreateGuildRequireCurrencies.Count == 0)
                 return true;
             return character.HasEnoughCurrencyAmounts(setting.CreateGuildRequireCurrencies, out _, out _);
@@ -496,6 +498,7 @@ namespace MultiplayerARPG
         public virtual void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
         {
             character.Gold -= setting.CreateGuildRequiredGold;
+            GameInstance.ServerUserHandlers.ChangeUserCash(character.UserId, -setting.CreateGuildRequiredCash);
             if (setting.CreateGuildRequireCurrencies.Count == 0)
                 return;
             character.DecreaseCurrencies(setting.CreateGuildRequireCurrencies);
