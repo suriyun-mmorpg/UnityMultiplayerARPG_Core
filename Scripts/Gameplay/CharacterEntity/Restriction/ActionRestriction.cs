@@ -5,6 +5,8 @@ namespace MultiplayerARPG
     {
         public bool restrictedWhileAirborne;
         public bool restrictedWhileCrouching;
+        public bool restrictedWhileCrouchMoving;
         public bool restrictedWhileCrawling;
+        public bool restrictedWhileCrawlMoving;
     }
 }

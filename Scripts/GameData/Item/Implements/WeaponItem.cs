@@ -137,14 +137,20 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private ActionRestriction attackRestriction = default;
+        private ActionRestriction attackRestriction = new ActionRestriction()
+        {
+            restrictedWhileCrawlMoving = true,
+        };
         public ActionRestriction AttackRestriction
         {
             get { return attackRestriction; }
         }
 
         [SerializeField]
-        private ActionRestriction reloadRestriction = default;
+        private ActionRestriction reloadRestriction = new ActionRestriction()
+        {
+            restrictedWhileCrawlMoving = true,
+        };
         public ActionRestriction ReloadRestriction
         {
             get { return reloadRestriction; }

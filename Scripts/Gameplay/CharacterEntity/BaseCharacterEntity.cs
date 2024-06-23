@@ -551,6 +551,15 @@ namespace MultiplayerARPG
             if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.AttackRestriction.restrictedWhileCrawling)
                 return false;
 
+            if (Entity.MovementState.HasDirectionMovement())
+            {
+                if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.AttackRestriction.restrictedWhileCrouchMoving)
+                    return false;
+
+                if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.AttackRestriction.restrictedWhileCrawlMoving)
+                    return false;
+            }
+
             return true;
         }
 
@@ -577,6 +586,15 @@ namespace MultiplayerARPG
 
             if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.useSkillRestriction.restrictedWhileCrawling)
                 return false;
+
+            if (Entity.MovementState.HasDirectionMovement())
+            {
+                if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.useSkillRestriction.restrictedWhileCrouchMoving)
+                    return false;
+
+                if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.useSkillRestriction.restrictedWhileCrawlMoving)
+                    return false;
+            }
 
             return true;
         }
@@ -605,6 +623,15 @@ namespace MultiplayerARPG
             if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.useSkillRestriction.restrictedWhileCrawling)
                 return false;
 
+            if (Entity.MovementState.HasDirectionMovement())
+            {
+                if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && skill.useSkillRestriction.restrictedWhileCrouchMoving)
+                    return false;
+
+                if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && skill.useSkillRestriction.restrictedWhileCrawlMoving)
+                    return false;
+            }
+
             return true;
         }
 
@@ -629,6 +656,15 @@ namespace MultiplayerARPG
 
             if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.ReloadRestriction.restrictedWhileCrawling)
                 return false;
+
+            if (Entity.MovementState.HasDirectionMovement())
+            {
+                if (Entity.ExtraMovementState == ExtraMovementState.IsCrouching && weaponItem.ReloadRestriction.restrictedWhileCrouchMoving)
+                    return false;
+
+                if (Entity.ExtraMovementState == ExtraMovementState.IsCrawling && weaponItem.ReloadRestriction.restrictedWhileCrawlMoving)
+                    return false;
+            }
 
             return true;
         }
