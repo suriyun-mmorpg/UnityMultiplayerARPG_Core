@@ -760,7 +760,33 @@ namespace MultiplayerARPG
 
         public static CharacterItem GetAvailableWeapon(this ICharacterData data, ref bool isLeftHand)
         {
-            return data.GetCaches().GetAvailableWeapon(ref isLeftHand);
+            CharacterItem result;
+            bool foundItem;
+            if (isLeftHand)
+            {
+                // Left hand
+                result = data.EquipWeapons.leftHand;
+                foundItem = data.EquipWeapons.GetLeftHandWeaponItem() != null;
+                if (!foundItem)
+                {
+                    // Left hand not found, use right hand
+                    result = data.EquipWeapons.rightHand;
+                    foundItem = data.EquipWeapons.GetRightHandWeaponItem() != null;
+                    isLeftHand = false;
+                }
+            }
+            else
+            {
+                // Right hand
+                result = data.EquipWeapons.rightHand;
+                foundItem = data.EquipWeapons.GetRightHandWeaponItem() != null;
+            }
+            if (!foundItem)
+            {
+                // Really can't get the item, then it is a default one
+                result = CharacterItem.CreateDefaultWeapon();
+            }
+            return result;
         }
 
         public static DamageInfo GetWeaponDamageInfo(this ICharacterData data, ref bool isLeftHand)
