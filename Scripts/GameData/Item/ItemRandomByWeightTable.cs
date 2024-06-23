@@ -33,6 +33,11 @@ namespace MultiplayerARPG
             }
         }
 
+        protected virtual void OnValidate()
+        {
+            OnValidateGameData();
+        }
+
         public bool OnValidateGameData()
         {
             bool hasChanges = false;
