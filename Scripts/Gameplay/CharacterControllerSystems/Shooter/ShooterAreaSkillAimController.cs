@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         public const float GROUND_DETECTION_DISTANCE = 30f;
         private readonly RaycastHit[] findGroundRaycastHits = new RaycastHit[32];
         public bool IsAiming { get { return Time.frameCount - _lastUpdateFrame <= 1; } }
-        public bool IsMobile { get { return InputManager.UseMobileInput(); } }
+        public bool IsMobile { get { return InputManager.IsUseMobileInput(); } }
 
         private int _lastUpdateFrame;
         private bool _beginDragged;
