@@ -92,7 +92,6 @@ namespace MultiplayerARPG
                 sliderGage.value = 0;
             yield return null;
             var asyncOp = sceneRef.LoadSceneAsync(LoadSceneMode.Single);
-            LiteNetLibGameManager.LatestLoadedAddressableSceneAsyncOperation = asyncOp;
             while (!asyncOp.IsDone)
             {
                 if (uiTextProgress != null)
