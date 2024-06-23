@@ -694,6 +694,8 @@ namespace MultiplayerARPG
                     _tempMovementState |= MovementState.IsUnderWater;
                 if (_isGrounded || _airborneElapsed < airborneDelay || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
                     _tempMovementState |= MovementState.IsGrounded;
+                if (_isJumping)
+                    _tempMovementState |= MovementState.IsJump;
                 // Update movement state
                 MovementState = _tempMovementState;
                 // Update extra movement state
