@@ -92,6 +92,11 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
+            return FindGroundedPosition(groundFindingType, GroundLayerMask, fromPosition, findDistance, out result);
+        }
+
+        public static bool FindGroundedPosition(GameAreaGroundFindingType groundFindingType, int groundLayerMask, Vector3 fromPosition, float findDistance, out Vector3 result)
+        {
             result = fromPosition;
             switch (groundFindingType)
             {
@@ -103,7 +108,7 @@ namespace MultiplayerARPG
                     }
                     return false;
                 default:
-                    return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GroundLayerMask, out result);
+                    return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, groundLayerMask, out result);
             }
         }
 
