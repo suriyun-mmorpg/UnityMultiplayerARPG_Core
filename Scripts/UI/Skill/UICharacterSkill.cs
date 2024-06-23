@@ -606,7 +606,7 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
 
             // Controlling by hotkey controller
-            UICharacterHotkeys.SetupHotkeyForDialogControlling(HotkeyType.Skill, Skill.Id);
+            UICharacterHotkeys.SetupHotkeyForAimming(HotkeyType.Skill, Skill.Id);
         }
     }
 }
