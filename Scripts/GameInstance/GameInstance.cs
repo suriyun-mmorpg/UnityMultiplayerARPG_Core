@@ -649,8 +649,8 @@ namespace MultiplayerARPG
             LoadHomeScenePreventions.Clear();
             EventSystemManager = gameObject.GetOrAddComponent<EventSystemManager>();
 #if UNITY_EDITOR
-            InputManager.useMobileInputOnNonMobile = IsMobileTestInEditor();
-            InputManager.useNonMobileInput = testInEditorMode == TestInEditorMode.MobileWithKeyInputs && Application.isEditor;
+            InputManager.UseMobileInputOnNonMobile = IsMobileTestInEditor();
+            InputManager.UseNonMobileInput = testInEditorMode == TestInEditorMode.MobileWithKeyInputs && Application.isEditor;
 #endif
 
             DefaultArmorType = ScriptableObject.CreateInstance<ArmorType>()
@@ -928,9 +928,7 @@ namespace MultiplayerARPG
             {
                 if (GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
                 {
-                    var asyncOp = addressableScene.LoadSceneAsync();
-                    LiteNetLibGameManager.LatestLoadedAddressableSceneAsyncOperation = asyncOp;
-                    yield return asyncOp;
+                    yield return addressableScene.LoadSceneAsync();
                 }
                 else
                 {
