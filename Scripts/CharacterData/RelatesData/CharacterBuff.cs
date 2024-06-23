@@ -1,11 +1,14 @@
 ﻿using LiteNetLib.Utils;
 using LiteNetLibManager;
+using Newtonsoft.Json;
 
 namespace MultiplayerARPG
 {
     public partial struct CharacterBuff
     {
+        [JsonIgnore]
         public EntityInfo BuffApplier => MemoryManager.CharacterBuffs.GetBuffApplier(in this);
+        [JsonIgnore]
         public CharacterItem BuffApplierWeapon => MemoryManager.CharacterBuffs.GetBuffApplierWeapon(in this);
 
         public BaseSkill GetSkill()
