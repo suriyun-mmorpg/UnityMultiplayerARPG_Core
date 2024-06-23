@@ -243,6 +243,10 @@ namespace MultiplayerARPG
                 Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
             }
+            CurrentMapInfo.GetEnterMapPoint(playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation);
+            playerCharacterData.CurrentMapName = mapName;
+            playerCharacterData.CurrentPosition = position;
+            playerCharacterData.CurrentRotation = rotation;
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
                 playerCharacterData.CurrentPosition = _teleportPosition.HasValue ? _teleportPosition.Value : CurrentMapInfo.StartPosition;
             Quaternion characterRotation = Quaternion.identity;
