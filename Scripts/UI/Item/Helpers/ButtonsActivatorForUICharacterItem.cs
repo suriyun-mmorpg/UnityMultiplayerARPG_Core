@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         public Button buttonAddVendingItem;
         private UICharacterItem ui;
 
-        private void Start()
+        private void Awake()
         {
             ui = GetComponent<UICharacterItem>();
             ui.onSetEquippedData.AddListener(OnSetEquippedData);
