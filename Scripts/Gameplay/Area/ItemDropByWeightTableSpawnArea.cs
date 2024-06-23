@@ -39,6 +39,13 @@ namespace MultiplayerARPG
         {
             for (int i = 0; i < amount; ++i)
             {
+                if (weightTable == null)
+                {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                    Logging.LogWarning(ToString(), $"Unable to spawn item, table is empty.");
+#endif
+                    continue;
+                }
                 weightTable.RandomItem((item, amount) =>
                 {
                     Spawn(CharacterItem.Create(item, 1, amount), 0f);
