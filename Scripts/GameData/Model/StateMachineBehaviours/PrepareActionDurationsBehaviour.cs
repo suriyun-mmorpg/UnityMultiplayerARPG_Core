@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                s_triggerDurations.Add(stateInfo.length);
+                s_triggerDurations.Add(stateInfo.length * 0.5f);
             }
             _actionManager.SetPreparingActionDurations(s_triggerDurations.ToArray(), stateInfo.length);
         }
