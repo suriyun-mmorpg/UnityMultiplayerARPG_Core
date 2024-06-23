@@ -372,6 +372,8 @@ namespace MultiplayerARPG
             isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+            lookPosition.deliveryMethod = DeliveryMethod.Sequenced;
+            lookPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             targetEntityId.clientDataChannel = STATE_DATA_CHANNEL;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;

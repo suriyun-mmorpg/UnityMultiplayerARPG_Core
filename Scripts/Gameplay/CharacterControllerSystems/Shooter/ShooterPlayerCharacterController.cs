@@ -1031,7 +1031,8 @@ namespace MultiplayerARPG
         {
             float pitch = _cameraEulerAngles.x;
 
-            // Update charcter pitch
+            // Update charcter look position and pitch
+            PlayingCharacterEntity.LookPosition = CacheGameplayCameraController.CameraTransform.position + CacheGameplayCameraController.CameraTransform.forward * 20f;
             PlayingCharacterEntity.Pitch = pitch;
 
             // If mobile platforms, don't receive input raw to make it smooth
@@ -1548,7 +1549,9 @@ namespace MultiplayerARPG
             List<BaseWeaponAbility> abilities = PlayingCharacterEntity.CachedData.RightHandWeaponAbilities;
             bool isSameAbility = WeaponAbility != null && index < abilities.Count && abilities[index] == WeaponAbility;
             if (isSameAbility)
+            {
                 return;
+            }
             if (WeaponAbility != null)
             {
                 WeaponAbility.Desetup();
@@ -1656,7 +1659,7 @@ namespace MultiplayerARPG
         public bool IsUsingHotkey()
         {
             // Check using hotkey for PC only
-            return !InputManager.UseMobileInput() && UICharacterHotkeys.UsingHotkey != null;
+            return !InputManager.IsUseMobileInput() && UICharacterHotkeys.UsingHotkey != null;
         }
 
         public virtual bool GetPrimaryAttackButton()

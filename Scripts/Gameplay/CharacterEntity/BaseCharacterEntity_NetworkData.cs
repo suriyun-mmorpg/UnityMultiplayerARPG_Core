@@ -30,6 +30,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldUShort pitch = new SyncFieldUShort();
         [SerializeField]
+        protected SyncFieldVector3 lookPosition = new SyncFieldVector3();
+        [SerializeField]
         protected SyncFieldAimPosition aimPosition = new SyncFieldAimPosition();
         [SerializeField]
         protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
@@ -91,6 +93,17 @@ namespace MultiplayerARPG
             set
             {
                 pitch.Value = (ushort)(value / 360f * 10000);
+            }
+        }
+        public Vector3 LookPosition
+        {
+            get
+            {
+                return lookPosition.Value;
+            }
+            set
+            {
+                lookPosition.Value = value;
             }
         }
         public AimPosition AimPosition
@@ -269,6 +282,7 @@ namespace MultiplayerARPG
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
             isWeaponsSheathed.onChange += OnIsWeaponsSheathedChange;
             pitch.onChange += OnPitchChange;
+            lookPosition.onChange += OnLookPositionChange;
             aimPosition.onChange += OnAimPositionChange;
             targetEntityId.onChange += OnTargetEntityIdChange;
             // On list changed events
@@ -297,6 +311,7 @@ namespace MultiplayerARPG
             equipWeaponSet.onChange -= OnEquipWeaponSetChange;
             isWeaponsSheathed.onChange -= OnIsWeaponsSheathedChange;
             pitch.onChange -= OnPitchChange;
+            lookPosition.onChange -= OnLookPositionChange;
             aimPosition.onChange -= OnAimPositionChange;
             targetEntityId.onChange -= OnTargetEntityIdChange;
             // On list changed events
@@ -439,6 +454,17 @@ namespace MultiplayerARPG
         {
             if (onPitchChange != null)
                 onPitchChange.Invoke(pitch);
+        }
+
+        /// <summary>
+        /// This will be called when look position changed
+        /// </summary>
+        /// <param name="isInitial"></param>
+        /// <param name="lookPosition"></param>
+        private void OnLookPositionChange(bool isInitial, Vector3 lookPosition)
+        {
+            if (onLookPositionChange != null)
+                onLookPositionChange.Invoke(lookPosition);
         }
 
         /// <summary>

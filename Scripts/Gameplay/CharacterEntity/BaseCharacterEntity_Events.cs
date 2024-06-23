@@ -1,5 +1,6 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
@@ -26,6 +27,7 @@ namespace MultiplayerARPG
         public event System.Action<byte> onEquipWeaponSetChange;
         public event System.Action<bool> onIsWeaponsSheathedChange;
         public event System.Action<ushort> onPitchChange;
+        public event System.Action<Vector3> onLookPositionChange;
         public event System.Action<AimPosition> onAimPositionChange;
         public event System.Action<uint> onTargetEntityIdChange;
         // Sync lists
