@@ -445,13 +445,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public CharacterItem GetAvailableWeapon(ref bool isLeftHand)
-        {
-            if (isLeftHand && !IsLeftHandItemAvailable)
-                isLeftHand = false;
-            return isLeftHand ? LeftHandItem : RightHandItem;
-        }
-
         public void ClearChanceToRemoveBuffWhenAttack()
         {
             HavingChanceToRemoveBuffWhenAttack = false;
