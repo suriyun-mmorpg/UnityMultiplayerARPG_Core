@@ -286,15 +286,23 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void RenderSaveRespawnPointUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
+        protected virtual async void RenderSaveRespawnPointUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
         {
             if (uiNpcDialog.onSwitchToSaveRespawnPointDialog != null)
                 uiNpcDialog.onSwitchToSaveRespawnPointDialog.Invoke();
+
             if (uiNpcDialog.uiConfirmRequirement != null && confirmRequirement.HasConfirmConditions())
             {
                 uiNpcDialog.uiConfirmRequirement.Data = confirmRequirement;
                 uiNpcDialog.uiConfirmRequirement.Show();
             }
+
+            if (uiNpcDialog.uiMenuPrefab == null)
+            {
+                await GoToNextDialog(GameInstance.PlayingCharacterEntity, CONFIRM_MENU_INDEX);
+                return;
+            }
+
             UINpcDialogMenuAction confirmMenuAction = new UINpcDialogMenuAction();
             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
 
@@ -310,15 +318,23 @@ namespace MultiplayerARPG
             menuActions.Add(cancelMenuAction);
         }
 
-        protected virtual void RenderWarpUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
+        protected virtual async void RenderWarpUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
         {
             if (uiNpcDialog.onSwitchToWarpDialog != null)
                 uiNpcDialog.onSwitchToWarpDialog.Invoke();
+
             if (uiNpcDialog.uiConfirmRequirement != null && confirmRequirement.HasConfirmConditions())
             {
                 uiNpcDialog.uiConfirmRequirement.Data = confirmRequirement;
                 uiNpcDialog.uiConfirmRequirement.Show();
             }
+
+            if (uiNpcDialog.uiMenuPrefab == null)
+            {
+                await GoToNextDialog(GameInstance.PlayingCharacterEntity, CONFIRM_MENU_INDEX);
+                return;
+            }
+
             UINpcDialogMenuAction confirmMenuAction = new UINpcDialogMenuAction();
             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
 
@@ -334,10 +350,17 @@ namespace MultiplayerARPG
             menuActions.Add(cancelMenuAction);
         }
 
-        protected virtual void RenderRefineItemUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
+        protected virtual async void RenderRefineItemUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
         {
             if (uiNpcDialog.onSwitchToRefineItemDialog != null)
                 uiNpcDialog.onSwitchToRefineItemDialog.Invoke();
+
+            if (uiNpcDialog.uiMenuPrefab == null)
+            {
+                await GoToNextDialog(GameInstance.PlayingCharacterEntity, CONFIRM_MENU_INDEX);
+                return;
+            }
+
             UINpcDialogMenuAction confirmMenuAction = new UINpcDialogMenuAction();
             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
 
@@ -353,10 +376,17 @@ namespace MultiplayerARPG
             menuActions.Add(cancelMenuAction);
         }
 
-        protected virtual void RenderPlayerStorageUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
+        protected virtual async void RenderPlayerStorageUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
         {
             if (uiNpcDialog.onSwitchToPlayerStorageDialog != null)
                 uiNpcDialog.onSwitchToPlayerStorageDialog.Invoke();
+
+            if (uiNpcDialog.uiMenuPrefab == null)
+            {
+                await GoToNextDialog(GameInstance.PlayingCharacterEntity, CONFIRM_MENU_INDEX);
+                return;
+            }
+
             UINpcDialogMenuAction confirmMenuAction = new UINpcDialogMenuAction();
             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
 
@@ -372,10 +402,17 @@ namespace MultiplayerARPG
             menuActions.Add(cancelMenuAction);
         }
 
-        protected virtual void RenderGuildStorageUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
+        protected virtual async void RenderGuildStorageUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
         {
             if (uiNpcDialog.onSwitchToGuildStorageDialog != null)
                 uiNpcDialog.onSwitchToGuildStorageDialog.Invoke();
+
+            if (uiNpcDialog.uiMenuPrefab == null)
+            {
+                await GoToNextDialog(GameInstance.PlayingCharacterEntity, CONFIRM_MENU_INDEX);
+                return;
+            }
+
             UINpcDialogMenuAction confirmMenuAction = new UINpcDialogMenuAction();
             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
 
@@ -391,10 +428,17 @@ namespace MultiplayerARPG
             menuActions.Add(cancelMenuAction);
         }
 
-        protected virtual void RenderDismantleItemUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
+        protected virtual async void RenderDismantleItemUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
         {
             if (uiNpcDialog.onSwitchToDismantleItemDialog != null)
                 uiNpcDialog.onSwitchToDismantleItemDialog.Invoke();
+
+            if (uiNpcDialog.uiMenuPrefab == null)
+            {
+                await GoToNextDialog(GameInstance.PlayingCharacterEntity, CONFIRM_MENU_INDEX);
+                return;
+            }
+
             UINpcDialogMenuAction confirmMenuAction = new UINpcDialogMenuAction();
             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
 
@@ -410,10 +454,17 @@ namespace MultiplayerARPG
             menuActions.Add(cancelMenuAction);
         }
         
-        protected virtual void RenderRepairItemUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
+        protected virtual async void RenderRepairItemUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
         {
             if (uiNpcDialog.onSwitchToRepairItemDialog != null)
                 uiNpcDialog.onSwitchToRepairItemDialog.Invoke();
+
+            if (uiNpcDialog.uiMenuPrefab == null)
+            {
+                await GoToNextDialog(GameInstance.PlayingCharacterEntity, CONFIRM_MENU_INDEX);
+                return;
+            }
+
             UINpcDialogMenuAction confirmMenuAction = new UINpcDialogMenuAction();
             UINpcDialogMenuAction cancelMenuAction = new UINpcDialogMenuAction();
 
