@@ -29,11 +29,13 @@ namespace MultiplayerARPG
         }
 
         [Header("Effects")]
+#if UNITY_EDITOR || !UNITY_SERVER
         [Tooltip("These game effects must placed as this children, it will be activated when launch (can place muzzle effects here)")]
         public GameEffect[] weaponLaunchEffects = new GameEffect[0];
         [Tooltip("These game effects prefabs will instantiates to container when launch (can place muzzle effects here)")]
         public GameEffectPoolContainer[] poolingWeaponLaunchEffects = new GameEffectPoolContainer[0];
         [Tooltip("This is overriding missile damage transform, if this is not empty, it will spawn missile damage entity from this transform")]
+#endif
         public Transform missileDamageTransform;
 
         [Header("Events")]
@@ -57,6 +59,7 @@ namespace MultiplayerARPG
             get
             {
                 List<IPoolDescriptor> effects = new List<IPoolDescriptor>();
+#if !UNITY_SERVER
                 if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
                 {
                     foreach (GameEffectPoolContainer container in poolingWeaponLaunchEffects)
@@ -64,6 +67,7 @@ namespace MultiplayerARPG
                         effects.Add(container.prefab);
                     }
                 }
+#endif
                 return effects;
             }
         }
@@ -78,6 +82,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
+#if !UNITY_SERVER
             if (weaponLaunchEffects != null && weaponLaunchEffects.Length > 0)
             {
                 foreach (GameEffect weaponLaunchEffect in weaponLaunchEffects)
@@ -85,7 +90,7 @@ namespace MultiplayerARPG
                     weaponLaunchEffect.gameObject.SetActive(false);
                 }
             }
-
+#endif
             onEnable.Invoke();
         }
 
@@ -99,6 +104,7 @@ namespace MultiplayerARPG
             if (!gameObject.activeInHierarchy)
                 return;
 
+#if !UNITY_SERVER
             // Play effects at clients only
             if (BaseGameNetworkManager.Singleton.IsClientConnected)
             {
@@ -108,6 +114,7 @@ namespace MultiplayerARPG
                 if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
                     poolingWeaponLaunchEffects[Random.Range(0, poolingWeaponLaunchEffects.Length)].GetInstance();
             }
+#endif
 
             onPlayLaunch.Invoke();
         }
@@ -130,6 +137,7 @@ namespace MultiplayerARPG
         [ContextMenu("Set `missileDamageTransform` as `poolingWeaponLaunchEffects` container")]
         public void SetMissileDamageTransformAsPoolingEffectsContainer()
         {
+#if !UNITY_SERVER
             if (poolingWeaponLaunchEffects != null && poolingWeaponLaunchEffects.Length > 0)
             {
                 for (int i = 0; i < poolingWeaponLaunchEffects.Length; ++i)
@@ -139,6 +147,7 @@ namespace MultiplayerARPG
                     poolingWeaponLaunchEffects[i] = container;
                 }
             }
+#endif
         }
 
 #if UNITY_EDITOR

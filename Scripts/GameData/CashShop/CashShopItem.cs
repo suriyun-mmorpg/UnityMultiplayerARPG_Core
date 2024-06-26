@@ -88,7 +88,9 @@ namespace MultiplayerARPG
             languageSpecificTitles = titleLanguageDataList.ToArray();
             languageSpecificDescriptions = descriptionLanguageDataList.ToArray();
             category = item.Category;
+#if UNITY_EDITOR || !UNITY_SERVER
             icon = item.Icon;
+#endif
             sellPriceCash = generatingData.sellPriceCash;
             sellPriceGold = generatingData.sellPriceGold;
             receiveItems = new ItemAmount[]

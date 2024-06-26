@@ -51,14 +51,14 @@ namespace MultiplayerARPG
                     icon == null ? LanguageManager.GetUnknowDescription() : icon.Description);
             }
 
-
+#if UNITY_EDITOR || !UNITY_SERVER
             if (imageIcon != null)
             {
                 Sprite iconSprite = icon == null ? null : icon.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
-                imageIcon.preserveAspect = true;
             }
+#endif
         }
 
         public void SetDataByDataId(int dataId)

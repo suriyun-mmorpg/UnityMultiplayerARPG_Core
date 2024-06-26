@@ -134,8 +134,10 @@ namespace MultiplayerARPG
                     tempElement.Title,
                     "0");
             }
+#if UNITY_EDITOR || !UNITY_SERVER
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = tempElement.Icon;
+#endif
             if (inactiveIfAmountZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
         }

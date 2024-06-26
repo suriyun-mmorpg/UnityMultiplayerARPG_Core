@@ -32,9 +32,11 @@ namespace MultiplayerARPG
         [Tooltip("This is duration to make item to be expired and destroyed from inventory, set it to 0 to not apply expiring duration, set it to 7 to make it expire in next 7 hours (if `ExpireDurationUnit` is `Hours)")]
         protected int expireDuration = 0;
 
+#if UNITY_EDITOR || !UNITY_SERVER
         [Category(10, "In-Scene Objects/Appearance")]
         [SerializeField]
         protected GameObject dropModel = null;
+#endif
 
         [Category(50, "Dismantle Settings")]
         [SerializeField]
@@ -100,7 +102,9 @@ namespace MultiplayerARPG
 
         public int ExpireDuration { get => expireDuration; set => expireDuration = value; }
 
+#if UNITY_EDITOR || !UNITY_SERVER
         public GameObject DropModel { get => dropModel; set => dropModel = value; }
+#endif
 
         public int DismantleReturnGold { get => dismantleReturnGold; set => dismantleReturnGold = value; }
 

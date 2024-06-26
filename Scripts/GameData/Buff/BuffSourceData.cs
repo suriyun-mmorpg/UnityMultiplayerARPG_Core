@@ -29,6 +29,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR || !UNITY_SERVER
         public Sprite Icon
         {
             get
@@ -38,6 +39,7 @@ namespace MultiplayerARPG
                 return data.Icon;
             }
         }
+#endif
 
         public bool IsValid()
         {

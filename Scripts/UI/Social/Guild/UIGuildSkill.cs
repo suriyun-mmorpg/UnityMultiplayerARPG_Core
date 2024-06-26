@@ -236,13 +236,14 @@ namespace MultiplayerARPG
                     Level.ToString("N0"));
             }
 
+#if UNITY_EDITOR || !UNITY_SERVER
             if (imageIcon != null)
             {
                 Sprite iconSprite = GuildSkill == null ? null : GuildSkill.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
-                imageIcon.preserveAspect = true;
             }
+#endif
 
             if (uiTextSkillType != null)
             {

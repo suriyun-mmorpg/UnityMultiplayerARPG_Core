@@ -136,19 +136,23 @@ namespace MultiplayerARPG
                     Data == null || string.IsNullOrEmpty(Data.Description) ? BuildDescription() : Data.Description);
             }
 
+#if UNITY_EDITOR || !UNITY_SERVER
             if (imageIcon != null)
             {
                 Sprite iconSprite = Data == null || Data.Icon == null ? BuildIcon() : Data.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
+#endif
 
+#if UNITY_EDITOR || !UNITY_SERVER
             if (rawImageExternalIcon != null)
             {
                 rawImageExternalIcon.gameObject.SetActive(Data != null && !string.IsNullOrEmpty(Data.ExternalIconUrl));
                 if (Data != null && !string.IsNullOrEmpty(Data.ExternalIconUrl))
                     StartCoroutine(LoadExternalIcon());
             }
+#endif
 
             if (uiTextSellPriceCash != null)
             {
@@ -245,6 +249,7 @@ namespace MultiplayerARPG
 
         public Sprite BuildIcon()
         {
+#if !UNITY_SERVER
             if (Data != null)
             {
                 if (Data.ReceiveItems.Length > 0)
@@ -252,6 +257,7 @@ namespace MultiplayerARPG
                 if (Data.ReceiveCurrencies.Length > 0)
                     return Data.ReceiveCurrencies[0].currency.Icon;
             }
+#endif
             return null;
         }
 

@@ -668,19 +668,23 @@ namespace MultiplayerARPG
                 }
             }
 
+#if UNITY_EDITOR || !UNITY_SERVER
             if (imageIcon != null)
             {
                 Sprite iconSprite = isEmpty ? null : Item.Icon;
                 imageIcon.gameObject.SetActive(iconSprite != null);
                 imageIcon.sprite = iconSprite;
             }
+#endif
 
+#if UNITY_EDITOR || !UNITY_SERVER
             if (imageRarity != null)
             {
                 Sprite iconSprite = isEmpty || Item.ItemRefine == null ? null : Item.ItemRefine.Icon;
                 imageRarity.gameObject.SetActive(iconSprite != null);
                 imageRarity.sprite = iconSprite;
             }
+#endif
 
             if (uiTextItemType != null)
             {

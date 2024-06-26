@@ -48,10 +48,12 @@ namespace MultiplayerARPG
         /// This is duration to make item to be expired and destroyed from inventory
         /// </summary>
         int ExpireDuration { get; }
+#if UNITY_EDITOR || !UNITY_SERVER
         /// <summary>
         /// Drop model
         /// </summary>
         GameObject DropModel { get; }
+#endif
         /// <summary>
         /// Returning gold after this item was dismantled
         /// </summary>

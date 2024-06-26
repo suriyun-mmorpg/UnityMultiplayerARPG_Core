@@ -183,8 +183,10 @@ namespace MultiplayerARPG
                         zeroFormatSimple));
                     break;
             }
+#if UNITY_EDITOR || !UNITY_SERVER
             if (componentPair.imageIcon != null)
                 componentPair.imageIcon.sprite = componentPair.skill.Icon;
+#endif
             if (inactiveIfLevelZero && componentPair.root != null)
                 componentPair.root.SetActive(false);
         }

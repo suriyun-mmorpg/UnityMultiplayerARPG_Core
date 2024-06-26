@@ -20,7 +20,9 @@ namespace MultiplayerARPG
 
         public string Title => source.Title;
         public string Description => source.Description;
+#if UNITY_EDITOR || !UNITY_SERVER
         public Sprite Icon => source.Icon;
+#endif
 
         public bool IsValid()
         {

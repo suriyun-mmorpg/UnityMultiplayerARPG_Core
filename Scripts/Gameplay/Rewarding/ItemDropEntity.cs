@@ -270,6 +270,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnItemDropDataChange(bool isInitial, ItemDropData itemDropData)
         {
+#if !UNITY_SERVER
             // Instantiate model at clients
             if (!IsClient)
                 return;
@@ -285,6 +286,7 @@ namespace MultiplayerARPG
                 _dropModel.RemoveComponentsInChildren<Collider>(false);
                 _dropModel.transform.localPosition = Vector3.zero;
             }
+#endif
         }
 
         public bool IsAbleToLoot(BaseCharacterEntity baseCharacterEntity)

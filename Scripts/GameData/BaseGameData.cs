@@ -73,6 +73,7 @@ namespace MultiplayerARPG
             set { category = value; }
         }
 
+#if UNITY_EDITOR || !UNITY_SERVER
         [SerializeField]
         [PreviewSprite(50)]
         protected Sprite icon;
@@ -81,7 +82,7 @@ namespace MultiplayerARPG
             get { return icon; }
             set { icon = value; }
         }
-
+#endif
 
         [NonSerialized]
         protected int? dataId;
