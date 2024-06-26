@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             foreach (ItemDropEntity entity in ItemDropEntityDetector.itemDrops)
             {
                 tempEntryId = entity.ObjectId.ToString();
-                tempCharacterItem = CharacterItem.Create(entity.ItemDropData.dataId, entity.ItemDropData.level, entity.ItemDropData.amount);
+                tempCharacterItem = entity.ItemDropData.characterItem;
                 tempCharacterItem.id = tempEntryId;
                 droppedItems.Add(tempCharacterItem);
             }

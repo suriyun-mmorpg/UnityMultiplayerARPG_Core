@@ -7,24 +7,18 @@ namespace MultiplayerARPG
     public struct ItemDropData : INetSerializable
     {
         public bool putOnPlaceholder;
-        public int dataId;
-        public int level;
-        public int amount;
+        public CharacterItem characterItem;
 
         public void Deserialize(NetDataReader reader)
         {
             putOnPlaceholder = reader.GetBool();
-            dataId = reader.GetPackedInt();
-            level = reader.GetPackedInt();
-            amount = reader.GetPackedInt();
+            characterItem = reader.Get<CharacterItem>();
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put(putOnPlaceholder);
-            writer.PutPackedInt(dataId);
-            writer.PutPackedInt(level);
-            writer.PutPackedInt(amount);
+            writer.Put(characterItem);
         }
     }
 

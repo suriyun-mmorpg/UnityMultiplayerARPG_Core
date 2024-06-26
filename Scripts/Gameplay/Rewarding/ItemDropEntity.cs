@@ -88,7 +88,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (ItemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(ItemDropData.dataId, out BaseItem item))
+                if (ItemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(ItemDropData.characterItem.dataId, out BaseItem item))
                     return item.Title;
                 return base.EntityTitle;
             }
@@ -210,9 +210,7 @@ namespace MultiplayerARPG
             ItemDropData = new ItemDropData()
             {
                 putOnPlaceholder = PutOnPlaceholder,
-                dataId = DropItems[0].dataId,
-                level = DropItems[0].level,
-                amount = DropItems[0].amount,
+                characterItem = DropItems[0],
             };
         }
 
@@ -279,7 +277,7 @@ namespace MultiplayerARPG
             ModelContainer.gameObject.SetActive(true);
             if (_dropModel != null)
                 Destroy(_dropModel);
-            if (itemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(itemDropData.dataId, out BaseItem item) && item.DropModel != null)
+            if (itemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(itemDropData.characterItem.dataId, out BaseItem item) && item.DropModel != null)
             {
                 _dropModel = Instantiate(item.DropModel, ModelContainer);
                 _dropModel.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
