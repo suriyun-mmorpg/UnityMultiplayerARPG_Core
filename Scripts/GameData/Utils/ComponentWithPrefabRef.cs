@@ -14,20 +14,22 @@ namespace MultiplayerARPG
     public abstract class ComponentWithPrefabRef<T> : MonoBehaviour, IComponentWithPrefabRef
         where T : MonoBehaviour
     {
-        public T refToPrefab;
 #if UNITY_EDITOR
+        public T refToPrefab;
         [InspectorButton(nameof(ReplacePrefab))]
         public bool btnRepacePrefab;
 #endif
 
         public void SetupRefToPrefab(GameObject prefab)
         {
+#if UNITY_EDITOR
             if (prefab == null)
             {
                 refToPrefab = null;
                 return;
             }
             refToPrefab = prefab.GetComponent<T>();
+#endif
         }
 
 #if UNITY_EDITOR
