@@ -496,7 +496,8 @@ namespace MultiplayerARPG
                     _openedNpcDialogs[i].Hide();
                 _openedNpcDialogs.RemoveAt(i);
             }
-            GameInstance.PlayingCharacterEntity.NpcAction.CallCmdHideNpcDialog();
+            if (GameInstance.PlayingCharacterEntity.NpcAction.CurrentNpcDialog != null)
+                GameInstance.PlayingCharacterEntity.NpcAction.CallCmdHideNpcDialog();
         }
 
         public void OnShowNpcRefineItem()

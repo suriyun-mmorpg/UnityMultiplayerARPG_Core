@@ -54,6 +54,7 @@ namespace MultiplayerARPG
         }
 
         public Quest CompletingQuest { get; set; }
+        public BaseNpcDialog CurrentDialog { get; protected set; }
 
         /// <summary>
         /// Action: int questDataId
@@ -136,6 +137,7 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out NpcEntity npcEntity))
             {
                 // Can't find the entity
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
                 return;
             }
 
@@ -149,43 +151,52 @@ namespace MultiplayerARPG
             _currentNpcEntity = npcEntity;
             await SetServerCurrentDialog(npcEntity, npcEntity.StartDialog);
 
-            // Update task
-            CharacterQuest tempCharacterQuest;
-            Quest tempQuest;
-            int tempTaskIndex;
-            BaseNpcDialog tempTalkToNpcTaskDialog;
-            bool tempCompleteAfterTalked;
-            for (int i = 0; i < Entity.Quests.Count; ++i)
+            try
             {
-                tempCharacterQuest = Entity.Quests[i];
-                if (tempCharacterQuest.isComplete)
-                    continue;
-                tempQuest = tempCharacterQuest.GetQuest();
-                if (tempQuest == null || !tempQuest.HaveToTalkToNpc(Entity, npcEntity, tempCharacterQuest.randomTasksIndex, out tempTaskIndex, out tempTalkToNpcTaskDialog, out tempCompleteAfterTalked))
-                    continue;
-                await SetServerCurrentDialog(npcEntity, tempTalkToNpcTaskDialog);
-                if (!tempCharacterQuest.completedTasks.Contains(tempTaskIndex))
-                    tempCharacterQuest.completedTasks.Add(tempTaskIndex);
-                Entity.Quests[i] = tempCharacterQuest;
-                if (tempCompleteAfterTalked && tempCharacterQuest.IsAllTasksDone(Entity, out _))
+                // Update task
+                CharacterQuest tempCharacterQuest;
+                Quest tempQuest;
+                int tempTaskIndex;
+                BaseNpcDialog tempTalkToNpcTaskDialog;
+                bool tempCompleteAfterTalked;
+                for (int i = 0; i < Entity.Quests.Count; ++i)
                 {
-                    if (tempQuest.selectableRewardItems != null &&
-                        tempQuest.selectableRewardItems.Length > 0)
+                    tempCharacterQuest = Entity.Quests[i];
+                    if (tempCharacterQuest.isComplete)
+                        continue;
+                    tempQuest = tempCharacterQuest.GetQuest();
+                    if (tempQuest == null || !tempQuest.HaveToTalkToNpc(Entity, npcEntity, tempCharacterQuest.randomTasksIndex, out tempTaskIndex, out tempTalkToNpcTaskDialog, out tempCompleteAfterTalked))
+                        continue;
+                    await SetServerCurrentDialog(npcEntity, tempTalkToNpcTaskDialog);
+                    if (!tempCharacterQuest.completedTasks.Contains(tempTaskIndex))
+                        tempCharacterQuest.completedTasks.Add(tempTaskIndex);
+                    Entity.Quests[i] = tempCharacterQuest;
+                    if (tempCompleteAfterTalked && tempCharacterQuest.IsAllTasksDone(Entity, out _))
                     {
-                        // Show quest reward dialog at client
-                        CallOwnerShowQuestRewardItemSelection(tempQuest.DataId);
-                        CompletingQuest = tempQuest;
-                        await SetServerCurrentDialog(null, null);
-                        SetServerDialogAfterSelectRewardItem(npcEntity, tempTalkToNpcTaskDialog);
-                    }
-                    else
-                    {
-                        // No selectable reward items, complete the quest immediately
-                        if (!Entity.CompleteQuest(tempQuest.DataId, 0))
+                        if (tempQuest.selectableRewardItems != null &&
+                            tempQuest.selectableRewardItems.Length > 0)
+                        {
+                            // Show quest reward dialog at client
+                            CallOwnerShowQuestRewardItemSelection(tempQuest.DataId);
+                            CompletingQuest = tempQuest;
                             await SetServerCurrentDialog(null, null);
+                            SetServerDialogAfterSelectRewardItem(npcEntity, tempTalkToNpcTaskDialog);
+                        }
+                        else
+                        {
+                            // No selectable reward items, complete the quest immediately
+                            if (!Entity.CompleteQuest(tempQuest.DataId, 0))
+                                await SetServerCurrentDialog(null, null);
+                        }
+                        break;
                     }
-                    break;
                 }
+            }
+            catch (System.Exception ex)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR);
+                Logging.LogException(LogTag, ex);
+                return;
             }
 
             if (CurrentNpcDialog != null)
@@ -230,6 +241,8 @@ namespace MultiplayerARPG
             // Show npc dialog by dataId, if it can't find dialog, it will hide
             if (!GameInstance.NpcDialogs.TryGetValue(npcDialogDataId, out BaseNpcDialog npcDialog))
                 npcDialog = null;
+
+            CurrentDialog = npcDialog;
 
             if (npcDialog != null && npcDialog.EnterDialogActionsOnClient.Count > 0)
             {
@@ -379,9 +392,11 @@ namespace MultiplayerARPG
                 return;
             }
 
+            int sellAmount = sellItem.amount > 0 ? sellItem.amount : sellItem.item.MaxStack;
+
             // Can carry or not?
             int dataId = sellItem.item.DataId;
-            if (Entity.IncreasingItemsWillOverwhelming(dataId, amount))
+            if (Entity.IncreasingItemsWillOverwhelming(dataId, amount * sellAmount))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return;
@@ -391,7 +406,7 @@ namespace MultiplayerARPG
             CurrentGameplayRule.DecreaseCurrenciesWhenBuyItem(Entity, sellItem, amount);
 
             // Add item to inventory
-            Entity.IncreaseItems(CharacterItem.Create(dataId, 1, amount), characterItem => Entity.OnRewardItem(RewardGivenType.NpcShop, characterItem));
+            Entity.IncreaseItems(CharacterItem.Create(dataId, 1, amount * sellAmount), characterItem => Entity.OnRewardItem(RewardGivenType.NpcShop, characterItem));
             Entity.FillEmptySlots();
 
             GameInstance.ServerLogHandlers.LogBuyNpcItem(Entity, sellItem, amount);
