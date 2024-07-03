@@ -39,10 +39,12 @@ namespace MultiplayerARPG
             if (uiCharacterItem != null)
             {
                 if (Data.item == null)
+                {
                     uiCharacterItem.Hide();
+                }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(Data.item), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(Data.item, 1, Data.amount > 0 ? Data.amount : Data.item.MaxStack), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
                     uiCharacterItem.Show();
                 }
             }
@@ -72,20 +74,13 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (item.MaxStack == 1)
-            {
-                GameInstance.PlayingCharacterEntity.NpcAction.CallCmdBuyNpcItem(indexOfData, 1);
-            }
-            else
-            {
-                UISceneGlobal.Singleton.ShowInputDialog(
-                    LanguageManager.GetText(UITextKeys.UI_BUY_ITEM.ToString()),
-                    LanguageManager.GetText(UITextKeys.UI_BUY_ITEM_DESCRIPTION.ToString()),
-                    OnBuyAmountConfirmed,
-                    1,  /* Min Amount */
-                    item.MaxStack,
-                    1   /* Start Amount*/);
-            }
+            UISceneGlobal.Singleton.ShowInputDialog(
+                LanguageManager.GetText(UITextKeys.UI_BUY_ITEM.ToString()),
+                LanguageManager.GetText(UITextKeys.UI_BUY_ITEM_DESCRIPTION.ToString()),
+                OnBuyAmountConfirmed,
+                1,  /* Min Amount */
+                null,
+                1   /* Start Amount */);
         }
 
         private void OnBuyAmountConfirmed(int amount)
