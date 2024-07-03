@@ -54,8 +54,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            bool isOnline = GameInstance.ClientOnlinePlayerHandlers.IsCharacterOnline(Data.senderId);
-            GameInstance.ClientOnlinePlayerHandlers.RequestOnlineCharacter(Data.senderId);
+            bool isOnline = GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.senderId);
+            GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.senderId);
             for (int i = 0; i < signOnlines.Length; ++i)
             {
                 signOnlines[i].SetActive(isOnline);
