@@ -444,9 +444,18 @@ namespace MultiplayerARPG
                 return false;
             if (GameInstance.JoinedGuild.GetSkillLevel(guildSkill.DataId) <= 0)
                 return false;
-            if (UICharacterHotkeys.filterCategories.Count > 0 &&
-                !UICharacterHotkeys.filterCategories.Contains(guildSkill.Category))
-                return false;
+            if (UICharacterHotkeys.filterCategories.Count > 0)
+            {
+                // Trim filter categories
+                for (int i = 0; i < UICharacterHotkeys.filterCategories.Count; ++i)
+                {
+                    UICharacterHotkeys.filterCategories[i] = UICharacterHotkeys.filterCategories[i].Trim().ToLower();
+                }
+                if (!UICharacterHotkeys.filterCategories.Contains(guildSkill.Category.ToLower()))
+                {
+                    return false;
+                }
+            }
             return true;
         }
 
@@ -461,12 +470,23 @@ namespace MultiplayerARPG
                 return false;
             if (!skill.IsAvailable(GameInstance.PlayingCharacter))
                 return false;
-            if (UICharacterHotkeys.filterCategories.Count > 0 &&
-                !UICharacterHotkeys.filterCategories.Contains(skill.Category))
-                return false;
+            if (UICharacterHotkeys.filterCategories.Count > 0)
+            {
+                // Trim filter categories
+                for (int i = 0; i < UICharacterHotkeys.filterCategories.Count; ++i)
+                {
+                    UICharacterHotkeys.filterCategories[i] = UICharacterHotkeys.filterCategories[i].Trim().ToLower();
+                }
+                if (!UICharacterHotkeys.filterCategories.Contains(skill.Category.ToLower()))
+                {
+                    return false;
+                }
+            }
             if (UICharacterHotkeys.filterSkillTypes.Count > 0 &&
                 !UICharacterHotkeys.filterSkillTypes.Contains(skill.SkillType))
+            {
                 return false;
+            }
             return true;
         }
 
@@ -477,12 +497,23 @@ namespace MultiplayerARPG
             if (characterItem.IsEmptySlot())
                 return false;
             BaseItem item = characterItem.GetItem();
-            if (UICharacterHotkeys.filterCategories.Count > 0 &&
-                !UICharacterHotkeys.filterCategories.Contains(item.Category))
-                return false;
+            if (UICharacterHotkeys.filterCategories.Count > 0)
+            {
+                // Trim filter categories
+                for (int i = 0; i < UICharacterHotkeys.filterCategories.Count; ++i)
+                {
+                    UICharacterHotkeys.filterCategories[i] = UICharacterHotkeys.filterCategories[i].Trim().ToLower();
+                }
+                if (!UICharacterHotkeys.filterCategories.Contains(item.Category.ToLower()))
+                {
+                    return false;
+                }
+            }
             if (UICharacterHotkeys.filterItemTypes.Count > 0 &&
                 !UICharacterHotkeys.filterItemTypes.Contains(item.ItemType))
+            {
                 return false;
+            }
             return true;
         }
 
