@@ -52,6 +52,20 @@ namespace MultiplayerARPG
             onNotTypeWriter = null;
         }
 
+        protected override void UpdateUI()
+        {
+            bool isOnline = GameInstance.ClientOnlinePlayerHandlers.IsCharacterOnline(Data.senderId);
+            GameInstance.ClientOnlinePlayerHandlers.RequestOnlineCharacter(Data.senderId);
+            for (int i = 0; i < signOnlines.Length; ++i)
+            {
+                signOnlines[i].SetActive(isOnline);
+            }
+            for (int i = 0; i < signOfflines.Length; ++i)
+            {
+                signOfflines[i].SetActive(!isOnline);
+            }
+        }
+
         protected override void UpdateData()
         {
             if (uiTextMessage != null)
