@@ -663,13 +663,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlayHitAnimation()
         {
-            if (Entity.TryGetComponent<BaseMonsterActivityComponent>(out BaseMonsterActivityComponent mons) && Entity.IsClient)
-            {
-                if (mons.miniStunDuration <= 0) { return; } // Won't play hit anim if cannot stun
-                if (!Entity.Manager.IsOfflineConnection) { mons.ApplyStun(); }
-            }
-            if (_isDoingAction && mons == null)
-                return;
             WeaponAnimations weaponAnimations;
             if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.hurtState.clip != null)
             {
