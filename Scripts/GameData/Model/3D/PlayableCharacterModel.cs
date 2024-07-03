@@ -21,6 +21,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public SkinnedMeshRenderer skinnedMeshRenderer;
         public SkinnedMeshRenderer SkinnedMeshRenderer => skinnedMeshRenderer;
 
+        public PlayableGraphLODUpdater animationLodUpdater = new PlayableGraphLODUpdater()
+        {
+            settings = new List<AnimatorLODSetting>()
+            {
+                new AnimatorLODSetting() { distance = 25, framesPerSecond = 30 },
+                new AnimatorLODSetting() { distance = 50, framesPerSecond = 15 },
+                new AnimatorLODSetting() { distance = 75, framesPerSecond = 5 },
+            }
+        };
+
         [Header("Animations")]
         [Tooltip("If `avatarMask` in action state settings is `null`, it will use this value")]
         public AvatarMask actionAvatarMask;
@@ -90,8 +100,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void UpdateAnimation(float deltaTime)
         {
-            if (Graph.IsValid())
-                Graph.Evaluate(deltaTime);
+            animationLodUpdater.Graph = Graph;
+            animationLodUpdater.Transform = Entity.GetTransform();
+            animationLodUpdater.WatcherTransform = GameInstance.PlayingCharacterEntity.GetTransform();
+            animationLodUpdater.Update(deltaTime);
         }
 
         protected void CreateGraph()
@@ -651,7 +663,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void PlayHitAnimation()
         {
-            if (_isDoingAction)
+            if (Entity.TryGetComponent<BaseMonsterActivityComponent>(out BaseMonsterActivityComponent mons) && Entity.IsClient)
+            {
+                if (mons.miniStunDuration <= 0) { return; } // Won't play hit anim if cannot stun
+                if (!Entity.Manager.IsOfflineConnection) { mons.ApplyStun(); }
+            }
+            if (_isDoingAction && mons == null)
                 return;
             WeaponAnimations weaponAnimations;
             if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.hurtState.clip != null)
