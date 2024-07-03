@@ -503,8 +503,7 @@ namespace MultiplayerARPG
             _targetLookDirection = MovementTransform.forward;
             characterEntity.ForceMakeCaches();
             SetupEquipWeapons(characterEntity.EquipWeapons);
-            characterEntity.onEquipWeaponSetChange += SetupEquipWeapons;
-            characterEntity.onSelectableWeaponSetsOperation += SetupEquipWeapons;
+            characterEntity.onRecached += SetupEquipWeapons;
             characterEntity.onLaunchDamageEntity += OnLaunchDamageEntity;
             if (CacheFpsModel != null)
                 Destroy(CacheFpsModel.gameObject);
@@ -532,8 +531,7 @@ namespace MultiplayerARPG
             if (characterEntity == null)
                 return;
 
-            characterEntity.onEquipWeaponSetChange -= SetupEquipWeapons;
-            characterEntity.onSelectableWeaponSetsOperation -= SetupEquipWeapons;
+            characterEntity.onRecached -= SetupEquipWeapons;
             characterEntity.onLaunchDamageEntity -= OnLaunchDamageEntity;
         }
 
@@ -546,12 +544,7 @@ namespace MultiplayerARPG
             Cursor.visible = true;
         }
 
-        protected void SetupEquipWeapons(byte equipWeaponSet)
-        {
-            SetupEquipWeapons(PlayingCharacterEntity.EquipWeapons);
-        }
-
-        protected void SetupEquipWeapons(LiteNetLibManager.LiteNetLibSyncList.Operation operation, int index)
+        protected void SetupEquipWeapons()
         {
             SetupEquipWeapons(PlayingCharacterEntity.EquipWeapons);
         }
@@ -883,6 +876,13 @@ namespace MultiplayerARPG
                 {
                     // Use weapon ability if it can
                     _tempPressWeaponAbility = !isBlockController && GetSecondaryAttackButtonDown();
+                }
+
+                // TODO: Improve this, this is a codes which will force players to not attack in safe area
+                if (PlayingCharacterEntity.IsInSafeArea)
+                {
+                    _tempPressAttackRight = false;
+                    _tempPressAttackLeft = false;
                 }
 
                 attacking = _tempPressAttackRight || _tempPressAttackLeft;
@@ -1546,7 +1546,7 @@ namespace MultiplayerARPG
 
         public virtual void ChangeWeaponAbility(int index)
         {
-            List<BaseWeaponAbility> abilities = PlayingCharacterEntity.CachedData.RightHandWeaponAbilities;
+            List<BaseWeaponAbility> abilities = PlayingCharacterEntity.GetCaches().RightHandWeaponAbilities;
             bool isSameAbility = WeaponAbility != null && index < abilities.Count && abilities[index] == WeaponAbility;
             if (isSameAbility)
             {
