@@ -260,7 +260,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                RPC(CmdReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
+                RPC(CmdReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Unreliable, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -279,6 +279,11 @@ namespace MultiplayerARPG
         {
 #if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (!_manager.IsAcceptNewAction())
+                return;
+
+            // Prevent speed hack and also prevent data error
+            // Reload is unlike attacking, I think it won't have someone who want to play reload very fast like attacking
+            if (Time.unscaledTime - LastReloadEndTime < 0f)
                 return;
 
             CharacterItem reloadingWeapon = isLeftHand ? Entity.EquipWeapons.leftHand : Entity.EquipWeapons.rightHand;
