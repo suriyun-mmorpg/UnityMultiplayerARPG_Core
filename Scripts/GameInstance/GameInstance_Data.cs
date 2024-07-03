@@ -195,7 +195,7 @@ namespace MultiplayerARPG
                 return;
             foreach (ItemRandomByWeight itemDrop in itemDrops)
             {
-                AddItems(itemDrop.Item);
+                AddItems(itemDrop.item);
             }
         }
 
@@ -546,8 +546,11 @@ namespace MultiplayerARPG
                 return;
             foreach (BaseMapInfo mapInfo in mapInfos)
             {
-                if (mapInfo == null || MapInfos.ContainsKey(mapInfo.Id) || (!mapInfo.IsAddressableSceneValid() && !mapInfo.IsSceneValid()))
+                if (mapInfo == null || (!mapInfo.IsAddressableSceneValid() && !mapInfo.IsSceneValid()) ||
+                    (MapInfos.TryGetValue(mapInfo.Id, out BaseMapInfo tempData) && tempData != null))
+                {
                     continue;
+                }
                 mapInfo.Validate();
                 MapInfos[mapInfo.Id] = mapInfo;
                 mapInfo.PrepareRelatesData();
@@ -734,7 +737,7 @@ namespace MultiplayerARPG
             {
                 if (characterEntity == null)
                     continue;
-                if (!characterEntity.Identity.IsSceneObject && !CharacterEntities.ContainsKey(characterEntity.Identity.HashAssetId))
+                if (!characterEntity.Identity.IsSceneObject && (!CharacterEntities.TryGetValue(characterEntity.Identity.HashAssetId, out BaseCharacterEntity tempData) || tempData == null))
                     CharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
                 if (characterEntity is BasePlayerCharacterEntity playerCharacterEntity)
                     AddGameEntity(PlayerCharacterEntities, playerCharacterEntity);
@@ -915,7 +918,7 @@ namespace MultiplayerARPG
                 return;
             foreach (LiteNetLibIdentity networkObject in networkObjects)
             {
-                if (networkObject == null || OtherNetworkObjectPrefabs.ContainsKey(networkObject.HashAssetId))
+                if (networkObject == null || (OtherNetworkObjectPrefabs.TryGetValue(networkObject.HashAssetId, out LiteNetLibIdentity tempData) && tempData != null))
                     continue;
                 OtherNetworkObjectPrefabs.Add(networkObject.HashAssetId, networkObject);
             }
@@ -938,16 +941,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void AddPoolingWeaponLaunchEffects(IEnumerable<EquipmentModel> equipmentModels)
+        public static async void AddPoolingWeaponLaunchEffects(IEnumerable<EquipmentModel> equipmentModels)
         {
             if (equipmentModels == null)
                 return;
             List<GameObject> modelObjects = new List<GameObject>();
             foreach (EquipmentModel equipmentModel in equipmentModels)
             {
-                if (equipmentModel.meshPrefab == null)
+                GameObject meshPrefab = await equipmentModel.GetMeshPrefab();
+                if (meshPrefab == null)
                     continue;
-                modelObjects.Add(equipmentModel.meshPrefab);
+                modelObjects.Add(meshPrefab);
             }
             AddPoolingObjects(modelObjects.GetComponents<BaseEquipmentEntity>());
         }
@@ -978,7 +982,7 @@ namespace MultiplayerARPG
         {
             if ((data as Object) == null)
                 return false;
-            if (!dict.ContainsKey(data.DataId))
+            if (!dict.TryGetValue(data.DataId, out T tempData) || (tempData as Object) == null)
             {
                 data.Validate();
                 dict[data.DataId] = data;
@@ -1003,13 +1007,14 @@ namespace MultiplayerARPG
         {
             if ((entity as Object) == null)
                 return false;
-            if (!entity.Identity.IsSceneObject && !dict.ContainsKey(entity.Identity.HashAssetId))
+            if (entity.Identity.IsSceneObject)
+            {
+                entity.PrepareRelatesData();
+                return true;
+            }
+            if (!dict.TryGetValue(entity.Identity.HashAssetId, out T tempData) || (tempData as Object) == null)
             {
                 dict[entity.Identity.HashAssetId] = entity;
-                entity.PrepareRelatesData();
-            }
-            else if (entity.Identity.IsSceneObject)
-            {
                 entity.PrepareRelatesData();
             }
             return true;

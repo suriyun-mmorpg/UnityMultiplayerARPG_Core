@@ -2,6 +2,8 @@
 using UnityEngine;
 using UtilsComponents;
 using Cysharp.Text;
+using Cysharp.Threading.Tasks;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -173,6 +175,8 @@ namespace MultiplayerARPG
         // Optimize garbage collector
         protected readonly List<string> _tempAddingKeys = new List<string>();
         protected readonly List<string> _tempCachedKeys = new List<string>();
+        protected bool _isEquipmentsUpdating = false;
+        protected bool _hasPendingEquipmentsUpdating = false;
 
         protected override void Awake()
         {
@@ -409,13 +413,20 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public virtual void SetEquipItems(IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
+        public virtual async void SetEquipItems(IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
             EquipItems = equipItems;
             SelectableWeaponSets = selectableWeaponSets;
             EquipWeaponSet = equipWeaponSet;
             IsWeaponsSheathed = isWeaponsSheathed;
-            UpdateEquipmentModels();
+            if (_isEquipmentsUpdating)
+            {
+                _hasPendingEquipmentsUpdating = true;
+                return;
+            }
+            await UpdateEquipmentModels(equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
+            if (_hasPendingEquipmentsUpdating)
+                SetEquipItemsImmediately(equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
         }
 
         public void SetEquipItemsImmediately(IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
@@ -425,8 +436,12 @@ namespace MultiplayerARPG
             UpdateEquipmentImmediately = false;
         }
 
-        public void UpdateEquipmentModels()
+        public async UniTask UpdateEquipmentModels(IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
+            if (_isEquipmentsUpdating)
+                return;
+            _isEquipmentsUpdating = true;
+
             // Prepared data
             EquipmentContainer tempContainer;
             EquipmentModel tempEquipmentModel;
@@ -442,61 +457,61 @@ namespace MultiplayerARPG
                 onBeforeUpdateEquipmentModels.Invoke(this, showingModels, storingModels, unequippingSockets);
 
             // Setup equipping models from equip items
-            if (EquipItems != null && EquipItems.Count > 0)
+            if (equipItems != null && equipItems.Count > 0)
             {
-                foreach (CharacterItem equipItem in EquipItems)
+                foreach (CharacterItem equipItem in equipItems)
                 {
                     IArmorItem armorItem = equipItem.GetArmorItem();
                     if (armorItem == null)
                         continue;
-                    SetupEquippingModels(showingModels, storingModels, unequippingSockets, armorItem.EquipmentModels, armorItem.GetEquipPosition(), equipItem);
+                    await SetupEquippingModels(showingModels, storingModels, unequippingSockets, armorItem.EquipmentModels, armorItem.GetEquipPosition(), equipItem);
                 }
             }
 
             // Setup equipping models from equip weapons
             EquipWeapons equipWeapons;
-            if (IsWeaponsSheathed || SelectableWeaponSets == null || SelectableWeaponSets.Count == 0)
+            if (isWeaponsSheathed || selectableWeaponSets == null || selectableWeaponSets.Count == 0)
             {
                 equipWeapons = new EquipWeapons();
             }
             else
             {
-                if (EquipWeaponSet >= SelectableWeaponSets.Count)
+                if (equipWeaponSet >= selectableWeaponSets.Count)
                 {
                     // Issues occuring, so try to simulate data
                     // Create a new list to make sure that changes won't be applied to the source list (the source list must be readonly)
-                    SelectableWeaponSets = new List<EquipWeapons>(SelectableWeaponSets);
-                    while (EquipWeaponSet >= SelectableWeaponSets.Count)
+                    selectableWeaponSets = new List<EquipWeapons>(selectableWeaponSets);
+                    while (equipWeaponSet >= selectableWeaponSets.Count)
                     {
-                        SelectableWeaponSets.Add(new EquipWeapons());
+                        selectableWeaponSets.Add(new EquipWeapons());
                     }
                 }
-                equipWeapons = SelectableWeaponSets[EquipWeaponSet];
+                equipWeapons = selectableWeaponSets[equipWeaponSet];
             }
             IEquipmentItem rightHandItem = equipWeapons.GetRightHandEquipmentItem();
             IEquipmentItem leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
             if (rightHandItem != null && rightHandItem.IsWeapon())
-                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).EquipmentModels, GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeapons.rightHand);
+                await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).EquipmentModels, GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeapons.rightHand);
             if (leftHandItem != null && leftHandItem.IsWeapon())
-                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandEquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
+                await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandEquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
             if (leftHandItem != null && leftHandItem.IsShield())
-                SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
+                await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
 
-            if (SelectableWeaponSets != null && SelectableWeaponSets.Count > 0)
+            if (selectableWeaponSets != null && selectableWeaponSets.Count > 0)
             {
-                for (byte i = 0; i < SelectableWeaponSets.Count; ++i)
+                for (byte i = 0; i < selectableWeaponSets.Count; ++i)
                 {
-                    if (IsWeaponsSheathed || i != EquipWeaponSet)
+                    if (isWeaponsSheathed || i != equipWeaponSet)
                     {
-                        equipWeapons = SelectableWeaponSets[i];
+                        equipWeapons = selectableWeaponSets[i];
                         rightHandItem = equipWeapons.GetRightHandEquipmentItem();
                         leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
                         if (rightHandItem != null && rightHandItem.IsWeapon())
-                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_RIGHT_HAND, "_", i), equipWeapons.rightHand, true, i);
+                            await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_RIGHT_HAND, "_", i), equipWeapons.rightHand, true, i);
                         if (leftHandItem != null && leftHandItem.IsWeapon())
-                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandSheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
+                            await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandSheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
                         if (leftHandItem != null && leftHandItem.IsShield())
-                            SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
+                            await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
                     }
                 }
             }
@@ -561,9 +576,10 @@ namespace MultiplayerARPG
                     tempContainer.DeactivateInstantiatedObjectGroups();
                     tempContainer.SetActiveDefaultModel(false);
                     tempContainer.SetActiveDefaultModelGroup(false);
+                    GameObject meshPrefab = await tempEquipmentModel.GetMeshPrefab();
                     if (tempContainer.transform != null)
                     {
-                        tempEquipmentObject = Instantiate(tempEquipmentModel.meshPrefab, tempContainer.transform);
+                        tempEquipmentObject = Instantiate(meshPrefab, tempContainer.transform);
                         tempEquipmentObject.transform.localPosition = tempEquipmentModel.localPosition;
                         tempEquipmentObject.transform.localEulerAngles = tempEquipmentModel.localEulerAngles;
                         if (!tempEquipmentModel.doNotChangeScale)
@@ -586,7 +602,8 @@ namespace MultiplayerARPG
                     if (tempEquipmentEntity != null)
                     {
                         tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.item);
-                        tempEquipmentEntity.SetupRefToPrefab(tempEquipmentModel.meshPrefab);
+                        GameObject meshPrefab = await tempEquipmentModel.GetMeshPrefab();
+                        tempEquipmentEntity.SetupRefToPrefab(meshPrefab);
                     }
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
                         CacheRightHandEquipmentEntity = tempEquipmentEntity;
@@ -598,6 +615,7 @@ namespace MultiplayerARPG
                 OnInstantiatedEquipment(tempEquipmentModel, tempEquipmentObject, tempEquipmentEntity, tempEquipmentObjectGroup, tempContainer);
             }
             EquippedModels = storingModels;
+            _isEquipmentsUpdating = false;
         }
 
         private void ClearEquippedModel(string equipSocket)
@@ -617,7 +635,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, string equipPosition, CharacterItem item, bool isSheathModels = false, byte equipWeaponSet = 0, EquipmentModelDelegate onInstantiated = null)
+        public async UniTask SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, string equipPosition, CharacterItem item, bool isSheathModels = false, byte equipWeaponSet = 0, EquipmentModelDelegate onInstantiated = null)
         {
             if (equipmentModels == null || equipmentModels.Length == 0 || string.IsNullOrWhiteSpace(equipPosition))
                 return;
@@ -626,8 +644,8 @@ namespace MultiplayerARPG
             for (int i = 0; i < equipmentModels.Length; ++i)
             {
                 tempModel = equipmentModels[i];
-
-                if (string.IsNullOrEmpty(tempModel.equipSocket) || (!tempModel.useInstantiatedObject && !tempModel.meshPrefab))
+                GameObject meshPrefab = await tempModel.GetMeshPrefab();
+                if (string.IsNullOrEmpty(tempModel.equipSocket) || (!tempModel.useInstantiatedObject && meshPrefab == null))
                 {
                     // Required data are empty, skip it
                     continue;

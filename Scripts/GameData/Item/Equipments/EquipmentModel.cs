@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -15,7 +18,10 @@ namespace MultiplayerARPG
         public bool useInstantiatedObject;
         [BoolShowConditional(nameof(useInstantiatedObject), false)]
         [FormerlySerializedAs("model")]
-        public GameObject meshPrefab;
+        [SerializeField]
+        protected GameObject meshPrefab;
+        [SerializeField]
+        protected AssetReferenceGameObject addressableMeshPrefab;
         [BoolShowConditional(nameof(useInstantiatedObject), true)]
         public int instantiatedObjectIndex;
         public byte priority;
@@ -51,6 +57,25 @@ namespace MultiplayerARPG
         public EquipmentModelDelegate onInstantiated;
         #endregion
 
+        public async UniTask<GameObject> GetMeshPrefab()
+        {
+            if (meshPrefab != null)
+            {
+                return meshPrefab;
+            }
+            else if (addressableMeshPrefab.IsDataValid())
+            {
+                return await addressableMeshPrefab.GetOrLoadAssetAsync();
+            }
+            return null;
+        }
+
+        public EquipmentModel SetMeshPrefab(GameObject meshPrefab)
+        {
+            this.meshPrefab = meshPrefab;
+            return this;
+        }
+
         public EquipmentModel Clone()
         {
             return new EquipmentModel()
@@ -60,6 +85,7 @@ namespace MultiplayerARPG
                 // Prefab Settings
                 useInstantiatedObject = useInstantiatedObject,
                 meshPrefab = meshPrefab,
+                addressableMeshPrefab = addressableMeshPrefab,
                 instantiatedObjectIndex = instantiatedObjectIndex,
                 priority = priority,
                 // Skinned Mesh Settings

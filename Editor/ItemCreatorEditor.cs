@@ -253,7 +253,7 @@ namespace MultiplayerARPG
             }
             newItemData.Id = id;
             if (savedDropModel != null)
-                newItemData.DropModel = savedDropModel;
+                newItemData.SetDropModel(savedDropModel);
 
             if (savedEquipModelR != null && (itemType == ItemType.Armor || itemType == ItemType.Weapon || itemType == ItemType.Shield))
             {
@@ -263,8 +263,7 @@ namespace MultiplayerARPG
                     {
                         equipSocket = equipSocketR,
                         useInstantiatedObject = false,
-                        meshPrefab = savedEquipModelR,
-                    }
+                    }.SetMeshPrefab(savedEquipModelR),
                 };
                 if (newItemData is Item)
                 {
@@ -287,8 +286,7 @@ namespace MultiplayerARPG
                     {
                         equipSocket = equipSocketL,
                         useInstantiatedObject = false,
-                        meshPrefab = savedEquipModelL,
-                    }
+                    }.SetMeshPrefab(savedEquipModelL),
                 };
                 if (newItemData is Item)
                 {

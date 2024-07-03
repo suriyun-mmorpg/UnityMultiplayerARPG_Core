@@ -268,7 +268,7 @@ namespace MultiplayerARPG
                 onPickedUp.Invoke();
         }
 
-        protected virtual void OnItemDropDataChange(bool isInitial, ItemDropData itemDropData)
+        protected virtual async void OnItemDropDataChange(bool isInitial, ItemDropData itemDropData)
         {
 #if !UNITY_SERVER
             // Instantiate model at clients
@@ -278,9 +278,12 @@ namespace MultiplayerARPG
             ModelContainer.gameObject.SetActive(true);
             if (_dropModel != null)
                 Destroy(_dropModel);
-            if (itemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(itemDropData.characterItem.dataId, out BaseItem item) && item.DropModel != null)
+            if (itemDropData.putOnPlaceholder && GameInstance.Items.TryGetValue(itemDropData.characterItem.dataId, out BaseItem item))
             {
-                _dropModel = Instantiate(item.DropModel, ModelContainer);
+                GameObject dropModel = await item.GetDropModel();
+                if (dropModel == null)
+                    return;
+                _dropModel = Instantiate(dropModel, ModelContainer);
                 _dropModel.gameObject.SetLayerRecursively(CurrentGameInstance.itemDropLayer, true);
                 _dropModel.gameObject.SetActive(true);
                 _dropModel.RemoveComponentsInChildren<Collider>(false);
@@ -347,7 +350,7 @@ namespace MultiplayerARPG
             }
             else if (GameInstance.Singleton.addressableItemDropEntityPrefab.IsDataValid())
             {
-                entity = Drop(GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAsset<AssetReferenceItemDropEntity, ItemDropEntity>(), dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+                entity = Drop(GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAsset<ItemDropEntity>(), dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
             }
             return entity;
         }

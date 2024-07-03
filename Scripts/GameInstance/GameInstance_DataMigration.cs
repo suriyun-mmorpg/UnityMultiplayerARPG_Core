@@ -26,16 +26,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void MigrateEquipmentEntities(IEnumerable<EquipmentModel> equipmentModels)
+        public static async void MigrateEquipmentEntities(IEnumerable<EquipmentModel> equipmentModels)
         {
             if (equipmentModels == null)
                 return;
             List<GameObject> modelObjects = new List<GameObject>();
             foreach (EquipmentModel equipmentModel in equipmentModels)
             {
-                if (equipmentModel.meshPrefab == null)
+                GameObject meshPrefab = await equipmentModel.GetMeshPrefab();
+                if (meshPrefab == null)
                     continue;
-                modelObjects.Add(equipmentModel.meshPrefab);
+                modelObjects.Add(meshPrefab);
             }
             List<EquipmentEntity> equipmentEntities = modelObjects.GetComponents<EquipmentEntity>();
             foreach (EquipmentEntity equipmentEntity in equipmentEntities)

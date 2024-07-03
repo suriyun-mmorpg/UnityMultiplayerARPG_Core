@@ -422,7 +422,7 @@ namespace MultiplayerARPG
             return CharacterDatabase.DamageInfo.GetFov();
         }
 
-        public override void Killed(EntityInfo lastAttacker)
+        public override async void Killed(EntityInfo lastAttacker)
         {
             base.Killed(lastAttacker);
 
@@ -462,7 +462,9 @@ namespace MultiplayerARPG
                         }
                         else if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
                         {
-                            ItemsContainerEntity.DropItems(CurrentGameInstance.addressableMonsterCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
+                            prefab = await CurrentGameInstance.addressableMonsterCorpsePrefab.GetOrLoadAssetAsync<ItemsContainerEntity>();
+                            if (prefab != null)
+                                ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
                         }
                     }
                     break;
@@ -778,7 +780,7 @@ namespace MultiplayerARPG
             int maxStack = item.MaxStack;
             while (amount > 0)
             {
-                int stackSize = Mathf.Min(maxStack ,amount);
+                int stackSize = Mathf.Min(maxStack, amount);
                 _droppingItems.Add(CharacterItem.Create(item, 1, stackSize));
                 amount -= stackSize;
             }

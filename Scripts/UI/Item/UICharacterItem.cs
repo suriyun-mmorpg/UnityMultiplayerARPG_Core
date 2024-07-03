@@ -558,7 +558,7 @@ namespace MultiplayerARPG
             UpdateStartVendingUIVisibility(false);
         }
 
-        protected override void UpdateData()
+        protected override async void UpdateData()
         {
             bool isEmpty = Item == null;
             foreach (GameObject obj in emptyObjects)
@@ -1328,7 +1328,7 @@ namespace MultiplayerARPG
                 }
                 else if (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid())
                 {
-                    tempEntity = ItemWithMonsterEntity.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseMonsterCharacterEntity>();
+                    tempEntity = await ItemWithMonsterEntity.AddressableMonsterCharacterEntity.GetOrLoadAssetAsync<BaseMonsterCharacterEntity>();
                 }
 
                 if (uiTextMonster != null)
@@ -1374,7 +1374,7 @@ namespace MultiplayerARPG
                 }
                 else if (ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid())
                 {
-                    tempEntity = ItemWithBuildingEntity.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>();
+                    tempEntity = await ItemWithBuildingEntity.AddressableBuildingEntity.GetOrLoadAssetAsync<BuildingEntity>();
                 }
 
                 if (uiTextBuilding != null)
@@ -1400,7 +1400,7 @@ namespace MultiplayerARPG
                 }
                 else if (ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid())
                 {
-                    tempEntity = ItemWithVehicleEntity.AddressableVehicleEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>();
+                    tempEntity = await ItemWithVehicleEntity.AddressableVehicleEntity.GetOrLoadAssetAsync<VehicleEntity>();
                 }
 
                 if (uiTextVehicle != null)

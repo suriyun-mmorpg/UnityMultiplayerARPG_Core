@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -36,6 +39,8 @@ namespace MultiplayerARPG
         [Category(10, "In-Scene Objects/Appearance")]
         [SerializeField]
         protected GameObject dropModel = null;
+        [SerializeField]
+        protected AssetReferenceGameObject addressableDropModel;
 #endif
 
         [Category(50, "Dismantle Settings")]
@@ -103,7 +108,24 @@ namespace MultiplayerARPG
         public int ExpireDuration { get => expireDuration; set => expireDuration = value; }
 
 #if UNITY_EDITOR || !UNITY_SERVER
-        public GameObject DropModel { get => dropModel; set => dropModel = value; }
+        public async UniTask<GameObject> GetDropModel()
+        {
+            if (dropModel != null)
+            {
+                return dropModel;
+            }
+            else if (addressableDropModel.IsDataValid())
+            {
+                return await addressableDropModel.GetOrLoadAssetAsync();
+            }
+            return null;
+        }
+
+        public IItem SetDropModel(GameObject dropModel)
+        {
+            this.dropModel = dropModel;
+            return this;
+        }
 #endif
 
         public int DismantleReturnGold { get => dismantleReturnGold; set => dismantleReturnGold = value; }

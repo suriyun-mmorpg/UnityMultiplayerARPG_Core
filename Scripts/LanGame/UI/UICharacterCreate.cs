@@ -269,7 +269,7 @@ namespace MultiplayerARPG
                     List<Task<BaseCharacterEntity>> loadTasks = new List<Task<BaseCharacterEntity>>();
                     foreach (AssetReferenceBasePlayerCharacterEntity entry in GameInstance.AddressablePlayerCharacterEntities.Values)
                     {
-                        loadTasks.Add(entry.GetOrLoadAssetAsync<AssetReferenceBasePlayerCharacterEntity, BaseCharacterEntity>());
+                        loadTasks.Add(entry.GetOrLoadAssetAsync<BaseCharacterEntity>());
                     }
                     await Task.WhenAll(loadTasks);
                     for (int i = 0; i < loadTasks.Count; ++i)

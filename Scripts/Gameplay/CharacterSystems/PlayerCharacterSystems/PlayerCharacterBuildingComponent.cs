@@ -17,6 +17,11 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
+            CmdConstructBuildingBody(itemIndex, position, rotation, parentObjectId);
+        }
+
+        protected virtual async void CmdConstructBuildingBody(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
+        {
 #if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
             {
@@ -27,6 +32,13 @@ namespace MultiplayerARPG
             if (itemIndex >= Entity.NonEquipItems.Count)
             {
                 // Invalid data index
+                return;
+            }
+
+            if (Entity.IsInSafeArea)
+            {
+                // Unable to build in safe area
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_IN_SAFE_AREA);
                 return;
             }
 
@@ -46,18 +58,18 @@ namespace MultiplayerARPG
                 return;
             }
 
-            BuildingEntity buildingEntity;
+            BuildingEntity buildingEntity = null;
             if (buildingItem.BuildingEntity != null)
             {
                 buildingEntity = buildingItem.BuildingEntity;
             }
             else if (buildingItem.AddressableBuildingEntity.IsDataValid())
             {
-                buildingEntity = buildingItem.AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>();
+                buildingEntity = await buildingItem.AddressableBuildingEntity.GetOrLoadAssetAsync<BuildingEntity>();
             }
-            else
+
+            if (buildingEntity == null)
             {
-                // Invalid data
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_ENTITY);
                 return;
             }

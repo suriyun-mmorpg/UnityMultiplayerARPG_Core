@@ -1,7 +1,10 @@
 ﻿using UnityEngine;
 using UnityEngine.Serialization;
 using System;
+using LiteNetLibManager;
 using Newtonsoft.Json;
+using UnityEngine.AddressableAssets;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -77,9 +80,18 @@ namespace MultiplayerARPG
         [SerializeField]
         [PreviewSprite(50)]
         protected Sprite icon;
+        [SerializeField]
+        protected AssetReferenceSprite addressableIcon;
         public Sprite Icon
         {
-            get { return icon; }
+            get
+            {
+                if (icon != null)
+                    return icon;
+                if (addressableIcon.IsDataValid())
+                    return addressableIcon.LoadAssetAsync<Sprite>().WaitForCompletion();
+                return null;
+            }
             set { icon = value; }
         }
 #endif

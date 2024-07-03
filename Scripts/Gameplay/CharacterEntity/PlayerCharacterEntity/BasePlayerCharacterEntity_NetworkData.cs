@@ -463,7 +463,7 @@ namespace MultiplayerARPG
                 Destroy(BasePlayerCharacterController.Singleton.gameObject);
         }
 
-        protected override void EntityOnSetOwnerClient()
+        protected override async void EntityOnSetOwnerClient()
         {
             base.EntityOnSetOwnerClient();
 
@@ -487,11 +487,11 @@ namespace MultiplayerARPG
                 }
                 else if (AddressableControllerPrefab.IsDataValid())
                 {
-                    prefab = AddressableControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
+                    prefab = await AddressableControllerPrefab.GetOrLoadAssetAsync<BasePlayerCharacterController>();
                 }
                 else if (CurrentGameInstance.addressableDefaultControllerPrefab.IsDataValid())
                 {
-                    prefab = CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAsset<AssetReferenceBasePlayerCharacterController, BasePlayerCharacterController>();
+                    prefab = await CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAssetAsync<BasePlayerCharacterController>();
                 }
                 else if (BasePlayerCharacterController.Singleton != null)
                 {

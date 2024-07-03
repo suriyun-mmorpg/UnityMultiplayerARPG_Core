@@ -92,7 +92,7 @@ namespace MultiplayerARPG
                 Dictionary<ItemRandomByWeight, int> randomItems = new Dictionary<ItemRandomByWeight, int>();
                 foreach (ItemRandomByWeight item in quest.randomRewardItems)
                 {
-                    if (item.Item == null || item.maxAmount <= 0 || item.randomWeight <= 0)
+                    if (item.item == null || item.maxAmount <= 0 || item.randomWeight <= 0)
                         continue;
                     randomItems[item] = item.randomWeight;
                 }
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                 {
                     rewardItems.Add(new ItemAmount()
                     {
-                        item = randomedItem.Item,
+                        item = randomedItem.item,
                         amount = randomedItem.maxAmount,
                     });
                 }
@@ -109,7 +109,7 @@ namespace MultiplayerARPG
                 {
                     rewardItems.Add(new ItemAmount()
                     {
-                        item = randomedItem.Item,
+                        item = randomedItem.item,
                         amount = Random.Range(randomedItem.minAmount, randomedItem.maxAmount),
                     });
                 }

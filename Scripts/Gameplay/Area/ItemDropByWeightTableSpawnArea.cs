@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -11,6 +12,7 @@ namespace MultiplayerARPG
         public int amount = 5;
         public float respawnPickedupDelay = 10f;
         public float respawnPendingEntitiesDelay = 5f;
+        public float droppedItemDestroyDelay = 300f;
 
         protected float _respawnPendingEntitiesTimer = 0f;
         protected readonly List<CharacterItem> _pending = new List<CharacterItem>();
@@ -53,16 +55,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual Coroutine Spawn(CharacterItem item, float delay)
-        {
-            return StartCoroutine(SpawnRoutine(item, delay));
-        }
-
-        IEnumerator SpawnRoutine(CharacterItem item, float delay)
+        public virtual async void Spawn(CharacterItem item, float delay)
         {
             if (item.IsEmptySlot())
-                yield break;
-            yield return new WaitForSecondsRealtime(delay);
+                return;
+            await UniTask.Delay(Mathf.RoundToInt(delay * 1000));
             ItemDropEntity newEntity = null;
             if (GetRandomPosition(out Vector3 dropPosition))
             {
@@ -83,7 +80,11 @@ namespace MultiplayerARPG
                 }
                 else if (GameInstance.Singleton.addressableItemDropEntityPrefab.IsDataValid())
                 {
-                    newEntity = ItemDropEntity.Drop(GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAsset<AssetReferenceItemDropEntity, ItemDropEntity>(), dropPosition, dropRotation, RewardGivenType.None, item, new string[0], -1);
+                    prefab = await GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAssetAsync<ItemDropEntity>();
+                    if (prefab != null)
+                    {
+                        newEntity = ItemDropEntity.Drop(prefab, dropPosition, dropRotation, RewardGivenType.None, item, new string[0], -1);
+                    }
                 }
             }
             if (newEntity == null)
@@ -92,6 +93,9 @@ namespace MultiplayerARPG
             }
             else
             {
+                // TODO: fix this later
+                //if (droppedItemDestroyDelay >= 0)
+                //    newEntity.NetworkDestroy(droppedItemDestroyDelay);
                 newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                 newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
             }

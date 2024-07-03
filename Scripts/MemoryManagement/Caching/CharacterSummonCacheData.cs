@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             BaseMonsterCharacterEntity tempPrefab;
             if (GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
             {
-                tempPrefab = addressablePrefab.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>() as BaseMonsterCharacterEntity;
+                tempPrefab = addressablePrefab.GetOrLoadAsset<BaseCharacterEntity>() as BaseMonsterCharacterEntity;
                 if (tempPrefab != null && tempPrefab.CharacterDatabase != null)
                     tempBuff = tempPrefab.CharacterDatabase.SummonerBuff;
             }

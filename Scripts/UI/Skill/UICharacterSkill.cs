@@ -247,7 +247,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void UpdateData()
+        protected override async void UpdateData()
         {
             UpdateCoolDownRemainsDuration(1f);
 
@@ -434,13 +434,21 @@ namespace MultiplayerARPG
                     }
                     else if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
                     {
-                        uiTextSummon.text = ZString.Format(
-                            LanguageManager.GetText(formatKeySummon),
-                            skillSummon.AddressableMonsterCharacterEntity.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseMonsterCharacterEntity>().Title,
-                            skillSummon.Level.GetAmount(Level),
-                            skillSummon.AmountEachTime.GetAmount(Level),
-                            skillSummon.MaxStack.GetAmount(Level),
-                            skillSummon.Duration.GetAmount(Level));
+                        BaseMonsterCharacterEntity prefab = await skillSummon.AddressableMonsterCharacterEntity.GetOrLoadAssetAsync<BaseMonsterCharacterEntity>();
+                        if (prefab != null)
+                        {
+                            uiTextSummon.text = ZString.Format(
+                                LanguageManager.GetText(formatKeySummon),
+                                prefab.Title,
+                                skillSummon.Level.GetAmount(Level),
+                                skillSummon.AmountEachTime.GetAmount(Level),
+                                skillSummon.MaxStack.GetAmount(Level),
+                                skillSummon.Duration.GetAmount(Level));
+                        }
+                        else
+                        {
+                            uiTextSummon.SetGameObjectActive(false);
+                        }
                     }
                 }
             }
@@ -462,9 +470,17 @@ namespace MultiplayerARPG
                     }
                     else if (skillMount.AddressableMountEntity.IsDataValid())
                     {
-                        uiTextMount.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyMount),
-                            skillMount.AddressableMountEntity.GetOrLoadAsset<AssetReferenceVehicleEntity, VehicleEntity>().Title);
+                        VehicleEntity prefab = await skillMount.AddressableMountEntity.GetOrLoadAssetAsync<VehicleEntity>();
+                        if (prefab != null)
+                        {
+                            uiTextMount.text = ZString.Format(
+                                LanguageManager.GetText(formatKeyMount),
+                                prefab.Title);
+                        }
+                        else
+                        {
+                            uiTextMount.SetGameObjectActive(false);
+                        }
                     }
                 }
             }

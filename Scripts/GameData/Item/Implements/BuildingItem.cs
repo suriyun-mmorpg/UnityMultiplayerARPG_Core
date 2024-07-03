@@ -89,7 +89,7 @@ namespace MultiplayerARPG
             }
             else if (AddressableBuildingEntity.IsDataValid())
             {
-                return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<AssetReferenceBuildingEntity, BuildingEntity>());
+                return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<BuildingEntity>());
             }
             return default;
         }

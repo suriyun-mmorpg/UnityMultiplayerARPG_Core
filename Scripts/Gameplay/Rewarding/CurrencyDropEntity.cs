@@ -121,7 +121,7 @@ namespace MultiplayerARPG
             }
             else if (GameInstance.Singleton.addressableCurrencyDropEntityPrefab.IsDataValid())
             {
-                entity = Drop(GameInstance.Singleton.addressableCurrencyDropEntityPrefab.GetOrLoadAsset<AssetReferenceCurrencyDropEntity, CurrencyDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
+                entity = Drop(GameInstance.Singleton.addressableCurrencyDropEntityPrefab.GetOrLoadAsset<CurrencyDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
             }
             if (entity != null)
             {

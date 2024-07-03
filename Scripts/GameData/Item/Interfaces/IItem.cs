@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -49,10 +50,8 @@ namespace MultiplayerARPG
         /// </summary>
         int ExpireDuration { get; }
 #if UNITY_EDITOR || !UNITY_SERVER
-        /// <summary>
-        /// Drop model
-        /// </summary>
-        GameObject DropModel { get; }
+        UniTask<GameObject> GetDropModel();
+        IItem SetDropModel(GameObject dropModel);
 #endif
         /// <summary>
         /// Returning gold after this item was dismantled

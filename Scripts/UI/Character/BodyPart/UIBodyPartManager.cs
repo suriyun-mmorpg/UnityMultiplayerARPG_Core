@@ -101,22 +101,22 @@ namespace MultiplayerARPG
             ColorSelectionManager.eventOnSelect.RemoveListener(OnSelectColorUI);
         }
 
-        private void OnSelectModelUI(UIBodyPartModelOption ui)
+        private async void OnSelectModelUI(UIBodyPartModelOption ui)
         {
             if (_component == null)
                 return;
             _component.SetModel(ui.Index);
-            _model.UpdateEquipmentModels();
+            await _model.UpdateEquipmentModels(_model.EquipItems, _model.SelectableWeaponSets, _model.EquipWeaponSet, _model.IsWeaponsSheathed);
             SetupColorList();
             onSetModelValue?.Invoke(ui.HashedSettingId, ui.Index);
         }
 
-        private void OnSelectColorUI(UIBodyPartColorOption ui)
+        private async void OnSelectColorUI(UIBodyPartColorOption ui)
         {
             if (_component == null)
                 return;
             _component.SetColor(ui.Index);
-            _model.UpdateEquipmentModels();
+            await _model.UpdateEquipmentModels(_model.EquipItems, _model.SelectableWeaponSets, _model.EquipWeaponSet, _model.IsWeaponsSheathed);
             onSetColorValue?.Invoke(ui.HashedSettingId, ui.Index);
         }
 

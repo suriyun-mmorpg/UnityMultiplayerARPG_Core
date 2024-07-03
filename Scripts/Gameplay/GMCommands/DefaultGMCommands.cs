@@ -492,7 +492,7 @@ namespace MultiplayerARPG
                     BaseMonsterCharacterEntity targetMonster = null;
                     foreach (AssetReferenceBaseMonsterCharacterEntity addressableMonster in GameInstance.AddressableMonsterCharacterEntities.Values)
                     {
-                        BaseMonsterCharacterEntity monster = addressableMonster.GetOrLoadAsset<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>() as BaseMonsterCharacterEntity;
+                        BaseMonsterCharacterEntity monster = addressableMonster.GetOrLoadAsset<BaseCharacterEntity>() as BaseMonsterCharacterEntity;
                         if (monster == null)
                             continue;
                         if (monster.name.Equals(data[1]) ||

@@ -98,7 +98,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        protected void KilledDropItems(EntityInfo lastAttacker, DeadPunishmentType deadPunishmentType, int decreaseItems)
+        protected async void KilledDropItems(EntityInfo lastAttacker, DeadPunishmentType deadPunishmentType, int decreaseItems)
         {
             if (decreaseItems <= 0)
                 return;
@@ -273,7 +273,11 @@ namespace MultiplayerARPG
                                 }
                                 else if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
                                 {
-                                    ItemsContainerEntity.DropItems(CurrentGameInstance.addressablePlayerCorpsePrefab.GetOrLoadAsset<AssetReferenceItemsContainerEntity, ItemsContainerEntity>(), this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                                    prefab = await CurrentGameInstance.addressablePlayerCorpsePrefab.GetOrLoadAssetAsync<ItemsContainerEntity>();
+                                    if (prefab != null)
+                                    {
+                                        ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
+                                    }
                                 }
                             }
                             break;
