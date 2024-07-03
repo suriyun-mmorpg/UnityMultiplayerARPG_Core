@@ -220,6 +220,14 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
+            // Prepare and validate item
+            EquipWeapons equipWeapons = Entity.EquipWeapons;
+            if ((isLeftHand && equipWeapons.leftHand.IsDiffer(weapon)) ||
+                (!isLeftHand && equipWeapons.rightHand.IsDiffer(weapon)))
+            {
+                // Invalid item, player may change the item before the reloading is done
+                return;
+            }
             if (!Entity.DecreaseItems(reloadingAmmoDataId, reloadingAmmoAmount))
             {
                 if (_entityIsPlayer && IsServer)
@@ -236,11 +244,14 @@ namespace MultiplayerARPG
             Entity.FillEmptySlots();
             weapon.ammoDataId = reloadingAmmoDataId;
             weapon.ammo += reloadingAmmoAmount;
-            EquipWeapons equipWeapons = Entity.EquipWeapons;
             if (isLeftHand)
+            {
                 equipWeapons.leftHand = weapon;
+            }
             else
+            {
                 equipWeapons.rightHand = weapon;
+            }
             Entity.EquipWeapons = equipWeapons;
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogReloadTrigger(_playerCharacterEntity, triggerIndex);
