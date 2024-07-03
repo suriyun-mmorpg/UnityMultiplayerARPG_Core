@@ -357,7 +357,7 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void RpcReload(bool isLeftHand, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
-            if (IsServer || IsOwnerClient)
+            if (IsServer)
             {
                 // Don't play reloading animation again
                 return;
