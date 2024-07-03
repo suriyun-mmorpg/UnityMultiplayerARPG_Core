@@ -140,14 +140,14 @@ namespace MultiplayerARPG
         {
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
                 return;
-            playerCharacter.UserGold.Increase(gold);
+            playerCharacter.UserGold = playerCharacter.UserGold.Increase(gold);
         }
 
         public virtual void ChangeUserCash(string userId, int cash)
         {
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
                 return;
-            playerCharacter.UserCash.Increase(cash);
+            playerCharacter.UserCash = playerCharacter.UserCash.Increase(cash);
         }
     }
 }
