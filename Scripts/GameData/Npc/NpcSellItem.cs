@@ -11,6 +11,10 @@ namespace MultiplayerARPG
         [Tooltip("Selling item")]
         public BaseItem item;
         /// <summary>
+        /// Amount of item
+        /// </summary>
+        public int amount;
+        /// <summary>
         /// Require gold to buy item
         /// </summary>
         [Tooltip("Sell price in gold")]
