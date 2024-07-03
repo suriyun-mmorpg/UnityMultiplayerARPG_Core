@@ -56,6 +56,12 @@ namespace MultiplayerARPG
 
         private BaseCustomDamageInfo _builtInDamageInfo;
 
+        private bool TryGetDamageInfo(out BaseCustomDamageInfo damageInfo)
+        {
+            damageInfo = GetDamageInfo();
+            return damageInfo != null;
+        }
+
         private BaseCustomDamageInfo GetDamageInfo()
         {
             switch (damageType)
@@ -112,7 +118,7 @@ namespace MultiplayerARPG
 
         public float GetDistance()
         {
-            float dist = GetDamageInfo()?.GetDistance() ?? 0f;
+            float dist = TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.GetDistance() : 0f;
             if (startAttackDistance > 0 && startAttackDistance < dist)
                 dist = startAttackDistance;
             return dist;
@@ -120,12 +126,12 @@ namespace MultiplayerARPG
 
         public float GetFov()
         {
-            return GetDamageInfo()?.GetFov() ?? 0f;
+            return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.GetFov() : 0f;
         }
 
         public Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
-            return GetDamageInfo()?.GetDamageTransform(attacker, isLeftHand) ?? null;
+            return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.GetDamageTransform(attacker, isLeftHand) : null;
         }
 
         public void LaunchDamageEntity(
@@ -149,18 +155,21 @@ namespace MultiplayerARPG
             if (attacker.IsServer && attacker.IsDead())
                 return;
 
-            GetDamageInfo()?.LaunchDamageEntity(
-                attacker,
-                isLeftHand,
-                weapon,
-                simulateSeed,
-                triggerIndex,
-                spreadIndex,
-                fireStagger,
-                damageAmounts,
-                skill,
-                skillLevel,
-                aimPosition);
+            if (TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo))
+            {
+                dmgInfo.LaunchDamageEntity(
+                    attacker,
+                    isLeftHand,
+                    weapon,
+                    simulateSeed,
+                    triggerIndex,
+                    spreadIndex,
+                    fireStagger,
+                    damageAmounts,
+                    skill,
+                    skillLevel,
+                    aimPosition);
+            }
 
             // Trigger attacker's on launch damage entity event
             attacker.OnLaunchDamageEntity(
@@ -177,12 +186,18 @@ namespace MultiplayerARPG
 
         public void PrepareRelatesData()
         {
-            GetDamageInfo()?.PrepareRelatesData();
+            if (TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo))
+                dmgInfo.PrepareRelatesData();
         }
 
         public bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox)
         {
-            return GetDamageInfo()?.IsHitValid(hitValidateData, hitData, hitBox) ?? false;
+            return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.IsHitValid(hitValidateData, hitData, hitBox) : false;
+        }
+
+        public bool IsHeadshotInstantDeath()
+        {
+            return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.IsHeadshotInstantDeath() : false;
         }
     }
 

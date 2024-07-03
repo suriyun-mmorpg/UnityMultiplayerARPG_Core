@@ -35,5 +35,6 @@ namespace MultiplayerARPG
         float GetDistance();
         float GetFov();
         bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox);
+        bool IsHeadshotInstantDeath();
     }
 }

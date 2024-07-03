@@ -56,6 +56,9 @@ namespace MultiplayerARPG
         [SerializeField]
         private Buff summonerBuff = Buff.Empty;
         public Buff SummonerBuff { get { return summonerBuff; } }
+        [SerializeField]
+        private bool isHeadshotInstantDeathProtected;
+        public bool IsHeadshotInstantDeathProtected { get { return isHeadshotInstantDeathProtected; } }
 
         [Category(4, "Attacking")]
         [SerializeField]

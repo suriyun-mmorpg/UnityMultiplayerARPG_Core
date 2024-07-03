@@ -102,6 +102,11 @@ namespace MultiplayerARPG
             return IsAcceptHitBetweenTime(dist, hitData.LaunchTimestamp, hitData.HitTimestamp, 1.05);
         }
 
+        public override bool IsHeadshotInstantDeath()
+        {
+            return true;
+        }
+
         private bool IsAcceptHitBetweenTime(float dist, long launchTimestamp, long hitTimestamp, double acceptableRate)
         {
             double duration = hitTimestamp - launchTimestamp;

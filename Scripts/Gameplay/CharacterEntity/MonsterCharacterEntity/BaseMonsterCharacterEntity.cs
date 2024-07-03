@@ -834,6 +834,78 @@ namespace MultiplayerARPG
             // TODO: May play teleport effects
             NetworkDestroy();
         }
+
+        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
+        {
+            if (damageAmounts == null)
+            {
+                Logging.LogWarning($"{name}({nameof(BaseCharacterEntity)}) damage amounts dictionary is null, this should not occurring.");
+                combatAmountType = CombatAmountType.Miss;
+                totalDamage = 0;
+                return;
+            }
+
+            if (instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter))
+            {
+                // Notify enemy spotted when received damage from enemy
+                NotifyEnemySpotted(attackerCharacter);
+
+                // Notify enemy spotted when damage taken to enemy
+                attackerCharacter.NotifyEnemySpotted(this);
+            }
+
+            if (!CurrentGameInstance.GameplayRule.RandomAttackHitOccurs(fromPosition, attackerCharacter, this, damageAmounts, weapon, skill, skillLevel, randomSeed, out bool isCritical, out bool isBlocked))
+            {
+                // Don't hit (Miss)
+                combatAmountType = CombatAmountType.Miss;
+                totalDamage = 0;
+                return;
+            }
+
+            // Calculate damages
+            combatAmountType = CombatAmountType.NormalDamage;
+            float calculatingTotalDamage = 0f;
+            foreach (DamageElement damageElement in damageAmounts.Keys)
+            {
+                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(CachedData.Resistances, CachedData.Armors,
+                    CurrentGameInstance.GameplayRule.RandomAttackDamage(fromPosition, attackerCharacter, this, damageElement, damageAmounts[damageElement], weapon, skill, skillLevel, randomSeed));
+            }
+
+            if (attackerCharacter != null)
+            {
+                // If critical occurs
+                if (isCritical)
+                {
+                    calculatingTotalDamage = CurrentGameInstance.GameplayRule.GetCriticalDamage(attackerCharacter, this, calculatingTotalDamage);
+                    combatAmountType = CombatAmountType.CriticalDamage;
+                }
+                // If block occurs
+                if (isBlocked)
+                {
+                    calculatingTotalDamage = CurrentGameInstance.GameplayRule.GetBlockDamage(attackerCharacter, this, calculatingTotalDamage);
+                    combatAmountType = CombatAmountType.BlockedDamage;
+                }
+            }
+
+            // Apply damages
+            totalDamage = CurrentGameInstance.GameplayRule.GetTotalDamage(fromPosition, instigator, this, calculatingTotalDamage, weapon, skill, skillLevel);
+            if (totalDamage < 0)
+                totalDamage = 0;
+
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (position == HitBoxPosition.Head && 
+                !CharacterDatabase.IsHeadshotInstantDeathProtected &&
+                weaponItem != null && weaponItem.WeaponType != null &&
+                weaponItem.WeaponType.DamageInfo.IsHeadshotInstantDeath())
+            {
+                // Headshot!, one hit dead
+                combatAmountType = CombatAmountType.CriticalDamage;
+                if (totalDamage < CurrentHp)
+                    totalDamage = CurrentHp;
+            }
+
+            CurrentHp -= totalDamage;
+        }
     }
 
     public struct ReceivedDamageRecord

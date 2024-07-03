@@ -65,6 +65,11 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public override bool IsHeadshotInstantDeath()
+        {
+            return true;
+        }
+
         public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;

@@ -21,6 +21,10 @@ namespace MultiplayerARPG
         public abstract float GetDistance();
         public abstract float GetFov();
         public abstract bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox);
+        public virtual bool IsHeadshotInstantDeath()
+        {
+            return false;
+        }
 
         public virtual void PrepareRelatesData()
         {
