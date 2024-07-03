@@ -62,6 +62,11 @@ namespace MultiplayerARPG
                 {
                     Object.DestroyImmediate(tmps[j]);
                 }
+                Animator[] animators = rootObjects[i].GetComponentsInChildren<Animator>();
+                for (int j = 0; j < animators.Length; ++j)
+                {
+                    Object.DestroyImmediate(animators[j]);
+                }
                 SkinnedMeshRenderer[] skinnedMeshRenderers = rootObjects[i].GetComponentsInChildren<SkinnedMeshRenderer>();
                 for (int j = 0; j < skinnedMeshRenderers.Length; ++j)
                 {
