@@ -97,22 +97,11 @@ namespace MultiplayerARPG
                     randomItems[item] = item.randomWeight;
                 }
                 ItemRandomByWeight randomedItem = WeightedRandomizer.From(randomItems).TakeOne();
-                if (randomedItem.minAmount <= 0)
+                rewardItems.Add(new ItemAmount()
                 {
-                    rewardItems.Add(new ItemAmount()
-                    {
-                        item = randomedItem.item,
-                        amount = randomedItem.maxAmount,
-                    });
-                }
-                else
-                {
-                    rewardItems.Add(new ItemAmount()
-                    {
-                        item = randomedItem.item,
-                        amount = Random.Range(randomedItem.minAmount, randomedItem.maxAmount),
-                    });
-                }
+                    item = randomedItem.item,
+                    amount = randomedItem.GetRandomedAmount(),
+                });
             }
             if (quest.rewardItems != null &&
                 quest.rewardItems.Length > 0)

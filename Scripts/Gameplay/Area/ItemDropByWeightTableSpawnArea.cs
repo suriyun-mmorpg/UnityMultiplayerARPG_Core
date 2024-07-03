@@ -50,6 +50,7 @@ namespace MultiplayerARPG
                 }
                 weightTable.RandomItem((item, amount) =>
                 {
+                    Debug.LogError("Drop");
                     Spawn(CharacterItem.Create(item, 1, amount), 0f);
                 });
             }
@@ -58,7 +59,9 @@ namespace MultiplayerARPG
         public virtual async void Spawn(CharacterItem item, float delay)
         {
             if (item.IsEmptySlot())
+            {
                 return;
+            }
             await UniTask.Delay(Mathf.RoundToInt(delay * 1000));
             ItemDropEntity newEntity = null;
             if (GetRandomPosition(out Vector3 dropPosition))

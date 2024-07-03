@@ -13,5 +13,23 @@ namespace MultiplayerARPG
         [Min(1)]
         public int maxAmount;
         public int randomWeight;
+
+        public void GetMinMaxAmount(out int min, out int max)
+        {
+            min = minAmount;
+            max = maxAmount;
+            if (max <= 0)
+                max = 1;
+            if (max < min)
+                max = min;
+            if (min <= 0)
+                min = max;
+        }
+
+        public int GetRandomedAmount()
+        {
+            GetMinMaxAmount(out int min, out int max);
+            return Random.Range(min, max);
+        }
     }
 }

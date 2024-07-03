@@ -33,12 +33,9 @@ namespace MultiplayerARPG
         public void RandomItem(System.Action<BaseItem, int> onRandomItem)
         {
             ItemRandomByWeight randomedItem = WeightedRandomizer.From(CacheRandomItems).TakeOne();
-            if (randomedItem.item == null || randomedItem.maxAmount <= 0)
+            if (randomedItem.item == null)
                 return;
-            if (randomedItem.minAmount <= 0)
-                onRandomItem.Invoke(randomedItem.item, randomedItem.maxAmount);
-            else
-                onRandomItem.Invoke(randomedItem.item, Random.Range(randomedItem.minAmount, randomedItem.maxAmount));
+            onRandomItem.Invoke(randomedItem.item, randomedItem.GetRandomedAmount());
         }
     }
 }

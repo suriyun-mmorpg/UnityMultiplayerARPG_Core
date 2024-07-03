@@ -208,7 +208,7 @@ namespace MultiplayerARPG
                 currencies.Add(new CurrencyAmount()
                 {
                     currency = randomCurrency.currency,
-                    amount = Random.Range(randomCurrency.minAmount, randomCurrency.maxAmount),
+                    amount = randomCurrency.GetRandomedAmount(),
                 });
             }
             return currencies.ToArray();

@@ -115,10 +115,7 @@ namespace MultiplayerARPG
             {
                 if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_certainDropItems[i].item))
                     continue;
-                if (_certainDropItems[i].minAmount <= 0)
-                    onRandomItem.Invoke(_certainDropItems[i].item, _certainDropItems[i].maxAmount);
-                else
-                    onRandomItem.Invoke(_certainDropItems[i].item, Random.Range(_certainDropItems[i].minAmount, _certainDropItems[i].maxAmount));
+                onRandomItem.Invoke(_certainDropItems[i].item, _certainDropItems[i].GetRandomedAmount());
                 ++randomDropCount;
             }
             // Reached max drop items?
@@ -132,10 +129,7 @@ namespace MultiplayerARPG
                     continue;
                 if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_uncertainDropItems[i].item))
                     continue;
-                if (_uncertainDropItems[i].minAmount <= 0)
-                    onRandomItem.Invoke(_uncertainDropItems[i].item, _uncertainDropItems[i].maxAmount);
-                else
-                    onRandomItem.Invoke(_uncertainDropItems[i].item, Random.Range(_uncertainDropItems[i].minAmount, _uncertainDropItems[i].maxAmount));
+                onRandomItem.Invoke(_uncertainDropItems[i].item, _uncertainDropItems[i].GetRandomedAmount());
                 ++randomDropCount;
             }
             // Reached max drop items?

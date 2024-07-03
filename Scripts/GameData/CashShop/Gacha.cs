@@ -67,26 +67,15 @@ namespace MultiplayerARPG
             for (int i = 0; i < count; ++i)
             {
                 ItemRandomByWeight randomedItem = WeightedRandomizer.From(CacheRandomItems).TakeOne();
-                if (randomedItem.minAmount <= 0)
+                if (randomedItem.item == null)
+                    continue;
+                rewardItems.Add(new RewardedItem()
                 {
-                    rewardItems.Add(new RewardedItem()
-                    {
-                        item = randomedItem.item,
-                        level = 1,
-                        amount = randomedItem.maxAmount,
-                        randomSeed = Random.Range(int.MinValue, int.MaxValue),
-                    });
-                }
-                else
-                {
-                    rewardItems.Add(new RewardedItem()
-                    {
-                        item = randomedItem.item,
-                        level = 1,
-                        amount = Random.Range(randomedItem.minAmount, randomedItem.maxAmount),
-                        randomSeed = Random.Range(int.MinValue, int.MaxValue),
-                    });
-                }
+                    item = randomedItem.item,
+                    level = 1,
+                    amount = randomedItem.GetRandomedAmount(),
+                    randomSeed = Random.Range(int.MinValue, int.MaxValue),
+                });
             }
             return rewardItems;
         }

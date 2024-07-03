@@ -14,5 +14,23 @@ namespace MultiplayerARPG
         public int maxAmount;
         [Range(0f, 1f)]
         public float dropRate;
+
+        public void GetMinMaxAmount(out int min, out int max)
+        {
+            min = minAmount;
+            max = maxAmount;
+            if (max <= 0)
+                max = 1;
+            if (max < min)
+                max = min;
+            if (min <= 0)
+                min = max;
+        }
+
+        public int GetRandomedAmount()
+        {
+            GetMinMaxAmount(out int min, out int max);
+            return Random.Range(min, max);
+        }
     }
 }
