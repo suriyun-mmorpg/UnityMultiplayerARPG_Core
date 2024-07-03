@@ -31,7 +31,7 @@ namespace MultiplayerARPG
 
         public static bool IsEmptySlot(this CharacterItem data)
         {
-            return data.IsEmpty() || data.dataId == 0 || data.amount <= 0;
+            return data.IsEmpty() || data.dataId == 0 || data.amount <= 0 || data.GetItem() == null;
         }
 
         public static bool NotEmptySlot(this CharacterItem data)
