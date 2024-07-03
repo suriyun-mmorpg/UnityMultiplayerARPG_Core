@@ -573,6 +573,11 @@ namespace MultiplayerARPG
 
             if (PlayingCharacterEntity.IsDead())
             {
+                // Untoggle all extra movement state
+                _toggleSprintOn = false;
+                _toggleWalkOn = false;
+                _toggleCrouchOn = false;
+                _toggleCrawlOn = false;
                 // Deactivate weapon ability immediately when dead
                 if (WeaponAbility != null && WeaponAbility.ShouldDeactivateOnDead && WeaponAbilityState != WeaponAbilityState.Deactivated)
                 {
@@ -712,10 +717,10 @@ namespace MultiplayerARPG
             if (_moveDirection.sqrMagnitude > 0f)
                 HideNpcDialog();
 
-            // If jumping add jump state
-            if (!isBlockController)
+            // Update movement state inputs
+            if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
             {
-                if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
+                if (!isBlockController)
                 {
                     if (InputManager.GetButton("SwimUp"))
                     {
@@ -725,42 +730,45 @@ namespace MultiplayerARPG
                     {
                         _movementState |= MovementState.Down;
                     }
-                    _extraMovementState = ExtraMovementState.None;
-                    _toggleSprintOn = false;
+                }
+                _extraMovementState = ExtraMovementState.None;
+                _toggleSprintOn = false;
+                _toggleWalkOn = false;
+                _toggleCrouchOn = false;
+                _toggleCrawlOn = false;
+            }
+            else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
+            {
+                if (DetectExtraActive("Sprint", sprintActiveMode, isBlockController, ref _toggleSprintOn))
+                {
+                    _extraMovementState = ExtraMovementState.IsSprinting;
                     _toggleWalkOn = false;
                     _toggleCrouchOn = false;
                     _toggleCrawlOn = false;
                 }
-                else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
+                if (DetectExtraActive("Walk", walkActiveMode, isBlockController, ref _toggleWalkOn))
                 {
-                    if (DetectExtraActive("Sprint", sprintActiveMode, ref _toggleSprintOn))
-                    {
-                        _extraMovementState = ExtraMovementState.IsSprinting;
-                        _toggleWalkOn = false;
-                        _toggleCrouchOn = false;
-                        _toggleCrawlOn = false;
-                    }
-                    if (DetectExtraActive("Walk", walkActiveMode, ref _toggleWalkOn))
-                    {
-                        _extraMovementState = ExtraMovementState.IsWalking;
-                        _toggleSprintOn = false;
-                        _toggleCrouchOn = false;
-                        _toggleCrawlOn = false;
-                    }
-                    if (DetectExtraActive("Crouch", crouchActiveMode, ref _toggleCrouchOn))
-                    {
-                        _extraMovementState = ExtraMovementState.IsCrouching;
-                        _toggleSprintOn = false;
-                        _toggleWalkOn = false;
-                        _toggleCrawlOn = false;
-                    }
-                    if (DetectExtraActive("Crawl", crawlActiveMode, ref _toggleCrawlOn))
-                    {
-                        _extraMovementState = ExtraMovementState.IsCrawling;
-                        _toggleSprintOn = false;
-                        _toggleWalkOn = false;
-                        _toggleCrouchOn = false;
-                    }
+                    _extraMovementState = ExtraMovementState.IsWalking;
+                    _toggleSprintOn = false;
+                    _toggleCrouchOn = false;
+                    _toggleCrawlOn = false;
+                }
+                if (DetectExtraActive("Crouch", crouchActiveMode, isBlockController, ref _toggleCrouchOn))
+                {
+                    _extraMovementState = ExtraMovementState.IsCrouching;
+                    _toggleSprintOn = false;
+                    _toggleWalkOn = false;
+                    _toggleCrawlOn = false;
+                }
+                if (DetectExtraActive("Crawl", crawlActiveMode, isBlockController, ref _toggleCrawlOn))
+                {
+                    _extraMovementState = ExtraMovementState.IsCrawling;
+                    _toggleSprintOn = false;
+                    _toggleWalkOn = false;
+                    _toggleCrouchOn = false;
+                }
+                if (!isBlockController)
+                {
                     if (InputManager.GetButtonDown("Jump"))
                     {
                         if (unToggleCrouchWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
@@ -839,8 +847,12 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection));
         }
 
-        protected bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, ref bool state)
+        protected bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, bool isBlockController, ref bool state)
         {
+            if (isBlockController)
+            {
+                return state;
+            }
             switch (activeMode)
             {
                 case ExtraMoveActiveMode.Hold:
