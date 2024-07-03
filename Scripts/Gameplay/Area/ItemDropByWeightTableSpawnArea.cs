@@ -50,7 +50,6 @@ namespace MultiplayerARPG
                 }
                 weightTable.RandomItem((item, amount) =>
                 {
-                    Debug.LogError("Drop");
                     Spawn(CharacterItem.Create(item, 1, amount), 0f);
                 });
             }
