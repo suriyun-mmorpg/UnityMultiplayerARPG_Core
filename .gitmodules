@@ -25,9 +25,6 @@
 [submodule "SuperGrid2DVisibleChecker"]
 	path = SuperGrid2DVisibleChecker
 	url = https://github.com/insthync/LiteNetLib-SuperGrid2D-Integration.git
-[submodule "SimpleAssetBundleClient"]
-	path = SimpleAssetBundleClient
-	url = https://github.com/insthync/unity-simple-asset-bundle-client.git
 [submodule "GraphicSettings"]
 	path = GraphicSettings
 	url = https://github.com/insthync/unity-graphic-settings.git
