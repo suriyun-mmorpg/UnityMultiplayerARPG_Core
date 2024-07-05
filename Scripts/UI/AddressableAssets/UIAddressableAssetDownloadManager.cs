@@ -1,4 +1,4 @@
-using LiteNetLibManager;
+using Insthync.AddressableAssetTools;
 using UnityEngine;
 using UnityEngine.Serialization;
 using UnityEngine.UI;

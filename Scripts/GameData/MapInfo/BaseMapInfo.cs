@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using Insthync.AddressableAssetTools;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;

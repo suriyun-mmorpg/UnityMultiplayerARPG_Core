@@ -1,4 +1,5 @@
 #if UNITY_EDITOR
+using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using Newtonsoft.Json;
 using System.Collections.Generic;

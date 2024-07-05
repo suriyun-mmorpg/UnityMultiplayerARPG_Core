@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
