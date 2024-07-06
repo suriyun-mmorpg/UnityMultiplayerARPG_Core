@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     public class JobHandleCompleter : MonoBehaviour
     {
         private static JobHandleCompleter s_singleton;
-        public static JobHandleCompleter SSingleton
+        public static JobHandleCompleter Singleton
         {
             get
             {
