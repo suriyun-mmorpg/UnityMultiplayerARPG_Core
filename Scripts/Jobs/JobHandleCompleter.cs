@@ -8,17 +8,17 @@ namespace MultiplayerARPG
     [DefaultExecutionOrder(int.MaxValue)]
     public class JobHandleCompleter : MonoBehaviour
     {
-        private static JobHandleCompleter _singleton;
-        public static JobHandleCompleter Singleton
+        private static JobHandleCompleter s_singleton;
+        public static JobHandleCompleter SSingleton
         {
             get
             {
-                if (_singleton == null)
+                if (s_singleton == null)
                 {
-                    _singleton = new GameObject("_JobHandleCompleter_Instance").AddComponent<JobHandleCompleter>();
-                    DontDestroyOnLoad(_singleton.gameObject);
+                    s_singleton = new GameObject("_JobHandleCompleter_Instance").AddComponent<JobHandleCompleter>();
+                    DontDestroyOnLoad(s_singleton.gameObject);
                 }
-                return _singleton;
+                return s_singleton;
             }
         }
 
