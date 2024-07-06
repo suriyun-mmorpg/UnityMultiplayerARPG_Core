@@ -262,24 +262,14 @@ namespace MultiplayerARPG
                         case DeadDropItemMode.CorpseLooting:
                             if (removingItemInstances.Count > 0)
                             {
-                                ItemsContainerEntity prefab;
+                                ItemsContainerEntity tempPrefab = null;
 #if !EXCLUDE_PREFAB_REFS
-                                prefab = CurrentGameInstance.playerCorpsePrefab;
-#else
-                                prefab = null;
+                                tempPrefab = CurrentGameInstance.playerCorpsePrefab;
 #endif
-                                if (prefab != null)
-                                {
-                                    ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
-                                }
-                                else if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
-                                {
-                                    prefab = await CurrentGameInstance.addressablePlayerCorpsePrefab.GetOrLoadAssetAsync<ItemsContainerEntity>();
-                                    if (prefab != null)
-                                    {
-                                        ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
-                                    }
-                                }
+                                AssetReferenceItemsContainerEntity tempAddressablePrefab = CurrentGameInstance.addressablePlayerCorpsePrefab;
+                                ItemsContainerEntity loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+                                if (loadedPrefab != null)
+                                    ItemsContainerEntity.DropItems(loadedPrefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
                             }
                             break;
                     }

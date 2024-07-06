@@ -66,29 +66,19 @@ namespace MultiplayerARPG
             ItemDropEntity newEntity = null;
             if (GetRandomPosition(out Vector3 dropPosition))
             {
-                ItemDropEntity prefab;
-#if !EXCLUDE_PREFAB_REFS
-                prefab = GameInstance.Singleton.itemDropEntityPrefab;
-#else
-                prefab = null;
-#endif
                 Quaternion dropRotation = Quaternion.identity;
                 if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
                 {
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
                 }
-                if (prefab != null)
-                {
-                    newEntity = ItemDropEntity.Drop(prefab, dropPosition, dropRotation, RewardGivenType.None, item, new string[0], -1);
-                }
-                else if (GameInstance.Singleton.addressableItemDropEntityPrefab.IsDataValid())
-                {
-                    prefab = await GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAssetAsync<ItemDropEntity>();
-                    if (prefab != null)
-                    {
-                        newEntity = ItemDropEntity.Drop(prefab, dropPosition, dropRotation, RewardGivenType.None, item, new string[0], -1);
-                    }
-                }
+                ItemDropEntity tempPrefab = null;
+#if !EXCLUDE_PREFAB_REFS
+                tempPrefab = GameInstance.Singleton.itemDropEntityPrefab;
+#endif
+                AssetReferenceItemDropEntity tempAddressablePrefab = GameInstance.Singleton.addressableItemDropEntityPrefab;
+                ItemDropEntity loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+                if (loadedPrefab != null)
+                    newEntity = ItemDropEntity.Drop(loadedPrefab, dropPosition, dropRotation, RewardGivenType.None, item, System.Array.Empty<string>(), -1);
             }
             if (newEntity == null)
             {

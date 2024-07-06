@@ -60,15 +60,7 @@ namespace MultiplayerARPG
 
         public async UniTask<GameObject> GetMeshPrefab()
         {
-            if (meshPrefab != null)
-            {
-                return meshPrefab;
-            }
-            else if (addressableMeshPrefab.IsDataValid())
-            {
-                return await addressableMeshPrefab.GetOrLoadAssetAsync();
-            }
-            return null;
+            return await addressableMeshPrefab.GetOrLoadAssetAsyncOrUsePrefab(meshPrefab);
         }
 
         public EquipmentModel SetMeshPrefab(GameObject meshPrefab)

@@ -1042,10 +1042,26 @@ namespace MultiplayerARPG
             if (!dict.ContainsKey(data.HashAssetId))
             {
                 dict[data.HashAssetId] = data;
+                bool isError = false;
                 AsyncOperationHandle<TType> loadOp = data.LoadAssetAsync();
-                TType loadedData = loadOp.WaitForCompletion();
-                loadedData.PrepareRelatesData();
-                Addressables.Release(loadOp);
+                TType loadedData;
+                try
+                {
+                    loadedData = loadOp.WaitForCompletion();
+                    loadedData.PrepareRelatesData();
+                }
+                catch
+                {
+                    isError = true;
+                }
+                finally
+                {
+                    Addressables.Release(loadOp);
+                }
+                if (isError)
+                {
+                    return false;
+                }
             }
             return true;
         }

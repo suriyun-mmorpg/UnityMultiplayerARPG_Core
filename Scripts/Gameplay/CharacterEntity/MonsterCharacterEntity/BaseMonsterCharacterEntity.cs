@@ -451,22 +451,14 @@ namespace MultiplayerARPG
                 case RewardingItemMode.CorpseLooting:
                     if (_droppingItems.Count > 0)
                     {
-                        ItemsContainerEntity prefab;
+                        ItemsContainerEntity tempPrefab = null;
 #if !EXCLUDE_PREFAB_REFS
-                        prefab = CurrentGameInstance.monsterCorpsePrefab;
-#else
-                        prefab = null;
+                        tempPrefab = CurrentGameInstance.monsterCorpsePrefab;
 #endif
-                        if (prefab != null)
-                        {
-                            ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
-                        }
-                        else if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
-                        {
-                            prefab = await CurrentGameInstance.addressableMonsterCorpsePrefab.GetOrLoadAssetAsync<ItemsContainerEntity>();
-                            if (prefab != null)
-                                ItemsContainerEntity.DropItems(prefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
-                        }
+                        AssetReferenceItemsContainerEntity tempAddressablePrefab = CurrentGameInstance.addressableMonsterCorpsePrefab;
+                        ItemsContainerEntity loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+                        if (loadedPrefab != null)
+                            ItemsContainerEntity.DropItems(loadedPrefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
                     }
                     break;
                 case RewardingItemMode.Immediately:

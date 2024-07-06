@@ -1309,7 +1309,10 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (ItemWithMonsterEntity == null || (!ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid() && ItemWithMonsterEntity.MonsterCharacterEntity == null))
+            BaseMonsterCharacterEntity tempMonsterEntity = 
+                await ItemWithMonsterEntity.AddressableMonsterCharacterEntity
+                    .GetOrLoadAssetAsyncOrUsePrefab(ItemWithMonsterEntity.MonsterCharacterEntity);
+            if (tempMonsterEntity == null)
             {
                 if (uiTextMonster != null)
                     uiTextMonster.SetGameObjectActive(false);
@@ -1322,28 +1325,18 @@ namespace MultiplayerARPG
             }
             else
             {
-                BaseMonsterCharacterEntity tempEntity = null;
-                if (ItemWithMonsterEntity.MonsterCharacterEntity != null)
-                {
-                    tempEntity = ItemWithMonsterEntity.MonsterCharacterEntity;
-                }
-                else if (ItemWithMonsterEntity.AddressableMonsterCharacterEntity.IsDataValid())
-                {
-                    tempEntity = await ItemWithMonsterEntity.AddressableMonsterCharacterEntity.GetOrLoadAssetAsync<BaseMonsterCharacterEntity>();
-                }
-
                 if (uiTextMonster != null)
                 {
                     uiTextMonster.SetGameObjectActive(true);
                     uiTextMonster.text = ZString.Format(
                         LanguageManager.GetText(formatKeyPet),
-                        tempEntity.Title);
+                        tempMonsterEntity.Title);
                 }
 
                 // Item's EXP (pet's EXP)
                 int currentExp;
                 int nextLevelExp;
-                tempEntity.GetProperCurrentByNextLevelExp(out currentExp, out nextLevelExp);
+                tempMonsterEntity.GetProperCurrentByNextLevelExp(out currentExp, out nextLevelExp);
 
                 if (uiTextExp != null)
                 {
@@ -1361,55 +1354,41 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (ItemWithBuildingEntity == null || (!ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid() && ItemWithBuildingEntity.BuildingEntity == null))
+            BuildingEntity tempBuildingEntity =
+                await ItemWithBuildingEntity.AddressableBuildingEntity
+                    .GetOrLoadAssetAsyncOrUsePrefab(ItemWithBuildingEntity.BuildingEntity);
+            if (tempBuildingEntity == null)
             {
                 if (uiTextBuilding != null)
                     uiTextBuilding.SetGameObjectActive(false);
             }
             else
             {
-                BuildingEntity tempEntity = null;
-                if (ItemWithBuildingEntity.BuildingEntity != null)
-                {
-                    tempEntity = ItemWithBuildingEntity.BuildingEntity;
-                }
-                else if (ItemWithBuildingEntity.AddressableBuildingEntity.IsDataValid())
-                {
-                    tempEntity = await ItemWithBuildingEntity.AddressableBuildingEntity.GetOrLoadAssetAsync<BuildingEntity>();
-                }
-
                 if (uiTextBuilding != null)
                 {
                     uiTextBuilding.SetGameObjectActive(true);
                     uiTextBuilding.text = ZString.Format(
                         LanguageManager.GetText(formatKeyBuilding),
-                        tempEntity.Title);
+                        tempBuildingEntity.Title);
                 }
             }
 
-            if (ItemWithVehicleEntity == null || (!ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid() && ItemWithVehicleEntity.VehicleEntity == null))
+            VehicleEntity tempVehicleEntity = 
+                await ItemWithVehicleEntity.AddressableVehicleEntity
+                    .GetOrLoadAssetAsyncOrUsePrefab(ItemWithVehicleEntity.VehicleEntity);
+            if (tempVehicleEntity == null)
             {
                 if (uiTextVehicle != null)
                     uiTextVehicle.SetGameObjectActive(false);
             }
             else
             {
-                VehicleEntity tempEntity = null;
-                if (ItemWithVehicleEntity.VehicleEntity != null)
-                {
-                    tempEntity = ItemWithVehicleEntity.VehicleEntity;
-                }
-                else if (ItemWithVehicleEntity.AddressableVehicleEntity.IsDataValid())
-                {
-                    tempEntity = await ItemWithVehicleEntity.AddressableVehicleEntity.GetOrLoadAssetAsync<VehicleEntity>();
-                }
-
                 if (uiTextVehicle != null)
                 {
                     uiTextVehicle.SetGameObjectActive(true);
                     uiTextVehicle.text = ZString.Format(
                         LanguageManager.GetText(formatKeyMount),
-                        tempEntity.Title);
+                        tempVehicleEntity.Title);
                 }
             }
 

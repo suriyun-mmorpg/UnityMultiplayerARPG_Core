@@ -59,23 +59,17 @@ namespace MultiplayerARPG
                 return;
             }
 
-            BuildingEntity buildingEntity = null;
-            if (buildingItem.BuildingEntity != null)
-            {
-                buildingEntity = buildingItem.BuildingEntity;
-            }
-            else if (buildingItem.AddressableBuildingEntity.IsDataValid())
-            {
-                buildingEntity = await buildingItem.AddressableBuildingEntity.GetOrLoadAssetAsync<BuildingEntity>();
-            }
+            BuildingEntity tempPrefab = buildingItem.BuildingEntity;
+            AssetReferenceBuildingEntity tempAddressablePrefab = buildingItem.AddressableBuildingEntity;
+            BuildingEntity loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
 
-            if (buildingEntity == null)
+            if (loadedPrefab == null)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_BUILDING_ENTITY);
                 return;
             }
 
-            if (buildingEntity.BuildLimit > 0 && GameInstance.ServerBuildingHandlers.CountPlayerBuildings(Entity.Id, buildingEntity.EntityId) >= buildingEntity.BuildLimit)
+            if (loadedPrefab.BuildLimit > 0 && GameInstance.ServerBuildingHandlers.CountPlayerBuildings(Entity.Id, loadedPrefab.EntityId) >= loadedPrefab.BuildLimit)
             {
                 // Reached limit amount
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_REACHED_BUILD_LIMIT);
@@ -96,9 +90,9 @@ namespace MultiplayerARPG
             buildingSaveData.ParentId = string.Empty;
             if (Manager.TryGetEntityByObjectId(parentObjectId, out BuildingEntity parentBuildingEntity))
                 buildingSaveData.ParentId = parentBuildingEntity.Id;
-            buildingSaveData.EntityId = buildingEntity.EntityId;
-            buildingSaveData.CurrentHp = buildingEntity.MaxHp;
-            buildingSaveData.RemainsLifeTime = buildingEntity.LifeTime;
+            buildingSaveData.EntityId = loadedPrefab.EntityId;
+            buildingSaveData.CurrentHp = loadedPrefab.MaxHp;
+            buildingSaveData.RemainsLifeTime = loadedPrefab.LifeTime;
             buildingSaveData.Position = position;
             buildingSaveData.Rotation = rotation;
             buildingSaveData.CreatorId = Entity.Id;

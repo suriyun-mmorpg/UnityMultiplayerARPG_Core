@@ -339,19 +339,15 @@ namespace MultiplayerARPG
         public static ItemDropEntity Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
         {
             ItemDropEntity entity = null;
-            ItemDropEntity prefab;
+            ItemDropEntity tempPrefab = null;
 #if !EXCLUDE_PREFAB_REFS
-            prefab = GameInstance.Singleton.itemDropEntityPrefab;
-#else
-            prefab = null;
+            tempPrefab = GameInstance.Singleton.itemDropEntityPrefab;
 #endif
-            if (prefab != null)
+            AssetReferenceItemDropEntity tempAddressablePrefab = GameInstance.Singleton.addressableItemDropEntityPrefab;
+            ItemDropEntity loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
+            if (loadedPrefab != null)
             {
-                entity = Drop(prefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
-            }
-            else if (GameInstance.Singleton.addressableItemDropEntityPrefab.IsDataValid())
-            {
-                entity = Drop(GameInstance.Singleton.addressableItemDropEntityPrefab.GetOrLoadAsset<ItemDropEntity>(), dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+                entity = Drop(loadedPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
             }
             return entity;
         }

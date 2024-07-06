@@ -114,6 +114,7 @@ namespace MultiplayerARPG
         public IncrementalInt maxStack;
         [Tooltip("Game effects which appearing on character while applied. This won't be applied to monster's summoner.")]
         public GameEffect[] effects;
+        public AssetReferenceGameEffect[] addressableEffects; 
 
         public void PrepareRelatesData()
         {

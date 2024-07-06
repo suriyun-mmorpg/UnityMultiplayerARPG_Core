@@ -416,72 +416,40 @@ namespace MultiplayerARPG
 
             if (uiTextSummon != null)
             {
-                if (Skill == null || !Skill.TryGetSummon(out SkillSummon skillSummon) || (!skillSummon.AddressableMonsterCharacterEntity.IsDataValid() && skillSummon.MonsterCharacterEntity == null))
+                uiTextSummon.SetGameObjectActive(false);
+                if (Skill != null && Skill.TryGetSummon(out SkillSummon skillSummon))
                 {
-                    uiTextSummon.SetGameObjectActive(false);
-                }
-                else
-                {
-                    uiTextSummon.SetGameObjectActive(true);
-                    if (skillSummon.MonsterCharacterEntity != null)
+                    BaseMonsterCharacterEntity tempMonsterEntity = 
+                        await skillSummon.AddressableMonsterCharacterEntity
+                            .GetOrLoadAssetAsyncOrUsePrefab(skillSummon.MonsterCharacterEntity);
+                    if (tempMonsterEntity != null)
                     {
+                        uiTextSummon.SetGameObjectActive(true);
                         uiTextSummon.text = ZString.Format(
                             LanguageManager.GetText(formatKeySummon),
-                            skillSummon.MonsterCharacterEntity.Title,
+                            tempMonsterEntity.Title,
                             skillSummon.Level.GetAmount(Level),
                             skillSummon.AmountEachTime.GetAmount(Level),
                             skillSummon.MaxStack.GetAmount(Level),
                             skillSummon.Duration.GetAmount(Level));
-                    }
-                    else if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
-                    {
-                        BaseMonsterCharacterEntity prefab = await skillSummon.AddressableMonsterCharacterEntity.GetOrLoadAssetAsync<BaseMonsterCharacterEntity>();
-                        if (prefab != null)
-                        {
-                            uiTextSummon.text = ZString.Format(
-                                LanguageManager.GetText(formatKeySummon),
-                                prefab.Title,
-                                skillSummon.Level.GetAmount(Level),
-                                skillSummon.AmountEachTime.GetAmount(Level),
-                                skillSummon.MaxStack.GetAmount(Level),
-                                skillSummon.Duration.GetAmount(Level));
-                        }
-                        else
-                        {
-                            uiTextSummon.SetGameObjectActive(false);
-                        }
                     }
                 }
             }
 
             if (uiTextMount != null)
             {
-                if (Skill == null || !Skill.TryGetMount(out SkillMount skillMount) || (!skillMount.AddressableMountEntity.IsDataValid() && skillMount.MountEntity == null))
+                uiTextMount.SetGameObjectActive(false);
+                if (Skill != null && Skill.TryGetMount(out SkillMount skillMount))
                 {
-                    uiTextMount.SetGameObjectActive(false);
-                }
-                else
-                {
-                    uiTextMount.SetGameObjectActive(true);
-                    if (skillMount.MountEntity != null)
+                    VehicleEntity tempMountEntity = 
+                        await skillMount.AddressableMountEntity
+                            .GetOrLoadAssetAsyncOrUsePrefab(skillMount.MountEntity);
+                    if (tempMountEntity != null)
                     {
+                        uiTextMount.SetGameObjectActive(true);
                         uiTextMount.text = ZString.Format(
                             LanguageManager.GetText(formatKeyMount),
-                            skillMount.MountEntity.Title);
-                    }
-                    else if (skillMount.AddressableMountEntity.IsDataValid())
-                    {
-                        VehicleEntity prefab = await skillMount.AddressableMountEntity.GetOrLoadAssetAsync<VehicleEntity>();
-                        if (prefab != null)
-                        {
-                            uiTextMount.text = ZString.Format(
-                                LanguageManager.GetText(formatKeyMount),
-                                prefab.Title);
-                        }
-                        else
-                        {
-                            uiTextMount.SetGameObjectActive(false);
-                        }
+                            tempMountEntity.Title);
                     }
                 }
             }

@@ -1052,14 +1052,9 @@ namespace MultiplayerARPG
                 case LegacyItemType.Potion:
                     return default;
                 case LegacyItemType.Building:
-                    if (BuildingEntity != null)
-                    {
-                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, BuildingEntity);
-                    }
-                    else if (AddressableBuildingEntity.IsDataValid())
-                    {
-                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, AddressableBuildingEntity.GetOrLoadAsset<BuildingEntity>());
-                    }
+                    BuildingEntity tempBuildingEntity = AddressableBuildingEntity.GetOrLoadAssetOrUsePrefab(BuildingEntity);
+                    if (tempBuildingEntity != null)
+                        return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, tempBuildingEntity);
                     return default;
                 case LegacyItemType.Pet:
                     return default;

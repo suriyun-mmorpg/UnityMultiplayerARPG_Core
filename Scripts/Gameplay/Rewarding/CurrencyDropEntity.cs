@@ -110,19 +110,15 @@ namespace MultiplayerARPG
         public static CurrencyDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, Currency currency, int amount, IEnumerable<string> looters)
         {
             CurrencyDropEntity entity = null;
-            CurrencyDropEntity prefab;
+            CurrencyDropEntity tempPrefab = null;
 #if !EXCLUDE_PREFAB_REFS
-            prefab = GameInstance.Singleton.currencyDropEntityPrefab;
-#else
-            prefab = null;
+            tempPrefab = GameInstance.Singleton.currencyDropEntityPrefab;
 #endif
-            if (prefab != null)
+            AssetReferenceCurrencyDropEntity tempAddressablePrefab = GameInstance.Singleton.addressableCurrencyDropEntityPrefab;
+            CurrencyDropEntity loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
+            if (loadedPrefab != null)
             {
-                entity = Drop(prefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
-            }
-            else if (GameInstance.Singleton.addressableCurrencyDropEntityPrefab.IsDataValid())
-            {
-                entity = Drop(GameInstance.Singleton.addressableCurrencyDropEntityPrefab.GetOrLoadAsset<CurrencyDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
+                entity = Drop(loadedPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
             }
             if (entity != null)
             {

@@ -105,18 +105,18 @@ namespace MultiplayerARPG
                 return _cacheBuff;
             _recachingBuff = false;
             Buff tempBuff = Buff.Empty;
-            BaseMonsterCharacterEntity tempPrefab;
+            BaseMonsterCharacterEntity loadedPrefab;
             if (GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
             {
-                tempPrefab = addressablePrefab.GetOrLoadAsset<BaseCharacterEntity>() as BaseMonsterCharacterEntity;
-                if (tempPrefab != null && tempPrefab.CharacterDatabase != null)
-                    tempBuff = tempPrefab.CharacterDatabase.SummonerBuff;
+                loadedPrefab = addressablePrefab.GetOrLoadAsset<BaseCharacterEntity>() as BaseMonsterCharacterEntity;
+                if (loadedPrefab != null && loadedPrefab.CharacterDatabase != null)
+                    tempBuff = loadedPrefab.CharacterDatabase.SummonerBuff;
             }
             else
             {
-                tempPrefab = prefab;
-                if (tempPrefab != null && tempPrefab.CharacterDatabase != null)
-                    tempBuff = tempPrefab.CharacterDatabase.SummonerBuff;
+                loadedPrefab = prefab;
+                if (loadedPrefab != null && loadedPrefab.CharacterDatabase != null)
+                    tempBuff = loadedPrefab.CharacterDatabase.SummonerBuff;
             }
             _cacheBuff.Build(tempBuff, _level);
             return _cacheBuff;

@@ -111,15 +111,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !UNITY_SERVER
         public async UniTask<GameObject> GetDropModel()
         {
-            if (dropModel != null)
-            {
-                return dropModel;
-            }
-            else if (addressableDropModel.IsDataValid())
-            {
-                return await addressableDropModel.GetOrLoadAssetAsync();
-            }
-            return null;
+            return await addressableDropModel.GetOrLoadAssetAsyncOrUsePrefab(dropModel);
         }
 
         public IItem SetDropModel(GameObject dropModel)

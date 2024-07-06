@@ -9,19 +9,15 @@ namespace MultiplayerARPG
         public static GoldDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {
             GoldDropEntity entity = null;
-            GoldDropEntity prefab;
+            GoldDropEntity tempPrefab = null;
 #if !EXCLUDE_PREFAB_REFS
-            prefab = GameInstance.Singleton.goldDropEntityPrefab;
-#else
-            prefab = null;
+            tempPrefab = GameInstance.Singleton.goldDropEntityPrefab;
 #endif
-            if (prefab != null)
+            AssetReferenceGoldDropEntity tempAddressablePrefab = GameInstance.Singleton.addressableGoldDropEntityPrefab;
+            GoldDropEntity loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
+            if (loadedPrefab != null)
             {
-                entity = Drop(prefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as GoldDropEntity;
-            }
-            else if (GameInstance.Singleton.addressableGoldDropEntityPrefab.IsDataValid())
-            {
-                entity = Drop(GameInstance.Singleton.addressableGoldDropEntityPrefab.GetOrLoadAsset<GoldDropEntity>(), dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as GoldDropEntity;
+                entity = Drop(loadedPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as GoldDropEntity;
             }
             return entity;
         }
