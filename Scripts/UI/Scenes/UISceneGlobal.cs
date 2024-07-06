@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public UIMessageDialog uiMessageDialog;
         public UIInputDialog uiInputDialog;
         public UIInputDialog uiPasswordDialog;
+        public UIRewarding uiRewarding;
 
         private void Awake()
         {
@@ -19,6 +20,7 @@ namespace MultiplayerARPG
                 Destroy(gameObject);
                 return;
             }
+
             Singleton = this;
             DontDestroyOnLoad(gameObject);
             if (uiPasswordDialog == null)
@@ -160,7 +162,15 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_DISCONNECTED.ToString()), errorMessage, true, false, false, false);
+
+            Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_DISCONNECTED.ToString()),
+                errorMessage, true, false, false, false);
+        }
+
+        public void ShowRewardDialog(UIRewardingData rewardData)
+        {
+            uiRewarding.Data = rewardData;
+            uiRewarding.Show();
         }
     }
 }

@@ -159,6 +159,11 @@ namespace MultiplayerARPG
         {
             ClientCashShopActions.ResponseCashShopBuy(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            if (uiRewarding == null)
+            {
+                // Try use ref from global one
+                uiRewarding = UISceneGlobal.Singleton.uiRewarding;
+            }
             if (uiRewarding != null)
             {
                 uiRewarding.Data = new UIRewardingData()
