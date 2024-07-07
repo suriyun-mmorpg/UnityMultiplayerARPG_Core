@@ -40,6 +40,13 @@ namespace MultiplayerARPG
             get { return damageHitEffects; }
         }
 
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableDamageHitEffects = new AssetReferenceGameEffect[0];
+        public AssetReferenceGameEffect[] AddressableDamageHitEffects
+        {
+            get { return addressableDamageHitEffects; }
+        }
+
         public float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount)
         {
             return GameInstance.Singleton.GameplayRule.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, this);

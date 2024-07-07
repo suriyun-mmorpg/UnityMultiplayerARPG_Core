@@ -22,8 +22,11 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillBuffType));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.moveSpeedRateWhileUsingSkill));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillCastEffects));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.addressableSkillCastEffects));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.castDuration));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.canBeInterruptedWhileCasting));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillActivateEffects));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.addressableSkillActivateEffects));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireShield));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableWeapons));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableArmors));
@@ -34,6 +37,7 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireAmmos));
             // Normal Attack skill
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageHitEffects));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.addressableDamageHitEffects));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageInfo));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.damageAmount));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.effectivenessAttributes));
@@ -45,6 +49,7 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.Normal), nameof(skill.harvestType));
             // Based On Weapon Attack skill
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.damageHitEffects));
+            ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.addressableDamageHitEffects));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.weaponDamageInflictions));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.additionalDamageAmounts));
             ShowOnEnum(nameof(skill.skillAttackType), nameof(Skill.SkillAttackType.BasedOnWeapon), nameof(skill.increaseDamageAmountsWithBuffs));

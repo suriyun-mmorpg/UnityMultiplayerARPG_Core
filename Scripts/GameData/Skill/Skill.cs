@@ -48,7 +48,8 @@ namespace MultiplayerARPG
         public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
-        public GameEffect[] damageHitEffects;
+        public GameEffect[] damageHitEffects = new GameEffect[0];
+        public AssetReferenceGameEffect[] addressableDamageHitEffects = new AssetReferenceGameEffect[0];
 
         [Category(4, "Buff")]
         public SkillBuffType skillBuffType;
@@ -78,6 +79,14 @@ namespace MultiplayerARPG
             get
             {
                 return damageHitEffects;
+            }
+        }
+
+        public override GameEffect[] AddressableDamageHitEffects
+        {
+            get
+            {
+                return addressableDamageHitEffects;
             }
         }
 

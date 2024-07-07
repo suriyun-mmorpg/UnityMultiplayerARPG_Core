@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Text;
+using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UtilsComponents;
-using Cysharp.Text;
-using Cysharp.Threading.Tasks;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -737,21 +739,24 @@ namespace MultiplayerARPG
                 {
                     // Buff effects
                     tempKey = buff.GetKey();
+                    Buff buffData = buff.GetBuff().GetBuff();
                     if (!_tempCachedKeys.Contains(tempKey))
                     {
                         // If old buffs not contains this buff, add this buff effect
-                        InstantiateBuffEffect(tempKey, buff.GetBuff().GetBuff().effects);
+                        InstantiateBuffEffect(tempKey, buffData.effects);
+                        InstantiateBuffEffect(tempKey, buffData.addressableEffects);
                         _tempCachedKeys.Add(tempKey);
                     }
                     _tempAddingKeys.Add(tempKey);
                     // Ailment effects
-                    switch (buff.GetBuff().GetBuff().ailment)
+                    switch (buffData.ailment)
                     {
                         case AilmentPresets.Stun:
                             tempKey = nameof(AilmentPresets.Stun);
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.StunEffects);
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableStunEffects);
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -761,6 +766,7 @@ namespace MultiplayerARPG
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.MuteEffects);
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableMuteEffects);
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -770,6 +776,7 @@ namespace MultiplayerARPG
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.FreezeEffects);
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableFreezeEffects);
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -794,6 +801,18 @@ namespace MultiplayerARPG
             if (buffEffects == null || buffEffects.Length == 0)
                 return;
             CreateCacheEffect(buffId, InstantiateEffect(buffEffects));
+        }
+
+        public async void InstantiateBuffEffect(string buffId, AssetReferenceGameEffect[] buffEffects)
+        {
+            if (buffEffects == null || buffEffects.Length == 0)
+                return;
+            List<Task<GameEffect>> loadTasks = new List<Task<GameEffect>>();
+            for (int i = 0; i < buffEffects.Length; ++i)
+            {
+                loadTasks.Add(buffEffects[i].GetOrLoadAssetAsync<GameEffect>());
+            }
+            CreateCacheEffect(buffId, InstantiateEffect(await Task.WhenAll(loadTasks)));
         }
 
         public bool GetRandomRightHandAttackAnimation(

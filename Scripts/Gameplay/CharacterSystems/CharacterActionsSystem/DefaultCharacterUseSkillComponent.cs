@@ -227,9 +227,15 @@ namespace MultiplayerARPG
                 if (IsClient)
                 {
                     if (tpsModelAvailable)
+                    {
                         Entity.CharacterModel.InstantiateEffect(skill.SkillCastEffects);
+                        Entity.CharacterModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
+                    }
                     if (fpsModelAvailable)
+                    {
                         Entity.FpsModel.InstantiateEffect(skill.SkillCastEffects);
+                        Entity.FpsModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
+                    }
                 }
 
                 if (CastingSkillDuration > 0f)
@@ -249,9 +255,15 @@ namespace MultiplayerARPG
                 if (IsClient)
                 {
                     if (tpsModelAvailable)
+                    {
                         Entity.CharacterModel.InstantiateEffect(skill.SkillActivateEffects);
+                        Entity.CharacterModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+                    }
                     if (fpsModelAvailable)
+                    {
                         Entity.FpsModel.InstantiateEffect(skill.SkillActivateEffects);
+                        Entity.FpsModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+                    }
                 }
 
                 // Play action animation

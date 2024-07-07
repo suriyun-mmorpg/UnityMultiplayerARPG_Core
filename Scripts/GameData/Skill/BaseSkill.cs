@@ -32,12 +32,14 @@ namespace MultiplayerARPG
 
         [Category(2, "Skill Casting")]
         [Header("Casting Effects")]
-        public GameEffect[] skillCastEffects;
+        public GameEffect[] skillCastEffects = new GameEffect[0];
+        public AssetReferenceGameEffect[] addressableSkillCastEffects = new AssetReferenceGameEffect[0];
         public IncrementalFloat castDuration;
         public bool canBeInterruptedWhileCasting;
 
         [Header("Casted Effects")]
-        public GameEffect[] skillActivateEffects;
+        public GameEffect[] skillActivateEffects = new GameEffect[0];
+        public AssetReferenceGameEffect[] addressableSkillActivateEffects = new AssetReferenceGameEffect[0];
 
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup (Tools)")]
@@ -294,6 +296,11 @@ namespace MultiplayerARPG
             get { return skillCastEffects; }
         }
 
+        public AssetReferenceGameEffect[] AddressableSkillCastEffects
+        {
+            get { return addressableSkillCastEffects; }
+        }
+
         public float GetCastDuration(int level)
         {
             return castDuration.GetAmount(level);
@@ -304,7 +311,17 @@ namespace MultiplayerARPG
             get { return skillActivateEffects; }
         }
 
+        public AssetReferenceGameEffect[] AddressableSkillActivateEffects
+        {
+            get { return addressableSkillActivateEffects; }
+        }
+
         public virtual GameEffect[] DamageHitEffects
+        {
+            get { return null; }
+        }
+
+        public virtual AssetReferenceGameEffect[] AddressableDamageHitEffects
         {
             get { return null; }
         }

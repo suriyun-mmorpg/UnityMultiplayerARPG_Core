@@ -1,4 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using Insthync.AddressableAssetTools;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UtilsComponents;
 
@@ -280,6 +283,18 @@ namespace MultiplayerARPG
             return tempAddingEffects;
         }
 
+        public async UniTask<List<GameEffect>> InstantiateEffect(IEnumerable<AssetReferenceGameEffect> effects)
+        {
+            if (effects == null)
+                return null;
+            List<Task<GameEffect>> loadTasks = new List<Task<GameEffect>>();
+            foreach (AssetReferenceGameEffect effect in effects)
+            {
+                loadTasks.Add(effect.GetOrLoadAssetAsync<GameEffect>());
+            }
+            return InstantiateEffect(await Task.WhenAll(loadTasks));
+        }
+        
         public virtual void AddingNewEffect(GameEffect newEffect) { }
     }
 }

@@ -206,11 +206,19 @@ namespace MultiplayerARPG
         [SerializeField]
         private GameEffect[] levelUpEffects = new GameEffect[0];
         [SerializeField]
+        private AssetReferenceGameEffect[] addressableLevelUpEffects = new AssetReferenceGameEffect[0];
+        [SerializeField]
         private GameEffect[] stunEffects = new GameEffect[0];
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableStunEffects = new AssetReferenceGameEffect[0];
         [SerializeField]
         private GameEffect[] muteEffects = new GameEffect[0];
         [SerializeField]
+        private AssetReferenceGameEffect[] addressableMuteEffects = new AssetReferenceGameEffect[0];
+        [SerializeField]
         private GameEffect[] freezeEffects = new GameEffect[0];
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableFreezeEffects = new AssetReferenceGameEffect[0];
 
         [Header("Gameplay Database and Default Data")]
         [Tooltip("Exp tree for both player character, monster character and item, this may be deprecated in the future, you should setup `Exp Table` instead.")]
@@ -239,6 +247,9 @@ namespace MultiplayerARPG
         [Tooltip("Default hit effects, will be used when attack to enemies or receive damages from enemies")]
         [SerializeField]
         private GameEffect[] defaultDamageHitEffects = new GameEffect[0];
+
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableDefaultDamageHitEffects = new AssetReferenceGameEffect[0];
 
         [Header("Object Tags and Layers")]
         [Tooltip("Tag for player character entities, this tag will set to player character entities game object when instantiated")]
@@ -549,9 +560,19 @@ namespace MultiplayerARPG
             get { return levelUpEffects; }
         }
 
+        public AssetReferenceGameEffect[] AddressableLevelUpEffects
+        {
+            get { return addressableLevelUpEffects; }
+        }
+
         public GameEffect[] StunEffects
         {
             get { return stunEffects; }
+        }
+
+        public AssetReferenceGameEffect[] AddressableStunEffects
+        {
+            get { return addressableStunEffects; }
         }
 
         public GameEffect[] MuteEffects
@@ -559,9 +580,19 @@ namespace MultiplayerARPG
             get { return muteEffects; }
         }
 
+        public AssetReferenceGameEffect[] AddressableMuteEffects
+        {
+            get { return addressableMuteEffects; }
+        }
+
         public GameEffect[] FreezeEffects
         {
             get { return freezeEffects; }
+        }
+
+        public AssetReferenceGameEffect[] AddressableFreezeEffects
+        {
+            get { return addressableFreezeEffects; }
         }
 
         public ArmorType DefaultArmorType
@@ -592,6 +623,11 @@ namespace MultiplayerARPG
         public GameEffect[] DefaultDamageHitEffects
         {
             get { return defaultDamageHitEffects; }
+        }
+
+        public AssetReferenceGameEffect[] AddressableDefaultDamageHitEffects
+        {
+            get { return addressableDefaultDamageHitEffects; }
         }
 
         public NewCharacterSetting NewCharacterSetting

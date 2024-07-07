@@ -225,6 +225,11 @@ namespace MultiplayerARPG
                 return;
 
             BaseUISceneGameplay.Singleton.PrepareCombatText(this, combatAmountType, amount);
+            PlayHitEffects(combatAmountType, hitEffectsSourceType, hitEffectsSourceDataId);
+        }
+
+        protected virtual async void PlayHitEffects(CombatAmountType combatAmountType, HitEffectsSourceType hitEffectsSourceType, int hitEffectsSourceDataId)
+        {
             if (combatAmountType == CombatAmountType.NormalDamage ||
                 combatAmountType == CombatAmountType.CriticalDamage ||
                 combatAmountType == CombatAmountType.BlockedDamage)
@@ -233,6 +238,7 @@ namespace MultiplayerARPG
                 {
                     // Find effects to instantiate
                     GameEffect[] effects = CurrentGameInstance.DefaultDamageHitEffects;
+                    AssetReferenceGameEffect[] addressableEffects = CurrentGameInstance.AddressableDefaultDamageHitEffects;
                     switch (hitEffectsSourceType)
                     {
                         case HitEffectsSourceType.DamageElement:
@@ -241,6 +247,7 @@ namespace MultiplayerARPG
                                 damageElement.DamageHitEffects.Length > 0)
                             {
                                 effects = damageElement.DamageHitEffects;
+                                addressableEffects = damageElement.AddressableDamageHitEffects;
                             }
                             break;
                         case HitEffectsSourceType.Skill:
@@ -249,12 +256,15 @@ namespace MultiplayerARPG
                                 skill.DamageHitEffects.Length > 0)
                             {
                                 effects = skill.DamageHitEffects;
+                                addressableEffects = skill.AddressableDamageHitEffects;
                             }
                             break;
                     }
+
                     if (hitEffectsSourceType != HitEffectsSourceType.None)
                         PlayHitAnimation();
                     Model.InstantiateEffect(effects);
+                    await Model.InstantiateEffect(addressableEffects);
                 }
             }
         }
