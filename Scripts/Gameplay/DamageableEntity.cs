@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using LiteNetLibManager;
-using UnityEngine.Events;
+﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
+using LiteNetLibManager;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
@@ -228,7 +229,7 @@ namespace MultiplayerARPG
             PlayHitEffects(combatAmountType, hitEffectsSourceType, hitEffectsSourceDataId);
         }
 
-        protected virtual async void PlayHitEffects(CombatAmountType combatAmountType, HitEffectsSourceType hitEffectsSourceType, int hitEffectsSourceDataId)
+        protected virtual void PlayHitEffects(CombatAmountType combatAmountType, HitEffectsSourceType hitEffectsSourceType, int hitEffectsSourceDataId)
         {
             if (combatAmountType == CombatAmountType.NormalDamage ||
                 combatAmountType == CombatAmountType.CriticalDamage ||
@@ -264,7 +265,7 @@ namespace MultiplayerARPG
                     if (hitEffectsSourceType != HitEffectsSourceType.None)
                         PlayHitAnimation();
                     Model.InstantiateEffect(effects);
-                    await Model.InstantiateEffect(addressableEffects);
+                    Model.InstantiateEffect(addressableEffects).Forget();
                 }
             }
         }

@@ -287,12 +287,7 @@ namespace MultiplayerARPG
         {
             if (effects == null)
                 return null;
-            List<Task<GameEffect>> loadTasks = new List<Task<GameEffect>>();
-            foreach (AssetReferenceGameEffect effect in effects)
-            {
-                loadTasks.Add(effect.GetOrLoadAssetAsync<GameEffect>());
-            }
-            return InstantiateEffect(await Task.WhenAll(loadTasks));
+            return InstantiateEffect(await effects.GetOrLoadAssetsAsync<GameEffect>());
         }
         
         public virtual void AddingNewEffect(GameEffect newEffect) { }

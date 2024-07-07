@@ -226,10 +226,10 @@ namespace MultiplayerARPG
                 onLevelUp.Invoke();
         }
 
-        protected virtual async void PlayLevelUpEffects()
+        protected virtual void PlayLevelUpEffects()
         {
             CharacterModel.InstantiateEffect(CurrentGameInstance.LevelUpEffects);
-            await CharacterModel.InstantiateEffect(CurrentGameInstance.AddressableLevelUpEffects);
+            CharacterModel.InstantiateEffect(CurrentGameInstance.AddressableLevelUpEffects).Forget();
         }
 
         [ServerRpc]

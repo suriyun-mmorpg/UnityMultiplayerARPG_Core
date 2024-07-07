@@ -744,7 +744,7 @@ namespace MultiplayerARPG
                     {
                         // If old buffs not contains this buff, add this buff effect
                         InstantiateBuffEffect(tempKey, buffData.effects);
-                        InstantiateBuffEffect(tempKey, buffData.addressableEffects);
+                        InstantiateBuffEffect(tempKey, buffData.addressableEffects).Forget();
                         _tempCachedKeys.Add(tempKey);
                     }
                     _tempAddingKeys.Add(tempKey);
@@ -756,7 +756,7 @@ namespace MultiplayerARPG
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.StunEffects);
-                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableStunEffects);
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableStunEffects).Forget();
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -766,7 +766,7 @@ namespace MultiplayerARPG
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.MuteEffects);
-                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableMuteEffects);
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableMuteEffects).Forget();
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -776,7 +776,7 @@ namespace MultiplayerARPG
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.FreezeEffects);
-                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableFreezeEffects);
+                                InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableFreezeEffects).Forget();
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -803,16 +803,11 @@ namespace MultiplayerARPG
             CreateCacheEffect(buffId, InstantiateEffect(buffEffects));
         }
 
-        public async void InstantiateBuffEffect(string buffId, AssetReferenceGameEffect[] buffEffects)
+        public async UniTaskVoid InstantiateBuffEffect(string buffId, AssetReferenceGameEffect[] buffEffects)
         {
             if (buffEffects == null || buffEffects.Length == 0)
                 return;
-            List<Task<GameEffect>> loadTasks = new List<Task<GameEffect>>();
-            for (int i = 0; i < buffEffects.Length; ++i)
-            {
-                loadTasks.Add(buffEffects[i].GetOrLoadAssetAsync<GameEffect>());
-            }
-            CreateCacheEffect(buffId, InstantiateEffect(await Task.WhenAll(loadTasks)));
+            CreateCacheEffect(buffId, await InstantiateEffect(buffEffects));
         }
 
         public bool GetRandomRightHandAttackAnimation(
