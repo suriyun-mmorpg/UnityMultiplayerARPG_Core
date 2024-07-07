@@ -778,59 +778,59 @@ namespace MultiplayerARPG
 
         public async UniTask<ItemDropEntity> GetLoadedItemDropEntityPrefab()
         {
-                return await AddressableItemDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(ItemDropEntityPrefab);
+            return await AddressableItemDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(ItemDropEntityPrefab);
         }
 
         public async UniTask<ExpDropEntity> GetLoadedExpDropEntityPrefab()
         {
-                return await AddressableExpDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(ExpDropEntityPrefab);
+            return await AddressableExpDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(ExpDropEntityPrefab);
         }
 
         public async UniTask<GoldDropEntity> GetLoadedGoldDropEntityPrefab()
         {
-                return await AddressableGoldDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(GoldDropEntityPrefab);
+            return await AddressableGoldDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(GoldDropEntityPrefab);
         }
 
         public async UniTask<CurrencyDropEntity> GetLoadedCurrencyDropEntityPrefab()
         {
-                return await AddressableCurrencyDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(CurrencyDropEntityPrefab);
+            return await AddressableCurrencyDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(CurrencyDropEntityPrefab);
         }
 
         public async UniTask<WarpPortalEntity> GetLoadedWarpPortalEntityPrefab()
         {
-                return await AddressableWarpPortalEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(WarpPortalEntityPrefab);
+            return await AddressableWarpPortalEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(WarpPortalEntityPrefab);
         }
 
         public async UniTask<ItemsContainerEntity> GetLoadedPlayerCorpsePrefab()
         {
-                return await AddressablePlayerCorpsePrefab.GetOrLoadAssetAsyncOrUsePrefab(PlayerCorpsePrefab);
+            return await AddressablePlayerCorpsePrefab.GetOrLoadAssetAsyncOrUsePrefab(PlayerCorpsePrefab);
         }
 
         public async UniTask<ItemsContainerEntity> GetLoadedMonsterCorpsePrefab()
         {
-                return await AddressableMonsterCorpsePrefab.GetOrLoadAssetAsyncOrUsePrefab(MonsterCorpsePrefab);
+            return await AddressableMonsterCorpsePrefab.GetOrLoadAssetAsyncOrUsePrefab(MonsterCorpsePrefab);
         }
 
         public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayPrefab()
         {
-                return await AddressableUiSceneGameplayPrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayPrefab);
+            return await AddressableUiSceneGameplayPrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayPrefab);
         }
 
         public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayMobilePrefab()
         {
-                return await AddressableUiSceneGameplayMobilePrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayMobilePrefab);
+            return await AddressableUiSceneGameplayMobilePrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayMobilePrefab);
         }
 
         public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayConsolePrefab()
         {
-                return await AddressableUiSceneGameplayConsolePrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayConsolePrefab);
+            return await AddressableUiSceneGameplayConsolePrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayConsolePrefab);
         }
 
         public async UniTask<BasePlayerCharacterController> GetLoadedDefaultControllerPrefab()
         {
-                return await AddressableDefaultControllerPrefab.GetOrLoadAssetAsyncOrUsePrefab(DefaultControllerPrefab);
+            return await AddressableDefaultControllerPrefab.GetOrLoadAssetAsyncOrUsePrefab(DefaultControllerPrefab);
         }
-        
+
         public GameEffect[] LevelUpEffects
         {
             get
