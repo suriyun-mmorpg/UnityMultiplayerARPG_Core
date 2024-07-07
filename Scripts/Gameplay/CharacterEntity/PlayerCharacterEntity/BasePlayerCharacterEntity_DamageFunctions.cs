@@ -1,5 +1,4 @@
-﻿using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
+﻿using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -256,18 +255,13 @@ namespace MultiplayerARPG
                         case DeadDropItemMode.DropOnGround:
                             for (int i = 0; i < removingItemInstances.Count; ++i)
                             {
-                                ItemDropEntity.Drop(this, RewardGivenType.PlayerDead, removingItemInstances[i], looters);
+                                ItemDropEntity.Drop(this, RewardGivenType.PlayerDead, removingItemInstances[i], looters).Forget();
                             }
                             break;
                         case DeadDropItemMode.CorpseLooting:
                             if (removingItemInstances.Count > 0)
                             {
-                                ItemsContainerEntity tempPrefab = null;
-#if !EXCLUDE_PREFAB_REFS
-                                tempPrefab = CurrentGameInstance.playerCorpsePrefab;
-#endif
-                                AssetReferenceItemsContainerEntity tempAddressablePrefab = CurrentGameInstance.addressablePlayerCorpsePrefab;
-                                ItemsContainerEntity loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+                                ItemsContainerEntity loadedPrefab = await CurrentGameInstance.GetLoadedPlayerCorpsePrefab();
                                 if (loadedPrefab != null)
                                     ItemsContainerEntity.DropItems(loadedPrefab, this, RewardGivenType.PlayerDead, removingItemInstances, looters, CurrentGameInstance.playerCorpseAppearDuration);
                             }

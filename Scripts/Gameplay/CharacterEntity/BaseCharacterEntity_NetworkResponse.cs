@@ -1,5 +1,6 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 
 namespace MultiplayerARPG
 {
@@ -186,9 +187,9 @@ namespace MultiplayerARPG
                     CharacterItem dropData = nonEquipItem.Clone();
                     dropData.amount = amount;
                     if (CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
-                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, dropData, new string[0]);
+                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, dropData, System.Array.Empty<string>()).Forget();
                     else
-                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, dropData, new string[] { Id });
+                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, dropData, new string[] { Id }).Forget();
                     break;
             }
 #endif

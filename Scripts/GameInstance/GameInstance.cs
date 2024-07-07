@@ -1,4 +1,5 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using System.Collections;
 using System.Collections.Generic;
@@ -140,34 +141,56 @@ namespace MultiplayerARPG
         public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        public ItemDropEntity itemDropEntityPrefab = null;
-        public ExpDropEntity expDropEntityPrefab = null;
-        public GoldDropEntity goldDropEntityPrefab = null;
-        public CurrencyDropEntity currencyDropEntityPrefab = null;
-        public WarpPortalEntity warpPortalEntityPrefab = null;
-        public ItemsContainerEntity playerCorpsePrefab = null;
-        public ItemsContainerEntity monsterCorpsePrefab = null;
-        public BaseUISceneGameplay uiSceneGameplayPrefab = null;
+        [SerializeField]
+        private ItemDropEntity itemDropEntityPrefab = null;
+        [SerializeField]
+        private ExpDropEntity expDropEntityPrefab = null;
+        [SerializeField]
+        private GoldDropEntity goldDropEntityPrefab = null;
+        [SerializeField]
+        private CurrencyDropEntity currencyDropEntityPrefab = null;
+        [SerializeField]
+        private WarpPortalEntity warpPortalEntityPrefab = null;
+        [SerializeField]
+        private ItemsContainerEntity playerCorpsePrefab = null;
+        [SerializeField]
+        private ItemsContainerEntity monsterCorpsePrefab = null;
+        [SerializeField]
+        private BaseUISceneGameplay uiSceneGameplayPrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
-        public BaseUISceneGameplay uiSceneGameplayMobilePrefab = null;
+        [SerializeField]
+        private BaseUISceneGameplay uiSceneGameplayMobilePrefab = null;
         [Tooltip("If this is empty, it will use `UI Scene Gameplay Prefab` as gameplay UI prefab")]
-        public BaseUISceneGameplay uiSceneGameplayConsolePrefab = null;
+        [SerializeField]
+        private BaseUISceneGameplay uiSceneGameplayConsolePrefab = null;
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
-        public BasePlayerCharacterController defaultControllerPrefab = null;
+        [SerializeField]
+        private BasePlayerCharacterController defaultControllerPrefab = null;
 #endif
-        public AssetReferenceItemDropEntity addressableItemDropEntityPrefab = null;
-        public AssetReferenceExpDropEntity addressableExpDropEntityPrefab = null;
-        public AssetReferenceGoldDropEntity addressableGoldDropEntityPrefab = null;
-        public AssetReferenceCurrencyDropEntity addressableCurrencyDropEntityPrefab = null;
-        public AssetReferenceWarpPortalEntity addressableWarpPortalEntityPrefab = null;
-        public AssetReferenceItemsContainerEntity addressablePlayerCorpsePrefab = null;
-        public AssetReferenceItemsContainerEntity addressableMonsterCorpsePrefab = null;
-        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayPrefab = null;
+        [SerializeField]
+        private AssetReferenceItemDropEntity addressableItemDropEntityPrefab = null;
+        [SerializeField]
+        private AssetReferenceExpDropEntity addressableExpDropEntityPrefab = null;
+        [SerializeField]
+        private AssetReferenceGoldDropEntity addressableGoldDropEntityPrefab = null;
+        [SerializeField]
+        private AssetReferenceCurrencyDropEntity addressableCurrencyDropEntityPrefab = null;
+        [SerializeField]
+        private AssetReferenceWarpPortalEntity addressableWarpPortalEntityPrefab = null;
+        [SerializeField]
+        private AssetReferenceItemsContainerEntity addressablePlayerCorpsePrefab = null;
+        [SerializeField]
+        private AssetReferenceItemsContainerEntity addressableMonsterCorpsePrefab = null;
+        [SerializeField]
+        private AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayPrefab = null;
         [Tooltip("If this is empty, it will use `Addressable UI Scene Gameplay Prefab` as gameplay UI prefab")]
-        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayMobilePrefab = null;
+        [SerializeField]
+        private AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayMobilePrefab = null;
         [Tooltip("If this is empty, it will use `Addressable UI Scene Gameplay Prefab` as gameplay UI prefab")]
-        public AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayConsolePrefab = null;
-        public AssetReferenceBasePlayerCharacterController addressableDefaultControllerPrefab = null;
+        [SerializeField]
+        private AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayConsolePrefab = null;
+        [SerializeField]
+        private AssetReferenceBasePlayerCharacterController addressableDefaultControllerPrefab = null;
 
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
         public ServerCharacter serverCharacterPrefab = null;
@@ -566,6 +589,248 @@ namespace MultiplayerARPG
             get { return expTable; }
         }
 
+        public ItemDropEntity ItemDropEntityPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return itemDropEntityPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public ExpDropEntity ExpDropEntityPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return expDropEntityPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public GoldDropEntity GoldDropEntityPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return goldDropEntityPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public CurrencyDropEntity CurrencyDropEntityPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return currencyDropEntityPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public WarpPortalEntity WarpPortalEntityPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return warpPortalEntityPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public ItemsContainerEntity PlayerCorpsePrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return playerCorpsePrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public ItemsContainerEntity MonsterCorpsePrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return monsterCorpsePrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public BaseUISceneGameplay UiSceneGameplayPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+            return uiSceneGameplayPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public BaseUISceneGameplay UiSceneGameplayMobilePrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return uiSceneGameplayMobilePrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public BaseUISceneGameplay UiSceneGameplayConsolePrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return uiSceneGameplayConsolePrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public BasePlayerCharacterController DefaultControllerPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return defaultControllerPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public AssetReferenceItemDropEntity AddressableItemDropEntityPrefab
+        {
+            get { return addressableItemDropEntityPrefab; }
+        }
+
+        public AssetReferenceExpDropEntity AddressableExpDropEntityPrefab
+        {
+            get { return addressableExpDropEntityPrefab; }
+        }
+
+        public AssetReferenceGoldDropEntity AddressableGoldDropEntityPrefab
+        {
+            get { return addressableGoldDropEntityPrefab; }
+        }
+
+        public AssetReferenceCurrencyDropEntity AddressableCurrencyDropEntityPrefab
+        {
+            get { return addressableCurrencyDropEntityPrefab; }
+        }
+
+        public AssetReferenceWarpPortalEntity AddressableWarpPortalEntityPrefab
+        {
+            get { return addressableWarpPortalEntityPrefab; }
+        }
+
+        public AssetReferenceItemsContainerEntity AddressablePlayerCorpsePrefab
+        {
+            get { return addressablePlayerCorpsePrefab; }
+        }
+
+        public AssetReferenceItemsContainerEntity AddressableMonsterCorpsePrefab
+        {
+            get { return addressableMonsterCorpsePrefab; }
+        }
+
+        public AssetReferenceBaseUISceneGameplay AddressableUiSceneGameplayPrefab
+        {
+            get { return addressableUiSceneGameplayPrefab; }
+        }
+
+        public AssetReferenceBaseUISceneGameplay AddressableUiSceneGameplayMobilePrefab
+        {
+            get { return addressableUiSceneGameplayMobilePrefab; }
+        }
+
+        public AssetReferenceBaseUISceneGameplay AddressableUiSceneGameplayConsolePrefab
+        {
+            get { return addressableUiSceneGameplayConsolePrefab; }
+        }
+
+        public AssetReferenceBasePlayerCharacterController AddressableDefaultControllerPrefab
+        {
+            get { return addressableDefaultControllerPrefab; }
+        }
+
+        public async UniTask<ItemDropEntity> GetLoadedItemDropEntityPrefab()
+        {
+                return await AddressableItemDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(ItemDropEntityPrefab);
+        }
+
+        public async UniTask<ExpDropEntity> GetLoadedExpDropEntityPrefab()
+        {
+                return await AddressableExpDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(ExpDropEntityPrefab);
+        }
+
+        public async UniTask<GoldDropEntity> GetLoadedGoldDropEntityPrefab()
+        {
+                return await AddressableGoldDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(GoldDropEntityPrefab);
+        }
+
+        public async UniTask<CurrencyDropEntity> GetLoadedCurrencyDropEntityPrefab()
+        {
+                return await AddressableCurrencyDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(CurrencyDropEntityPrefab);
+        }
+
+        public async UniTask<WarpPortalEntity> GetLoadedWarpPortalEntityPrefab()
+        {
+                return await AddressableWarpPortalEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(WarpPortalEntityPrefab);
+        }
+
+        public async UniTask<ItemsContainerEntity> GetLoadedPlayerCorpsePrefab()
+        {
+                return await AddressablePlayerCorpsePrefab.GetOrLoadAssetAsyncOrUsePrefab(PlayerCorpsePrefab);
+        }
+
+        public async UniTask<ItemsContainerEntity> GetLoadedMonsterCorpsePrefab()
+        {
+                return await AddressableMonsterCorpsePrefab.GetOrLoadAssetAsyncOrUsePrefab(MonsterCorpsePrefab);
+        }
+
+        public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayPrefab()
+        {
+                return await AddressableUiSceneGameplayPrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayPrefab);
+        }
+
+        public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayMobilePrefab()
+        {
+                return await AddressableUiSceneGameplayMobilePrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayMobilePrefab);
+        }
+
+        public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayConsolePrefab()
+        {
+                return await AddressableUiSceneGameplayConsolePrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayConsolePrefab);
+        }
+
+        public async UniTask<BasePlayerCharacterController> GetLoadedDefaultControllerPrefab()
+        {
+                return await AddressableDefaultControllerPrefab.GetOrLoadAssetAsyncOrUsePrefab(DefaultControllerPrefab);
+        }
+        
         public GameEffect[] LevelUpEffects
         {
             get

@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using Cysharp.Text;
+﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using LiteNetLib;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -248,7 +248,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < droppingItems.Count; ++i)
                 {
                     // Drop item on ground
-                    ItemDropEntity.Drop(this, RewardGivenType.BuildingDrop, droppingItems[i], new string[0]);
+                    ItemDropEntity.Drop(this, RewardGivenType.BuildingDrop, droppingItems[i], System.Array.Empty<string>()).Forget();
                 }
             }
         }

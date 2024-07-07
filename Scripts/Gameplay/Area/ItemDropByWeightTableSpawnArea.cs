@@ -1,8 +1,6 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
-using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -67,16 +65,11 @@ namespace MultiplayerARPG
             if (GetRandomPosition(out Vector3 dropPosition))
             {
                 Quaternion dropRotation = Quaternion.identity;
-                if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
+                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 {
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
                 }
-                ItemDropEntity tempPrefab = null;
-#if !EXCLUDE_PREFAB_REFS
-                tempPrefab = GameInstance.Singleton.itemDropEntityPrefab;
-#endif
-                AssetReferenceItemDropEntity tempAddressablePrefab = GameInstance.Singleton.addressableItemDropEntityPrefab;
-                ItemDropEntity loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+                ItemDropEntity loadedPrefab = await CurrentGameInstance.GetLoadedItemDropEntityPrefab();
                 if (loadedPrefab != null)
                     newEntity = ItemDropEntity.Drop(loadedPrefab, dropPosition, dropRotation, RewardGivenType.None, item, System.Array.Empty<string>(), -1);
             }

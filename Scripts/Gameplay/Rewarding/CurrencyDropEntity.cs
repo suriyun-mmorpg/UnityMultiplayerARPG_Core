@@ -1,4 +1,4 @@
-using Insthync.AddressableAssetTools;
+using Cysharp.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
@@ -107,15 +107,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public static CurrencyDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, Currency currency, int amount, IEnumerable<string> looters)
+        public static async UniTask<CurrencyDropEntity> Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, Currency currency, int amount, IEnumerable<string> looters)
         {
             CurrencyDropEntity entity = null;
-            CurrencyDropEntity tempPrefab = null;
-#if !EXCLUDE_PREFAB_REFS
-            tempPrefab = GameInstance.Singleton.currencyDropEntityPrefab;
-#endif
-            AssetReferenceCurrencyDropEntity tempAddressablePrefab = GameInstance.Singleton.addressableCurrencyDropEntityPrefab;
-            CurrencyDropEntity loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
+            CurrencyDropEntity loadedPrefab = await GameInstance.Singleton.GetLoadedCurrencyDropEntityPrefab();
             if (loadedPrefab != null)
             {
                 entity = Drop(loadedPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;

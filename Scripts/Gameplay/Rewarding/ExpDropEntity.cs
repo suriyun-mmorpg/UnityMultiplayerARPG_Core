@@ -1,20 +1,14 @@
-using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
     public partial class ExpDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
     {
-        public static ExpDropEntity Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
+        public static async UniTask<ExpDropEntity> Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {
             ExpDropEntity entity = null;
-            ExpDropEntity tempPrefab = null;
-#if !EXCLUDE_PREFAB_REFS
-            tempPrefab = GameInstance.Singleton.expDropEntityPrefab;
-#endif
-            AssetReferenceExpDropEntity tempAddressablePrefab = GameInstance.Singleton.addressableExpDropEntityPrefab;
-            ExpDropEntity loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
+            ExpDropEntity loadedPrefab = await GameInstance.Singleton.GetLoadedExpDropEntityPrefab();
             if (loadedPrefab != null)
             {
                 entity = Drop(loadedPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as ExpDropEntity;

@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Insthync.AddressableAssetTools;
 using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
@@ -445,18 +444,13 @@ namespace MultiplayerARPG
                 case RewardingItemMode.DropOnGround:
                     for (int i = 0; i < _droppingItems.Count; ++i)
                     {
-                        ItemDropEntity.Drop(this, RewardGivenType.KillMonster, _droppingItems[i], _looters);
+                        ItemDropEntity.Drop(this, RewardGivenType.KillMonster, _droppingItems[i], _looters).Forget();
                     }
                     break;
                 case RewardingItemMode.CorpseLooting:
                     if (_droppingItems.Count > 0)
                     {
-                        ItemsContainerEntity tempPrefab = null;
-#if !EXCLUDE_PREFAB_REFS
-                        tempPrefab = CurrentGameInstance.monsterCorpsePrefab;
-#endif
-                        AssetReferenceItemsContainerEntity tempAddressablePrefab = CurrentGameInstance.addressableMonsterCorpsePrefab;
-                        ItemsContainerEntity loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+                        ItemsContainerEntity loadedPrefab = await CurrentGameInstance.GetLoadedMonsterCorpsePrefab();
                         if (loadedPrefab != null)
                             ItemsContainerEntity.DropItems(loadedPrefab, this, RewardGivenType.KillMonster, _droppingItems, _looters, CurrentGameInstance.monsterCorpseAppearDuration);
                     }
@@ -501,12 +495,12 @@ namespace MultiplayerARPG
 
             if (!reward.NoExp() && CurrentGameInstance.monsterExpRewardingMode == RewardingMode.DropOnGround)
             {
-                ExpDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.exp, _looters);
+                ExpDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.exp, _looters).Forget();
             }
 
             if (!reward.NoGold() && CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.DropOnGround)
             {
-                GoldDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.gold, _looters);
+                GoldDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.gold, _looters).Forget();
             }
 
             if (!reward.NoCurrencies() && CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.DropOnGround)
@@ -515,7 +509,7 @@ namespace MultiplayerARPG
                 {
                     if (currencyAmount.currency == null || currencyAmount.amount <= 0)
                         continue;
-                    CurrencyDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, currencyAmount.currency, currencyAmount.amount, _looters);
+                    CurrencyDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, currencyAmount.currency, currencyAmount.amount, _looters).Forget();
                 }
             }
 

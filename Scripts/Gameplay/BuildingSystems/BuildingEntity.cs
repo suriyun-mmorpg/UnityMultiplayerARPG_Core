@@ -1,8 +1,9 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Profiling;
+﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Profiling;
 using UnityEngine.UI;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -594,7 +595,7 @@ namespace MultiplayerARPG
                 {
                     if (droppingItem.item == null || droppingItem.amount == 0)
                         continue;
-                    ItemDropEntity.Drop(this, RewardGivenType.BuildingDestroyed, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), new string[0]);
+                    ItemDropEntity.Drop(this, RewardGivenType.BuildingDestroyed, CharacterItem.Create(droppingItem.item, 1, droppingItem.amount), System.Array.Empty<string>()).Forget();
                 }
             }
             // Destroy this entity

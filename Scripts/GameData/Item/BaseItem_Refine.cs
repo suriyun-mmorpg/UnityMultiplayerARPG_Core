@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -204,7 +205,7 @@ namespace MultiplayerARPG
                     returning = WeightedRandomizer.From(randomItems).TakeOne();
                     isReturning = true;
                     character.Gold.Increase(returning.returnGold);
-                    character.IncreaseItems(returning.returnItems, onFail: dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }));
+                    character.IncreaseItems(returning.returnItems, onFail: dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }).Forget());
                     character.IncreaseCurrencies(returning.returnCurrencies);
                     inventoryChanged = true;
                 }

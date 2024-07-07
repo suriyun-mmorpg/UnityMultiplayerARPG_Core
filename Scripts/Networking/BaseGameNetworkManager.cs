@@ -528,20 +528,20 @@ namespace MultiplayerARPG
 #if !EXCLUDE_PREFAB_REFS
             Assets.playerPrefab = null;
             HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
-            if (CurrentGameInstance.itemDropEntityPrefab != null)
-                spawnablePrefabs.Add(CurrentGameInstance.itemDropEntityPrefab.Identity);
-            if (CurrentGameInstance.expDropEntityPrefab != null)
-                spawnablePrefabs.Add(CurrentGameInstance.expDropEntityPrefab.Identity);
-            if (CurrentGameInstance.goldDropEntityPrefab != null)
-                spawnablePrefabs.Add(CurrentGameInstance.goldDropEntityPrefab.Identity);
-            if (CurrentGameInstance.currencyDropEntityPrefab != null)
-                spawnablePrefabs.Add(CurrentGameInstance.currencyDropEntityPrefab.Identity);
-            if (CurrentGameInstance.warpPortalEntityPrefab != null)
-                spawnablePrefabs.Add(CurrentGameInstance.warpPortalEntityPrefab.Identity);
-            if (CurrentGameInstance.playerCorpsePrefab != null)
-                spawnablePrefabs.Add(CurrentGameInstance.playerCorpsePrefab.Identity);
-            if (CurrentGameInstance.monsterCorpsePrefab != null)
-                spawnablePrefabs.Add(CurrentGameInstance.monsterCorpsePrefab.Identity);
+            if (CurrentGameInstance.ItemDropEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.ItemDropEntityPrefab.Identity);
+            if (CurrentGameInstance.ExpDropEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.ExpDropEntityPrefab.Identity);
+            if (CurrentGameInstance.GoldDropEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.GoldDropEntityPrefab.Identity);
+            if (CurrentGameInstance.CurrencyDropEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.CurrencyDropEntityPrefab.Identity);
+            if (CurrentGameInstance.WarpPortalEntityPrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.WarpPortalEntityPrefab.Identity);
+            if (CurrentGameInstance.PlayerCorpsePrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.PlayerCorpsePrefab.Identity);
+            if (CurrentGameInstance.MonsterCorpsePrefab != null)
+                spawnablePrefabs.Add(CurrentGameInstance.MonsterCorpsePrefab.Identity);
             foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);
@@ -572,20 +572,20 @@ namespace MultiplayerARPG
 
             Assets.addressablePlayerPrefab = null;
             HashSet<AssetReferenceLiteNetLibIdentity> addressableSpawnablePrefabs = new HashSet<AssetReferenceLiteNetLibIdentity>(Assets.addressableSpawnablePrefabs);
-            if (CurrentGameInstance.addressableItemDropEntityPrefab.IsDataValid())
-                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableItemDropEntityPrefab);
-            if (CurrentGameInstance.addressableExpDropEntityPrefab.IsDataValid())
-                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableExpDropEntityPrefab);
-            if (CurrentGameInstance.addressableGoldDropEntityPrefab.IsDataValid())
-                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableGoldDropEntityPrefab);
-            if (CurrentGameInstance.addressableCurrencyDropEntityPrefab.IsDataValid())
-                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableCurrencyDropEntityPrefab);
-            if (CurrentGameInstance.addressableWarpPortalEntityPrefab.IsDataValid())
-                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableWarpPortalEntityPrefab);
-            if (CurrentGameInstance.addressablePlayerCorpsePrefab.IsDataValid())
-                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressablePlayerCorpsePrefab);
-            if (CurrentGameInstance.addressableMonsterCorpsePrefab.IsDataValid())
-                addressableSpawnablePrefabs.Add(CurrentGameInstance.addressableMonsterCorpsePrefab);
+            if (CurrentGameInstance.AddressableItemDropEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressableItemDropEntityPrefab);
+            if (CurrentGameInstance.AddressableExpDropEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressableExpDropEntityPrefab);
+            if (CurrentGameInstance.AddressableGoldDropEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressableGoldDropEntityPrefab);
+            if (CurrentGameInstance.AddressableCurrencyDropEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressableCurrencyDropEntityPrefab);
+            if (CurrentGameInstance.AddressableWarpPortalEntityPrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressableWarpPortalEntityPrefab);
+            if (CurrentGameInstance.AddressablePlayerCorpsePrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressablePlayerCorpsePrefab);
+            if (CurrentGameInstance.AddressableMonsterCorpsePrefab.IsDataValid())
+                addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressableMonsterCorpsePrefab);
             foreach (AssetReferenceBaseCharacterEntity entry in GameInstance.AddressableCharacterEntities.Values)
             {
                 addressableSpawnablePrefabs.Add(entry);
@@ -738,11 +738,11 @@ namespace MultiplayerARPG
                     {
                         warpPortal = mapWarpPortals[i];
 #if !EXCLUDE_PREFAB_REFS
-                        warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.warpPortalEntityPrefab;
+                        warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.WarpPortalEntityPrefab;
 #else
                         warpPortalPrefab = null;
 #endif
-                        addressableWarpPortalPrefab = warpPortal.addressableEntityPrefab.IsDataValid() ? warpPortal.addressableEntityPrefab : CurrentGameInstance.addressableWarpPortalEntityPrefab;
+                        addressableWarpPortalPrefab = warpPortal.addressableEntityPrefab.IsDataValid() ? warpPortal.addressableEntityPrefab : CurrentGameInstance.AddressableWarpPortalEntityPrefab;
                         spawnObj = null;
                         if (warpPortalPrefab != null)
                         {

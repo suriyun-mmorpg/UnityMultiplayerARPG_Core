@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using LiteNetLib;
 using System.Collections.Generic;
@@ -336,15 +335,10 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public static ItemDropEntity Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
+        public static async UniTask<ItemDropEntity> Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
         {
             ItemDropEntity entity = null;
-            ItemDropEntity tempPrefab = null;
-#if !EXCLUDE_PREFAB_REFS
-            tempPrefab = GameInstance.Singleton.itemDropEntityPrefab;
-#endif
-            AssetReferenceItemDropEntity tempAddressablePrefab = GameInstance.Singleton.addressableItemDropEntityPrefab;
-            ItemDropEntity loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
+            ItemDropEntity loadedPrefab = await GameInstance.Singleton.GetLoadedItemDropEntityPrefab();
             if (loadedPrefab != null)
             {
                 entity = Drop(loadedPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);

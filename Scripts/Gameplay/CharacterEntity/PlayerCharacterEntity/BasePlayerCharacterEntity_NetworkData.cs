@@ -477,9 +477,9 @@ namespace MultiplayerARPG
                 {
                     prefab = ControllerPrefab;
                 }
-                else if (CurrentGameInstance.defaultControllerPrefab != null)
+                else if (CurrentGameInstance.DefaultControllerPrefab != null)
                 {
-                    prefab = CurrentGameInstance.defaultControllerPrefab;
+                    prefab = CurrentGameInstance.DefaultControllerPrefab;
                 }
 #endif
                 if (prefab != null)
@@ -490,9 +490,9 @@ namespace MultiplayerARPG
                 {
                     prefab = await AddressableControllerPrefab.GetOrLoadAssetAsync<BasePlayerCharacterController>();
                 }
-                else if (CurrentGameInstance.addressableDefaultControllerPrefab.IsDataValid())
+                else if (CurrentGameInstance.AddressableDefaultControllerPrefab.IsDataValid())
                 {
-                    prefab = await CurrentGameInstance.addressableDefaultControllerPrefab.GetOrLoadAssetAsync<BasePlayerCharacterController>();
+                    prefab = await CurrentGameInstance.AddressableDefaultControllerPrefab.GetOrLoadAssetAsync<BasePlayerCharacterController>();
                 }
                 else if (BasePlayerCharacterController.Singleton != null)
                 {
