@@ -178,12 +178,14 @@ namespace MultiplayerARPG
 
         private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, DamageableHitBox hitBox, Vector3 damagePosition)
         {
-            if (!impactEffects.TryGetEffect(tag, out GameEffect gameEffect))
+            if (impactEffects == null)
                 return;
+            Vector3 position = hitBox.Bounds.center;
             Vector3 targetPosition = hitBox.Bounds.center;
             targetPosition.y = damagePosition.y;
             Vector3 dir = (targetPosition - damagePosition).normalized;
-            PoolSystem.GetInstance(gameEffect, hitBox.Bounds.center, Quaternion.LookRotation(Vector3.up, dir));
+            Quaternion rotation = Quaternion.LookRotation(Vector3.up, dir);
+            impactEffects.PlayEffect(tag, position, rotation);
         }
     }
 }

@@ -1,30 +1,39 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Serialization;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.IMPACT_EFFECTS_FILE, menuName = GameDataMenuConsts.IMPACT_EFFECTS_MENU, order = GameDataMenuConsts.IMPACT_EFFECTS_ORDER)]
     public class ImpactEffects : ScriptableObject
     {
+        [HideInInspector]
         public GameEffect defaultEffect;
-        public ImpactEffect[] effects;
+        public ImpactEffect defaultImpactEffect;
+        [FormerlySerializedAs("effects")]
+        public ImpactEffect[] impaceEffects;
 
         [System.NonSerialized]
-        private Dictionary<string, GameEffect> _cacheEffects;
-        public Dictionary<string, GameEffect> Effects
+        private Dictionary<string, ImpactEffect> _cacheEffects;
+        public Dictionary<string, ImpactEffect> Effects
         {
             get
             {
                 if (_cacheEffects == null)
                 {
-                    _cacheEffects = new Dictionary<string, GameEffect>();
-                    if (effects != null && effects.Length > 0)
+                    _cacheEffects = new Dictionary<string, ImpactEffect>();
+                    if (impaceEffects != null && impaceEffects.Length > 0)
                     {
-                        foreach (ImpactEffect effect in effects)
+                        _cacheEffects[defaultImpactEffect.tag.Tag] = defaultImpactEffect;
+                        foreach (ImpactEffect effect in impaceEffects)
                         {
                             if (effect.effect == null)
                                 continue;
-                            _cacheEffects[effect.tag.Tag] = effect.effect;
+                            _cacheEffects[effect.tag.Tag] = effect;
                         }
                     }
                 }
@@ -32,24 +41,46 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool TryGetEffect(string tag, out GameEffect effect)
+        public bool TryGetEffect(string tag, out ImpactEffect effect)
         {
             if (Effects.TryGetValue(tag, out effect))
                 return true;
             if (defaultEffect != null)
             {
-                effect = defaultEffect;
+                effect = defaultImpactEffect;
                 return true;
             }
             return false;
         }
 
+        public void PlayEffect(string tag, Vector3 position, Quaternion rotation)
+        {
+            if (!TryGetEffect(tag, out ImpactEffect effect))
+                return;
+            effect.GetInstance(position, rotation);
+        }
+
+        private void OnValidate()
+        {
+#if UNITY_EDITOR
+            if (defaultEffect != null && defaultImpactEffect.effect == null)
+            {
+                ImpactEffect impactEffect = defaultImpactEffect;
+                impactEffect.effect = defaultEffect;
+                defaultImpactEffect = impactEffect;
+                defaultEffect = null;
+                EditorUtility.SetDirty(this);
+            }
+#endif
+        }
+
         public void PrepareRelatesData()
         {
-            List<GameEffect> effects = new List<GameEffect>(Effects.Values)
+            List<GameEffect> effects = new List<GameEffect>();
+            foreach (ImpactEffect effect in Effects.Values)
             {
-                defaultEffect
-            };
+                effects.Add(effect.effect);
+            }
             GameInstance.AddPoolingObjects(effects);
         }
     }

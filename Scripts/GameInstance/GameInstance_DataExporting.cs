@@ -114,7 +114,7 @@ namespace MultiplayerARPG
             if (defaultDamageElement == null)
             {
                 defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>()
-                    .GenerateDefaultDamageElement(DefaultDamageHitEffects);
+                    .GenerateDefaultDamageElement(DefaultDamageHitEffects, AddressableDefaultDamageHitEffects);
                 haveToClearDefaultDamageElement = true;
             }
 

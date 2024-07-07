@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
 #if !UNITY_SERVER || UNITY_EDITOR
         public Transform container;
-#if !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         public GameEffect prefab;
 #endif
         public AssetReferenceGameEffect addressablePrefab;

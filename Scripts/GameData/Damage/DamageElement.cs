@@ -31,7 +31,10 @@ namespace MultiplayerARPG
         [SerializeField]
         [Range(0f, 1f)]
         private float maxResistanceAmount = 1f;
-        public float MaxResistanceAmount { get { return maxResistanceAmount; } }
+        public float MaxResistanceAmount
+        {
+            get { return maxResistanceAmount; }
+        }
 
         [SerializeField]
         private GameEffect[] damageHitEffects = new GameEffect[0];
@@ -58,12 +61,13 @@ namespace MultiplayerARPG
             GameInstance.AddPoolingObjects(damageHitEffects);
         }
 
-        public DamageElement GenerateDefaultDamageElement(GameEffect[] defaultDamageHitEffects)
+        public DamageElement GenerateDefaultDamageElement(GameEffect[] defaultDamageHitEffects, AssetReferenceGameEffect[] addressableDefaultDamageHitEffects)
         {
             name = GameDataConst.DEFAULT_DAMAGE_ID;
             defaultTitle = GameDataConst.DEFAULT_DAMAGE_TITLE;
             maxResistanceAmount = 1f;
             damageHitEffects = defaultDamageHitEffects;
+            addressableDamageHitEffects = addressableDefaultDamageHitEffects;
             return this;
         }
     }

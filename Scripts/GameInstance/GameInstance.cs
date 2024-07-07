@@ -199,6 +199,10 @@ namespace MultiplayerARPG
         public NpcQuestIndicator npcQuestIndicator = null;
 
         [Header("Gameplay Effects")]
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox effectHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
         [HideInInspector]
         // TODO: Deprecated, use `levelUpEffects` instead.
@@ -206,17 +210,18 @@ namespace MultiplayerARPG
         [SerializeField]
         private GameEffect[] levelUpEffects = new GameEffect[0];
         [SerializeField]
-        private AssetReferenceGameEffect[] addressableLevelUpEffects = new AssetReferenceGameEffect[0];
-        [SerializeField]
         private GameEffect[] stunEffects = new GameEffect[0];
-        [SerializeField]
-        private AssetReferenceGameEffect[] addressableStunEffects = new AssetReferenceGameEffect[0];
         [SerializeField]
         private GameEffect[] muteEffects = new GameEffect[0];
         [SerializeField]
-        private AssetReferenceGameEffect[] addressableMuteEffects = new AssetReferenceGameEffect[0];
-        [SerializeField]
         private GameEffect[] freezeEffects = new GameEffect[0];
+#endif
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableLevelUpEffects = new AssetReferenceGameEffect[0];
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableStunEffects = new AssetReferenceGameEffect[0];
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableMuteEffects = new AssetReferenceGameEffect[0];
         [SerializeField]
         private AssetReferenceGameEffect[] addressableFreezeEffects = new AssetReferenceGameEffect[0];
 
@@ -245,9 +250,13 @@ namespace MultiplayerARPG
         [SerializeField]
         private DamageElement defaultDamageElement = null;
         [Tooltip("Default hit effects, will be used when attack to enemies or receive damages from enemies")]
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox damageHitEffectHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
         private GameEffect[] defaultDamageHitEffects = new GameEffect[0];
-
+#endif
         [SerializeField]
         private AssetReferenceGameEffect[] addressableDefaultDamageHitEffects = new AssetReferenceGameEffect[0];
 
@@ -524,19 +533,21 @@ namespace MultiplayerARPG
             get { return socialSystemSetting; }
         }
 
-#if !EXCLUDE_PREFAB_REFS
         public BaseUISceneGameplay UISceneGameplayPrefab
         {
             get
             {
+#if !EXCLUDE_PREFAB_REFS
                 if ((Application.isMobilePlatform || IsMobileTestInEditor()) && uiSceneGameplayMobilePrefab != null)
                     return uiSceneGameplayMobilePrefab;
                 if ((Application.isConsolePlatform || IsConsoleTestInEditor()) && uiSceneGameplayConsolePrefab != null)
                     return uiSceneGameplayConsolePrefab;
                 return uiSceneGameplayPrefab;
+#else
+                return null;
+#endif
             }
         }
-#endif
 
         public AssetReferenceBaseUISceneGameplay AddressableUISceneGameplayPrefab
         {
@@ -557,7 +568,14 @@ namespace MultiplayerARPG
 
         public GameEffect[] LevelUpEffects
         {
-            get { return levelUpEffects; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return levelUpEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
         }
 
         public AssetReferenceGameEffect[] AddressableLevelUpEffects
@@ -567,7 +585,14 @@ namespace MultiplayerARPG
 
         public GameEffect[] StunEffects
         {
-            get { return stunEffects; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return stunEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
         }
 
         public AssetReferenceGameEffect[] AddressableStunEffects
@@ -577,7 +602,14 @@ namespace MultiplayerARPG
 
         public GameEffect[] MuteEffects
         {
-            get { return muteEffects; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return muteEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
         }
 
         public AssetReferenceGameEffect[] AddressableMuteEffects
@@ -587,7 +619,14 @@ namespace MultiplayerARPG
 
         public GameEffect[] FreezeEffects
         {
-            get { return freezeEffects; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return freezeEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
         }
 
         public AssetReferenceGameEffect[] AddressableFreezeEffects
@@ -622,7 +661,14 @@ namespace MultiplayerARPG
 
         public GameEffect[] DefaultDamageHitEffects
         {
-            get { return defaultDamageHitEffects; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return defaultDamageHitEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
         }
 
         public AssetReferenceGameEffect[] AddressableDefaultDamageHitEffects
@@ -716,7 +762,7 @@ namespace MultiplayerARPG
             if (defaultDamageElement == null)
             {
                 defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>()
-                    .GenerateDefaultDamageElement(DefaultDamageHitEffects);
+                    .GenerateDefaultDamageElement(DefaultDamageHitEffects, AddressableDefaultDamageHitEffects);
             }
 
             // Setup string formatter if not existed
