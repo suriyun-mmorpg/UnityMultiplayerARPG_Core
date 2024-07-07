@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override GameEffect[] AddressableDamageHitEffects
+        public override AssetReferenceGameEffect[] AddressableDamageHitEffects
         {
             get
             {
