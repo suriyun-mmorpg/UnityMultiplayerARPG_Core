@@ -24,6 +24,22 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public static bool ShowUnhandledResponseMessageDialog(this UnityRestClient.RestClient.IResult result)
+        {
+            if (result.IsNetworkError)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_CONNECTION_FAILED.ToString()));
+                return true;
+            }
+            if (result.IsHttpError)
+            {
+                UISceneGlobal.Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_ERROR.ToString()), LanguageManager.GetText(UITextKeys.UI_ERROR_INTERNAL_SERVER_ERROR.ToString()));
+                return true;
+            }
+            // TODO: Improve error handling
+            return false;
+        }
+
         public static ChatMessage FillChannelId(this ChatMessage message)
         {
             IPlayerCharacterData playerCharacter;
