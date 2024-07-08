@@ -93,8 +93,9 @@ namespace MultiplayerARPG
             NativeArray<Vector3> sourceLocalScales = new NativeArray<Vector3>(transformsCount, Allocator.TempJob);
             for (int i = 0; i < _srcTransforms.Count; ++i)
             {
-                sourcePositions[i] = _srcTransforms[i].position;
-                sourceRotations[i] = _srcTransforms[i].rotation;
+                _srcTransforms[i].GetPositionAndRotation(out Vector3 position, out Quaternion rotation);
+                sourcePositions[i] = position;
+                sourceRotations[i] = rotation;
                 sourceLocalScales[i] = _srcTransforms[i].localScale;
             }
 
@@ -125,8 +126,7 @@ namespace MultiplayerARPG
             {
                 if (!transform.isValid)
                     return;
-                transform.position = sourcePositions[index];
-                transform.rotation = sourceRotations[index];
+                transform.SetPositionAndRotation(sourcePositions[index], sourceRotations[index]);
                 transform.localScale = sourceLocalScales[index];
             }
         }
