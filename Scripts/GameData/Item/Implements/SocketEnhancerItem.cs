@@ -15,6 +15,7 @@ namespace MultiplayerARPG
             get { return ItemType.SocketEnhancer; }
         }
 
+        [Category(0, "Item Settings")]
         [SerializeField]
         private SocketEnhancerType socketEnhancerType = SocketEnhancerType.Type1;
         public SocketEnhancerType SocketEnhancerType
