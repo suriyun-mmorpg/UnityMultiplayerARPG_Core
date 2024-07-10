@@ -63,19 +63,27 @@ namespace MultiplayerARPG
         private void OnValidate()
         {
 #if UNITY_EDITOR
+            if (Migrate())
+                EditorUtility.SetDirty(this);
+#endif
+        }
+
+        private bool Migrate()
+        {
             if (defaultEffect != null && defaultImpactEffect.effect == null)
             {
                 ImpactEffect impactEffect = defaultImpactEffect;
                 impactEffect.effect = defaultEffect;
                 defaultImpactEffect = impactEffect;
                 defaultEffect = null;
-                EditorUtility.SetDirty(this);
+                return true;
             }
-#endif
+            return false;
         }
 
         public void PrepareRelatesData()
         {
+            Migrate();
             List<GameEffect> effects = new List<GameEffect>();
             foreach (ImpactEffect effect in Effects.Values)
             {
