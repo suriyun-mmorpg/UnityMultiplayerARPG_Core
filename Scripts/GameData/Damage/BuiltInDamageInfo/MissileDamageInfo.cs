@@ -11,8 +11,25 @@ namespace MultiplayerARPG
         public bool hitOnlySelectedTarget;
         public float missileDistance;
         public float missileSpeed;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         public MissileDamageEntity missileDamageEntity;
+#endif
+        public MissileDamageEntity MissileDamageEntity
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return missileDamageEntity;
+#else
+                return null;
+#endif
+            }
+        }
         public AssetReferenceMissileDamageEntity addressableMissileDamageEntity;
+        public AssetReferenceMissileDamageEntity AddressableMissileDamageEntity
+        {
+            get => addressableMissileDamageEntity;
+        }
         private MissileDamageEntity.HitDetectionMode _hitDetectionMode;
         private float _sphereCastRadius;
         private Vector3 _boxCastSize;
@@ -20,9 +37,9 @@ namespace MultiplayerARPG
 
         public override async void PrepareRelatesData()
         {
-            GameInstance.AddPoolingObjects(missileDamageEntity);
-            MissileDamageEntity loadedDamageEntity = await addressableMissileDamageEntity
-                .GetOrLoadAssetAsyncOrUsePrefab(missileDamageEntity);
+            GameInstance.AddPoolingObjects(MissileDamageEntity);
+            MissileDamageEntity loadedDamageEntity = await AddressableMissileDamageEntity
+                .GetOrLoadAssetAsyncOrUsePrefab(MissileDamageEntity);
             PrepareHitValidationData(loadedDamageEntity);
         }
 
@@ -139,8 +156,8 @@ namespace MultiplayerARPG
 
         public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
-            MissileDamageEntity loadedDamageEntity = await addressableMissileDamageEntity
-                .GetOrLoadAssetAsyncOrUsePrefab(missileDamageEntity);
+            MissileDamageEntity loadedDamageEntity = await AddressableMissileDamageEntity
+                .GetOrLoadAssetAsyncOrUsePrefab(MissileDamageEntity);
 
             // Spawn missile damage entity, it will move to target then apply damage when hit
             // Instantiates on both client and server (damage applies at server)

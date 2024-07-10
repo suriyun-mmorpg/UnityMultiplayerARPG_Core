@@ -9,8 +9,25 @@ namespace MultiplayerARPG
     {
         public float missileDistance;
         public float missileSpeed;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         public ProjectileEffect projectileEffect;
+#endif
+        public ProjectileEffect ProjectileEffect
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return projectileEffect;
+#else
+                return null;
+#endif
+            }
+        }
         public AssetReferenceProjectileEffect addressableProjectEffect;
+        public AssetReferenceProjectileEffect AddressableProjectEffect
+        {
+            get => addressableProjectEffect;
+        }
         public byte pierceThroughEntities;
         public ImpactEffects impactEffects;
 
@@ -104,8 +121,8 @@ namespace MultiplayerARPG
                 return;
             }
 
-            ProjectileEffect loadedProjectileEffect = await addressableProjectEffect
-                .GetOrLoadAssetAsyncOrUsePrefab(projectileEffect);
+            ProjectileEffect loadedProjectileEffect = await AddressableProjectEffect
+                .GetOrLoadAssetAsyncOrUsePrefab(ProjectileEffect);
 
             bool isPlayImpactEffects = isClient && impactEffects != null;
             float projectileDistance = missileDistance;

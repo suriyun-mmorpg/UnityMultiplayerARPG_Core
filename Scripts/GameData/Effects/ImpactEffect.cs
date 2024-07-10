@@ -12,7 +12,7 @@ namespace MultiplayerARPG
 #endif
         public AssetReferenceGameEffect addressableEffect;
         
-        public async void GetInstance(Vector3 position, Quaternion rotation)
+        public async void Play(Vector3 position, Quaternion rotation)
         {
 #if !UNITY_SERVER
             GameEffect tempPrefab = null;

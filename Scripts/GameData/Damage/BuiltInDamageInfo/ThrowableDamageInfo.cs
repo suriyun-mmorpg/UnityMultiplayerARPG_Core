@@ -9,8 +9,25 @@ namespace MultiplayerARPG
     {
         public float throwForce;
         public float throwableLifeTime;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         public ThrowableDamageEntity throwableDamageEntity;
+#endif
+        public ThrowableDamageEntity ThrowableDamageEntity
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return throwableDamageEntity;
+#else
+                return null;
+#endif
+            }
+        }
         public AssetReferenceThrowableDamageEntity addressableThrowableDamageEntity;
+        public AssetReferenceThrowableDamageEntity AddressableThrowableDamageEntity
+        {
+            get => addressableThrowableDamageEntity;
+        }
 
         public override void PrepareRelatesData()
         {
@@ -62,8 +79,8 @@ namespace MultiplayerARPG
 
         public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
-            ThrowableDamageEntity loadedDamageEntity = await addressableThrowableDamageEntity
-                .GetOrLoadAssetAsyncOrUsePrefab(throwableDamageEntity);
+            ThrowableDamageEntity loadedDamageEntity = await AddressableThrowableDamageEntity
+                .GetOrLoadAssetAsyncOrUsePrefab(ThrowableDamageEntity);
 
             if (loadedDamageEntity == null)
                 return;

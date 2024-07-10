@@ -57,7 +57,7 @@ namespace MultiplayerARPG
         {
             if (!TryGetEffect(tag, out ImpactEffect effect))
                 return;
-            effect.GetInstance(position, rotation);
+            effect.Play(position, rotation);
         }
 
         private void OnValidate()
