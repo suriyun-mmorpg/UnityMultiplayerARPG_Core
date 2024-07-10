@@ -14,7 +14,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameData : ScriptableObject, IGameData, IExportableData, IComparable
+    public abstract partial class BaseGameData : ScriptableObject, IGameData, IExternableData, IComparable
     {
         [Tooltip("Game data ID, if this is empty it will uses file's name as ID")]
         [SerializeField]

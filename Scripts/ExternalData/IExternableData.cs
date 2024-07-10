@@ -2,7 +2,7 @@ using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
-    public interface IExportableData
+    public interface IExternableData
     {
         string Id { get; }
     }

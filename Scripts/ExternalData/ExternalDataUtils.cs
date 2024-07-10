@@ -56,16 +56,16 @@ namespace MultiplayerARPG
                     fieldType = field.FieldType.GetElementType();
                 if (fieldType.IsClass)
                 {
-                    if (fieldType.HasInterface<IExportableData>())
+                    if (fieldType.HasInterface<IGameData>())
                     {
-                        IExportableData exportableData = field.GetValue(target) as IExportableData;
-                        if (exportableData != null && !string.IsNullOrEmpty(exportableData.Id))
+                        IGameData gameData = field.GetValue(target) as IGameData;
+                        if (gameData != null && !string.IsNullOrEmpty(gameData.Id))
                         {
                             result[field.Name] = new Dictionary<string, string>()
-                        {
-                            { "Type", fieldType.FullName },
-                            { "Id",  exportableData.Id },
-                        };
+                            {
+                                { "Type", fieldType.FullName },
+                                { "Id",  gameData.Id },
+                            };
                         }
                         continue;
                     }
@@ -78,15 +78,7 @@ namespace MultiplayerARPG
                         }
                         continue;
                     }
-                    if (fieldType.IsSubclassOf(typeof(GameObject)))
-                    {
-                        continue;
-                    }
-                    if (fieldType.IsSubclassOf(typeof(Component)))
-                    {
-                        continue;
-                    }
-                    if (fieldType.IsSubclassOf(typeof(ScriptableObject)))
+                    if (fieldType.IsSubclassOf(typeof(UnityEngine.Object)))
                     {
                         continue;
                     }
@@ -94,7 +86,6 @@ namespace MultiplayerARPG
                 }
                 else if (fieldType.IsValueType && !fieldType.IsPrimitive && !fieldType.IsEnum)
                 {
-                    Debug.LogError($"S {fieldType.Name}");
                     result[field.Name] = GetExportData(field.GetValue(target));
                 }
                 else
