@@ -73,6 +73,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+            DamageInfo.PrepareRelatesData();
             GameInstance.AddAmmoTypes(AmmoType);
         }
     }
