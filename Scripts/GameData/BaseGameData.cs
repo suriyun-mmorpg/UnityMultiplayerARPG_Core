@@ -5,6 +5,8 @@ using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
+using System.Collections.Generic;
+using System.Reflection;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -12,7 +14,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseGameData : ScriptableObject, IGameData, IComparable
+    public abstract partial class BaseGameData : ScriptableObject, IGameData, IExportableData, IComparable
     {
         [Tooltip("Game data ID, if this is empty it will uses file's name as ID")]
         [SerializeField]
@@ -170,6 +172,12 @@ namespace MultiplayerARPG
         public override bool Equals(object obj)
         {
             return GetHashCode() == obj.GetHashCode();
+        }
+
+        [ContextMenu("Test Export Data")]
+        public void TestExportData()
+        {
+            Debug.Log($"Exporting data is:\n{JsonConvert.SerializeObject(this.GetExportData())}");
         }
     }
 }
