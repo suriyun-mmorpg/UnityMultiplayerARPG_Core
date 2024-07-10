@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -10,10 +12,28 @@ namespace MultiplayerARPG
         public float missileDistance;
         public float missileSpeed;
         public MissileDamageEntity missileDamageEntity;
+        public AssetReferenceMissileDamageEntity addressableMissileDamageEntity;
+        private MissileDamageEntity.HitDetectionMode _hitDetectionMode;
+        private float _sphereCastRadius;
+        private Vector3 _boxCastSize;
+        private float _explodeDistance;
 
-        public override void PrepareRelatesData()
+        public override async void PrepareRelatesData()
         {
             GameInstance.AddPoolingObjects(missileDamageEntity);
+            MissileDamageEntity loadedDamageEntity = await addressableMissileDamageEntity
+                .GetOrLoadAssetAsyncOrUsePrefab(missileDamageEntity);
+            PrepareHitValidationData(loadedDamageEntity);
+        }
+
+        protected void PrepareHitValidationData(MissileDamageEntity damageEntity)
+        {
+            if (damageEntity != null)
+                return;
+            _hitDetectionMode = damageEntity.hitDetectionMode;
+            _sphereCastRadius = damageEntity.sphereCastRadius;
+            _boxCastSize = damageEntity.boxCastSize;
+            _explodeDistance = damageEntity.explodeDistance;
         }
 
         public override Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
@@ -55,13 +75,13 @@ namespace MultiplayerARPG
         {
             float hitBoxMaxExtents = Mathf.Max(hitBox.Bounds.extents.x, hitBox.Bounds.extents.y, hitBox.Bounds.extents.z);
             float missileHitDist = 0f;
-            switch (missileDamageEntity.hitDetectionMode)
+            switch (_hitDetectionMode)
             {
                 case MissileDamageEntity.HitDetectionMode.SphereCast:
-                    missileHitDist = missileDamageEntity.sphereCastRadius;
+                    missileHitDist = _sphereCastRadius;
                     break;
                 case MissileDamageEntity.HitDetectionMode.BoxCast:
-                    missileHitDist = Mathf.Max(missileDamageEntity.boxCastSize.x * 0.5f, missileDamageEntity.boxCastSize.y * 0.5f, missileDamageEntity.boxCastSize.z * 0.5f);
+                    missileHitDist = Mathf.Max(_boxCastSize.x * 0.5f, _boxCastSize.y * 0.5f, _boxCastSize.z * 0.5f);
                     break;
             }
             // Not in hit distance?
@@ -89,7 +109,7 @@ namespace MultiplayerARPG
             {
                 return false;
             }
-            float explodeDistance = missileDamageEntity.explodeDistance;
+            float explodeDistance = _explodeDistance;
             if (explodeDistance > 0f && hitData.HitDestination.HasValue)
             {
                 float distHitPoints = Vector3.Distance(hitData.HitOrigin, hitData.HitDestination.Value);
@@ -117,12 +137,20 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
+            MissileDamageEntity loadedDamageEntity = await addressableMissileDamageEntity
+                .GetOrLoadAssetAsyncOrUsePrefab(missileDamageEntity);
+
             // Spawn missile damage entity, it will move to target then apply damage when hit
             // Instantiates on both client and server (damage applies at server)
-            if (missileDamageEntity == null)
+            if (loadedDamageEntity == null)
                 return;
+
+#if UNITY_EDITOR
+            // Store data for testing
+            PrepareHitValidationData(loadedDamageEntity);
+#endif
 
             // Get generic attack data
             EntityInfo instigator = attacker.GetInfo();
@@ -147,7 +175,7 @@ namespace MultiplayerARPG
             // Instantiate missile damage entity
             float missileDistance = this.missileDistance;
             float missileSpeed = this.missileSpeed;
-            PoolSystem.GetInstance(missileDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], skill, skillLevel, hitRegData, missileDistance, missileSpeed, lockingTarget);
+            PoolSystem.GetInstance(loadedDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], skill, skillLevel, hitRegData, missileDistance, missileSpeed, lockingTarget);
         }
     }
 }

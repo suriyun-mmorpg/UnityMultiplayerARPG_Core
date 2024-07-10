@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -36,9 +37,13 @@ namespace MultiplayerARPG
         public float missileSpeed;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile) })]
         public MissileDamageEntity missileDamageEntity;
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile) })]
+        public AssetReferenceMissileDamageEntity addressableMissileDamageEntity;
 
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public ProjectileEffect projectileEffect;
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
+        public AssetReferenceProjectileEffect addressableProjectEffect;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public byte pierceThroughEntities;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee), nameof(DamageType.Raycast) })]
@@ -50,6 +55,8 @@ namespace MultiplayerARPG
         public float throwableLifeTime;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
         public ThrowableDamageEntity throwableDamageEntity;
+        [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
+        public AssetReferenceThrowableDamageEntity addressableThrowableDamageEntity;
 
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Custom) })]
         public BaseCustomDamageInfo customDamageInfo;
@@ -75,6 +82,7 @@ namespace MultiplayerARPG
                         tempThrowableDamageInfo.throwForce = throwForce;
                         tempThrowableDamageInfo.throwableLifeTime = throwableLifeTime;
                         tempThrowableDamageInfo.throwableDamageEntity = throwableDamageEntity;
+                        tempThrowableDamageInfo.addressableThrowableDamageEntity = addressableThrowableDamageEntity;
                         _builtInDamageInfo = tempThrowableDamageInfo;
                     }
                     break;
@@ -85,6 +93,7 @@ namespace MultiplayerARPG
                         tempRaycastDamageInfo.missileDistance = missileDistance;
                         tempRaycastDamageInfo.missileSpeed = missileSpeed;
                         tempRaycastDamageInfo.projectileEffect = projectileEffect;
+                        tempRaycastDamageInfo.addressableProjectEffect = addressableProjectEffect;
                         tempRaycastDamageInfo.pierceThroughEntities = pierceThroughEntities;
                         tempRaycastDamageInfo.impactEffects = impactEffects;
                         _builtInDamageInfo = tempRaycastDamageInfo;
@@ -98,6 +107,7 @@ namespace MultiplayerARPG
                         tempMissileDamageInfo.missileDistance = missileDistance;
                         tempMissileDamageInfo.missileSpeed = missileSpeed;
                         tempMissileDamageInfo.missileDamageEntity = missileDamageEntity;
+                        tempMissileDamageInfo.addressableMissileDamageEntity = addressableMissileDamageEntity;
                         _builtInDamageInfo = tempMissileDamageInfo;
                     }
                     break;
@@ -134,7 +144,7 @@ namespace MultiplayerARPG
             return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.GetDamageTransform(attacker, isLeftHand) : null;
         }
 
-        public void LaunchDamageEntity(
+        public async UniTask LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,
@@ -157,7 +167,7 @@ namespace MultiplayerARPG
 
             if (TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo))
             {
-                dmgInfo.LaunchDamageEntity(
+                await dmgInfo.LaunchDamageEntity(
                     attacker,
                     isLeftHand,
                     weapon,

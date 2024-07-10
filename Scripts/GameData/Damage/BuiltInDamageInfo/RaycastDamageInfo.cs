@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -8,6 +10,7 @@ namespace MultiplayerARPG
         public float missileDistance;
         public float missileSpeed;
         public ProjectileEffect projectileEffect;
+        public AssetReferenceProjectileEffect addressableProjectEffect;
         public byte pierceThroughEntities;
         public ImpactEffects impactEffects;
 
@@ -70,7 +73,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;
             bool isServer = attacker.IsServer;
@@ -101,6 +104,9 @@ namespace MultiplayerARPG
                 return;
             }
 
+            ProjectileEffect loadedProjectileEffect = await addressableProjectEffect
+                .GetOrLoadAssetAsyncOrUsePrefab(projectileEffect);
+
             bool isPlayImpactEffects = isClient && impactEffects != null;
             float projectileDistance = missileDistance;
             List<ImpactEffectPlayingData> impactEffectsData = new List<ImpactEffectPlayingData>();
@@ -109,9 +115,9 @@ namespace MultiplayerARPG
             if (tempHitCount <= 0)
             {
                 // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                if (isClient)
+                if (isClient && loadedProjectileEffect)
                 {
-                    PoolSystem.GetInstance(projectileEffect, damagePosition, damageRotation)
+                    PoolSystem.GetInstance(loadedProjectileEffect, damagePosition, damageRotation)
                         .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
                 }
                 return;
@@ -221,9 +227,9 @@ namespace MultiplayerARPG
             }
 
             // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-            if (isClient)
+            if (isClient && loadedProjectileEffect)
             {
-                PoolSystem.GetInstance(projectileEffect, damagePosition, damageRotation)
+                PoolSystem.GetInstance(loadedProjectileEffect, damagePosition, damageRotation)
                     .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
             }
         }

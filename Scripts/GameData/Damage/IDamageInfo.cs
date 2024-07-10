@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -19,7 +20,7 @@ namespace MultiplayerARPG
         /// <param name="skill">Which skill?</param>
         /// <param name="skillLevel">Which skill level?</param>
         /// <param name="aimPosition">Aim position</param>
-        void LaunchDamageEntity(
+        UniTask LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,

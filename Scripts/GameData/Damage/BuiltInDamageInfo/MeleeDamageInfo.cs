@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -45,7 +46,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireStagger, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;
             bool isServer = attacker.IsServer;
@@ -73,14 +74,14 @@ namespace MultiplayerARPG
             {
                 // Only server entities (such as monsters) and clients will launch raycast damage
                 // clients do it for game effects playing, server do it to apply damage
-                return;
+                return default;
             }
 
             // Find hitting objects
             int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
             int tempHitCount = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, layerMask, true, QueryTriggerInteraction.Collide);
             if (tempHitCount <= 0)
-                return;
+                return default;
 
             HashSet<uint> hitObjects = new HashSet<uint>();
             bool isPlayImpactEffects = isClient && impactEffects != null;
@@ -174,6 +175,8 @@ namespace MultiplayerARPG
                     PlayMeleeImpactEffect(attacker, tempTag, tempDamageTakenTarget, damagePosition);
                 }
             }
+
+            return default;
         }
 
         private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, DamageableHitBox hitBox, Vector3 damagePosition)

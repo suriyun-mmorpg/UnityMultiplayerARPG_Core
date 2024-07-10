@@ -1,11 +1,12 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public abstract class BaseCustomDamageInfo : ScriptableObject, IDamageInfo
     {
-        public abstract void LaunchDamageEntity(
+        public abstract UniTask LaunchDamageEntity(
             BaseCharacterEntity attacker,
             bool isLeftHand,
             CharacterItem weapon,
