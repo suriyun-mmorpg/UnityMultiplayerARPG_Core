@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public List<AnimatorLODSetting> settings = new List<AnimatorLODSetting>();
 
         [InspectorButton(nameof(SortSettings))]
-        public bool btnSort;
+        public bool sortSettings;
 
         private float _accumulateDeltaTime;
 

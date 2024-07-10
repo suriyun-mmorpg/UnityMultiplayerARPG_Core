@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         public TextWrapper textWrapper;
         [InspectorButton(nameof(UpdateUI))]
         public bool updateUI;
-        private string currentLanguageKey;
+        private string _currentLanguageKey;
 
         public string Text
         {
@@ -28,9 +28,9 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (!textWrapper || LanguageManager.CurrentLanguageKey.Equals(currentLanguageKey))
+            if (!textWrapper || LanguageManager.CurrentLanguageKey.Equals(_currentLanguageKey))
                 return;
-            currentLanguageKey = LanguageManager.CurrentLanguageKey;
+            _currentLanguageKey = LanguageManager.CurrentLanguageKey;
             textWrapper.text = Text;
         }
 

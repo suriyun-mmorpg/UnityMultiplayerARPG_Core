@@ -26,7 +26,7 @@ namespace UtilsComponents
     {
 #if UNITY_EDITOR
         [InspectorButton(nameof(SaveCurrentSetting))]
-        public bool btnSaveCurrentSetting;
+        public bool saveCurrentSetting;
 #endif
 
         public override void Apply()

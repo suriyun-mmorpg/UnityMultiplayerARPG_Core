@@ -29,7 +29,7 @@ namespace UtilsComponents
         public int currentHeight = 9;
 #if UNITY_EDITOR
         [InspectorButton(nameof(Apply))]
-        public bool btnApply;
+        public bool apply;
 #endif
 
         protected int _prevAspect = -1;

@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         public T refToPrefab;
         [InspectorButton(nameof(ReplacePrefab))]
-        public bool btnRepacePrefab;
+        public bool repacePrefab;
 #endif
 
         public void SetupRefToPrefab(GameObject prefab)

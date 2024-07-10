@@ -9,7 +9,7 @@ namespace UtilsComponents
         public float matchWidthOrHeight = 1f;
 
         [InspectorButton(nameof(Apply))]
-        public bool btnApply;
+        public bool apply;
 
         public void Apply()
         {
