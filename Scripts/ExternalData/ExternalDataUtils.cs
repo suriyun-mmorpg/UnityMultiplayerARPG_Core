@@ -50,6 +50,13 @@ namespace MultiplayerARPG
                     exportingFields.Add(nonPublicFields[i]);
                 }
             }
+            for (int i = exportingFields.Count -1; i >= 0; --i)
+            {
+                if (exportingFields[i].HasAttribute<NonSerializedAttribute>())
+                {
+                    exportingFields.RemoveAt(i);
+                }
+            }
             foreach (FieldInfo field in exportingFields)
             {
                 Type fieldType = field.FieldType;
@@ -64,20 +71,23 @@ namespace MultiplayerARPG
                             continue;
                         }
                         Array arr = field.GetValue(target) as Array;
+                        if (arr == null)
+                        {
+                            continue;
+                        }
                         List<Dictionary<string, object>> dicts = new List<Dictionary<string, object>>();
                         if (elementType.HasInterface<IGameData>())
                         {
                             for (int i = 0; i < arr.Length; ++i)
                             {
                                 IGameData gameData = arr.GetValue(i) as IGameData;
-                                if (gameData != null && !string.IsNullOrEmpty(gameData.Id))
+                                if (gameData == null || string.IsNullOrEmpty(gameData.Id))
+                                    continue;
+                                dicts.Add(new Dictionary<string, object>()
                                 {
-                                    dicts.Add(new Dictionary<string, object>()
-                                    {
-                                        { "Type", elementType.FullName },
-                                        { "Id",  gameData.Id },
-                                    });
-                                }
+                                    { "Type", elementType.FullName },
+                                    { "Id",  gameData.Id },
+                                });
                             }
                             result[field.Name] = dicts;
                             continue;
@@ -87,19 +97,19 @@ namespace MultiplayerARPG
                             for (int i = 0; i < arr.Length; ++i)
                             {
                                 AssetReference aa = arr.GetValue(i) as AssetReference;
-                                if (aa.IsDataValid())
+                                if (!aa.IsDataValid())
+                                    continue;
+                                dicts.Add(new Dictionary<string, object>()
                                 {
-                                    dicts.Add(new Dictionary<string, object>()
-                                    {
-                                        { "Type", elementType.FullName },
-                                        { "Key", aa.RuntimeKey },
-                                    });
-                                }
+                                    { "Type", elementType.FullName },
+                                    { "Key", aa.RuntimeKey },
+                                });
                             }
                             result[field.Name] = dicts;
                             continue;
                         }
-                        if (elementType.IsSubclassOf(typeof(UnityEngine.Object)))
+                        if (elementType.IsSubclassOf(typeof(UnityEngine.Object)) ||
+                            elementType.IsSubclassOf(typeof(Delegate)))
                         {
                             continue;
                         }
@@ -109,7 +119,7 @@ namespace MultiplayerARPG
                         }
                         result[field.Name] = dicts;
                     }
-                    else if (fieldType.IsValueType && !fieldType.IsPrimitive && !fieldType.IsEnum)
+                    else if (elementType.IsValueType && !elementType.IsPrimitive && !elementType.IsEnum)
                     {
                         Array arr = field.GetValue(target) as Array;
                         List<Dictionary<string, object>> dicts = new List<Dictionary<string, object>>();
@@ -134,30 +144,29 @@ namespace MultiplayerARPG
                     if (fieldType.HasInterface<IGameData>())
                     {
                         IGameData gameData = field.GetValue(target) as IGameData;
-                        if (gameData != null && !string.IsNullOrEmpty(gameData.Id))
+                        if (gameData == null || string.IsNullOrEmpty(gameData.Id))
+                            continue;
+                        result[field.Name] = new Dictionary<string, object>()
                         {
-                            result[field.Name] = new Dictionary<string, string>()
-                            {
-                                { "Type", fieldType.FullName },
-                                { "Id",  gameData.Id },
-                            };
-                        }
+                            { "Type", fieldType.FullName },
+                            { "Id",  gameData.Id },
+                        };
                         continue;
                     }
                     if (fieldType.IsSubclassOf(typeof(AssetReference)))
                     {
                         AssetReference aa = field.GetValue(target) as AssetReference;
-                        if (aa.IsDataValid())
+                        if (!aa.IsDataValid())
+                            continue;
+                        result[field.Name] = new Dictionary<string, object>()
                         {
-                            result[field.Name] = new Dictionary<string, object>()
-                            {
-                                { "Type", fieldType.FullName },
-                                { "Key", aa.RuntimeKey },
-                            };
-                        }
+                            { "Type", fieldType.FullName },
+                            { "Key", aa.RuntimeKey },
+                        };
                         continue;
                     }
-                    if (fieldType.IsSubclassOf(typeof(UnityEngine.Object)))
+                    if (fieldType.IsSubclassOf(typeof(UnityEngine.Object)) ||
+                        fieldType.IsSubclassOf(typeof(Delegate)))
                     {
                         continue;
                     }
