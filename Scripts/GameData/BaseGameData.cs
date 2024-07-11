@@ -5,8 +5,6 @@ using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
-using System.Collections.Generic;
-using System.Reflection;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -177,7 +175,9 @@ namespace MultiplayerARPG
         [ContextMenu("Test Export Data")]
         public void TestExportData()
         {
-            Debug.Log($"Exporting data is:\n{JsonConvert.SerializeObject(this.GetExportData())}");
+            var data = this.GetExportData();
+            var json = JsonConvert.SerializeObject(data);
+            Debug.Log($"Exporting data is:\n{json}");
         }
     }
 }
