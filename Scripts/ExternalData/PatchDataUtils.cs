@@ -7,7 +7,7 @@ using UnityEngine.AddressableAssets;
 
 namespace MultiplayerARPG
 {
-    public static class ExternalDataUtils
+    public static class PatchDataUtils
     {
         public static bool HasAttribute<TAttributeType>(this FieldInfo field)
             where TAttributeType : System.Attribute
@@ -32,6 +32,16 @@ namespace MultiplayerARPG
                 }
             }
             return false;
+        }
+
+        public static Dictionary<string, object> GetExportDataForPatching(this IPatchableData patchable)
+        {
+            if (patchable == null)
+                return null;
+            Dictionary<string, object> result = GetExportData(patchable);
+            result["Type"] = patchable.GetType().FullName;
+            result["Id"] = patchable.Id;
+            return result;
         }
 
         public static Dictionary<string, object> GetExportData(this object target)
