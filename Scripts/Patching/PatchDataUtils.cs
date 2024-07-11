@@ -271,42 +271,37 @@ namespace MultiplayerARPG
                             field.SetValue(target, entry.Value);
                             continue;
                         }
-                        Array arr = field.GetValue(target) as Array;
-                        if (arr == null)
+                        List<Dictionary<string, object>> patchDataList = entry.Value as List<Dictionary<string, object>>;
+                        if (patchDataList == null)
                         {
                             continue;
                         }
-                        List<Dictionary<string, object>> dicts = new List<Dictionary<string, object>>();
                         if (elementType.HasInterface<IGameData>())
                         {
-                            for (int i = 0; i < arr.Length; ++i)
+                            Array dataArray = Array.CreateInstance(elementType, patchDataList.Count);
+                            for (int i = 0; i < patchDataList.Count; ++i)
                             {
-                                IGameData gameData = arr.GetValue(i) as IGameData;
-                                if (gameData == null || string.IsNullOrEmpty(gameData.Id))
+                                Dictionary<string, object> patchData = patchDataList[i];
+                                if (!patchData.TryGetValue(KEY_TYPE, out object type) || !patchData.TryGetValue(KEY_ID, out object id))
                                     continue;
-                                dicts.Add(new Dictionary<string, object>()
-                                {
-                                    { KEY_TYPE, gameData.GetType().FullName },
-                                    { KEY_ID,  gameData.Id },
-                                });
+                                // TODO: Get data by type and id
+                                IGameData foundData = null;
+                                dataArray.SetValue(foundData, i);
                             }
-                            result[field.Name] = dicts;
+                            ApplyListOrArrayField(dataArray, field, target);
                             continue;
                         }
                         if (elementType.IsSubclassOf(typeof(AssetReference)))
                         {
-                            for (int i = 0; i < arr.Length; ++i)
+                            Array dataArray = Array.CreateInstance(elementType, patchDataList.Count);
+                            for (int i = 0; i < patchDataList.Count; ++i)
                             {
-                                AssetReference aa = arr.GetValue(i) as AssetReference;
-                                if (!aa.IsDataValid())
+                                Dictionary<string, object> patchData = patchDataList[i];
+                                if (!patchData.TryGetValue(KEY_KEY, out object aaKey))
                                     continue;
-                                dicts.Add(new Dictionary<string, object>()
-                                {
-                                    { KEY_TYPE, aa.GetType().FullName },
-                                    { KEY_KEY, aa.RuntimeKey },
-                                });
+                                ApplyAddressablePatchData(Activator.CreateInstance(elementType) as AssetReference, aaKey);
                             }
-                            result[field.Name] = dicts;
+                            ApplyListOrArrayField(dataArray, field, target);
                             continue;
                         }
                         if (elementType.IsSubclassOf(typeof(UnityEngine.Object)) ||
@@ -314,35 +309,16 @@ namespace MultiplayerARPG
                         {
                             continue;
                         }
-                        for (int i = 0; i < arr.Length; ++i)
-                        {
-                            dicts.Add(GetExportData(arr.GetValue(i)));
-                        }
-                        result[field.Name] = dicts;
+                        ApplyListOfPatchData(patchDataList, field, elementType, target);
                     }
                     else if (elementType.IsValueType && !elementType.IsPrimitive && !elementType.IsEnum)
                     {
-                        IList arr = field.GetValue(target) as IList;
-                        Array convArr = Array.CreateInstance(elementType, arr.Count);
-                        if (arr == null)
+                        List<Dictionary<string, object>> patchDataList = entry.Value as List<Dictionary<string, object>>;
+                        if (patchDataList == null)
                         {
                             continue;
                         }
-                        for (int i = 0; i < arr.Count; ++i)
-                        {
-                            arr[i] = ApplyPatch(arr[i], entry.Value as Dictionary<string, object>);
-                            convArr.SetValue(arr[i], i);
-                        }
-                        if (fieldType.IsArray)
-                        {
-                            // Array
-                            field.SetValue(target, convArr);
-                        }
-                        else
-                        {
-                            // List
-                            field.SetValue(target, arr);
-                        }
+                        ApplyListOfPatchData(patchDataList, field, elementType, target);
                     }
                     else
                     {
@@ -385,6 +361,33 @@ namespace MultiplayerARPG
             return target;
         }
 
+        private static void ApplyListOrArrayField(Array dataArray, FieldInfo field, object target)
+        {
+            if (field.FieldType.IsArray)
+            {
+                field.SetValue(target, dataArray);
+            }
+            else
+            {
+                IList list = field.GetValue(target) as IList;
+                list.Clear();
+                for (int i = 0; i < dataArray.Length; ++i)
+                {
+                    list.Add(dataArray.GetValue(i));
+                }
+            }
+        }
+
+        private static void ApplyListOfPatchData(List<Dictionary<string, object>> patchDataList, FieldInfo field, Type elementType, object target)
+        {
+            Array dataArray = Array.CreateInstance(elementType, patchDataList.Count);
+            for (int i = 0; i < patchDataList.Count; ++i)
+            {
+                dataArray.SetValue(ApplyPatch(Activator.CreateInstance(elementType), patchDataList[i]), i);
+            }
+            ApplyListOrArrayField(dataArray, field, target);
+        }
+
         private static void ApplyGameDataPatchData(FieldInfo field, object target, Dictionary<string, object> patchData)
         {
             if (field.DeclaringType is not IGameData)
@@ -403,8 +406,13 @@ namespace MultiplayerARPG
                 return;
             if (!patchData.TryGetValue(KEY_KEY, out object aaKey))
                 return;
+            ApplyAddressablePatchData(aa, aaKey);
+        }
+
+        private static void ApplyAddressablePatchData(AssetReference aa, object guid)
+        {
             FieldInfo guidField = aa.GetType().GetField("m_AssetGUID", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-            guidField.SetValue(aa, aaKey);
+            guidField.SetValue(aa, guid);
         }
     }
 }
