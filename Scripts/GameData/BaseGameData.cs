@@ -136,6 +136,16 @@ namespace MultiplayerARPG
             return dataId;
         }
 
+        protected virtual void OnEnable()
+        {
+            Debug.LogError($"Enabled {GetType()} {Id}");
+        }
+
+        protected virtual void OnDisable()
+        {
+            Debug.LogError($"Disabled {GetType()} {Id}");
+        }
+
 #if UNITY_EDITOR
         protected void OnValidate()
         {
