@@ -5,6 +5,8 @@ using System;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
+using System.Collections.Generic;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -116,14 +118,22 @@ namespace MultiplayerARPG
             get
             {
                 if (!hashCode.HasValue)
-                    hashCode = $"{GetType()}_{Id}".GetHashCode();
+                    hashCode = $"{GetType().FullName}_{Id}".GetHashCode();
                 return hashCode.Value;
             }
         }
 
+        public readonly static Dictionary<int, string> IdMap = new Dictionary<int, string>();
+        public readonly static Dictionary<string, int> DataIdMap = new Dictionary<string, int>();
+
         public static int MakeDataId(string id)
         {
-            return id.GenerateHashId();
+            if (DataIdMap.TryGetValue(id, out int dataId))
+                return dataId;
+            dataId = id.GenerateHashId();
+            IdMap[dataId] = id;
+            DataIdMap[id] = dataId;
+            return dataId;
         }
 
 #if UNITY_EDITOR
