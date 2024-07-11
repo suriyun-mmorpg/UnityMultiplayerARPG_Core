@@ -85,7 +85,7 @@ namespace MultiplayerARPG
                                     continue;
                                 dicts.Add(new Dictionary<string, object>()
                                 {
-                                    { "Type", elementType.FullName },
+                                    { "Type", gameData.GetType().FullName },
                                     { "Id",  gameData.Id },
                                 });
                             }
@@ -101,7 +101,7 @@ namespace MultiplayerARPG
                                     continue;
                                 dicts.Add(new Dictionary<string, object>()
                                 {
-                                    { "Type", elementType.FullName },
+                                    { "Type", aa.GetType().FullName },
                                     { "Key", aa.RuntimeKey },
                                 });
                             }
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
                             continue;
                         result[field.Name] = new Dictionary<string, object>()
                         {
-                            { "Type", fieldType.FullName },
+                            { "Type", gameData.GetType().FullName },
                             { "Id",  gameData.Id },
                         };
                         continue;
@@ -160,7 +160,7 @@ namespace MultiplayerARPG
                             continue;
                         result[field.Name] = new Dictionary<string, object>()
                         {
-                            { "Type", fieldType.FullName },
+                            { "Type", aa.GetType().FullName },
                             { "Key", aa.RuntimeKey },
                         };
                         continue;
