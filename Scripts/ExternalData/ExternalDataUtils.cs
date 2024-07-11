@@ -39,20 +39,19 @@ namespace MultiplayerARPG
             if (target == null)
                 return null;
             Dictionary<string, object> result = new Dictionary<string, object>();
-            List<FieldInfo> exportingFields = new List<FieldInfo>();
-            FieldInfo[] publicFields = target.GetType().GetFields(BindingFlags.Public | BindingFlags.Instance);
-            FieldInfo[] nonPublicFields = target.GetType().GetFields(BindingFlags.NonPublic | BindingFlags.Instance);
-            exportingFields.AddRange(publicFields);
-            for (int i = 0; i < nonPublicFields.Length; ++i)
+            List<FieldInfo> exportingFields = new List<FieldInfo>(target.GetType().GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
+            for (int i = exportingFields.Count - 1; i >= 0; --i)
             {
-                if (nonPublicFields[i].HasAttribute<SerializeField>())
+                bool isRemoving = false;
+                if (!exportingFields[i].IsPublic && !exportingFields[i].HasAttribute<SerializeField>())
                 {
-                    exportingFields.Add(nonPublicFields[i]);
+                    isRemoving = true;
                 }
-            }
-            for (int i = exportingFields.Count -1; i >= 0; --i)
-            {
                 if (exportingFields[i].HasAttribute<NonSerializedAttribute>())
+                {
+                    isRemoving = true;
+                }
+                if (isRemoving)
                 {
                     exportingFields.RemoveAt(i);
                 }
