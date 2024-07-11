@@ -48,13 +48,13 @@ namespace MultiplayerARPG
         public byte specificSheathEquipWeaponSet;
 
         #region These variables will be used at runtime, do not make changes in editor
-        [HideInInspector]
+        [System.NonSerialized]
         public int indexOfModel = -1;
-        [HideInInspector]
+        [System.NonSerialized]
         public string equipPosition;
-        [HideInInspector]
+        [System.NonSerialized]
         public CharacterItem item;
-        [HideInInspector]
+        [System.NonSerialized]
         public EquipmentModelDelegate onInstantiated;
         #endregion
 
