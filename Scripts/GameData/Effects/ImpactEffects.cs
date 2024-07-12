@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void ConvertDefaultEffectPrefab(string varName)
+        private void ConvertDefaultEffectPrefab(object convertingObject, string varName)
         {
             Migrate();
         }
