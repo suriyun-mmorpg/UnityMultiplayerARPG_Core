@@ -9,22 +9,22 @@ namespace MultiplayerARPG
 {
     public class GameDataCreatorEditor : EditorWindow
     {
-        public static string[] assemblyNames = new string[] { "Assembly-CSharp" };
-        public GameDatabase workingDatabase { get; set; }
-        public Type workingFieldType { get; set; }
-        public string workingFieldName { get; set; }
-        public ScriptableObject[] workingArray { get; set; }
+        public static readonly HashSet<string> AssemblyNames = new HashSet<string>() { "Assembly-CSharp" };
+        public GameDatabase WorkingDatabase { get; set; }
+        public Type WorkingFieldType { get; set; }
+        public string WorkingFieldName { get; set; }
+        public ScriptableObject[] WorkingArray { get; set; }
 
         public static void CreateNewEditor(GameDatabase workingDatabase, Type workingFieldType, string workingFieldName, ScriptableObject[] workingArray)
         {
             GameDataCreatorEditor window = GetWindow<GameDataCreatorEditor>();
-            window.workingDatabase = workingDatabase;
-            window.workingFieldType = workingFieldType;
-            window.workingFieldName = workingFieldName;
-            window.workingArray = workingArray;
+            window.WorkingDatabase = workingDatabase;
+            window.WorkingFieldType = workingFieldType;
+            window.WorkingFieldName = workingFieldName;
+            window.WorkingArray = workingArray;
         }
 
-        private Vector2 scrollViewPosition = Vector2.zero;
+        private Vector2 _scrollViewPosition = Vector2.zero;
 
         List<Type> FindTypes(string name)
         {
@@ -35,10 +35,10 @@ namespace MultiplayerARPG
                 Assembly asm = Assembly.Load(new AssemblyName(name));
 
                 // filter out all the ScriptableObject types
-                foreach (Type t in asm.GetTypes())
+                foreach (Type type in asm.GetTypes())
                 {
-                    if ((t == workingFieldType || t.IsSubclassOf(workingFieldType)) && !t.IsAbstract)
-                        types.Add(t);
+                    if ((type == WorkingFieldType || type.IsSubclassOf(WorkingFieldType)) && !type.IsAbstract)
+                        types.Add(type);
                 }
             }
             catch { }
@@ -49,29 +49,29 @@ namespace MultiplayerARPG
         void OnGUI()
         {
             GUILayout.Label("Select the type to create:");
-            scrollViewPosition = EditorGUILayout.BeginScrollView(scrollViewPosition, false, false);
-            foreach (string assemblyName in assemblyNames)
+            _scrollViewPosition = EditorGUILayout.BeginScrollView(_scrollViewPosition, false, false);
+            foreach (string assemblyName in AssemblyNames)
             {
-                foreach (Type t in FindTypes(assemblyName))
+                foreach (Type type in FindTypes(assemblyName))
                 {
-                    if (GUILayout.Button(t.FullName))
+                    if (GUILayout.Button(type.FullName))
                     {
                         // create the asset, select it, allow renaming, close
-                        ScriptableObject newData = CreateInstance(t);
-                        string savedPath = EditorUtility.SaveFilePanel("Save asset", "Assets", t.Name + ".asset", "asset");
+                        ScriptableObject newData = CreateInstance(type);
+                        string savedPath = EditorUtility.SaveFilePanel("Save asset", "Assets", type.Name + ".asset", "asset");
                         if (!string.IsNullOrEmpty(savedPath))
                         {
                             savedPath = savedPath.Substring(savedPath.IndexOf("Assets"));
                             AssetDatabase.CreateAsset(newData, savedPath);
-                            List<ScriptableObject> appending = new List<ScriptableObject>(workingArray);
+                            List<ScriptableObject> appending = new List<ScriptableObject>(WorkingArray);
                             appending.Add(AssetDatabase.LoadAssetAtPath<ScriptableObject>(savedPath));
-                            Array newArray = Array.CreateInstance(workingFieldType, appending.Count);
+                            Array newArray = Array.CreateInstance(WorkingFieldType, appending.Count);
                             for (int i = 0; i < newArray.Length; ++i)
                             {
                                 newArray.SetValue(appending[i], i);
                             }
-                            workingDatabase.GetType().GetField(workingFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(workingDatabase, newArray);
-                            EditorUtility.SetDirty(workingDatabase);
+                            WorkingDatabase.GetType().GetField(WorkingFieldName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic).SetValue(WorkingDatabase, newArray);
+                            EditorUtility.SetDirty(WorkingDatabase);
                             Close();
                         }
                     }
