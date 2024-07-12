@@ -8,7 +8,7 @@ using UnityEngine.AddressableAssets;
 
 namespace MultiplayerARPG
 {
-    public static class PatchDataUtils
+    public static class PatchDataManager
     {
         public const string KEY_PATCHING = "__PATCHING";
         public const string KEY_TYPE = "__TYPE";
@@ -18,7 +18,16 @@ namespace MultiplayerARPG
         /// <summary>
         /// Dictionary: [$"{TYPE}_{ID}, DATA]
         /// </summary>
-        public static readonly Dictionary<string, object> PatchingData = new Dictionary<string, object>();
+        public static readonly Dictionary<string, IPatchableData> PatchableData = new Dictionary<string, IPatchableData>();
+        /// <summary>
+        /// Dictionary: [$"{TYPE}_{ID}, DATA]
+        /// </summary>
+        public static readonly Dictionary<string, Dictionary<string, object>> PatchingData = new Dictionary<string, Dictionary<string, object>>();
+
+        public static string GetPatchKey(this IPatchableData patchableData)
+        {
+            return $"{patchableData.GetType().FullName}_{patchableData.Id}";
+        }
 
         public static bool HasAttribute<TAttributeType>(this FieldInfo field)
             where TAttributeType : System.Attribute

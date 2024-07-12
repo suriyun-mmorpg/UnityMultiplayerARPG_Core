@@ -138,12 +138,18 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            Debug.LogError($"Enabled {GetType()} {Id}");
+            string key = this.GetPatchKey();
+            if (PatchDataManager.PatchableData.TryAdd(key, this) &&
+                PatchDataManager.PatchingData.TryGetValue(key, out Dictionary<string, object> patch))
+            {
+                this.ApplyPatch(patch);
+            }
         }
 
         protected virtual void OnDisable()
         {
-            Debug.LogError($"Disabled {GetType()} {Id}");
+            string key = this.GetPatchKey();
+            PatchDataManager.PatchableData.Remove(key);
         }
 
 #if UNITY_EDITOR
