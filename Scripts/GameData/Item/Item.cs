@@ -96,20 +96,32 @@ namespace MultiplayerARPG
             addSpreadWhileAttackAndMoving = 20f,
         };
 
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
+        [AddressableAssetConversion(nameof(launchClipSettings), nameof(ConvertAudioClip))]
         public AudioClip launchClip;
+#endif
         public AudioClipWithVolumeSettings[] launchClipSettings = new AudioClipWithVolumeSettings[0];
 
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
+        [AddressableAssetConversion(nameof(reloadClipSettings), nameof(ConvertAudioClip))]
         public AudioClip reloadClip;
+#endif
         public AudioClipWithVolumeSettings[] reloadClipSettings = new AudioClipWithVolumeSettings[0];
 
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
+        [AddressableAssetConversion(nameof(reloadedClipSettings), nameof(ConvertAudioClip))]
         public AudioClip reloadedClip;
+#endif
         public AudioClipWithVolumeSettings[] reloadedClipSettings = new AudioClipWithVolumeSettings[0];
 
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
+        [AddressableAssetConversion(nameof(emptyClipSettings), nameof(ConvertAudioClip))]
         public AudioClip emptyClip;
+#endif
         public AudioClipWithVolumeSettings[] emptyClipSettings = new AudioClipWithVolumeSettings[0];
 
         [Header("Fire Configs")]
@@ -154,29 +166,23 @@ namespace MultiplayerARPG
         [Category(2, "Ammo Settings")]
         public AmmoType ammoType;
 
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
-        public UnityHelpBox buildingEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
-#endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(2, "Building Settings")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableBuildingEntity))]
         public BuildingEntity buildingEntity;
 #endif
         public AssetReferenceBuildingEntity addressableBuildingEntity;
 
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
-        public UnityHelpBox petEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
-#endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(2, "Pet Settings")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressablePetEntity))]
         public BaseMonsterCharacterEntity petEntity;
 #endif
         public AssetReferenceBaseMonsterCharacterEntity addressablePetEntity;
 
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
-        public UnityHelpBox mountEntityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
-#endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(2, "Mount Settings")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableMountEntity))]
         public VehicleEntity mountEntity;
 #endif
         public AssetReferenceVehicleEntity addressableMountEntity;
@@ -306,14 +312,14 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> cacheRequireAttributeAmounts;
+        private Dictionary<Attribute, float> _cacheRequireAttributeAmounts;
         public Dictionary<Attribute, float> RequireAttributeAmounts
         {
             get
             {
-                if (cacheRequireAttributeAmounts == null)
-                    cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
-                return cacheRequireAttributeAmounts;
+                if (_cacheRequireAttributeAmounts == null)
+                    _cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
+                return _cacheRequireAttributeAmounts;
             }
         }
 
@@ -788,6 +794,7 @@ namespace MultiplayerARPG
                 }.ToArray();
                 hasChanges = true;
             }
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
             if (MigrateAudioClips(ref launchClip, ref launchClipSettings))
                 hasChanges = true;
             if (MigrateAudioClips(ref reloadClip, ref reloadClipSettings))
@@ -796,6 +803,7 @@ namespace MultiplayerARPG
                 hasChanges = true;
             if (MigrateAudioClips(ref emptyClip, ref emptyClipSettings))
                 hasChanges = true;
+#endif
             if (increaseSkillLevels != null && increaseSkillLevels.Length > 0)
             {
                 List<SkillIncremental> skills = new List<SkillIncremental>();
@@ -855,7 +863,9 @@ namespace MultiplayerARPG
             {
                 clipSettings.Add(new AudioClipWithVolumeSettings()
                 {
+#if !EXCLUDE_PREFAB_REFS
                     audioClip = clips[i],
+#endif
                     minRandomVolume = 1f,
                     maxRandomVolume = 1f,
                 });
@@ -1101,6 +1111,11 @@ namespace MultiplayerARPG
                     return skillLevel.skill.IsChanneledAbility();
             }
             return false;
+        }
+
+        private void ConvertAudioClip(object audioClip, string aaVarName)
+        {
+            // TODO: Implement this
         }
     }
 }

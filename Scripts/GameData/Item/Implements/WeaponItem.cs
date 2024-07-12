@@ -214,10 +214,12 @@ namespace MultiplayerARPG
         }
 
         [HideInInspector]
+        [AddressableAssetConversion(nameof(launchClipSettings), nameof(ConvertAudioClip))]
         [SerializeField]
         private AudioClip launchClip = null;
 
         [HideInInspector]
+        [AddressableAssetConversion(nameof(launchClipSettings), nameof(ConvertAudioClips))]
         [SerializeField]
         private AudioClip[] launchClips = new AudioClip[0];
 
@@ -234,13 +236,17 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
+        [AddressableAssetConversion(nameof(reloadClipSettings), nameof(ConvertAudioClip))]
         [SerializeField]
         private AudioClip reloadClip = null;
 
         [HideInInspector]
+        [AddressableAssetConversion(nameof(reloadClipSettings), nameof(ConvertAudioClips))]
         [SerializeField]
         private AudioClip[] reloadClips = new AudioClip[0];
+#endif
 
         [SerializeField]
         private AudioClipWithVolumeSettings[] reloadClipSettings = new AudioClipWithVolumeSettings[0];
@@ -256,10 +262,12 @@ namespace MultiplayerARPG
         }
 
         [HideInInspector]
+        [AddressableAssetConversion(nameof(reloadedClipSettings), nameof(ConvertAudioClip))]
         [SerializeField]
         private AudioClip reloadedClip = null;
 
         [HideInInspector]
+        [AddressableAssetConversion(nameof(reloadedClipSettings), nameof(ConvertAudioClips))]
         [SerializeField]
         private AudioClip[] reloadedClips = new AudioClip[0];
 
@@ -277,10 +285,12 @@ namespace MultiplayerARPG
         }
 
         [HideInInspector]
+        [AddressableAssetConversion(nameof(emptyClipSettings), nameof(ConvertAudioClip))]
         [SerializeField]
         private AudioClip emptyClip = null;
 
         [HideInInspector]
+        [AddressableAssetConversion(nameof(emptyClipSettings), nameof(ConvertAudioClips))]
         [SerializeField]
         private AudioClip[] emptyClips = new AudioClip[0];
 
@@ -467,5 +477,15 @@ namespace MultiplayerARPG
             EditorUtility.SetDirty(this);
         }
 #endif
+
+        private void ConvertAudioClip(object audioClip, string aaVarName)
+        {
+            // TODO: Implement this
+        }
+
+        private void ConvertAudioClips(object audioClips, string aaVarName)
+        {
+            // TODO: Implement this
+        }
     }
 }
