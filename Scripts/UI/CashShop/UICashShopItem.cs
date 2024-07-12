@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -136,14 +137,7 @@ namespace MultiplayerARPG
                     Data == null || string.IsNullOrEmpty(Data.Description) ? BuildDescription() : Data.Description);
             }
 
-#if UNITY_EDITOR || !UNITY_SERVER
-            if (imageIcon != null)
-            {
-                Sprite iconSprite = Data == null || Data.Icon == null ? BuildIcon() : Data.Icon;
-                imageIcon.gameObject.SetActive(iconSprite != null);
-                imageIcon.sprite = iconSprite;
-            }
-#endif
+            imageIcon.SetImageGameDataIcon(Data);
 
 #if UNITY_EDITOR || !UNITY_SERVER
             if (rawImageExternalIcon != null)
@@ -245,20 +239,6 @@ namespace MultiplayerARPG
                     return ZString.Format(LanguageManager.GetText(UIFormatKeys.UI_FORMAT_GOLD.ToString()), Data.ReceiveGold.ToString("N0"));
             }
             return LanguageManager.GetUnknowTitle();
-        }
-
-        public Sprite BuildIcon()
-        {
-#if !UNITY_SERVER
-            if (Data != null)
-            {
-                if (Data.ReceiveItems.Length > 0)
-                    return Data.ReceiveItems[0].item.Icon;
-                if (Data.ReceiveCurrencies.Length > 0)
-                    return Data.ReceiveCurrencies[0].currency.Icon;
-            }
-#endif
-            return null;
         }
 
         IEnumerator LoadExternalIcon()

@@ -1,6 +1,5 @@
-﻿using System.Collections.Generic;
-using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
+﻿using Insthync.AddressableAssetTools;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -38,12 +37,10 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
-        public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
-#endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(3, "Building Settings")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableBuildingEntity))]
         private BuildingEntity buildingEntity = null;
 #endif
         public BuildingEntity BuildingEntity

@@ -468,6 +468,7 @@ namespace MultiplayerARPG
             weaponType.LanguageSpecificDescriptions = LanguageSpecificDescriptions;
             weaponType.Category = Category;
             weaponType.Icon = Icon;
+            weaponType.AddressableIcon = AddressableIcon;
 
             path = path.Substring(path.IndexOf("Assets"));
             AssetDatabase.DeleteAsset(path);

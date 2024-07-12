@@ -1,4 +1,5 @@
 using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -21,7 +22,10 @@ namespace MultiplayerARPG
         public string Title => source.Title;
         public string Description => source.Description;
 #if UNITY_EDITOR || !UNITY_SERVER
-        public Sprite Icon => source.Icon;
+        public async UniTask<Sprite> GetIcon()
+        {
+            return await source.GetIcon();
+        }
 #endif
 
         public bool IsValid()

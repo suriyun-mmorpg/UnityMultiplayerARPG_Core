@@ -33,19 +33,23 @@ namespace MultiplayerARPG
         [Category(2, "Skill Casting")]
         [Header("Casting Effects")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
         [AddressableAssetConversion(nameof(addressableSkillCastEffects))]
-        public GameEffect[] skillCastEffects = new GameEffect[0];
+        private GameEffect[] skillCastEffects = new GameEffect[0];
 #endif
-        public AssetReferenceGameEffect[] addressableSkillCastEffects = new AssetReferenceGameEffect[0];
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableSkillCastEffects = new AssetReferenceGameEffect[0];
         public IncrementalFloat castDuration;
         public bool canBeInterruptedWhileCasting;
 
         [Header("Casted Effects")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
         [AddressableAssetConversion(nameof(addressableSkillActivateEffects))]
-        public GameEffect[] skillActivateEffects = new GameEffect[0];
+        private GameEffect[] skillActivateEffects = new GameEffect[0];
 #endif
-        public AssetReferenceGameEffect[] addressableSkillActivateEffects = new AssetReferenceGameEffect[0];
+        [SerializeField]
+        private AssetReferenceGameEffect[] addressableSkillActivateEffects = new AssetReferenceGameEffect[0];
 
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup (Tools)")]

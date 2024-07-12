@@ -237,12 +237,7 @@ namespace MultiplayerARPG
             }
 
 #if UNITY_EDITOR || !UNITY_SERVER
-            if (imageIcon != null)
-            {
-                Sprite iconSprite = GuildSkill == null ? null : GuildSkill.Icon;
-                imageIcon.gameObject.SetActive(iconSprite != null);
-                imageIcon.sprite = iconSprite;
-            }
+            imageIcon.SetImageGameDataIcon(GuildSkill);
 #endif
 
             if (uiTextSkillType != null)

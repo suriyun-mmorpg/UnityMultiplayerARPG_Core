@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
 using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
+
 
 
 #if UNITY_EDITOR
@@ -80,22 +82,60 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR || !UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableIcon))]
         [PreviewSprite(50)]
         protected Sprite icon;
-        [SerializeField]
-        protected AssetReferenceSprite addressableIcon;
+#endif
         public Sprite Icon
         {
             get
             {
-                if (icon != null)
-                    return icon;
-                if (addressableIcon.IsDataValid())
-                    return addressableIcon.LoadAssetAsync<Sprite>().WaitForCompletion();
+#if !EXCLUDE_PREFAB_REFS
+                return icon;
+#else
                 return null;
+#endif
             }
-            set { icon = value; }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS
+                icon = value;
+#endif
+            }
+        }
+        
+        [SerializeField]
+        protected AssetReferenceSprite addressableIcon;
+        public AssetReferenceSprite AddressableIcon
+        {
+            get
+            {
+                return addressableIcon;
+            }
+            set
+            {
+                addressableIcon = value;
+            }
+        }
+
+        public async UniTask<Sprite> GetIcon()
+        {
+#if !EXCLUDE_PREFAB_REFS
+            if (icon != null)
+                return icon;
+#endif
+            if (addressableIcon.IsDataValid())
+                return await addressableIcon.LoadAssetAsync<Sprite>();
+            return null;
+        }
+
+        public void SetIcon(Sprite sprite)
+        {
+#if !EXCLUDE_PREFAB_REFS
+            icon = sprite;
+#endif
         }
 #endif
 

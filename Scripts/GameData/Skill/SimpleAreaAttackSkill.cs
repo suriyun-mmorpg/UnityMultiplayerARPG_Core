@@ -13,7 +13,29 @@ namespace MultiplayerARPG
             BasedOnWeapon,
         }
         [Category("Area Settings")]
-        public AreaDamageEntity areaDamageEntity;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
+        [AddressableAssetConversion(nameof(addressableAreaDamageEntity))]
+        private AreaDamageEntity areaDamageEntity;
+#endif
+        public AreaDamageEntity AreaDamageEntity
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return areaDamageEntity;
+#else
+                return null;
+#endif
+            }
+        }
+
+        [SerializeField]
+        private AssetReferenceAreaDamageEntity addressableAreaDamageEntity;
+        public AssetReferenceAreaDamageEntity AddressableAreaDamageEntity
+        {
+            get { return addressableAreaDamageEntity; }
+        }
 
         [Category(3, "Attacking")]
         public SkillAttackType skillAttackType;

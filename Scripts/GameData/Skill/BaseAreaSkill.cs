@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace MultiplayerARPG
 {
@@ -10,7 +11,29 @@ namespace MultiplayerARPG
         [Category(2, "Area Settings")]
         public IncrementalFloat areaDuration;
         public IncrementalFloat applyDuration;
-        public GameObject targetObjectPrefab;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
+        [AddressableAssetConversion(nameof(addressableTargetObjectPrefab))]
+        private GameObject targetObjectPrefab;
+#endif
+        public GameObject TargetObjectPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return targetObjectPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        [SerializeField]
+        private AssetReferenceGameObject addressableTargetObjectPrefab;
+        public AssetReferenceGameObject AddressableTargetObjectPrefab
+        {
+            get { return addressableTargetObjectPrefab; }
+        }
 
         public override SkillType SkillType
         {

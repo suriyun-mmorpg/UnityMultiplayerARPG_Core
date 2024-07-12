@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
@@ -17,12 +16,34 @@ namespace MultiplayerARPG
         [Tooltip("Turn it on to use instantiated object which is a child of character model")]
         [FormerlySerializedAs("useInstantiatedObject")]
         public bool useInstantiatedObject;
+
         [BoolShowConditional(nameof(useInstantiatedObject), false)]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
         [FormerlySerializedAs("model")]
+        [AddressableAssetConversion(nameof(addressableMeshPrefab))]
+        protected GameObject meshPrefab = null;
+#endif
+        public GameObject MeshPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return meshPrefab;
+#else
+                return null;
+#endif
+            }
+        }
+
+        [BoolShowConditional(nameof(useInstantiatedObject), false)]
         [SerializeField]
-        protected GameObject meshPrefab;
-        [SerializeField]
-        protected AssetReferenceGameObject addressableMeshPrefab;
+        protected AssetReferenceGameObject addressableMeshPrefab = null;
+        public AssetReferenceGameObject AddressableMeshPrefab
+        {
+            get { return addressableMeshPrefab; }
+        }
+
         [BoolShowConditional(nameof(useInstantiatedObject), true)]
         public int instantiatedObjectIndex;
         public byte priority;
@@ -60,7 +81,7 @@ namespace MultiplayerARPG
 
         public async UniTask<GameObject> GetMeshPrefab()
         {
-            return await addressableMeshPrefab.GetOrLoadAssetAsyncOrUsePrefab(meshPrefab);
+            return await AddressableMeshPrefab.GetOrLoadAssetAsyncOrUsePrefab(MeshPrefab);
         }
 
         public EquipmentModel SetMeshPrefab(GameObject meshPrefab)
@@ -77,7 +98,9 @@ namespace MultiplayerARPG
                 equipSocket = equipSocket,
                 // Prefab Settings
                 useInstantiatedObject = useInstantiatedObject,
+#if !EXCLUDE_PREFAB_REFS
                 meshPrefab = meshPrefab,
+#endif
                 addressableMeshPrefab = addressableMeshPrefab,
                 instantiatedObjectIndex = instantiatedObjectIndex,
                 priority = priority,

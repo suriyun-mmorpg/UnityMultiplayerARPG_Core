@@ -8,7 +8,29 @@ namespace MultiplayerARPG
     public partial class SimpleAreaBuffSkill : BaseAreaSkill
     {
         [Category("Area Settings")]
-        public AreaBuffEntity areaBuffEntity;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
+        [AddressableAssetConversion(nameof(addressableAreaBuffEntity))]
+        private AreaBuffEntity areaBuffEntity;
+#endif
+        public AreaBuffEntity AreaBuffEntity
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return areaBuffEntity;
+#else
+                return null;
+#endif
+            }
+        }
+
+        [SerializeField]
+        private AssetReferenceAreaBuffEntity addressableAreaBuffEntity;
+        public AssetReferenceAreaBuffEntity AddressableAreaBuffEntity
+        {
+            get { return addressableAreaBuffEntity; }
+        }
 
         [Category(3, "Buff")]
         public Buff buff;

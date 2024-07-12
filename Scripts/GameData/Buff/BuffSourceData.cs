@@ -1,4 +1,5 @@
 using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -30,14 +31,11 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR || !UNITY_SERVER
-        public Sprite Icon
+        public async UniTask<Sprite> GetIcon()
         {
-            get
-            {
-                if (data == null)
-                    return null;
-                return data.Icon;
-            }
+            if (data == null)
+                return null;
+            return await data.GetIcon();
         }
 #endif
 

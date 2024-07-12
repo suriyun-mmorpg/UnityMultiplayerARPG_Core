@@ -138,10 +138,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(formatKeyAmount),
                 tempElement.Title,
                 zeroFormatRate));
-#if UNITY_EDITOR || !UNITY_SERVER
-            if (componentPair.imageIcon != null)
-                componentPair.imageIcon.sprite = tempElement.Icon;
-#endif
+            componentPair.imageIcon.SetImageGameDataIcon(tempElement);
         }
 
         private void UpdateList()

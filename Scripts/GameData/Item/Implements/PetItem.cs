@@ -36,12 +36,10 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
-        public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
-#endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category(3, "Pet Settings")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressablePetEntity))]
         private BaseMonsterCharacterEntity petEntity = null;
 #endif
         public BaseMonsterCharacterEntity MonsterCharacterEntity

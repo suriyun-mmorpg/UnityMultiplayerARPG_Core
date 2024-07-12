@@ -91,6 +91,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !UNITY_SERVER
             icon = item.Icon;
 #endif
+            addressableIcon = item.AddressableIcon;
             sellPriceCash = generatingData.sellPriceCash;
             sellPriceGold = generatingData.sellPriceGold;
             receiveItems = new ItemAmount[]

@@ -282,14 +282,7 @@ namespace MultiplayerARPG
                     Level.ToString("N0"));
             }
 
-#if UNITY_EDITOR || !UNITY_SERVER
-            if (imageIcon != null)
-            {
-                Sprite iconSprite = Skill == null ? null : Skill.Icon;
-                imageIcon.gameObject.SetActive(iconSprite != null);
-                imageIcon.sprite = iconSprite;
-            }
-#endif
+            imageIcon.SetImageGameDataIcon(Skill);
 
             if (uiTextSkillType != null)
             {

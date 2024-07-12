@@ -44,9 +44,9 @@ namespace MultiplayerARPG
             }
         }
 
-        private void ConvertDefaultEffectPrefab(object convertingObject, string varName)
+        private void ConvertDefaultEffectPrefab(object defaultEffect, string aaVarName)
         {
-            Migrate();
+            // TODO: Implement this
         }
 
         public bool TryGetEffect(string tag, out ImpactEffect effect)

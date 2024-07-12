@@ -21,12 +21,12 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillAttackType));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillBuffType));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.moveSpeedRateWhileUsingSkill));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillCastEffects));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.addressableSkillCastEffects));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), "skillCastEffects");
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), "addressableSkillCastEffects");
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.castDuration));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.canBeInterruptedWhileCasting));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillActivateEffects));
-            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.addressableSkillActivateEffects));
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), "skillActivateEffects");
+            ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), "addressableSkillActivateEffects");
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireShield));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableWeapons));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableArmors));

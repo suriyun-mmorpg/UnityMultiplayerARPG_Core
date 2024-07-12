@@ -1,3 +1,4 @@
+using Insthync.AddressableAssetTools;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -16,16 +17,25 @@ namespace MultiplayerARPG
         private bool _beginDragged;
         private GameObject _targetObject;
 
+        private async void InstantiateTargetObject(BaseAreaSkill skill)
+        {
+            if (_targetObject != null)
+                Destroy(_targetObject);
+            GameObject prefab = await skill.AddressableTargetObjectPrefab.GetOrLoadAssetAsyncOrUsePrefab(skill.TargetObjectPrefab);
+            if (prefab != null)
+            {
+                _targetObject = Instantiate(prefab);
+                _targetObject.SetActive(true);
+            }
+        }
+
         public AimPosition UpdateAimControls(Vector2 aimAxes, BaseAreaSkill skill, int skillLevel)
         {
             _lastUpdateFrame = Time.frameCount;
-            if (!_beginDragged && skill.targetObjectPrefab != null)
+            if (!_beginDragged)
             {
                 _beginDragged = true;
-                if (_targetObject != null)
-                    Destroy(_targetObject);
-                _targetObject = Instantiate(skill.targetObjectPrefab);
-                _targetObject.SetActive(true);
+                InstantiateTargetObject(skill);
             }
             if (GameInstance.UseMobileInput())
                 return UpdateAimControls_Mobile(aimAxes, skill, skillLevel);

@@ -121,14 +121,7 @@ namespace MultiplayerARPG
                     !_tempSummonData ? LanguageManager.GetUnknowTitle() : _tempSummonData.Title);
             }
 
-#if UNITY_EDITOR || !UNITY_SERVER
-            if (imageIcon != null)
-            {
-                Sprite iconSprite = !_tempSummonData ? null : _tempSummonData.Icon;
-                imageIcon.gameObject.SetActive(iconSprite);
-                imageIcon.sprite = iconSprite;
-            }
-#endif
+            imageIcon.SetImageGameDataIcon(_tempSummonData);
 
             if (uiCharacter != null)
             {
