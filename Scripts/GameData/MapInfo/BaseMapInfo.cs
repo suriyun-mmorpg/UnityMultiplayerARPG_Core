@@ -1,8 +1,10 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -152,9 +154,54 @@ namespace MultiplayerARPG
 
         #region Minimap Settings
         [Category("Minimap Settings")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableMinimapSprite))]
+        [PreviewSprite(50)]
         [SerializeField]
         private Sprite minimapSprite;
-        public Sprite MinimapSprite { get { return minimapSprite; } set { minimapSprite = value; } }
+#endif
+        public Sprite MinimapSprite
+        {
+            private get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return minimapSprite;
+#else
+                return null;
+#endif
+            }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS
+                minimapSprite = value;
+#endif
+            }
+        }
+
+        [SerializeField]
+        protected AssetReferenceSprite addressableMinimapSprite;
+        public AssetReferenceSprite AddressableMinimapSprite
+        {
+            get
+            {
+                return addressableMinimapSprite;
+            }
+            set
+            {
+                addressableMinimapSprite = value;
+            }
+        }
+
+        public async UniTask<Sprite> GetMinimapSprite()
+        {
+#if !EXCLUDE_PREFAB_REFS
+            if (minimapSprite != null)
+                return minimapSprite;
+#endif
+            if (addressableMinimapSprite.IsDataValid())
+                return await addressableMinimapSprite.LoadAssetAsync<Sprite>();
+            return null;
+        }
 
         [SerializeField]
         private Vector3 minimapPosition;

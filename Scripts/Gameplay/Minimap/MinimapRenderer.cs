@@ -35,7 +35,11 @@ namespace MultiplayerARPG
             if (mapInfo == null || mapInfo == _currentMapInfo)
                 return;
             _currentMapInfo = mapInfo;
+            UpdateMinimap();
+        }
 
+        private async void UpdateMinimap()
+        {
             // Use bounds size to calculate transforms
             float boundsWidth = _currentMapInfo.MinimapBoundsWidth;
             float boundsLength = _currentMapInfo.MinimapBoundsLength;
@@ -57,7 +61,10 @@ namespace MultiplayerARPG
                         _spriteRenderer.transform.eulerAngles = new Vector3(90f, 0f, 0f);
                         break;
                 }
-                _spriteRenderer.sprite = _currentMapInfo.MinimapSprite != null ? _currentMapInfo.MinimapSprite : noMinimapSprite;
+                Sprite minimapSprite = await _currentMapInfo.GetMinimapSprite();
+                if (minimapSprite == null)
+                    minimapSprite = noMinimapSprite;
+                _spriteRenderer.sprite = minimapSprite;
                 if (_spriteRenderer.sprite != null)
                     _spriteRenderer.transform.localScale = new Vector3(1f, 1f) * maxBoundsSize * _spriteRenderer.sprite.pixelsPerUnit / Mathf.Max(_spriteRenderer.sprite.texture.width, _spriteRenderer.sprite.texture.height);
             }

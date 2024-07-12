@@ -66,7 +66,11 @@ namespace MultiplayerARPG
                 return;
             }
             _currentMapInfo = mapInfo;
+            UpdateMinimap();
+        }
 
+        private async void UpdateMinimap()
+        {
             // Use bounds size to calculate transforms
             float boundsWidth = _currentMapInfo.MinimapBoundsWidth;
             float boundsLength = _currentMapInfo.MinimapBoundsLength;
@@ -77,7 +81,7 @@ namespace MultiplayerARPG
 
             if (imageMinimap != null)
             {
-                imageMinimap.sprite = _currentMapInfo.MinimapSprite;
+                imageMinimap.sprite = await _currentMapInfo.GetMinimapSprite();
                 if (!imageMinimap.gameObject.activeSelf)
                     imageMinimap.gameObject.SetActive(true);
 
