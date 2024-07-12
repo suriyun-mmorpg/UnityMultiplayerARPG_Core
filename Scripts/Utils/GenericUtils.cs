@@ -657,6 +657,12 @@ public static partial class GenericUtils
         return field.GetCustomAttributes(typeof(TAttributeType), inherit).Length > 0;
     }
 
+    public static bool HasAttribute<TAttributeType>(this System.Type type, bool inherit = false)
+        where TAttributeType : System.Attribute
+    {
+        return type.GetCustomAttributes(typeof(TAttributeType), inherit).Length > 0;
+    }
+
     public static bool HasInterface<TInterfaceType>(this System.Type type)
     {
         foreach (System.Type interfaceType in type.GetInterfaces())
