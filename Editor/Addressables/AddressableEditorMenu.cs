@@ -126,6 +126,8 @@ namespace MultiplayerARPG
                 {
                     if (!type.IsSubclassOf(typeof(BaseGameData)))
                         continue;
+                    if (type.HasAttribute<NotConvertibleAttribute>())
+                        continue;
                     LogUnconvertibleFields(loggedTypes, type);
                 }
             }
@@ -153,7 +155,7 @@ namespace MultiplayerARPG
                 {
                     isRemoving = true;
                 }
-                if (fields[i].HasAttribute<AddressableAssetConversionAttribute>())
+                if (fields[i].HasAttribute<AddressableAssetConversionAttribute>() || fields[i].HasAttribute<NotConvertibleAttribute>())
                 {
                     isRemoving = true;
                 }
