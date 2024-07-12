@@ -1,12 +1,13 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.UI;
+﻿using Cysharp.Text;
 using TMPro;
-using UnityEngine.EventSystems;
-using Cysharp.Text;
+using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
+using UnityEngine;
+using UnityEngine.EventSystems;
+using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public static partial class GenericUtils
 {
@@ -648,5 +649,50 @@ public static partial class GenericUtils
             adjustedMinSize,
             adjustedMaxSize,
             SizeSuffixes[mag]);
+    }
+
+    public static bool HasAttribute<TAttributeType>(this FieldInfo field)
+        where TAttributeType : System.Attribute
+    {
+        foreach (System.Attribute attr in field.GetCustomAttributes())
+        {
+            if (attr.GetType() == typeof(TAttributeType))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static bool HasInterface<TInterfaceType>(this System.Type type)
+    {
+        foreach (System.Type interfaceType in type.GetInterfaces())
+        {
+            if (interfaceType == typeof(TInterfaceType))
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static bool IsListOrArray(this System.Type type, out System.Type itemType)
+    {
+        if (type.IsArray)
+        {
+            itemType = type.GetElementType();
+            return true;
+        }
+        foreach (System.Type interfaceType in type.GetInterfaces())
+        {
+            if (interfaceType.IsGenericType &&
+                interfaceType.GetGenericTypeDefinition() == typeof(IList<>))
+            {
+                itemType = type.GetGenericArguments()[0];
+                return true;
+            }
+        }
+        itemType = null;
+        return false;
     }
 }

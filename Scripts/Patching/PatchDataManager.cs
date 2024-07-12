@@ -29,51 +29,6 @@ namespace MultiplayerARPG
             return $"{patchableData.GetType().FullName}_{patchableData.Id}";
         }
 
-        public static bool HasAttribute<TAttributeType>(this FieldInfo field)
-            where TAttributeType : System.Attribute
-        {
-            foreach (System.Attribute attr in field.GetCustomAttributes())
-            {
-                if (attr.GetType() == typeof(TAttributeType))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static bool HasInterface<TInterfaceType>(this Type type)
-        {
-            foreach (Type interfaceType in type.GetInterfaces())
-            {
-                if (interfaceType == typeof(TInterfaceType))
-                {
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        public static bool IsListOrArray(this Type type, out Type itemType)
-        {
-            if (type.IsArray)
-            {
-                itemType = type.GetElementType();
-                return true;
-            }
-            foreach (Type interfaceType in type.GetInterfaces())
-            {
-                if (interfaceType.IsGenericType &&
-                    interfaceType.GetGenericTypeDefinition() == typeof(IList<>))
-                {
-                    itemType = type.GetGenericArguments()[0];
-                    return true;
-                }
-            }
-            itemType = null;
-            return false;
-        }
-
         public static Dictionary<string, object> GetExportDataForPatching(this IPatchableData target)
         {
             if (target == null)
