@@ -15,12 +15,14 @@ namespace MultiplayerARPG
             NpcDialog node = target as NpcDialog;
             NodeEditorGUILayout.PortField(target.GetInputPort(nameof(node.input)));
             EditorGUILayout.Space();
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.title)));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.titles)), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.description)));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.descriptions)), true);
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.icon)));
-            EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.voice)));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("title"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("titles"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("description"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("descriptions"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("icon"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("addressableIcon"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("voice"));
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("addressableVoice"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.type)));
             switch (node.type)
             {

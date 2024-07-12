@@ -113,21 +113,9 @@ namespace MultiplayerARPG
                     Data == null ? LanguageManager.GetUnknowDescription() : Data.Description));
             }
 
-            if (imageIcon != null)
-            {
-                Sprite iconSprite = Data == null ? null : Data.Icon;
-                imageIcon.gameObject.SetActive(iconSprite != null);
-                imageIcon.sprite = iconSprite;
-            }
+            imageIcon.SetImageNpcDialogIcon(Data);
 
-            if (voiceSource != null)
-            {
-                voiceSource.Stop();
-                AudioClip clip = Data == null ? null : Data.Voice;
-                voiceSource.clip = clip;
-                if (clip != null && enabled)
-                    voiceSource.Play();
-            }
+            voiceSource.PlayNpcDialogVoice(this, Data);
 
             _lastData = Data;
             if (_lastData != null)

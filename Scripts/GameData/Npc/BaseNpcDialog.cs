@@ -1,7 +1,10 @@
-﻿using UnityEngine;
-using XNode;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
+using UnityEngine;
+using XNode;
+using UnityEngine.AddressableAssets;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,19 +17,115 @@ namespace MultiplayerARPG
         public BaseNpcDialog input;
         [Header("NPC Dialog Configs")]
         [Tooltip("Default title")]
-        public string title;
+        [SerializeField]
+        protected string title;
+
         [Tooltip("Titles by language keys")]
-        public LanguageData[] titles = new LanguageData[0];
+        [SerializeField]
+        protected LanguageData[] titles = new LanguageData[0];
+
         [Tooltip("Default description")]
         [TextArea]
-        public string description;
+        [SerializeField]
+        protected string description;
+
         [Tooltip("Descriptions by language keys")]
-        public LanguageData[] descriptions = new LanguageData[0];
-        public Sprite icon;
-        public AudioClip voice;
+        [SerializeField]
+        protected LanguageData[] descriptions = new LanguageData[0];
+
+#if UNITY_EDITOR || !UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [PreviewSprite(50)]
+        [AddressableAssetConversion(nameof(addressableIcon))]
+        [SerializeField]
+        protected Sprite icon;
+#endif
+        public Sprite Icon
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return icon;
+#else
+                return null;
+#endif
+            }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS
+                icon = value;
+#endif
+            }
+        }
+
+        [SerializeField]
+        protected AssetReferenceSprite addressableIcon;
+        public AssetReferenceSprite AddressableIcon
+        {
+            get
+            {
+                return addressableIcon;
+            }
+            set
+            {
+                addressableIcon = value;
+            }
+        }
+
+        public async UniTask<Sprite> GetIcon()
+        {
+            return await AddressableIcon.GetOrLoadObjectAsyncOrUseAsset(Icon);
+        }
+#endif
+
+#if UNITY_EDITOR || !UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableVoice))]
+        [SerializeField]
+        protected AudioClip voice;
+#endif
+        public AudioClip Voice
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return voice;
+#else
+                return null;
+#endif
+            }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS
+                voice = value;
+#endif
+            }
+        }
+
+        [SerializeField]
+        protected AssetReferenceAudioClip addressableVoice;
+        public AssetReferenceAudioClip AddressableVoice
+        {
+            get
+            {
+                return addressableVoice;
+            }
+            set
+            {
+                addressableVoice = value;
+            }
+        }
+
+        public async UniTask<AudioClip> GetVoice()
+        {
+            return await AddressableVoice.GetOrLoadObjectAsyncOrUseAsset(Voice);
+        }
+#endif
+
         [HideInInspector]
         public BaseNpcDialogAction enterDialogActionOnClient;
         public List<BaseNpcDialogAction> enterDialogActionsOnClient = new List<BaseNpcDialogAction>();
+
         [HideInInspector]
         public BaseNpcDialogAction enterDialogActionOnServer;
         public List<BaseNpcDialogAction> enterDialogActionsOnServer = new List<BaseNpcDialogAction>();
@@ -44,16 +143,6 @@ namespace MultiplayerARPG
         public string Description
         {
             get { return Language.GetText(descriptions, description); }
-        }
-
-        public Sprite Icon
-        {
-            get { return icon; }
-        }
-
-        public AudioClip Voice
-        {
-            get { return voice; }
         }
 
         public List<BaseNpcDialogAction> EnterDialogActionsOnClient

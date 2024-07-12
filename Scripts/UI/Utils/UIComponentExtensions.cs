@@ -1,5 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -16,12 +15,31 @@ namespace MultiplayerARPG
 #endif
         }
 
+        public static async void SetImageNpcDialogIcon(this Image image, BaseNpcDialog npcDialog, bool deactivateIfNotSprite = true)
+        {
+#if UNITY_EDITOR || !UNITY_SERVER
+            Sprite sprite = null;
+            if (npcDialog)
+                sprite = await npcDialog.GetIcon();
+            image.SetImageSprite(sprite, deactivateIfNotSprite);
+#endif
+        }
+
         public static void SetImageSprite(this Image image, Sprite sprite, bool deactivateIfNotSprite = true)
         {
             if (!image)
                 return;
             image.gameObject.SetActive(!deactivateIfNotSprite || sprite != null);
             image.sprite = sprite;
+        }
+
+        public static async void PlayNpcDialogVoice(this AudioSource source, MonoBehaviour uiRoot, BaseNpcDialog npcDialog)
+        {
+            source.Stop();
+            AudioClip clip = await npcDialog.GetVoice();
+            source.clip = clip;
+            if (clip != null && uiRoot.enabled)
+                source.Play();
         }
     }
 }
