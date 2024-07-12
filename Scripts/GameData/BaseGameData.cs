@@ -131,14 +131,6 @@ namespace MultiplayerARPG
             return null;
         }
 
-        public void SetIcon(Sprite sprite)
-        {
-#if !EXCLUDE_PREFAB_REFS
-            icon = sprite;
-#endif
-        }
-#endif
-
         [NonSerialized]
         protected int? dataId;
         public int DataId
