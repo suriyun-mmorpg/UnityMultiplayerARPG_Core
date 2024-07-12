@@ -3,7 +3,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [NotConvertible]
+    [NotPatchable]
     [CreateAssetMenu(fileName = GameDataMenuConsts.ZOOM_WEAPON_ABILITY_FILE, menuName = GameDataMenuConsts.ZOOM_WEAPON_ABILITY_MENU, order = GameDataMenuConsts.ZOOM_WEAPON_ABILITY_ORDER)]
     public class ZoomWeaponAbility : BaseWeaponAbility
     {

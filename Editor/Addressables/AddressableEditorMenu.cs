@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                 {
                     if (!type.IsSubclassOf(typeof(BaseGameData)))
                         continue;
-                    if (type.HasAttribute<NotConvertibleAttribute>())
+                    if (type.HasAttribute<NotPatchableAttribute>())
                         continue;
                     LogUnconvertibleFields(loggedTypes, type);
                 }
@@ -155,7 +155,7 @@ namespace MultiplayerARPG
                 {
                     isRemoving = true;
                 }
-                if (fields[i].HasAttribute<AddressableAssetConversionAttribute>() || fields[i].HasAttribute<NotConvertibleAttribute>())
+                if (fields[i].HasAttribute<AddressableAssetConversionAttribute>() || fields[i].HasAttribute<NotPatchableAttribute>())
                 {
                     isRemoving = true;
                 }
