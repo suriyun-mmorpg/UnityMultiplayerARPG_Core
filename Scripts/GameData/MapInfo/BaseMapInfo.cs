@@ -155,8 +155,8 @@ namespace MultiplayerARPG
         #region Minimap Settings
         [Category("Minimap Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        [AddressableAssetConversion(nameof(addressableMinimapSprite))]
         [PreviewSprite(50)]
+        [AddressableAssetConversion(nameof(addressableMinimapSprite))]
         [SerializeField]
         private Sprite minimapSprite;
 #endif

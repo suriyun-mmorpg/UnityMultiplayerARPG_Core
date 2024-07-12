@@ -83,9 +83,9 @@ namespace MultiplayerARPG
 
 #if UNITY_EDITOR || !UNITY_SERVER
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        [SerializeField]
-        [AddressableAssetConversion(nameof(addressableIcon))]
         [PreviewSprite(50)]
+        [AddressableAssetConversion(nameof(addressableIcon))]
+        [SerializeField]
         protected Sprite icon;
 #endif
         public Sprite Icon
@@ -122,13 +122,7 @@ namespace MultiplayerARPG
 
         public async UniTask<Sprite> GetIcon()
         {
-#if !EXCLUDE_PREFAB_REFS
-            if (icon != null)
-                return icon;
-#endif
-            if (addressableIcon.IsDataValid())
-                return await addressableIcon.LoadAssetAsync<Sprite>();
-            return null;
+            return await AddressableIcon.GetOrLoadObjectAsyncOrUseAsset(Icon);
         }
 #endif
 
