@@ -29,12 +29,20 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("itemTitle")]
         [SerializeField]
         protected string entityTitle;
+        public string EntityTitleSetting
+        {
+            get { return entityTitle; }
+        }
 
         [Tooltip("Titles by language keys")]
         [FormerlySerializedAs("characterTitles")]
         [FormerlySerializedAs("itemTitles")]
         [SerializeField]
         protected LanguageData[] entityTitles;
+        public LanguageData[] EntityTitlesSetting
+        {
+            get { return entityTitles; }
+        }
 
         [Category(100, "Sync Fields", false)]
         [SerializeField]
