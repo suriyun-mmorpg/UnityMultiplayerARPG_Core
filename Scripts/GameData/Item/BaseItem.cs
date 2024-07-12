@@ -39,6 +39,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !UNITY_SERVER
         [Category(10, "In-Scene Objects/Appearance")]
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableDropModel))]
         protected GameObject dropModel = null;
         [SerializeField]
         protected AssetReferenceGameObject addressableDropModel;

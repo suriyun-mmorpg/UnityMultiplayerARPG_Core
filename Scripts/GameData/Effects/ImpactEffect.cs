@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     {
         public UnityTag tag;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableEffect))]
         public GameEffect effect;
 #endif
         public AssetReferenceGameEffect addressableEffect;

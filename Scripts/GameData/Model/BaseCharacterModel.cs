@@ -743,8 +743,10 @@ namespace MultiplayerARPG
                     if (!_tempCachedKeys.Contains(tempKey))
                     {
                         // If old buffs not contains this buff, add this buff effect
-                        InstantiateBuffEffect(tempKey, buffData.effects);
-                        InstantiateBuffEffect(tempKey, buffData.addressableEffects).Forget();
+#if !EXCLUDE_PREFAB_REFS
+                        InstantiateBuffEffect(tempKey, buffData.Effects);
+#endif
+                        InstantiateBuffEffect(tempKey, buffData.AddressableEffects).Forget();
                         _tempCachedKeys.Add(tempKey);
                     }
                     _tempAddingKeys.Add(tempKey);
@@ -755,7 +757,9 @@ namespace MultiplayerARPG
                             tempKey = nameof(AilmentPresets.Stun);
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
+#if !EXCLUDE_PREFAB_REFS
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.StunEffects);
+#endif
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableStunEffects).Forget();
                                 _tempCachedKeys.Add(tempKey);
                             }
@@ -765,7 +769,9 @@ namespace MultiplayerARPG
                             tempKey = nameof(AilmentPresets.Mute);
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
+#if !EXCLUDE_PREFAB_REFS
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.MuteEffects);
+#endif
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableMuteEffects).Forget();
                                 _tempCachedKeys.Add(tempKey);
                             }
@@ -775,7 +781,9 @@ namespace MultiplayerARPG
                             tempKey = nameof(AilmentPresets.Freeze);
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
+#if !EXCLUDE_PREFAB_REFS
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.FreezeEffects);
+#endif
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableFreezeEffects).Forget();
                                 _tempCachedKeys.Add(tempKey);
                             }

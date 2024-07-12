@@ -374,7 +374,7 @@ namespace MultiplayerARPG
             ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
         }
 
-        protected virtual void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition)
+        protected virtual async void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition)
         {
             if (triggerIndex >= damageAmounts.Count)
             {
@@ -394,7 +394,7 @@ namespace MultiplayerARPG
             // Make sure it won't increase damage to the wrong collction
             for (byte spreadIndex = 0; spreadIndex < fireSpreadAmount + 1; ++spreadIndex)
             {
-                damageInfo.LaunchDamageEntity(
+                await damageInfo.LaunchDamageEntity(
                     Entity,
                     isLeftHand,
                     weapon,

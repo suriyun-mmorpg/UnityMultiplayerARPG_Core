@@ -113,8 +113,28 @@ namespace MultiplayerARPG
         [Tooltip("Max stack to applies buff, it won't be used while `isExtendDuration` is `TRUE`")]
         public IncrementalInt maxStack;
         [Tooltip("Game effects which appearing on character while applied. This won't be applied to monster's summoner.")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableEffects))]
         public GameEffect[] effects;
-        public AssetReferenceGameEffect[] addressableEffects; 
+#endif
+        public AssetReferenceGameEffect[] addressableEffects;
+
+        public GameEffect[] Effects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return effects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
+        }
+
+        public AssetReferenceGameEffect[] AddressableEffects
+        {
+            get { return addressableEffects; }
+        }
 
         public void PrepareRelatesData()
         {

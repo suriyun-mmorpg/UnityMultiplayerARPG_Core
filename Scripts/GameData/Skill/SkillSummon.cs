@@ -10,6 +10,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableMonsterCharacterEntity))]
         [FormerlySerializedAs("monsterEntity")]
         private BaseMonsterCharacterEntity monsterCharacterEntity;
 #endif

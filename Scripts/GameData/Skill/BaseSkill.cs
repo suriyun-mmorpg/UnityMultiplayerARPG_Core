@@ -32,13 +32,19 @@ namespace MultiplayerARPG
 
         [Category(2, "Skill Casting")]
         [Header("Casting Effects")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableSkillCastEffects))]
         public GameEffect[] skillCastEffects = new GameEffect[0];
+#endif
         public AssetReferenceGameEffect[] addressableSkillCastEffects = new AssetReferenceGameEffect[0];
         public IncrementalFloat castDuration;
         public bool canBeInterruptedWhileCasting;
 
         [Header("Casted Effects")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableSkillActivateEffects))]
         public GameEffect[] skillActivateEffects = new GameEffect[0];
+#endif
         public AssetReferenceGameEffect[] addressableSkillActivateEffects = new AssetReferenceGameEffect[0];
 
         [Category(11, "Requirement")]
@@ -253,12 +259,12 @@ namespace MultiplayerARPG
             GameInstance.AddPoolingObjects(skillActivateEffects);
             if (TryGetBuff(out Buff buff))
             {
-                GameInstance.AddPoolingObjects(buff.effects);
+                GameInstance.AddPoolingObjects(buff.Effects);
                 buff.PrepareRelatesData();
             }
             if (TryGetDebuff(out Buff debuff))
             {
-                GameInstance.AddPoolingObjects(debuff.effects);
+                GameInstance.AddPoolingObjects(debuff.Effects);
                 debuff.PrepareRelatesData();
             }
             if (TryGetSummon(out SkillSummon summon))
@@ -293,7 +299,14 @@ namespace MultiplayerARPG
 
         public GameEffect[] SkillCastEffects
         {
-            get { return skillCastEffects; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return skillCastEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
         }
 
         public AssetReferenceGameEffect[] AddressableSkillCastEffects
@@ -308,7 +321,14 @@ namespace MultiplayerARPG
 
         public GameEffect[] SkillActivateEffects
         {
-            get { return skillActivateEffects; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return skillActivateEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
         }
 
         public AssetReferenceGameEffect[] AddressableSkillActivateEffects

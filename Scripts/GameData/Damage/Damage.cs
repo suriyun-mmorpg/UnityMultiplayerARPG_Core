@@ -36,6 +36,7 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile), nameof(DamageType.Raycast) })]
         public float missileSpeed;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableMissileDamageEntity))]
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile) })]
         public MissileDamageEntity missileDamageEntity;
 #endif
@@ -43,6 +44,7 @@ namespace MultiplayerARPG
         public AssetReferenceMissileDamageEntity addressableMissileDamageEntity;
 
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableProjectEffect))]
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public ProjectileEffect projectileEffect;
 #endif
@@ -58,6 +60,7 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
         public float throwableLifeTime;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableThrowableDamageEntity))]
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
         public ThrowableDamageEntity throwableDamageEntity;
 #endif

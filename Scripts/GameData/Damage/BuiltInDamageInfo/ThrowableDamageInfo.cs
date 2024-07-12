@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public float throwForce;
         public float throwableLifeTime;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableThrowableDamageEntity))]
         public ThrowableDamageEntity throwableDamageEntity;
 #endif
         public ThrowableDamageEntity ThrowableDamageEntity

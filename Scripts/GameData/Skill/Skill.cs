@@ -48,7 +48,10 @@ namespace MultiplayerARPG
         public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableDamageHitEffects))]
         public GameEffect[] damageHitEffects = new GameEffect[0];
+#endif
         public AssetReferenceGameEffect[] addressableDamageHitEffects = new AssetReferenceGameEffect[0];
 
         [Category(4, "Buff")]
@@ -78,7 +81,11 @@ namespace MultiplayerARPG
         {
             get
             {
+#if !EXCLUDE_PREFAB_REFS
                 return damageHitEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
             }
         }
 
@@ -90,7 +97,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void ApplySkillImplement(
+        protected override async void ApplySkillImplement(
             BaseCharacterEntity skillUser,
             int skillLevel,
             bool isLeftHand,
@@ -112,7 +119,7 @@ namespace MultiplayerARPG
             if (IsAttack && TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
             {
                 // Launch damage entity to apply damage to other characters
-                damageInfo.LaunchDamageEntity(
+                await damageInfo.LaunchDamageEntity(
                     skillUser,
                     isLeftHand,
                     weapon,

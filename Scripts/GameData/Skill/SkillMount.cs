@@ -9,6 +9,7 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("Leave `Mount Entity` to NULL to not summon mount entity")]
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableMountEntity))]
         private VehicleEntity mountEntity;
 #endif
         public VehicleEntity MountEntity

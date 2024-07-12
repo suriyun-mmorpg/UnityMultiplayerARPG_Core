@@ -28,7 +28,10 @@ namespace MultiplayerARPG
         public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableDamageHitEffects))]
         public GameEffect[] damageHitEffects = new GameEffect[0];
+#endif
         public AssetReferenceGameEffect[] addressableDamageHitEffects = new AssetReferenceGameEffect[0];
 
         [Category(4, "Warp Settings")]
@@ -50,7 +53,11 @@ namespace MultiplayerARPG
         {
             get
             {
+#if !EXCLUDE_PREFAB_REFS
                 return damageHitEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
             }
         }
 

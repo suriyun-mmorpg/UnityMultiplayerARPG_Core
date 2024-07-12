@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public float missileDistance;
         public float missileSpeed;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableProjectEffect))]
         public ProjectileEffect projectileEffect;
 #endif
         public ProjectileEffect ProjectileEffect

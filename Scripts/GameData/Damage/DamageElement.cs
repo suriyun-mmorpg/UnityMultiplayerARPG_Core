@@ -36,11 +36,21 @@ namespace MultiplayerARPG
             get { return maxResistanceAmount; }
         }
 
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableDamageHitEffects))]
         private GameEffect[] damageHitEffects = new GameEffect[0];
+#endif
         public GameEffect[] DamageHitEffects
         {
-            get { return damageHitEffects; }
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return damageHitEffects;
+#else
+                return System.Array.Empty<GameEffect>();
+#endif
+            }
         }
 
         [SerializeField]
