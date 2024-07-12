@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                         continue;
                     if (type.HasAttribute<NotPatchableAttribute>())
                         continue;
-                    LogUnconvertibleFields(loggedTypes, type);
+                    LogUnconvertibleFields(loggedTypes, type.FullName, type);
                 }
             }
             catch (System.Exception ex)
@@ -138,7 +138,7 @@ namespace MultiplayerARPG
             Debug.Log("--- Log End ---");
         }
 
-        static void LogUnconvertibleFields(HashSet<object> loggedTypes, System.Type objectType)
+        static void LogUnconvertibleFields(HashSet<object> loggedTypes, string treeLog, System.Type objectType)
         {
             if (loggedTypes.Contains(objectType))
                 return;
@@ -169,6 +169,7 @@ namespace MultiplayerARPG
                 System.Type fieldType = field.FieldType;
                 if (fieldType.IsListOrArray(out System.Type elementType))
                 {
+                    string nodeName = $"{field.Name}({elementType.FullName})";
                     if (elementType.IsSubclassOf(typeof(System.Delegate)))
                     {
                         continue;
@@ -179,13 +180,14 @@ namespace MultiplayerARPG
                     }
                     if (elementType.IsSubclassOf(typeof(Object)) && !elementType.IsSubclassOf(typeof(ScriptableObject)))
                     {
-                        Debug.Log($"{objectType.FullName} -> {field.Name} {elementType.FullName} is object which is not convertible");
+                        Debug.Log($"{treeLog} -> {nodeName} is object which is not convertible");
                         continue;
                     }
-                    LogUnconvertibleFields(loggedTypes, elementType);
+                    LogUnconvertibleFields(loggedTypes, $"{treeLog} -> {nodeName}", elementType);
                 }
                 else if (fieldType.IsClass)
                 {
+                    string nodeName = $"{field.Name}({fieldType.FullName})";
                     if (fieldType.IsSubclassOf(typeof(System.Delegate)))
                     {
                         continue;
@@ -196,14 +198,15 @@ namespace MultiplayerARPG
                     }
                     if (fieldType.IsSubclassOf(typeof(Object)) && !fieldType.IsSubclassOf(typeof(ScriptableObject)))
                     {
-                        Debug.Log($"{objectType.FullName} -> {field.Name} {fieldType.FullName} is object which is not convertible");
+                        Debug.Log($"{treeLog} -> {nodeName} is object which is not convertible");
                         continue;
                     }
-                    LogUnconvertibleFields(loggedTypes, fieldType);
+                    LogUnconvertibleFields(loggedTypes, $"{treeLog} -> {nodeName}", fieldType);
                 }
                 else if (fieldType.IsValueType && !fieldType.IsPrimitive && !fieldType.IsEnum)
                 {
-                    LogUnconvertibleFields(loggedTypes, fieldType);
+                    string nodeName = $"{field.Name}({fieldType.FullName})";
+                    LogUnconvertibleFields(loggedTypes, $"{treeLog} -> {nodeName}", fieldType);
                 }
             }
         }
