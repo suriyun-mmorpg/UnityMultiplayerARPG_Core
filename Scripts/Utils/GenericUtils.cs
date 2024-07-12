@@ -651,17 +651,10 @@ public static partial class GenericUtils
             SizeSuffixes[mag]);
     }
 
-    public static bool HasAttribute<TAttributeType>(this FieldInfo field)
+    public static bool HasAttribute<TAttributeType>(this FieldInfo field, bool inherit = false)
         where TAttributeType : System.Attribute
     {
-        foreach (System.Attribute attr in field.GetCustomAttributes())
-        {
-            if (attr.GetType() == typeof(TAttributeType))
-            {
-                return true;
-            }
-        }
-        return false;
+        return field.GetCustomAttributes(typeof(TAttributeType), inherit).Length > 0;
     }
 
     public static bool HasInterface<TInterfaceType>(this System.Type type)
