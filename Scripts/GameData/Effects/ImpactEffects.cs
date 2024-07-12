@@ -11,8 +11,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.IMPACT_EFFECTS_FILE, menuName = GameDataMenuConsts.IMPACT_EFFECTS_MENU, order = GameDataMenuConsts.IMPACT_EFFECTS_ORDER)]
     public class ImpactEffects : ScriptableObject
     {
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
+        [AddressableAssetConversion(nameof(defaultImpactEffect), nameof(ConvertDefaultEffectPrefab))]
         public GameEffect defaultEffect;
+#endif
         public ImpactEffect defaultImpactEffect;
         [FormerlySerializedAs("effects")]
         public ImpactEffect[] impaceEffects;
@@ -39,6 +42,11 @@ namespace MultiplayerARPG
                 }
                 return _cacheEffects;
             }
+        }
+
+        private void ConvertDefaultEffectPrefab(string varName)
+        {
+            Migrate();
         }
 
         public bool TryGetEffect(string tag, out ImpactEffect effect)
@@ -70,6 +78,7 @@ namespace MultiplayerARPG
 
         private bool Migrate()
         {
+#if !EXCLUDE_PREFAB_REFS
             if (defaultEffect != null && defaultImpactEffect.effect == null)
             {
                 ImpactEffect impactEffect = defaultImpactEffect;
@@ -78,6 +87,7 @@ namespace MultiplayerARPG
                 defaultEffect = null;
                 return true;
             }
+#endif
             return false;
         }
 
