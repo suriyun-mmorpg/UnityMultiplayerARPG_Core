@@ -156,6 +156,35 @@ namespace MultiplayerARPG
                 tasks = null;
                 hasChanges = true;
             }
+#if UNITY_EDITOR
+            if (randomTasks != null && randomTasks.Length > 0)
+            {
+                for (int i = 0; i < randomTasks.Length; ++i)
+                {
+                    bool hasTaskChanges = false;
+                    QuestTasks randomTask = randomTasks[i];
+                    if (randomTask.tasks == null || randomTask.tasks.Length <= 0)
+                        continue;
+                    for (int j = 0; j < randomTask.tasks.Length; ++j)
+                    {
+                        QuestTask task = randomTask.tasks[j];
+                        NpcEntity npcEntity = task.npcEntity;
+                        if (npcEntity == null)
+                            continue;
+                        if (task.npcEntityId != npcEntity.EntityId)
+                            task.npcEntityId = npcEntity.EntityId;
+                        task.npcEntityTitle = npcEntity.EntityTitleSetting;
+                        task.npcEntityTitles = npcEntity.EntityTitlesSetting;
+                        hasTaskChanges = true;
+                        randomTask.tasks[j] = task;
+                    }
+                    if (hasTaskChanges) {
+                        hasChanges = true;
+                        randomTasks[i] = randomTask;
+                    }
+                }
+            }
+#endif
             return hasChanges || base.Validate();
         }
 
@@ -202,9 +231,7 @@ namespace MultiplayerARPG
             {
                 if (tasks[i].taskType != QuestTaskType.TalkToNpc)
                     continue;
-                if (tasks[i].npcEntity == null)
-                    continue;
-                if (tasks[i].npcEntity.EntityId == npcEntity.EntityId)
+                if (tasks[i].npcEntityId == npcEntity.EntityId)
                 {
                     taskIndex = i;
                     dialog = tasks[i].talkToNpcDialog;

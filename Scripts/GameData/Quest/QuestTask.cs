@@ -17,9 +17,22 @@ namespace MultiplayerARPG
         [Tooltip("If this is `TRUE`, it will not decrease task items when quest completed")]
         public bool doNotDecreaseItemsOnQuestComplete;
 
+#if UNITY_EDITOR
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        [NotPatchable]
         [Tooltip("Have to talk to this NPC to complete task")]
         public NpcEntity npcEntity;
+#endif
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        [ReadOnlyField]
+        public int npcEntityId;
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        [ReadOnlyField]
+        public string npcEntityTitle;
+        [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
+        [ReadOnlyField]
+        public LanguageData[] npcEntityTitles;
+
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
         [Tooltip("This dialog will be shown immediately instead of start dialog which set to the NPC")]
         public BaseNpcDialog talkToNpcDialog;
@@ -52,6 +65,11 @@ namespace MultiplayerARPG
         public string CustomCompletedDescription
         {
             get { return Language.GetText(languageSpecificCompletedDescriptions, defaultCompletedDescription); }
+        }
+
+        public string NpcEntityTitle
+        {
+            get { return Language.GetText(npcEntityTitles, npcEntityTitle); }
         }
     }
 }
