@@ -136,9 +136,7 @@ namespace MultiplayerARPG
                     if (fpsModelAvailable)
                         Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
                     // Play reload sfx
-                    AudioClipWithVolumeSettings audioClip = weaponItem.ReloadClip;
-                    if (audioClip != null)
-                        AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
+                    weaponItem.ReloadClip?.Play(Entity.CharacterModel.GenericAudioSource);
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
@@ -164,11 +162,8 @@ namespace MultiplayerARPG
                             Entity.CharacterModel.PlayEquippedWeaponReloaded(isLeftHand);
                         if (fpsModelAvailable)
                             Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
-
                         // Play reload sfx
-                        AudioClipWithVolumeSettings audioClip = weaponItem.ReloadedClip;
-                        if (audioClip != null)
-                            AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
+                        weaponItem.ReloadedClip?.Play(Entity.CharacterModel.GenericAudioSource);
                     }
 
                     await UniTask.Yield(reloadCancellationTokenSource.Token);

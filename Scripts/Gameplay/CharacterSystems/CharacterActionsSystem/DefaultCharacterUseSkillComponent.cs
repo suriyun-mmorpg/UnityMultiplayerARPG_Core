@@ -303,9 +303,7 @@ namespace MultiplayerARPG
                         if (fpsModelAvailable)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
-                        AudioClipWithVolumeSettings audioClip = weaponItem.LaunchClip;
-                        if (audioClip != null)
-                            AudioManager.PlaySfxClipAtAudioSource(audioClip.audioClip, Entity.CharacterModel.GenericAudioSource, audioClip.GetRandomedVolume());
+                        weaponItem.LaunchClip?.Play(Entity.CharacterModel.GenericAudioSource);
                     }
 
                     await UniTask.Yield(skillCancellationTokenSource.Token);
