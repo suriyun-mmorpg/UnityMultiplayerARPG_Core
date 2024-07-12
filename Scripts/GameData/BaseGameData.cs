@@ -130,6 +130,7 @@ namespace MultiplayerARPG
                 return await addressableIcon.LoadAssetAsync<Sprite>();
             return null;
         }
+#endif
 
         [NonSerialized]
         protected int? dataId;
