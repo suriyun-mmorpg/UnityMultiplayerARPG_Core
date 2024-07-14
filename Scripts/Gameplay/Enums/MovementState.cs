@@ -16,9 +16,9 @@
         Down = 1 << 9, // 512
         IsClimbing = 1 << 10, // 1024
         IsDash = 1 << 11, // 2048
-        IsStarting = 1 << 12, // 4096
-        IsEnding = 1 << 13, // 8192
-        IsEvenStep = 1 << 14, // 16384
+        IsEvenStep = 1 << 12, // 4096
+        IsStarting = 1 << 13, // 8192
+        IsEnding = 1 << 14, // 16384
     }
 
     public static class MovementStateExtensions
