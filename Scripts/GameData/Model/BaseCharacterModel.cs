@@ -965,19 +965,19 @@ namespace MultiplayerARPG
             SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, Vector2.down, false);
         }
 
-        public virtual float GetEnterVehicleAnimationDuration()
+        public virtual float GetEnterVehicleAnimationDuration(IVehicleEntity vehicleEntity)
         {
             return 0f;
         }
 
-        public virtual void PlayEnterVehicleAnimation() { }
+        public virtual void PlayEnterVehicleAnimation(IVehicleEntity vehicleEntity) { }
 
-        public virtual float GetExitVehicleAnimationDuration()
+        public virtual float GetExitVehicleAnimationDuration(IVehicleEntity vehicleEntity)
         {
             return 0f;
         }
 
-        public virtual void PlayExitVehicleAnimation() { }
+        public virtual void PlayExitVehicleAnimation(IVehicleEntity vehicleEntity) { }
 
         public virtual void PlayHitAnimation() { }
 

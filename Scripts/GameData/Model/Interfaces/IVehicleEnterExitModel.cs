@@ -6,19 +6,19 @@ namespace MultiplayerARPG
         /// Use this to get enter vehicle animation duration
         /// </summary>
         /// <returns></returns>
-        float GetEnterVehicleAnimationDuration();
+        float GetEnterVehicleAnimationDuration(IVehicleEntity vehicleEntity);
         /// <summary>
         /// Use this function to play enter vehicle animation when entering vehicle
         /// </summary>
-        void PlayEnterVehicleAnimation();
+        void PlayEnterVehicleAnimation(IVehicleEntity vehicleEntity);
         /// <summary>
         /// Use this to get exit vehicle animation duration
         /// </summary>
         /// <returns></returns>
-        float GetExitVehicleAnimationDuration();
+        float GetExitVehicleAnimationDuration(IVehicleEntity vehicleEntity);
         /// <summary>
         /// Use this function to play exit vehicle animation when exiting vehicle
         /// </summary>
-        void PlayExitVehicleAnimation();
+        void PlayExitVehicleAnimation(IVehicleEntity vehicleEntity);
     }
 }

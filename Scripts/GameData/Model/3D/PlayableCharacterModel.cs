@@ -661,7 +661,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.IsFreeze = IsFreezeAnimation;
         }
 
-        public override float GetEnterVehicleAnimationDuration()
+        public override float GetEnterVehicleAnimationDuration(IVehicleEntity vehicleEntity)
         {
             WeaponAnimations weaponAnimations;
             if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
@@ -671,7 +671,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return 0f;
         }
 
-        public override void PlayEnterVehicleAnimation()
+        public override void PlayEnterVehicleAnimation(IVehicleEntity vehicleEntity)
         {
             WeaponAnimations weaponAnimations;
             if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
@@ -683,7 +683,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.enterState, 1f);
         }
 
-        public override float GetExitVehicleAnimationDuration()
+        public override float GetExitVehicleAnimationDuration(IVehicleEntity vehicleEntity)
         {
             WeaponAnimations weaponAnimations;
             if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
@@ -693,7 +693,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             return 0f;
         }
 
-        public override void PlayExitVehicleAnimation()
+        public override void PlayExitVehicleAnimation(IVehicleEntity vehicleEntity)
         {
             WeaponAnimations weaponAnimations;
             if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.exitState.clip != null)

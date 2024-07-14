@@ -129,7 +129,7 @@ namespace MultiplayerARPG
             float enterDuration = 0f;
             if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
             {
-                enterDuration = vehicleEnterExitModel.GetEnterVehicleAnimationDuration();
+                enterDuration = vehicleEnterExitModel.GetEnterVehicleAnimationDuration(PassengingVehicleEntity);
             }
 
             if (enterDuration > 0f)
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
             float exitDuration = 0f;
             if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
             {
-                exitDuration = vehicleEnterExitModel.GetExitVehicleAnimationDuration();
+                exitDuration = vehicleEnterExitModel.GetExitVehicleAnimationDuration(PassengingVehicleEntity);
             }
 
             if (exitDuration > 0f)
@@ -301,13 +301,13 @@ namespace MultiplayerARPG
         public virtual void PlayEnterVehicleAnimation()
         {
             if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
-                vehicleEnterExitModel.PlayEnterVehicleAnimation();
+                vehicleEnterExitModel.PlayEnterVehicleAnimation(PassengingVehicleEntity);
         }
 
         public virtual void PlayExitVehicleAnimation()
         {
             if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
-                vehicleEnterExitModel.PlayExitVehicleAnimation();
+                vehicleEnterExitModel.PlayExitVehicleAnimation(PassengingVehicleEntity);
         }
     }
 }
