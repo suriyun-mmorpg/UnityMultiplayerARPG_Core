@@ -1,8 +1,6 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
-using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using UnityEngine;
 using UtilsComponents;
 
@@ -12,7 +10,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel
+    public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel, IVehicleEnterExitModel
     {
         public int Id { get; protected set; }
         public BaseCharacterModel MainModel { get; set; }
@@ -967,38 +965,29 @@ namespace MultiplayerARPG
             SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, Vector2.down, false);
         }
 
-        /// <summary>
-        /// Use this function to play enter vehicle animation when entering vehicle
-        /// </summary>
+        public virtual float GetEnterVehicleAnimationDuration()
+        {
+            return 0f;
+        }
+
         public virtual void PlayEnterVehicleAnimation() { }
 
-        /// <summary>
-        /// Use this function to play exit vehicle animation when exiting vehicle
-        /// </summary>
+        public virtual float GetExitVehicleAnimationDuration()
+        {
+            return 0f;
+        }
+
         public virtual void PlayExitVehicleAnimation() { }
 
-        /// <summary>
-        /// Use this function to play hit animation when receive damage
-        /// </summary>
         public virtual void PlayHitAnimation() { }
 
-        /// <summary>
-        /// Use this to get jump animation duration
-        /// </summary>
-        /// <returns></returns>
         public virtual float GetJumpAnimationDuration()
         {
             return 0f;
         }
 
-        /// <summary>
-        /// Use this function to play jump animation
-        /// </summary>
         public virtual void PlayJumpAnimation() { }
 
-        /// <summary>
-        /// Use this function to play pickup animation
-        /// </summary>
         public virtual void PlayPickupAnimation() { }
 
         public abstract void PlayMoveAnimation();

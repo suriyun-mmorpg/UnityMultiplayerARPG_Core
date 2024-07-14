@@ -1,4 +1,5 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -55,7 +56,7 @@ namespace MultiplayerARPG
 
         protected float _lastMountTime;
 
-        public virtual void Mount(VehicleEntity prefab, AssetReferenceVehicleEntity addressablePrefab)
+        public virtual async void Mount(VehicleEntity prefab, AssetReferenceVehicleEntity addressablePrefab)
         {
             if (!IsServer || (prefab == null && !addressablePrefab.IsDataValid()) || Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
                 return;
@@ -66,7 +67,7 @@ namespace MultiplayerARPG
             if (PassengingVehicleEntity != null)
             {
                 enterPosition = PassengingVehicleEntity.Entity.EntityTransform.position;
-                ExitVehicle();
+                await ExitVehicle();
             }
 
             // Instantiate new mount entity
@@ -97,10 +98,10 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj, 0, ConnectionId);
 
             // Seat index for mount entity always 0
-            EnterVehicle(vehicle, 0);
+            await EnterVehicle(vehicle, 0);
         }
 
-        protected virtual bool EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
+        protected virtual async UniTask<bool> EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
             if (!IsServer || vehicle.IsNull())
                 return false;
@@ -124,16 +125,47 @@ namespace MultiplayerARPG
             // Set passenger to vehicle
             vehicle.SetPassenger(seatIndex, this);
 
+            // Play enter vehicle animation
+            float enterDuration = 0f;
+            if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
+            {
+                enterDuration = vehicleEnterExitModel.GetEnterVehicleAnimationDuration();
+            }
+
+            if (enterDuration > 0f)
+            {
+                CallRpcPlayEnterVehicleAnimation();
+                await UniTask.Delay(Mathf.CeilToInt(enterDuration * 1000));
+            }
+
             return true;
         }
 
-        protected virtual void ExitVehicle()
+        protected virtual async void EnterVehicleAndForget(IVehicleEntity vehicle, byte seatIndex)
+        {
+            await EnterVehicle(vehicle, seatIndex);
+        }
+
+        protected virtual async UniTask<bool> ExitVehicle()
         {
             if (!IsServer || PassengingVehicleEntity.IsNull())
-                return;
+                return false;
 
             bool isDriver = PassengingVehicleEntity.IsDriver(PassengingVehicleSeatIndex);
             bool isDestroying = PassengingVehicleEntity.IsDestroyWhenExit(PassengingVehicleSeatIndex);
+
+            // Play exit vehicle animation
+            float exitDuration = 0f;
+            if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
+            {
+                exitDuration = vehicleEnterExitModel.GetExitVehicleAnimationDuration();
+            }
+
+            if (exitDuration > 0f)
+            {
+                CallRpcPlayExitVehicleAnimation();
+                await UniTask.Delay(Mathf.CeilToInt(exitDuration * 1000));
+            }
 
             // Clear object owner from driver
             if (PassengingVehicleEntity.IsDriver(PassengingVehicleSeatIndex))
@@ -155,6 +187,13 @@ namespace MultiplayerARPG
                 if (isDriver)
                     vehicleEntity.StopMove();
             }
+
+            return true;
+        }
+
+        protected virtual async void ExitVehicleAndForget()
+        {
+            await ExitVehicle();
         }
 
         /// <summary>
@@ -209,7 +248,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, error);
                 return;
             }
-            EnterVehicle(vehicleEntity, seatIndex);
+            EnterVehicleAndForget(vehicleEntity, seatIndex);
 #endif
         }
 
@@ -222,7 +261,7 @@ namespace MultiplayerARPG
         protected void CmdExitVehicle()
         {
 #if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
-            ExitVehicle();
+            ExitVehicleAndForget();
 #endif
         }
 
@@ -235,6 +274,40 @@ namespace MultiplayerARPG
         protected void RpcOnExitVehicle()
         {
             ClearPassengingVehicle();
+        }
+
+        public void CallRpcPlayEnterVehicleAnimation()
+        {
+            RPC(RpcPlayEnterVehicleAnimation);
+        }
+
+        [AllRpc]
+        protected void RpcPlayEnterVehicleAnimation()
+        {
+            PlayEnterVehicleAnimation();
+        }
+
+        public void CallRpcPlayExitVehicleAnimation()
+        {
+            RPC(RpcPlayExitVehicleAnimation);
+        }
+
+        [AllRpc]
+        protected void RpcPlayExitVehicleAnimation()
+        {
+            PlayExitVehicleAnimation();
+        }
+
+        public virtual void PlayEnterVehicleAnimation()
+        {
+            if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
+                vehicleEnterExitModel.PlayEnterVehicleAnimation();
+        }
+
+        public virtual void PlayExitVehicleAnimation()
+        {
+            if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
+                vehicleEnterExitModel.PlayExitVehicleAnimation();
         }
     }
 }

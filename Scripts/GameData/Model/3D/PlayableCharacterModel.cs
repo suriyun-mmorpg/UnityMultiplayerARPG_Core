@@ -661,6 +661,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.IsFreeze = IsFreezeAnimation;
         }
 
+        public override float GetEnterVehicleAnimationDuration()
+        {
+            WeaponAnimations weaponAnimations;
+            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
+                return weaponAnimations.vehicleEnterExitStates.enterState.GetClipLength(1f);
+            if (defaultAnimations.vehicleEnterExitStates.enterState.clip != null)
+                return defaultAnimations.vehicleEnterExitStates.enterState.GetClipLength(1f);
+            return 0f;
+        }
+
         public override void PlayEnterVehicleAnimation()
         {
             WeaponAnimations weaponAnimations;
@@ -671,6 +681,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
             if (defaultAnimations.vehicleEnterExitStates.enterState.clip != null)
                 Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.enterState, 1f);
+        }
+
+        public override float GetExitVehicleAnimationDuration()
+        {
+            WeaponAnimations weaponAnimations;
+            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
+                return weaponAnimations.vehicleEnterExitStates.exitState.GetClipLength(1f);
+            if (defaultAnimations.vehicleEnterExitStates.exitState.clip != null)
+                return defaultAnimations.vehicleEnterExitStates.exitState.GetClipLength(1f);
+            return 0f;
         }
 
         public override void PlayExitVehicleAnimation()

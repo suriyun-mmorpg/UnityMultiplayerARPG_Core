@@ -14,6 +14,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public bool isAdditive;
         public bool applyFootIk;
         public bool applyPlayableIk;
+
+        public float GetSpeed(float rate)
+        {
+            return (animSpeedRate > 0 ? animSpeedRate : 1) * rate;
+        }
+
+        public float GetClipLength(float rate)
+        {
+            return clip.length / GetSpeed(rate);
+        }
     }
 
     [System.Serializable]
@@ -33,6 +43,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public bool skipMovementValidation;
         [Tooltip("Turn this on to use root motion while playing this animation")]
         public bool shouldUseRootMotion;
+
+        public float GetSpeed(float rate)
+        {
+            return (animSpeedRate > 0 ? animSpeedRate : 1) * rate;
+        }
+
+        public float GetClipLength(float rate)
+        {
+            return clip.length / GetSpeed(rate);
+        }
     }
 
     [System.Serializable]

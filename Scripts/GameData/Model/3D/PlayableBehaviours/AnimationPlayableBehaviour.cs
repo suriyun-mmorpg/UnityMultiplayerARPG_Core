@@ -52,14 +52,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private struct BaseStateInfo : IStateInfo
         {
             public AnimState State { get; set; }
+
             public float GetSpeed(float rate)
             {
-                return (State.animSpeedRate > 0 ? State.animSpeedRate : 1) * rate;
+                return State.GetSpeed(rate);
             }
 
             public float GetClipLength(float rate)
             {
-                return State.clip.length / GetSpeed(rate);
+                return State.GetClipLength(rate);
             }
 
             public AnimationClip GetClip()
@@ -97,14 +98,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             public int InputPort { get; set; }
             public ActionState State { get; set; }
+
             public float GetSpeed(float rate)
             {
-                return (State.animSpeedRate > 0 ? State.animSpeedRate : 1) * rate;
+                return State.GetSpeed(rate);
             }
 
             public float GetClipLength(float rate)
             {
-                return State.clip.length / GetSpeed(rate);
+                return State.GetClipLength(rate);
             }
 
             public AnimationClip GetClip()
