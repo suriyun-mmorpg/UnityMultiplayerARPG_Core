@@ -11,11 +11,14 @@
         IsGrounded = 1 << 4, // 16
         IsUnderWater = 1 << 5, // 32
         IsJump = 1 << 6, // 64
-        IsTeleport = 1 << 7, // 128
+        IsTeleport = 1 << 7, // 128, end of byte
         Up = 1 << 8, // 256
         Down = 1 << 9, // 512
         IsClimbing = 1 << 10, // 1024
         IsDash = 1 << 11, // 2048
+        IsStarting = 1 << 12, // 4096
+        IsEnding = 1 << 13, // 8192
+        IsEvenStep = 1 << 14, // 16384
     }
 
     public static class MovementStateExtensions
