@@ -249,12 +249,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState fallState;
         public ActionState landedState;
 
-        [Header("Vehicle Animation")]
-        public EnterExitStates vehicleEnterExitStates;
-
-        [Header("Hurt")]
-        public ActionState hurtState;
-
         [Header("Dead")]
         public ActionState deadState;
 
@@ -262,9 +256,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState dashStartState;
         public ActionState dashLoopState;
         public ActionState dashEndState;
-
-        [Header("Pickup")]
-        public ActionState pickupState;
 
         public WeaponType Data { get { return weaponType; } }
     }
