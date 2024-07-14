@@ -968,6 +968,16 @@ namespace MultiplayerARPG
         }
 
         /// <summary>
+        /// Use this function to play enter vehicle animation when entering vehicle
+        /// </summary>
+        public virtual void PlayEnterVehicleAnimation() { }
+
+        /// <summary>
+        /// Use this function to play exit vehicle animation when exiting vehicle
+        /// </summary>
+        public virtual void PlayExitVehicleAnimation() { }
+
+        /// <summary>
         /// Use this function to play hit animation when receive damage
         /// </summary>
         public virtual void PlayHitAnimation() { }

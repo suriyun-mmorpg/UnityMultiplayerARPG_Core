@@ -661,6 +661,30 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.IsFreeze = IsFreezeAnimation;
         }
 
+        public override void PlayEnterVehicleAnimation()
+        {
+            WeaponAnimations weaponAnimations;
+            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
+            {
+                Behaviour.PlayAction(weaponAnimations.vehicleEnterExitStates.enterState, 1f);
+                return;
+            }
+            if (defaultAnimations.vehicleEnterExitStates.enterState.clip != null)
+                Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.enterState, 1f);
+        }
+
+        public override void PlayExitVehicleAnimation()
+        {
+            WeaponAnimations weaponAnimations;
+            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.exitState.clip != null)
+            {
+                Behaviour.PlayAction(weaponAnimations.vehicleEnterExitStates.exitState, 1f);
+                return;
+            }
+            if (defaultAnimations.vehicleEnterExitStates.exitState.clip != null)
+                Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.exitState, 1f);
+        }
+
         public override void PlayHitAnimation()
         {
             WeaponAnimations weaponAnimations;

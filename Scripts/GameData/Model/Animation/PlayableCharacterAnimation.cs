@@ -149,6 +149,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
     }
 
     [System.Serializable]
+    public struct EnterExitStates
+    {
+        public ActionState enterState;
+        public ActionState exitState;
+    }
+
+    [System.Serializable]
     public struct WeaponAnimations : IWeaponAnims
     {
         public WeaponType weaponType;
@@ -175,6 +182,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState jumpState;
         public AnimState fallState;
         public AnimState landedState;
+
+        [Header("Vehicle Animation")]
+        public EnterExitStates vehicleEnterExitStates;
 
         [Header("Hurt")]
         public ActionState hurtState;
@@ -239,6 +249,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState fallState;
         public ActionState landedState;
 
+        [Header("Vehicle Animation")]
+        public EnterExitStates vehicleEnterExitStates;
+
         [Header("Hurt")]
         public ActionState hurtState;
 
@@ -292,6 +305,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState jumpState;
         public AnimState fallState;
         public AnimState landedState;
+
+        [Header("Vehicle Animation")]
+        public EnterExitStates vehicleEnterExitStates;
 
         [Header("Hurt")]
         public ActionState hurtState;
