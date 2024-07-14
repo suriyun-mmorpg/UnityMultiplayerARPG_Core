@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Serialization;
+﻿using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
-using LiteNetLib.Utils;
 using LiteNetLib;
+using LiteNetLib.Utils;
+using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.Profiling;
-using Cysharp.Text;
+using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -328,7 +329,7 @@ namespace MultiplayerARPG
             Profiler.BeginSample("BaseCharacterEntity - DeadExitVehicle");
             // Clear data when character dead
             if (this.IsDead())
-                ExitVehicle();
+                ExitVehicle().Forget();
             Profiler.EndSample();
 
             Profiler.BeginSample("BaseCharacterEntity - MovementEnablingUpdate");
