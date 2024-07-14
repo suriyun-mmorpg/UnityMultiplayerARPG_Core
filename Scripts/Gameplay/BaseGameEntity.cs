@@ -254,9 +254,11 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityOnDestroy()
         {
-            // Exit vehicle when destroy
             if (IsServer)
-                ExitVehicle();
+            {
+                // Exit vehicle when destroy
+                ExitVehicleAndForget();
+            }
         }
 
         private void OnEnable()

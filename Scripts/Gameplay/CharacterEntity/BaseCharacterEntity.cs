@@ -326,11 +326,11 @@ namespace MultiplayerARPG
                 RespawnInvincibleCountDown -= deltaTime;
             }
 
-            Profiler.BeginSample("BaseCharacterEntity - DeadExitVehicle");
-            // Clear data when character dead
             if (this.IsDead())
-                ExitVehicle().Forget();
-            Profiler.EndSample();
+            {
+                // Clear data when character dead
+                ExitVehicleAndForget();
+            }
 
             Profiler.BeginSample("BaseCharacterEntity - MovementEnablingUpdate");
             // Enable movement or not
