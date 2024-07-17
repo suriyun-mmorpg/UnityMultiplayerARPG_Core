@@ -22,6 +22,13 @@ namespace MultiplayerARPG
                 return;
             }
             characterEntity.LadderComponent.TriggeredLadderEntry = this;
+            if (characterEntity.IsOwnerClient)
+            {
+                if (!characterEntity.LadderComponent.ClimbingLadder)
+                    characterEntity.LadderComponent.CallCmdEnterLadder();
+                else
+                    characterEntity.LadderComponent.CallCmdExitLadder();
+            }
         }
 
         private void OnTriggerExit(Collider other)

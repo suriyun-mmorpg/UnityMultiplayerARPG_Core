@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             RpcPlayEnterLadderAnimation(TriggeredLadderEntry.entryDirection);
             // TODO: Get entering duration
             ClimbingLadder = TriggeredLadderEntry.ladder;
-            RPC(TargetConfirmEnterLadder);
+            RPC(TargetConfirmEnterLadder, ConnectionId);
         }
 
         [TargetRpc]
@@ -122,7 +122,7 @@ namespace MultiplayerARPG
             RpcPlayExitLadderAnimation(TriggeredLadderEntry.entryDirection);
             // TODO: Get exiting duration
             ClimbingLadder = null;
-            RPC(TargetConfirmExitLadder);
+            RPC(TargetConfirmExitLadder, ConnectionId);
         }
 
         [TargetRpc]

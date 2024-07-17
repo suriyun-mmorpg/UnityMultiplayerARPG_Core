@@ -346,7 +346,7 @@ namespace MultiplayerARPG
         {
             _moveDirection = Vector3.zero;
             _isUnderWater = WaterCheck(_waterCollider);
-            _isClimbing = LadderComponent.ClimbingLadder != null;
+            _isClimbing = LadderComponent && LadderComponent.ClimbingLadder;
             _isGrounded = EntityMovement.GroundCheck();
             _isAirborne = !_isGrounded && !_isUnderWater && !_isClimbing && _airborneElapsed >= airborneDelay;
 
@@ -372,19 +372,33 @@ namespace MultiplayerARPG
 
         protected void UpdateClimbMovement(float deltaTime)
         {
-            bool forceUseRootMotion = alwaysUseRootMotion || Entity.ShouldUseRootMotion;
+            if (!_tempMovementState.Has(MovementState.Forward) &&
+                !_tempMovementState.Has(MovementState.Backward))
+            {
+                // No movement inputs
+                return;
+            }
+
+            Vector3 tempPredictPosition;
+            Vector3 tempCurrentPosition = CacheTransform.position;
             // Prepare movement speed
             _tempExtraMovementState = Entity.ValidateExtraMovementState(_tempMovementState, _tempExtraMovementState);
             float tempEntityMoveSpeed = Entity.GetMoveSpeed(_tempMovementState, _tempExtraMovementState);
             float tempMaxMoveSpeed = tempEntityMoveSpeed;
             CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
+            float moveY = 0f;
             if (_tempMovementState.Has(MovementState.Forward))
-                _moveDirection.y = 1f;
+                moveY = 1f;
             else if (_tempMovementState.Has(MovementState.Backward))
-                _moveDirection.y = -1f;
+                moveY = -1f;
 
-            // TODO: Implement ladder movement
+            Vector3 tempMoveVelocity = LadderComponent.ClimbingLadder.transform.up * moveY * CurrentMoveSpeed;
+            tempPredictPosition = tempCurrentPosition + (tempMoveVelocity * deltaTime);
+            _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
+            _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
+            _previousMovement = tempMoveVelocity * deltaTime;
+            EntityMovement.Move(_previousMovement);
         }
 
         protected void UpdateGenericMovement(float deltaTime)
@@ -392,7 +406,6 @@ namespace MultiplayerARPG
             float tempSqrMagnitude;
             float tempPredictSqrMagnitude;
             Vector3 tempPredictPosition;
-
             float tempTargetDistance = 0f;
             Vector3 tempHorizontalMoveDirection;
             Vector3 tempMoveVelocity = Vector3.zero;
