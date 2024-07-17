@@ -1,5 +1,4 @@
 ﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using LiteNetLib;
 using LiteNetLib.Utils;
@@ -16,6 +15,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterModelManager))]
     [RequireComponent(typeof(CharacterRecoveryComponent))]
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
+    [RequireComponent(typeof(CharacterLadderComponent))]
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData
     {
         public const float ACTION_DELAY = 0.1f;
@@ -108,6 +108,7 @@ namespace MultiplayerARPG
         public ICharacterChargeComponent ChargeComponent { get; protected set; }
         public CharacterRecoveryComponent RecoveryComponent { get; protected set; }
         public CharacterSkillAndBuffComponent SkillAndBuffComponent { get; protected set; }
+        public CharacterLadderComponent LadderComponent { get; protected set; }
         public bool IsAttacking { get { return AttackComponent.IsAttacking; } }
         public float LastAttackEndTime { get { return AttackComponent.LastAttackEndTime; } }
         public bool IsUseRootMotionWhileAttacking { get { return AttackComponent.IsUseRootMotionWhileAttacking; } }
@@ -204,6 +205,7 @@ namespace MultiplayerARPG
             ChargeComponent = gameObject.GetOrAddComponent<ICharacterChargeComponent, DefaultCharacterChargeComponent>();
             RecoveryComponent = gameObject.GetOrAddComponent<CharacterRecoveryComponent>();
             SkillAndBuffComponent = gameObject.GetOrAddComponent<CharacterSkillAndBuffComponent>();
+            LadderComponent = gameObject.GetOrAddComponent<CharacterLadderComponent>();
         }
 
         protected override void EntityAwake()

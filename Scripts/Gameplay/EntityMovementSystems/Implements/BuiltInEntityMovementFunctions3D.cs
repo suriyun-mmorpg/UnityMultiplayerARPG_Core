@@ -51,11 +51,13 @@ namespace MultiplayerARPG
         public bool useRootMotionForJump;
         public bool useRootMotionForFall;
         public bool useRootMotionUnderWater;
+        public bool useRootMotionClimbing;
 
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
 
         public BaseGameEntity Entity { get; private set; }
+        public CharacterLadderComponent LadderComponent { get; private set; }
         public bool IsServer { get { return Entity.IsServer; } }
         public bool IsClient { get { return Entity.IsClient; } }
         public bool IsOwnerClient { get { return Entity.IsOwnerClient; } }
@@ -107,6 +109,7 @@ namespace MultiplayerARPG
         private bool _isGrounded = true;
         private bool _isAirborne = false;
         private bool _isUnderWater = false;
+        private bool _isClimbing = false;
         private bool _previouslyGrounded = false;
         private bool _previouslyAirborne = false;
         private bool _simulatingKeyMovement = false;
@@ -152,6 +155,7 @@ namespace MultiplayerARPG
         public BuiltInEntityMovementFunctions3D(BaseGameEntity entity, Animator animator, IBuiltInEntityMovement3D entityMovement)
         {
             Entity = entity;
+            LadderComponent = entity.GetComponent<CharacterLadderComponent>();
             Animator = animator;
             EntityMovement = entityMovement;
             _yAngle = _targetYAngle = CacheTransform.eulerAngles.y;
@@ -196,6 +200,8 @@ namespace MultiplayerARPG
             if (!MovementState.Has(MovementState.IsGrounded) && useRootMotionForAirMovement)
                 Animator.ApplyBuiltinRootMotion();
             if (MovementState.Has(MovementState.IsUnderWater) && useRootMotionUnderWater)
+                Animator.ApplyBuiltinRootMotion();
+            if (MovementState.Has(MovementState.IsClimbing) && useRootMotionClimbing)
                 Animator.ApplyBuiltinRootMotion();
         }
 
@@ -338,26 +344,11 @@ namespace MultiplayerARPG
 
         public void UpdateMovement(float deltaTime)
         {
-            float tempSqrMagnitude;
-            float tempPredictSqrMagnitude;
-            float tempTargetDistance;
-            float tempEntityMoveSpeed;
-            float tempMaxMoveSpeed;
-            Vector3 tempHorizontalMoveDirection;
-            Vector3 tempMoveVelocity;
-            Vector3 tempCurrentPosition;
-            Vector3 tempTargetPosition;
-            Vector3 tempPredictPosition;
-
-            tempTargetDistance = 0f;
-            tempCurrentPosition = CacheTransform.position;
-            tempMoveVelocity = Vector3.zero;
             _moveDirection = Vector3.zero;
             _isUnderWater = WaterCheck(_waterCollider);
+            _isClimbing = LadderComponent.ClimbingLadder != null;
             _isGrounded = EntityMovement.GroundCheck();
-
-            bool forceUseRootMotion = alwaysUseRootMotion || Entity.ShouldUseRootMotion;
-            _isAirborne = !_isGrounded && !_isUnderWater && _airborneElapsed >= airborneDelay;
+            _isAirborne = !_isGrounded && !_isUnderWater && !_isClimbing && _airborneElapsed >= airborneDelay;
 
             // Update airborne elasped
             if (_isGrounded)
@@ -366,10 +357,49 @@ namespace MultiplayerARPG
                 _airborneElapsed += deltaTime;
 
             // Underwater state, movement state must be setup here to make it able to calculate move speed properly
-            if (_isUnderWater)
+            if (_isClimbing)
+                _tempMovementState |= MovementState.IsClimbing;
+            else if (_isUnderWater)
                 _tempMovementState |= MovementState.IsUnderWater;
 
-            tempTargetPosition = tempCurrentPosition;
+            if (_isClimbing)
+                UpdateClimbMovement(deltaTime);
+            else
+                UpdateGenericMovement(deltaTime);
+
+            _currentInput = Entity.SetInputYAngle(_currentInput, CacheTransform.eulerAngles.y);
+        }
+
+        protected void UpdateClimbMovement(float deltaTime)
+        {
+            bool forceUseRootMotion = alwaysUseRootMotion || Entity.ShouldUseRootMotion;
+            // Prepare movement speed
+            _tempExtraMovementState = Entity.ValidateExtraMovementState(_tempMovementState, _tempExtraMovementState);
+            float tempEntityMoveSpeed = Entity.GetMoveSpeed(_tempMovementState, _tempExtraMovementState);
+            float tempMaxMoveSpeed = tempEntityMoveSpeed;
+            CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
+
+            if (_tempMovementState.Has(MovementState.Forward))
+                _moveDirection.y = 1f;
+            else if (_tempMovementState.Has(MovementState.Backward))
+                _moveDirection.y = -1f;
+
+            // TODO: Implement ladder movement
+        }
+
+        protected void UpdateGenericMovement(float deltaTime)
+        {
+            float tempSqrMagnitude;
+            float tempPredictSqrMagnitude;
+            Vector3 tempPredictPosition;
+
+            float tempTargetDistance = 0f;
+            Vector3 tempHorizontalMoveDirection;
+            Vector3 tempMoveVelocity = Vector3.zero;
+            Vector3 tempCurrentPosition = CacheTransform.position;
+            Vector3 tempTargetPosition = tempCurrentPosition;
+            bool forceUseRootMotion = alwaysUseRootMotion || Entity.ShouldUseRootMotion;
+
             if (HasNavPaths)
             {
                 // Set `tempTargetPosition` and `tempCurrentPosition`
@@ -436,8 +466,8 @@ namespace MultiplayerARPG
 
             // Prepare movement speed
             _tempExtraMovementState = Entity.ValidateExtraMovementState(_tempMovementState, _tempExtraMovementState);
-            tempEntityMoveSpeed = _applyingJumpForce ? 0f : Entity.GetMoveSpeed(_tempMovementState, _tempExtraMovementState);
-            tempMaxMoveSpeed = tempEntityMoveSpeed;
+            float tempEntityMoveSpeed = _applyingJumpForce ? 0f : Entity.GetMoveSpeed(_tempMovementState, _tempExtraMovementState);
+            float tempMaxMoveSpeed = tempEntityMoveSpeed;
 
             // Calculate vertical velocity by gravity
             if (!_isGrounded && !_isUnderWater)
@@ -671,7 +701,6 @@ namespace MultiplayerARPG
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
             _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion + forceMotion) * deltaTime;
             EntityMovement.Move(_previousMovement);
-            _currentInput = Entity.SetInputYAngle(_currentInput, CacheTransform.eulerAngles.y);
         }
 
         public void UpdateRotation(float deltaTime)
@@ -1233,7 +1262,7 @@ namespace MultiplayerARPG
 
         public bool UseRootMotion()
         {
-            return alwaysUseRootMotion || useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionUnderWater;
+            return alwaysUseRootMotion || useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionUnderWater || useRootMotionClimbing;
         }
 
         public void RemoteTurnSimulation(bool isKeyMovement, float yAngle, float deltaTime)

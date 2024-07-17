@@ -10,7 +10,8 @@ namespace MultiplayerARPG
         public static ExtraMovementState ValidateExtraMovementState(this IEntityMovement movement, MovementState movementState, ExtraMovementState extraMovementState)
         {
             // Movement state can affect extra movement state
-            if (movementState.Has(MovementState.IsUnderWater))
+            if (movementState.Has(MovementState.IsUnderWater) ||
+                movementState.Has(MovementState.IsClimbing))
             {
                 // Extra movement states always none while under water
                 extraMovementState = ExtraMovementState.None;
