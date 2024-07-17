@@ -1,0 +1,83 @@
+using LiteNetLibManager;
+
+namespace MultiplayerARPG
+{
+    public partial class BaseGameEntity
+    {
+        #region Play Jump Animation
+        public void CallRpcPlayJumpAnimation()
+        {
+            RPC(RpcPlayJumpAnimation);
+        }
+
+        [AllRpc]
+        protected void RpcPlayJumpAnimation()
+        {
+            PlayJumpAnimation();
+        }
+
+        public virtual void PlayJumpAnimation()
+        {
+            if (Model is IJumppableModel jumppableModel)
+                jumppableModel.PlayJumpAnimation();
+        }
+        #endregion
+
+        #region Play Pickup Animation
+        public void CallRpcPlayPickupAnimation()
+        {
+            RPC(RpcPlayPickupAnimation);
+        }
+
+        [AllRpc]
+        protected void RpcPlayPickupAnimation()
+        {
+            PlayPickupAnimation();
+        }
+
+        public virtual void PlayPickupAnimation()
+        {
+            if (Model is IPickupableModel pickupableModel)
+                pickupableModel.PlayPickupAnimation();
+        }
+        #endregion
+
+        #region Play Custom Animation
+        public void CallRpcPlayCustomAnimation(int id)
+        {
+            RPC(RpcPlayCustomAnimation, id);
+        }
+
+        [AllRpc]
+        protected virtual void RpcPlayCustomAnimation(int id)
+        {
+            PlayCustomAnimation(id);
+        }
+
+        public virtual void PlayCustomAnimation(int id)
+        {
+            if (Model is ICustomAnimationModel customAnimationModel)
+                customAnimationModel.PlayCustomAnimation(id);
+        }
+        #endregion
+
+        #region Stop Custom Animation
+        public void CallRpcStopCustomAnimation()
+        {
+            RPC(RpcStopCustomAnimation);
+        }
+
+        [AllRpc]
+        protected virtual void RpcStopCustomAnimation()
+        {
+            StopCustomAnimation();
+        }
+
+        public virtual void StopCustomAnimation()
+        {
+            if (Model is ICustomAnimationModel customAnimationModel)
+                customAnimationModel.StopCustomAnimation();
+        }
+        #endregion
+    }
+}
