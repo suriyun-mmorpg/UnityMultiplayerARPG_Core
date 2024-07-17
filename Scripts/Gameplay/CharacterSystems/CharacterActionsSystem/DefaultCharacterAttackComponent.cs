@@ -186,7 +186,7 @@ namespace MultiplayerARPG
                 if (weaponItem.DoRecoilingAsAttackAnimation)
                 {
 
-                    _totalDuration = Entity.CharacterModel.CacheAttackRecoiler?.DefaultDuration ?? 1f;
+                    _totalDuration = Entity.CharacterModel.CacheAttackRecoiler?.DefaultRecoilDuration ?? 1f;
                     _triggerDurations = new float[] { 0f };
                     if (tpsModelAvailable)
                         Entity.CharacterModel.CacheAttackRecoiler?.PlayRecoiling();

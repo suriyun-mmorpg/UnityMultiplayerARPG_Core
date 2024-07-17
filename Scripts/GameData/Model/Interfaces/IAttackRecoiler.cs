@@ -2,7 +2,7 @@ namespace MultiplayerARPG
 {
     public interface IAttackRecoiler
     {
-        public float DefaultDuration { get; }
+        public float DefaultRecoilDuration { get; }
         public void PlayRecoiling();
     }
 }
