@@ -216,6 +216,7 @@ namespace MultiplayerARPG
         {
             base.RegisterMessages();
             RegisterHandlerMessages();
+            RegisterRequestToServer<EmptyMessage, EmptyMessage>(GameNetworkingConsts.SafeDisconnect, HandleRequestSafeDisconnect);
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
@@ -1102,6 +1103,14 @@ namespace MultiplayerARPG
             s_Writer.Reset();
             s_Writer.PutPackedUShort((ushort)message);
             KickClient(connectionId, s_Writer.Data);
+        }
+
+        protected virtual UniTaskVoid HandleRequestSafeDisconnect(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<EmptyMessage> result)
+        {
+            result.InvokeSuccess(EmptyMessage.Value);
+            return default;
         }
     }
 }

@@ -110,5 +110,6 @@
         public const ushort SortItems = 186;
         public const ushort AvailableContents = 187;
         public const ushort UnlockContent = 188;
+        public const ushort SafeDisconnect = 189;
     }
 }
