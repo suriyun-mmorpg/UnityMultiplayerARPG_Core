@@ -9,9 +9,9 @@ namespace MultiplayerARPG
     public class CharacterLadderComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>
     {
         [SerializeField]
-        private float raycastYOffsets = 1f;
+        private float overlapYOffsets = 1f;
         [SerializeField]
-        private float raycastDistance = 0.5f;
+        private float overlapRadius = 0.5f;
         /// <summary>
         /// Triggered ladder entry, will decide to enter the ladder or not later
         /// </summary>
@@ -75,6 +75,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(LogTag, "Only server can perform ladder entering");
                 return;
             }
+            FindAndSetTriggeredLadderEntry();
             if (!TriggeredLadderEntry)
             {
                 // No triggered ladder, so it cannot enter
@@ -115,11 +116,6 @@ namespace MultiplayerARPG
                 Logging.LogWarning(LogTag, "Only server can perform ladder exiting");
                 return;
             }
-            if (!TriggeredLadderEntry)
-            {
-                // No triggered ladder, so it cannot exit
-                return;
-            }
             if (!ClimbingLadder)
             {
                 // Not climbing yet, do not exit
@@ -141,26 +137,21 @@ namespace MultiplayerARPG
         {
             if (!IsOwnerClient)
                 return;
+            FindAndSetTriggeredLadderEntry();
+        }
 
-            // Set the data of the first command
-            Vector3 origin = Entity.EntityTransform.position + Entity.EntityTransform.up * raycastYOffsets;
-            Vector3 direction = Entity.EntityTransform.forward;
-
-            var result = Physics.RaycastAll(origin, direction, raycastDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Collide);
-            for (int i = 0; i < result.Length; ++i)
+        public void FindAndSetTriggeredLadderEntry()
+        {
+            Vector3 origin = Entity.EntityTransform.position + Entity.EntityTransform.up * overlapYOffsets;
+            Collider[] results = Physics.OverlapSphere(origin, overlapRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Collide);
+            for (int i = 0; i < results.Length; ++i)
             {
-                RaycastHit hit = result[i];
-                if (hit.collider == null)
+                Collider collider = results[i];
+                if (collider == null)
                     continue;
-                if (!hit.collider.TryGetComponent(out LadderEntry ladderEntry))
-                    continue;
-                if (TriggeredLadderEntry == ladderEntry)
+                if (!collider.TryGetComponent(out LadderEntry ladderEntry))
                     continue;
                 TriggeredLadderEntry = ladderEntry;
-                if (!ClimbingLadder)
-                    CallCmdEnterLadder();
-                else
-                    CallCmdExitLadder();
                 break;
             }
         }

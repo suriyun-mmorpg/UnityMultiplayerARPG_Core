@@ -6,6 +6,20 @@ namespace MultiplayerARPG
     {
         public Ladder ladder;
         public LadderEntryType type = LadderEntryType.Bottom;
+        public Transform TipTransform
+        {
+            get
+            {
+                switch (type)
+                {
+                    case LadderEntryType.Bottom:
+                        return ladder.bottomTransform;
+                    case LadderEntryType.Top:
+                        return ladder.topTransform;
+                }
+                return null;
+            }
+        }
 
         private void Awake()
         {
