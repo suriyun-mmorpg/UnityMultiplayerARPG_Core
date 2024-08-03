@@ -325,6 +325,23 @@ namespace MultiplayerARPG
             _movementForceAppliers.Clear();
         }
 
+        /// <summary>
+        /// Calculates the velocity required to move the character to the target position over a specific deltaTime.
+        /// Useful for when you wish to work with positions rather than velocities in the UpdateVelocity callback 
+        /// </summary>
+        public Vector3 GetVelocityForMovePosition(Vector3 fromPosition, Vector3 toPosition, float deltaTime)
+        {
+            return GetVelocityFromMovement(toPosition - fromPosition, deltaTime);
+        }
+
+        public Vector3 GetVelocityFromMovement(Vector3 movement, float deltaTime)
+        {
+            if (deltaTime <= 0f)
+                return Vector3.zero;
+
+            return movement / deltaTime;
+        }
+
         public bool WaterCheck(Collider waterCollider)
         {
             if (waterCollider == null)
@@ -393,7 +410,9 @@ namespace MultiplayerARPG
             else if (_tempMovementState.Has(MovementState.Backward))
                 moveY = -1f;
 
-            Vector3 tempMoveVelocity = LadderComponent.ClimbingLadder.transform.up * moveY * CurrentMoveSpeed;
+            Vector3 tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition,
+                LadderComponent.ClimbingLadder.ClosestPointOnLadderSegment(tempCurrentPosition, out float segmentState), deltaTime) +
+                LadderComponent.ClimbingLadder.Up * moveY * CurrentMoveSpeed;
             tempPredictPosition = tempCurrentPosition + (tempMoveVelocity * deltaTime);
             _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
             _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);

@@ -1,4 +1,6 @@
 using LiteNetLibManager;
+using Unity.Collections;
+using Unity.Jobs;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -6,6 +8,10 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public class CharacterLadderComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>
     {
+        [SerializeField]
+        private float raycastYOffsets = 1f;
+        [SerializeField]
+        private float raycastDistance = 0.5f;
         /// <summary>
         /// Triggered ladder entry, will decide to enter the ladder or not later
         /// </summary>
@@ -16,36 +22,36 @@ namespace MultiplayerARPG
         public Ladder ClimbingLadder { get; set; } = null;
 
         #region Play Enter Ladder Animation
-        public void CallRpcPlayEnterLadderAnimation(LadderEntryDirection direction)
+        public void CallRpcPlayEnterLadderAnimation(LadderEntryType direction)
         {
             RPC(RpcPlayEnterLadderAnimation, direction);
         }
 
         [AllRpc]
-        protected void RpcPlayEnterLadderAnimation(LadderEntryDirection direction)
+        protected void RpcPlayEnterLadderAnimation(LadderEntryType direction)
         {
             PlayEnterLadderAnimation(direction);
         }
 
-        public virtual void PlayEnterLadderAnimation(LadderEntryDirection direction)
+        public virtual void PlayEnterLadderAnimation(LadderEntryType direction)
         {
             // TODO: Implement this
         }
         #endregion
 
         #region Play Exit Ladder Animation
-        public void CallRpcPlayExitLadderAnimation(LadderEntryDirection direction)
+        public void CallRpcPlayExitLadderAnimation(LadderEntryType direction)
         {
             RPC(RpcPlayExitLadderAnimation, direction);
         }
 
         [AllRpc]
-        protected void RpcPlayExitLadderAnimation(LadderEntryDirection direction)
+        protected void RpcPlayExitLadderAnimation(LadderEntryType direction)
         {
             PlayExitLadderAnimation(direction);
         }
 
-        public virtual void PlayExitLadderAnimation(LadderEntryDirection direction)
+        public virtual void PlayExitLadderAnimation(LadderEntryType direction)
         {
             // TODO: Implement this
         }
@@ -79,7 +85,7 @@ namespace MultiplayerARPG
                 // Already climbing, do not enter
                 return;
             }
-            RpcPlayEnterLadderAnimation(TriggeredLadderEntry.entryDirection);
+            RpcPlayEnterLadderAnimation(TriggeredLadderEntry.type);
             // TODO: Get entering duration
             ClimbingLadder = TriggeredLadderEntry.ladder;
             RPC(TargetConfirmEnterLadder, ConnectionId);
@@ -119,7 +125,7 @@ namespace MultiplayerARPG
                 // Not climbing yet, do not exit
                 return;
             }
-            RpcPlayExitLadderAnimation(TriggeredLadderEntry.entryDirection);
+            RpcPlayExitLadderAnimation(TriggeredLadderEntry.type);
             // TODO: Get exiting duration
             ClimbingLadder = null;
             RPC(TargetConfirmExitLadder, ConnectionId);
@@ -129,6 +135,34 @@ namespace MultiplayerARPG
         protected void TargetConfirmExitLadder()
         {
             ClimbingLadder = null;
+        }
+
+        public override void EntityUpdate()
+        {
+            if (!IsOwnerClient)
+                return;
+
+            // Set the data of the first command
+            Vector3 origin = Entity.EntityTransform.position + Entity.EntityTransform.up * raycastYOffsets;
+            Vector3 direction = Entity.EntityTransform.forward;
+
+            var result = Physics.RaycastAll(origin, direction, raycastDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Collide);
+            for (int i = 0; i < result.Length; ++i)
+            {
+                RaycastHit hit = result[i];
+                if (hit.collider == null)
+                    continue;
+                if (!hit.collider.TryGetComponent(out LadderEntry ladderEntry))
+                    continue;
+                if (TriggeredLadderEntry == ladderEntry)
+                    continue;
+                TriggeredLadderEntry = ladderEntry;
+                if (!ClimbingLadder)
+                    CallCmdEnterLadder();
+                else
+                    CallCmdExitLadder();
+                break;
+            }
         }
     }
 }
