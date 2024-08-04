@@ -760,9 +760,9 @@ namespace MultiplayerARPG
             EntityMovement.Move(_previousMovement);
             if (LadderComponent && LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder && tempHorizontalMoveDirection.sqrMagnitude > 0f)
             {
-                Vector3 dirToLadder = (LadderComponent.TriggeredLadderEntry.TipTransform.position - Entity.EntityTransform.position).normalized;
+                Vector3 dirToLadder = (LadderComponent.TriggeredLadderEntry.TipTransform.position.GetXZ() - Entity.EntityTransform.position.GetXZ()).normalized;
                 float angle = Vector3.Angle(tempHorizontalMoveDirection, dirToLadder);
-                if (angle < 45f)
+                if (angle < 15f)
                     LadderComponent.CallCmdEnterLadder();
             }
         }

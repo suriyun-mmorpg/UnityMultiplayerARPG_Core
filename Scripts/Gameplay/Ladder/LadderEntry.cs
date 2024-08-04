@@ -26,5 +26,15 @@ namespace MultiplayerARPG
             if (ladder == null)
                 ladder = GetComponentInParent<Ladder>();
         }
+
+        private void OnTriggerStay(Collider other)
+        {
+            if (!other.transform.root.TryGetComponent(out BaseCharacterEntity characterEntity) ||
+                !characterEntity.LadderComponent)
+            {
+                return;
+            }
+            characterEntity.LadderComponent.TriggeredLadderEntry = this;
+        }
     }
 }

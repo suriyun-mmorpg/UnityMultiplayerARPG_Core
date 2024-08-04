@@ -8,10 +8,6 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public class CharacterLadderComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>
     {
-        [SerializeField]
-        private float overlapYOffsets = 1f;
-        [SerializeField]
-        private float overlapRadius = 0.5f;
         /// <summary>
         /// Triggered ladder entry, will decide to enter the ladder or not later
         /// </summary>
@@ -75,7 +71,6 @@ namespace MultiplayerARPG
                 Logging.LogWarning(LogTag, "Only server can perform ladder entering");
                 return;
             }
-            FindAndSetTriggeredLadderEntry();
             if (!TriggeredLadderEntry)
             {
                 // No triggered ladder, so it cannot enter
@@ -131,29 +126,6 @@ namespace MultiplayerARPG
         protected void TargetConfirmExitLadder()
         {
             ClimbingLadder = null;
-        }
-
-        public override void EntityUpdate()
-        {
-            if (!IsOwnerClient)
-                return;
-            FindAndSetTriggeredLadderEntry();
-        }
-
-        public void FindAndSetTriggeredLadderEntry()
-        {
-            Vector3 origin = Entity.EntityTransform.position + Entity.EntityTransform.up * overlapYOffsets;
-            Collider[] results = Physics.OverlapSphere(origin, overlapRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Collide);
-            for (int i = 0; i < results.Length; ++i)
-            {
-                Collider collider = results[i];
-                if (collider == null)
-                    continue;
-                if (!collider.TryGetComponent(out LadderEntry ladderEntry))
-                    continue;
-                TriggeredLadderEntry = ladderEntry;
-                break;
-            }
         }
     }
 }
