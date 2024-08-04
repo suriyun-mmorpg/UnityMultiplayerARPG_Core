@@ -1,6 +1,4 @@
 using LiteNetLibManager;
-using Unity.Collections;
-using Unity.Jobs;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -8,46 +6,61 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public class CharacterLadderComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>
     {
+        protected LadderEntrance _triggeredLadderEntry;
+        protected int _lastTriggeredLadderEntryFrame;
         /// <summary>
         /// Triggered ladder entry, will decide to enter the ladder or not later
         /// </summary>
-        public LadderEntry TriggeredLadderEntry { get; set; } = null;
+        public LadderEntrance TriggeredLadderEntry
+        {
+            get
+            {
+                if (Time.frameCount > _lastTriggeredLadderEntryFrame)
+                    _triggeredLadderEntry = null;
+                return _triggeredLadderEntry;
+            }
+            set
+            {
+                _lastTriggeredLadderEntryFrame = Time.frameCount;
+                _triggeredLadderEntry = value;
+            }
+        }
         /// <summary>
         /// The ladder which the entity is climbing
         /// </summary>
         public Ladder ClimbingLadder { get; set; } = null;
 
         #region Play Enter Ladder Animation
-        public void CallRpcPlayEnterLadderAnimation(LadderEntryType direction)
+        public void CallRpcPlayEnterLadderAnimation(LadderEntranceType direction)
         {
             RPC(RpcPlayEnterLadderAnimation, direction);
         }
 
         [AllRpc]
-        protected void RpcPlayEnterLadderAnimation(LadderEntryType direction)
+        protected void RpcPlayEnterLadderAnimation(LadderEntranceType direction)
         {
             PlayEnterLadderAnimation(direction);
         }
 
-        public virtual void PlayEnterLadderAnimation(LadderEntryType direction)
+        public virtual void PlayEnterLadderAnimation(LadderEntranceType direction)
         {
             // TODO: Implement this
         }
         #endregion
 
         #region Play Exit Ladder Animation
-        public void CallRpcPlayExitLadderAnimation(LadderEntryType direction)
+        public void CallRpcPlayExitLadderAnimation(LadderEntranceType direction)
         {
             RPC(RpcPlayExitLadderAnimation, direction);
         }
 
         [AllRpc]
-        protected void RpcPlayExitLadderAnimation(LadderEntryType direction)
+        protected void RpcPlayExitLadderAnimation(LadderEntranceType direction)
         {
             PlayExitLadderAnimation(direction);
         }
 
-        public virtual void PlayExitLadderAnimation(LadderEntryType direction)
+        public virtual void PlayExitLadderAnimation(LadderEntranceType direction)
         {
             // TODO: Implement this
         }
@@ -116,7 +129,7 @@ namespace MultiplayerARPG
                 // Not climbing yet, do not exit
                 return;
             }
-            RpcPlayExitLadderAnimation(TriggeredLadderEntry.type);
+            RpcPlayExitLadderAnimation(LadderEntranceType.Bottom);
             // TODO: Get exiting duration
             ClimbingLadder = null;
             RPC(TargetConfirmExitLadder, ConnectionId);

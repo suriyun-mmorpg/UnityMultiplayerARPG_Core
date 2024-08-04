@@ -2,24 +2,25 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class LadderEntry : MonoBehaviour
+    public class LadderEntrance : MonoBehaviour
     {
         public Ladder ladder;
-        public LadderEntryType type = LadderEntryType.Bottom;
+        public LadderEntranceType type = LadderEntranceType.Bottom;
         public Transform TipTransform
         {
             get
             {
                 switch (type)
                 {
-                    case LadderEntryType.Bottom:
+                    case LadderEntranceType.Bottom:
                         return ladder.bottomTransform;
-                    case LadderEntryType.Top:
+                    case LadderEntranceType.Top:
                         return ladder.topTransform;
                 }
                 return null;
             }
         }
+        private int _lastAddedTriggerObjectFrame;
 
         private void Awake()
         {
@@ -35,6 +36,7 @@ namespace MultiplayerARPG
                 return;
             }
             characterEntity.LadderComponent.TriggeredLadderEntry = this;
+            _lastAddedTriggerObjectFrame = Time.frameCount;
         }
     }
 }

@@ -8,9 +8,14 @@ namespace MultiplayerARPG
         public Transform topTransform;
         public Transform bottomExitTransform;
         public Transform topExitTransform;
+        public float yAngleOffsets = 0f;
         public Vector3 Up => (topTransform.position - bottomTransform.position).normalized;
+        public Vector3 Right => Vector3.Cross(Up, Vector3.forward).normalized;
+        public Vector3 Forward => Vector3.Cross(Right, Up).normalized;
+        public Vector3 RightWithYAngleOffsets => Quaternion.Euler(0, yAngleOffsets, 0) * Right;
+        public Vector3 ForwardWithYAngleOffsets => Quaternion.Euler(0, yAngleOffsets, 0) * Forward;
 
-        public Vector3 ClosestPointOnLadderSegment(Vector3 fromPoint, out float onSegmentState)
+        public Vector3 ClosestPointOnLadderSegment(Vector3 fromPoint, float forwardOffsets, out float onSegmentState)
         {
             Vector3 segment = topTransform.position - bottomTransform.position;
             Vector3 segmentPoint1ToPoint = fromPoint - bottomTransform.position;
@@ -23,20 +28,20 @@ namespace MultiplayerARPG
                 if (pointProjectionLength <= segment.magnitude)
                 {
                     onSegmentState = 0;
-                    return bottomTransform.position + (segment.normalized * pointProjectionLength);
+                    return bottomTransform.position + (segment.normalized * pointProjectionLength) + (ForwardWithYAngleOffsets * forwardOffsets);
                 }
                 // If we are higher than top point
                 else
                 {
                     onSegmentState = pointProjectionLength - segment.magnitude;
-                    return topTransform.position;
+                    return topTransform.position + (ForwardWithYAngleOffsets * forwardOffsets);
                 }
             }
             // When lower than bottom point
             else
             {
                 onSegmentState = pointProjectionLength;
-                return bottomTransform.position;
+                return bottomTransform.position + (ForwardWithYAngleOffsets * forwardOffsets);
             }
         }
 
@@ -48,8 +53,10 @@ namespace MultiplayerARPG
             Gizmos.DrawLine(bottomTransform.position, topTransform.position);
             Gizmos.color = Color.red;
             Gizmos.DrawLine(bottomTransform.position - transform.right * 0.1f, bottomTransform.position + transform.right * 0.1f);
+            Gizmos.DrawLine(bottomTransform.position, bottomTransform.position + ForwardWithYAngleOffsets * 0.1f);
             Gizmos.color = Color.green;
             Gizmos.DrawLine(topTransform.position - transform.right * 0.1f, topTransform.position + transform.right * 0.1f);
+            Gizmos.DrawLine(topTransform.position, topTransform.position + ForwardWithYAngleOffsets * 0.1f);
             if (bottomExitTransform == null || topExitTransform == null)
                 return;
             Gizmos.color = Color.red;

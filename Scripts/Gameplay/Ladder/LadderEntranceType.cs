@@ -1,8 +1,9 @@
 namespace MultiplayerARPG
 {
-    public enum LadderEntryType : byte
+    public enum LadderEntranceType : byte
     {
         Bottom,
         Top,
+        Middle,
     }
 }
