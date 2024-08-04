@@ -375,14 +375,9 @@ namespace MultiplayerARPG
 
             // Underwater state, movement state must be setup here to make it able to calculate move speed properly
             if (_isClimbing)
-            {
                 _tempMovementState |= MovementState.IsClimbing;
-                _tempMovementState |= MovementState.IsGrounded;
-            }
             else if (_isUnderWater)
-            {
                 _tempMovementState |= MovementState.IsUnderWater;
-            }
 
             if (_isClimbing)
                 UpdateClimbMovement(deltaTime);
@@ -409,21 +404,20 @@ namespace MultiplayerARPG
             float tempMaxMoveSpeed = tempEntityMoveSpeed;
             CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
-            float moveY = 0f;
             if (_tempMovementState.Has(MovementState.Forward))
-                moveY = 1f;
+                _moveDirection.y = 1f;
             else if (_tempMovementState.Has(MovementState.Backward))
-                moveY = -1f;
+                _moveDirection.y = -1f;
 
-            if (Mathf.Approximately(moveY, 0f))
+            if (Mathf.Approximately(_moveDirection.y, 0f))
                 return;
             Vector3 tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition,
                 LadderComponent.ClimbingLadder.ClosestPointOnLadderSegment(tempCurrentPosition, EntityMovement.GetBounds().extents.z, out float segmentState), deltaTime) +
-                LadderComponent.ClimbingLadder.Up * moveY * CurrentMoveSpeed;
+                LadderComponent.ClimbingLadder.Up * _moveDirection.y * CurrentMoveSpeed;
 
             if (Mathf.Abs(segmentState) > 0.05f)
             {
-                if (segmentState > 0 && moveY > 0f)
+                if (segmentState > 0 && _moveDirection.y > 0f)
                 {
                     // Exit (top)
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.topExitTransform.position, deltaTime);
@@ -431,7 +425,7 @@ namespace MultiplayerARPG
                     LadderComponent.ClimbingLadder = null;
                 }
                 // If we're lower than the ladder bottom point
-                else if (segmentState < 0 && moveY < 0f)
+                else if (segmentState < 0 && _moveDirection.y < 0f)
                 {
                     // Exit (bottom)
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.bottomExitTransform.position, deltaTime);
@@ -441,6 +435,7 @@ namespace MultiplayerARPG
             }
 
             tempPredictPosition = tempCurrentPosition + (tempMoveVelocity * deltaTime);
+            _currentInput = Entity.SetInputMovementState(_currentInput, _tempMovementState);
             _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
             _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
             _previousMovement = tempMoveVelocity * deltaTime;
