@@ -10,7 +10,7 @@ namespace MultiplayerARPG
 
         public override UniTask DoAction(IPlayerCharacterData player)
         {
-            player.Gold.Increase(gold);
+            player.Gold = player.Gold.Increase(gold);
             return UniTask.CompletedTask;
         }
 
