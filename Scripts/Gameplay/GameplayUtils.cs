@@ -78,6 +78,12 @@ namespace MultiplayerARPG
             return DirectionType2D.Down;
         }
 
+        public static MovementState GetMovementStateByDirection(Vector3 moveDirection, Ladder ladder)
+        {
+            float angle = Vector3.SignedAngle(moveDirection, ladder.ForwardWithYAngleOffsets, ladder.Up);
+            return Mathf.Abs(angle) > 90f ? MovementState.Up : MovementState.Down;
+        }
+
         public static MovementState GetMovementStateByDirection(Vector3 moveDirection, Vector3 entityForward)
         {
             float angle = Vector3.SignedAngle(moveDirection, entityForward, Vector3.up);

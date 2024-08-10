@@ -394,8 +394,8 @@ namespace MultiplayerARPG
 
         protected void UpdateClimbMovement(float deltaTime)
         {
-            if (!_tempMovementState.Has(MovementState.Forward) &&
-                !_tempMovementState.Has(MovementState.Backward))
+            if (!_tempMovementState.Has(MovementState.Up) &&
+                !_tempMovementState.Has(MovementState.Down))
             {
                 // No movement inputs
                 return;
@@ -409,9 +409,9 @@ namespace MultiplayerARPG
             float tempMaxMoveSpeed = tempEntityMoveSpeed;
             CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
-            if (_tempMovementState.Has(MovementState.Forward))
+            if (_tempMovementState.Has(MovementState.Up))
                 _moveDirection.y = 1f;
-            else if (_tempMovementState.Has(MovementState.Backward))
+            else if (_tempMovementState.Has(MovementState.Down))
                 _moveDirection.y = -1f;
 
             if (Mathf.Approximately(_moveDirection.y, 0f))
