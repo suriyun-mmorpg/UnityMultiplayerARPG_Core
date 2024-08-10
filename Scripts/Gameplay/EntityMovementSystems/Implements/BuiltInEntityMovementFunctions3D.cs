@@ -427,7 +427,7 @@ namespace MultiplayerARPG
                 {
                     // Exit (top)
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.topExitTransform.position, deltaTime);
-                    LadderComponent.CallCmdExitLadder();
+                    LadderComponent.CallCmdExitLadder(LadderEntranceType.Top);
                     LadderComponent.ClimbingLadder = null;
                 }
                 // If we're lower than the ladder bottom point
@@ -435,7 +435,7 @@ namespace MultiplayerARPG
                 {
                     // Exit (bottom)
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.bottomExitTransform.position, deltaTime);
-                    LadderComponent.CallCmdExitLadder();
+                    LadderComponent.CallCmdExitLadder(LadderEntranceType.Bottom);
                     LadderComponent.ClimbingLadder = null;
                 }
             }

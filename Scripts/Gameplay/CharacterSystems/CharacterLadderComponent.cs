@@ -106,18 +106,18 @@ namespace MultiplayerARPG
             ClimbingLadder = TriggeredLadderEntry.ladder;
         }
 
-        public void CallCmdExitLadder()
+        public void CallCmdExitLadder(LadderEntranceType entranceType)
         {
-            RPC(CmdExitLadder);
+            RPC(CmdExitLadder, entranceType);
         }
 
         [ServerRpc]
-        protected void CmdExitLadder()
+        protected void CmdExitLadder(LadderEntranceType entranceType)
         {
-            ExitLadder();
+            ExitLadder(entranceType);
         }
 
-        public void ExitLadder()
+        public void ExitLadder(LadderEntranceType entranceType)
         {
             if (!IsServer)
             {
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
                 // Not climbing yet, do not exit
                 return;
             }
-            RpcPlayExitLadderAnimation(LadderEntranceType.Bottom);
+            RpcPlayExitLadderAnimation(entranceType);
             // TODO: Get exiting duration
             ClimbingLadder = null;
             RPC(TargetConfirmExitLadder, ConnectionId);
