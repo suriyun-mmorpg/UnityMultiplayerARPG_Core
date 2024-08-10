@@ -269,6 +269,11 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 _targetYAngle = rotation.eulerAngles.y;
+                if (LadderComponent && LadderComponent.ClimbingLadder)
+                {
+                    // Turn to the ladder
+                    _targetYAngle = Quaternion.LookRotation(-LadderComponent.ClimbingLadder.ForwardWithYAngleOffsets).eulerAngles.y;
+                }
                 _lookRotationApplied = false;
             }
         }
@@ -411,6 +416,7 @@ namespace MultiplayerARPG
 
             if (Mathf.Approximately(_moveDirection.y, 0f))
                 return;
+
             Vector3 tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition,
                 LadderComponent.ClimbingLadder.ClosestPointOnLadderSegment(tempCurrentPosition, EntityMovement.GetBounds().extents.z, out float segmentState), deltaTime) +
                 LadderComponent.ClimbingLadder.Up * _moveDirection.y * CurrentMoveSpeed;
