@@ -768,7 +768,7 @@ namespace MultiplayerARPG
                 {
                     LadderComponent.CallCmdEnterLadder();
                     _previousMovement = GetVelocityForMovePosition(tempCurrentPosition,
-                        LadderComponent.ClimbingLadder.ClosestPointOnLadderSegment(tempCurrentPosition, EntityMovement.GetBounds().extents.z, out _),
+                        LadderComponent.TriggeredLadderEntry.ladder.ClosestPointOnLadderSegment(tempCurrentPosition, EntityMovement.GetBounds().extents.z, out _),
                         deltaTime) * deltaTime;
                 }
             }
