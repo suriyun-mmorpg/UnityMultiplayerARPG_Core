@@ -10,7 +10,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel, IVehicleEnterExitModel
+    public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel
     {
         public int Id { get; protected set; }
         public BaseCharacterModel MainModel { get; set; }
@@ -964,20 +964,6 @@ namespace MultiplayerARPG
             SetMoveAnimationSpeedMultiplier(1f);
             SetMovementState(MovementState.IsGrounded, ExtraMovementState.None, Vector2.down, false);
         }
-
-        public virtual float GetEnterVehicleAnimationDuration(IVehicleEntity vehicleEntity)
-        {
-            return 0f;
-        }
-
-        public virtual void PlayEnterVehicleAnimation(IVehicleEntity vehicleEntity) { }
-
-        public virtual float GetExitVehicleAnimationDuration(IVehicleEntity vehicleEntity)
-        {
-            return 0f;
-        }
-
-        public virtual void PlayExitVehicleAnimation(IVehicleEntity vehicleEntity) { }
 
         public virtual void PlayHitAnimation() { }
 

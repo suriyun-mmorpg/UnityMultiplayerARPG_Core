@@ -203,9 +203,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState fallState;
         public AnimState landedState;
 
-        [Header("Vehicle Animation")]
-        public EnterExitStates vehicleEnterExitStates;
-
         [Header("Hurt")]
         public ActionState hurtState;
 
@@ -319,6 +316,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         [Header("Vehicle Animation")]
         public EnterExitStates vehicleEnterExitStates;
+
+        [Header("Ladder Animation")]
+        public EnterExitStates ladderBottomEnterExitStates;
+        public EnterExitStates ladderTopEnterExitStates;
 
         [Header("Hurt")]
         public ActionState hurtState;
