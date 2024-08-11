@@ -1,11 +1,15 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class LadderEntrance : MonoBehaviour
     {
+        private static HashSet<LadderEntrance> s_entrances = new HashSet<LadderEntrance>();
+
         public Ladder ladder;
         public LadderEntranceType type = LadderEntranceType.Bottom;
+
         public Transform TipTransform
         {
             get
@@ -25,6 +29,28 @@ namespace MultiplayerARPG
         {
             if (ladder == null)
                 ladder = GetComponentInParent<Ladder>();
+            s_entrances.Add(this);
+        }
+
+        private void OnDestroy()
+        {
+            s_entrances.Remove(this);
+        }
+
+        public static LadderEntrance FindNearest(Vector3 origin)
+        {
+            float nearestDist = float.MaxValue;
+            LadderEntrance nearestEntrance = null;
+            foreach (LadderEntrance entrance in s_entrances)
+            {
+                float dist = Vector3.Distance(origin, entrance.transform.position);
+                if (nearestEntrance == null || dist < nearestDist)
+                {
+                    nearestDist = dist;
+                    nearestEntrance = entrance;
+                }
+            }
+            return nearestEntrance;
         }
 
         private void OnTriggerStay(Collider other)

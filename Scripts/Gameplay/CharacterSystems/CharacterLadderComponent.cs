@@ -39,6 +39,7 @@ namespace MultiplayerARPG
         [AllRpc]
         protected void RpcConfirmEnterLadder(LadderEntranceType direction)
         {
+            TriggeredLadderEntry = LadderEntrance.FindNearest(Entity.EntityTransform.position);
             ClimbingLadder = TriggeredLadderEntry.ladder;
             PlayEnterLadderAnimation(direction);
         }
