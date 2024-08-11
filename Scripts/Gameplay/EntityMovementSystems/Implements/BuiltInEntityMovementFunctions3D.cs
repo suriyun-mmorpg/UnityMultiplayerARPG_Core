@@ -428,7 +428,6 @@ namespace MultiplayerARPG
                     // Exit (top)
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.topExitTransform.position, deltaTime);
                     LadderComponent.CallCmdExitLadder(LadderEntranceType.Top);
-                    LadderComponent.ClimbingLadder = null;
                 }
                 // If we're lower than the ladder bottom point
                 else if (segmentState < 0 && _moveDirection.y < 0f)
@@ -436,7 +435,6 @@ namespace MultiplayerARPG
                     // Exit (bottom)
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.bottomExitTransform.position, deltaTime);
                     LadderComponent.CallCmdExitLadder(LadderEntranceType.Bottom);
-                    LadderComponent.ClimbingLadder = null;
                 }
             }
 
@@ -765,12 +763,7 @@ namespace MultiplayerARPG
                 Vector3 dirToLadder = (LadderComponent.TriggeredLadderEntry.TipTransform.position.GetXZ() - Entity.EntityTransform.position.GetXZ()).normalized;
                 float angle = Vector3.Angle(tempHorizontalMoveDirection, dirToLadder);
                 if (angle < 15f)
-                {
                     LadderComponent.CallCmdEnterLadder();
-                    _previousMovement = GetVelocityForMovePosition(tempCurrentPosition,
-                        LadderComponent.TriggeredLadderEntry.ladder.ClosestPointOnLadderSegment(tempCurrentPosition, EntityMovement.GetBounds().extents.z, out _),
-                        deltaTime) * deltaTime;
-                }
             }
             EntityMovement.Move(_previousMovement);
         }
