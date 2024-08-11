@@ -692,9 +692,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
             switch (entranceType)
             {
                 case LadderEntranceType.Bottom:
-                    return defaultAnimations.ladderBottomEnterExitStates;
+                    return defaultAnimations.climbBottomEnterExitStates;
                 case LadderEntranceType.Top:
-                    return defaultAnimations.ladderTopEnterExitStates;
+                    return defaultAnimations.climbTopEnterExitStates;
             }
             return default;
         }
