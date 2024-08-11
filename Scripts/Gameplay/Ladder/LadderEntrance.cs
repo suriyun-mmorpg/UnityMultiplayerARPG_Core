@@ -20,7 +20,6 @@ namespace MultiplayerARPG
                 return null;
             }
         }
-        private int _lastAddedTriggerObjectFrame;
 
         private void Awake()
         {
@@ -30,13 +29,17 @@ namespace MultiplayerARPG
 
         private void OnTriggerStay(Collider other)
         {
+            OnTrigger(other);
+        }
+
+        private void OnTrigger(Collider other)
+        {
             if (!other.transform.root.TryGetComponent(out BaseCharacterEntity characterEntity) ||
                 !characterEntity.LadderComponent)
             {
                 return;
             }
             characterEntity.LadderComponent.TriggeredLadderEntry = this;
-            _lastAddedTriggerObjectFrame = Time.frameCount;
         }
     }
 }
