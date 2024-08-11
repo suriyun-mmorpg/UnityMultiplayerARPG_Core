@@ -261,7 +261,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public Bounds GetBounds()
+        public Bounds GetMovementBounds()
         {
             return CacheCharacterController.bounds;
         }

@@ -410,6 +410,11 @@ namespace MultiplayerARPG
             return maxMoveSpeed;
         }
 
+        public Bounds GetMovementBounds()
+        {
+            return GameplayUtils.MakeLocalBoundsByCollider(transform);
+        }
+
         protected virtual void SetMovePaths(Vector2 position, bool useNavMesh)
         {
             // TODO: Implement nav mesh

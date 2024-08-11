@@ -204,11 +204,6 @@ namespace MultiplayerARPG
             return EntityInfo.Empty;
         }
 
-        public virtual Bounds MakeLocalBounds()
-        {
-            return GameplayUtils.MakeLocalBoundsByCollider(EntityTransform);
-        }
-
         private void Awake()
         {
             InitialRequiredComponents();

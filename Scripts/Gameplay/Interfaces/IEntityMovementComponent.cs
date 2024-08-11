@@ -1,4 +1,5 @@
 using LiteNetLib.Utils;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -22,5 +23,6 @@ namespace MultiplayerARPG
         bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably);
         void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader);
         void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader);
+        Bounds GetMovementBounds();
     }
 }

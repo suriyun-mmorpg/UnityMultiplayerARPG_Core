@@ -394,6 +394,22 @@ namespace MultiplayerARPG
             RotateY();
         }
 
+        public Bounds GetMovementBounds()
+        {
+            Vector3 agentPosition = transform.position;
+            Vector3 lossyScale = transform.lossyScale;
+
+            // Calculate the scaled extents using lossy scale
+            float scaledRadius = CacheNavMeshAgent.radius * Mathf.Max(lossyScale.x, lossyScale.z);
+            float scaledHeight = CacheNavMeshAgent.height * lossyScale.y;
+            float baseOffset = CacheNavMeshAgent.baseOffset * lossyScale.y;
+
+            // Adjust the center to include the baseOffset and scale
+            Vector3 center = new Vector3(agentPosition.x, agentPosition.y + baseOffset + (scaledHeight * 0.5f), agentPosition.z);
+            Vector3 size = new Vector3(scaledRadius * 2, scaledHeight, scaledRadius * 2);
+            return new Bounds(center, size);
+        }
+
         private void RotateY()
         {
             CacheTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);

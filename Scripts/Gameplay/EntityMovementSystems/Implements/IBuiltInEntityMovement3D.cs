@@ -8,6 +8,6 @@ namespace MultiplayerARPG
         void Move(Vector3 motion);
         void RotateY(float yAngle);
         void OnJumpForceApplied(float verticalVelocity);
-        Bounds GetBounds();
+        Bounds GetMovementBounds();
     }
 }

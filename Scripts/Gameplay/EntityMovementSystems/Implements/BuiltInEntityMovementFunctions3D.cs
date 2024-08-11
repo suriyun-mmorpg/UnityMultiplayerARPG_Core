@@ -359,7 +359,7 @@ namespace MultiplayerARPG
 
         public float TargetWaterSurfaceY(Collider waterCollider)
         {
-            Bounds movementBounds = EntityMovement.GetBounds();
+            Bounds movementBounds = EntityMovement.GetMovementBounds();
             float result = waterCollider.bounds.max.y - (underWaterThreshold * movementBounds.size.y);
             return result;
         }
@@ -394,13 +394,6 @@ namespace MultiplayerARPG
 
         protected void UpdateClimbMovement(float deltaTime)
         {
-            if (!_tempMovementState.Has(MovementState.Up) &&
-                !_tempMovementState.Has(MovementState.Down))
-            {
-                // No movement inputs
-                return;
-            }
-
             Vector3 tempPredictPosition;
             Vector3 tempCurrentPosition = CacheTransform.position;
             // Prepare movement speed
@@ -409,35 +402,51 @@ namespace MultiplayerARPG
             float tempMaxMoveSpeed = tempEntityMoveSpeed;
             CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
-            if (_tempMovementState.Has(MovementState.Up))
-                _moveDirection.y = 1f;
-            else if (_tempMovementState.Has(MovementState.Down))
-                _moveDirection.y = -1f;
-
-            if (Mathf.Approximately(_moveDirection.y, 0f))
-                return;
-
-            Vector3 tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition,
-                LadderComponent.ClimbingLadder.ClosestPointOnLadderSegment(tempCurrentPosition, EntityMovement.GetBounds().extents.z, out float segmentState), deltaTime) +
-                LadderComponent.ClimbingLadder.Up * _moveDirection.y * CurrentMoveSpeed;
-
-            if (Mathf.Abs(segmentState) > 0.05f)
+            float currentTime = Time.unscaledTime;
+            Vector3 tempMoveVelocity = Vector3.zero;
+            switch (LadderComponent.EnterExitState)
             {
-                if (segmentState > 0 && _moveDirection.y > 0f)
-                {
-                    // Exit (top)
-                    tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.topExitTransform.position, deltaTime);
-                    LadderComponent.CallCmdExitLadder(LadderEntranceType.Top);
-                }
-                // If we're lower than the ladder bottom point
-                else if (segmentState < 0 && _moveDirection.y < 0f)
-                {
-                    // Exit (bottom)
-                    tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.bottomExitTransform.position, deltaTime);
-                    LadderComponent.CallCmdExitLadder(LadderEntranceType.Bottom);
-                }
-            }
+                case EnterExitState.Enter:
+                case EnterExitState.Exit:
+                    if (currentTime < LadderComponent.EnterOrExitEndTime)
+                    {
+                        // Enter or exit
+                        Vector3 tempPosition = Vector3.Lerp(LadderComponent.EnterOrExitFromPosition, LadderComponent.EnterOrExitToPosition, currentTime - LadderComponent.EnterOrExitTime / LadderComponent.EnterOrExitDuration);
+                        tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, tempPosition, deltaTime);
+                    }
+                    break;
+                default:
+                    if (_tempMovementState.Has(MovementState.Up))
+                        _moveDirection.y = 1f;
+                    else if (_tempMovementState.Has(MovementState.Down))
+                        _moveDirection.y = -1f;
 
+                    if (Mathf.Approximately(_moveDirection.y, 0f))
+                        return;
+
+                    tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition,
+                        LadderComponent.ClimbingLadder.ClosestPointOnLadderSegment(tempCurrentPosition, EntityMovement.GetMovementBounds().extents.z, out float segmentState), deltaTime) +
+                        LadderComponent.ClimbingLadder.Up * _moveDirection.y * CurrentMoveSpeed;
+
+                    if (Mathf.Abs(segmentState) > 0.05f)
+                    {
+                        if (segmentState > 0 && _moveDirection.y > 0f)
+                        {
+                            // Exit (top)
+                            //tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.topExitTransform.position, deltaTime);
+                            LadderComponent.CallCmdExitLadder(LadderEntranceType.Top);
+                        }
+                        // If we're lower than the ladder bottom point
+                        else if (segmentState < 0 && _moveDirection.y < 0f)
+                        {
+                            // Exit (bottom)
+                            //tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.bottomExitTransform.position, deltaTime);
+                            LadderComponent.CallCmdExitLadder(LadderEntranceType.Bottom);
+                        }
+                    }
+                    break;
+            }
+            // Move
             tempPredictPosition = tempCurrentPosition + (tempMoveVelocity * deltaTime);
             _currentInput = Entity.SetInputMovementState(_currentInput, _tempMovementState);
             _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
