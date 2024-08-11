@@ -106,7 +106,7 @@ namespace MultiplayerARPG
             {
                 await UniTask.WaitForSeconds(EnterOrExitDuration);
             }
-            await UniTask.NextFrame();
+            await UniTask.DelayFrame(2);
             EnterExitState = EnterExitState.None;
         }
         #endregion
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
             {
                 await UniTask.WaitForSeconds(EnterOrExitDuration);
             }
-            await UniTask.NextFrame();
+            await UniTask.DelayFrame(2);
             EnterExitState = EnterExitState.None;
         }
         #endregion

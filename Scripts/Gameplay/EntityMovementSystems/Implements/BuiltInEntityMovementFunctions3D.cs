@@ -403,17 +403,18 @@ namespace MultiplayerARPG
             CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
             float currentTime = Time.unscaledTime;
-            Vector3 tempMoveVelocity = Vector3.zero;
+            Vector3 tempMoveVelocity;
             switch (LadderComponent.EnterExitState)
             {
                 case EnterExitState.Enter:
                 case EnterExitState.Exit:
-                    if (currentTime < LadderComponent.EnterOrExitEndTime)
-                    {
-                        // Enter or exit
-                        Vector3 tempPosition = Vector3.Lerp(LadderComponent.EnterOrExitFromPosition, LadderComponent.EnterOrExitToPosition, currentTime - LadderComponent.EnterOrExitTime / LadderComponent.EnterOrExitDuration);
-                        tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, tempPosition, deltaTime);
-                    }
+                    // Enter or exit
+                    Vector3 tempPosition;
+                    if (LadderComponent.EnterOrExitDuration > 0f)
+                        tempPosition = Vector3.Lerp(LadderComponent.EnterOrExitFromPosition, LadderComponent.EnterOrExitToPosition, currentTime - LadderComponent.EnterOrExitTime / LadderComponent.EnterOrExitDuration);
+                    else
+                        tempPosition = LadderComponent.EnterOrExitToPosition;
+                    tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, tempPosition, deltaTime);
                     break;
                 default:
                     if (_tempMovementState.Has(MovementState.Up))
