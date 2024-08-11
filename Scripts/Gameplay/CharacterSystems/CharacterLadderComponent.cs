@@ -31,14 +31,15 @@ namespace MultiplayerARPG
         public Ladder ClimbingLadder { get; set; } = null;
 
         #region Play Enter Ladder Animation
-        public void CallRpcPlayEnterLadderAnimation(LadderEntranceType direction)
+        public void CallRpcConfirmEnterLadder(LadderEntranceType direction)
         {
-            RPC(RpcPlayEnterLadderAnimation, direction);
+            RPC(RpcConfirmEnterLadder, direction);
         }
 
         [AllRpc]
-        protected void RpcPlayEnterLadderAnimation(LadderEntranceType direction)
+        protected void RpcConfirmEnterLadder(LadderEntranceType direction)
         {
+            ClimbingLadder = TriggeredLadderEntry.ladder;
             PlayEnterLadderAnimation(direction);
         }
 
@@ -49,14 +50,15 @@ namespace MultiplayerARPG
         #endregion
 
         #region Play Exit Ladder Animation
-        public void CallRpcPlayExitLadderAnimation(LadderEntranceType direction)
+        public void CallRpcConfirmExitLadder(LadderEntranceType direction)
         {
-            RPC(RpcPlayExitLadderAnimation, direction);
+            RPC(RpcConfirmExitLadder, direction);
         }
 
         [AllRpc]
-        protected void RpcPlayExitLadderAnimation(LadderEntranceType direction)
+        protected void RpcConfirmExitLadder(LadderEntranceType direction)
         {
+            ClimbingLadder = null;
             PlayExitLadderAnimation(direction);
         }
 
@@ -94,16 +96,7 @@ namespace MultiplayerARPG
                 // Already climbing, do not enter
                 return;
             }
-            RpcPlayEnterLadderAnimation(TriggeredLadderEntry.type);
-            // TODO: Get entering duration
-            ClimbingLadder = TriggeredLadderEntry.ladder;
-            RPC(TargetConfirmEnterLadder, ConnectionId);
-        }
-
-        [TargetRpc]
-        protected void TargetConfirmEnterLadder()
-        {
-            ClimbingLadder = TriggeredLadderEntry.ladder;
+            CallRpcConfirmEnterLadder(TriggeredLadderEntry.type);
         }
 
         public void CallCmdExitLadder(LadderEntranceType entranceType)
@@ -129,16 +122,7 @@ namespace MultiplayerARPG
                 // Not climbing yet, do not exit
                 return;
             }
-            RpcPlayExitLadderAnimation(entranceType);
-            // TODO: Get exiting duration
-            ClimbingLadder = null;
-            RPC(TargetConfirmExitLadder, ConnectionId);
-        }
-
-        [TargetRpc]
-        protected void TargetConfirmExitLadder()
-        {
-            ClimbingLadder = null;
+            CallRpcConfirmExitLadder(entranceType);
         }
     }
 }
