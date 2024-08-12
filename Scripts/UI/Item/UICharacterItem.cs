@@ -1297,7 +1297,7 @@ namespace MultiplayerARPG
             BaseMonsterCharacterEntity tempMonsterEntity = null;
             if (ItemWithMonsterEntity != null)
             {
-                await ItemWithMonsterEntity.AddressableMonsterCharacterEntity
+                tempMonsterEntity = await ItemWithMonsterEntity.AddressableMonsterCharacterEntity
                     .GetOrLoadAssetAsyncOrUsePrefab(ItemWithMonsterEntity.MonsterCharacterEntity);
             }
             if (tempMonsterEntity == null)
@@ -1324,7 +1324,7 @@ namespace MultiplayerARPG
                 // Item's EXP (pet's EXP)
                 int currentExp;
                 int nextLevelExp;
-                tempMonsterEntity.GetProperCurrentByNextLevelExp(out currentExp, out nextLevelExp);
+                tempMonsterEntity.GetProperCurrentByNextLevelExp(CharacterItem.level, CharacterItem.exp, out currentExp, out nextLevelExp);
 
                 if (uiTextExp != null)
                 {
@@ -1345,7 +1345,7 @@ namespace MultiplayerARPG
             BuildingEntity tempBuildingEntity = null;
             if (ItemWithBuildingEntity != null)
             {
-                await ItemWithBuildingEntity.AddressableBuildingEntity
+                tempBuildingEntity = await ItemWithBuildingEntity.AddressableBuildingEntity
                     .GetOrLoadAssetAsyncOrUsePrefab(ItemWithBuildingEntity.BuildingEntity);
             }
             if (tempBuildingEntity == null)
