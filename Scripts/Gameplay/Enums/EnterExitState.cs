@@ -5,5 +5,6 @@ namespace MultiplayerARPG
         None,
         Enter,
         Exit,
+        ConfirmAwaiting,
     }
 }

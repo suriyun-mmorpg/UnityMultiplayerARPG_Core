@@ -56,11 +56,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(LogTag, "Only server can perform ladder entering");
                 return;
             }
-            if (!TriggeredLadderEntry)
-            {
-                // No triggered ladder, so it cannot enter
-                return;
-            }
+            TriggeredLadderEntry = LadderEntrance.FindNearest(Entity.EntityTransform.position);
             if (ClimbingLadder && ClimbingLadder == TriggeredLadderEntry.ladder)
             {
                 // Already climbing, do not enter

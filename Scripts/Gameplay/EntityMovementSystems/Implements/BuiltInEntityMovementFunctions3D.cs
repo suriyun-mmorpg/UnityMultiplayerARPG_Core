@@ -416,6 +416,9 @@ namespace MultiplayerARPG
                         tempPosition = LadderComponent.EnterOrExitToPosition;
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, tempPosition, deltaTime);
                     break;
+                case EnterExitState.ConfirmAwaiting:
+                    tempMoveVelocity = Vector3.zero;
+                    break;
                 default:
                     if (_tempMovementState.Has(MovementState.Up))
                         _moveDirection.y = 1f;
@@ -435,6 +438,8 @@ namespace MultiplayerARPG
                         {
                             // Exit (top)
                             //tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.topExitTransform.position, deltaTime);
+
+                            LadderComponent.EnterExitState = EnterExitState.ConfirmAwaiting;
                             LadderComponent.CallCmdExitLadder(LadderEntranceType.Top);
                         }
                         // If we're lower than the ladder bottom point
@@ -442,6 +447,8 @@ namespace MultiplayerARPG
                         {
                             // Exit (bottom)
                             //tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.bottomExitTransform.position, deltaTime);
+
+                            LadderComponent.EnterExitState = EnterExitState.ConfirmAwaiting;
                             LadderComponent.CallCmdExitLadder(LadderEntranceType.Bottom);
                         }
                     }
@@ -768,12 +775,19 @@ namespace MultiplayerARPG
             }
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
             _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion + forceMotion) * deltaTime;
-            if (LadderComponent && LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder && tempHorizontalMoveDirection.sqrMagnitude > 0f)
+            if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent && 
+                LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder &&
+                LadderComponent.EnterExitState == EnterExitState.None &&
+                LadderComponent.EnterExitState != EnterExitState.ConfirmAwaiting &&
+                tempHorizontalMoveDirection.sqrMagnitude > 0f)
             {
                 Vector3 dirToLadder = (LadderComponent.TriggeredLadderEntry.TipTransform.position.GetXZ() - Entity.EntityTransform.position.GetXZ()).normalized;
                 float angle = Vector3.Angle(tempHorizontalMoveDirection, dirToLadder);
                 if (angle < 15f)
+                {
+                    LadderComponent.EnterExitState = EnterExitState.ConfirmAwaiting;
                     LadderComponent.CallCmdEnterLadder();
+                }
             }
             EntityMovement.Move(_previousMovement);
         }
