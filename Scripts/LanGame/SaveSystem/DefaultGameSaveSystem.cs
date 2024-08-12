@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     {
         private readonly WorldSaveData worldSaveData = new WorldSaveData();
         private readonly SummonBuffsSaveData summonBuffsSaveData = new SummonBuffsSaveData();
-        private readonly StorageSaveData hostStorageSaveData = new StorageSaveData();
+        private readonly StorageSaveData worldStorageSaveData = new StorageSaveData();
         private readonly StorageSaveData playerStorageSaveData = new StorageSaveData();
         private readonly Dictionary<StorageId, List<CharacterItem>> playerStorageItems = new Dictionary<StorageId, List<CharacterItem>>();
         private bool isReadyToSave;
@@ -60,9 +60,9 @@ namespace MultiplayerARPG
                     GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
                 }
                 // Load storage data
-                hostStorageSaveData.LoadPersistentData(hostPlayerCharacterData.Id);
+                worldStorageSaveData.LoadPersistentData($"{hostPlayerCharacterData.Id}_world");
                 StorageId storageId;
-                foreach (StorageCharacterItem storageItem in hostStorageSaveData.storageItems)
+                foreach (StorageCharacterItem storageItem in worldStorageSaveData.storageItems)
                 {
                     storageId = new StorageId(storageItem.storageType, storageItem.storageOwnerId);
                     if (!storageItems.ContainsKey(storageId))
@@ -121,18 +121,17 @@ namespace MultiplayerARPG
             if (!isReadyToSave)
                 return;
 
-            hostStorageSaveData.storageItems.Clear();
+            worldStorageSaveData.storageItems.Clear();
             foreach (StorageId storageId in storageItems.Keys)
             {
-                if (storageId.storageType == StorageType.Player &&
-                    !storageId.storageOwnerId.Equals(hostPlayerCharacterData.Id))
+                if (storageId.storageType == StorageType.Player)
                 {
-                    // Non-host player's storage will be saved in `SavePlayerStorage` function
+                    // Player's storage will be saved in `SavePlayerStorage` function
                     continue;
                 }
                 foreach (CharacterItem storageItem in storageItems[storageId])
                 {
-                    hostStorageSaveData.storageItems.Add(new StorageCharacterItem()
+                    worldStorageSaveData.storageItems.Add(new StorageCharacterItem()
                     {
                         storageType = storageId.storageType,
                         storageOwnerId = storageId.storageOwnerId,
@@ -140,7 +139,7 @@ namespace MultiplayerARPG
                     });
                 }
             }
-            hostStorageSaveData.SavePersistentData(hostPlayerCharacterData.Id);
+            worldStorageSaveData.SavePersistentData($"{hostPlayerCharacterData.Id}_world");
         }
 
         public override void SavePlayerStorage(IPlayerCharacterData playerCharacterData, List<CharacterItem> storageItems)
