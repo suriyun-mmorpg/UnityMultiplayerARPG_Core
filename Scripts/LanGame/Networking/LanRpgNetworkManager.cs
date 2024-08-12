@@ -121,6 +121,9 @@ namespace MultiplayerARPG
 
         private void NotifyStorageItemsUpdated(List<CharacterItem> storageItems)
         {
+            if (GameInstance.OpenedStorageType != StorageType.Player ||
+                !string.Equals(GameInstance.OpenedStorageOwnerId, selectedCharacter.Id))
+                return;
             selectedCharacterStorageItems = storageItems;
         }
 
@@ -157,11 +160,8 @@ namespace MultiplayerARPG
                     if (saveStorage)
                         SaveSystem.SaveStorage(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
                 }
-                else
-                {
-                    if (saveStorage)
-                        SaveSystem.SavePlayerStorage(selectedCharacter, selectedCharacterStorageItems);
-                }
+                if (saveStorage)
+                    SaveSystem.SavePlayerStorage(selectedCharacter, selectedCharacterStorageItems);
             }
             Profiler.EndSample();
         }
