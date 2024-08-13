@@ -59,15 +59,7 @@ namespace MultiplayerARPG
             }
 
             imageIcon.SetImageGameDataIcon(Data);
-
-#if UNITY_EDITOR || !UNITY_SERVER
-            if (rawImageExternalIcon != null)
-            {
-                rawImageExternalIcon.gameObject.SetActive(Data != null && !string.IsNullOrEmpty(Data.ExternalIconUrl));
-                if (Data != null && !string.IsNullOrEmpty(Data.ExternalIconUrl))
-                    StartCoroutine(LoadExternalIcon());
-            }
-#endif
+            rawImageExternalIcon.SetRawImageExternalTexture(Data.ExternalIconUrl);
 
             if (uiTextSellPrice != null)
             {
@@ -82,14 +74,6 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeyCashAmount),
                     Data == null ? "0" : Data.CashAmount.ToString("N0"));
             }
-        }
-
-        IEnumerator LoadExternalIcon()
-        {
-            UnityWebRequest www = UnityWebRequestTexture.GetTexture(Data.ExternalIconUrl);
-            yield return www.SendWebRequest();
-            if (!www.IsError())
-                rawImageExternalIcon.texture = ((DownloadHandlerTexture)www.downloadHandler).texture;
         }
 
         public void OnClickBuy()
