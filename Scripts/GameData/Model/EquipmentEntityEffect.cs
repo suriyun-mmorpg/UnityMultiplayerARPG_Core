@@ -1,17 +1,18 @@
-using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [Serializable]
-    public struct EquipmentEntityEffect : IComparable<EquipmentEntityEffect>
+    [System.Serializable]
+    public class EquipmentEntityEffect : System.IComparable<EquipmentEntityEffect>
     {
-        public int level;
+        public int level = 1;
         [HideInInspector]
-        [Obsolete("This is deprecated, use `effectMaterials` instead.")]
+        [System.Obsolete("This is deprecated, use `effectMaterials` instead.")]
         public Material[] materials;
-        public MaterialCollection[] equipmentMaterials;
-        public GameObject[] effectObjects;
+        [FormerlySerializedAs("equipmentMaterials")]
+        public MaterialCollection[] visibleMaterials = new MaterialCollection[0];
+        public GameObject[] effectObjects = new GameObject[0];
 
         public int CompareTo(EquipmentEntityEffect other)
         {
@@ -20,7 +21,7 @@ namespace MultiplayerARPG
 
         public void ApplyMaterials()
         {
-            equipmentMaterials.ApplyMaterials();
+            visibleMaterials.ApplyMaterials();
         }
     }
 }
