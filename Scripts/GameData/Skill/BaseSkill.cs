@@ -1,5 +1,6 @@
-﻿using System.Collections.Generic;
-using Cysharp.Text;
+﻿using Cysharp.Text;
+using Insthync.AddressableAssetTools;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR

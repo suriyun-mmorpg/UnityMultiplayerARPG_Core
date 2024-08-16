@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Insthync.AddressableAssetTools;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG

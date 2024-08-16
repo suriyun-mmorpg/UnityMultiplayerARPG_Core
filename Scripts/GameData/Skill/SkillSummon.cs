@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Insthync.AddressableAssetTools;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
