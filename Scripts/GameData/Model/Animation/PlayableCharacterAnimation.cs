@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG.GameData.Model.Playables
@@ -14,16 +14,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public bool isAdditive;
         public bool applyFootIk;
         public bool applyPlayableIk;
-
-        public float GetSpeed(float rate)
-        {
-            return (animSpeedRate > 0 ? animSpeedRate : 1) * rate;
-        }
-
-        public float GetClipLength(float rate)
-        {
-            return clip.length / GetSpeed(rate);
-        }
     }
 
     [System.Serializable]
@@ -32,6 +22,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationClip clip;
         [Tooltip("If this is `null`, it will use default avatar mask setting from model component")]
         public AvatarMask avatarMask;
+        [Tooltip("If this is true it will only use AvatarMask when character is moving")]
+        public bool useAvatarMaskWhenMoving;
         [Tooltip("If this <= 0, it will not be used to calculate with animation speed multiplier")]
         public float animSpeedRate;
         [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
@@ -43,16 +35,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public bool skipMovementValidation;
         [Tooltip("Turn this on to use root motion while playing this animation")]
         public bool shouldUseRootMotion;
-
-        public float GetSpeed(float rate)
-        {
-            return (animSpeedRate > 0 ? animSpeedRate : 1) * rate;
-        }
-
-        public float GetClipLength(float rate)
-        {
-            return clip.length / GetSpeed(rate);
-        }
     }
 
     [System.Serializable]
@@ -80,8 +62,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState backwardState;
         public AnimState leftState;
         public AnimState rightState;
-        public AnimState upState;
-        public AnimState downState;
         public AnimState forwardLeftState;
         public AnimState forwardRightState;
         public AnimState backwardLeftState;
@@ -95,8 +75,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState backwardState;
         public ActionState leftState;
         public ActionState rightState;
-        public ActionState upState;
-        public ActionState downState;
         public ActionState forwardLeftState;
         public ActionState forwardRightState;
         public ActionState backwardLeftState;
@@ -170,13 +148,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             return GetClipLength() + extendDuration;
         }
-    }
-
-    [System.Serializable]
-    public struct EnterExitStates
-    {
-        public ActionState enterState;
-        public ActionState exitState;
     }
 
     [System.Serializable]
@@ -270,6 +241,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState fallState;
         public ActionState landedState;
 
+        [Header("Hurt")]
+        public ActionState hurtState;
+
         [Header("Dead")]
         public ActionState deadState;
 
@@ -277,6 +251,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState dashStartState;
         public ActionState dashLoopState;
         public ActionState dashEndState;
+
+        [Header("Pickup")]
+        public ActionState pickupState;
 
         public WeaponType Data { get { return weaponType; } }
     }
@@ -317,15 +294,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState jumpState;
         public AnimState fallState;
         public AnimState landedState;
-
-        [Header("Vehicle Animation")]
-        public EnterExitStates vehicleEnterExitStates;
-
-        [Header("Ladder Animation")]
-        public EnterExitStates climbBottomEnterExitStates;
-        public EnterExitStates climbTopEnterExitStates;
-        public AnimState climbIdleState;
-        public MoveStates climbMoveStates;
 
         [Header("Hurt")]
         public ActionState hurtState;
