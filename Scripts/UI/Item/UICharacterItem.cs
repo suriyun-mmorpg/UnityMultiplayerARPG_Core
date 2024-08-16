@@ -1294,9 +1294,12 @@ namespace MultiplayerARPG
                 }
             }
 
-            BaseMonsterCharacterEntity tempMonsterEntity = 
-                await ItemWithMonsterEntity.AddressableMonsterCharacterEntity
+            BaseMonsterCharacterEntity tempMonsterEntity = null;
+            if (ItemWithMonsterEntity != null)
+            {
+                tempMonsterEntity = await ItemWithMonsterEntity.AddressableMonsterCharacterEntity
                     .GetOrLoadAssetAsyncOrUsePrefab(ItemWithMonsterEntity.MonsterCharacterEntity);
+            }
             if (tempMonsterEntity == null)
             {
                 if (uiTextMonster != null)
@@ -1321,7 +1324,7 @@ namespace MultiplayerARPG
                 // Item's EXP (pet's EXP)
                 int currentExp;
                 int nextLevelExp;
-                tempMonsterEntity.GetProperCurrentByNextLevelExp(out currentExp, out nextLevelExp);
+                tempMonsterEntity.GetProperCurrentByNextLevelExp(CharacterItem.level, CharacterItem.exp, out currentExp, out nextLevelExp);
 
                 if (uiTextExp != null)
                 {
@@ -1339,9 +1342,12 @@ namespace MultiplayerARPG
                 }
             }
 
-            BuildingEntity tempBuildingEntity =
-                await ItemWithBuildingEntity.AddressableBuildingEntity
+            BuildingEntity tempBuildingEntity = null;
+            if (ItemWithBuildingEntity != null)
+            {
+                tempBuildingEntity = await ItemWithBuildingEntity.AddressableBuildingEntity
                     .GetOrLoadAssetAsyncOrUsePrefab(ItemWithBuildingEntity.BuildingEntity);
+            }
             if (tempBuildingEntity == null)
             {
                 if (uiTextBuilding != null)
@@ -1358,9 +1364,12 @@ namespace MultiplayerARPG
                 }
             }
 
-            VehicleEntity tempVehicleEntity = 
-                await ItemWithVehicleEntity.AddressableVehicleEntity
-                    .GetOrLoadAssetAsyncOrUsePrefab(ItemWithVehicleEntity.VehicleEntity);
+            VehicleEntity tempVehicleEntity = null;
+            if (ItemWithVehicleEntity != null)
+            {
+                tempVehicleEntity = await ItemWithVehicleEntity.AddressableVehicleEntity
+                        .GetOrLoadAssetAsyncOrUsePrefab(ItemWithVehicleEntity.VehicleEntity);
+            }
             if (tempVehicleEntity == null)
             {
                 if (uiTextVehicle != null)

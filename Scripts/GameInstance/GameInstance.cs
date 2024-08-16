@@ -68,6 +68,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(EventSystemManager))]
     public partial class GameInstance : MonoBehaviour
     {
+        public const string KEY_REFRESH_TOKEN = "__REFRESH_TOKEN";
+
         public static readonly string LogTag = nameof(GameInstance);
         public static GameInstance Singleton { get; protected set; }
         public static IClientCashShopHandlers ClientCashShopHandlers { get; set; }
@@ -97,7 +99,12 @@ namespace MultiplayerARPG
         public static IItemsContainerUIVisibilityManager ItemsContainerUIVisibilityManager { get; set; }
         public static ICustomSummonManager CustomSummonManager { get; set; }
         public static string UserId { get; set; }
-        public static string UserToken { get; set; }
+        public static string AccessToken { get; set; }
+        public static string RefreshToken
+        {
+            get => PlayerPrefs.GetString(KEY_REFRESH_TOKEN, string.Empty);
+            set => PlayerPrefs.SetString(KEY_REFRESH_TOKEN, value);
+        }
         public static string SelectedCharacterId { get; set; }
         private static IPlayerCharacterData s_playingCharacter;
         public static IPlayerCharacterData PlayingCharacter

@@ -9,28 +9,36 @@ namespace MultiplayerARPG
     public partial class EquipmentEntity : BaseEquipmentEntity
     {
         [Header("Refine Effects")]
-        public MaterialCollection[] defaultMaterials;
         public List<EquipmentEntityEffect> effects = new List<EquipmentEntityEffect>();
 
         private List<GameObject> _allEffectObjects = new List<GameObject>();
+        private int _currentLevel = -1;
+        private EquipmentEntityEffect _currentEffect = null;
+        private MaterialCollection[] _currentVisibleMaterials = null;
+        private GameObject[] _currentEffectObjects = null;
 
-        private void Awake()
+        protected override void Awake()
         {
-            if (effects != null && effects.Count > 0)
+            base.Awake();
+            effects.Sort();
+            foreach (EquipmentEntityEffect effect in effects)
             {
-                effects.Sort();
-                foreach (EquipmentEntityEffect effect in effects)
+                if (effect.effectObjects != null && effect.effectObjects.Length > 0)
                 {
-                    if (effect.effectObjects != null && effect.effectObjects.Length > 0)
+                    foreach (GameObject effectObject in effect.effectObjects)
                     {
-                        foreach (GameObject effectObject in effect.effectObjects)
-                        {
-                            effectObject.SetActive(false);
-                            _allEffectObjects.Add(effectObject);
-                        }
+                        effectObject.SetActive(false);
+                        _allEffectObjects.Add(effectObject);
                     }
                 }
             }
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            effects.Nulling();
+            _allEffectObjects.DestroyAndNulling();
         }
 
 #if UNITY_EDITOR
@@ -47,11 +55,11 @@ namespace MultiplayerARPG
         {
             bool hasChanges = false;
             Renderer equipmentRenderer = GetComponent<Renderer>();
-            if (defaultMaterials == null || defaultMaterials.Length == 0)
+            if (visibleMaterials == null || visibleMaterials.Length == 0)
             {
                 if (equipmentRenderer)
                 {
-                    defaultMaterials = new MaterialCollection[1]
+                    visibleMaterials = new MaterialCollection[1]
                     {
                         new MaterialCollection()
                         {
@@ -70,7 +78,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < effects.Count; ++i)
                 {
                     tempEffect = effects[i];
-                    if (tempEffect.materials != null && tempEffect.materials.Length > 0 && (tempEffect.equipmentMaterials == null || tempEffect.equipmentMaterials.Length == 0))
+                    if (tempEffect.materials != null && tempEffect.materials.Length > 0 && (tempEffect.visibleMaterials == null || tempEffect.visibleMaterials.Length == 0))
                     {
                         MaterialCollection[] materials = new MaterialCollection[1]
                         {
@@ -80,60 +88,104 @@ namespace MultiplayerARPG
                                 materials = tempEffect.materials,
                             }
                         };
-                        tempEffect.equipmentMaterials = materials;
+                        tempEffect.visibleMaterials = materials;
                         effects[i] = tempEffect;
                         hasChanges = true;
                     }
                 }
             }
 #pragma warning restore CS0618 // Type or member is obsolete
+
             return hasChanges;
         }
 
         public override void OnItemChanged(CharacterItem item)
         {
-            int level = item.level;
-            if (_allEffectObjects != null && _allEffectObjects.Count > 0)
+            if (_currentLevel == item.level)
+                return;
+            _currentLevel = item.level;
+            foreach (GameObject allEffectObject in _allEffectObjects)
             {
-                foreach (GameObject allEffectObject in _allEffectObjects)
+                if (allEffectObject.activeSelf)
+                    allEffectObject.SetActive(false);
+            }
+
+            _currentEffect = null;
+            _currentVisibleMaterials = null;
+            _currentEffectObjects = null;
+            foreach (EquipmentEntityEffect effect in effects)
+            {
+                if (_currentLevel >= effect.level)
                 {
-                    if (allEffectObject.activeSelf)
-                        allEffectObject.SetActive(false);
+                    _currentEffect = effect;
+                }
+                else
+                {
+                    break;
                 }
             }
 
-            bool isFoundEffect = false;
-            EquipmentEntityEffect usingEffect = default;
-            if (effects != null && effects.Count > 0)
+            if (_currentEffect != null)
             {
-                foreach (EquipmentEntityEffect effect in effects)
+                _currentVisibleMaterials = _currentEffect.visibleMaterials;
+                _currentEffectObjects = _currentEffect.effectObjects;
+            }
+            else
+            {
+                // Not found effect apply default materials
+                _currentVisibleMaterials = visibleMaterials;
+            }
+
+            bool isVisible = CharacterModel.VisibleState == GameEntityModel.EVisibleState.Visible;
+            if (isVisible && _currentVisibleMaterials != null)
+            {
+                // It is visible, so apply the materials
+                _currentVisibleMaterials.ApplyMaterials();
+            }
+
+            if (_currentEffectObjects != null && _currentEffectObjects.Length > 0)
+            {
+                foreach (GameObject effectObject in _currentEffectObjects)
                 {
-                    if (level >= effect.level)
-                    {
-                        isFoundEffect = true;
-                        usingEffect = effect;
-                    }
-                    else
-                        break;
-                }
-                if (isFoundEffect)
-                {
-                    // Apply materials
-                    usingEffect.equipmentMaterials.ApplyMaterials();
-                    // Activate effect objects
-                    if (usingEffect.effectObjects != null && usingEffect.effectObjects.Length > 0)
-                    {
-                        foreach (GameObject effectObject in usingEffect.effectObjects)
-                        {
-                            effectObject.SetActive(true);
-                        }
-                    }
+                    if (effectObject.activeSelf != isVisible)
+                        effectObject.SetActive(isVisible);
                 }
             }
-            // Not found effect apply default materials
-            if (!isFoundEffect)
+        }
+
+        public override void SetVisibleState(GameEntityModel.EVisibleState visibleState)
+        {
+            if (_currentVisibleMaterials == null)
+                _currentVisibleMaterials = visibleMaterials;
+            switch (visibleState)
             {
-                defaultMaterials.ApplyMaterials();
+                case GameEntityModel.EVisibleState.Visible:
+                    // Visible state is Visible, show all objects and renderers
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, false);
+                    _currentVisibleMaterials.ApplyMaterials();
+                    break;
+                case GameEntityModel.EVisibleState.Invisible:
+                    // Visible state is Invisible, hide all objects and renderers
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, true);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
+                    invisibleMaterials.ApplyMaterials();
+                    break;
+                case GameEntityModel.EVisibleState.Fps:
+                    // Visible state is Fps, hide Fps objects and renderers
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
+                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
+                    fpsMaterials.ApplyMaterials();
+                    break;
+            }
+            bool isVisible = CharacterModel.VisibleState == GameEntityModel.EVisibleState.Visible;
+            if (_currentEffectObjects != null && _currentEffectObjects.Length > 0)
+            {
+                foreach (GameObject effectObject in _currentEffectObjects)
+                {
+                    if (effectObject.activeSelf != isVisible)
+                        effectObject.SetActive(isVisible);
+                }
             }
         }
     }

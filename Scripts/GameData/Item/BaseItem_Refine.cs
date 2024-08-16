@@ -204,7 +204,7 @@ namespace MultiplayerARPG
                     }
                     returning = WeightedRandomizer.From(randomItems).TakeOne();
                     isReturning = true;
-                    character.Gold.Increase(returning.returnGold);
+                    character.Gold = character.Gold.Increase(returning.returnGold);
                     character.IncreaseItems(returning.returnItems, onFail: dropData => ItemDropEntity.Drop(null, RewardGivenType.None, dropData, new string[] { character.Id }).Forget());
                     character.IncreaseCurrencies(returning.returnCurrencies);
                     inventoryChanged = true;

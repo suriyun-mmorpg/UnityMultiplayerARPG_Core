@@ -269,6 +269,11 @@ namespace MultiplayerARPG
             {
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 _targetYAngle = rotation.eulerAngles.y;
+                if (LadderComponent && LadderComponent.ClimbingLadder)
+                {
+                    // Turn to the ladder
+                    _targetYAngle = Quaternion.LookRotation(-LadderComponent.ClimbingLadder.ForwardWithYAngleOffsets).eulerAngles.y;
+                }
                 _lookRotationApplied = false;
             }
         }
@@ -325,6 +330,23 @@ namespace MultiplayerARPG
             _movementForceAppliers.Clear();
         }
 
+        /// <summary>
+        /// Calculates the velocity required to move the character to the target position over a specific deltaTime.
+        /// Useful for when you wish to work with positions rather than velocities in the UpdateVelocity callback 
+        /// </summary>
+        public Vector3 GetVelocityForMovePosition(Vector3 fromPosition, Vector3 toPosition, float deltaTime)
+        {
+            return GetVelocityFromMovement(toPosition - fromPosition, deltaTime);
+        }
+
+        public Vector3 GetVelocityFromMovement(Vector3 movement, float deltaTime)
+        {
+            if (deltaTime <= 0f)
+                return Vector3.zero;
+
+            return movement / deltaTime;
+        }
+
         public bool WaterCheck(Collider waterCollider)
         {
             if (waterCollider == null)
@@ -337,7 +359,7 @@ namespace MultiplayerARPG
 
         public float TargetWaterSurfaceY(Collider waterCollider)
         {
-            Bounds movementBounds = EntityMovement.GetBounds();
+            Bounds movementBounds = EntityMovement.GetMovementBounds();
             float result = waterCollider.bounds.max.y - (underWaterThreshold * movementBounds.size.y);
             return result;
         }
@@ -372,13 +394,6 @@ namespace MultiplayerARPG
 
         protected void UpdateClimbMovement(float deltaTime)
         {
-            if (!_tempMovementState.Has(MovementState.Forward) &&
-                !_tempMovementState.Has(MovementState.Backward))
-            {
-                // No movement inputs
-                return;
-            }
-
             Vector3 tempPredictPosition;
             Vector3 tempCurrentPosition = CacheTransform.position;
             // Prepare movement speed
@@ -387,14 +402,61 @@ namespace MultiplayerARPG
             float tempMaxMoveSpeed = tempEntityMoveSpeed;
             CurrentMoveSpeed = CalculateCurrentMoveSpeed(tempMaxMoveSpeed, deltaTime);
 
-            float moveY = 0f;
-            if (_tempMovementState.Has(MovementState.Forward))
-                moveY = 1f;
-            else if (_tempMovementState.Has(MovementState.Backward))
-                moveY = -1f;
+            float currentTime = Time.unscaledTime;
+            Vector3 tempMoveVelocity;
+            switch (LadderComponent.EnterExitState)
+            {
+                case EnterExitState.Enter:
+                case EnterExitState.Exit:
+                    // Enter or exit
+                    Vector3 tempPosition;
+                    if (LadderComponent.EnterOrExitDuration > 0f)
+                        tempPosition = Vector3.Lerp(LadderComponent.EnterOrExitFromPosition, LadderComponent.EnterOrExitToPosition, currentTime - LadderComponent.EnterOrExitTime / LadderComponent.EnterOrExitDuration);
+                    else
+                        tempPosition = LadderComponent.EnterOrExitToPosition;
+                    tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, tempPosition, deltaTime);
+                    break;
+                case EnterExitState.ConfirmAwaiting:
+                    tempMoveVelocity = Vector3.zero;
+                    break;
+                default:
+                    if (_tempMovementState.Has(MovementState.Up))
+                        _moveDirection.y = 1f;
+                    else if (_tempMovementState.Has(MovementState.Down))
+                        _moveDirection.y = -1f;
 
-            Vector3 tempMoveVelocity = LadderComponent.ClimbingLadder.transform.up * moveY * CurrentMoveSpeed;
+                    if (Mathf.Approximately(_moveDirection.y, 0f))
+                        return;
+
+                    tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition,
+                        LadderComponent.ClimbingLadder.ClosestPointOnLadderSegment(tempCurrentPosition, EntityMovement.GetMovementBounds().extents.z, out float segmentState), deltaTime) +
+                        LadderComponent.ClimbingLadder.Up * _moveDirection.y * CurrentMoveSpeed;
+
+                    if (Mathf.Abs(segmentState) > 0.05f)
+                    {
+                        if (segmentState > 0 && _moveDirection.y > 0f)
+                        {
+                            // Exit (top)
+                            //tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.topExitTransform.position, deltaTime);
+
+                            LadderComponent.EnterExitState = EnterExitState.ConfirmAwaiting;
+                            LadderComponent.CallCmdExitLadder(LadderEntranceType.Top);
+                        }
+                        // If we're lower than the ladder bottom point
+                        else if (segmentState < 0 && _moveDirection.y < 0f)
+                        {
+                            // Exit (bottom)
+                            //tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, LadderComponent.ClimbingLadder.bottomExitTransform.position, deltaTime);
+
+                            LadderComponent.EnterExitState = EnterExitState.ConfirmAwaiting;
+                            LadderComponent.CallCmdExitLadder(LadderEntranceType.Bottom);
+                        }
+                    }
+                    break;
+            }
+            // Move
             tempPredictPosition = tempCurrentPosition + (tempMoveVelocity * deltaTime);
+            _currentInput = Entity.SetInputMovementState(_currentInput, _tempMovementState);
             _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
             _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
             _previousMovement = tempMoveVelocity * deltaTime;
@@ -407,7 +469,7 @@ namespace MultiplayerARPG
             float tempPredictSqrMagnitude;
             Vector3 tempPredictPosition;
             float tempTargetDistance = 0f;
-            Vector3 tempHorizontalMoveDirection;
+            Vector3 tempHorizontalMoveDirection = Vector3.zero;
             Vector3 tempMoveVelocity = Vector3.zero;
             Vector3 tempCurrentPosition = CacheTransform.position;
             Vector3 tempTargetPosition = tempCurrentPosition;
@@ -713,6 +775,20 @@ namespace MultiplayerARPG
             }
             Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
             _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion + forceMotion) * deltaTime;
+            if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent && 
+                LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder &&
+                LadderComponent.EnterExitState == EnterExitState.None &&
+                LadderComponent.EnterExitState != EnterExitState.ConfirmAwaiting &&
+                tempHorizontalMoveDirection.sqrMagnitude > 0f)
+            {
+                Vector3 dirToLadder = (LadderComponent.TriggeredLadderEntry.TipTransform.position.GetXZ() - Entity.EntityTransform.position.GetXZ()).normalized;
+                float angle = Vector3.Angle(tempHorizontalMoveDirection, dirToLadder);
+                if (angle < 15f)
+                {
+                    LadderComponent.EnterExitState = EnterExitState.ConfirmAwaiting;
+                    LadderComponent.CallCmdEnterLadder();
+                }
+            }
             EntityMovement.Move(_previousMovement);
         }
 

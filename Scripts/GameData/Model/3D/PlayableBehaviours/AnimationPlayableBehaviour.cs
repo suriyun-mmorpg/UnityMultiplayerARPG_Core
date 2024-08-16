@@ -476,6 +476,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetBaseState(CLIP_JUMP, defaultAnimations.jumpState);
                 SetBaseState(CLIP_FALL, defaultAnimations.fallState);
                 SetBaseState(CLIP_LANDED, defaultAnimations.landedState);
+                SetBaseState(CLIP_CLIMB_IDLE, defaultAnimations.climbIdleState);
+                SetMoveStates(string.Empty, MOVE_TYPE_CLIMB, defaultAnimations.climbMoveStates);
                 SetBaseState(CLIP_DEAD, defaultAnimations.deadState);
                 SetBaseState(CLIP_DASH_START, defaultAnimations.dashStartState);
                 SetBaseState(CLIP_DASH_LOOP, defaultAnimations.dashLoopState);
@@ -544,6 +546,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_BACKWARD, moveType), moveStates.backwardState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_LEFT, moveType), moveStates.leftState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_RIGHT, moveType), moveStates.rightState);
+                SetBaseState(ZString.Concat(weaponTypeId, DIR_UP, moveType), moveStates.upState);
+                SetBaseState(ZString.Concat(weaponTypeId, DIR_DOWN, moveType), moveStates.downState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_LEFT, moveType), moveStates.forwardLeftState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_RIGHT, moveType), moveStates.forwardRightState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_LEFT, moveType), moveStates.backwardLeftState);
@@ -573,6 +577,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_BACKWARD, moveType), moveStates.backwardState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_LEFT, moveType), moveStates.leftState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_RIGHT, moveType), moveStates.rightState);
+                SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_UP, moveType), moveStates.upState);
+                SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_DOWN, moveType), moveStates.downState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_LEFT, moveType), moveStates.forwardLeftState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_RIGHT, moveType), moveStates.forwardRightState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_LEFT, moveType), moveStates.backwardLeftState);
@@ -605,6 +611,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public const string DIR_BACKWARD = "Backward";
         public const string DIR_LEFT = "Left";
         public const string DIR_RIGHT = "Right";
+        public const string DIR_UP = "Up";
+        public const string DIR_DOWN = "Down";
         // Move
         public const string CLIP_IDLE = "__Idle";
         public const string MOVE_TYPE_SPRINT = "__Sprint";
@@ -618,15 +626,20 @@ namespace MultiplayerARPG.GameData.Model.Playables
         // Swim
         public const string CLIP_SWIM_IDLE = "__SwimIdle";
         public const string MOVE_TYPE_SWIM = "__SwimMove";
-        // Other
+        // Airborne
         public const string CLIP_JUMP = "__Jump";
         public const string CLIP_FALL = "__Fall";
         public const string CLIP_LANDED = "__Landed";
-        public const string CLIP_HURT = "__Hurt";
-        public const string CLIP_DEAD = "__Dead";
+        // Ladder Climbing
+        public const string CLIP_CLIMB_IDLE = "__LadderClimbIdle";
+        public const string MOVE_TYPE_CLIMB = "__LadderClimbMove";
+        // Dash
         public const string CLIP_DASH_START = "__DashStart";
         public const string CLIP_DASH_LOOP = "__DashLoop";
         public const string CLIP_DASH_END = "__DashEnd";
+        // Other
+        public const string CLIP_HURT = "__Hurt";
+        public const string CLIP_DEAD = "__Dead";
 
         public Playable Self { get; private set; }
         public PlayableGraph Graph { get; private set; }
@@ -778,17 +791,38 @@ namespace MultiplayerARPG.GameData.Model.Playables
             bool movingBackward = stateUpdateData.MovementState.Has(MovementState.Backward);
             bool movingLeft = stateUpdateData.MovementState.Has(MovementState.Left);
             bool movingRight = stateUpdateData.MovementState.Has(MovementState.Right);
-            stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight) && _moveAnimationSpeedMultiplier > 0f;
+            bool movingUp = stateUpdateData.MovementState.Has(MovementState.Up);
+            bool movingDown = stateUpdateData.MovementState.Has(MovementState.Down);
+            stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight || movingUp || movingDown) && _moveAnimationSpeedMultiplier > 0f;
             if (stateUpdateData.isMoving)
             {
-                if (movingForward)
-                    stringBuilder.Append(DIR_FORWARD);
-                else if (movingBackward)
-                    stringBuilder.Append(DIR_BACKWARD);
-                if (movingLeft)
-                    stringBuilder.Append(DIR_LEFT);
-                else if (movingRight)
-                    stringBuilder.Append(DIR_RIGHT);
+                if (movingUp)
+                {
+                    stringBuilder.Append(DIR_UP);
+                }
+                else if (movingDown)
+                {
+                    stringBuilder.Append(DIR_DOWN);
+                }
+                else
+                {
+                    if (movingForward)
+                    {
+                        stringBuilder.Append(DIR_FORWARD);
+                    }
+                    else if (movingBackward)
+                    {
+                        stringBuilder.Append(DIR_BACKWARD);
+                    }
+                    if (movingLeft)
+                    {
+                        stringBuilder.Append(DIR_LEFT);
+                    }
+                    else if (movingRight)
+                    {
+                        stringBuilder.Append(DIR_RIGHT);
+                    }
+                }
             }
             // Set state without move type, it will be used if state with move type not found
             string stateWithoutWeaponIdAndMoveType = stringBuilder.ToString();
@@ -798,6 +832,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stringBuilder.Append(CLIP_SWIM_IDLE);
                 else
                     stringBuilder.Append(MOVE_TYPE_SWIM);
+            }
+            else if (stateUpdateData.MovementState.Has(MovementState.IsClimbing))
+            {
+                if (!stateUpdateData.isMoving)
+                    stringBuilder.Append(CLIP_CLIMB_IDLE);
+                else
+                    stringBuilder.Append(MOVE_TYPE_CLIMB);
             }
             else
             {

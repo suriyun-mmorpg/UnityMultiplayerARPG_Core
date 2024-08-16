@@ -35,6 +35,8 @@ namespace MultiplayerARPG
 
         public static async void PlayNpcDialogVoice(this AudioSource source, MonoBehaviour uiRoot, BaseNpcDialog npcDialog)
         {
+            if (!source)
+                return;
             source.Stop();
             AudioClip clip = await npcDialog.GetVoice();
             source.clip = clip;

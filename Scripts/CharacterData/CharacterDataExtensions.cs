@@ -104,6 +104,27 @@ namespace MultiplayerARPG
             characterData.ExpTable.GetProperCurrentByNextLevelExp(data.Level, data.Exp, out properCurrentExp, out properNextLevelExp);
         }
 
+        public static void GetProperCurrentByNextLevelExp(this ICharacterData data, int currentLevel, int currentExp, out int properCurrentExp, out int properNextLevelExp)
+        {
+            properCurrentExp = 0;
+            properNextLevelExp = 0;
+            if (data == null)
+                return;
+            BaseCharacter characterData = data.GetDatabase();
+            if (characterData == null || characterData.ExpTable == null)
+                return;
+            characterData.ExpTable.GetProperCurrentByNextLevelExp(currentLevel, currentExp, out properCurrentExp, out properNextLevelExp);
+        }
+
+        public static void GetProperCurrentByNextLevelExp(this ExpTable expTable, int currentLevel, int currentExp, out int properCurrentExp, out int properNextLevelExp)
+        {
+            properCurrentExp = 0;
+            properNextLevelExp = 0;
+            if (expTable == null)
+                return;
+            expTable.GetProperCurrentByNextLevelExp(currentLevel, currentExp, out properCurrentExp, out properNextLevelExp);
+        }
+
         #region Stats calculation, make saperate stats for buffs calculation
         public static float GetTotalItemWeight(this IList<CharacterItem> itemList)
         {

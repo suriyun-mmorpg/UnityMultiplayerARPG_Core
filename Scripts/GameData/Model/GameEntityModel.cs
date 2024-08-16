@@ -26,7 +26,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while entity is visible")]
         [SerializeField]
-        protected MaterialCollection[] visibleMaterials;
+        protected MaterialCollection[] visibleMaterials = new MaterialCollection[0];
         public MaterialCollection[] VisibleMaterials
         {
             get { return visibleMaterials; }
@@ -35,7 +35,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while entity is invisible")]
         [SerializeField]
-        protected MaterialCollection[] invisibleMaterials;
+        protected MaterialCollection[] invisibleMaterials = new MaterialCollection[0];
         public virtual MaterialCollection[] InvisibleMaterials
         {
             get { return invisibleMaterials; }
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
 
         [Tooltip("Materials which will be applied while view mode is FPS")]
         [SerializeField]
-        protected MaterialCollection[] fpsMaterials;
+        protected MaterialCollection[] fpsMaterials = new MaterialCollection[0];
         public MaterialCollection[] FpsMaterials
         {
             get { return fpsMaterials; }
@@ -129,6 +129,9 @@ namespace MultiplayerARPG
         public virtual BaseGameEntity Entity { get; set; }
         public Transform CacheTransform { get; protected set; }
         public ModelHiddingUpdater ModelHiddingUpdater { get; protected set; }
+
+        // Events
+        public event System.Action<EVisibleState> onVisibleStateChange;
 
         protected Dictionary<string, EffectContainer> _cacheEffectContainers = null;
         /// <summary>
@@ -240,12 +243,13 @@ namespace MultiplayerARPG
                     InvisibleMaterials.ApplyMaterials();
                     break;
                 case EVisibleState.Fps:
-                    // Visible state is Fps, hide Fps objects and renderers
+                    // Visible state is Fps, hide Fps objects and renderers (may use it to hide head mesh)
                     ModelHiddingUpdater.SetHiddingObjectsAndRenderers(HiddingObjects, HiddingRenderers, false);
                     ModelHiddingUpdater.SetHiddingObjectsAndRenderers(FpsHiddingObjects, FpsHiddingRenderers, true);
                     FpsMaterials.ApplyMaterials();
                     break;
             }
+            onVisibleStateChange?.Invoke(visibleState);
         }
 
         public List<GameEffect> InstantiateEffect(params GameEffect[] effects)

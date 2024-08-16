@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG.GameData.Model.Playables
 {
-    public partial class PlayableCharacterModel : BaseCharacterModel, ICustomAnimationModel, IModelWithAnimator, IModelWithSkinnedMeshRenderer
+    public partial class PlayableCharacterModel : BaseCharacterModel, ICustomAnimationModel, IModelWithAnimator, IModelWithSkinnedMeshRenderer, IVehicleEnterExitModel, ILadderEnterExitModel
     {
         public const int OFFSET_FOR_CUSTOM_ANIMATION_ACTION_ID = 1000;
 
@@ -661,48 +661,72 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.IsFreeze = IsFreezeAnimation;
         }
 
-        public override float GetEnterVehicleAnimationDuration(IVehicleEntity vehicleEntity)
+        public virtual float GetEnterVehicleAnimationDuration(IVehicleEntity vehicleEntity)
         {
-            WeaponAnimations weaponAnimations;
-            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
-                return weaponAnimations.vehicleEnterExitStates.enterState.GetClipLength(1f);
             if (defaultAnimations.vehicleEnterExitStates.enterState.clip != null)
                 return defaultAnimations.vehicleEnterExitStates.enterState.GetClipLength(1f);
             return 0f;
         }
 
-        public override void PlayEnterVehicleAnimation(IVehicleEntity vehicleEntity)
+        public virtual void PlayEnterVehicleAnimation(IVehicleEntity vehicleEntity)
         {
-            WeaponAnimations weaponAnimations;
-            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
-            {
-                Behaviour.PlayAction(weaponAnimations.vehicleEnterExitStates.enterState, 1f);
-                return;
-            }
             if (defaultAnimations.vehicleEnterExitStates.enterState.clip != null)
                 Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.enterState, 1f);
         }
 
-        public override float GetExitVehicleAnimationDuration(IVehicleEntity vehicleEntity)
+        public virtual float GetExitVehicleAnimationDuration(IVehicleEntity vehicleEntity)
         {
-            WeaponAnimations weaponAnimations;
-            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.enterState.clip != null)
-                return weaponAnimations.vehicleEnterExitStates.exitState.GetClipLength(1f);
             if (defaultAnimations.vehicleEnterExitStates.exitState.clip != null)
                 return defaultAnimations.vehicleEnterExitStates.exitState.GetClipLength(1f);
             return 0f;
         }
 
-        public override void PlayExitVehicleAnimation(IVehicleEntity vehicleEntity)
+        public virtual void PlayExitVehicleAnimation(IVehicleEntity vehicleEntity)
         {
-            WeaponAnimations weaponAnimations;
-            if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.vehicleEnterExitStates.exitState.clip != null)
-            {
-                Behaviour.PlayAction(weaponAnimations.vehicleEnterExitStates.exitState, 1f);
-                return;
-            }
             if (defaultAnimations.vehicleEnterExitStates.exitState.clip != null)
                 Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.exitState, 1f);
+        }
+
+        public EnterExitStates GetLadderEnterExitStates(LadderEntranceType entranceType)
+        {
+            switch (entranceType)
+            {
+                case LadderEntranceType.Bottom:
+                    return defaultAnimations.climbBottomEnterExitStates;
+                case LadderEntranceType.Top:
+                    return defaultAnimations.climbTopEnterExitStates;
+            }
+            return default;
+        }
+
+        public virtual float GetEnterLadderAnimationDuration(LadderEntranceType entranceType)
+        {
+            EnterExitStates states = GetLadderEnterExitStates(entranceType);
+            if (states.enterState.clip != null)
+                return states.enterState.GetClipLength(1f);
+            return 0f;
+        }
+
+        public virtual void PlayEnterLadderAnimation(LadderEntranceType entranceType)
+        {
+            EnterExitStates states = GetLadderEnterExitStates(entranceType);
+            if (states.enterState.clip != null)
+                Behaviour.PlayAction(states.enterState, 1f);
+        }
+
+        public virtual float GetExitLadderAnimationDuration(LadderEntranceType entranceType)
+        {
+            EnterExitStates states = GetLadderEnterExitStates(entranceType);
+            if (states.exitState.clip != null)
+                return states.exitState.GetClipLength(1f);
+            return 0f;
+        }
+
+        public virtual void PlayExitLadderAnimation(LadderEntranceType entranceType)
+        {
+            EnterExitStates states = GetLadderEnterExitStates(entranceType);
+            if (states.exitState.clip != null)
+                Behaviour.PlayAction(states.exitState, 1f);
         }
 
         public override void PlayHitAnimation()

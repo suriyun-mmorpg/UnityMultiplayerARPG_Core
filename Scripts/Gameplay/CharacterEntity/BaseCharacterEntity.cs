@@ -280,7 +280,7 @@ namespace MultiplayerARPG
             Profiler.BeginSample("BaseCharacterEntity - ApplyFallDamage");
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
-                bool isGrounded = MovementState.Has(MovementState.IsGrounded);
+                bool isGrounded = MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsClimbing);
                 // Ground check, ground damage will be calculated at server while dimension type is 3d only
                 if (!_lastGrounded && isGrounded)
                 {

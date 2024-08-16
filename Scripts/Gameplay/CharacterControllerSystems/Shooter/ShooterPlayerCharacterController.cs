@@ -798,6 +798,10 @@ namespace MultiplayerARPG
                         _movementState |= GameplayUtils.GetMovementStateByDirection(_moveDirection, MovementTransform.forward);
                         break;
                 }
+                if (PlayingCharacterEntity.LadderComponent && PlayingCharacterEntity.LadderComponent.ClimbingLadder)
+                {
+                    _movementState = GameplayUtils.GetMovementStateByDirection(_moveDirection, PlayingCharacterEntity.LadderComponent.ClimbingLadder);
+                }
             }
             PlayingCharacterEntity.KeyMovement(_moveDirection, _movementState);
             PlayingCharacterEntity.SetExtraMovementState(_extraMovementState);

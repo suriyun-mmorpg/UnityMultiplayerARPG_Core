@@ -80,6 +80,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState backwardState;
         public AnimState leftState;
         public AnimState rightState;
+        public AnimState upState;
+        public AnimState downState;
         public AnimState forwardLeftState;
         public AnimState forwardRightState;
         public AnimState backwardLeftState;
@@ -93,6 +95,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public ActionState backwardState;
         public ActionState leftState;
         public ActionState rightState;
+        public ActionState upState;
+        public ActionState downState;
         public ActionState forwardLeftState;
         public ActionState forwardRightState;
         public ActionState backwardLeftState;
@@ -202,9 +206,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimState jumpState;
         public AnimState fallState;
         public AnimState landedState;
-
-        [Header("Vehicle Animation")]
-        public EnterExitStates vehicleEnterExitStates;
 
         [Header("Hurt")]
         public ActionState hurtState;
@@ -319,6 +320,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         [Header("Vehicle Animation")]
         public EnterExitStates vehicleEnterExitStates;
+
+        [Header("Ladder Animation")]
+        public EnterExitStates climbBottomEnterExitStates;
+        public EnterExitStates climbTopEnterExitStates;
+        public AnimState climbIdleState;
+        public MoveStates climbMoveStates;
 
         [Header("Hurt")]
         public ActionState hurtState;
