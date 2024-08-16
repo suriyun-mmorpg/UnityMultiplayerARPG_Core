@@ -1,4 +1,4 @@
-﻿using Cysharp.Text;
+using Cysharp.Text;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Animations;
@@ -47,6 +47,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public bool ApplyFootIk();
             public bool ApplyPlayableIk();
             public AvatarMask GetAvatarMask();
+            public bool UseAvatarMaskWhenMoving();
         }
 
         private struct BaseStateInfo : IStateInfo
@@ -91,6 +92,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public AvatarMask GetAvatarMask()
             {
                 return null;
+            }
+
+            public bool UseAvatarMaskWhenMoving()
+            {
+                return false;
             }
         }
 
@@ -137,6 +143,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public AvatarMask GetAvatarMask()
             {
                 return State.avatarMask;
+            }
+
+            public bool UseAvatarMaskWhenMoving()
+            {
+                return State.useAvatarMaskWhenMoving;
             }
         }
 
@@ -372,11 +383,32 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 ActionLayerMixer.SetInputWeight(0, 1f);
 
                 // Set avatar mask
-                AvatarMask avatarMask = actionState.avatarMask;
+                AvatarMask avatarMask = null;
+                // Check if the character is moving based on movement state
+                bool movingForward = behaviour.CharacterModel.MovementState.Has(MovementState.Forward);
+                bool movingBackward = behaviour.CharacterModel.MovementState.Has(MovementState.Backward);
+                bool movingLeft = behaviour.CharacterModel.MovementState.Has(MovementState.Left);
+                bool movingRight = behaviour.CharacterModel.MovementState.Has(MovementState.Right);
+                bool isMoving = (movingForward || movingBackward || movingLeft || movingRight) && behaviour.CharacterModel.MoveAnimationSpeedMultiplier > 0f;
+
+                // Check if we should use the AvatarMask based on movement and the new boolean
+                if (actionState.useAvatarMaskWhenMoving)
+                {
+                    // Use mask if the character is moving, otherwise use full animation
+                    avatarMask = isMoving ? actionState.avatarMask : null;
+                }
+                else
+                {
+                    // Default behavior
+                    avatarMask = actionState.avatarMask;
+                }
+
                 if (avatarMask == null)
                     avatarMask = behaviour.CharacterModel.actionAvatarMask;
+
                 if (avatarMask == null)
                     avatarMask = EmptyMask;
+
                 behaviour.LayerMixer.SetLayerMaskFromAvatarMask(castedLayer, avatarMask);
 
                 // Set clip info
@@ -953,9 +985,22 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 stateUpdateData.inputPort = inputCount - 1;
 
                 // Set avatar mask
-                AvatarMask avatarMask = stateInfos[playingStateId].GetAvatarMask();
+                AvatarMask avatarMask = null;
+                // Check if we should use the AvatarMask based on movement and the new boolean
+                if (stateInfos[playingStateId].UseAvatarMaskWhenMoving())
+                {
+                    // Use mask if the character is moving, otherwise use full animation
+                    avatarMask = stateUpdateData.isMoving ? stateInfos[playingStateId].GetAvatarMask() : null;
+                }
+                else
+                {
+                    // Default behavior
+                    avatarMask = stateInfos[playingStateId].GetAvatarMask();
+                }
+
                 if (avatarMask == null)
                     avatarMask = EmptyMask;
+
                 LayerMixer.SetLayerMaskFromAvatarMask(layer, avatarMask);
 
                 // Set clip info

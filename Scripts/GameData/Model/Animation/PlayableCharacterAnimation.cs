@@ -1,4 +1,4 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG.GameData.Model.Playables
@@ -32,6 +32,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public AnimationClip clip;
         [Tooltip("If this is `null`, it will use default avatar mask setting from model component")]
         public AvatarMask avatarMask;
+        [Tooltip("If this is true it will only use AvatarMask when character is moving")]
+        public bool useAvatarMaskWhenMoving;
         [Tooltip("If this <= 0, it will not be used to calculate with animation speed multiplier")]
         public float animSpeedRate;
         [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
