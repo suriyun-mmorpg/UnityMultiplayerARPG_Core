@@ -1,5 +1,5 @@
-﻿using Cysharp.Text;
 using System.Collections.Generic;
+using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Animations;
 using UnityEngine.Playables;
@@ -11,26 +11,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
     /// </summary>
     public partial class AnimationPlayableBehaviour : PlayableBehaviour
     {
-        private static AnimationClip s_emptyClip = null;
-        public static AnimationClip EmptyClip
-        {
-            get
-            {
-                if (s_emptyClip == null)
-                    s_emptyClip = new AnimationClip();
-                return s_emptyClip;
-            }
-        }
-        private static AvatarMask s_emptyMask = null;
-        public static AvatarMask EmptyMask
-        {
-            get
-            {
-                if (s_emptyMask == null)
-                    s_emptyMask = new AvatarMask();
-                return s_emptyMask;
-            }
-        }
+        public static readonly AnimationClip EmptyClip = new AnimationClip();
+        public static readonly AvatarMask EmptyMask = new AvatarMask();
 
         public const int BASE_LAYER = 0;
         public const int LEFT_HAND_WIELDING_LAYER = 1;
@@ -47,20 +29,20 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public bool ApplyFootIk();
             public bool ApplyPlayableIk();
             public AvatarMask GetAvatarMask();
+            bool UseAvatarMaskWhenMoving();
         }
 
         private struct BaseStateInfo : IStateInfo
         {
             public AnimState State { get; set; }
-
             public float GetSpeed(float rate)
             {
-                return State.GetSpeed(rate);
+                return (State.animSpeedRate > 0 ? State.animSpeedRate : 1) * rate;
             }
 
             public float GetClipLength(float rate)
             {
-                return State.GetClipLength(rate);
+                return State.clip.length / GetSpeed(rate);
             }
 
             public AnimationClip GetClip()
@@ -92,21 +74,25 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 return null;
             }
+
+            public bool UseAvatarMaskWhenMoving()
+            {
+                return false;
+            }
         }
 
         private struct LeftHandWieldingStateInfo : IStateInfo
         {
             public int InputPort { get; set; }
             public ActionState State { get; set; }
-
             public float GetSpeed(float rate)
             {
-                return State.GetSpeed(rate);
+                return (State.animSpeedRate > 0 ? State.animSpeedRate : 1) * rate;
             }
 
             public float GetClipLength(float rate)
             {
-                return State.GetClipLength(rate);
+                return State.clip.length / GetSpeed(rate);
             }
 
             public AnimationClip GetClip()
@@ -137,6 +123,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public AvatarMask GetAvatarMask()
             {
                 return State.avatarMask;
+            }
+
+            public bool UseAvatarMaskWhenMoving()
+            {
+                return State.useAvatarMaskWhenMoving;
             }
         }
 
@@ -372,11 +363,33 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 ActionLayerMixer.SetInputWeight(0, 1f);
 
                 // Set avatar mask
-                AvatarMask avatarMask = actionState.avatarMask;
+                AvatarMask avatarMask = null;
+
+                // Check if the character is moving based on movement state
+                bool movingForward = behaviour.CharacterModel.MovementState.Has(MovementState.Forward);
+                bool movingBackward = behaviour.CharacterModel.MovementState.Has(MovementState.Backward);
+                bool movingLeft = behaviour.CharacterModel.MovementState.Has(MovementState.Left);
+                bool movingRight = behaviour.CharacterModel.MovementState.Has(MovementState.Right);
+                bool isMoving = (movingForward || movingBackward || movingLeft || movingRight) && behaviour.CharacterModel.MoveAnimationSpeedMultiplier > 0f;
+
+                // Check if we should use the AvatarMask based on movement and the new boolean
+                if (actionState.useAvatarMaskWhenMoving)
+                {
+                    // Use mask if the character is moving, otherwise use full animation
+                    avatarMask = isMoving ? actionState.avatarMask : null;
+                }
+                else
+                {
+                    // Default behavior
+                    avatarMask = actionState.avatarMask;
+                }
+
                 if (avatarMask == null)
                     avatarMask = behaviour.CharacterModel.actionAvatarMask;
+
                 if (avatarMask == null)
                     avatarMask = EmptyMask;
+
                 behaviour.LayerMixer.SetLayerMaskFromAvatarMask(castedLayer, avatarMask);
 
                 // Set clip info
@@ -476,8 +489,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetBaseState(CLIP_JUMP, defaultAnimations.jumpState);
                 SetBaseState(CLIP_FALL, defaultAnimations.fallState);
                 SetBaseState(CLIP_LANDED, defaultAnimations.landedState);
-                SetBaseState(CLIP_CLIMB_IDLE, defaultAnimations.climbIdleState);
-                SetMoveStates(string.Empty, MOVE_TYPE_CLIMB, defaultAnimations.climbMoveStates);
                 SetBaseState(CLIP_DEAD, defaultAnimations.deadState);
                 SetBaseState(CLIP_DASH_START, defaultAnimations.dashStartState);
                 SetBaseState(CLIP_DASH_LOOP, defaultAnimations.dashLoopState);
@@ -546,8 +557,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_BACKWARD, moveType), moveStates.backwardState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_LEFT, moveType), moveStates.leftState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_RIGHT, moveType), moveStates.rightState);
-                SetBaseState(ZString.Concat(weaponTypeId, DIR_UP, moveType), moveStates.upState);
-                SetBaseState(ZString.Concat(weaponTypeId, DIR_DOWN, moveType), moveStates.downState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_LEFT, moveType), moveStates.forwardLeftState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_RIGHT, moveType), moveStates.forwardRightState);
                 SetBaseState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_LEFT, moveType), moveStates.backwardLeftState);
@@ -577,8 +586,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_BACKWARD, moveType), moveStates.backwardState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_LEFT, moveType), moveStates.leftState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_RIGHT, moveType), moveStates.rightState);
-                SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_UP, moveType), moveStates.upState);
-                SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_DOWN, moveType), moveStates.downState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_LEFT, moveType), moveStates.forwardLeftState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_FORWARD, DIR_RIGHT, moveType), moveStates.forwardRightState);
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_LEFT, moveType), moveStates.backwardLeftState);
@@ -596,10 +603,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
         }
         private static readonly Dictionary<int, CacheData> s_caches = new Dictionary<int, CacheData>();
-        public static void ClearCaches()
-        {
-            s_caches.Clear();
-        }
         private CacheData Cache
         {
             get { return s_caches[CharacterModel.Id]; }
@@ -611,8 +614,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public const string DIR_BACKWARD = "Backward";
         public const string DIR_LEFT = "Left";
         public const string DIR_RIGHT = "Right";
-        public const string DIR_UP = "Up";
-        public const string DIR_DOWN = "Down";
         // Move
         public const string CLIP_IDLE = "__Idle";
         public const string MOVE_TYPE_SPRINT = "__Sprint";
@@ -626,20 +627,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
         // Swim
         public const string CLIP_SWIM_IDLE = "__SwimIdle";
         public const string MOVE_TYPE_SWIM = "__SwimMove";
-        // Airborne
+        // Other
         public const string CLIP_JUMP = "__Jump";
         public const string CLIP_FALL = "__Fall";
         public const string CLIP_LANDED = "__Landed";
-        // Ladder Climbing
-        public const string CLIP_CLIMB_IDLE = "__LadderClimbIdle";
-        public const string MOVE_TYPE_CLIMB = "__LadderClimbMove";
-        // Dash
+        public const string CLIP_HURT = "__Hurt";
+        public const string CLIP_DEAD = "__Dead";
         public const string CLIP_DASH_START = "__DashStart";
         public const string CLIP_DASH_LOOP = "__DashLoop";
         public const string CLIP_DASH_END = "__DashEnd";
-        // Other
-        public const string CLIP_HURT = "__Hurt";
-        public const string CLIP_DEAD = "__Dead";
 
         public Playable Self { get; private set; }
         public PlayableGraph Graph { get; private set; }
@@ -791,38 +787,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
             bool movingBackward = stateUpdateData.MovementState.Has(MovementState.Backward);
             bool movingLeft = stateUpdateData.MovementState.Has(MovementState.Left);
             bool movingRight = stateUpdateData.MovementState.Has(MovementState.Right);
-            bool movingUp = stateUpdateData.MovementState.Has(MovementState.Up);
-            bool movingDown = stateUpdateData.MovementState.Has(MovementState.Down);
-            stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight || movingUp || movingDown) && _moveAnimationSpeedMultiplier > 0f;
+            stateUpdateData.isMoving = (movingForward || movingBackward || movingLeft || movingRight) && _moveAnimationSpeedMultiplier > 0f;
             if (stateUpdateData.isMoving)
             {
-                if (movingUp)
-                {
-                    stringBuilder.Append(DIR_UP);
-                }
-                else if (movingDown)
-                {
-                    stringBuilder.Append(DIR_DOWN);
-                }
-                else
-                {
-                    if (movingForward)
-                    {
-                        stringBuilder.Append(DIR_FORWARD);
-                    }
-                    else if (movingBackward)
-                    {
-                        stringBuilder.Append(DIR_BACKWARD);
-                    }
-                    if (movingLeft)
-                    {
-                        stringBuilder.Append(DIR_LEFT);
-                    }
-                    else if (movingRight)
-                    {
-                        stringBuilder.Append(DIR_RIGHT);
-                    }
-                }
+                if (movingForward)
+                    stringBuilder.Append(DIR_FORWARD);
+                else if (movingBackward)
+                    stringBuilder.Append(DIR_BACKWARD);
+                if (movingLeft)
+                    stringBuilder.Append(DIR_LEFT);
+                else if (movingRight)
+                    stringBuilder.Append(DIR_RIGHT);
             }
             // Set state without move type, it will be used if state with move type not found
             string stateWithoutWeaponIdAndMoveType = stringBuilder.ToString();
@@ -832,13 +807,6 @@ namespace MultiplayerARPG.GameData.Model.Playables
                     stringBuilder.Append(CLIP_SWIM_IDLE);
                 else
                     stringBuilder.Append(MOVE_TYPE_SWIM);
-            }
-            else if (stateUpdateData.MovementState.Has(MovementState.IsClimbing))
-            {
-                if (!stateUpdateData.isMoving)
-                    stringBuilder.Append(CLIP_CLIMB_IDLE);
-                else
-                    stringBuilder.Append(MOVE_TYPE_CLIMB);
             }
             else
             {
@@ -953,9 +921,23 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 stateUpdateData.inputPort = inputCount - 1;
 
                 // Set avatar mask
-                AvatarMask avatarMask = stateInfos[playingStateId].GetAvatarMask();
+                AvatarMask avatarMask = null;
+
+                // Check if we should use the AvatarMask based on movement and the new boolean
+                if (stateInfos[playingStateId].UseAvatarMaskWhenMoving())
+                {
+                    // Use mask if the character is moving, otherwise use full animation
+                    avatarMask = stateUpdateData.isMoving ? stateInfos[playingStateId].GetAvatarMask() : null;
+                }
+                else
+                {
+                    // Default behavior
+                    avatarMask = stateInfos[playingStateId].GetAvatarMask();
+                }
+
                 if (avatarMask == null)
                     avatarMask = EmptyMask;
+
                 LayerMixer.SetLayerMaskFromAvatarMask(layer, avatarMask);
 
                 // Set clip info
