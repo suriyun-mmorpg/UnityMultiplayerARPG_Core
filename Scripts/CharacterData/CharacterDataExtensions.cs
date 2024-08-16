@@ -461,6 +461,36 @@ namespace MultiplayerARPG
             return DecreaseItems(itemList, dataId, amount, isLimitInventorySlot, out _);
         }
 
+        public static void DecreaseItems(this IList<CharacterItem> itemList, Dictionary<BaseItem, int> itemAmounts, bool isLimitInventorySlot, float multiplier = 1)
+        {
+            if (itemAmounts == null)
+                return;
+            foreach (KeyValuePair<BaseItem, int> itemAmount in itemAmounts)
+            {
+                DecreaseItems(itemList, itemAmount.Key.DataId, Mathf.CeilToInt(itemAmount.Value * multiplier), isLimitInventorySlot, out _);
+            }
+        }
+
+        public static void DecreaseItems(this IList<CharacterItem> itemList, IEnumerable<ItemAmount> itemAmounts, bool isLimitInventorySlot, float multiplier = 1)
+        {
+            if (itemAmounts == null)
+                return;
+            foreach (ItemAmount characterItem in itemAmounts)
+            {
+                DecreaseItems(itemList, characterItem.item.DataId, Mathf.CeilToInt(characterItem.amount * multiplier), isLimitInventorySlot, out _);
+            }
+        }
+
+        public static void DecreaseItems(this IList<CharacterItem> itemList, IEnumerable<CharacterItem> characterItems, bool isLimitInventorySlot, float multiplier = 1)
+        {
+            if (characterItems == null)
+                return;
+            foreach (CharacterItem characterItem in characterItems)
+            {
+                DecreaseItems(itemList, characterItem.dataId, Mathf.CeilToInt(characterItem.amount * multiplier), isLimitInventorySlot, out _);
+            }
+        }
+
         public static bool DecreaseItems(this ICharacterData data, int dataId, int amount, out Dictionary<int, int> decreaseItems)
         {
             if (DecreaseItems(data.NonEquipItems, dataId, amount, GameInstance.Singleton.IsLimitInventorySlot, out decreaseItems))
