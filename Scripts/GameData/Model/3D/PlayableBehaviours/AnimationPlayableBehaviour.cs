@@ -50,7 +50,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             public bool UseAvatarMaskWhenMoving();
         }
 
-        private struct BaseStateInfo : IStateInfo
+        private class BaseStateInfo : IStateInfo
         {
             public AnimState State { get; set; }
 
@@ -100,10 +100,10 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
         }
 
-        private struct LeftHandWieldingStateInfo : IStateInfo
+        private class LeftHandWieldingStateInfo : IStateInfo
         {
             public int InputPort { get; set; }
-            public ActionState State { get; set; }
+            public AnimWithMaskState State { get; set; }
 
             public float GetSpeed(float rate)
             {
@@ -147,7 +147,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
             public bool UseAvatarMaskWhenMoving()
             {
-                return State.useAvatarMaskWhenMoving;
+                return false;
             }
         }
 
@@ -617,7 +617,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetLeftHandWieldingState(ZString.Concat(weaponTypeId, DIR_BACKWARD, DIR_RIGHT, moveType), moveStates.backwardRightState);
             }
 
-            private void SetLeftHandWieldingState(string id, ActionState state)
+            private void SetLeftHandWieldingState(string id, AnimWithMaskState state)
             {
                 if (state.clip == null)
                     return;

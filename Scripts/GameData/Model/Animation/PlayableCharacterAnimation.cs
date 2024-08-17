@@ -4,7 +4,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG.GameData.Model.Playables
 {
     [System.Serializable]
-    public struct AnimState
+    public class AnimState
     {
         public AnimationClip clip;
         [Tooltip("If this <= 0, it will not be used to calculate with animation speed multiplier")]
@@ -27,91 +27,78 @@ namespace MultiplayerARPG.GameData.Model.Playables
     }
 
     [System.Serializable]
-    public struct ActionState
+    public class AnimWithMaskState : AnimState
     {
-        public AnimationClip clip;
         [Tooltip("If this is `null`, it will use default avatar mask setting from model component")]
         public AvatarMask avatarMask;
-        [Tooltip("If this is true it will only use AvatarMask when character is moving")]
+    }
+
+    [System.Serializable]
+    public class ActionState : AnimWithMaskState
+    {
+        [Tooltip("If this is `TRUE` it will only use AvatarMask when character is moving")]
         public bool useAvatarMaskWhenMoving;
-        [Tooltip("If this <= 0, it will not be used to calculate with animation speed multiplier")]
-        public float animSpeedRate;
-        [Tooltip("If this <= 0, it will use default transition duration setting from model component")]
-        public float transitionDuration;
-        public bool isAdditive;
-        public bool applyFootIk;
-        public bool applyPlayableIk;
         [Tooltip("Turn this on to skip movement validation while playing this animation")]
         public bool skipMovementValidation;
         [Tooltip("Turn this on to use root motion while playing this animation")]
         public bool shouldUseRootMotion;
-
-        public float GetSpeed(float rate)
-        {
-            return (animSpeedRate > 0 ? animSpeedRate : 1) * rate;
-        }
-
-        public float GetClipLength(float rate)
-        {
-            return clip.length / GetSpeed(rate);
-        }
     }
 
     [System.Serializable]
-    public struct HolsterAnimation
+    public class HolsterAnimation
     {
         [Header("Sheath")]
         [FormerlySerializedAs("holsterState")]
-        public ActionState sheathState;
+        public ActionState sheathState = new ActionState();
         [Range(0f, 1f)]
         [FormerlySerializedAs("holsteredDurationRate")]
         public float sheathedDurationRate;
 
         [Header("Unsheath")]
         [FormerlySerializedAs("drawState")]
-        public ActionState unsheathState;
+        public ActionState unsheathState = new ActionState();
         [Range(0f, 1f)]
         [FormerlySerializedAs("drawnDurationRate")]
         public float unsheathedDurationRate;
     }
 
     [System.Serializable]
-    public struct MoveStates
+    public class MoveStates
     {
-        public AnimState forwardState;
-        public AnimState backwardState;
-        public AnimState leftState;
-        public AnimState rightState;
-        public AnimState upState;
-        public AnimState downState;
-        public AnimState forwardLeftState;
-        public AnimState forwardRightState;
-        public AnimState backwardLeftState;
-        public AnimState backwardRightState;
+        public AnimState forwardState = new AnimState();
+        public AnimState backwardState = new AnimState();
+        public AnimState leftState = new AnimState();
+        public AnimState rightState = new AnimState();
+        public AnimState upState = new AnimState();
+        public AnimState downState = new AnimState();
+        public AnimState forwardLeftState = new AnimState();
+        public AnimState forwardRightState = new AnimState();
+        public AnimState backwardLeftState = new AnimState();
+        public AnimState backwardRightState = new AnimState();
     }
 
     [System.Serializable]
-    public struct WieldMoveStates
+    public class WieldMoveStates
     {
-        public ActionState forwardState;
-        public ActionState backwardState;
-        public ActionState leftState;
-        public ActionState rightState;
-        public ActionState upState;
-        public ActionState downState;
-        public ActionState forwardLeftState;
-        public ActionState forwardRightState;
-        public ActionState backwardLeftState;
-        public ActionState backwardRightState;
+        public AnimWithMaskState forwardState = new AnimWithMaskState();
+        public AnimWithMaskState backwardState = new AnimWithMaskState();
+        public AnimWithMaskState leftState = new AnimWithMaskState();
+        public AnimWithMaskState rightState = new AnimWithMaskState();
+        public AnimWithMaskState upState = new AnimWithMaskState();
+        public AnimWithMaskState downState = new AnimWithMaskState();
+        public AnimWithMaskState forwardLeftState = new AnimWithMaskState();
+        public AnimWithMaskState forwardRightState = new AnimWithMaskState();
+        public AnimWithMaskState backwardLeftState = new AnimWithMaskState();
+        public AnimWithMaskState backwardRightState = new AnimWithMaskState();
     }
 
     [System.Serializable]
-    public struct ActionAnimation
+    public class ActionAnimation
     {
-        public ActionState state;
+        public ActionState state = new ActionState();
         [Tooltip("This will be in used with attacking/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
-        public float[] triggerDurationRates;
+        public float[] triggerDurationRates = new float[0];
         [Tooltip("How animation duration defined")]
         public AnimationDurationType durationType;
         [StringShowConditional(nameof(durationType), nameof(AnimationDurationType.ByFixedDuration))]
@@ -120,7 +107,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Tooltip("This will be in use with attacking/skill animations, This is duration after action animation clip played to add some delay before next animation")]
         public float extendDuration;
         [Tooltip("This will be in use with attacking/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
-        public AudioClip[] audioClips;
+        public AudioClip[] audioClips = new AudioClip[0];
 
         public AudioClip GetRandomAudioClip()
         {
@@ -175,150 +162,150 @@ namespace MultiplayerARPG.GameData.Model.Playables
     }
 
     [System.Serializable]
-    public struct EnterExitStates
+    public class EnterExitStates
     {
-        public ActionState enterState;
-        public ActionState exitState;
+        public ActionState enterState = new ActionState();
+        public ActionState exitState = new ActionState();
     }
 
     [System.Serializable]
-    public struct WeaponAnimations : IWeaponAnims
+    public class WeaponAnimations : IWeaponAnims
     {
         public WeaponType weaponType;
 
         [Header("Movements while standing")]
-        public AnimState idleState;
-        public MoveStates moveStates;
-        public MoveStates sprintStates;
-        public MoveStates walkStates;
+        public AnimState idleState = new AnimState();
+        public MoveStates moveStates = new MoveStates();
+        public MoveStates sprintStates = new MoveStates();
+        public MoveStates walkStates = new MoveStates();
 
         [Header("Movements while crouching")]
-        public AnimState crouchIdleState;
-        public MoveStates crouchMoveStates;
+        public AnimState crouchIdleState = new AnimState();
+        public MoveStates crouchMoveStates = new MoveStates();
 
         [Header("Movements while crawling")]
-        public AnimState crawlIdleState;
-        public MoveStates crawlMoveStates;
+        public AnimState crawlIdleState = new AnimState();
+        public MoveStates crawlMoveStates = new MoveStates();
 
         [Header("Movements while swimming")]
-        public AnimState swimIdleState;
-        public MoveStates swimMoveStates;
+        public AnimState swimIdleState = new AnimState();
+        public MoveStates swimMoveStates = new MoveStates();
 
         [Header("Airborne")]
-        public AnimState jumpState;
-        public AnimState fallState;
-        public AnimState landedState;
+        public AnimState jumpState = new AnimState();
+        public AnimState fallState = new AnimState();
+        public AnimState landedState = new AnimState();
 
         [Header("Hurt")]
-        public ActionState hurtState;
+        public ActionState hurtState = new ActionState();
 
         [Header("Dead")]
-        public AnimState deadState;
+        public AnimState deadState = new AnimState();
 
         [Header("Dash")]
-        public AnimState dashStartState;
-        public AnimState dashLoopState;
-        public AnimState dashEndState;
+        public AnimState dashStartState = new AnimState();
+        public AnimState dashLoopState = new AnimState();
+        public AnimState dashEndState = new AnimState();
 
         [Header("Pickup")]
-        public ActionState pickupState;
+        public ActionState pickupState = new ActionState();
 
         [Header("Attack animations")]
-        public ActionState rightHandChargeState;
-        public ActionState leftHandChargeState;
+        public ActionState rightHandChargeState = new ActionState();
+        public ActionState leftHandChargeState = new ActionState();
         [ArrayElementTitle("clip")]
-        public ActionAnimation[] rightHandAttackAnimations;
+        public ActionAnimation[] rightHandAttackAnimations = new ActionAnimation[0];
         [ArrayElementTitle("clip")]
-        public ActionAnimation[] leftHandAttackAnimations;
+        public ActionAnimation[] leftHandAttackAnimations = new ActionAnimation[0];
 
         [Header("Reload(Gun) animations")]
-        public ActionAnimation rightHandReloadAnimation;
-        public ActionAnimation leftHandReloadAnimation;
+        public ActionAnimation rightHandReloadAnimation = new ActionAnimation();
+        public ActionAnimation leftHandReloadAnimation = new ActionAnimation();
 
         [Header("Sheath/Unsheath Animations")]
         [FormerlySerializedAs("rightHandHolsterAnimation")]
-        public HolsterAnimation rightHandWeaponSheathingAnimation;
+        public HolsterAnimation rightHandWeaponSheathingAnimation = new HolsterAnimation();
         [FormerlySerializedAs("leftHandHolsterAnimation")]
-        public HolsterAnimation leftHandWeaponSheathingAnimation;
+        public HolsterAnimation leftHandWeaponSheathingAnimation = new HolsterAnimation();
 
         public WeaponType Data { get { return weaponType; } }
     }
 
     [System.Serializable]
-    public struct WieldWeaponAnimations : IWeaponAnims
+    public class WieldWeaponAnimations : IWeaponAnims
     {
         public WeaponType weaponType;
 
         [Header("Movements while standing")]
-        public ActionState idleState;
-        public WieldMoveStates moveStates;
-        public WieldMoveStates sprintStates;
-        public WieldMoveStates walkStates;
+        public ActionState idleState = new ActionState();
+        public WieldMoveStates moveStates = new WieldMoveStates();
+        public WieldMoveStates sprintStates = new WieldMoveStates();
+        public WieldMoveStates walkStates = new WieldMoveStates();
 
         [Header("Movements while crouching")]
-        public ActionState crouchIdleState;
-        public WieldMoveStates crouchMoveStates;
+        public ActionState crouchIdleState = new ActionState();
+        public WieldMoveStates crouchMoveStates = new WieldMoveStates();
 
         [Header("Movements while crawling")]
-        public ActionState crawlIdleState;
-        public WieldMoveStates crawlMoveStates;
+        public ActionState crawlIdleState = new ActionState();
+        public WieldMoveStates crawlMoveStates = new WieldMoveStates();
 
         [Header("Movements while swimming")]
-        public ActionState swimIdleState;
-        public WieldMoveStates swimMoveStates;
+        public ActionState swimIdleState = new ActionState();
+        public WieldMoveStates swimMoveStates = new WieldMoveStates();
 
         [Header("Airborne")]
-        public ActionState jumpState;
-        public ActionState fallState;
-        public ActionState landedState;
+        public ActionState jumpState = new ActionState();
+        public ActionState fallState = new ActionState();
+        public ActionState landedState = new ActionState();
 
         [Header("Dead")]
-        public ActionState deadState;
+        public ActionState deadState = new ActionState();
 
         [Header("Dash")]
-        public ActionState dashStartState;
-        public ActionState dashLoopState;
-        public ActionState dashEndState;
+        public ActionState dashStartState = new ActionState();
+        public ActionState dashLoopState = new ActionState();
+        public ActionState dashEndState = new ActionState();
 
         public WeaponType Data { get { return weaponType; } }
     }
 
     [System.Serializable]
-    public struct SkillAnimations : ISkillAnims
+    public class SkillAnimations : ISkillAnims
     {
         public BaseSkill skill;
-        public ActionState castState;
+        public ActionState castState = new ActionState();
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional(nameof(activateAnimationType), nameof(SkillActivateAnimationType.UseActivateAnimation))]
-        public ActionAnimation activateAnimation;
+        public ActionAnimation activateAnimation = new ActionAnimation();
         public BaseSkill Data { get { return skill; } }
     }
 
     [System.Serializable]
-    public struct DefaultAnimations
+    public class DefaultAnimations
     {
         [Header("Movements while standing")]
-        public AnimState idleState;
-        public MoveStates moveStates;
-        public MoveStates sprintStates;
-        public MoveStates walkStates;
+        public AnimState idleState = new AnimState();
+        public MoveStates moveStates = new MoveStates();
+        public MoveStates sprintStates = new MoveStates();
+        public MoveStates walkStates = new MoveStates();
 
         [Header("Movements while crouching")]
-        public AnimState crouchIdleState;
-        public MoveStates crouchMoveStates;
+        public AnimState crouchIdleState = new AnimState();
+        public MoveStates crouchMoveStates = new MoveStates();
 
         [Header("Movements while crawling")]
-        public AnimState crawlIdleState;
-        public MoveStates crawlMoveStates;
+        public AnimState crawlIdleState = new AnimState();
+        public MoveStates crawlMoveStates = new MoveStates();
 
         [Header("Movements while swimming")]
-        public AnimState swimIdleState;
-        public MoveStates swimMoveStates;
+        public AnimState swimIdleState = new AnimState();
+        public MoveStates swimMoveStates = new MoveStates();
 
         [Header("Airborne")]
-        public AnimState jumpState;
-        public AnimState fallState;
-        public AnimState landedState;
+        public AnimState jumpState = new AnimState();
+        public AnimState fallState = new AnimState();
+        public AnimState landedState = new AnimState();
 
         [Header("Vehicle Animation")]
         public EnterExitStates vehicleEnterExitStates;
@@ -326,44 +313,44 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Header("Ladder Animation")]
         public EnterExitStates climbBottomEnterExitStates;
         public EnterExitStates climbTopEnterExitStates;
-        public AnimState climbIdleState;
-        public MoveStates climbMoveStates;
+        public AnimState climbIdleState = new AnimState();
+        public MoveStates climbMoveStates = new MoveStates();
 
         [Header("Hurt")]
-        public ActionState hurtState;
+        public ActionState hurtState = new ActionState();
 
         [Header("Dead")]
-        public AnimState deadState;
+        public AnimState deadState = new AnimState();
 
         [Header("Dash")]
-        public AnimState dashStartState;
-        public AnimState dashLoopState;
-        public AnimState dashEndState;
+        public AnimState dashStartState = new AnimState();
+        public AnimState dashLoopState = new AnimState();
+        public AnimState dashEndState = new AnimState();
 
         [Header("Pickup")]
-        public ActionState pickupState;
+        public ActionState pickupState = new ActionState();
 
         [Header("Attack animations")]
-        public ActionState rightHandChargeState;
-        public ActionState leftHandChargeState;
+        public ActionState rightHandChargeState = new ActionState();
+        public ActionState leftHandChargeState = new ActionState();
         [ArrayElementTitle("clip")]
-        public ActionAnimation[] rightHandAttackAnimations;
+        public ActionAnimation[] rightHandAttackAnimations = new ActionAnimation[0];
         [ArrayElementTitle("clip")]
-        public ActionAnimation[] leftHandAttackAnimations;
+        public ActionAnimation[] leftHandAttackAnimations = new ActionAnimation[0];
 
         [Header("Reload(Gun) animations")]
-        public ActionAnimation rightHandReloadAnimation;
-        public ActionAnimation leftHandReloadAnimation;
+        public ActionAnimation rightHandReloadAnimation = new ActionAnimation();
+        public ActionAnimation leftHandReloadAnimation = new ActionAnimation();
 
         [Header("Skill animations")]
-        public ActionState skillCastState;
-        public ActionAnimation skillActivateAnimation;
+        public ActionState skillCastState = new ActionState();
+        public ActionAnimation skillActivateAnimation = new ActionAnimation();
 
         [Header("Sheath/Unsheath Animations")]
         [FormerlySerializedAs("rightHandHolsterAnimation")]
-        public HolsterAnimation rightHandWeaponSheathingAnimation;
+        public HolsterAnimation rightHandWeaponSheathingAnimation = new HolsterAnimation();
         [FormerlySerializedAs("leftHandHolsterAnimation")]
-        public HolsterAnimation leftHandWeaponSheathingAnimation;
-        public HolsterAnimation leftHandShieldSheathingAnimation;
+        public HolsterAnimation leftHandWeaponSheathingAnimation = new HolsterAnimation();
+        public HolsterAnimation leftHandShieldSheathingAnimation = new HolsterAnimation();
     }
 }
