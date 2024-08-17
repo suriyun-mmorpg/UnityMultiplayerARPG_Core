@@ -210,6 +210,8 @@ public static partial class GenericUtils
             GameObject[] rootGameObjects = scene.GetRootGameObjects();
             for (int j = 0; j < rootGameObjects.Length; ++j)
             {
+                if (!rootGameObjects[j].activeSelf && !includeInactive)
+                    continue;
                 result.AddRange(rootGameObjects[j].GetComponentsInChildren<T>(includeInactive));
             }
         }
