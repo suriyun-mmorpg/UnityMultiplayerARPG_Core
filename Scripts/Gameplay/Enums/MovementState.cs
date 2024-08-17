@@ -33,7 +33,9 @@
             return self.Has(MovementState.Forward) ||
                 self.Has(MovementState.Backward) ||
                 self.Has(MovementState.Right) ||
-                self.Has(MovementState.Left);
+                self.Has(MovementState.Left) ||
+                self.Has(MovementState.Up) ||
+                self.Has(MovementState.Down);
         }
     }
 }
