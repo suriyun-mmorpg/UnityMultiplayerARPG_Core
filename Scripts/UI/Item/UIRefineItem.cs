@@ -94,7 +94,7 @@ namespace MultiplayerARPG
 
             CanRefine = false;
             ReachedMaxLevel = false;
-            ItemRefineLevel? refineLevel = null;
+            ItemRefineLevel refineLevel = null;
             float increaseSuccessRate = 0f;
             float decreaseRequireGoldRate = 0f;
             float chanceToNotDecreaseLevels = 0f;
@@ -128,13 +128,13 @@ namespace MultiplayerARPG
                 uiRefineEnhancerItems.inventoryType = InventoryType.Unknow;
                 uiRefineEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 List<CharacterItem> characterItems = new List<CharacterItem>();
-                if (refineLevel.HasValue)
+                if (refineLevel != null)
                 {
                     for (int i = 0; i < GameInstance.PlayingCharacter.NonEquipItems.Count; ++i)
                     {
-                        for (int j = 0; j < refineLevel.Value.AvailableEnhancers.Length; ++j)
+                        for (int j = 0; j < refineLevel.AvailableEnhancers.Length; ++j)
                         {
-                            if (refineLevel.Value.AvailableEnhancers[j].item == GameInstance.PlayingCharacter.NonEquipItems[i].GetItem())
+                            if (refineLevel.AvailableEnhancers[j].item == GameInstance.PlayingCharacter.NonEquipItems[i].GetItem())
                                 characterItems.Add(GameInstance.PlayingCharacter.NonEquipItems[i].Clone());
                         }
                     }
@@ -151,19 +151,19 @@ namespace MultiplayerARPG
                 uiAppliedRefineEnhancerItems.inventoryType = InventoryType.Unknow;
                 uiAppliedRefineEnhancerItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 List<CharacterItem> characterItems = new List<CharacterItem>();
-                if (refineLevel.HasValue)
+                if (refineLevel != null)
                 {
                     for (int i = 0; i < _enhancerDataIds.Count; ++i)
                     {
                         characterItems.Add(CharacterItem.Create(_enhancerDataIds[i]));
-                        for (int j = 0; j < refineLevel.Value.AvailableEnhancers.Length; ++j)
+                        for (int j = 0; j < refineLevel.AvailableEnhancers.Length; ++j)
                         {
-                            if (refineLevel.Value.AvailableEnhancers[j].item.DataId == _enhancerDataIds[i])
+                            if (refineLevel.AvailableEnhancers[j].item.DataId == _enhancerDataIds[i])
                             {
-                                increaseSuccessRate += refineLevel.Value.AvailableEnhancers[j].increaseSuccessRate;
-                                decreaseRequireGoldRate += refineLevel.Value.AvailableEnhancers[j].decreaseRequireGoldRate;
-                                chanceToNotDecreaseLevels += refineLevel.Value.AvailableEnhancers[j].chanceToNotDecreaseLevels;
-                                chanceToNotDestroyItem += refineLevel.Value.AvailableEnhancers[j].chanceToNotDestroyItem;
+                                increaseSuccessRate += refineLevel.AvailableEnhancers[j].increaseSuccessRate;
+                                decreaseRequireGoldRate += refineLevel.AvailableEnhancers[j].decreaseRequireGoldRate;
+                                chanceToNotDecreaseLevels += refineLevel.AvailableEnhancers[j].chanceToNotDecreaseLevels;
+                                chanceToNotDestroyItem += refineLevel.AvailableEnhancers[j].chanceToNotDestroyItem;
                             }
                         }
                     }
@@ -186,7 +186,7 @@ namespace MultiplayerARPG
 
             if (uiRequireItemAmounts != null)
             {
-                if (!refineLevel.HasValue || refineLevel.Value.RequireItems == null || refineLevel.Value.RequireItems.Length == 0)
+                if (refineLevel != null || refineLevel.RequireItems == null || refineLevel.RequireItems.Length == 0)
                 {
                     uiRequireItemAmounts.Hide();
                 }
@@ -194,13 +194,13 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(refineLevel.Value.RequireItems, null);
+                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(refineLevel.RequireItems, null);
                 }
             }
 
             if (uiRequireCurrencyAmounts != null)
             {
-                if (!refineLevel.HasValue || refineLevel.Value.RequireCurrencies == null || refineLevel.Value.RequireCurrencies.Length == 0)
+                if (refineLevel != null || refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
                 {
                     uiRequireCurrencyAmounts.Hide();
                 }
@@ -208,13 +208,13 @@ namespace MultiplayerARPG
                 {
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.Show();
-                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(refineLevel.Value.RequireCurrencies, null);
+                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, null);
                 }
             }
 
             if (uiTextRequireGold != null)
             {
-                if (!refineLevel.HasValue)
+                if (refineLevel != null)
                 {
                     uiTextRequireGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
@@ -224,20 +224,20 @@ namespace MultiplayerARPG
                 else
                 {
                     uiTextRequireGold.text = ZString.Format(
-                        GameInstance.PlayingCharacter.Gold >= refineLevel.Value.RequireGold ?
+                        GameInstance.PlayingCharacter.Gold >= refineLevel.RequireGold ?
                             LanguageManager.GetText(formatKeyRequireGold) :
                             LanguageManager.GetText(formatKeyRequireGoldNotEnough),
                         GameInstance.PlayingCharacter.Gold.ToString("N0"),
-                        GameInstance.Singleton.GameplayRule.GetRefineItemRequireGold(GameInstance.PlayingCharacter, refineLevel.Value, decreaseRequireGoldRate).ToString("N0"));
+                        GameInstance.Singleton.GameplayRule.GetRefineItemRequireGold(GameInstance.PlayingCharacter, refineLevel, decreaseRequireGoldRate).ToString("N0"));
                 }
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), !refineLevel.HasValue ? "0" : refineLevel.Value.RequireGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), refineLevel != null ? "0" : refineLevel.RequireGold.ToString("N0"));
 
             if (uiTextSuccessRate != null)
             {
-                if (!refineLevel.HasValue)
+                if (refineLevel != null)
                 {
                     uiTextSuccessRate.text = ZString.Format(
                         LanguageManager.GetText(formatKeySuccessRate),
@@ -247,13 +247,13 @@ namespace MultiplayerARPG
                 {
                     uiTextSuccessRate.text = ZString.Format(
                         LanguageManager.GetText(formatKeySuccessRate),
-                        ((refineLevel.Value.SuccessRate + increaseSuccessRate) * 100).ToString("N2"));
+                        ((refineLevel.SuccessRate + increaseSuccessRate) * 100).ToString("N2"));
                 }
             }
 
             if (uiTextRefiningLevel != null)
             {
-                if (!refineLevel.HasValue)
+                if (refineLevel != null)
                 {
                     uiTextRefiningLevel.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRefiningLevel),

@@ -20,6 +20,14 @@ namespace MultiplayerARPG
         private ItemRepairPrice[] repairPrices = new ItemRepairPrice[0];
         public ItemRepairPrice[] RepairPrices { get { return repairPrices; } }
 
+        public Color GetTitleColor(int level)
+        {
+            int index = level - 1;
+            if (index >= 0 && index < Levels.Length && Levels[index].TitleColor.a != 0)
+                return Levels[index].TitleColor;
+            return TitleColor;
+        }
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -43,89 +51,73 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public partial struct ItemRefineEnhancer
+    public partial class ItemRefineEnhancer
     {
         public BaseItem item;
         [Range(0f, 1f)]
-        public float increaseSuccessRate;
+        public float increaseSuccessRate = 0f;
         [Range(0f, 1f)]
-        public float decreaseRequireGoldRate;
+        public float decreaseRequireGoldRate = 0f;
         [Range(0f, 1f)]
-        public float chanceToNotDecreaseLevels;
+        public float chanceToNotDecreaseLevels = 0f;
         [Range(0f, 1f)]
-        public float chanceToNotDestroyItem;
+        public float chanceToNotDestroyItem = 0f;
     }
 
     [System.Serializable]
-    public partial struct ItemRefineFailReturning
+    public partial class ItemRefineFailReturning
     {
-        public int randomWeight;
-        public ItemAmount[] returnItems;
-        public CurrencyAmount[] returnCurrencies;
-        public int returnGold;
+        public int randomWeight = 0;
+        public ItemAmount[] returnItems = new ItemAmount[0];
+        public CurrencyAmount[] returnCurrencies = new CurrencyAmount[0];
+        public int returnGold = 0;
     }
 
     [System.Serializable]
-    public partial struct ItemRefineLevel
+    public partial class ItemRefineLevel
     {
+        [SerializeField]
+        public Color titleColor = Color.clear;
+        public Color TitleColor { get { return titleColor; } }
+        
         [Range(0.01f, 1f)]
         [SerializeField]
-        private float successRate;
+        private float successRate = 0.01f;
         public float SuccessRate { get { return successRate; } }
 
         [SerializeField]
         [ArrayElementTitle("item")]
-        private ItemAmount[] requireItems;
+        private ItemAmount[] requireItems = new ItemAmount[0];
         public ItemAmount[] RequireItems { get { return requireItems; } }
 
         [SerializeField]
         [ArrayElementTitle("currency")]
-        private CurrencyAmount[] requireCurrencies;
+        private CurrencyAmount[] requireCurrencies = new CurrencyAmount[0];
         public CurrencyAmount[] RequireCurrencies { get { return requireCurrencies; } }
 
         [SerializeField]
-        private int requireGold;
+        private int requireGold = 0;
         public int RequireGold { get { return requireGold; } }
 
         [Tooltip("How many levels it will be decreased if refining failed")]
         [SerializeField]
-        private int refineFailDecreaseLevels;
+        private int refineFailDecreaseLevels = 0;
         public int RefineFailDecreaseLevels { get { return refineFailDecreaseLevels; } }
 
         [Tooltip("It will be destroyed if this value is TRUE and refining failed")]
         [SerializeField]
-        private bool refineFailDestroyItem;
+        private bool refineFailDestroyItem = false;
         public bool RefineFailDestroyItem { get { return refineFailDestroyItem; } }
 
         [Tooltip("Materials for item refinement enhancing")]
         [SerializeField]
-        private ItemRefineEnhancer[] availableEnhancers;
+        private ItemRefineEnhancer[] availableEnhancers = new ItemRefineEnhancer[0];
         public ItemRefineEnhancer[] AvailableEnhancers { get { return availableEnhancers; } }
 
         [Tooltip("Items/currencies which will be returned when refining failed")]
         [SerializeField]
-        private ItemRefineFailReturning[] failReturnings;
+        private ItemRefineFailReturning[] failReturnings = new ItemRefineFailReturning[0];
         public ItemRefineFailReturning[] FailReturnings { get { return failReturnings; } }
-
-        public ItemRefineLevel(
-            float successRate,
-            ItemAmount[] requireItems,
-            CurrencyAmount[] requireCurrencies,
-            int requireGold,
-            int refineFailDecreaseLevels,
-            bool refineFailDestroyItem,
-            ItemRefineEnhancer[] availableEnhancers,
-            ItemRefineFailReturning[] failReturnings)
-        {
-            this.successRate = successRate;
-            this.requireItems = requireItems;
-            this.requireCurrencies = requireCurrencies;
-            this.requireGold = requireGold;
-            this.refineFailDecreaseLevels = refineFailDecreaseLevels;
-            this.refineFailDestroyItem = refineFailDestroyItem;
-            this.availableEnhancers = availableEnhancers;
-            this.failReturnings = failReturnings;
-        }
 
         public bool CanRefine(IPlayerCharacterData character, int[] materialDataIds)
         {
@@ -173,7 +165,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public partial struct ItemRepairPrice : System.IComparable<ItemRepairPrice>
+    public partial class ItemRepairPrice : System.IComparable<ItemRepairPrice>
     {
         [Range(0.01f, 1f)]
         [SerializeField]
@@ -182,16 +174,16 @@ namespace MultiplayerARPG
 
         [SerializeField]
         [ArrayElementTitle("item")]
-        private ItemAmount[] requireItems;
+        private ItemAmount[] requireItems = new ItemAmount[0];
         public ItemAmount[] RequireItems { get { return requireItems; } }
 
         [SerializeField]
         [ArrayElementTitle("currency")]
-        private CurrencyAmount[] requireCurrencies;
+        private CurrencyAmount[] requireCurrencies = new CurrencyAmount[0];
         public CurrencyAmount[] RequireCurrencies { get { return requireCurrencies; } }
 
         [SerializeField]
-        private int requireGold;
+        private int requireGold = 0;
         public int RequireGold { get { return requireGold; } }
 
         public ItemRepairPrice(
