@@ -12,6 +12,33 @@ namespace MultiplayerARPG
         [Category(2, "Area Settings")]
         public IncrementalFloat areaDuration;
         public IncrementalFloat applyDuration;
+        [Tooltip("If this is `TRUE`, it will use `targetDetectionLayerMask`, not game instance's `GetTargetLayerMask()`")]
+        public bool overrideTargetDetectionLayerMask;
+        public LayerMask targetDetectionLayerMask;
+        [Tooltip("If this is `TRUE`, it will use `groundDetectionLayerMask`, not game instance's `GetAreaSkillGroundDetectionLayerMask()`")]
+        public bool overrideGroundDetectionLayerMask;
+        public LayerMask groundDetectionLayerMask;
+
+        public int TargetDetectionLayerMask
+        {
+            get
+            {
+                if (overrideTargetDetectionLayerMask)
+                    return targetDetectionLayerMask.value;
+                return GameInstance.Singleton.GetTargetLayerMask();
+            }
+        }
+
+        public int GroundDetectionLayerMask
+        {
+            get
+            {
+                if (overrideGroundDetectionLayerMask)
+                    return groundDetectionLayerMask.value;
+                return GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask();
+            }
+        }
+
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
         [AddressableAssetConversion(nameof(addressableTargetObjectPrefab))]

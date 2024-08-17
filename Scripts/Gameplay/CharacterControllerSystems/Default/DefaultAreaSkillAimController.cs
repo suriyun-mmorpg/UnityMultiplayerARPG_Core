@@ -54,9 +54,9 @@ namespace MultiplayerARPG
         public AimPosition UpdateAimControls_PC(Vector3 cursorPosition, BaseAreaSkill skill, int skillLevel)
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
-            Vector3 position = GameplayUtils.CursorWorldPosition(Camera.main, cursorPosition);
+            Vector3 position = GameplayUtils.CursorWorldPosition(Camera.main, cursorPosition, 100f, skill.TargetDetectionLayerMask);
             position = GameplayUtils.ClampPosition(EntityTransform.position, position, castDistance);
-            position = PhysicUtils.FindGroundedPosition(position, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
+            position = PhysicUtils.FindGroundedPosition(position, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, skill.GroundDetectionLayerMask);
             if (_targetObject != null)
                 _targetObject.transform.position = position;
             return AimPosition.CreatePosition(position);
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = EntityTransform.position + (GameplayUtils.GetDirectionByAxes(Camera.main.transform, aimAxes.x, aimAxes.y) * castDistance);
-            position = PhysicUtils.FindGroundedPosition(position, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
+            position = PhysicUtils.FindGroundedPosition(position, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, skill.GroundDetectionLayerMask);
             if (_targetObject != null)
                 _targetObject.transform.position = position;
             return AimPosition.CreatePosition(position);
@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         {
             float castDistance = skill.castDistance.GetAmount(skillLevel);
             Vector3 position = EntityTransform.position + (EntityTransform.forward * castDistance * consoleDistanceRate);
-            position = PhysicUtils.FindGroundedPosition(position, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetAreaSkillGroundDetectionLayerMask());
+            position = PhysicUtils.FindGroundedPosition(position, findGroundRaycastHits, GROUND_DETECTION_DISTANCE, skill.GroundDetectionLayerMask);
             if (_targetObject != null)
                 _targetObject.transform.position = position;
             return AimPosition.CreatePosition(position);

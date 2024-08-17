@@ -6,10 +6,15 @@ namespace MultiplayerARPG
     {
         public static Vector3 CursorWorldPosition(Camera camera, Vector3 cursorPosition, float distance = 100f)
         {
+            return CursorWorldPosition(camera, cursorPosition, distance, GameInstance.Singleton.GetTargetLayerMask());
+        }
+
+        public static Vector3 CursorWorldPosition(Camera camera, Vector3 cursorPosition, float distance, int layerMask)
+        {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
             {
                 RaycastHit tempHit;
-                if (Physics.Raycast(camera.ScreenPointToRay(cursorPosition), out tempHit, distance, GameInstance.Singleton.GetTargetLayerMask()))
+                if (Physics.Raycast(camera.ScreenPointToRay(cursorPosition), out tempHit, distance, layerMask))
                 {
                     return tempHit.point;
                 }
