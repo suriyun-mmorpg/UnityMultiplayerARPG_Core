@@ -334,9 +334,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             _isDoingAction = true;
 
-            ActionState actionState1 = default;
+            ActionState actionState1 = null;
             float triggeredDurationRate1 = 0f;
-            ActionState actionState2 = default;
+            ActionState actionState2 = null;
             float triggeredDurationRate2 = 0f;
             if (isWeaponsSheathed)
             {
@@ -386,7 +386,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
             float animationDelay = 0f;
             float triggeredDelay = 0f;
-            if (actionState1.clip != null)
+            if (actionState1 != null && actionState1.clip != null)
             {
                 // Setup animation playing duration
                 animationDelay = Behaviour.PlayAction(0, actionState1, 1f);
@@ -395,7 +395,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
             float animationDelay2 = 0f;
             float triggeredDelay2 = 0f;
-            if (actionState2.clip != null)
+            if (actionState2 != null && actionState2.clip != null)
             {
                 // Setup animation playing duration
                 animationDelay2 = Behaviour.PlayAction(1, actionState2, 1f);
