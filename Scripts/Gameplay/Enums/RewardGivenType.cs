@@ -15,5 +15,6 @@
         BuildingDrop,
         BuildingDestroyed,
         Vending,
+        GM,
     }
 }

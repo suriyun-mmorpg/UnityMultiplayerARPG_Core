@@ -334,6 +334,7 @@ namespace MultiplayerARPG
                         else
                         {
                             characterEntity.AddOrSetNonEquipItems(CharacterItem.Create(targetItem, 1, amount));
+                            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(characterEntity.ConnectionId, RewardGivenType.GM, targetItem.DataId, amount);
                             response = $"Add item {targetItem.Title}x{amount} to character's inventory";
                         }
                     }
@@ -349,6 +350,7 @@ namespace MultiplayerARPG
                     else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out targetCharacter))
                     {
                         targetCharacter.Gold = targetCharacter.Gold.Increase(amount);
+                        GameInstance.ServerGameMessageHandlers.NotifyRewardGold(targetCharacter.ConnectionId, RewardGivenType.GM, amount);
                         response = $"Add gold for character: {receiver}";
                     }
                 }
@@ -387,6 +389,7 @@ namespace MultiplayerARPG
                         else
                         {
                             targetCharacter.AddOrSetNonEquipItems(CharacterItem.Create(targetItem, 1, amount));
+                            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(targetCharacter.ConnectionId, RewardGivenType.GM, targetItem.DataId, amount);
                             response = $"Add item {targetItem.Title}x{amount} to {receiver}'s inventory";
                         }
                     }
