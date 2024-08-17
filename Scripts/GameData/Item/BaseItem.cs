@@ -86,6 +86,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public string GetTitle(int level)
+        {
+            if (itemRefine == null)
+                return base.Title;
+            Color titleColor = itemRefine.GetTitleColor(level);
+            if (titleColor.a == 0)
+                return base.Title;
+            return "<color=#" + ColorUtility.ToHtmlStringRGB(titleColor) + ">" + base.Title + "</color>";
+        }
+
         public abstract string TypeTitle { get; }
 
         public abstract ItemType ItemType { get; }

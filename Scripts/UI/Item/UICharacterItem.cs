@@ -618,12 +618,12 @@ namespace MultiplayerARPG
             {
                 string str = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
-                    isEmpty ? LanguageManager.GetUnknowTitle() : Item.Title);
+                    isEmpty ? LanguageManager.GetUnknowTitle() : Item.GetTitle(Level));
                 if (!dontAppendRefineLevelToTitle && EquipmentItem != null && Level > 1)
                 {
                     str = ZString.Format(
                         LanguageManager.GetText(formatKeyTitleWithRefineLevel),
-                        isEmpty ? LanguageManager.GetUnknowTitle() : Item.Title,
+                        isEmpty ? LanguageManager.GetUnknowTitle() : Item.GetTitle(Level),
                         (Level - 1).ToString("N0"));
                 }
                 uiTextTitle.text = str;
