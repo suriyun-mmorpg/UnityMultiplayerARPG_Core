@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         [System.Serializable]
         public struct PlayableCharacterModelSettingsData
         {
-            [Tooltip("Apply animations to all playable character models or not?, don't have to set `weaponType` data")]
+            [Tooltip("Apply animations to all playable character models or not?, don't have to set `skill` data")]
             public bool applySkillAnimations;
             public Playables.SkillAnimations skillAnimations;
         }
