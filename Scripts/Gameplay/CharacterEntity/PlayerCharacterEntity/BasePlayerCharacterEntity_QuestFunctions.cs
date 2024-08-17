@@ -100,6 +100,7 @@ namespace MultiplayerARPG
                 rewardItems.Add(new ItemAmount()
                 {
                     item = randomedItem.item,
+                    level = randomedItem.GetRandomedLevel(),
                     amount = randomedItem.GetRandomedAmount(),
                 });
             }

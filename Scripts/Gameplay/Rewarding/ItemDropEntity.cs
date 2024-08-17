@@ -197,9 +197,9 @@ namespace MultiplayerARPG
             if (!PutOnPlaceholder)
             {
                 DropItems.Clear();
-                ItemDropManager.RandomItems((item, amount) =>
+                ItemDropManager.RandomItems((item, level, amount) =>
                 {
-                    DropItems.Add(CharacterItem.Create(item.DataId, 1, amount));
+                    DropItems.Add(CharacterItem.Create(item.DataId, level, amount));
                 });
             }
             if (DropItems.Count == 0)

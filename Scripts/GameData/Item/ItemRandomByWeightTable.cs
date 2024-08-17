@@ -30,12 +30,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public void RandomItem(System.Action<BaseItem, int> onRandomItem)
+        public void RandomItem(OnDropItemDelegate onRandomItem)
         {
             ItemRandomByWeight randomedItem = WeightedRandomizer.From(CacheRandomItems).TakeOne();
             if (randomedItem.item == null)
                 return;
-            onRandomItem.Invoke(randomedItem.item, randomedItem.GetRandomedAmount());
+            onRandomItem.Invoke(randomedItem.item, randomedItem.GetRandomedLevel(), randomedItem.GetRandomedAmount());
         }
     }
 }

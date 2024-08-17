@@ -762,13 +762,13 @@ namespace MultiplayerARPG
             return GameInstance.Singleton.partyShareItemDistance <= 0f || Vector3.Distance(attacker.EntityTransform.position, member.EntityTransform.position) <= GameInstance.Singleton.partyShareItemDistance;
         }
 
-        private void OnRandomDropItem(BaseItem item, int amount)
+        private void OnRandomDropItem(BaseItem item, int level, int amount)
         {
             int maxStack = item.MaxStack;
             while (amount > 0)
             {
                 int stackSize = Mathf.Min(maxStack, amount);
-                _droppingItems.Add(CharacterItem.Create(item, 1, stackSize));
+                _droppingItems.Add(CharacterItem.Create(item, level, stackSize));
                 amount -= stackSize;
             }
         }

@@ -162,4 +162,9 @@ namespace MultiplayerARPG
         BaseEquipmentEntity instantiatedEntity,
         EquipmentInstantiatedObjectGroup instantiatedObjectGroup,
         EquipmentContainer equipmentContainer);
+
+    public delegate void OnDropItemDelegate(
+        BaseItem item,
+        int level,
+        int amount);
 }

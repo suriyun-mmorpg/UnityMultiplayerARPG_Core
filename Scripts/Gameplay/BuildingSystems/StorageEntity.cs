@@ -103,11 +103,12 @@ namespace MultiplayerARPG
             base.InitSceneObject();
             List<CharacterItem> storageItems = new List<CharacterItem>();
             List<ItemAmount> increasingItems = new List<ItemAmount>(sceneStorageItems);
-            sceneStorageRandomItemManager.RandomItems((item, amount) =>
+            sceneStorageRandomItemManager.RandomItems((item, level, amount) =>
             {
                 increasingItems.Add(new ItemAmount()
                 {
                     item = item,
+                    level = level,
                     amount = amount,
                 });
             });

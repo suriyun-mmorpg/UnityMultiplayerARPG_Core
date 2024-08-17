@@ -103,7 +103,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void RandomItems(System.Action<BaseItem, int> onRandomItem, float rate = 1f)
+        public virtual void RandomItems(OnDropItemDelegate onRandomItem, float rate = 1f)
         {
             if (CacheRandomItems.Count == 0 && CacheItemRandomByWeightTables.Count <= 0)
                 return;
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
             {
                 if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_certainDropItems[i].item))
                     continue;
-                onRandomItem.Invoke(_certainDropItems[i].item, _certainDropItems[i].GetRandomedAmount());
+                onRandomItem.Invoke(_certainDropItems[i].item, _certainDropItems[i].GetRandomedLevel(), _certainDropItems[i].GetRandomedAmount());
                 ++randomDropCount;
             }
             // Reached max drop items?
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
                     continue;
                 if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_uncertainDropItems[i].item))
                     continue;
-                onRandomItem.Invoke(_uncertainDropItems[i].item, _uncertainDropItems[i].GetRandomedAmount());
+                onRandomItem.Invoke(_uncertainDropItems[i].item, _uncertainDropItems[i].GetRandomedLevel(), _uncertainDropItems[i].GetRandomedAmount());
                 ++randomDropCount;
             }
             // Reached max drop items?

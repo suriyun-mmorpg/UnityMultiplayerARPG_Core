@@ -47,9 +47,9 @@ namespace MultiplayerARPG
 #endif
                     continue;
                 }
-                weightTable.RandomItem((item, amount) =>
+                weightTable.RandomItem((item, level, amount) =>
                 {
-                    Spawn(CharacterItem.Create(item, 1, amount), 0f);
+                    Spawn(CharacterItem.Create(item, level, amount), 0f);
                 });
             }
         }
@@ -94,9 +94,9 @@ namespace MultiplayerARPG
 
         protected virtual void NewEntity_onNetworkDestroy(byte reasons)
         {
-            weightTable.RandomItem((item, amount) =>
+            weightTable.RandomItem((item, level, amount) =>
             {
-                Spawn(CharacterItem.Create(item, 1, amount), respawnPickedupDelay);
+                Spawn(CharacterItem.Create(item, level, amount), respawnPickedupDelay);
             });
         }
     }

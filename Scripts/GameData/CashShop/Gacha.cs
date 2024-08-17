@@ -72,7 +72,7 @@ namespace MultiplayerARPG
                 rewardItems.Add(new RewardedItem()
                 {
                     item = randomedItem.item,
-                    level = 1,
+                    level = randomedItem.GetRandomedLevel(),
                     amount = randomedItem.GetRandomedAmount(),
                     randomSeed = Random.Range(int.MinValue, int.MaxValue),
                 });

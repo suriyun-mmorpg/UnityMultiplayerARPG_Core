@@ -191,7 +191,7 @@ namespace MultiplayerARPG
             return randomGold.GetAmount(level).Random();
         }
 
-        public virtual void RandomItems(System.Action<BaseItem, int> onRandomItem, float rate = 1f)
+        public virtual void RandomItems(OnDropItemDelegate onRandomItem, float rate = 1f)
         {
             ItemDropManager.RandomItems(onRandomItem, rate);
         }
