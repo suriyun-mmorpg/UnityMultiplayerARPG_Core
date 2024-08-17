@@ -530,17 +530,25 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #region Skill animations
         public ActionAnimation GetSkillActivateAnimation(int dataId)
         {
-            SkillAnimations anims;
-            if (TryGetSkillAnimations(dataId, out anims) && anims.activateAnimation.state.clip != null)
-                return anims.activateAnimation;
+            if (TryGetSkillAnimations(dataId, out SkillAnimations anims))
+            {
+                int weaponTypeDataId = _equippedWeaponType ? _equippedWeaponType.DataId : 0;
+                ActionAnimation actionAnim = anims.GetActivateAnimation(weaponTypeDataId);
+                if (actionAnim.state.clip != null)
+                    return actionAnim;
+            }
             return defaultAnimations.skillActivateAnimation;
         }
 
         public ActionState GetSkillCastState(int dataId)
         {
-            SkillAnimations anims;
-            if (TryGetSkillAnimations(dataId, out anims) && anims.castState.clip != null)
-                return anims.castState;
+            if (TryGetSkillAnimations(dataId, out SkillAnimations anims))
+            {
+                int weaponTypeDataId = _equippedWeaponType ? _equippedWeaponType.DataId : 0;
+                ActionState actionState = anims.GetCastState(weaponTypeDataId);
+                if (actionState.clip != null)
+                    return actionState;
+            }
             return defaultAnimations.skillCastState;
         }
 

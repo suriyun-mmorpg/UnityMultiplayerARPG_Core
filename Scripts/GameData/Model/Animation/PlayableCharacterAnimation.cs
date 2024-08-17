@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -271,14 +272,85 @@ namespace MultiplayerARPG.GameData.Model.Playables
     }
 
     [System.Serializable]
+    public class WeaponActionState : ActionState
+    {
+        public WeaponType weaponType;
+    }
+
+    [System.Serializable]
+    public class WeaponActionAnimation : ActionAnimation
+    {
+        public WeaponType weaponType;
+    }
+
+    [System.Serializable]
     public class SkillAnimations : ISkillAnims
     {
         public BaseSkill skill;
         public ActionState castState = new ActionState();
+        public WeaponActionState[] castStatesByWeaponTypes = new WeaponActionState[0];
         public SkillActivateAnimationType activateAnimationType;
         [StringShowConditional(nameof(activateAnimationType), nameof(SkillActivateAnimationType.UseActivateAnimation))]
         public ActionAnimation activateAnimation = new ActionAnimation();
+        public WeaponActionAnimation[] activateAnimationsByWeaponTypes = new WeaponActionAnimation[0];
         public BaseSkill Data { get { return skill; } }
+        private Dictionary<int, WeaponActionState> _cacheCastStatesByWeaponTypes = null;
+        public Dictionary<int, WeaponActionState> CastStatesByWeaponTypes
+        {
+            get
+            {
+                if (_cacheCastStatesByWeaponTypes == null)
+                {
+                    _cacheCastStatesByWeaponTypes = new Dictionary<int, WeaponActionState>();
+                    WeaponActionState actionState;
+                    for (int i = 0; i < castStatesByWeaponTypes.Length; ++i)
+                    {
+                        actionState = castStatesByWeaponTypes[i];
+                        if (actionState == null ||
+                            actionState.weaponType == null ||
+                            actionState.clip == null)
+                            continue;
+                        _cacheCastStatesByWeaponTypes[actionState.weaponType.DataId] = actionState;
+                    }
+                }
+                return _cacheCastStatesByWeaponTypes;
+            }
+        }
+        private Dictionary<int, WeaponActionAnimation> _cacheActivateAnimationsByWeaponTypes = null;
+        public Dictionary<int, WeaponActionAnimation> ActivateAnimationsByWeaponTypes
+        {
+            get
+            {
+                if (_cacheActivateAnimationsByWeaponTypes == null)
+                {
+                    _cacheActivateAnimationsByWeaponTypes = new Dictionary<int, WeaponActionAnimation>();
+                    WeaponActionAnimation actionState;
+                    for (int i = 0; i < activateAnimationsByWeaponTypes.Length; ++i)
+                    {
+                        actionState = activateAnimationsByWeaponTypes[i];
+                        if (actionState == null ||
+                            actionState.weaponType == null)
+                            continue;
+                        _cacheActivateAnimationsByWeaponTypes[actionState.weaponType.DataId] = actionState;
+                    }
+                }
+                return _cacheActivateAnimationsByWeaponTypes;
+            }
+        }
+
+        public ActionState GetCastState(int weaponTypeDataId)
+        {
+            if (CastStatesByWeaponTypes.TryGetValue(weaponTypeDataId, out WeaponActionState weaponCastState))
+                return weaponCastState;
+            return castState;
+        }
+
+        public ActionAnimation GetActivateAnimation(int weaponTypeDataId)
+        {
+            if (ActivateAnimationsByWeaponTypes.TryGetValue(weaponTypeDataId, out WeaponActionAnimation weaponActivateAnimation))
+                return weaponActivateAnimation;
+            return activateAnimation;
+        }
     }
 
     [System.Serializable]
