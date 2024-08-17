@@ -37,8 +37,18 @@ namespace MultiplayerARPG.GameData.Model.Playables
     [System.Serializable]
     public class ActionState : AnimWithMaskState
     {
-        [Tooltip("If this is `TRUE` it will not use avatar mask while character is moving")]
-        public bool doNotUseAvatarMaskWhileMoving;
+        [Tooltip("If this is `null`, it will use `clip`")]
+        public AnimationClip clipWhileMoving;
+        [Tooltip("If this is `null`, it will use `avatarMask`")]
+        public AvatarMask avatarMaskWhileMoving;
+        [Tooltip("If this is `null`, it will use `clipWhileMoving`")]
+        public AnimationClip clipWhileSprinting;
+        [Tooltip("If this is `null`, it will use `avatarMaskWhileMoving`")]
+        public AvatarMask avatarMaskWhileSprinting;
+        [Tooltip("If this is `null`, it will use `clip`")]
+        public AnimationClip clipWhileAirbourne;
+        [Tooltip("If this is `null`, it will use `avatarMask`")]
+        public AvatarMask avatarMaskWhileAirbourne;
         [Tooltip("Turn this on to skip movement validation while playing this animation")]
         public bool skipMovementValidation;
         [Tooltip("Turn this on to use root motion while playing this animation")]

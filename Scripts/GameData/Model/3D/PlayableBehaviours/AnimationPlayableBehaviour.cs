@@ -364,22 +364,49 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 behaviour.Graph.Connect(ActionLayerMixer, 0, behaviour.LayerMixer, _layer);
                 behaviour.LayerMixer.SetInputWeight(_layer, 0f);
 
-                AnimationClip clip = actionState.clip != null ? actionState.clip : EmptyClip;
+                bool isMoving = behaviour.CharacterModel.MovementState.HasDirectionMovement();
+                bool isGround = behaviour.CharacterModel.MovementState.Has(MovementState.IsGrounded);
+
+                // Prepare clip and avatar mask
+                AnimationClip clip = null;
+                AvatarMask avatarMask = null;
+                if (isGround)
+                {
+                    if (isMoving)
+                    {
+                        switch (behaviour.CharacterModel.ExtraMovementState)
+                        {
+                            case ExtraMovementState.IsSprinting:
+                                clip = actionState.clipWhileSprinting;
+                                avatarMask = actionState.avatarMaskWhileSprinting;
+                                break;
+                            default:
+                                clip = actionState.clipWhileMoving;
+                                avatarMask = actionState.avatarMaskWhileMoving;
+                                break;
+                        }
+                    }
+                }
+                else
+                {
+                    clip = actionState.clipWhileAirbourne;
+                    avatarMask = actionState.avatarMaskWhileAirbourne;
+                }
+                if (clip == null)
+                    clip = actionState.clip;
+                if (clip == null)
+                    clip = EmptyClip;
+                if (avatarMask == null)
+                    avatarMask = actionState.avatarMask;
+                if (avatarMask == null)
+                    avatarMask = behaviour.CharacterModel.actionAvatarMask;
+                if (avatarMask == null)
+                    avatarMask = EmptyMask;
                 AnimationClipPlayable playable = AnimationClipPlayable.Create(behaviour.Graph, clip);
                 playable.SetApplyFootIK(actionState.applyFootIk);
                 playable.SetApplyPlayableIK(actionState.applyPlayableIk);
                 behaviour.Graph.Connect(playable, 0, ActionLayerMixer, 0);
                 ActionLayerMixer.SetInputWeight(0, 1f);
-
-                // Set avatar mask
-                AvatarMask avatarMask = actionState.avatarMask;
-                if (avatarMask == null)
-                    avatarMask = behaviour.CharacterModel.actionAvatarMask;
-                // Use empty mask if it should
-                if (avatarMask == null || (actionState.doNotUseAvatarMaskWhileMoving &&
-                    behaviour.CharacterModel.MovementState.HasDirectionMovement() &&
-                    behaviour.CharacterModel.MoveAnimationSpeedMultiplier > 0f))
-                    avatarMask = EmptyMask;
 
                 behaviour.LayerMixer.SetLayerMaskFromAvatarMask(castedLayer, avatarMask);
 
