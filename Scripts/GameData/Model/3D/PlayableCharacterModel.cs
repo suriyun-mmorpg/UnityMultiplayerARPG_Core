@@ -768,7 +768,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 Behaviour.PlayAction(defaultAnimations.pickupState, 1f);
         }
 
-        public void PlayCustomAnimation(int id)
+        public void PlayCustomAnimation(int id, bool loop)
         {
             if (id < 0 || id >= customAnimations.Length)
                 return;
@@ -777,7 +777,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (customAnimations[id].clip != null)
             {
                 _latestCustomAnimationActionId = OFFSET_FOR_CUSTOM_ANIMATION_ACTION_ID + id;
-                Behaviour.PlayAction(customAnimations[id], 1f, actionId: _latestCustomAnimationActionId);
+                Behaviour.PlayAction(customAnimations[id], 1f, 0f, loop, _latestCustomAnimationActionId);
             }
         }
 

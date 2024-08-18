@@ -43,21 +43,21 @@ namespace MultiplayerARPG
         #endregion
 
         #region Play Custom Animation
-        public void CallRpcPlayCustomAnimation(int id)
+        public void CallRpcPlayCustomAnimation(int id, bool loop)
         {
-            RPC(RpcPlayCustomAnimation, id);
+            RPC(RpcPlayCustomAnimation, id, loop);
         }
 
         [AllRpc]
-        protected virtual void RpcPlayCustomAnimation(int id)
+        protected virtual void RpcPlayCustomAnimation(int id, bool loop)
         {
-            PlayCustomAnimation(id);
+            PlayCustomAnimation(id, loop);
         }
 
-        public virtual void PlayCustomAnimation(int id)
+        public virtual void PlayCustomAnimation(int id, bool loop)
         {
             if (Model is ICustomAnimationModel customAnimationModel)
-                customAnimationModel.PlayCustomAnimation(id);
+                customAnimationModel.PlayCustomAnimation(id, loop);
         }
         #endregion
 
