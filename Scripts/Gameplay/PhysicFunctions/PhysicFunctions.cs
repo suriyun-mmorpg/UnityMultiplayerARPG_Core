@@ -4,13 +4,25 @@ namespace MultiplayerARPG
 {
     public class PhysicFunctions : IPhysicFunctions
     {
-        private readonly RaycastHit[] _raycasts;
-        private readonly Collider[] _overlapColliders;
+        private RaycastHit[] _raycasts;
+        private Collider[] _overlapColliders;
 
         public PhysicFunctions(int allocSize)
         {
             _raycasts = new RaycastHit[allocSize];
             _overlapColliders = new Collider[allocSize];
+        }
+
+        ~PhysicFunctions()
+        {
+            Clean();
+        }
+
+        public void Clean()
+        {
+            _raycasts = null;
+            _overlapColliders.Nulling();
+            _overlapColliders = null;
         }
 
         public bool SingleRaycast(Vector3 start, Vector3 end, out PhysicRaycastResult result, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
