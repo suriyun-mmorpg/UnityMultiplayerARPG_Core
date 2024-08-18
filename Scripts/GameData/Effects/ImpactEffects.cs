@@ -18,7 +18,8 @@ namespace MultiplayerARPG
 #endif
         public ImpactEffect defaultImpactEffect;
         [FormerlySerializedAs("effects")]
-        public ImpactEffect[] impaceEffects;
+        [FormerlySerializedAs("impaceEffects")]
+        public ImpactEffect[] impactEffects;
 
         [System.NonSerialized]
         private Dictionary<string, ImpactEffect> _cacheEffects;
@@ -29,10 +30,10 @@ namespace MultiplayerARPG
                 if (_cacheEffects == null)
                 {
                     _cacheEffects = new Dictionary<string, ImpactEffect>();
-                    if (impaceEffects != null && impaceEffects.Length > 0)
+                    if (impactEffects != null && impactEffects.Length > 0)
                     {
                         _cacheEffects[defaultImpactEffect.tag.Tag] = defaultImpactEffect;
-                        foreach (ImpactEffect effect in impaceEffects)
+                        foreach (ImpactEffect effect in impactEffects)
                         {
                             if (effect.effect == null)
                                 continue;
