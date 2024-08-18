@@ -1,5 +1,4 @@
-﻿using Insthync.AddressableAssetTools;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
@@ -13,7 +12,6 @@ namespace MultiplayerARPG
     {
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
-        [AddressableAssetConversion(nameof(defaultImpactEffect), nameof(ConvertDefaultEffectPrefab))]
         public GameEffect defaultEffect;
 #endif
         public ImpactEffect defaultImpactEffect;
@@ -43,11 +41,6 @@ namespace MultiplayerARPG
                 }
                 return _cacheEffects;
             }
-        }
-
-        private void ConvertDefaultEffectPrefab(object defaultEffect, string aaVarName)
-        {
-            // TODO: Implement this
         }
 
         public bool TryGetEffect(string tag, out ImpactEffect effect)

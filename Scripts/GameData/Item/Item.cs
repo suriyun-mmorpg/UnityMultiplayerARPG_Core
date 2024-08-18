@@ -98,28 +98,24 @@ namespace MultiplayerARPG
 
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
-        [AddressableAssetConversion(nameof(launchClipSettings), nameof(ConvertAudioClip))]
         public AudioClip launchClip;
 #endif
         public AudioClipWithVolumeSettings[] launchClipSettings = new AudioClipWithVolumeSettings[0];
 
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
-        [AddressableAssetConversion(nameof(reloadClipSettings), nameof(ConvertAudioClip))]
         public AudioClip reloadClip;
 #endif
         public AudioClipWithVolumeSettings[] reloadClipSettings = new AudioClipWithVolumeSettings[0];
 
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
-        [AddressableAssetConversion(nameof(reloadedClipSettings), nameof(ConvertAudioClip))]
         public AudioClip reloadedClip;
 #endif
         public AudioClipWithVolumeSettings[] reloadedClipSettings = new AudioClipWithVolumeSettings[0];
 
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [HideInInspector]
-        [AddressableAssetConversion(nameof(emptyClipSettings), nameof(ConvertAudioClip))]
         public AudioClip emptyClip;
 #endif
         public AudioClipWithVolumeSettings[] emptyClipSettings = new AudioClipWithVolumeSettings[0];
@@ -1111,11 +1107,6 @@ namespace MultiplayerARPG
                     return skillLevel.skill.IsChanneledAbility();
             }
             return false;
-        }
-
-        private void ConvertAudioClip(object audioClip, string aaVarName)
-        {
-            // TODO: Implement this
         }
     }
 }
