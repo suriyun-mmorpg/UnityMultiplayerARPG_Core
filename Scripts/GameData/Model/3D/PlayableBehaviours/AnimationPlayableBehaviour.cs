@@ -374,15 +374,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 {
                     if (isMoving)
                     {
+                        clip = actionState.clipWhileMoving;
+                        avatarMask = actionState.avatarMaskWhileMoving;
                         switch (behaviour.CharacterModel.ExtraMovementState)
                         {
                             case ExtraMovementState.IsSprinting:
-                                clip = actionState.clipWhileSprinting;
-                                avatarMask = actionState.avatarMaskWhileSprinting;
-                                break;
-                            default:
-                                clip = actionState.clipWhileMoving;
-                                avatarMask = actionState.avatarMaskWhileMoving;
+                                if (actionState.clipWhileSprinting != null)
+                                    clip = actionState.clipWhileSprinting;
+                                if (actionState.avatarMaskWhileSprinting != null)
+                                    avatarMask = actionState.avatarMaskWhileSprinting;
                                 break;
                         }
                     }
