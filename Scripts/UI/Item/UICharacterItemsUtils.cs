@@ -2,10 +2,10 @@
 
 namespace MultiplayerARPG
 {
-    public delegate List<KeyValuePair<int, CharacterItem>> GetFilteredListDelegate(List<CharacterItem> list, List<string> filterCategories, List<ItemType> filterItemTypes, List<SocketEnhancerType> filterSocketEnhancerTypes, bool doNotShowEmptySlots);
-
     public class UICharacterItemsUtils
     {
+        public delegate List<KeyValuePair<int, CharacterItem>> GetFilteredListDelegate(List<CharacterItem> list, List<string> filterCategories, List<ItemType> filterItemTypes, List<SocketEnhancerType> filterSocketEnhancerTypes, bool doNotShowEmptySlots);
+
         public static List<KeyValuePair<int, CharacterItem>> GetFilteredList(List<CharacterItem> list, List<string> filterCategories, List<ItemType> filterItemTypes, List<SocketEnhancerType> filterSocketEnhancerTypes, bool doNotShowEmptySlots)
         {
             // Prepare result

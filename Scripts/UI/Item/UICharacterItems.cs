@@ -50,7 +50,7 @@ namespace MultiplayerARPG
         }
 
         public System.Action<int, CharacterItem> onGenerateEntry = null;
-        public GetFilteredListDelegate overrideGetFilteredListFunction = null;
+        public UICharacterItemsUtils.GetFilteredListDelegate overrideGetFilteredListFunction = null;
         public virtual ICharacterData Character { get; protected set; }
         public List<CharacterItem> LoadedList { get; private set; } = new List<CharacterItem>();
 
