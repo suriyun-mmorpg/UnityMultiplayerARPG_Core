@@ -1125,6 +1125,51 @@ namespace MultiplayerARPG
             }
         }
 
+        public static List<RewardedItem> ToRewardedItems(this IEnumerable<CharacterItem> characterItems)
+        {
+            List<RewardedItem> result = new List<RewardedItem>();
+            foreach (CharacterItem characterItem in characterItems)
+            {
+                result.Add(new RewardedItem()
+                {
+                    item = characterItem.GetItem(),
+                    level = characterItem.level,
+                    amount = characterItem.amount,
+                    randomSeed = characterItem.randomSeed,
+                });
+            }
+            return result;
+        }
+
+        public static List<ItemAmount> ToItemAmounts(this IEnumerable<CharacterItem> characterItems)
+        {
+            List<ItemAmount> result = new List<ItemAmount>();
+            foreach (CharacterItem characterItem in characterItems)
+            {
+                result.Add(new ItemAmount()
+                {
+                    item = characterItem.GetItem(),
+                    level = characterItem.level,
+                    amount = characterItem.amount,
+                });
+            }
+            return result;
+        }
+
+        public static List<CurrencyAmount> ToCurrencyAmounts(this IEnumerable<CharacterCurrency> characterCurrencies)
+        {
+            List<CurrencyAmount> result = new List<CurrencyAmount>();
+            foreach (CharacterCurrency characterCurrency in characterCurrencies)
+            {
+                result.Add(new CurrencyAmount()
+                {
+                    currency = characterCurrency.GetCurrency(),
+                    amount = characterCurrency.amount,
+                });
+            }
+            return result;
+        }
+
         public static Dictionary<int, int> ToAttributeAmountDictionary(this IEnumerable<CharacterAttribute> list)
         {
             Dictionary<int, int> result = new Dictionary<int, int>();
