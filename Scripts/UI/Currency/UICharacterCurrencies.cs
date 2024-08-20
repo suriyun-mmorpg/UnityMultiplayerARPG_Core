@@ -142,6 +142,16 @@ namespace MultiplayerARPG
             UpdateData(character, character.Currencies);
         }
 
+        public void UpdateData(IPlayerCharacterData character, IList<CurrencyAmount> currencyAmounts)
+        {
+            List<CharacterCurrency> characterCurrencies = new List<CharacterCurrency>();
+            foreach (CurrencyAmount currencyAmount in currencyAmounts)
+            {
+                characterCurrencies.Add(CharacterCurrency.Create(currencyAmount.currency, currencyAmount.amount));
+            }
+            UpdateData(character, characterCurrencies);
+        }
+
         public virtual void UpdateData(IPlayerCharacterData character, IList<CharacterCurrency> characterCurrencies)
         {
             Character = character;
