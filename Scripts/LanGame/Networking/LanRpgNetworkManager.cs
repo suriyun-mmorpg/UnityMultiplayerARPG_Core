@@ -121,7 +121,7 @@ namespace MultiplayerARPG
 
         private void NotifyStorageItemsUpdated(StorageType storageType, string storageOwnerId, List<CharacterItem> storageItems)
         {
-            if (storageType != StorageType.Player || !string.Equals(storageType, storageOwnerId))
+            if (storageType != StorageType.Player || !string.Equals(storageOwnerId, selectedCharacter.Id))
                 return;
             selectedCharacterStorageItems = storageItems;
         }
