@@ -399,11 +399,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void NotifyStorageItemsToClients(this IServerGameMessageHandlers handlers, IEnumerable<long> connectionIds, List<CharacterItem> storageItems)
+        public static void NotifyStorageItemsToClients(this IServerGameMessageHandlers handlers, IEnumerable<long> connectionIds, StorageType storageType, string storageOwnerId, List<CharacterItem> storageItems)
         {
             foreach (long connectionId in connectionIds)
             {
-                handlers.NotifyStorageItems(connectionId, storageItems);
+                handlers.NotifyStorageItems(connectionId, storageType, storageOwnerId, storageItems);
             }
         }
     }

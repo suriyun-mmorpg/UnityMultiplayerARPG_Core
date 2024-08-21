@@ -11,9 +11,9 @@ namespace MultiplayerARPG
         void NotifyRewardItem(long connectionId, RewardGivenType givenType, int dataId, int amount);
         void NotifyRewardCurrency(long connectionId, RewardGivenType givenType, int dataId, int amount);
         // Storage
-        void NotifyStorageItems(long connectionId, List<CharacterItem> storageItems);
+        void NotifyStorageItems(long connectionId, StorageType storageType, string storageOwnerId, List<CharacterItem> storageItems);
         void NotifyStorageOpened(long connectionId, StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit);
-        void NotifyStorageClosed(long connectionId);
+        void NotifyStorageClosed(long connectionId, StorageType storageType, string storageOwnerId);
         // Party
         void SendSetPartyData(long connectionId, int id, bool shareExp, bool shareItem, string leaderId);
         void SendSetPartyLeader(long connectionId, int id, string leaderId);

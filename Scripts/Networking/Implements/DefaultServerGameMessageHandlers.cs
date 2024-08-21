@@ -78,10 +78,12 @@ namespace MultiplayerARPG
         }
 
         // Storage
-        public void NotifyStorageItems(long connectionId, List<CharacterItem> storageItems)
+        public void NotifyStorageItems(long connectionId, StorageType storageType, string storageOwnerId, List<CharacterItem> storageItems)
         {
             Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageItemsUpdated, (writer) =>
             {
+                writer.Put((byte)storageType);
+                writer.Put(storageOwnerId);
                 writer.PutList(storageItems);
             });
         }
@@ -98,9 +100,13 @@ namespace MultiplayerARPG
             });
         }
 
-        public void NotifyStorageClosed(long connectionId)
+        public void NotifyStorageClosed(long connectionId, StorageType storageType, string storageOwnerId)
         {
-            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageClosed);
+            Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyStorageClosed, (writer) =>
+            {
+                writer.Put((byte)storageType);
+                writer.Put(storageOwnerId);
+            });
         }
 
         // Party

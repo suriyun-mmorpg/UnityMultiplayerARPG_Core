@@ -24,12 +24,14 @@ namespace MultiplayerARPG
         public float TotalWeight { get; private set; }
         public int UsedSlots { get; private set; }
 
-        private bool doNotCloseStorageOnDisable;
+        private bool _doNotCloseStorageOnDisable;
 
         protected override void OnEnable()
         {
             inventoryType = InventoryType.StorageItems;
-            UpdateData(ClientStorageActions.UpdatedStorageItems);
+            StorageId storageId = new StorageId(StorageType, StorageOwnerId);
+            if (GameInstance.OpenedStorages.TryGetValue(storageId, out List<CharacterItem> updatedItems))
+                UpdateData(StorageType, StorageOwnerId, updatedItems);
             ClientStorageActions.onNotifyStorageItemsUpdated += UpdateData;
             onGenerateEntry += OnGenerateEntry;
             base.OnEnable();
@@ -40,9 +42,9 @@ namespace MultiplayerARPG
             ClientStorageActions.onNotifyStorageItemsUpdated -= UpdateData;
             onGenerateEntry -= OnGenerateEntry;
             // Close storage
-            if (!doNotCloseStorageOnDisable)
+            if (!_doNotCloseStorageOnDisable)
                 GameInstance.ClientStorageHandlers.RequestCloseStorage(ClientStorageActions.ResponseCloseStorage);
-            doNotCloseStorageOnDisable = false;
+            _doNotCloseStorageOnDisable = false;
             // Clear data
             StorageType = StorageType.None;
             StorageOwnerId = string.Empty;
@@ -54,13 +56,13 @@ namespace MultiplayerARPG
 
         public override void Hide()
         {
-            doNotCloseStorageOnDisable = false;
+            _doNotCloseStorageOnDisable = false;
             base.Hide();
         }
 
         public void Hide(bool doNotCloseStorageOnDisable)
         {
-            this.doNotCloseStorageOnDisable = doNotCloseStorageOnDisable;
+            _doNotCloseStorageOnDisable = doNotCloseStorageOnDisable;
             base.Hide();
         }
 
@@ -95,7 +97,7 @@ namespace MultiplayerARPG
             Show();
         }
 
-        public virtual void UpdateData(IList<CharacterItem> characterItems)
+        public virtual void UpdateData(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
             UpdateData(GameInstance.PlayingCharacter, characterItems);
         }

@@ -60,12 +60,17 @@ namespace MultiplayerARPG
 
         public void HandleNotifyStorageClosed(MessageHandlerData messageHandler)
         {
-            ClientStorageActions.NotifyStorageClosed();
+            ClientStorageActions.NotifyStorageClosed(
+                (StorageType)messageHandler.Reader.GetByte(),
+                messageHandler.Reader.GetString());
         }
 
         public void HandleNotifyStorageItems(MessageHandlerData messageHandler)
         {
-            ClientStorageActions.NotifyStorageItemsUpdated(messageHandler.Reader.GetList<CharacterItem>());
+            ClientStorageActions.NotifyStorageItemsUpdated(
+                (StorageType)messageHandler.Reader.GetByte(),
+                messageHandler.Reader.GetString(),
+                messageHandler.Reader.GetList<CharacterItem>());
         }
 
         public void HandleNotifyPartyInvitation(MessageHandlerData messageHandler)

@@ -120,8 +120,7 @@ namespace MultiplayerARPG
         public static BasePlayerCharacterEntity PlayingCharacterEntity { get { return PlayingCharacter as BasePlayerCharacterEntity; } }
         public static PartyData JoinedParty { get; set; }
         public static GuildData JoinedGuild { get; set; }
-        public static StorageType OpenedStorageType { get; set; }
-        public static string OpenedStorageOwnerId { get; set; }
+        public static Dictionary<StorageId, List<CharacterItem>> OpenedStorages { get; set; } = new Dictionary<StorageId, List<CharacterItem>>();
 
         [Header("Gameplay Systems")]
         [SerializeField]
@@ -1001,6 +1000,10 @@ namespace MultiplayerARPG
             }
             DontDestroyOnLoad(gameObject);
             Singleton = this;
+            s_playingCharacter = default;
+            JoinedParty = null;
+            JoinedGuild = null;
+            OpenedStorages.Clear();
             LoadHomeScenePreventions.Clear();
             EventSystemManager = gameObject.GetOrAddComponent<EventSystemManager>();
 #if UNITY_EDITOR
@@ -1210,6 +1213,8 @@ namespace MultiplayerARPG
                 if (item.IsAmmo())
                 {
                     IAmmoItem ammoItem = item as IAmmoItem;
+                    if (ammoItem.AmmoType == null)
+                        continue;
                     if (!ItemsByAmmoType.ContainsKey(ammoItem.AmmoType.DataId))
                         ItemsByAmmoType.Add(ammoItem.AmmoType.DataId, new Dictionary<int, BaseItem>());
                     ItemsByAmmoType[ammoItem.AmmoType.DataId][item.DataId] = item;

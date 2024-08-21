@@ -90,14 +90,22 @@ namespace MultiplayerARPG
                 case InventoryType.StorageItems:
                     if (doNotMoveToStorage)
                         return;
-                    // Drop non equip item to storage item
+                    // Drop equip item to storage item
+                    UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
+                    if (uiStorageItems == null)
+                    {
+                        Debug.LogError("Unable to drop non equip item, no opened storage items UI");
+                        return;
+                    }
+                    StorageType storageType = uiStorageItems.StorageType;
+                    string storageOwnerId = uiStorageItems.StorageOwnerId;
                     if (doNotSwapOrMergeWithStorageItem)
                     {
-                        draggedItemUI.UIItem.OnClickMoveToStorage(-1);
+                        draggedItemUI.UIItem.OnClickMoveToStorage(storageType, storageOwnerId, -1);
                     }
                     else
                     {
-                        draggedItemUI.UIItem.OnClickMoveToStorage(uiCharacterItem.IndexOfData);
+                        draggedItemUI.UIItem.OnClickMoveToStorage(storageType, storageOwnerId, uiCharacterItem.IndexOfData);
                     }
                     break;
             }
@@ -107,8 +115,6 @@ namespace MultiplayerARPG
         {
             // Set UI drop state
             draggedItemUI.IsDropped = true;
-            StorageType storageType = GameInstance.OpenedStorageType;
-            string storageOwnerId = GameInstance.OpenedStorageOwnerId;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -133,13 +139,21 @@ namespace MultiplayerARPG
                     if (doNotMoveToStorage)
                         return;
                     // Drop non equip item to storage item
+                    UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
+                    if (uiStorageItems == null)
+                    {
+                        Debug.LogError("Unable to drop non equip item, no opened storage items UI");
+                        return;
+                    }
+                    StorageType storageType = uiStorageItems.StorageType;
+                    string storageOwnerId = uiStorageItems.StorageOwnerId;
                     if (doNotSwapOrMergeWithStorageItem)
                     {
-                        draggedItemUI.UIItem.OnClickMoveToStorage(-1);
+                        draggedItemUI.UIItem.OnClickMoveToStorage(storageType, storageOwnerId, -1);
                     }
                     else
                     {
-                        draggedItemUI.UIItem.OnClickMoveToStorage(uiCharacterItem.IndexOfData);
+                        draggedItemUI.UIItem.OnClickMoveToStorage(storageType, storageOwnerId, uiCharacterItem.IndexOfData);
                     }
                     break;
             }
@@ -149,8 +163,6 @@ namespace MultiplayerARPG
         {
             // Set UI drop state
             draggedItemUI.IsDropped = true;
-            StorageType storageType = GameInstance.OpenedStorageType;
-            string storageOwnerId = GameInstance.OpenedStorageOwnerId;
             switch (uiCharacterItem.InventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -173,6 +185,14 @@ namespace MultiplayerARPG
                     if (doNotSwapOrMergeStorageItem)
                         return;
                     // Drop storage item to storage item
+                    UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
+                    if (uiStorageItems == null)
+                    {
+                        Debug.LogError("Unable to drop storage item, no opened storage items UI");
+                        return;
+                    }
+                    StorageType storageType = uiStorageItems.StorageType;
+                    string storageOwnerId = uiStorageItems.StorageOwnerId;
                     GameInstance.ClientStorageHandlers.RequestSwapOrMergeStorageItem(new RequestSwapOrMergeStorageItemMessage()
                     {
                         storageType = storageType,

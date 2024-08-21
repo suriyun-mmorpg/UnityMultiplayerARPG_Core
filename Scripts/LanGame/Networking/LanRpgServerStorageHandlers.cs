@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             GameInstance.ServerGameMessageHandlers.NotifyStorageOpened(connectionId, storageId.storageType, storageId.storageOwnerId, storageObjectId, storage.weightLimit, storage.slotLimit);
             List<CharacterItem> storageItems = GetStorageItems(storageId);
             storageItems.FillEmptySlots(storage.slotLimit > 0, storage.slotLimit);
-            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, storageItems);
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItems(connectionId, storageId.storageType, storageId.storageOwnerId, storageItems);
             return default;
         }
 
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                 usingStorageClients[storageId].Remove(connectionId);
                 usingStorageIds.TryRemove(connectionId, out _);
                 usingStorageEntities.TryRemove(connectionId, out _);
-                GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId);
+                GameInstance.ServerGameMessageHandlers.NotifyStorageClosed(connectionId, storageId.storageType, storageId.storageOwnerId);
             }
             return default;
         }
@@ -206,7 +206,7 @@ namespace MultiplayerARPG
             StorageId storageId = new StorageId(storageType, storageOwnerId);
             if (!usingStorageClients.ContainsKey(storageId))
                 return;
-            GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageClients[storageId], GetStorageItems(storageId));
+            GameInstance.ServerGameMessageHandlers.NotifyStorageItemsToClients(usingStorageClients[storageId], storageType, storageOwnerId, GetStorageItems(storageId));
         }
 
         public IDictionary<StorageId, List<CharacterItem>> GetAllStorageItems()

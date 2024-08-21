@@ -11,9 +11,8 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseMoveItemToStorageMessage> onResponseMoveItemToStorage;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSwapOrMergeStorageItemMessage> onResponseSwapOrMergeStorageItem;
         public static event System.Action<StorageType, string, uint, int, int> onNotifyStorageOpened;
-        public static event System.Action onNotifyStorageClosed;
-        public static event System.Action<List<CharacterItem>> onNotifyStorageItemsUpdated;
-        public static List<CharacterItem> UpdatedStorageItems { get; private set; }
+        public static event System.Action<StorageType, string> onNotifyStorageClosed;
+        public static event System.Action<StorageType, string, List<CharacterItem>> onNotifyStorageItemsUpdated;
 
         public static void Clean()
         {
@@ -25,7 +24,6 @@ namespace MultiplayerARPG
             onNotifyStorageOpened = null;
             onNotifyStorageClosed = null;
             onNotifyStorageItemsUpdated = null;
-            UpdatedStorageItems?.Clear();
         }
 
         public static void ResponseOpenStorage(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseOpenStorageMessage response)
@@ -63,29 +61,32 @@ namespace MultiplayerARPG
                 onResponseSwapOrMergeStorageItem.Invoke(requestHandler, responseCode, response);
         }
 
-        public static void NotifyStorageOpened(StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit)
+        public static void NotifyStorageOpened(StorageType type, string ownerId, uint objectId, int weightLimit, int slotLimit)
         {
-            GameInstance.OpenedStorageType = storageType;
-            GameInstance.OpenedStorageOwnerId = storageOwnerId;
-            GameInstance.ItemUIVisibilityManager.ShowStorageDialog(storageType, storageOwnerId, objectId, weightLimit, slotLimit);
+            StorageId storageId = new StorageId(type, ownerId);
+            if (!GameInstance.OpenedStorages.ContainsKey(storageId))
+                GameInstance.OpenedStorages.Add(storageId, new List<CharacterItem>());
+            GameInstance.ItemUIVisibilityManager.ShowStorageDialog(type, ownerId, objectId, weightLimit, slotLimit);
             if (onNotifyStorageOpened != null)
-                onNotifyStorageOpened.Invoke(storageType, storageOwnerId, objectId, weightLimit, slotLimit);
+                onNotifyStorageOpened.Invoke(type, ownerId, objectId, weightLimit, slotLimit);
         }
 
-        public static void NotifyStorageClosed()
+        public static void NotifyStorageClosed(StorageType type, string ownerId)
         {
-            GameInstance.OpenedStorageType = StorageType.None;
-            GameInstance.OpenedStorageOwnerId = string.Empty;
+            StorageId storageId = new StorageId(type, ownerId);
+            GameInstance.OpenedStorages.Remove(storageId);
             GameInstance.ItemUIVisibilityManager.HideStorageDialog();
             if (onNotifyStorageClosed != null)
-                onNotifyStorageClosed.Invoke();
+                onNotifyStorageClosed.Invoke(type, ownerId);
         }
 
-        public static void NotifyStorageItemsUpdated(List<CharacterItem> storageItems)
+        public static void NotifyStorageItemsUpdated(StorageType type, string ownerId, List<CharacterItem> storageItems)
         {
+            StorageId storageId = new StorageId(type, ownerId);
             if (onNotifyStorageItemsUpdated != null)
-                onNotifyStorageItemsUpdated.Invoke(storageItems);
-            UpdatedStorageItems = storageItems;
+                onNotifyStorageItemsUpdated.Invoke(type, ownerId, storageItems);
+            if (GameInstance.OpenedStorages.ContainsKey(storageId))
+                GameInstance.OpenedStorages[storageId] = storageItems;
         }
     }
 }

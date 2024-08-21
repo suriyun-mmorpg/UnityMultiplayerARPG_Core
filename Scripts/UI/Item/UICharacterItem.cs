@@ -2,6 +2,7 @@
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
@@ -2041,10 +2042,14 @@ namespace MultiplayerARPG
         #region Move To Storage Functions
         public void OnClickMoveToStorage()
         {
-            OnClickMoveToStorage(-1);
+            if (GameInstance.OpenedStorages.Count > 0)
+            {
+                StorageId storageId = GameInstance.OpenedStorages.Keys.FirstOrDefault();
+                OnClickMoveToStorage(storageId.storageType, storageId.storageOwnerId, -1);
+            }
         }
 
-        public void OnClickMoveToStorage(int storageItemIndex)
+        public void OnClickMoveToStorage(StorageType storageType, string storageOwnerId, int storageItemIndex)
         {
             // Only unequipped equipment can be moved to storage
             if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
@@ -2052,23 +2057,21 @@ namespace MultiplayerARPG
 
             if (CharacterItem.amount == 1)
             {
-                OnClickMoveToStorageConfirmed(storageItemIndex, 1);
+                OnClickMoveToStorageConfirmed(storageType, storageOwnerId, storageItemIndex, 1);
             }
             else
             {
                 UISceneGlobal.Singleton.ShowInputDialog(LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_TO_STORAGE.ToString()), LanguageManager.GetText(UITextKeys.UI_MOVE_ITEM_TO_STORAGE_DESCRIPTION.ToString()), (amount) =>
                 {
-                    OnClickMoveToStorageConfirmed(storageItemIndex, amount);
+                    OnClickMoveToStorageConfirmed(storageType, storageOwnerId, storageItemIndex, amount);
                 }, 1, CharacterItem.amount, CharacterItem.amount);
             }
         }
 
-        private void OnClickMoveToStorageConfirmed(int storageItemIndex, int amount)
+        private void OnClickMoveToStorageConfirmed(StorageType storageType, string storageOwnerId, int storageItemIndex, int amount)
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            StorageType storageType = GameInstance.OpenedStorageType;
-            string storageOwnerId = GameInstance.OpenedStorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemToStorage(new RequestMoveItemToStorageMessage()
             {
                 storageType = storageType,
@@ -2111,8 +2114,14 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            StorageType storageType = GameInstance.OpenedStorageType;
-            string storageOwnerId = GameInstance.OpenedStorageOwnerId;
+            UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
+            if (uiStorageItems == null)
+            {
+                Debug.LogError("Unable to move from storage, no opened storage items UI");
+                return;
+            }
+            StorageType storageType = uiStorageItems.StorageType;
+            string storageOwnerId = uiStorageItems.StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
             {
                 storageType = storageType,
