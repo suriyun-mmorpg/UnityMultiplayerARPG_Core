@@ -253,9 +253,10 @@ namespace MultiplayerARPG
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
             // NOTE: entity ID is a hash asset ID :)
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                playerCharacterData.EntityId,
+                GameInstance.Singleton.GetCharacterEntityHashAssetId(playerCharacterData.EntityId),
                 playerCharacterData.CurrentPosition,
                 characterRotation);
+
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
             Assets.NetworkSpawn(spawnObj, 0, connectionId);
