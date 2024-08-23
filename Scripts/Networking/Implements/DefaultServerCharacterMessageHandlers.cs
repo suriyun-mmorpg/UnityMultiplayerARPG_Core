@@ -98,7 +98,7 @@ namespace MultiplayerARPG
                 return default;
             }
             // TODO: Implement data unlocking
-            if (!GameInstance.PlayerIcons.TryGetValue(request.dataId, out PlayerIcon data) || data.IsLocked)
+            if (!GameInstance.PlayerIcons.TryGetValue(request.dataId, out PlayerIcon data) || data.UnlockRequirement.isLocked)
             {
                 result.InvokeError(new ResponseSetIconMessage()
                 {
@@ -125,7 +125,7 @@ namespace MultiplayerARPG
                 return default;
             }
             // TODO: Implement data unlocking
-            if (!GameInstance.PlayerFrames.TryGetValue(request.dataId, out PlayerFrame data) || data.IsLocked)
+            if (!GameInstance.PlayerFrames.TryGetValue(request.dataId, out PlayerFrame data) || data.UnlockRequirement.isLocked)
             {
                 result.InvokeError(new ResponseSetFrameMessage()
                 {
@@ -152,7 +152,7 @@ namespace MultiplayerARPG
                 return default;
             }
             // TODO: Implement data unlocking
-            if (!GameInstance.PlayerTitles.TryGetValue(request.dataId, out PlayerTitle data) || data.IsLocked)
+            if (!GameInstance.PlayerTitles.TryGetValue(request.dataId, out PlayerTitle data) || data.UnlockRequirement.isLocked)
             {
                 result.InvokeError(new ResponseSetTitleMessage()
                 {

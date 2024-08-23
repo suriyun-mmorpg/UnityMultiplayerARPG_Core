@@ -6,11 +6,10 @@ namespace MultiplayerARPG
     public partial class PlayerTitle : BaseGameData, IUnlockableGameData
     {
         [SerializeField]
-        protected bool isLocked;
-        public bool IsLocked
+        private UnlockRequirement unlockRequirement;
+        public UnlockRequirement UnlockRequirement
         {
-            get { return isLocked; }
-            set { isLocked = value; }
+            get { return unlockRequirement; }
         }
 
         [SerializeField]
