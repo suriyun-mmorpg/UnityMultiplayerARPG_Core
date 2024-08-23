@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         [SerializeField]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [AddressableAssetConversion(nameof(addressableEntityPrefab))]
-        private BasePlayerCharacterEntity entityPrefab;
+        protected BasePlayerCharacterEntity entityPrefab;
 #endif
         public BasePlayerCharacterEntity EntityPrefab
         {
@@ -25,13 +25,54 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private AssetReferenceBasePlayerCharacterEntity addressableEntityPrefab;
+        protected AssetReferenceBasePlayerCharacterEntity addressableEntityPrefab;
         public AssetReferenceBasePlayerCharacterEntity AddressableEntityPrefab
         {
             get
             {
                 return addressableEntityPrefab;
             }
+        }
+
+        [Tooltip("This is list which used as choice of character classes when create character")]
+        [SerializeField]
+        protected PlayerCharacter[] characterDatabases = new PlayerCharacter[0];
+        public PlayerCharacter[] CharacterDatabases
+        {
+            get { return characterDatabases; }
+            set { characterDatabases = value; }
+        }
+
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Tooltip("Leave this empty to use GameInstance's controller prefab")]
+        [SerializeField]
+        protected BasePlayerCharacterController controllerPrefab;
+#endif
+        public BasePlayerCharacterController ControllerPrefab
+        {
+            get
+            {
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+                return controllerPrefab;
+#else
+                return null;
+#endif
+            }
+            set
+            {
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+                controllerPrefab = value;
+#endif
+            }
+        }
+
+        [Tooltip("Leave this empty to use GameInstance's controller prefab")]
+        [SerializeField]
+        protected AssetReferenceBasePlayerCharacterController addressableControllerPrefab;
+        public AssetReferenceBasePlayerCharacterController AddressableControllerPrefab
+        {
+            get { return addressableControllerPrefab; }
+            set { addressableControllerPrefab = value; }
         }
 
         public int GetPlayerCharacterEntityHashAssetId()
@@ -41,6 +82,15 @@ namespace MultiplayerARPG
             if (EntityPrefab != null)
                 return EntityPrefab.HashAssetId;
             return 0;
+        }
+
+        public async UniTask<BasePlayerCharacterEntity> GetOrLoadAssetAsync()
+        {
+            BasePlayerCharacterEntity loadedPrefab = await AddressableEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(EntityPrefab);
+            loadedPrefab.CharacterDatabases = characterDatabases;
+            loadedPrefab.ControllerPrefab = controllerPrefab;
+            loadedPrefab.AddressableControllerPrefab = AddressableControllerPrefab;
+            return loadedPrefab;
         }
     }
 }

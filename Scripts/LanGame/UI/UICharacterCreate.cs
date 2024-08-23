@@ -1,11 +1,12 @@
 ﻿using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Threading.Tasks;
+using Cysharp.Threading.Tasks;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -283,6 +284,19 @@ namespace MultiplayerARPG
             for (int i = 0; i < _addressablePlayerCharacterEntities.Count; ++i)
             {
                 tempPlayerCharacterEntities.Add(_addressablePlayerCharacterEntities[i]);
+            }
+            if (GameInstance.PlayerCharacterEntityMetaDataList.Count > 0)
+            {
+                List<Task<BasePlayerCharacterEntity>> loadTasks = new List<Task<BasePlayerCharacterEntity>>();
+                foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
+                {
+                    loadTasks.Add(entry.GetOrLoadAssetAsync().AsTask());
+                }
+                await Task.WhenAll(loadTasks);
+                for (int i = 0; i < loadTasks.Count; ++i)
+                {
+                    tempPlayerCharacterEntities.Add(loadTasks[i].Result);
+                }
             }
             if (RaceToggles.Count > 0)
             {

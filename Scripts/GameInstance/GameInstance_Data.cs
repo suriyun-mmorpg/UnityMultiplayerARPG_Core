@@ -1093,10 +1093,12 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public int GetCharacterEntityHashAssetId(int entityId)
+        public int GetCharacterEntityHashAssetId(int entityId, out int? metaDataId)
         {
+            metaDataId = null;
             if (PlayerCharacterEntityMetaDataList.TryGetValue(entityId, out PlayerCharacterEntityMetaData metaData))
             {
+                metaDataId = metaData.DataId;
                 return metaData.GetPlayerCharacterEntityHashAssetId();
             }
             else if (AddressableCharacterEntities.ContainsKey(entityId) || CharacterEntities.ContainsKey(entityId))

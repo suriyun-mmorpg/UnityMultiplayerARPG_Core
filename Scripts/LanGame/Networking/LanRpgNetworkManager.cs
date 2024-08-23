@@ -252,13 +252,17 @@ namespace MultiplayerARPG
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);
             // NOTE: entity ID is a hash asset ID :)
+            int? metaDataId;
             LiteNetLibIdentity spawnObj = Assets.GetObjectInstance(
-                GameInstance.Singleton.GetCharacterEntityHashAssetId(playerCharacterData.EntityId),
+                GameInstance.Singleton.GetCharacterEntityHashAssetId(playerCharacterData.EntityId, out metaDataId),
                 playerCharacterData.CurrentPosition,
                 characterRotation);
 
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
+            if (metaDataId.HasValue)
+                playerCharacterEntity.MetaDataId = metaDataId;
+
             Assets.NetworkSpawn(spawnObj, 0, connectionId);
 
             // Set user Id

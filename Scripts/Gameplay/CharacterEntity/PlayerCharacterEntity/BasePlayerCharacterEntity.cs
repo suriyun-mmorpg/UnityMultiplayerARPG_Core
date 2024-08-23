@@ -14,32 +14,43 @@ namespace MultiplayerARPG
         [Tooltip("This is list which used as choice of character classes when create character")]
         [SerializeField]
         [FormerlySerializedAs("playerCharacters")]
-        protected PlayerCharacter[] characterDatabases;
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        [Tooltip("Leave this empty to use GameInstance's controller prefab")]
-        [SerializeField]
-        protected BasePlayerCharacterController controllerPrefab;
-#endif
-        [Tooltip("Leave this empty to use GameInstance's controller prefab")]
-        [SerializeField]
-        protected AssetReferenceBasePlayerCharacterController addressableControllerPrefab;
-
+        protected PlayerCharacter[] characterDatabases = new PlayerCharacter[0];
         public PlayerCharacter[] CharacterDatabases
         {
             get { return characterDatabases; }
             set { characterDatabases = value; }
         }
 
-#if !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Tooltip("Leave this empty to use GameInstance's controller prefab")]
+        [SerializeField]
+        protected BasePlayerCharacterController controllerPrefab;
+#endif
         public BasePlayerCharacterController ControllerPrefab
         {
-            get { return controllerPrefab; }
-        }
+            get
+            {
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+                return controllerPrefab;
+#else
+                return null;
 #endif
+            }
+            set
+            {
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+                controllerPrefab = value;
+#endif
+            }
+        }
 
+        [Tooltip("Leave this empty to use GameInstance's controller prefab")]
+        [SerializeField]
+        protected AssetReferenceBasePlayerCharacterController addressableControllerPrefab;
         public AssetReferenceBasePlayerCharacterController AddressableControllerPrefab
         {
             get { return addressableControllerPrefab; }
+            set { addressableControllerPrefab = value; }
         }
 
         public PlayerCharacterBuildingComponent Building
