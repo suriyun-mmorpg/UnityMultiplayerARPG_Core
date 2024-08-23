@@ -4,13 +4,12 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial struct SkillMount
+    public partial struct SkillMount : IAddressableAssetConversable
     {
         public static readonly SkillMount Empty = new SkillMount();
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("Leave `Mount Entity` to NULL to not summon mount entity")]
         [SerializeField]
-        [AddressableAssetConversion(nameof(addressableMountEntity))]
         private VehicleEntity mountEntity;
 #endif
         public VehicleEntity MountEntity
@@ -41,6 +40,13 @@ namespace MultiplayerARPG
             this.mountEntity = mountEntity;
 #endif
             this.addressableMountEntity = addressableMountEntity;
+        }
+
+        public void ProceedAddressableAssetConversion()
+        {
+#if UNITY_EDITOR
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref mountEntity, ref addressableMountEntity);
+#endif
         }
     }
 }

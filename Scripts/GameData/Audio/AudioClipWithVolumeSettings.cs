@@ -4,10 +4,9 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class AudioClipWithVolumeSettings
+    public class AudioClipWithVolumeSettings : IAddressableAssetConversable
     {
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        [AddressableAssetConversion(nameof(addressableAudioClip))]
         public AudioClip audioClip;
 #endif
         public AudioClip AudioClip
@@ -42,6 +41,13 @@ namespace MultiplayerARPG
         {
 #if !UNITY_SERVER
             AudioManager.PlaySfxClipAtAudioSource(await AddressableAudioClip.GetOrLoadObjectAsyncOrUseAsset(AudioClip), source, GetRandomedVolume());
+#endif
+        }
+
+        public void ProceedAddressableAssetConversion()
+        {
+#if UNITY_EDITOR
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref audioClip, ref addressableAudioClip);
 #endif
         }
     }

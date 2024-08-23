@@ -42,6 +42,8 @@ namespace MultiplayerARPG
             MissileDamageEntity loadedDamageEntity = await AddressableMissileDamageEntity
                 .GetOrLoadAssetAsyncOrUsePrefab(MissileDamageEntity);
             PrepareHitValidationData(loadedDamageEntity);
+            if (AddressableMissileDamageEntity.IsDataValid())
+                AddressableAssetsManager.Release(AddressableMissileDamageEntity.RuntimeKey);
         }
 
         protected void PrepareHitValidationData(MissileDamageEntity damageEntity)

@@ -15,7 +15,7 @@ namespace MultiplayerARPG
     }
 
     [System.Serializable]
-    public class DamageInfo : IDamageInfo
+    public class DamageInfo : IDamageInfo, IAddressableAssetConversable
     {
         public DamageType damageType;
 
@@ -37,7 +37,6 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile), nameof(DamageType.Raycast) })]
         public float missileSpeed;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        [AddressableAssetConversion(nameof(addressableMissileDamageEntity))]
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile) })]
         public MissileDamageEntity missileDamageEntity;
 #endif
@@ -45,7 +44,6 @@ namespace MultiplayerARPG
         public AssetReferenceMissileDamageEntity addressableMissileDamageEntity;
 
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        [AddressableAssetConversion(nameof(addressableProjectEffect))]
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public ProjectileEffect projectileEffect;
 #endif
@@ -61,7 +59,6 @@ namespace MultiplayerARPG
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
         public float throwableLifeTime;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        [AddressableAssetConversion(nameof(addressableThrowableDamageEntity))]
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
         public ThrowableDamageEntity throwableDamageEntity;
 #endif
@@ -181,6 +178,56 @@ namespace MultiplayerARPG
             if (attacker.IsServer && attacker.IsDead())
                 return;
 
+            // Increase damage by stats
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem != null && weaponItem.WeaponType != null)
+            {
+                if (weaponItem.WeaponType.WeaponDeclaringType == WeaponDeclaringType.Type1 && attacker.CachedData.IncreaseDamageType1 > 0)
+                {
+                    for (int i = 0; i < damageAmounts.Count; ++i)
+                    {
+                        damageAmounts[i] = GameDataHelpers.CombineDamages(damageAmounts[i], new KeyValuePair<DamageElement, MinMaxFloat>(GameInstance.Singleton.DefaultDamageElement, new MinMaxFloat()
+                        {
+                            min = attacker.CachedData.IncreaseDamageType1,
+                            max = attacker.CachedData.IncreaseDamageType1,
+                        }));
+                    }
+                }
+                if (weaponItem.WeaponType.WeaponDeclaringType == WeaponDeclaringType.Type2 && attacker.CachedData.IncreaseDamageType2 > 0)
+                {
+                    for (int i = 0; i < damageAmounts.Count; ++i)
+                    {
+                        damageAmounts[i] = GameDataHelpers.CombineDamages(damageAmounts[i], new KeyValuePair<DamageElement, MinMaxFloat>(GameInstance.Singleton.DefaultDamageElement, new MinMaxFloat()
+                        {
+                            min = attacker.CachedData.IncreaseDamageType2,
+                            max = attacker.CachedData.IncreaseDamageType2,
+                        }));
+                    }
+                }
+                if (weaponItem.WeaponType.WeaponDeclaringType == WeaponDeclaringType.Type3 && attacker.CachedData.IncreaseDamageType3 > 0)
+                {
+                    for (int i = 0; i < damageAmounts.Count; ++i)
+                    {
+                        damageAmounts[i] = GameDataHelpers.CombineDamages(damageAmounts[i], new KeyValuePair<DamageElement, MinMaxFloat>(GameInstance.Singleton.DefaultDamageElement, new MinMaxFloat()
+                        {
+                            min = attacker.CachedData.IncreaseDamageType3,
+                            max = attacker.CachedData.IncreaseDamageType3,
+                        }));
+                    }
+                }
+                if (weaponItem.WeaponType.WeaponDeclaringType == WeaponDeclaringType.Type4 && attacker.CachedData.IncreaseDamageType4 > 0)
+                {
+                    for (int i = 0; i < damageAmounts.Count; ++i)
+                    {
+                        damageAmounts[i] = GameDataHelpers.CombineDamages(damageAmounts[i], new KeyValuePair<DamageElement, MinMaxFloat>(GameInstance.Singleton.DefaultDamageElement, new MinMaxFloat()
+                        {
+                            min = attacker.CachedData.IncreaseDamageType4,
+                            max = attacker.CachedData.IncreaseDamageType4,
+                        }));
+                    }
+                }
+            }
+
             if (TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo))
             {
                 await dmgInfo.LaunchDamageEntity(
@@ -224,6 +271,15 @@ namespace MultiplayerARPG
         public bool IsHeadshotInstantDeath()
         {
             return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.IsHeadshotInstantDeath() : false;
+        }
+
+        public void ProceedAddressableAssetConversion()
+        {
+#if UNITY_EDITOR
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref missileDamageEntity, ref addressableMissileDamageEntity);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref projectileEffect, ref addressableProjectEffect);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref throwableDamageEntity, ref addressableThrowableDamageEntity);
+#endif
         }
     }
 

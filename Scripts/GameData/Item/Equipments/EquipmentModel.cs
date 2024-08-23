@@ -7,7 +7,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class EquipmentModel
+    public class EquipmentModel : IAddressableAssetConversable
     {
         [Header("Generic Settings")]
         public string equipSocket;
@@ -21,7 +21,6 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
         [FormerlySerializedAs("model")]
-        [AddressableAssetConversion(nameof(addressableMeshPrefab))]
         protected GameObject meshPrefab = null;
 #endif
         public GameObject MeshPrefab
@@ -127,6 +126,13 @@ namespace MultiplayerARPG
         {
             if (onInstantiated != null)
                 onInstantiated.Invoke(this, modelObject, equipmentEntity, instantiatedObjectGroup, equipmentContainer);
+        }
+
+        public void ProceedAddressableAssetConversion()
+        {
+#if UNITY_EDITOR
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref meshPrefab, ref addressableMeshPrefab);
+#endif
         }
     }
 }

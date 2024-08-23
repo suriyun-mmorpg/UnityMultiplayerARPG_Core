@@ -37,9 +37,11 @@ namespace MultiplayerARPG
 
 #if UNITY_EDITOR || !UNITY_SERVER
         [Category(10, "In-Scene Objects/Appearance")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [SerializeField]
         [AddressableAssetConversion(nameof(addressableDropModel))]
         protected GameObject dropModel = null;
+#endif
         [SerializeField]
         protected AssetReferenceGameObject addressableDropModel;
 #endif
@@ -121,6 +123,11 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !UNITY_SERVER
         public async UniTask<GameObject> GetDropModel()
         {
+#if !EXCLUDE_PREFAB_REFS
+            GameObject dropModel = this.dropModel;
+#else
+            dropModel = null;
+#endif
             return await addressableDropModel.GetOrLoadAssetAsyncOrUsePrefab(dropModel);
         }
 
