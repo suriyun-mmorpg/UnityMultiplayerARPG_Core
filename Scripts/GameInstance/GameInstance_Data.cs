@@ -1016,23 +1016,15 @@ namespace MultiplayerARPG
                 return false;
             if (entity.Identity.IsSceneObject)
             {
-                PrepareRelatesData(entity);
+                entity.PrepareRelatesData();
                 return true;
             }
             if (!dict.TryGetValue(entity.Identity.HashAssetId, out T tempData) || (tempData as Object) == null)
             {
                 dict[entity.Identity.HashAssetId] = entity;
-                PrepareRelatesData(entity);
+                entity.PrepareRelatesData();
             }
             return true;
-        }
-
-        private static void PrepareRelatesData<T>(T entity)
-            where T : IGameEntity
-        {
-            entity.PrepareRelatesData();
-            if (entity.EntityGameObject.TryGetComponent(out PlayerCharacterAppearancesComponent appearanceComp))
-                AddCharacterAppearances(appearanceComp.GetAllAppearances());
         }
 
         private static void AddManyAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, IEnumerable<TBehaviour> list)
