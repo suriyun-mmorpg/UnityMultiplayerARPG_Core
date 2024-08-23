@@ -28,12 +28,12 @@ namespace MultiplayerARPG
 
         public static bool TryGetEntityPrefab(this ICharacterData data, out BaseCharacterEntity prefab)
         {
-            return GameInstance.CharacterEntities.TryGetValue(data.EntityId, out prefab);
+            return GameInstance.CharacterEntities.TryGetValue(GameInstance.Singleton.GetCharacterEntityHashAssetId(data.EntityId), out prefab);
         }
 
         public static bool TryGetEntityAddressablePrefab(this ICharacterData data, out AssetReferenceBaseCharacterEntity assetRef)
         {
-            return GameInstance.AddressableCharacterEntities.TryGetValue(data.EntityId, out assetRef);
+            return GameInstance.AddressableCharacterEntities.TryGetValue(GameInstance.Singleton.GetCharacterEntityHashAssetId(data.EntityId), out assetRef);
         }
 
         public static BaseCharacterModel InstantiateModel(this ICharacterData data, Transform parent)

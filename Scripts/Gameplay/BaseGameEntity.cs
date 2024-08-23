@@ -15,10 +15,25 @@ namespace MultiplayerARPG
         protected static readonly NetDataWriter s_EntityStateMessageWriter = new NetDataWriter();
         protected static readonly NetDataWriter s_EntityStateDataWriter = new NetDataWriter();
 
-        public int EntityId
+        public int HashAssetId
         {
             get { return Identity.HashAssetId; }
+        }
+
+        public virtual int EntityId
+        {
+            get
+            {
+                if (MetaDataId.HasValue)
+                    return MetaDataId.Value;
+                return HashAssetId;
+            }
             set { }
+        }
+
+        public int? MetaDataId
+        {
+            get; set;
         }
 
         public bool ForceHide { get; set; }

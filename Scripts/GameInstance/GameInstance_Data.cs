@@ -17,6 +17,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Harvestable> Harvestables = new Dictionary<int, Harvestable>();
         public static readonly Dictionary<int, BaseCharacter> Characters = new Dictionary<int, BaseCharacter>();
         public static readonly Dictionary<int, PlayerCharacter> PlayerCharacters = new Dictionary<int, PlayerCharacter>();
+        public static readonly Dictionary<int, PlayerCharacterEntityMetaData> PlayerCharacterEntityMetaDataList = new Dictionary<int, PlayerCharacterEntityMetaData>();
         public static readonly Dictionary<int, MonsterCharacter> MonsterCharacters = new Dictionary<int, MonsterCharacter>();
         public static readonly Dictionary<int, ArmorType> ArmorTypes = new Dictionary<int, ArmorType>();
         public static readonly Dictionary<int, WeaponType> WeaponTypes = new Dictionary<int, WeaponType>();
@@ -478,6 +479,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddPlayerCharacterEntityMetaDataList(params PlayerCharacterEntityMetaData[] metaDataList)
+        {
+            AddManyGameData(PlayerCharacterEntityMetaDataList, metaDataList);
+        }
+
         public static void AddMapWarpPortals(params WarpPortals[] mapWarpPortals)
         {
             AddMapWarpPortals((IEnumerable<WarpPortals>)mapWarpPortals);
@@ -722,7 +728,7 @@ namespace MultiplayerARPG
         {
             AddManyGameData(EquipmentSets, equipmentSets);
         }
-#endregion
+        #endregion
 
         #region Add game entity functions
         public static void AddCharacterEntities(params BaseCharacterEntity[] characterEntities)
@@ -1010,15 +1016,23 @@ namespace MultiplayerARPG
                 return false;
             if (entity.Identity.IsSceneObject)
             {
-                entity.PrepareRelatesData();
+                PrepareRelatesData(entity);
                 return true;
             }
             if (!dict.TryGetValue(entity.Identity.HashAssetId, out T tempData) || (tempData as Object) == null)
             {
                 dict[entity.Identity.HashAssetId] = entity;
-                entity.PrepareRelatesData();
+                PrepareRelatesData(entity);
             }
             return true;
+        }
+
+        private static void PrepareRelatesData<T>(T entity)
+            where T : IGameEntity
+        {
+            entity.PrepareRelatesData();
+            if (entity.EntityGameObject.TryGetComponent(out PlayerCharacterAppearancesComponent appearanceComp))
+                AddCharacterAppearances(appearanceComp.GetAllAppearances());
         }
 
         private static void AddManyAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, IEnumerable<TBehaviour> list)
@@ -1064,6 +1078,40 @@ namespace MultiplayerARPG
                 }
             }
             return true;
+        }
+
+        public static UnlockRequirement GetUnlockableContentRequirement(UnlockableContentType type, int dataId)
+        {
+            UnlockRequirement result = default;
+            switch (type)
+            {
+                case UnlockableContentType.Icon:
+                    if (PlayerIcons.TryGetValue(dataId, out PlayerIcon playerIcon))
+                        result = playerIcon.UnlockRequirement;
+                    break;
+                case UnlockableContentType.Frame:
+                    if (PlayerFrames.TryGetValue(dataId, out PlayerFrame playerFrame))
+                        result = playerFrame.UnlockRequirement;
+                    break;
+                case UnlockableContentType.Title:
+                    if (PlayerTitles.TryGetValue(dataId, out PlayerTitle playerTitle))
+                        result = playerTitle.UnlockRequirement;
+                    break;
+            }
+            return result;
+        }
+
+        public int GetCharacterEntityHashAssetId(int entityId)
+        {
+            if (PlayerCharacterEntityMetaDataList.TryGetValue(entityId, out PlayerCharacterEntityMetaData metaData))
+            {
+                return metaData.GetPlayerCharacterEntityHashAssetId();
+            }
+            else if (AddressableCharacterEntities.ContainsKey(entityId) || CharacterEntities.ContainsKey(entityId))
+            {
+                return entityId;
+            }
+            return 0;
         }
     }
 }

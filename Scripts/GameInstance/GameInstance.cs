@@ -1133,6 +1133,7 @@ namespace MultiplayerARPG
             Harvestables.Clear();
             Characters.Clear();
             PlayerCharacters.Clear();
+            PlayerCharacterEntityMetaDataList.Clear();
             MonsterCharacters.Clear();
             ArmorTypes.Clear();
             WeaponTypes.Clear();

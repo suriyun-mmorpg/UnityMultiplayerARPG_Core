@@ -9,8 +9,6 @@ namespace MultiplayerARPG
     public class AssetReferenceBaseGameEntity<T> : AssetReferenceLiteNetLibBehaviour<BaseGameEntity>
         where T : BaseGameEntity
     {
-        public int EntityId => HashAssetId;
-
         public AssetReferenceBaseGameEntity(string guid) : base(guid)
         {
         }

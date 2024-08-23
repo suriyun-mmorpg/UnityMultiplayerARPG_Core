@@ -48,6 +48,7 @@ namespace MultiplayerARPG
         public GuildIcon[] guildIcons;
         public StatusEffect[] statusEffects;
         public PlayerCharacter[] playerCharacters;
+        public PlayerCharacterEntityMetaData[] playerCharacterEntityMetaDataList;
         public MonsterCharacter[] monsterCharacters;
         public Harvestable[] harvestables;
         public BaseMapInfo[] mapInfos;
@@ -81,6 +82,7 @@ namespace MultiplayerARPG
             GameInstance.AddGuildIcons(guildIcons);
             GameInstance.AddStatusEffects(statusEffects);
             GameInstance.AddCharacters(playerCharacters);
+            GameInstance.AddPlayerCharacterEntityMetaDataList(playerCharacterEntityMetaDataList);
             GameInstance.AddCharacters(monsterCharacters);
             GameInstance.AddHarvestables(harvestables);
             GameInstance.AddMapInfos(mapInfos);
@@ -110,6 +112,7 @@ namespace MultiplayerARPG
             GameInstance.AddGuildIcons(guildIcons);
             GameInstance.AddStatusEffects(statusEffects);
             GameInstance.AddCharacters(playerCharacters);
+            GameInstance.AddPlayerCharacterEntityMetaDataList(playerCharacterEntityMetaDataList);
             GameInstance.AddCharacters(monsterCharacters);
             GameInstance.AddHarvestables(harvestables);
             GameInstance.AddMapInfos(mapInfos);
@@ -186,6 +189,10 @@ namespace MultiplayerARPG
             List<PlayerCharacter> tempPlayerCharacters = new List<PlayerCharacter>(GameInstance.PlayerCharacters.Values);
             tempPlayerCharacters.Sort();
             playerCharacters = tempPlayerCharacters.ToArray();
+
+            List<PlayerCharacterEntityMetaData> tempPlayerCharacterEntityMetadataList = new List<PlayerCharacterEntityMetaData>(GameInstance.PlayerCharacterEntityMetaDataList.Values);
+            tempPlayerCharacterEntityMetadataList.Sort();
+            playerCharacterEntityMetaDataList = tempPlayerCharacterEntityMetadataList.ToArray();
 
             List<MonsterCharacter> tempMonsterCharacters = new List<MonsterCharacter>(GameInstance.MonsterCharacters.Values);
             tempMonsterCharacters.Sort();

@@ -31,9 +31,17 @@ namespace MultiplayerARPG
         #endregion
 
         #region Game Data
+        public const string EXP_TABLE_FILE = "Exp Table";
+        public const string EXP_TABLE_MENU = "Create GameData/Exp Table";
+        public const int EXP_TABLE_ORDER = -5999;
+
         public const string CURRENCY_FILE = "Currency";
         public const string CURRENCY_MENU = "Create GameData/Currency";
-        public const int CURRENCY_ORDER = -5999;
+        public const int CURRENCY_ORDER = -5949;
+
+        public const string PLAYER_CHARACTER_ENTITY_METADATA_FILE = "Player Character Entity Metadata";
+        public const string PLAYER_CHARACTER_ENTITY_METADATA_MENU = "Create GameData/Player Character Entity Metadata";
+        public const int PLAYER_CHARACTER_ENTITY_METADATA_ORDER = -5900;
 
         public const string PLAYER_CHARACTER_FILE = "Player Character";
         public const string PLAYER_CHARACTER_MENU = "Create GameData/Player Character";

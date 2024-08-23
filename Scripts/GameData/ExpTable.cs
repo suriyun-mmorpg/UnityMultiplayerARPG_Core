@@ -2,6 +2,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
+    [CreateAssetMenu(fileName = GameDataMenuConsts.EXP_TABLE_FILE, menuName = GameDataMenuConsts.EXP_TABLE_MENU, order = GameDataMenuConsts.EXP_TABLE_ORDER)]
     public class ExpTable : ScriptableObject
     {
         public int[] expTree = new int[0];
