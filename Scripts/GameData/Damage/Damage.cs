@@ -178,56 +178,6 @@ namespace MultiplayerARPG
             if (attacker.IsServer && attacker.IsDead())
                 return;
 
-            // Increase damage by stats
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem != null && weaponItem.WeaponType != null)
-            {
-                if (weaponItem.WeaponType.WeaponDeclaringType == WeaponDeclaringType.Type1 && attacker.CachedData.IncreaseDamageType1 > 0)
-                {
-                    for (int i = 0; i < damageAmounts.Count; ++i)
-                    {
-                        damageAmounts[i] = GameDataHelpers.CombineDamages(damageAmounts[i], new KeyValuePair<DamageElement, MinMaxFloat>(GameInstance.Singleton.DefaultDamageElement, new MinMaxFloat()
-                        {
-                            min = attacker.CachedData.IncreaseDamageType1,
-                            max = attacker.CachedData.IncreaseDamageType1,
-                        }));
-                    }
-                }
-                if (weaponItem.WeaponType.WeaponDeclaringType == WeaponDeclaringType.Type2 && attacker.CachedData.IncreaseDamageType2 > 0)
-                {
-                    for (int i = 0; i < damageAmounts.Count; ++i)
-                    {
-                        damageAmounts[i] = GameDataHelpers.CombineDamages(damageAmounts[i], new KeyValuePair<DamageElement, MinMaxFloat>(GameInstance.Singleton.DefaultDamageElement, new MinMaxFloat()
-                        {
-                            min = attacker.CachedData.IncreaseDamageType2,
-                            max = attacker.CachedData.IncreaseDamageType2,
-                        }));
-                    }
-                }
-                if (weaponItem.WeaponType.WeaponDeclaringType == WeaponDeclaringType.Type3 && attacker.CachedData.IncreaseDamageType3 > 0)
-                {
-                    for (int i = 0; i < damageAmounts.Count; ++i)
-                    {
-                        damageAmounts[i] = GameDataHelpers.CombineDamages(damageAmounts[i], new KeyValuePair<DamageElement, MinMaxFloat>(GameInstance.Singleton.DefaultDamageElement, new MinMaxFloat()
-                        {
-                            min = attacker.CachedData.IncreaseDamageType3,
-                            max = attacker.CachedData.IncreaseDamageType3,
-                        }));
-                    }
-                }
-                if (weaponItem.WeaponType.WeaponDeclaringType == WeaponDeclaringType.Type4 && attacker.CachedData.IncreaseDamageType4 > 0)
-                {
-                    for (int i = 0; i < damageAmounts.Count; ++i)
-                    {
-                        damageAmounts[i] = GameDataHelpers.CombineDamages(damageAmounts[i], new KeyValuePair<DamageElement, MinMaxFloat>(GameInstance.Singleton.DefaultDamageElement, new MinMaxFloat()
-                        {
-                            min = attacker.CachedData.IncreaseDamageType4,
-                            max = attacker.CachedData.IncreaseDamageType4,
-                        }));
-                    }
-                }
-            }
-
             if (TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo))
             {
                 await dmgInfo.LaunchDamageEntity(
