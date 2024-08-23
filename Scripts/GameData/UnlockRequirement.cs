@@ -5,8 +5,5 @@ namespace MultiplayerARPG
     {
         public bool isLocked;
         public int progression;
-        public long softCurrency;
-        public long hardCurrency;
-        public int userHandleLevel;
     }
 }
