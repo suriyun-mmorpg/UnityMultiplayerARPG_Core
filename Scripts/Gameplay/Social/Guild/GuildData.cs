@@ -109,9 +109,9 @@ namespace MultiplayerARPG
 
         private void MakeCaches()
         {
-            if (_isCached)
+            if (IsCached)
                 return;
-            _isCached = true;
+            IsCached = true;
             _increaseMaxMember = 0;
             _increaseExpGainPercentage = 0;
             _increaseGoldGainPercentage = 0;
