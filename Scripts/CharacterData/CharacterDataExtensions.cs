@@ -26,26 +26,45 @@ namespace MultiplayerARPG
             return database;
         }
 
-        public static bool TryGetEntityPrefab(this ICharacterData data, out BaseCharacterEntity prefab)
+        public static bool TryGetEntityPrefab(this ICharacterData data, out BaseCharacterEntity prefab, out int? metaDataId)
         {
-            return GameInstance.CharacterEntities.TryGetValue(GameInstance.Singleton.GetCharacterEntityHashAssetId(data.EntityId, out _), out prefab);
+            int hashAssetId = GameInstance.Singleton.GetCharacterEntityHashAssetId(data.EntityId, out metaDataId);
+            if (metaDataId.HasValue)
+            {
+                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.EntityPrefab != null)
+                {
+                    prefab = metaData.EntityPrefab;
+                    return true;
+                }
+            }
+            return GameInstance.CharacterEntities.TryGetValue(hashAssetId, out prefab);
         }
 
-        public static bool TryGetEntityAddressablePrefab(this ICharacterData data, out AssetReferenceBaseCharacterEntity assetRef)
+        public static bool TryGetEntityAddressablePrefab(this ICharacterData data, out AssetReferenceBaseCharacterEntity assetRef, out int? metaDataId)
         {
-            return GameInstance.AddressableCharacterEntities.TryGetValue(GameInstance.Singleton.GetCharacterEntityHashAssetId(data.EntityId, out _), out assetRef);
+            int hashAssetId = GameInstance.Singleton.GetCharacterEntityHashAssetId(data.EntityId, out metaDataId);
+            if (metaDataId.HasValue)
+            {
+                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.AddressableEntityPrefab.IsDataValid())
+                {
+                    assetRef = metaData.AddressableEntityPrefab;
+                    return true;
+                }
+            }
+            return GameInstance.AddressableCharacterEntities.TryGetValue(hashAssetId, out assetRef);
         }
 
         public static BaseCharacterModel InstantiateModel(this ICharacterData data, Transform parent)
         {
             BaseCharacterEntity result;
-            if (data.TryGetEntityAddressablePrefab(out AssetReferenceBaseCharacterEntity assetRef))
+            int? metaDataId;
+            if (data.TryGetEntityAddressablePrefab(out AssetReferenceBaseCharacterEntity assetRef, out metaDataId))
             {
                 AsyncOperationHandle<BaseCharacterEntity> handler = assetRef.InstantiateAsync();
                 result = handler.WaitForCompletion();
                 result.gameObject.AddComponent<AssetReferenceReleaser>().Setup(handler);
             }
-            else if (data.TryGetEntityPrefab(out BaseCharacterEntity prefab))
+            else if (data.TryGetEntityPrefab(out BaseCharacterEntity prefab, out metaDataId))
             {
                 result = Object.Instantiate(prefab);
             }
@@ -54,7 +73,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning($"[InstantiateModel] Cannot find character entity with id: {data.EntityId}");
                 return null;
             }
-
+            result.MetaDataId = metaDataId;
             LiteNetLibBehaviour[] networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
             foreach (LiteNetLibBehaviour networkBehaviour in networkBehaviours)
             {
