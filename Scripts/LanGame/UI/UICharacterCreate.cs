@@ -5,8 +5,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 using System.Threading.Tasks;
-using Cysharp.Threading.Tasks;
-
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.AddressableAssets;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -159,7 +159,6 @@ namespace MultiplayerARPG
         }
 
         protected readonly Dictionary<int, BaseCharacterModel> _characterModelByEntityId = new Dictionary<int, BaseCharacterModel>();
-        protected List<BasePlayerCharacterEntity> _addressablePlayerCharacterEntities = null;
         protected BaseCharacterModel _selectedModel;
         public BaseCharacterModel SelectedModel { get { return _selectedModel; } }
         protected readonly Dictionary<int, List<PlayerCharacter>> _playerCharacterDataByEntityId = new Dictionary<int, List<PlayerCharacter>>();
@@ -222,8 +221,6 @@ namespace MultiplayerARPG
             _characterClassSelectionManager = null;
             _factionSelectionManager = null;
             _characterModelByEntityId?.Clear();
-            _addressablePlayerCharacterEntities.Nulling();
-            _addressablePlayerCharacterEntities?.Clear();
             _selectedModel = null;
             _playerCharacterDataByEntityId?.Clear();
             _selectableCharacterClasses.Nulling();
@@ -261,48 +258,88 @@ namespace MultiplayerARPG
             return hasChanges;
         }
 
-        protected virtual async Task<List<BasePlayerCharacterEntity>> GetCreatableCharacters()
+        protected virtual async Task<List<PlayerCharacterData>> GetCreatableCharacters()
         {
-            if (_addressablePlayerCharacterEntities == null)
+            List<PlayerCharacterData> result = new List<PlayerCharacterData>();
+            if (GameInstance.PlayerCharacterEntities.Count > 0)
             {
-                _addressablePlayerCharacterEntities = new List<BasePlayerCharacterEntity>();
-                if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
+                foreach (BasePlayerCharacterEntity prefab in GameInstance.PlayerCharacterEntities.Values)
                 {
-                    List<Task<BaseCharacterEntity>> loadTasks = new List<Task<BaseCharacterEntity>>();
-                    foreach (AssetReferenceBasePlayerCharacterEntity entry in GameInstance.AddressablePlayerCharacterEntities.Values)
+                    if (RaceToggles.Count <= 0 || (prefab.Race != null && SelectedRaces.Contains(prefab.Race)))
                     {
-                        loadTasks.Add(entry.GetOrLoadAssetAsync<BaseCharacterEntity>());
-                    }
-                    await Task.WhenAll(loadTasks);
-                    for (int i = 0; i < loadTasks.Count; ++i)
-                    {
-                        _addressablePlayerCharacterEntities.Add(loadTasks[i].Result as BasePlayerCharacterEntity);
+                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
+                        data.CharacterName = prefab.EntityTitle;
+                        result.Add(data);
+                        _playerCharacterDataByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
                     }
                 }
             }
-            List<BasePlayerCharacterEntity> tempPlayerCharacterEntities = new List<BasePlayerCharacterEntity>(GameInstance.PlayerCharacterEntities.Values);
-            for (int i = 0; i < _addressablePlayerCharacterEntities.Count; ++i)
+            if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
             {
-                tempPlayerCharacterEntities.Add(_addressablePlayerCharacterEntities[i]);
-            }
-            if (GameInstance.PlayerCharacterEntityMetaDataList.Count > 0)
-            {
+                List<AsyncOperationHandle<BasePlayerCharacterEntity>> asyncOps = new List<AsyncOperationHandle<BasePlayerCharacterEntity>>();
                 List<Task<BasePlayerCharacterEntity>> loadTasks = new List<Task<BasePlayerCharacterEntity>>();
-                foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
+                foreach (AssetReferenceBasePlayerCharacterEntity entry in GameInstance.AddressablePlayerCharacterEntities.Values)
                 {
-                    loadTasks.Add(entry.GetOrLoadAssetAsync().AsTask());
+                    AsyncOperationHandle<BasePlayerCharacterEntity> asyncOp = entry.LoadAssetAsync();
+                    asyncOps.Add(asyncOp);
+                    loadTasks.Add(asyncOp.Task);
                 }
                 await Task.WhenAll(loadTasks);
                 for (int i = 0; i < loadTasks.Count; ++i)
                 {
-                    tempPlayerCharacterEntities.Add(loadTasks[i].Result);
+                    BasePlayerCharacterEntity prefab = asyncOps[i].Result;
+                    if (RaceToggles.Count <= 0 || SelectedRaces.Contains(prefab.Race))
+                    {
+                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
+                        data.CharacterName = prefab.EntityTitle;
+                        result.Add(data);
+                        _playerCharacterDataByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
+                    }
+                    Addressables.Release(asyncOps[i]);
                 }
             }
-            if (RaceToggles.Count > 0)
+            if (GameInstance.PlayerCharacterEntityMetaDataList.Count > 0)
             {
-                tempPlayerCharacterEntities = new List<BasePlayerCharacterEntity>(tempPlayerCharacterEntities.Where(o => SelectedRaces.Contains(o.Race)));
+                List<AsyncOperationHandle<BasePlayerCharacterEntity>> asyncOps = new List<AsyncOperationHandle<BasePlayerCharacterEntity>>();
+                List<Task<BasePlayerCharacterEntity>> loadTasks = new List<Task<BasePlayerCharacterEntity>>();
+                List<PlayerCharacterEntityMetaData> loadMetaDataList = new List<PlayerCharacterEntityMetaData>();
+                foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
+                {
+                    if (entry.AddressableEntityPrefab.IsDataValid())
+                    {
+                        AsyncOperationHandle<BasePlayerCharacterEntity> asyncOp = entry.AddressableEntityPrefab.LoadAssetAsync();
+                        asyncOps.Add(asyncOp);
+                        loadTasks.Add(asyncOp.Task);
+                        loadMetaDataList.Add(entry);
+                    }
+                    else if (entry.EntityPrefab != null)
+                    {
+                        BasePlayerCharacterEntity prefab = entry.EntityPrefab;
+                        if (RaceToggles.Count <= 0 || (prefab.Race != null && SelectedRaces.Contains(prefab.Race)))
+                        {
+                            PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
+                            data.CharacterName = entry.Title;
+                            data.EntityId = entry.DataId;
+                            result.Add(data);
+                        }
+                    }
+                    _playerCharacterDataByEntityId[entry.DataId] = new List<PlayerCharacter>(entry.CharacterDatabases);
+                }
+                await Task.WhenAll(loadTasks);
+                for (int i = 0; i < loadTasks.Count; ++i)
+                {
+                    BasePlayerCharacterEntity prefab = asyncOps[i].Result;
+                    if (RaceToggles.Count <= 0 || SelectedRaces.Contains(prefab.Race))
+                    {
+                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
+                        data.CharacterName = loadMetaDataList[i].Title;
+                        data.EntityId = loadMetaDataList[i].DataId;
+                        result.Add(data);
+                    }
+                    Addressables.Release(asyncOps[i]);
+                }
             }
-            return tempPlayerCharacterEntities;
+            return result;
         }
 
         protected virtual List<Faction> GetSelectableFactions()
@@ -322,14 +359,12 @@ namespace MultiplayerARPG
             CharacterList.HideAll();
             // Show list of characters that can be created
             PlayerCharacterData firstData = null;
-            CharacterList.Generate(await GetCreatableCharacters(), (index, characterEntity, ui) =>
+            CharacterList.Generate(await GetCreatableCharacters(), (index, characterData, ui) =>
             {
-                // Cache player character to dictionary, we will use it later
-                _playerCharacterDataByEntityId[characterEntity.EntityId] = new List<PlayerCharacter>(characterEntity.CharacterDatabases);
                 // Prepare data
-                BaseCharacter playerCharacter = characterEntity.CharacterDatabases[0];
+                BaseCharacter playerCharacter = _playerCharacterDataByEntityId[characterData.EntityId][0];
                 PlayerCharacterData playerCharacterData = new PlayerCharacterData();
-                playerCharacterData.SetNewPlayerCharacterData(characterEntity.EntityTitle, playerCharacter.DataId, characterEntity.EntityId, characterEntity.FactionId);
+                playerCharacterData.SetNewPlayerCharacterData(characterData.CharacterName, playerCharacter.DataId, characterData.EntityId, characterData.FactionId);
                 // Hide all model, the first one will be shown later
                 BaseCharacterModel characterModel = playerCharacterData.InstantiateModel(characterModelContainer);
                 _characterModelByEntityId[playerCharacterData.EntityId] = characterModel;
