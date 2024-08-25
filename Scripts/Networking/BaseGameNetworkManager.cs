@@ -543,6 +543,11 @@ namespace MultiplayerARPG
                 spawnablePrefabs.Add(CurrentGameInstance.PlayerCorpsePrefab.Identity);
             if (CurrentGameInstance.MonsterCorpsePrefab != null)
                 spawnablePrefabs.Add(CurrentGameInstance.MonsterCorpsePrefab.Identity);
+            foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
+            {
+                if (entry.EntityPrefab != null)
+                    spawnablePrefabs.Add(entry.EntityPrefab.Identity);
+            }
             foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);
@@ -587,6 +592,11 @@ namespace MultiplayerARPG
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressablePlayerCorpsePrefab);
             if (CurrentGameInstance.AddressableMonsterCorpsePrefab.IsDataValid())
                 addressableSpawnablePrefabs.Add(CurrentGameInstance.AddressableMonsterCorpsePrefab);
+            foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
+            {
+                if (entry.AddressableEntityPrefab.IsDataValid())
+                    addressableSpawnablePrefabs.Add(entry.AddressableEntityPrefab);
+            }
             foreach (AssetReferenceBaseCharacterEntity entry in GameInstance.AddressableCharacterEntities.Values)
             {
                 addressableSpawnablePrefabs.Add(entry);
