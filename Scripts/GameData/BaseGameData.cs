@@ -228,5 +228,11 @@ namespace MultiplayerARPG
             var json = JsonConvert.SerializeObject(data);
             Debug.Log($"Exporting data is:\n{json}");
         }
+
+        [ContextMenu("Debug Data ID")]
+        public void DebugDataId()
+        {
+            Debug.Log(DataId);
+        }
     }
 }
