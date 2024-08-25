@@ -260,8 +260,7 @@ namespace MultiplayerARPG
 
             BasePlayerCharacterEntity playerCharacterEntity = spawnObj.GetComponent<BasePlayerCharacterEntity>();
             playerCharacterData.CloneTo(playerCharacterEntity);
-            if (metaDataId.HasValue)
-                playerCharacterEntity.MetaDataId = metaDataId;
+            playerCharacterEntity.MetaDataId = metaDataId;
 
             Assets.NetworkSpawn(spawnObj, 0, connectionId);
 
