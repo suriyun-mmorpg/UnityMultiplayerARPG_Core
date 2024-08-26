@@ -1,6 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using Insthync.AddressableAssetTools;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
+using Cysharp.Threading.Tasks;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -22,15 +24,55 @@ namespace MultiplayerARPG
         public BaseCharacterModel MainTpsModel { get { return mainTpsModel; } set { mainTpsModel = value; } }
 
         [Header("FPS Model Settings")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableFpsModelPrefab))]
+        protected BaseCharacterModel fpsModelPrefab;
+#endif
+        public BaseCharacterModel FpsModelPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return fpsModelPrefab;
+#else
+                return null;
+#endif
+            }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS
+                fpsModelPrefab = value;
+#endif
+            }
+        }
+
         [SerializeField]
-        private BaseCharacterModel fpsModelPrefab = null;
+        protected AssetReferenceBaseCharacterModel addressableFpsModelPrefab;
+        public AssetReferenceBaseCharacterModel AddressableFpsModelPrefab
+        {
+            get { return addressableFpsModelPrefab; }
+            set { addressableFpsModelPrefab = value; }
+        }
+
         [SerializeField]
         [FormerlySerializedAs("fpsModelOffsets")]
         [Tooltip("Position offsets from fps model container (Camera's transform)")]
         private Vector3 fpsModelPositionOffsets = Vector3.zero;
+        public Vector3 FpsModelPositionOffsets
+        {
+            get { return fpsModelPositionOffsets; }
+            set { fpsModelPositionOffsets = value; }
+        }
+
         [SerializeField]
         [Tooltip("Rotation offsets from fps model container (Camera's transform)")]
         private Vector3 fpsModelRotationOffsets = Vector3.zero;
+        public Vector3 FpsModelRotationOffsets
+        {
+            get { return fpsModelRotationOffsets; }
+            set { fpsModelRotationOffsets = value; }
+        }
+
         public BaseCharacterModel ActiveTpsModel { get; private set; }
         public BaseCharacterModel ActiveFpsModel { get; private set; }
         public BaseCharacterModel MainFpsModel { get; set; }
@@ -69,6 +111,7 @@ namespace MultiplayerARPG
         {
             mainTpsModel = null;
             fpsModelPrefab = null;
+            addressableFpsModelPrefab = null;
             ActiveTpsModel = null;
             ActiveFpsModel = null;
             MainFpsModel = null;
@@ -101,20 +144,24 @@ namespace MultiplayerARPG
             }
         }
 
-        public BaseCharacterModel InstantiateFpsModel(Transform container)
+        public async UniTask<BaseCharacterModel> InstantiateFpsModel(Transform container)
         {
-            if (fpsModelPrefab == null)
+            MainFpsModel = await AddressableFpsModelPrefab.GetOrLoadAssetAsyncOrUsePrefab(FpsModelPrefab);
+            if (MainFpsModel == null)
                 return null;
-            MainFpsModel = Instantiate(fpsModelPrefab, container);
+            MainFpsModel.transform.SetParent(container);
+            MainFpsModel.transform.localPosition = FpsModelPositionOffsets;
+            MainFpsModel.transform.localEulerAngles = FpsModelRotationOffsets;
             InitFpsModel(MainFpsModel);
-            MainFpsModel.transform.localPosition = fpsModelPositionOffsets;
-            MainFpsModel.transform.localRotation = Quaternion.Euler(fpsModelRotationOffsets);
             MainFpsModel.SetEquipItems(MainTpsModel.EquipItems, MainTpsModel.SelectableWeaponSets, MainTpsModel.EquipWeaponSet, MainTpsModel.IsWeaponsSheathed);
 #if UNITY_EDITOR
-            IComponentWithPrefabRef[] refs = MainFpsModel.GetComponents<IComponentWithPrefabRef>();
-            for (int i = 0; i < refs.Length; ++i)
+            if (FpsModelPrefab != null)
             {
-                refs[i].SetupRefToPrefab(fpsModelPrefab.gameObject);
+                IComponentWithPrefabRef[] refs = MainFpsModel.GetComponents<IComponentWithPrefabRef>();
+                for (int i = 0; i < refs.Length; ++i)
+                {
+                    refs[i].SetupRefToPrefab(FpsModelPrefab.gameObject);
+                }
             }
 #endif
             return MainFpsModel;

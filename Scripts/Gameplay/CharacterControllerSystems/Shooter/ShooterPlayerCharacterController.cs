@@ -507,7 +507,7 @@ namespace MultiplayerARPG
             characterEntity.onLaunchDamageEntity += OnLaunchDamageEntity;
             if (CacheFpsModel != null)
                 Destroy(CacheFpsModel.gameObject);
-            CacheFpsModel = characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraController.CameraTransform);
+            CacheFpsModel = await characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraController.CameraTransform);
             await UniTask.NextFrame();
             characterEntity.ModelManager.SetIsFps(ViewMode == ShooterControllerViewMode.Fps);
             UpdateViewMode();

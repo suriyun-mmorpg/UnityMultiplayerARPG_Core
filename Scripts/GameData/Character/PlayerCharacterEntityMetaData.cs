@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_FILE, menuName = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_MENU, order = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_ORDER)]
     public partial class PlayerCharacterEntityMetaData : BaseGameData
     {
+        [Header("Character Prefabs And Data")]
         [SerializeField]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [AddressableAssetConversion(nameof(addressableEntityPrefab))]
@@ -22,16 +23,20 @@ namespace MultiplayerARPG
                 return null;
 #endif
             }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS
+                entityPrefab = value;
+#endif
+            }
         }
 
         [SerializeField]
         protected AssetReferenceBasePlayerCharacterEntity addressableEntityPrefab;
         public AssetReferenceBasePlayerCharacterEntity AddressableEntityPrefab
         {
-            get
-            {
-                return addressableEntityPrefab;
-            }
+            get { return addressableEntityPrefab; }
+            set { addressableEntityPrefab = value; }
         }
 
         [Tooltip("This is list which used as choice of character classes when create character")]
@@ -80,6 +85,59 @@ namespace MultiplayerARPG
         public CharacterRace Race
         {
             get { return race; }
+            set { race = value; }
+        }
+
+        [Header("FPS Model Settings")]
+        [SerializeField]
+        protected bool overrideFpsModel;
+        public bool OverrideFpsModel
+        {
+            get { return overrideFpsModel; }
+            set { overrideFpsModel = value; }
+        }
+
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [AddressableAssetConversion(nameof(addressableFpsModelPrefab))]
+        protected BaseCharacterModel fpsModelPrefab;
+#endif
+        public BaseCharacterModel FpsModelPrefab
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return fpsModelPrefab;
+#else
+                return null;
+#endif
+            }
+            set { fpsModelPrefab = value; }
+        }
+
+        [SerializeField]
+        protected AssetReferenceBaseCharacterModel addressableFpsModelPrefab;
+        public AssetReferenceBaseCharacterModel AddressableFpsModelPrefab
+        {
+            get { return addressableFpsModelPrefab; }
+            set { addressableFpsModelPrefab = value; }
+        }
+
+        [SerializeField]
+        [Tooltip("Position offsets from fps model container (Camera's transform)")]
+        private Vector3 fpsModelPositionOffsets = Vector3.zero;
+        public Vector3 FpsModelPositionOffsets
+        {
+            get { return fpsModelPositionOffsets; }
+            set { fpsModelPositionOffsets = value; }
+        }
+
+        [SerializeField]
+        [Tooltip("Rotation offsets from fps model container (Camera's transform)")]
+        private Vector3 fpsModelRotationOffsets = Vector3.zero;
+        public Vector3 FpsModelRotationOffsets
+        {
+            get { return fpsModelRotationOffsets; }
+            set { fpsModelRotationOffsets = value; }
         }
 
         public int GetPlayerCharacterEntityHashAssetId()
@@ -94,10 +152,17 @@ namespace MultiplayerARPG
         public void Setup(BasePlayerCharacterEntity entity)
         {
             entity.MetaDataId = DataId;
-            entity.CharacterDatabases = characterDatabases;
-            entity.ControllerPrefab = controllerPrefab;
-            entity.AddressableControllerPrefab = addressableControllerPrefab;
-            entity.Race = race;
+            entity.CharacterDatabases = CharacterDatabases;
+            entity.ControllerPrefab = ControllerPrefab;
+            entity.AddressableControllerPrefab = AddressableControllerPrefab;
+            entity.Race = Race;
+            if (overrideFpsModel)
+            {
+                entity.ModelManager.FpsModelPrefab = FpsModelPrefab;
+                entity.ModelManager.AddressableFpsModelPrefab = AddressableFpsModelPrefab;
+                entity.ModelManager.FpsModelPositionOffsets = FpsModelPositionOffsets;
+                entity.ModelManager.FpsModelRotationOffsets = FpsModelRotationOffsets;
+            }
             this.InvokeInstanceDevExtMethods("Setup", entity);
         }
     }
