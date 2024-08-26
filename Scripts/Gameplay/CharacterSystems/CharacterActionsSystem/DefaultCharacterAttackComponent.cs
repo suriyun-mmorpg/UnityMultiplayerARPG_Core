@@ -240,7 +240,10 @@ namespace MultiplayerARPG
                         if (fpsModelAvailable)
                             Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
-                        weaponItem.LaunchClip?.Play(Entity.CharacterModel.GenericAudioSource);
+                        AudioClipWithVolumeSettings launchClip = weaponItem.LaunchClip;
+                        if (Entity.GetCaches().TryGetWeaponAbility(isLeftHand, LaunchSfxWeaponAbility.KEY, out BaseWeaponAbility ability) && ability is LaunchSfxWeaponAbility launchSfxAbility)
+                            launchClip = launchSfxAbility.LaunchClip;
+                        launchClip?.Play(Entity.CharacterModel.GenericAudioSource);
                     }
 
                     await UniTask.Yield(attackCancellationTokenSource.Token);

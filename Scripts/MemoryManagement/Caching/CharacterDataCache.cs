@@ -21,7 +21,9 @@ namespace MultiplayerARPG
         public Dictionary<StatusEffect, float> StatusEffectResistances { get; private set; }
         public Dictionary<EquipmentSet, int> EquipmentSets { get; private set; }
         public List<BaseWeaponAbility> RightHandWeaponAbilities { get; private set; }
+        public Dictionary<string, int> RightHandWeaponAbilityIndexes { get; private set; }
         public List<BaseWeaponAbility> LeftHandWeaponAbilities { get; private set; }
+        public Dictionary<string, int> LeftHandWeaponAbilityIndexes { get; private set; }
         public int MaxHp => (int)_stats.hp;
         public int MaxMp => (int)_stats.mp;
         public int MaxStamina => (int)_stats.stamina;
@@ -79,7 +81,9 @@ namespace MultiplayerARPG
             StatusEffectResistances = new Dictionary<StatusEffect, float>();
             EquipmentSets = new Dictionary<EquipmentSet, int>();
             RightHandWeaponAbilities = new List<BaseWeaponAbility>();
+            RightHandWeaponAbilityIndexes = new Dictionary<string, int>();
             LeftHandWeaponAbilities = new List<BaseWeaponAbility>();
+            LeftHandWeaponAbilityIndexes = new Dictionary<string, int>();
         }
 
         ~CharacterDataCache()
@@ -108,8 +112,12 @@ namespace MultiplayerARPG
             EquipmentSets = null;
             RightHandWeaponAbilities.Clear();
             RightHandWeaponAbilities = null;
+            RightHandWeaponAbilityIndexes.Clear();
+            RightHandWeaponAbilityIndexes = null;
             LeftHandWeaponAbilities.Clear();
             LeftHandWeaponAbilities = null;
+            LeftHandWeaponAbilityIndexes.Clear();
+            LeftHandWeaponAbilityIndexes = null;
         }
 
         public CharacterDataCache MarkToMakeCaches()
@@ -213,7 +221,9 @@ namespace MultiplayerARPG
             StatusEffectResistances.Clear();
             EquipmentSets.Clear();
             RightHandWeaponAbilities.Clear();
+            RightHandWeaponAbilityIndexes.Clear();
             LeftHandWeaponAbilities.Clear();
+            LeftHandWeaponAbilityIndexes.Clear();
 
             int oldBattlePoints = BattlePoints;
 
@@ -380,7 +390,7 @@ namespace MultiplayerARPG
                 RightHandItem = characterData.EquipWeapons.rightHand;
                 if (rightWeaponItem.WeaponAbilities != null && rightWeaponItem.WeaponAbilities.Length > 0)
                     RightHandWeaponAbilities.AddRange(rightWeaponItem.WeaponAbilities);
-                AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandItem.sockets);
+                AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandWeaponAbilityIndexes, RightHandItem.sockets);
             }
             IWeaponItem leftWeaponItem = characterData.EquipWeapons.GetLeftHandWeaponItem();
             if (leftWeaponItem != null)
@@ -389,7 +399,7 @@ namespace MultiplayerARPG
                 LeftHandItem = characterData.EquipWeapons.leftHand;
                 if (leftWeaponItem.WeaponAbilities != null && leftWeaponItem.WeaponAbilities.Length > 0)
                     LeftHandWeaponAbilities.AddRange(leftWeaponItem.WeaponAbilities);
-                AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandItem.sockets);
+                AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandWeaponAbilityIndexes, LeftHandItem.sockets);
             }
             if (!IsLeftHandItemAvailable && !IsRightHandItemAvailable)
             {
@@ -401,17 +411,17 @@ namespace MultiplayerARPG
             return this;
         }
 
-        private void AddOrReplaceWeaponAbilities(List<BaseWeaponAbility> weaponAbilities, List<int> sockets)
+        private static void AddOrReplaceWeaponAbilities(List<BaseWeaponAbility> weaponAbilities, Dictionary<string, int> weaponAbilityIndexes, List<int> sockets)
         {
-            Dictionary<string, int> abilityIndexes = new Dictionary<string, int>();
+            weaponAbilityIndexes.Clear();
             int i;
             for (i = 0; i < weaponAbilities.Count; ++i)
             {
                 if (weaponAbilities[i] == null)
                     continue;
-                if (abilityIndexes.ContainsKey(weaponAbilities[i].AbilityKey))
+                if (weaponAbilityIndexes.ContainsKey(weaponAbilities[i].AbilityKey))
                     continue;
-                abilityIndexes[weaponAbilities[i].AbilityKey] = i;
+                weaponAbilityIndexes[weaponAbilities[i].AbilityKey] = i;
             }
 
             for (i = 0; i < sockets.Count; ++i)
@@ -429,20 +439,46 @@ namespace MultiplayerARPG
                         continue;
 
                     string abilityKey = socketEnhancerItem.WeaponAbilities[j].AbilityKey;
-                    if (!abilityIndexes.ContainsKey(abilityKey))
+                    if (!weaponAbilityIndexes.ContainsKey(abilityKey))
                     {
                         // Add a new ability
                         weaponAbilities.Add(socketEnhancerItem.WeaponAbilities[j]);
-                        abilityIndexes[abilityKey] = weaponAbilities.Count - 1;
+                        weaponAbilityIndexes[abilityKey] = weaponAbilities.Count - 1;
                         continue;
                     }
                     else
                     {
                         // Change old ability
-                        weaponAbilities[abilityIndexes[abilityKey]] = socketEnhancerItem.WeaponAbilities[j];
+                        weaponAbilities[weaponAbilityIndexes[abilityKey]] = socketEnhancerItem.WeaponAbilities[j];
                     }
                 }
             }
+        }
+
+        public bool TryGetWeaponAbility(bool isLeftHand, string key, out BaseWeaponAbility ability)
+        {
+            return isLeftHand ? TryGetLeftHandWeaponAbility(key, out ability) : TryGetRightHandWeaponAbility(key, out ability);
+        }
+
+        public bool TryGetRightHandWeaponAbility(string key, out BaseWeaponAbility ability)
+        {
+            return TryGetWeaponAbility(RightHandWeaponAbilities, RightHandWeaponAbilityIndexes, key, out ability);
+        }
+
+        public bool TryGetLeftHandWeaponAbility(string key, out BaseWeaponAbility ability)
+        {
+            return TryGetWeaponAbility(LeftHandWeaponAbilities, LeftHandWeaponAbilityIndexes, key, out ability);
+        }
+
+        public static bool TryGetWeaponAbility(List<BaseWeaponAbility> weaponAbilities, Dictionary<string, int> weaponAbilityIndexes, string key, out BaseWeaponAbility ability)
+        {
+            if (weaponAbilityIndexes.TryGetValue(key, out int index))
+            {
+                ability = weaponAbilities[index];
+                return true;
+            }
+            ability = null;
+            return false;
         }
 
         public void ClearChanceToRemoveBuffWhenAttack()
