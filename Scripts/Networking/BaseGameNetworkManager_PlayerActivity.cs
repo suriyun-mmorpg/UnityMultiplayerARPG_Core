@@ -20,8 +20,6 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (CurrentMapInfo == null)
-                return string.Empty;
             if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition || !CurrentMapInfo.SaveCurrentMapPosition)
                 return playerCharacterEntity.RespawnMapName;
             return CurrentMapInfo.Id;
@@ -34,8 +32,6 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
-            if (CurrentMapInfo == null)
-                return Vector3.zero;
             if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition || !CurrentMapInfo.SaveCurrentMapPosition)
                 return playerCharacterEntity.RespawnPosition;
             Vector3 currentPosition = playerCharacterEntity.EntityTransform.position;
