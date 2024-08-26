@@ -171,6 +171,10 @@ namespace MultiplayerARPG
         public const string ZOOM_WEAPON_ABILITY_MENU = "Create GameData/Weapon Ability/Zoom Weapon Ability";
         public const int ZOOM_WEAPON_ABILITY_ORDER = -5596;
 
+        public const string LAUNCH_SFX_WEAPON_ABILITY_FILE = "Launch Sfx Weapon Ability";
+        public const string LAUNCH_SFX_WEAPON_ABILITY_MENU = "Create GameData/Weapon Ability/Launch Sfx Weapon Ability";
+        public const int LAUNCH_SFX_WEAPON_ABILITY_ORDER = -5595;
+
         public const string ARMOR_TYPE_FILE = "Armor Type";
         public const string ARMOR_TYPE_MENU = "Create GameData/Armor Type";
         public const int ARMOR_TYPE_ORDER = -5595;
