@@ -75,6 +75,13 @@ namespace MultiplayerARPG
             set { addressableControllerPrefab = value; }
         }
 
+        [SerializeField]
+        protected CharacterRace race;
+        public CharacterRace Race
+        {
+            get { return race; }
+        }
+
         public int GetPlayerCharacterEntityHashAssetId()
         {
             if (AddressableEntityPrefab.IsDataValid())
@@ -90,6 +97,7 @@ namespace MultiplayerARPG
             loadedPrefab.CharacterDatabases = characterDatabases;
             loadedPrefab.ControllerPrefab = controllerPrefab;
             loadedPrefab.AddressableControllerPrefab = AddressableControllerPrefab;
+            loadedPrefab.Race = Race;
             return loadedPrefab;
         }
     }

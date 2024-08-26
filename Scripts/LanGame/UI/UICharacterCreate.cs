@@ -161,7 +161,7 @@ namespace MultiplayerARPG
         protected readonly Dictionary<int, BaseCharacterModel> _characterModelByEntityId = new Dictionary<int, BaseCharacterModel>();
         protected BaseCharacterModel _selectedModel;
         public BaseCharacterModel SelectedModel { get { return _selectedModel; } }
-        protected readonly Dictionary<int, List<PlayerCharacter>> _playerCharacterDataByEntityId = new Dictionary<int, List<PlayerCharacter>>();
+        protected readonly Dictionary<int, List<PlayerCharacter>> _playerCharactersByEntityId = new Dictionary<int, List<PlayerCharacter>>();
         protected List<PlayerCharacter> _selectableCharacterClasses;
         public List<PlayerCharacter> SelectableCharacterClasses { get { return _selectableCharacterClasses; } }
         protected PlayerCharacter _selectedPlayerCharacter;
@@ -222,7 +222,7 @@ namespace MultiplayerARPG
             _factionSelectionManager = null;
             _characterModelByEntityId?.Clear();
             _selectedModel = null;
-            _playerCharacterDataByEntityId?.Clear();
+            _playerCharactersByEntityId?.Clear();
             _selectableCharacterClasses.Nulling();
             _selectedPlayerCharacter = null;
             _selectedPlayerCharacterData = null;
@@ -265,13 +265,12 @@ namespace MultiplayerARPG
             {
                 foreach (BasePlayerCharacterEntity prefab in GameInstance.PlayerCharacterEntities.Values)
                 {
-                    if (RaceToggles.Count <= 0 || (prefab.Race != null && SelectedRaces.Contains(prefab.Race)))
-                    {
-                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
-                        data.CharacterName = prefab.EntityTitle;
-                        result.Add(data);
-                        _playerCharacterDataByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
-                    }
+                    if (RaceToggles.Count > 0 && prefab.Race != null && !SelectedRaces.Contains(prefab.Race))
+                        continue;
+                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
+                    data.CharacterName = prefab.EntityTitle;
+                    result.Add(data);
+                    _playerCharactersByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
                 }
             }
             if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
@@ -288,14 +287,17 @@ namespace MultiplayerARPG
                 for (int i = 0; i < loadTasks.Count; ++i)
                 {
                     BasePlayerCharacterEntity prefab = asyncOps[i].Result;
-                    if (RaceToggles.Count <= 0 || SelectedRaces.Contains(prefab.Race))
+                    if (RaceToggles.Count > 0 && prefab.Race != null && !SelectedRaces.Contains(prefab.Race))
                     {
-                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
-                        data.CharacterName = prefab.EntityTitle;
-                        result.Add(data);
-                        _playerCharacterDataByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
+                        Addressables.Release(asyncOps[i]);
+                        continue;
                     }
-                    Addressables.Release(asyncOps[i]);
+                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
+                    data.CharacterName = prefab.EntityTitle;
+                    result.Add(data);
+                    _playerCharactersByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
+                    if (RaceToggles.Count > 0 && prefab.Race != null && !SelectedRaces.Contains(prefab.Race))
+                        Addressables.Release(asyncOps[i]);
                 }
             }
             if (GameInstance.PlayerCharacterEntityMetaDataList.Count > 0)
@@ -305,6 +307,8 @@ namespace MultiplayerARPG
                 List<PlayerCharacterEntityMetaData> loadMetaDataList = new List<PlayerCharacterEntityMetaData>();
                 foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
                 {
+                    if (RaceToggles.Count > 0 && entry.Race != null && !SelectedRaces.Contains(entry.Race))
+                        continue;
                     if (entry.AddressableEntityPrefab.IsDataValid())
                     {
                         AsyncOperationHandle<BasePlayerCharacterEntity> asyncOp = entry.AddressableEntityPrefab.LoadAssetAsync();
@@ -315,27 +319,21 @@ namespace MultiplayerARPG
                     else if (entry.EntityPrefab != null)
                     {
                         BasePlayerCharacterEntity prefab = entry.EntityPrefab;
-                        if (RaceToggles.Count <= 0 || (prefab.Race != null && SelectedRaces.Contains(prefab.Race)))
-                        {
-                            PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
-                            data.CharacterName = entry.Title;
-                            data.EntityId = entry.DataId;
-                            result.Add(data);
-                        }
+                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
+                        data.CharacterName = entry.Title;
+                        data.EntityId = entry.DataId;
+                        result.Add(data);
                     }
-                    _playerCharacterDataByEntityId[entry.DataId] = new List<PlayerCharacter>(entry.CharacterDatabases);
+                    _playerCharactersByEntityId[entry.DataId] = new List<PlayerCharacter>(entry.CharacterDatabases);
                 }
                 await Task.WhenAll(loadTasks);
                 for (int i = 0; i < loadTasks.Count; ++i)
                 {
                     BasePlayerCharacterEntity prefab = asyncOps[i].Result;
-                    if (RaceToggles.Count <= 0 || SelectedRaces.Contains(prefab.Race))
-                    {
-                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
-                        data.CharacterName = loadMetaDataList[i].Title;
-                        data.EntityId = loadMetaDataList[i].DataId;
-                        result.Add(data);
-                    }
+                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData());
+                    data.CharacterName = loadMetaDataList[i].Title;
+                    data.EntityId = loadMetaDataList[i].DataId;
+                    result.Add(data);
                     Addressables.Release(asyncOps[i]);
                 }
             }
@@ -353,7 +351,7 @@ namespace MultiplayerARPG
             characterModelContainer.RemoveChildren();
             _characterModelByEntityId.Clear();
             // Remove all cached data
-            _playerCharacterDataByEntityId.Clear();
+            _playerCharactersByEntityId.Clear();
             // Clear character selection
             CharacterSelectionManager.Clear();
             CharacterList.HideAll();
@@ -362,7 +360,7 @@ namespace MultiplayerARPG
             CharacterList.Generate(await GetCreatableCharacters(), (index, characterData, ui) =>
             {
                 // Prepare data
-                BaseCharacter playerCharacter = _playerCharacterDataByEntityId[characterData.EntityId][0];
+                BaseCharacter playerCharacter = _playerCharactersByEntityId[characterData.EntityId][0];
                 PlayerCharacterData playerCharacterData = new PlayerCharacterData();
                 playerCharacterData.SetNewPlayerCharacterData(characterData.CharacterName, playerCharacter.DataId, characterData.EntityId, characterData.FactionId);
                 // Hide all model, the first one will be shown later
@@ -513,7 +511,7 @@ namespace MultiplayerARPG
             CharacterClassList.HideAll();
             // Setup character class list
             PlayerCharacter firstData = null;
-            _playerCharacterDataByEntityId.TryGetValue(SelectedEntityId, out _selectableCharacterClasses);
+            _playerCharactersByEntityId.TryGetValue(SelectedEntityId, out _selectableCharacterClasses);
             CharacterClassList.Generate(_selectableCharacterClasses, (index, playerCharacter, ui) =>
             {
                 // Setup UI
