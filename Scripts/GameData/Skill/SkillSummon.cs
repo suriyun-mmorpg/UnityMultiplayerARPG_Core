@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial struct SkillSummon
+    public partial struct SkillSummon : IAddressableAssetConversable
     {
         public static readonly SkillSummon Empty = new SkillSummon();
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
