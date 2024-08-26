@@ -134,7 +134,7 @@ namespace MultiplayerARPG
         public bool destroyImmediatelyAfterFired;
 
         [Category(4, "Buff/Bonus Settings")]
-        public Buff buff;
+        public Buff buff = new Buff();
         public CharacterStatsIncremental increaseStats;
         public CharacterStatsIncremental increaseStatsRate;
         [ArrayElementTitle("attribute")]
@@ -206,7 +206,7 @@ namespace MultiplayerARPG
         public StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
 
         // For equipment items
-        public ItemRandomBonus randomBonus;
+        public ItemRandomBonus randomBonus = new ItemRandomBonus();
 
         public override ItemType ItemType
         {
@@ -650,7 +650,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Implement IPotionItem, IBuildingItem, IPetItem, IMountItem, ISkillItem
-        public Buff? BuffData
+        public Buff BuffData
         {
             get
             {
