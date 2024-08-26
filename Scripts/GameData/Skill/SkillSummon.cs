@@ -5,9 +5,8 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial struct SkillSummon : IAddressableAssetConversable
+    public partial class SkillSummon : IAddressableAssetConversable
     {
-        public static readonly SkillSummon Empty = new SkillSummon();
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
         [SerializeField]
@@ -52,24 +51,6 @@ namespace MultiplayerARPG
         [SerializeField]
         private IncrementalInt level;
         public IncrementalInt Level { get { return level; } }
-
-        public SkillSummon(
-            BaseMonsterCharacterEntity monsterCharacterEntity,
-            AssetReferenceBaseMonsterCharacterEntity addressableMonsterCharacterEntity,
-            IncrementalFloat duration,
-            IncrementalInt amountEachTime,
-            IncrementalInt maxStack,
-            IncrementalInt level)
-        {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-            this.monsterCharacterEntity = monsterCharacterEntity;
-#endif
-            this.addressableMonsterCharacterEntity = addressableMonsterCharacterEntity;
-            this.duration = duration;
-            this.amountEachTime = amountEachTime;
-            this.maxStack = maxStack;
-            this.level = level;
-        }
 
         public void ProceedAddressableAssetConversion()
         {

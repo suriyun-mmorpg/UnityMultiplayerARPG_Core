@@ -314,7 +314,8 @@ namespace MultiplayerARPG
 
             if (uiTextExtras != null)
             {
-                bool activated = Data.buff.disallowMove ||
+                bool activated = Data.buff != null &&
+                    (Data.buff.disallowMove ||
                     Data.buff.disallowSprint ||
                     Data.buff.disallowWalk ||
                     Data.buff.disallowJump ||
@@ -330,7 +331,7 @@ namespace MultiplayerARPG
                     Data.buff.isBlind ||
                     Data.buff.doNotRemoveOnDead ||
                     Data.buff.muteFootstepSound ||
-                    Data.buff.isExtendDuration;
+                    Data.buff.isExtendDuration);
                 uiTextExtras.SetGameObjectActive(activated);
                 if (activated)
                 {

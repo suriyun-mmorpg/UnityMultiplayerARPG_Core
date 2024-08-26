@@ -53,7 +53,7 @@ namespace MultiplayerARPG
         protected ArmorIncremental[] armors = new ArmorIncremental[0];
 
         [SerializeField]
-        protected Buff buff = Buff.Empty;
+        protected Buff buff = new Buff();
 
         [SerializeField]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onVehicleDestroy` event before it's going to be destroyed from the game.")]

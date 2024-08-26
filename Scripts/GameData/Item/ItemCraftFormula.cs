@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         [Category("Item Craft Formula Settings")]
         [SerializeField]
-        private ItemCraft itemCraft = default;
+        private ItemCraft itemCraft = new ItemCraft();
         public ItemCraft ItemCraft
         {
             get { return itemCraft; }
@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private bool canBeCraftedWithoutSource;
+        private bool canBeCraftedWithoutSource = false;
         public bool CanBeCraftedWithoutSource
         {
             get { return canBeCraftedWithoutSource; }

@@ -9,7 +9,7 @@ namespace MultiplayerARPG
         public StatusEffect StatusEffect { get { return StatusEffectApplying.statusEffect; } }
         public int Level { get { return Data.targetLevel; } }
         public UIStatusEffectApplyingTarget ApplyingTarget { get { return Data.applyingTarget; } }
-        public Buff Buff { get { return StatusEffect == null ? Buff.Empty : StatusEffect.Buff; } }
+        public Buff Buff { get { return StatusEffect == null ? null : StatusEffect.Buff; } }
         public int BuffLevel { get { return StatusEffectApplying.buffLevel.GetAmount(Level); } }
 
         [Header("String Formats")]

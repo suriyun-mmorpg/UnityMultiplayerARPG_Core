@@ -54,7 +54,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("monsterSkills")]
         private MonsterSkill[] skills = new MonsterSkill[0];
         [SerializeField]
-        private Buff summonerBuff = Buff.Empty;
+        private Buff summonerBuff = new Buff();
         public Buff SummonerBuff { get { return summonerBuff; } }
         [SerializeField]
         private bool isHeadshotInstantDeathProtected;

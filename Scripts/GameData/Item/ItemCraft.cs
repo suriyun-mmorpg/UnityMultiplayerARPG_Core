@@ -4,45 +4,30 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial struct ItemCraft
+    public partial class ItemCraft
     {
-        public static readonly ItemCraft Empty = new ItemCraft();
         [SerializeField]
         private BaseItem craftingItem;
         public BaseItem CraftingItem { get { return craftingItem; } }
 
         [SerializeField]
-        private int amount;
+        private int amount = 1;
         public int Amount { get { return (amount > 0 ? amount : 1); } }
 
         [SerializeField]
-        private int requireGold;
+        private int requireGold = 0;
         public int RequireGold { get { return requireGold; } }
 
         [SerializeField]
         [FormerlySerializedAs("craftRequirements")]
         [ArrayElementTitle("item")]
-        private ItemAmount[] requireItems;
+        private ItemAmount[] requireItems = new ItemAmount[0];
         public ItemAmount[] RequireItems { get { return requireItems; } }
 
         [SerializeField]
         [ArrayElementTitle("currency")]
-        private CurrencyAmount[] requireCurrencies;
+        private CurrencyAmount[] requireCurrencies = new CurrencyAmount[0];
         public CurrencyAmount[] RequireCurrencies { get { return requireCurrencies; } }
-
-        public ItemCraft(
-            BaseItem craftingItem,
-            int amount,
-            int requireGold,
-            ItemAmount[] requireItems,
-            CurrencyAmount[] requireCurrencies)
-        {
-            this.craftingItem = craftingItem;
-            this.amount = amount;
-            this.requireGold = requireGold;
-            this.requireItems = requireItems;
-            this.requireCurrencies = requireCurrencies;
-        }
 
         public bool CanCraft(IPlayerCharacterData character)
         {

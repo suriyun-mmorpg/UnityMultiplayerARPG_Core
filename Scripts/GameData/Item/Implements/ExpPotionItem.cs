@@ -38,8 +38,8 @@ namespace MultiplayerARPG
 
         [Header("Potion Configs")]
         [SerializeField]
-        private Buff buff = Buff.Empty;
-        public Buff? BuffData
+        private Buff buff = new Buff();
+        public Buff BuffData
         {
             get { return buff; }
         }

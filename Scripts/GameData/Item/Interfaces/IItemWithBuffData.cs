@@ -5,6 +5,6 @@ namespace MultiplayerARPG
         /// <summary>
         /// Buff data for this item
         /// </summary>
-        Buff? BuffData { get; }
+        Buff BuffData { get; }
     }
 }

@@ -37,7 +37,7 @@ namespace MultiplayerARPG
         public NpcSellItem[] sellItems;
 
         // Craft Item
-        public ItemCraft itemCraft;
+        public ItemCraft itemCraft = new ItemCraft();
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog craftDoneDialog;
         [Output(connectionType = ConnectionType.Override)]

@@ -104,7 +104,7 @@ namespace MultiplayerARPG
             if (!_recachingBuff)
                 return _cacheBuff;
             _recachingBuff = false;
-            Buff tempBuff = Buff.Empty;
+            Buff tempBuff = null;
             BaseMonsterCharacterEntity loadedPrefab;
             if (GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
             {

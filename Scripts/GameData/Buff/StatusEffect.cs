@@ -9,8 +9,7 @@ namespace MultiplayerARPG
     {
         [Category("Status Effect Settings")]
         [SerializeField]
-        private Buff buff = Buff.Empty;
-
+        private Buff buff = new Buff();
         public Buff Buff
         {
             get { return buff; }

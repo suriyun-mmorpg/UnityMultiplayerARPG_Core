@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                 case BuffType.PotionBuff:
                     if (!GameInstance.Items.ContainsKey(dataId) || !GameInstance.Items[dataId].IsPotion())
                         return;
-                    tempBuff = (GameInstance.Items[dataId] as IPotionItem).BuffData.Value;
+                    tempBuff = (GameInstance.Items[dataId] as IPotionItem).BuffData;
                     isExtendDuration = tempBuff.isExtendDuration;
                     maxStack = tempBuff.GetMaxStack(level);
                     break;
@@ -63,8 +63,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < Buffs.Count; ++i)
             {
                 tempRestrictTags = Buffs[i].GetBuff().GetBuff().restrictTags;
-                if (tempRestrictTags != null && tempRestrictTags.Length > 0)
-                    _restrictBuffTags.AddRange(tempRestrictTags);
+                _restrictBuffTags.AddRange(tempRestrictTags);
             }
 
             if (!string.IsNullOrEmpty(tempBuff.tag) && _restrictBuffTags.Contains(tempBuff.tag))

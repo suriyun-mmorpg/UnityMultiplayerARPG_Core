@@ -21,15 +21,15 @@ namespace MultiplayerARPG
         [Range(0f, 1f)]
         [Tooltip("This is move speed rate while using this skill")]
         public float moveSpeedRateWhileUsingSkill = 0f;
-        public MovementRestriction movementRestrictionWhileUsingSkill;
-        public ActionRestriction useSkillRestriction;
-        public IncrementalInt consumeHp;
-        public IncrementalInt consumeMp;
-        public IncrementalInt consumeStamina;
-        public IncrementalFloat consumeHpRate;
-        public IncrementalFloat consumeMpRate;
-        public IncrementalFloat consumeStaminaRate;
-        public IncrementalFloat coolDownDuration;
+        public MovementRestriction movementRestrictionWhileUsingSkill = new MovementRestriction();
+        public ActionRestriction useSkillRestriction = new ActionRestriction();
+        public IncrementalInt consumeHp = new IncrementalInt();
+        public IncrementalInt consumeMp = new IncrementalInt();
+        public IncrementalInt consumeStamina = new IncrementalInt();
+        public IncrementalFloat consumeHpRate = new IncrementalFloat();
+        public IncrementalFloat consumeMpRate = new IncrementalFloat();
+        public IncrementalFloat consumeStaminaRate = new IncrementalFloat();
+        public IncrementalFloat coolDownDuration = new IncrementalFloat();
 
         [Category(2, "Skill Casting")]
         [Header("Casting Effects")]
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
 #endif
         [SerializeField]
         private AssetReferenceGameEffect[] addressableSkillCastEffects = new AssetReferenceGameEffect[0];
-        public IncrementalFloat castDuration;
+        public IncrementalFloat castDuration = new IncrementalFloat();
         public bool canBeInterruptedWhileCasting;
 
         [Header("Casted Effects")]
@@ -71,28 +71,28 @@ namespace MultiplayerARPG
 
         [Header("Required Equipments")]
         [Tooltip("If this is `TRUE`, character have to equip shield to use skill")]
-        public bool requireShield;
+        public bool requireShield = false;
 
         [Tooltip("Characters will be able to use skill if this list is empty or equipping one in this list")]
-        public WeaponType[] availableWeapons;
+        public WeaponType[] availableWeapons = new WeaponType[0];
 
         [Tooltip("Characters will be able to use skill if this list is empty or equipping one in this list")]
-        public ArmorType[] availableArmors;
+        public ArmorType[] availableArmors = new ArmorType[0];
 
         [Header("Required Vehicles")]
         [Tooltip("Characters will be able to use skill if this list is empty or driving one in this list")]
-        public VehicleType[] availableVehicles;
+        public VehicleType[] availableVehicles = new VehicleType[0];
 
         [Header("Requirements to Use")]
         [Tooltip("If this list is empty it won't decrease items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]
-        public ItemAmount[] requireItems;
+        public ItemAmount[] requireItems = new ItemAmount[0];
         [Tooltip("If `Require Ammo Type` is `Based On Weapon` it will decrease ammo based on ammo type which set to the weapon, amount to decrease ammo can be set to `Require Ammo Amount`. If weapon has no require ammo, it will not able to use skill. If `Require Ammo Type` is `Based On Skill`, it will decrease ammo based on `Require Ammos` setting")]
-        public RequireAmmoType requireAmmoType;
+        public RequireAmmoType requireAmmoType = RequireAmmoType.None;
         [FormerlySerializedAs("useAmmoAmount")]
         [Tooltip("It will be used while `Require Ammo Type` is `Based On Weapon` to decrease ammo")]
-        public int requireAmmoAmount;
+        public int requireAmmoAmount = 0;
         [Tooltip("If this list is empty it won't decrease ammo items from inventory. It will decrease one kind of item in this list when using skill, not all items in this list")]
-        public AmmoTypeAmount[] requireAmmos;
+        public AmmoTypeAmount[] requireAmmos = new AmmoTypeAmount[0];
 
         public virtual string TypeTitle
         {
@@ -590,31 +590,31 @@ namespace MultiplayerARPG
 
         public virtual bool TryGetBuff(out Buff buff)
         {
-            buff = Buff.Empty;
+            buff = null;
             return false;
         }
 
         public virtual bool TryGetDebuff(out Buff debuff)
         {
-            debuff = Buff.Empty;
+            debuff = null;
             return false;
         }
 
         public virtual bool TryGetSummon(out SkillSummon summon)
         {
-            summon = SkillSummon.Empty;
+            summon = null;
             return false;
         }
 
         public virtual bool TryGetMount(out SkillMount mount)
         {
-            mount = SkillMount.Empty;
+            mount = null;
             return false;
         }
 
         public virtual bool TryGetItemCraft(out ItemCraft itemCraft)
         {
-            itemCraft = ItemCraft.Empty;
+            itemCraft = null;
             return false;
         }
 

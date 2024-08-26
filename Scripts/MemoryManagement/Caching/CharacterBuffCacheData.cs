@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             if (!_recachingBuff)
                 return _cacheBuff;
             _recachingBuff = false;
-            Buff tempBuff = Buff.Empty;
+            Buff tempBuff = null;
             BaseSkill tempSkill;
             BaseItem tempItem;
             GuildSkill tempGuildSkill;
@@ -102,7 +102,7 @@ namespace MultiplayerARPG
                 case BuffType.PotionBuff:
                     tempItem = GetItem();
                     if (tempItem.IsPotion())
-                        tempBuff = (tempItem as IPotionItem).BuffData.Value;
+                        tempBuff = (tempItem as IPotionItem).BuffData;
                     break;
                 case BuffType.GuildSkillBuff:
                     tempGuildSkill = GetGuildSkill();

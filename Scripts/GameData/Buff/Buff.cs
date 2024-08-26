@@ -4,121 +4,119 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial struct Buff
+    public partial class Buff
     {
-        public static readonly Buff Empty = new Buff();
-
         [Header("Generic Settings")]
         public string tag;
-        public string[] restrictTags;
+        public string[] restrictTags = new string[0];
         [Tooltip("If it is not enable, it will have 100% chance to apply the buff")]
         public bool enableApplyChance;
         [Tooltip("1 = 100% chance to apply the buff")]
-        public IncrementalFloat applyChance;
+        public IncrementalFloat applyChance = new IncrementalFloat();
 
         [Header("Settings for Passive and Active Skills")]
         [Tooltip("Increase character's stats.")]
-        public CharacterStatsIncremental increaseStats;
+        public CharacterStatsIncremental increaseStats = new CharacterStatsIncremental();
         [Tooltip("Increase character's stats rate.")]
-        public CharacterStatsIncremental increaseStatsRate;
+        public CharacterStatsIncremental increaseStatsRate = new CharacterStatsIncremental();
         [Tooltip("Increase character's attributes.")]
         [ArrayElementTitle("attribute")]
-        public AttributeIncremental[] increaseAttributes;
+        public AttributeIncremental[] increaseAttributes = new AttributeIncremental[0];
         [Tooltip("Increase character's attributes rate.")]
         [ArrayElementTitle("attribute")]
-        public AttributeIncremental[] increaseAttributesRate;
+        public AttributeIncremental[] increaseAttributesRate = new AttributeIncremental[0];
         [Tooltip("Increase character's resistances.")]
         [ArrayElementTitle("damageElement")]
-        public ResistanceIncremental[] increaseResistances;
+        public ResistanceIncremental[] increaseResistances = new ResistanceIncremental[0];
         [Tooltip("Increase character's armors.")]
         [ArrayElementTitle("damageElement")]
-        public ArmorIncremental[] increaseArmors;
+        public ArmorIncremental[] increaseArmors = new ArmorIncremental[0];
         [Tooltip("Increase character's armors rate.")]
         [ArrayElementTitle("damageElement")]
-        public ArmorIncremental[] increaseArmorsRate;
+        public ArmorIncremental[] increaseArmorsRate = new ArmorIncremental[0];
         [Tooltip("Increase character's damages.")]
         [ArrayElementTitle("damageElement")]
-        public DamageIncremental[] increaseDamages;
+        public DamageIncremental[] increaseDamages = new DamageIncremental[0];
         [Tooltip("Increase character's damages rate.")]
         [ArrayElementTitle("damageElement")]
-        public DamageIncremental[] increaseDamagesRate;
+        public DamageIncremental[] increaseDamagesRate = new DamageIncremental[0];
         [Tooltip("Increase character's status effect resistance.")]
         [ArrayElementTitle("statusEffect")]
-        public StatusEffectResistanceIncremental[] increaseStatusEffectResistances;
+        public StatusEffectResistanceIncremental[] increaseStatusEffectResistances = new StatusEffectResistanceIncremental[0];
         [Header("Settings for Active Skills only")]
         [Tooltip("If duration less than or equals to 0, buff stats won't applied only recovery will be applied. This won't be applied to monster's summoner.")]
-        public IncrementalFloat duration;
+        public IncrementalFloat duration = new IncrementalFloat();
         [Tooltip("Recover character's current HP. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryHp;
+        public IncrementalInt recoveryHp = new IncrementalInt();
         [Tooltip("Recover character's current MP. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryMp;
+        public IncrementalInt recoveryMp = new IncrementalInt();
         [Tooltip("Recover character's current stamina. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryStamina;
+        public IncrementalInt recoveryStamina = new IncrementalInt();
         [Tooltip("Recover character's current food. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryFood;
+        public IncrementalInt recoveryFood = new IncrementalInt();
         [Tooltip("Recover character's current water. This won't be applied to monster's summoner.")]
-        public IncrementalInt recoveryWater;
+        public IncrementalInt recoveryWater = new IncrementalInt();
         [Tooltip("Set buffs that you want to remove when this buff is appied here.")]
-        public BuffRemoval[] buffRemovals;
+        public BuffRemoval[] buffRemovals = new BuffRemoval[0];
         [Tooltip("Applies damage within duration to character. This won't be applied to monster's summoner.")]
         [ArrayElementTitle("damageElement")]
-        public DamageIncremental[] damageOverTimes;
+        public DamageIncremental[] damageOverTimes = new DamageIncremental[0];
         [Tooltip("`disallowMove`, `disallowAttack`, `disallowUseSkill`, `disallowUseItem` and `freezeAnimation` will be used if this is `None`")]
-        public AilmentPresets ailment;
+        public AilmentPresets ailment = AilmentPresets.None;
         [Tooltip("Disallow character to move while applied. This won't be applied to monster's summoner.")]
-        public bool disallowMove;
-        public bool disallowSprint;
-        public bool disallowWalk;
-        public bool disallowJump;
-        public bool disallowDash;
-        public bool disallowCrouch;
-        public bool disallowCrawl;
+        public bool disallowMove = false;
+        public bool disallowSprint = false;
+        public bool disallowWalk = false;
+        public bool disallowJump = false;
+        public bool disallowDash = false;
+        public bool disallowCrouch = false;
+        public bool disallowCrawl = false;
         [Tooltip("Disallow character to attack while applied. This won't be applied to monster's summoner.")]
-        public bool disallowAttack;
+        public bool disallowAttack = false;
         [Tooltip("Disallow character to use skill while applied. This won't be applied to monster's summoner.")]
-        public bool disallowUseSkill;
+        public bool disallowUseSkill = false;
         [Tooltip("Disallow character to use item while applied. This won't be applied to monster's summoner.")]
-        public bool disallowUseItem;
+        public bool disallowUseItem = false;
         [Tooltip("Freeze animation while this buff is applied")]
-        public bool freezeAnimation;
+        public bool freezeAnimation = false;
         [Tooltip("1 = 100% chance to remove this buff when attacking")]
-        public IncrementalFloat removeBuffWhenAttackChance;
+        public IncrementalFloat removeBuffWhenAttackChance = new IncrementalFloat();
         [Tooltip("1 = 100% chance to remove this buff when attacked")]
-        public IncrementalFloat removeBuffWhenAttackedChance;
+        public IncrementalFloat removeBuffWhenAttackedChance = new IncrementalFloat();
         [Tooltip("1 = 100% chance to remove this buff when using skill")]
-        public IncrementalFloat removeBuffWhenUseSkillChance;
+        public IncrementalFloat removeBuffWhenUseSkillChance = new IncrementalFloat();
         [Tooltip("1 = 100% chance to remove this buff when using item")]
-        public IncrementalFloat removeBuffWhenUseItemChance;
+        public IncrementalFloat removeBuffWhenUseItemChance = new IncrementalFloat();
         [Tooltip("1 = 100% chance to remove this buff when picking item up")]
-        public IncrementalFloat removeBuffWhenPickupItemChance;
+        public IncrementalFloat removeBuffWhenPickupItemChance = new IncrementalFloat();
         [Tooltip("Hide character. This won't be applied to monster's summoner.")]
-        public bool isHide;
+        public bool isHide = false;
         [Tooltip("Reveals hidding characters")]
-        public bool isRevealsHide;
+        public bool isRevealsHide = false;
         [Tooltip("Can't see other characters")]
-        public bool isBlind;
+        public bool isBlind = false;
         [Tooltip("Mute character movement sound while applied. This won't be applied to monster's summoner.")]
-        public bool muteFootstepSound;
+        public bool muteFootstepSound = false;
         [Tooltip("Status effects that can be applied to the attacker when attacking.")]
-        public StatusEffectApplying[] selfStatusEffectsWhenAttacking;
+        public StatusEffectApplying[] selfStatusEffectsWhenAttacking = new StatusEffectApplying[0];
         [Tooltip("Status effects that can be applied to the enemy when attacking.")]
-        public StatusEffectApplying[] enemyStatusEffectsWhenAttacking;
+        public StatusEffectApplying[] enemyStatusEffectsWhenAttacking = new StatusEffectApplying[0];
         [Tooltip("Status effects that can be applied to the attacker when attacked.")]
-        public StatusEffectApplying[] selfStatusEffectsWhenAttacked;
+        public StatusEffectApplying[] selfStatusEffectsWhenAttacked = new StatusEffectApplying[0];
         [Tooltip("Status effects that can be applied to the enemy when attacked.")]
-        public StatusEffectApplying[] enemyStatusEffectsWhenAttacked;
+        public StatusEffectApplying[] enemyStatusEffectsWhenAttacked = new StatusEffectApplying[0];
         [Tooltip("If this is `TRUE` it will not be removed when the character dies")]
-        public bool doNotRemoveOnDead;
+        public bool doNotRemoveOnDead = false;
         [Tooltip("If this is `TRUE` it will extend duration when applying buff, not remove and re-apply")]
-        public bool isExtendDuration;
+        public bool isExtendDuration = false;
         [Tooltip("Max stack to applies buff, it won't be used while `isExtendDuration` is `TRUE`")]
-        public IncrementalInt maxStack;
+        public IncrementalInt maxStack = new IncrementalInt();
         [Tooltip("Game effects which appearing on character while applied. This won't be applied to monster's summoner.")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [AddressableAssetConversion(nameof(addressableEffects))]
-        public GameEffect[] effects;
+        public GameEffect[] effects = new GameEffect[0];
 #endif
-        public AssetReferenceGameEffect[] addressableEffects;
+        public AssetReferenceGameEffect[] addressableEffects = new AssetReferenceGameEffect[0];
 
         public GameEffect[] Effects
         {

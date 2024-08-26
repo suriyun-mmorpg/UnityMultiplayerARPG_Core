@@ -61,9 +61,9 @@ namespace MultiplayerARPG
         public Buff buff;
 
         [Category(5, "Summon/Mount/Item Craft")]
-        public SkillSummon summon;
-        public SkillMount mount;
-        public ItemCraft itemCraft;
+        public SkillSummon summon = new SkillSummon();
+        public SkillMount mount = new SkillMount();
+        public ItemCraft itemCraft = new ItemCraft();
 
         [System.NonSerialized]
         private Dictionary<Attribute, float> _cacheEffectivenessAttributes;

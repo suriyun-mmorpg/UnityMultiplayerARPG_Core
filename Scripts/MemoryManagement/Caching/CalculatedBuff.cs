@@ -86,30 +86,33 @@ namespace MultiplayerARPG
 
             Clear();
 
-            _cacheDuration = buff.GetDuration(level);
-            _cacheRecoveryHp = buff.GetRecoveryHp(level);
-            _cacheRecoveryMp = buff.GetRecoveryMp(level);
-            _cacheRecoveryStamina = buff.GetRecoveryStamina(level);
-            _cacheRecoveryFood = buff.GetRecoveryFood(level);
-            _cacheRecoveryWater = buff.GetRecoveryWater(level);
-            _cacheIncreaseStats = buff.GetIncreaseStats(level);
-            _cacheIncreaseStatsRate = buff.GetIncreaseStatsRate(level);
-            _cacheIncreaseAttributes = buff.GetIncreaseAttributes(level, _cacheIncreaseAttributes);
-            _cacheIncreaseAttributesRate = buff.GetIncreaseAttributesRate(level, _cacheIncreaseAttributesRate);
-            _cacheIncreaseResistances = buff.GetIncreaseResistances(level, _cacheIncreaseResistances);
-            _cacheIncreaseArmors = buff.GetIncreaseArmors(level, _cacheIncreaseArmors);
-            _cacheIncreaseArmorsRate = buff.GetIncreaseArmorsRate(level, _cacheIncreaseArmorsRate);
-            _cacheIncreaseDamages = buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
-            _cacheIncreaseDamagesRate = buff.GetIncreaseDamagesRate(level, _cacheIncreaseDamagesRate);
-            _cacheIncreaseStatusEffectResistances = buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
-            _cacheBuffRemovals = buff.GetBuffRemovals(level, _cacheBuffRemovals);
-            _cacheDamageOverTimes = buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
-            _cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
-            _cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
-            _cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);
-            _cacheRemoveBuffWhenUseItemChance = buff.GetRemoveBuffWhenUseItemChance(level);
-            _cacheRemoveBuffWhenPickupItemChance = buff.GetRemoveBuffWhenPickupItemChance(level);
-            _cacheMaxStack = buff.GetMaxStack(level);
+            if (buff != null)
+            {
+                _cacheDuration = buff.GetDuration(level);
+                _cacheRecoveryHp = buff.GetRecoveryHp(level);
+                _cacheRecoveryMp = buff.GetRecoveryMp(level);
+                _cacheRecoveryStamina = buff.GetRecoveryStamina(level);
+                _cacheRecoveryFood = buff.GetRecoveryFood(level);
+                _cacheRecoveryWater = buff.GetRecoveryWater(level);
+                _cacheIncreaseStats = buff.GetIncreaseStats(level);
+                _cacheIncreaseStatsRate = buff.GetIncreaseStatsRate(level);
+                _cacheIncreaseAttributes = buff.GetIncreaseAttributes(level, _cacheIncreaseAttributes);
+                _cacheIncreaseAttributesRate = buff.GetIncreaseAttributesRate(level, _cacheIncreaseAttributesRate);
+                _cacheIncreaseResistances = buff.GetIncreaseResistances(level, _cacheIncreaseResistances);
+                _cacheIncreaseArmors = buff.GetIncreaseArmors(level, _cacheIncreaseArmors);
+                _cacheIncreaseArmorsRate = buff.GetIncreaseArmorsRate(level, _cacheIncreaseArmorsRate);
+                _cacheIncreaseDamages = buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
+                _cacheIncreaseDamagesRate = buff.GetIncreaseDamagesRate(level, _cacheIncreaseDamagesRate);
+                _cacheIncreaseStatusEffectResistances = buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
+                _cacheBuffRemovals = buff.GetBuffRemovals(level, _cacheBuffRemovals);
+                _cacheDamageOverTimes = buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
+                _cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
+                _cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
+                _cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);
+                _cacheRemoveBuffWhenUseItemChance = buff.GetRemoveBuffWhenUseItemChance(level);
+                _cacheRemoveBuffWhenPickupItemChance = buff.GetRemoveBuffWhenPickupItemChance(level);
+                _cacheMaxStack = buff.GetMaxStack(level);
+            }
 
             if (GameExtensionInstance.onBuildCalculatedBuff != null)
                 GameExtensionInstance.onBuildCalculatedBuff(this);

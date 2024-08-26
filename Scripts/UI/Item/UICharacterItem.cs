@@ -1389,14 +1389,14 @@ namespace MultiplayerARPG
 
             if (uiBuff != null)
             {
-                if (ItemWithBuffData == null || !ItemWithBuffData.BuffData.HasValue)
+                if (ItemWithBuffData == null || ItemWithBuffData.BuffData == null)
                 {
                     uiBuff.Hide();
                 }
                 else
                 {
                     uiBuff.Show();
-                    uiBuff.Data = new UIBuffData(ItemWithBuffData.BuffData.Value, Level);
+                    uiBuff.Data = new UIBuffData(ItemWithBuffData.BuffData, Level);
                 }
             }
 
