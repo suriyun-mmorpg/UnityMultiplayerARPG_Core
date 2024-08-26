@@ -98,6 +98,7 @@ namespace MultiplayerARPG
             entity.ControllerPrefab = controllerPrefab;
             entity.AddressableControllerPrefab = addressableControllerPrefab;
             entity.Race = race;
+            this.InvokeInstanceDevExtMethods("Setup", entity);
         }
     }
 }
