@@ -152,7 +152,7 @@ namespace MultiplayerARPG
         public void Setup(BasePlayerCharacterEntity entity)
         {
             entity.MetaDataId = DataId;
-            entity.CharacterDatabases = CharacterDatabases;
+            entity.CharacterDatabases = (PlayerCharacter[])CharacterDatabases.Clone();
             entity.ControllerPrefab = ControllerPrefab;
             entity.AddressableControllerPrefab = AddressableControllerPrefab;
             entity.Race = Race;
