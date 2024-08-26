@@ -28,7 +28,7 @@ namespace MultiplayerARPG
 
         public static bool TryGetEntityPrefab(this ICharacterData data, out BaseCharacterEntity prefab, out int? metaDataId)
         {
-            int hashAssetId = GameInstance.Singleton.GetCharacterEntityHashAssetId(data.EntityId, out metaDataId);
+            int hashAssetId = GameInstance.GetCharacterEntityHashAssetId(data.EntityId, out metaDataId);
             if (metaDataId.HasValue)
             {
                 if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.EntityPrefab != null)
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
 
         public static bool TryGetEntityAddressablePrefab(this ICharacterData data, out AssetReferenceBaseCharacterEntity assetRef, out int? metaDataId)
         {
-            int hashAssetId = GameInstance.Singleton.GetCharacterEntityHashAssetId(data.EntityId, out metaDataId);
+            int hashAssetId = GameInstance.GetCharacterEntityHashAssetId(data.EntityId, out metaDataId);
             if (metaDataId.HasValue)
             {
                 if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.AddressableEntityPrefab.IsDataValid())

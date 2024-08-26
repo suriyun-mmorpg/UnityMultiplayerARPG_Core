@@ -91,14 +91,13 @@ namespace MultiplayerARPG
             return 0;
         }
 
-        public async UniTask<BasePlayerCharacterEntity> GetOrLoadAssetAsync()
+        public void Setup(BasePlayerCharacterEntity entity)
         {
-            BasePlayerCharacterEntity loadedPrefab = await AddressableEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(EntityPrefab);
-            loadedPrefab.CharacterDatabases = characterDatabases;
-            loadedPrefab.ControllerPrefab = controllerPrefab;
-            loadedPrefab.AddressableControllerPrefab = AddressableControllerPrefab;
-            loadedPrefab.Race = Race;
-            return loadedPrefab;
+            entity.MetaDataId = DataId;
+            entity.CharacterDatabases = characterDatabases;
+            entity.ControllerPrefab = controllerPrefab;
+            entity.AddressableControllerPrefab = addressableControllerPrefab;
+            entity.Race = race;
         }
     }
 }

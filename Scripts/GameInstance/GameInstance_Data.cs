@@ -1093,7 +1093,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public int GetCharacterEntityHashAssetId(int entityId, out int? metaDataId)
+        public static int GetCharacterEntityHashAssetId(int entityId, out int? metaDataId)
         {
             metaDataId = null;
             if (PlayerCharacterEntityMetaDataList.TryGetValue(entityId, out PlayerCharacterEntityMetaData metaData))
@@ -1106,6 +1106,16 @@ namespace MultiplayerARPG
                 return entityId;
             }
             return 0;
+        }
+
+        public static void SetupByMetaData(BasePlayerCharacterEntity playerCharacterEntity, int? metaDataId)
+        {
+            if (playerCharacterEntity == null)
+                return;
+            playerCharacterEntity.MetaDataId = metaDataId;
+            if (!metaDataId.HasValue || !PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData))
+                return;
+            metaData.Setup(playerCharacterEntity);
         }
     }
 }
