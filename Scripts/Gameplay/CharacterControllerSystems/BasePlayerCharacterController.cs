@@ -1,7 +1,5 @@
 ﻿using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
 using UnityEngine;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -124,14 +122,14 @@ namespace MultiplayerARPG
         {
         }
 
-        protected virtual async void Setup(BasePlayerCharacterEntity characterEntity)
+        protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
             BaseUISceneGameplay tempPrefab = null;
 #if !EXCLUDE_PREFAB_REFS
             tempPrefab = CurrentGameInstance.UISceneGameplayPrefab;
 #endif
             AssetReferenceBaseUISceneGameplay tempAddressablePrefab = CurrentGameInstance.AddressableUISceneGameplayPrefab;
-            BaseUISceneGameplay loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+            BaseUISceneGameplay loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
             if (loadedPrefab != null)
                 UISceneGameplay = Instantiate(loadedPrefab);
             if (UISceneGameplay != null)
