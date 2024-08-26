@@ -267,7 +267,7 @@ namespace MultiplayerARPG
                 {
                     if (RaceToggles.Count > 0 && prefab.Race != null && !SelectedRaces.Contains(prefab.Race))
                         continue;
-                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, true);
+                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
                     data.CharacterName = prefab.EntityTitle;
                     result.Add(data);
                     _playerCharactersByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
@@ -292,7 +292,7 @@ namespace MultiplayerARPG
                         Addressables.Release(asyncOps[i]);
                         continue;
                     }
-                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, true);
+                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
                     data.CharacterName = prefab.EntityTitle;
                     result.Add(data);
                     _playerCharactersByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
@@ -319,7 +319,7 @@ namespace MultiplayerARPG
                     else if (entry.EntityPrefab != null)
                     {
                         BasePlayerCharacterEntity prefab = entry.EntityPrefab;
-                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, true);
+                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
                         data.CharacterName = entry.Title;
                         data.EntityId = entry.DataId;
                         result.Add(data);
@@ -330,7 +330,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < loadTasks.Count; ++i)
                 {
                     BasePlayerCharacterEntity prefab = asyncOps[i].Result;
-                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, true);
+                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
                     data.CharacterName = loadMetaDataList[i].Title;
                     data.EntityId = loadMetaDataList[i].DataId;
                     result.Add(data);
