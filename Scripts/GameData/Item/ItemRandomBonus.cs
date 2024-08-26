@@ -3,20 +3,20 @@
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct ItemRandomBonus
+    public partial class ItemRandomBonus
     {
         [Tooltip("0 = Unlimit")]
-        public int maxRandomStatsAmount;
-        public RandomCharacterStats randomCharacterStats;
-        public RandomCharacterStats randomCharacterStatsRate;
-        public AttributeRandomAmount[] randomAttributeAmounts;
-        public AttributeRandomAmount[] randomAttributeAmountRates;
-        public ResistanceRandomAmount[] randomResistanceAmounts;
-        public ArmorRandomAmount[] randomArmorAmounts;
-        public ArmorRandomAmount[] randomArmorAmountRates;
-        public DamageRandomAmount[] randomDamageAmounts;
-        public DamageRandomAmount[] randomDamageAmountRates;
-        public SkillRandomLevel[] randomSkillLevels;
+        public int maxRandomStatsAmount = 0;
+        public RandomCharacterStats randomCharacterStats = new RandomCharacterStats();
+        public RandomCharacterStats randomCharacterStatsRate = new RandomCharacterStats();
+        public AttributeRandomAmount[] randomAttributeAmounts = new AttributeRandomAmount[0];
+        public AttributeRandomAmount[] randomAttributeAmountRates = new AttributeRandomAmount[0];
+        public ResistanceRandomAmount[] randomResistanceAmounts = new ResistanceRandomAmount[0];
+        public ArmorRandomAmount[] randomArmorAmounts = new ArmorRandomAmount[0];
+        public ArmorRandomAmount[] randomArmorAmountRates = new ArmorRandomAmount[0];
+        public DamageRandomAmount[] randomDamageAmounts = new DamageRandomAmount[0];
+        public DamageRandomAmount[] randomDamageAmountRates = new DamageRandomAmount[0];
+        public SkillRandomLevel[] randomSkillLevels = new SkillRandomLevel[0];
 
         public void PrepareRelatesData()
         {
