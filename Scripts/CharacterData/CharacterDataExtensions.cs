@@ -73,7 +73,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning($"[InstantiateModel] Cannot find character entity with id: {data.EntityId}");
                 return null;
             }
-            result.MetaDataId = metaDataId;
+            GameInstance.SetupByMetaData(result as BasePlayerCharacterEntity, metaDataId);
             LiteNetLibBehaviour[] networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
             foreach (LiteNetLibBehaviour networkBehaviour in networkBehaviours)
             {
