@@ -6,6 +6,7 @@ namespace MultiplayerARPG
         {
             base.Clean();
             characterDatabases.Nulling();
+            characterDatabases = null;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
             controllerPrefab = null;
 #endif
