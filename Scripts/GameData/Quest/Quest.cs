@@ -39,6 +39,10 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("canRepeat")]
         public QuestRepeatType repeatType;
         public bool canAbandon = true;
+        [FormerlySerializedAs("nextAssignQuest")]
+        public Quest[] nextAssignQuests = new Quest[0];
+        [FormerlySerializedAs("autoTrack")]
+        public bool autoTrackQuest;
 
         [System.NonSerialized]
         private HashSet<int> _cacheKillMonsterIds;

@@ -1,6 +1,5 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -41,6 +40,8 @@ namespace MultiplayerARPG
                 quests[indexOfQuest] = characterQuest;
             else
                 quests.Add(characterQuest);
+            if (quest.autoTrackQuest)
+                ChangeQuestTracking(questDataId, true);
             GameInstance.ServerLogHandlers.LogQuestAccept(this, quest);
         }
 
@@ -166,6 +167,19 @@ namespace MultiplayerARPG
             checked
             {
                 SkillPoint += quest.rewardSkillPoints;
+            }
+            // Assign next quest
+            if (quest.nextAssignQuests.Length > 0)
+            {
+                foreach (Quest nextQuest in quest.nextAssignQuests)
+                {
+                    // Already assigned?
+                    int indexOfNextQuest = this.IndexOfQuest(nextQuest.DataId);
+                    if (indexOfNextQuest >= 0)
+                        continue;
+                    // Assign a new quest
+                    AcceptQuest(nextQuest.DataId);
+                }
             }
             // Set quest state
             characterQuest.isComplete = true;
