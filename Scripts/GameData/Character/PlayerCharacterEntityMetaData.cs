@@ -152,18 +152,13 @@ namespace MultiplayerARPG
         public void Setup(BasePlayerCharacterEntity entity)
         {
             entity.MetaDataId = DataId;
-            entity.CharacterDatabases = (PlayerCharacter[])CharacterDatabases.Clone();
-            entity.ControllerPrefab = ControllerPrefab;
-            entity.AddressableControllerPrefab = AddressableControllerPrefab;
-            entity.Race = Race;
-            if (overrideFpsModel)
-            {
-                entity.ModelManager.FpsModelPrefab = FpsModelPrefab;
-                entity.ModelManager.AddressableFpsModelPrefab = AddressableFpsModelPrefab;
-                entity.ModelManager.FpsModelPositionOffsets = FpsModelPositionOffsets;
-                entity.ModelManager.FpsModelRotationOffsets = FpsModelRotationOffsets;
-            }
             this.InvokeInstanceDevExtMethods("Setup", entity);
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddCharacters(CharacterDatabases);
         }
     }
 }

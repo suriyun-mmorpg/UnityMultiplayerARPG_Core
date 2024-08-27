@@ -93,7 +93,7 @@ namespace MultiplayerARPG
         [Category(5, "Character Settings")]
         [SerializeField]
         private CharacterRace race;
-        public CharacterRace Race
+        public virtual CharacterRace Race
         {
             get { return race; }
             set { race = value; }

@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Cysharp.Threading.Tasks;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -33,6 +32,8 @@ namespace MultiplayerARPG
             get
             {
 #if !EXCLUDE_PREFAB_REFS
+                if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData) && metaData.OverrideFpsModel)
+                    return metaData.FpsModelPrefab;
                 return fpsModelPrefab;
 #else
                 return null;
@@ -50,7 +51,12 @@ namespace MultiplayerARPG
         protected AssetReferenceBaseCharacterModel addressableFpsModelPrefab;
         public AssetReferenceBaseCharacterModel AddressableFpsModelPrefab
         {
-            get { return addressableFpsModelPrefab; }
+            get
+            {
+                if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData) && metaData.OverrideFpsModel)
+                    return metaData.AddressableFpsModelPrefab;
+                return addressableFpsModelPrefab;
+            }
             set { addressableFpsModelPrefab = value; }
         }
 
@@ -60,7 +66,12 @@ namespace MultiplayerARPG
         private Vector3 fpsModelPositionOffsets = Vector3.zero;
         public Vector3 FpsModelPositionOffsets
         {
-            get { return fpsModelPositionOffsets; }
+            get
+            {
+                if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData) && metaData.OverrideFpsModel)
+                    return metaData.FpsModelPositionOffsets;
+                return fpsModelPositionOffsets;
+            }
             set { fpsModelPositionOffsets = value; }
         }
 
@@ -69,7 +80,12 @@ namespace MultiplayerARPG
         private Vector3 fpsModelRotationOffsets = Vector3.zero;
         public Vector3 FpsModelRotationOffsets
         {
-            get { return fpsModelRotationOffsets; }
+            get
+            {
+                if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData) && metaData.OverrideFpsModel)
+                    return metaData.FpsModelRotationOffsets;
+                return fpsModelRotationOffsets;
+            }
             set { fpsModelRotationOffsets = value; }
         }
 
@@ -115,6 +131,14 @@ namespace MultiplayerARPG
             ActiveTpsModel = null;
             ActiveFpsModel = null;
             MainFpsModel = null;
+        }
+
+        public bool TryGetMetaData(out PlayerCharacterEntityMetaData metaData)
+        {
+            metaData = null;
+            if (Entity is BasePlayerCharacterEntity playerCharacterEntity)
+                return playerCharacterEntity.TryGetMetaData(out metaData);
+            return false;
         }
 
         internal byte InitTpsModel(BaseCharacterModel model)

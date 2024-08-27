@@ -10,6 +10,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData, IActivatableEntity
     {
+
         [Category("Character Settings")]
         [Tooltip("This is list which used as choice of character classes when create character")]
         [SerializeField]
@@ -17,7 +18,12 @@ namespace MultiplayerARPG
         protected PlayerCharacter[] characterDatabases = new PlayerCharacter[0];
         public PlayerCharacter[] CharacterDatabases
         {
-            get { return characterDatabases; }
+            get
+            {
+                if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData))
+                    return metaData.CharacterDatabases;
+                return characterDatabases;
+            }
             set { characterDatabases = value; }
         }
 
@@ -31,6 +37,8 @@ namespace MultiplayerARPG
             get
             {
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+                if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData))
+                    return metaData.ControllerPrefab;
                 return controllerPrefab;
 #else
                 return null;
@@ -49,7 +57,12 @@ namespace MultiplayerARPG
         protected AssetReferenceBasePlayerCharacterController addressableControllerPrefab;
         public AssetReferenceBasePlayerCharacterController AddressableControllerPrefab
         {
-            get { return addressableControllerPrefab; }
+            get
+            {
+                if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData))
+                    return metaData.AddressableControllerPrefab;
+                return addressableControllerPrefab;
+            }
             set { addressableControllerPrefab = value; }
         }
 
@@ -86,6 +99,25 @@ namespace MultiplayerARPG
         public PlayerCharacterPkComponent Pk
         {
             get; private set;
+        }
+
+        public override CharacterRace Race
+        {
+            get
+            {
+                if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData))
+                    return metaData.Race;
+                return base.Race;
+            }
+            set { base.Race = value; }
+        }
+
+        public bool TryGetMetaData(out PlayerCharacterEntityMetaData metaData)
+        {
+            metaData = null;
+            if (!MetaDataId.HasValue || !GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(MetaDataId.Value, out metaData))
+                return false;
+            return true;
         }
 
         public int IndexOfCharacterDatabase(int dataId)
