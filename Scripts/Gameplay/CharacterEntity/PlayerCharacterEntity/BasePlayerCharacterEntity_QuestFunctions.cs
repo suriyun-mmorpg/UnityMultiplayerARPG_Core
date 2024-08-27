@@ -46,7 +46,7 @@ namespace MultiplayerARPG
 
         public virtual void AbandonQuest(int questDataId)
         {
-            if (!GameInstance.Quests.TryGetValue(questDataId, out Quest quest))
+            if (!GameInstance.Quests.TryGetValue(questDataId, out Quest quest) && quest.canAbandon)
                 return;
             int indexOfQuest = this.IndexOfQuest(questDataId);
             if (indexOfQuest < 0)

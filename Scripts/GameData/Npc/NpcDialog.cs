@@ -217,14 +217,15 @@ namespace MultiplayerARPG
                     if (index >= 0)
                     {
                         characterQuest = characterEntity.Quests[index];
+                        Quest quest = characterQuest.GetQuest();
                         if (!characterQuest.isComplete)
                         {
-                            if (!characterQuest.IsAllTasksDoneAndIsCompletingTarget(characterEntity, characterEntity.GetTargetEntity() as NpcEntity))
-                                menuActions.Add(abandonMenuAction);
-                            else
+                            if (characterQuest.IsAllTasksDoneAndIsCompletingTarget(characterEntity, characterEntity.GetTargetEntity() as NpcEntity))
                                 menuActions.Add(completeMenuAction);
+                            else if (quest.canAbandon)
+                                menuActions.Add(abandonMenuAction);
                         }
-                        else if (characterEntity.Quests[index].GetQuest().CanReceiveQuest(characterEntity))
+                        else if (quest.CanReceiveQuest(characterEntity))
                         {
                             menuActions.Add(acceptMenuAction);
                             menuActions.Add(declineMenuAction);

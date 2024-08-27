@@ -38,6 +38,7 @@ namespace MultiplayerARPG
         public ItemRandomByWeight[] randomRewardItems = new ItemRandomByWeight[0];
         [FormerlySerializedAs("canRepeat")]
         public QuestRepeatType repeatType;
+        public bool canAbandon = true;
 
         [System.NonSerialized]
         private HashSet<int> _cacheKillMonsterIds;
@@ -178,7 +179,8 @@ namespace MultiplayerARPG
                         hasTaskChanges = true;
                         randomTask.tasks[j] = task;
                     }
-                    if (hasTaskChanges) {
+                    if (hasTaskChanges)
+                    {
                         hasChanges = true;
                         randomTasks[i] = randomTask;
                     }
