@@ -983,7 +983,7 @@ namespace MultiplayerARPG
             if (intDamage < 0)
                 intDamage = 0;
             character.CurrentHp -= intDamage;
-            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.NormalDamage, intDamage, CharacterItem.Empty, null, 0, CharacterBuff.Empty);
+            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.FallDamage, intDamage, CharacterItem.Empty, null, 0, CharacterBuff.Empty);
             if (character.IsDead())
             {
                 // Dead by itself, so instigator is itself

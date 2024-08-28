@@ -19,5 +19,6 @@
         HpLeech,
         MpLeech,
         StaminaLeech,
+        FallDamage,
     }
 }
