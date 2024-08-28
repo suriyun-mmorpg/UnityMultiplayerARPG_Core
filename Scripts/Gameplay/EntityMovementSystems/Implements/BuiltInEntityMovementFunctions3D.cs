@@ -384,6 +384,12 @@ namespace MultiplayerARPG
             else if (_isUnderWater)
                 _tempMovementState |= MovementState.IsUnderWater;
 
+            if (_isAirborne || _isClimbing || _isUnderWater)
+            {
+                if (_tempExtraMovementState == ExtraMovementState.IsCrouching || _tempExtraMovementState == ExtraMovementState.IsCrawling)
+                    _tempExtraMovementState = ExtraMovementState.None;
+            }
+
             if (_isClimbing)
                 UpdateClimbMovement(deltaTime);
             else
@@ -701,7 +707,7 @@ namespace MultiplayerARPG
                 if (_pauseMovementCountDown > 0f)
                 {
                     // Remove movement from movestate while pausing movement
-                    _tempMovementState ^= MovementState.Forward | MovementState.Backward | MovementState.Left | MovementState.Right;
+                    _tempMovementState &= ~(MovementState.Forward | MovementState.Backward | MovementState.Left | MovementState.Right);
                 }
             }
 
