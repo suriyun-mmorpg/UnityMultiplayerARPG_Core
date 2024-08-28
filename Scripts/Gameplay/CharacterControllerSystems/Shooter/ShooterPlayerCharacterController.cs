@@ -784,6 +784,12 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            else
+            {
+                _toggleCrouchOn = false;
+                _toggleCrawlOn = false;
+            }
+            
             if (_moveDirection.magnitude > 0f)
             {
                 switch (mode)
