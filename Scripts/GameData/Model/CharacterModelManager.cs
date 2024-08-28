@@ -170,10 +170,10 @@ namespace MultiplayerARPG
 
         public async UniTask<BaseCharacterModel> InstantiateFpsModel(Transform container)
         {
-            MainFpsModel = await AddressableFpsModelPrefab.GetOrLoadAssetAsyncOrUsePrefab(FpsModelPrefab);
-            if (MainFpsModel == null)
+            BaseCharacterModel loadedPrefab = await AddressableFpsModelPrefab.GetOrLoadAssetAsyncOrUsePrefab(FpsModelPrefab);
+            if (loadedPrefab == null)
                 return null;
-            MainFpsModel.transform.SetParent(container);
+            MainFpsModel = Instantiate(loadedPrefab, container);
             MainFpsModel.transform.localPosition = FpsModelPositionOffsets;
             MainFpsModel.transform.localEulerAngles = FpsModelRotationOffsets;
             InitFpsModel(MainFpsModel);
