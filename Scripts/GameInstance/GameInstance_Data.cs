@@ -1072,6 +1072,33 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public static Dictionary<int, UnlockRequirement> GetUnlockableContentRequirements(UnlockableContentType type)
+        {
+            Dictionary<int, UnlockRequirement> result = new Dictionary<int, UnlockRequirement>();
+            switch (type)
+            {
+                case UnlockableContentType.Icon:
+                    foreach (var kv in PlayerIcons)
+                    {
+                        result[kv.Key] = kv.Value.UnlockRequirement;
+                    }
+                    break;
+                case UnlockableContentType.Frame:
+                    foreach (var kv in PlayerFrames)
+                    {
+                        result[kv.Key] = kv.Value.UnlockRequirement;
+                    }
+                    break;
+                case UnlockableContentType.Title:
+                    foreach (var kv in PlayerTitles)
+                    {
+                        result[kv.Key] = kv.Value.UnlockRequirement;
+                    }
+                    break;
+            }
+            return result;
+        }
+
         public static UnlockRequirement GetUnlockableContentRequirement(UnlockableContentType type, int dataId)
         {
             UnlockRequirement result = default;
