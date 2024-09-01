@@ -90,8 +90,8 @@ namespace MultiplayerARPG
             category = item.Category;
 #if UNITY_EDITOR || !UNITY_SERVER
             icon = item.Icon;
-#endif
             addressableIcon = item.AddressableIcon;
+#endif
             sellPriceCash = generatingData.sellPriceCash;
             sellPriceGold = generatingData.sellPriceGold;
             receiveItems = new ItemAmount[]

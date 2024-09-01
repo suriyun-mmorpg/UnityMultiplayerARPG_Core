@@ -168,7 +168,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSendDuelingRequest(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (DisableDueling)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdAcceptDuelingRequest()
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (DuelingCharacter == null)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCEPT_DUELING_REQUEST);
@@ -267,7 +267,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdDeclineDuelingRequest()
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (DuelingCharacter != null)
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(DuelingCharacter.ConnectionId, UITextKeys.UI_ERROR_DUELING_REQUEST_DECLINED);
             GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_DUELING_REQUEST_DECLINED);

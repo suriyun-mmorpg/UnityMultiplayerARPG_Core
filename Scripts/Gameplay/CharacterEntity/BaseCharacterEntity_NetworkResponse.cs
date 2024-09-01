@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void CmdPickup(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!CanPickup())
                 return;
 
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void CmdPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!CanPickup())
                 return;
 
@@ -97,7 +97,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void CmdPickupAllItemsFromContainer(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!CanPickup())
                 return;
 
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void CmdPickupNearbyItems()
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!CanPickup())
                 return;
             List<ItemDropEntity> itemDropEntities = FindGameEntitiesInDistance<ItemDropEntity>(CurrentGameInstance.pickUpItemDistance, CurrentGameInstance.itemDropLayer.Mask);
@@ -161,7 +161,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void CmdDropItem(int index, int amount)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (amount <= 0 || !CanDoActions() || index >= NonEquipItems.Count)
                 return;
 
@@ -235,7 +235,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected virtual void CmdUnSummon(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             int index = this.IndexOfSummon(objectId);
             if (index < 0)
                 return;

@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdUseItem(int itemIndex)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!CanUseItem())
                 return;
 

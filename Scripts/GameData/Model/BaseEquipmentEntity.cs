@@ -123,7 +123,9 @@ namespace MultiplayerARPG
             fpsHiddingRenderers.DestroyAndNulling();
             hiddingObjects.DestroyAndNulling();
             fpsHiddingObjects.DestroyAndNulling();
+#if UNITY_EDITOR || !UNITY_SERVER
             weaponLaunchEffects.DestroyAndNulling();
+#endif
         }
 
         protected virtual void OnEnable()

@@ -128,7 +128,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected async void CmdNpcActivate(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected async void CmdSelectNpcDialogMenu(byte menuIndex)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (CurrentNpcDialog == null)
                 return;
 
@@ -354,7 +354,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdHideNpcDialog()
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             ClearNpcDialogData();
             CallOwnerShowNpcDialog(0);
 #endif
@@ -371,7 +371,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdBuyNpcItem(int index, int amount)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (amount <= 0 || Entity.IsDead())
                 return;
 
@@ -424,7 +424,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected async void CmdSelectQuestRewardItem(byte index)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (CompletingQuest == null)
                 return;
 

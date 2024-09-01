@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
         protected virtual async void CmdConstructBuildingBody(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
             {
                 // Not allow to do it
@@ -115,7 +115,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdRepairBuilding(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -153,7 +153,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdDestroyBuilding(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -193,7 +193,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdOpenStorage(uint objectId, string password)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -240,7 +240,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdOpenDoor(uint objectId, string password)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -280,7 +280,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdCloseDoor(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -314,7 +314,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdTurnOnCampFire(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -348,7 +348,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdTurnOffCampFire(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -377,7 +377,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdCraftItemByWorkbench(uint objectId, int dataId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -411,7 +411,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdSetBuildingPassword(uint objectId, string password)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -458,7 +458,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdLockBuilding(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
@@ -504,7 +504,7 @@ namespace MultiplayerARPG
         [ServerRpc]
         protected void CmdUnlockBuilding(uint objectId)
         {
-#if UNITY_EDITOR || !EXCLUDE_SERVER_CODES
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (!Entity.CanDoActions())
                 return;
 
