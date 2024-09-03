@@ -119,6 +119,7 @@ namespace MultiplayerARPG
             }
 
             CharacterCreationData data = new CharacterCreationData();
+#if !EXCLUDE_PREFAB_REFS
             foreach (var kv in PlayerCharacterEntities)
             {
                 if (kv.Value.CharacterDatabases == null || kv.Value.CharacterDatabases.Length == 0)
@@ -130,6 +131,7 @@ namespace MultiplayerARPG
                     data.AvailableCharacters[kv.Key][database.DataId] = new PlayerCharacterData().SetNewPlayerCharacterData(string.Empty, database.DataId, kv.Key, 0);
                 }
             }
+#endif
 
             foreach (var kv in AddressablePlayerCharacterEntities)
             {

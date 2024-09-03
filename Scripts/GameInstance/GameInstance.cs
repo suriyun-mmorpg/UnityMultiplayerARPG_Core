@@ -1150,6 +1150,7 @@ namespace MultiplayerARPG
             StatusEffects.Clear();
             DamageElements.Clear();
             EquipmentSets.Clear();
+#if !EXCLUDE_PREFAB_REFS
             BuildingEntities.Clear();
             PlayerCharacterEntities.Clear();
             MonsterCharacterEntities.Clear();
@@ -1158,6 +1159,7 @@ namespace MultiplayerARPG
             VehicleEntities.Clear();
             WarpPortalEntities.Clear();
             NpcEntities.Clear();
+#endif
             AddressableBuildingEntities.Clear();
             AddressablePlayerCharacterEntities.Clear();
             AddressableMonsterCharacterEntities.Clear();
@@ -1170,7 +1172,9 @@ namespace MultiplayerARPG
             MapNpcs.Clear();
             MapInfos.Clear();
             Factions.Clear();
+#if !EXCLUDE_PREFAB_REFS
             OtherNetworkObjectPrefabs.Clear();
+#endif
             AddressableOtherNetworkObjectPrefabs.Clear();
         }
 
