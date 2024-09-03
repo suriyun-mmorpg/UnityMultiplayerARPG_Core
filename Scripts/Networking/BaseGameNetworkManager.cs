@@ -548,7 +548,11 @@ namespace MultiplayerARPG
                 if (entry.EntityPrefab != null)
                     spawnablePrefabs.Add(entry.EntityPrefab.Identity);
             }
-            foreach (BaseCharacterEntity entry in GameInstance.CharacterEntities.Values)
+            foreach (BasePlayerCharacterEntity entry in GameInstance.PlayerCharacterEntities.Values)
+            {
+                spawnablePrefabs.Add(entry.Identity);
+            }
+            foreach (BaseMonsterCharacterEntity entry in GameInstance.MonsterCharacterEntities.Values)
             {
                 spawnablePrefabs.Add(entry.Identity);
             }
@@ -597,23 +601,27 @@ namespace MultiplayerARPG
                 if (entry.AddressableEntityPrefab.IsDataValid())
                     addressableSpawnablePrefabs.Add(entry.AddressableEntityPrefab);
             }
-            foreach (AssetReferenceBaseCharacterEntity entry in GameInstance.AddressableCharacterEntities.Values)
+            foreach (AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity> entry in GameInstance.AddressablePlayerCharacterEntities.Values)
             {
                 addressableSpawnablePrefabs.Add(entry);
             }
-            foreach (AssetReferenceVehicleEntity entry in GameInstance.AddressableVehicleEntities.Values)
+            foreach (AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity> entry in GameInstance.AddressableMonsterCharacterEntities.Values)
             {
                 addressableSpawnablePrefabs.Add(entry);
             }
-            foreach (AssetReferenceWarpPortalEntity entry in GameInstance.AddressableWarpPortalEntities.Values)
+            foreach (AssetReferenceLiteNetLibBehaviour<VehicleEntity> entry in GameInstance.AddressableVehicleEntities.Values)
             {
                 addressableSpawnablePrefabs.Add(entry);
             }
-            foreach (AssetReferenceNpcEntity entry in GameInstance.AddressableNpcEntities.Values)
+            foreach (AssetReferenceLiteNetLibBehaviour<WarpPortalEntity> entry in GameInstance.AddressableWarpPortalEntities.Values)
             {
                 addressableSpawnablePrefabs.Add(entry);
             }
-            foreach (AssetReferenceBuildingEntity entry in GameInstance.AddressableBuildingEntities.Values)
+            foreach (AssetReferenceLiteNetLibBehaviour<NpcEntity> entry in GameInstance.AddressableNpcEntities.Values)
+            {
+                addressableSpawnablePrefabs.Add(entry);
+            }
+            foreach (AssetReferenceLiteNetLibBehaviour<BuildingEntity> entry in GameInstance.AddressableBuildingEntities.Values)
             {
                 addressableSpawnablePrefabs.Add(entry);
             }
@@ -657,17 +665,13 @@ namespace MultiplayerARPG
             }
 
             // Register scene entities
-            GameInstance.AddCharacterEntities(FindObjectsOfType<BaseMonsterCharacterEntity>());
+#if !EXCLUDE_PREFAB_REFS
+            GameInstance.AddMonsterCharacterEntities(FindObjectsOfType<BaseMonsterCharacterEntity>());
             GameInstance.AddHarvestableEntities(FindObjectsOfType<HarvestableEntity>());
             GameInstance.AddItemDropEntities(FindObjectsOfType<ItemDropEntity>());
+#endif
 
             PoolSystem.Clear();
-            foreach (IPoolDescriptor poolingObject in GameInstance.PoolingObjectPrefabs)
-            {
-                if (!IsClient && (poolingObject is GameEffect || poolingObject is ProjectileEffect))
-                    continue;
-                PoolSystem.InitPool(poolingObject);
-            }
             System.GC.Collect();
         }
 
@@ -965,18 +969,20 @@ namespace MultiplayerARPG
         public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
             LiteNetLibIdentity spawnObj;
-            if (GameInstance.AddressableBuildingEntities.TryGetValue(saveData.EntityId, out AssetReferenceBuildingEntity addressablePrefab))
+            if (GameInstance.AddressableBuildingEntities.TryGetValue(saveData.EntityId, out AssetReferenceLiteNetLibBehaviour<BuildingEntity> addressablePrefab))
             {
                 spawnObj = Assets.GetObjectInstance(
                     addressablePrefab.HashAssetId,
                     saveData.Position, Quaternion.Euler(saveData.Rotation));
             }
+#if !EXCLUDE_PREFAB_REFS
             else if (GameInstance.BuildingEntities.TryGetValue(saveData.EntityId, out BuildingEntity prefab))
             {
                 spawnObj = Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId,
                     saveData.Position, Quaternion.Euler(saveData.Rotation));
             }
+#endif
             else
             {
                 return null;

@@ -19,11 +19,13 @@ namespace MultiplayerARPG
         public UnityHelpBox entityHelpBox = new UnityHelpBox("Game database will load referring game data from an entities when game instance initializing");
 #endif
         [Header("Entity")]
+#if !EXCLUDE_PREFAB_REFS
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
         [FormerlySerializedAs("mountEntities")]
         public VehicleEntity[] vehicleEntities;
         public LiteNetLibIdentity[] otherNetworkObjects;
+#endif
 
         [Header("Addressable Entity")]
         public AssetReferenceBasePlayerCharacterEntity[] addressablePlayerCharacterEntities;
@@ -58,13 +60,21 @@ namespace MultiplayerARPG
 
         protected override UniTask LoadDataImplement(GameInstance gameInstance)
         {
-            GameInstance.AddCharacterEntities(playerCharacterEntities);
-            GameInstance.AddAssetReferenceCharacterEntities(addressablePlayerCharacterEntities);
-            GameInstance.AddCharacterEntities(monsterCharacterEntities);
-            GameInstance.AddAssetReferenceCharacterEntities(addressableMonsterCharacterEntities);
+#if !EXCLUDE_PREFAB_REFS
+            GameInstance.AddPlayerCharacterEntities(playerCharacterEntities);
+#endif
+            GameInstance.AddAssetReferencePlayerCharacterEntities(addressablePlayerCharacterEntities);
+#if !EXCLUDE_PREFAB_REFS
+            GameInstance.AddMonsterCharacterEntities(monsterCharacterEntities);
+#endif
+            GameInstance.AddAssetReferenceMonsterCharacterEntities(addressableMonsterCharacterEntities);
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddVehicleEntities(vehicleEntities);
+#endif
             GameInstance.AddAssetReferenceVehicleEntities(addressableVehicleEntities);
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddOtherNetworkObjects(otherNetworkObjects);
+#endif
             GameInstance.AddAssetReferenceOtherNetworkObjects(addressableOtherNetworkObjects);
             GameInstance.AddAttributes(attributes);
             GameInstance.AddCurrencies(currencies);
@@ -119,11 +129,17 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
             GameInstance.AddGachas(gachas);
-            GameInstance.AddCharacterEntities(playerCharacterEntities);
-            GameInstance.AddAssetReferenceCharacterEntities(addressablePlayerCharacterEntities);
-            GameInstance.AddCharacterEntities(monsterCharacterEntities);
-            GameInstance.AddAssetReferenceCharacterEntities(addressableMonsterCharacterEntities);
+#if !EXCLUDE_PREFAB_REFS
+            GameInstance.AddPlayerCharacterEntities(playerCharacterEntities);
+#endif
+            GameInstance.AddAssetReferencePlayerCharacterEntities(addressablePlayerCharacterEntities);
+#if !EXCLUDE_PREFAB_REFS
+            GameInstance.AddMonsterCharacterEntities(monsterCharacterEntities);
+#endif
+            GameInstance.AddAssetReferenceMonsterCharacterEntities(addressableMonsterCharacterEntities);
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddVehicleEntities(vehicleEntities);
+#endif
             GameInstance.AddAssetReferenceVehicleEntities(addressableVehicleEntities);
 
             List<Attribute> tempAttributes = new List<Attribute>(GameInstance.Attributes.Values);

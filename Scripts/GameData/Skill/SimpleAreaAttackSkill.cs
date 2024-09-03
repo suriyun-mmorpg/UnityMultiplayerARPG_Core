@@ -13,8 +13,8 @@ namespace MultiplayerARPG
             Normal,
             BasedOnWeapon,
         }
-        [Category("Area Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Category("Area Settings")]
         [SerializeField]
         [AddressableAssetConversion(nameof(addressableAreaDamageEntity))]
         private AreaDamageEntity areaDamageEntity;
@@ -119,8 +119,19 @@ namespace MultiplayerARPG
 
                 // Spawn area entity
                 // Aim position type always is `Position`
+                int hashAssetId = 0;
+#if !EXCLUDE_PREFAB_REFS
+                hashAssetId = areaDamageEntity.Identity.HashAssetId;
+#endif
+                if (addressableAreaDamageEntity.IsDataValid())
+                    hashAssetId = addressableAreaDamageEntity.HashAssetId;
+                if (hashAssetId == 0)
+                {
+                    Logging.LogError("SimpleAreaDamageSkill", $"Unable to spawn area damage entity, skill ID: {Id}");
+                    return;
+                }
                 LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                    areaDamageEntity.Identity.HashAssetId,
+                    hashAssetId,
                     aimPosition.position,
                     GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
                 AreaDamageEntity entity = spawnObj.GetComponent<AreaDamageEntity>();
@@ -204,8 +215,10 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+#if !EXCLUDE_PREFAB_REFS
             areaDamageEntity.InitPrefab();
             GameInstance.AddOtherNetworkObjects(areaDamageEntity.Identity);
+#endif
         }
 
         public override bool TryGetDebuff(out Buff debuff)

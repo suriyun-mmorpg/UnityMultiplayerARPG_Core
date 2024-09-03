@@ -56,7 +56,7 @@ namespace MultiplayerARPG
 
         protected float _lastMountTime;
 
-        public virtual async void Mount(VehicleEntity prefab, AssetReferenceVehicleEntity addressablePrefab)
+        public virtual async void Mount(VehicleEntity prefab, AssetReferenceLiteNetLibBehaviour<VehicleEntity> addressablePrefab)
         {
             if (!IsServer || (prefab == null && !addressablePrefab.IsDataValid()) || Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
                 return;

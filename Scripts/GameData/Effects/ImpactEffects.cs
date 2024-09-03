@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Insthync.AddressableAssetTools;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
@@ -33,7 +34,11 @@ namespace MultiplayerARPG
                         _cacheEffects[defaultImpactEffect.tag.Tag] = defaultImpactEffect;
                         foreach (ImpactEffect effect in impactEffects)
                         {
-                            if (effect.effect == null)
+                            GameEffect gameEffect = null;
+#if !EXCLUDE_PREFAB_REFS
+                            gameEffect = effect.effect;
+#endif
+                            if (gameEffect == null && !effect.addressableEffect.IsDataValid())
                                 continue;
                             _cacheEffects[effect.tag.Tag] = effect;
                         }
@@ -47,12 +52,17 @@ namespace MultiplayerARPG
         {
             if (Effects.TryGetValue(tag, out effect))
                 return true;
-            if (defaultEffect != null)
+            GameEffect gameEffect = null;
+#if !EXCLUDE_PREFAB_REFS
+            gameEffect = defaultImpactEffect.effect;
+#endif
+            if (gameEffect == null && !defaultImpactEffect.addressableEffect.IsDataValid())
             {
-                effect = defaultImpactEffect;
-                return true;
+                effect = default;
+                return false;
             }
-            return false;
+            effect = defaultImpactEffect;
+            return true;
         }
 
         public void PlayEffect(string tag, Vector3 position, Quaternion rotation)
@@ -70,6 +80,11 @@ namespace MultiplayerARPG
 #endif
         }
 
+        public void PrepareRelatesData()
+        {
+            Migrate();
+        }
+
         private bool Migrate()
         {
 #if !EXCLUDE_PREFAB_REFS
@@ -83,17 +98,6 @@ namespace MultiplayerARPG
             }
 #endif
             return false;
-        }
-
-        public void PrepareRelatesData()
-        {
-            Migrate();
-            List<GameEffect> effects = new List<GameEffect>();
-            foreach (ImpactEffect effect in Effects.Values)
-            {
-                effects.Add(effect.effect);
-            }
-            GameInstance.AddPoolingObjects(effects);
         }
     }
 }

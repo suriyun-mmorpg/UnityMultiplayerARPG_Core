@@ -66,18 +66,14 @@ namespace MultiplayerARPG
             return GameInstance.Singleton.GameplayRule.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, this);
         }
 
-        public override void PrepareRelatesData()
-        {
-            base.PrepareRelatesData();
-            GameInstance.AddPoolingObjects(damageHitEffects);
-        }
-
         public DamageElement GenerateDefaultDamageElement(GameEffect[] defaultDamageHitEffects, AssetReferenceGameEffect[] addressableDefaultDamageHitEffects)
         {
             name = GameDataConst.DEFAULT_DAMAGE_ID;
             defaultTitle = GameDataConst.DEFAULT_DAMAGE_TITLE;
             maxResistanceAmount = 1f;
+#if !EXCLUDE_PREFAB_REFS
             damageHitEffects = defaultDamageHitEffects;
+#endif
             addressableDamageHitEffects = addressableDefaultDamageHitEffects;
             return this;
         }

@@ -765,7 +765,7 @@ namespace MultiplayerARPG
                 return 0;
             }
         }
-#endregion
+        #endregion
 
         #region Implement ISocketEnhancerItem
         public SocketEnhancerType SocketEnhancerType
@@ -875,11 +875,11 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
 #if !EXCLUDE_PREFAB_REFS
             GameInstance.AddBuildingEntities(buildingEntity);
-            GameInstance.AddCharacterEntities(petEntity);
+            GameInstance.AddMonsterCharacterEntities(petEntity);
             GameInstance.AddVehicleEntities(mountEntity);
 #endif
             GameInstance.AddAssetReferenceBuildingEntities(addressableBuildingEntity);
-            GameInstance.AddAssetReferenceCharacterEntities(addressablePetEntity);
+            GameInstance.AddAssetReferenceMonsterCharacterEntities(addressablePetEntity);
             GameInstance.AddAssetReferenceVehicleEntities(addressableMountEntity);
             GameInstance.AddAttributes(increaseAttributes);
             GameInstance.AddAttributes(increaseAttributesRate);
@@ -897,8 +897,6 @@ namespace MultiplayerARPG
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacked);
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacked);
             GameInstance.AddEquipmentSets(equipmentSet);
-            GameInstance.AddPoolingWeaponLaunchEffects(equipmentModels);
-            GameInstance.AddPoolingWeaponLaunchEffects(offHandEquipmentModels);
             GameInstance.AddArmorTypes(armorType);
             GameInstance.AddWeaponTypes(weaponType);
             GameInstance.AddAmmoTypes(ammoType);

@@ -8,8 +8,8 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_FILE, menuName = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_MENU, order = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_ORDER)]
     public partial class SimpleAreaBuffSkill : BaseAreaSkill
     {
-        [Category("Area Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Category("Area Settings")]
         [SerializeField]
         [AddressableAssetConversion(nameof(addressableAreaBuffEntity))]
         private AreaBuffEntity areaBuffEntity;
@@ -57,8 +57,19 @@ namespace MultiplayerARPG
             {
                 // Spawn area entity
                 // Aim position type always is `Position`
+                int hashAssetId = 0;
+#if !EXCLUDE_PREFAB_REFS
+                hashAssetId = areaBuffEntity.Identity.HashAssetId;
+#endif
+                if (addressableAreaBuffEntity.IsDataValid())
+                    hashAssetId = addressableAreaBuffEntity.HashAssetId;
+                if (hashAssetId == 0)
+                {
+                    Logging.LogError("SimpleAreaBuffSkill", $"Unable to spawn area buff entity, skill ID: {Id}");
+                    return;
+                }
                 LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
-                    areaBuffEntity.Identity.HashAssetId,
+                    hashAssetId,
                     aimPosition.position,
                     GameInstance.Singleton.GameplayRule.GetSummonRotation(skillUser));
                 AreaBuffEntity entity = spawnObj.GetComponent<AreaBuffEntity>();
@@ -73,8 +84,10 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+#if !EXCLUDE_PREFAB_REFS
             areaBuffEntity.InitPrefab();
             GameInstance.AddOtherNetworkObjects(areaBuffEntity.Identity);
+#endif
         }
 
         public override bool TryGetBuff(out Buff buff)

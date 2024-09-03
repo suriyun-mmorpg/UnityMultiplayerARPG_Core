@@ -30,11 +30,6 @@ namespace MultiplayerARPG
             get => addressableThrowableDamageEntity;
         }
 
-        public override void PrepareRelatesData()
-        {
-            GameInstance.AddPoolingObjects(throwableDamageEntity);
-        }
-
         public override Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
             Transform transform = null;

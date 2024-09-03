@@ -37,8 +37,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [Category(3, "Pet Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Category(3, "Pet Settings")]
         [SerializeField]
         [AddressableAssetConversion(nameof(addressablePetEntity))]
         private BaseMonsterCharacterEntity petEntity = null;
@@ -113,8 +113,10 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddCharacterEntities(MonsterCharacterEntity);
-            GameInstance.AddAssetReferenceCharacterEntities(AddressableMonsterCharacterEntity);
+#if !EXCLUDE_PREFAB_REFS
+            GameInstance.AddMonsterCharacterEntities(MonsterCharacterEntity);
+#endif
+            GameInstance.AddAssetReferenceMonsterCharacterEntities(AddressableMonsterCharacterEntity);
         }
     }
 }

@@ -34,7 +34,6 @@ namespace MultiplayerARPG
 
         public override void PrepareRelatesData()
         {
-            GameInstance.AddPoolingObjects(projectileEffect);
             if (impactEffects != null)
                 impactEffects.PrepareRelatesData();
         }

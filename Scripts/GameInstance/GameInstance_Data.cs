@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using System.Collections.Generic;
@@ -34,8 +35,8 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, StatusEffect> StatusEffects = new Dictionary<int, StatusEffect>();
         public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
         public static readonly Dictionary<int, EquipmentSet> EquipmentSets = new Dictionary<int, EquipmentSet>();
+#if !EXCLUDE_PREFAB_REFS
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
-        public static readonly Dictionary<int, BaseCharacterEntity> CharacterEntities = new Dictionary<int, BaseCharacterEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
         public static readonly Dictionary<int, ItemDropEntity> ItemDropEntities = new Dictionary<int, ItemDropEntity>();
@@ -43,22 +44,23 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, VehicleEntity> VehicleEntities = new Dictionary<int, VehicleEntity>();
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
-        public static readonly Dictionary<int, AssetReferenceBuildingEntity> AddressableBuildingEntities = new Dictionary<int, AssetReferenceBuildingEntity>();
-        public static readonly Dictionary<int, AssetReferenceBaseCharacterEntity> AddressableCharacterEntities = new Dictionary<int, AssetReferenceBaseCharacterEntity>();
-        public static readonly Dictionary<int, AssetReferenceBasePlayerCharacterEntity> AddressablePlayerCharacterEntities = new Dictionary<int, AssetReferenceBasePlayerCharacterEntity>();
-        public static readonly Dictionary<int, AssetReferenceBaseMonsterCharacterEntity> AddressableMonsterCharacterEntities = new Dictionary<int, AssetReferenceBaseMonsterCharacterEntity>();
-        public static readonly Dictionary<int, AssetReferenceItemDropEntity> AddressableItemDropEntities = new Dictionary<int, AssetReferenceItemDropEntity>();
-        public static readonly Dictionary<int, AssetReferenceHarvestableEntity> AddressableHarvestableEntities = new Dictionary<int, AssetReferenceHarvestableEntity>();
-        public static readonly Dictionary<int, AssetReferenceVehicleEntity> AddressableVehicleEntities = new Dictionary<int, AssetReferenceVehicleEntity>();
-        public static readonly Dictionary<int, AssetReferenceWarpPortalEntity> AddressableWarpPortalEntities = new Dictionary<int, AssetReferenceWarpPortalEntity>();
-        public static readonly Dictionary<int, AssetReferenceNpcEntity> AddressableNpcEntities = new Dictionary<int, AssetReferenceNpcEntity>();
+#endif
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<BuildingEntity>> AddressableBuildingEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<BuildingEntity>>();
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>> AddressablePlayerCharacterEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>>();
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity>> AddressableMonsterCharacterEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity>>();
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<ItemDropEntity>> AddressableItemDropEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<ItemDropEntity>>();
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<HarvestableEntity>> AddressableHarvestableEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<HarvestableEntity>>();
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<VehicleEntity>> AddressableVehicleEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<VehicleEntity>>();
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>> AddressableWarpPortalEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>>();
+        public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<NpcEntity>> AddressableNpcEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<NpcEntity>>();
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, BaseMapInfo> MapInfos = new Dictionary<string, BaseMapInfo>();
         public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
+#if !EXCLUDE_PREFAB_REFS
         public static readonly Dictionary<int, LiteNetLibIdentity> OtherNetworkObjectPrefabs = new Dictionary<int, LiteNetLibIdentity>();
+#endif
         public static readonly Dictionary<int, AssetReferenceLiteNetLibIdentity> AddressableOtherNetworkObjectPrefabs = new Dictionary<int, AssetReferenceLiteNetLibIdentity>();
-        public static readonly HashSet<IPoolDescriptor> PoolingObjectPrefabs = new HashSet<IPoolDescriptor>();
 
         #region Add game data functions
         public static void AddAttributes(params Attribute[] attributes)
@@ -506,7 +508,7 @@ namespace MultiplayerARPG
 #if !EXCLUDE_PREFAB_REFS
                     AddGameEntity(WarpPortalEntities, warpPortal.entityPrefab);
 #endif
-                    AddAssetReference<AssetReferenceWarpPortalEntity, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortal.addressableEntityPrefab);
+                    AddAssetReference<AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortal.addressableEntityPrefab);
                 }
             }
         }
@@ -533,7 +535,7 @@ namespace MultiplayerARPG
 #if !EXCLUDE_PREFAB_REFS
                     AddGameEntity(NpcEntities, npc.entityPrefab);
 #endif
-                    AddAssetReference<AssetReferenceNpcEntity, NpcEntity>(AddressableNpcEntities, npc.addressableEntityPrefab);
+                    AddAssetReference<AssetReferenceLiteNetLibBehaviour<NpcEntity>, NpcEntity>(AddressableNpcEntities, npc.addressableEntityPrefab);
                     if (npc.startDialog != null)
                         AddGameData(NpcDialogs, npc.startDialog);
                     if (npc.graph != null)
@@ -731,28 +733,31 @@ namespace MultiplayerARPG
         #endregion
 
         #region Add game entity functions
-        public static void AddCharacterEntities(params BaseCharacterEntity[] characterEntities)
+#if !EXCLUDE_PREFAB_REFS
+        public static void AddPlayerCharacterEntities(params BasePlayerCharacterEntity[] playerCharacterEntities)
         {
-            AddCharacterEntities((IEnumerable<BaseCharacterEntity>)characterEntities);
+            AddPlayerCharacterEntities((IEnumerable<BasePlayerCharacterEntity>)playerCharacterEntities);
         }
 
-        public static void AddCharacterEntities(IEnumerable<BaseCharacterEntity> characterEntities)
+        public static void AddPlayerCharacterEntities(IEnumerable<BasePlayerCharacterEntity> playerCharacterEntities)
         {
-            if (characterEntities == null)
-                return;
-            foreach (BaseCharacterEntity characterEntity in characterEntities)
-            {
-                if (characterEntity == null)
-                    continue;
-                if (!characterEntity.Identity.IsSceneObject && (!CharacterEntities.TryGetValue(characterEntity.Identity.HashAssetId, out BaseCharacterEntity tempData) || tempData == null))
-                    CharacterEntities[characterEntity.Identity.HashAssetId] = characterEntity;
-                if (characterEntity is BasePlayerCharacterEntity playerCharacterEntity)
-                    AddGameEntity(PlayerCharacterEntities, playerCharacterEntity);
-                else if (characterEntity is BaseMonsterCharacterEntity monsterCharacterEntity)
-                    AddGameEntity(MonsterCharacterEntities, monsterCharacterEntity);
-            }
+            AddManyGameEntity(PlayerCharacterEntities, playerCharacterEntities);
+        }
+#endif
+
+#if !EXCLUDE_PREFAB_REFS
+        public static void AddMonsterCharacterEntities(params BaseMonsterCharacterEntity[] monsterCharacterEntities)
+        {
+            AddMonsterCharacterEntities((IEnumerable<BaseMonsterCharacterEntity>)monsterCharacterEntities);
         }
 
+        public static void AddMonsterCharacterEntities(IEnumerable<BaseMonsterCharacterEntity> monsterCharacterEntities)
+        {
+            AddManyGameEntity(MonsterCharacterEntities, monsterCharacterEntities);
+        }
+#endif
+
+#if !EXCLUDE_PREFAB_REFS
         public static void AddItemDropEntities(params ItemDropEntity[] itemDropEntities)
         {
             AddItemDropEntities((IEnumerable<ItemDropEntity>)itemDropEntities);
@@ -762,7 +767,9 @@ namespace MultiplayerARPG
         {
             AddManyGameEntity(ItemDropEntities, itemDropEntities);
         }
+#endif
 
+#if !EXCLUDE_PREFAB_REFS
         public static void AddHarvestableEntities(params HarvestableEntity[] harvestableEntities)
         {
             AddHarvestableEntities((IEnumerable<HarvestableEntity>)harvestableEntities);
@@ -772,7 +779,9 @@ namespace MultiplayerARPG
         {
             AddManyGameEntity(HarvestableEntities, harvestableEntities);
         }
+#endif
 
+#if !EXCLUDE_PREFAB_REFS
         public static void AddVehicleEntities(params VehicleEntity[] vehicleEntities)
         {
             AddVehicleEntities((IEnumerable<VehicleEntity>)vehicleEntities);
@@ -782,7 +791,9 @@ namespace MultiplayerARPG
         {
             AddManyGameEntity(VehicleEntities, vehicleEntities);
         }
+#endif
 
+#if !EXCLUDE_PREFAB_REFS
         public static void AddBuildingEntities(params BuildingEntity[] buildingEntities)
         {
             AddBuildingEntities((IEnumerable<BuildingEntity>)buildingEntities);
@@ -792,7 +803,9 @@ namespace MultiplayerARPG
         {
             AddManyGameEntity(BuildingEntities, buildingEntities);
         }
+#endif
 
+#if !EXCLUDE_PREFAB_REFS
         public static void AddWarpPortalEntities(params WarpPortalEntity[] warpPortalEntities)
         {
             AddWarpPortalEntities((IEnumerable<WarpPortalEntity>)warpPortalEntities);
@@ -802,7 +815,9 @@ namespace MultiplayerARPG
         {
             AddManyGameEntity(WarpPortalEntities, warpPortalEntities);
         }
+#endif
 
+#if !EXCLUDE_PREFAB_REFS
         public static void AddNpcEntities(params NpcEntity[] npcEntities)
         {
             AddNpcEntities((IEnumerable<NpcEntity>)npcEntities);
@@ -812,108 +827,92 @@ namespace MultiplayerARPG
         {
             AddManyGameEntity(NpcEntities, npcEntities);
         }
+#endif
         #endregion
 
         #region Add asset reference functions
-        public static void AddAssetReferenceCharacterEntities(params AssetReferenceBaseCharacterEntity[] characterEntities)
+        public static void AddAssetReferencePlayerCharacterEntities(params AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>[] playerCharacterEntities)
         {
-            AddAssetReferenceCharacterEntities((IEnumerable<AssetReferenceBaseCharacterEntity>)characterEntities);
+            AddAssetReferencePlayerCharacterEntities((IEnumerable<AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>>)playerCharacterEntities);
         }
 
-        public static void AddAssetReferenceCharacterEntities(IEnumerable<AssetReferenceBaseCharacterEntity> characterEntities)
+        public static void AddAssetReferencePlayerCharacterEntities(IEnumerable<AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>> playerCharacterEntities)
         {
-            if (characterEntities == null)
-                return;
-            foreach (AssetReferenceBaseCharacterEntity characterEntity in characterEntities)
-            {
-                if (characterEntity == null)
-                    continue;
-                AddressableCharacterEntities[characterEntity.HashAssetId] = characterEntity;
-                if (characterEntity is AssetReferenceBasePlayerCharacterEntity playerCharacterEntity)
-                    AddAssetReference<AssetReferenceBasePlayerCharacterEntity, BaseCharacterEntity>(AddressablePlayerCharacterEntities, playerCharacterEntity);
-                else if (characterEntity is AssetReferenceBaseMonsterCharacterEntity monsterCharacterEntity)
-                    AddAssetReference<AssetReferenceBaseMonsterCharacterEntity, BaseCharacterEntity>(AddressableMonsterCharacterEntities, monsterCharacterEntity);
-            }
+            AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>, BasePlayerCharacterEntity>(AddressablePlayerCharacterEntities, playerCharacterEntities);
         }
 
-        public static void AddAssetReferenceItemDropEntities(params AssetReferenceItemDropEntity[] itemDropEntities)
+        public static void AddAssetReferenceMonsterCharacterEntities(params AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity>[] monsterCharacterEntities)
         {
-            AddAssetReferenceItemDropEntities((IEnumerable<AssetReferenceItemDropEntity>)itemDropEntities);
+            AddAssetReferenceMonsterCharacterEntities((IEnumerable<AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity>>)monsterCharacterEntities);
         }
 
-        public static void AddAssetReferenceItemDropEntities(IEnumerable<AssetReferenceItemDropEntity> itemDropEntities)
+        public static void AddAssetReferenceMonsterCharacterEntities(IEnumerable<AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity>> monsterCharacterEntities)
         {
-            AddManyAssetReference<AssetReferenceItemDropEntity, ItemDropEntity>(AddressableItemDropEntities, itemDropEntities);
+            AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity>, BaseMonsterCharacterEntity>(AddressableMonsterCharacterEntities, monsterCharacterEntities);
         }
 
-        public static void AddAssetReferenceHarvestableEntities(params AssetReferenceHarvestableEntity[] harvestableEntities)
+        public static void AddAssetReferenceItemDropEntities(params AssetReferenceLiteNetLibBehaviour<ItemDropEntity>[] itemDropEntities)
         {
-            AddAssetReferenceHarvestableEntities((IEnumerable<AssetReferenceHarvestableEntity>)harvestableEntities);
+            AddAssetReferenceItemDropEntities((IEnumerable<AssetReferenceLiteNetLibBehaviour<ItemDropEntity>>)itemDropEntities);
         }
 
-        public static void AddAssetReferenceHarvestableEntities(IEnumerable<AssetReferenceHarvestableEntity> harvestableEntities)
+        public static void AddAssetReferenceItemDropEntities(IEnumerable<AssetReferenceLiteNetLibBehaviour<ItemDropEntity>> itemDropEntities)
         {
-            AddManyAssetReference<AssetReferenceHarvestableEntity, HarvestableEntity>(AddressableHarvestableEntities, harvestableEntities);
+            AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<ItemDropEntity>, ItemDropEntity>(AddressableItemDropEntities, itemDropEntities);
         }
 
-        public static void AddAssetReferenceVehicleEntities(params AssetReferenceVehicleEntity[] vehicleEntities)
+        public static void AddAssetReferenceHarvestableEntities(params AssetReferenceLiteNetLibBehaviour<HarvestableEntity>[] harvestableEntities)
         {
-            AddAssetReferenceVehicleEntities((IEnumerable<AssetReferenceVehicleEntity>)vehicleEntities);
+            AddAssetReferenceHarvestableEntities((IEnumerable<AssetReferenceLiteNetLibBehaviour<HarvestableEntity>>)harvestableEntities);
         }
 
-        public static void AddAssetReferenceVehicleEntities(IEnumerable<AssetReferenceVehicleEntity> vehicleEntities)
+        public static void AddAssetReferenceHarvestableEntities(IEnumerable<AssetReferenceLiteNetLibBehaviour<HarvestableEntity>> harvestableEntities)
         {
-            AddManyAssetReference<AssetReferenceVehicleEntity, VehicleEntity>(AddressableVehicleEntities, vehicleEntities);
+            AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<HarvestableEntity>, HarvestableEntity>(AddressableHarvestableEntities, harvestableEntities);
         }
 
-        public static void AddAssetReferenceBuildingEntities(params AssetReferenceBuildingEntity[] buildingEntities)
+        public static void AddAssetReferenceVehicleEntities(params AssetReferenceLiteNetLibBehaviour<VehicleEntity>[] vehicleEntities)
         {
-            AddAssetReferenceBuildingEntities((IEnumerable<AssetReferenceBuildingEntity>)buildingEntities);
+            AddAssetReferenceVehicleEntities((IEnumerable<AssetReferenceLiteNetLibBehaviour<VehicleEntity>>)vehicleEntities);
         }
 
-        public static void AddAssetReferenceBuildingEntities(IEnumerable<AssetReferenceBuildingEntity> buildingEntities)
+        public static void AddAssetReferenceVehicleEntities(IEnumerable<AssetReferenceLiteNetLibBehaviour<VehicleEntity>> vehicleEntities)
         {
-            AddManyAssetReference<AssetReferenceBuildingEntity, BuildingEntity>(AddressableBuildingEntities, buildingEntities);
+            AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<VehicleEntity>, VehicleEntity>(AddressableVehicleEntities, vehicleEntities);
         }
 
-        public static void AddAssetReferenceWarpPortalEntities(params AssetReferenceWarpPortalEntity[] warpPortalEntities)
+        public static void AddAssetReferenceBuildingEntities(params AssetReferenceLiteNetLibBehaviour<BuildingEntity>[] buildingEntities)
         {
-            AddAssetReferenceWarpPortalEntities((IEnumerable<AssetReferenceWarpPortalEntity>)warpPortalEntities);
+            AddAssetReferenceBuildingEntities((IEnumerable<AssetReferenceLiteNetLibBehaviour<BuildingEntity>>)buildingEntities);
         }
 
-        public static void AddAssetReferenceWarpPortalEntities(IEnumerable<AssetReferenceWarpPortalEntity> warpPortalEntities)
+        public static void AddAssetReferenceBuildingEntities(IEnumerable<AssetReferenceLiteNetLibBehaviour<BuildingEntity>> buildingEntities)
         {
-            AddManyAssetReference<AssetReferenceWarpPortalEntity, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortalEntities);
+            AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<BuildingEntity>, BuildingEntity>(AddressableBuildingEntities, buildingEntities);
         }
 
-        public static void AddAssetReferenceNpcEntities(params AssetReferenceNpcEntity[] npcEntities)
+        public static void AddAssetReferenceWarpPortalEntities(params AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>[] warpPortalEntities)
         {
-            AddAssetReferenceNpcEntities((IEnumerable<AssetReferenceNpcEntity>)npcEntities);
+            AddAssetReferenceWarpPortalEntities((IEnumerable<AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>>)warpPortalEntities);
         }
 
-        public static void AddAssetReferenceNpcEntities(IEnumerable<AssetReferenceNpcEntity> npcEntities)
+        public static void AddAssetReferenceWarpPortalEntities(IEnumerable<AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>> warpPortalEntities)
         {
-            AddManyAssetReference<AssetReferenceNpcEntity, NpcEntity>(AddressableNpcEntities, npcEntities);
+            AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortalEntities);
+        }
+
+        public static void AddAssetReferenceNpcEntities(params AssetReferenceLiteNetLibBehaviour<NpcEntity>[] npcEntities)
+        {
+            AddAssetReferenceNpcEntities((IEnumerable<AssetReferenceLiteNetLibBehaviour<NpcEntity>>)npcEntities);
+        }
+
+        public static void AddAssetReferenceNpcEntities(IEnumerable<AssetReferenceLiteNetLibBehaviour<NpcEntity>> npcEntities)
+        {
+            AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<NpcEntity>, NpcEntity>(AddressableNpcEntities, npcEntities);
         }
         #endregion
 
-        public static void AddPoolingObjects(params IPoolDescriptor[] poolingObjects)
-        {
-            AddPoolingObjects((IEnumerable<IPoolDescriptor>)poolingObjects);
-        }
-
-        public static void AddPoolingObjects(IEnumerable<IPoolDescriptor> poolingObjects)
-        {
-            if (poolingObjects == null)
-                return;
-            foreach (IPoolDescriptor poolingObject in poolingObjects)
-            {
-                if ((poolingObject as Object) == null || PoolingObjectPrefabs.Contains(poolingObject))
-                    continue;
-                PoolingObjectPrefabs.Add(poolingObject);
-            }
-        }
-
+#if !EXCLUDE_PREFAB_REFS
         public static void AddOtherNetworkObjects(params LiteNetLibIdentity[] networkObjects)
         {
             AddOtherNetworkObjects((IEnumerable<LiteNetLibIdentity>)networkObjects);
@@ -930,6 +929,7 @@ namespace MultiplayerARPG
                 OtherNetworkObjectPrefabs.Add(networkObject.HashAssetId, networkObject);
             }
         }
+#endif
 
         public static void AddAssetReferenceOtherNetworkObjects(params AssetReferenceLiteNetLibIdentity[] networkObjects)
         {
@@ -945,31 +945,6 @@ namespace MultiplayerARPG
                 if (networkObject == null || AddressableOtherNetworkObjectPrefabs.ContainsKey(networkObject.HashAssetId))
                     continue;
                 AddressableOtherNetworkObjectPrefabs.Add(networkObject.HashAssetId, networkObject);
-            }
-        }
-
-        public static async void AddPoolingWeaponLaunchEffects(IEnumerable<EquipmentModel> equipmentModels)
-        {
-            if (equipmentModels == null)
-                return;
-            List<GameObject> modelObjects = new List<GameObject>();
-            foreach (EquipmentModel equipmentModel in equipmentModels)
-            {
-                GameObject meshPrefab = await equipmentModel.GetMeshPrefab();
-                if (meshPrefab == null)
-                    continue;
-                modelObjects.Add(meshPrefab);
-            }
-            AddPoolingObjects(modelObjects.GetComponents<BaseEquipmentEntity>());
-        }
-
-        public static void AddPoolingObjects(IEnumerable<IPoolDescriptorCollection> collections)
-        {
-            if (collections == null)
-                return;
-            foreach (IPoolDescriptorCollection collection in collections)
-            {
-                AddPoolingObjects(collection.PoolDescriptors);
             }
         }
 
@@ -1028,7 +1003,7 @@ namespace MultiplayerARPG
         }
 
         private static void AddManyAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, IEnumerable<TBehaviour> list)
-            where TBehaviour : AssetReferenceBaseGameEntity<TType>
+            where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
             where TType : BaseGameEntity
         {
             if (list == null)
@@ -1040,34 +1015,31 @@ namespace MultiplayerARPG
         }
 
         private static bool AddAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, TBehaviour data)
-            where TBehaviour : AssetReferenceBaseGameEntity<TType>
+            where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
             where TType : BaseGameEntity
         {
             if (!data.IsDataValid())
                 return false;
             if (!dict.ContainsKey(data.HashAssetId))
             {
-                dict[data.HashAssetId] = data;
                 bool isError = false;
                 AsyncOperationHandle<TType> loadOp = data.LoadAssetAsync();
-                TType loadedData;
+                TType loadedData = loadOp.WaitForCompletion();
                 try
                 {
-                    loadedData = loadOp.WaitForCompletion();
                     loadedData.PrepareRelatesData();
                 }
-                catch
+                catch (System.Exception ex)
                 {
                     isError = true;
+                    Debug.LogException(ex);
                 }
-                finally
-                {
-                    Addressables.Release(loadOp);
-                }
+                if (!isError)
+                    dict[data.HashAssetId] = data;
+                Addressables.Release(loadOp);
+                System.GC.Collect();
                 if (isError)
-                {
                     return false;
-                }
             }
             return true;
         }
@@ -1120,7 +1092,7 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static int GetCharacterEntityHashAssetId(int entityId, out int? metaDataId)
+        public static int GetPlayerCharacterEntityHashAssetId(int entityId, out int? metaDataId)
         {
             metaDataId = null;
             if (PlayerCharacterEntityMetaDataList.TryGetValue(entityId, out PlayerCharacterEntityMetaData metaData))
@@ -1128,10 +1100,16 @@ namespace MultiplayerARPG
                 metaDataId = metaData.DataId;
                 return metaData.GetPlayerCharacterEntityHashAssetId();
             }
-            else if (AddressableCharacterEntities.ContainsKey(entityId) || CharacterEntities.ContainsKey(entityId))
+            else if (AddressablePlayerCharacterEntities.ContainsKey(entityId))
             {
                 return entityId;
             }
+#if !EXCLUDE_PREFAB_REFS
+            else if (PlayerCharacterEntities.ContainsKey(entityId))
+            {
+                return entityId;
+            }
+#endif
             return 0;
         }
 

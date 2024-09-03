@@ -240,7 +240,6 @@ namespace MultiplayerARPG
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacked);
             GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacked);
             GameInstance.AddEquipmentSets(EquipmentSet);
-            GameInstance.AddPoolingWeaponLaunchEffects(EquipmentModels);
             RandomBonus.PrepareRelatesData();
             // Data migration
             GameInstance.MigrateEquipmentEntities(EquipmentModels);

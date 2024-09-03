@@ -38,7 +38,6 @@ namespace MultiplayerARPG
 
         public override async void PrepareRelatesData()
         {
-            GameInstance.AddPoolingObjects(MissileDamageEntity);
             MissileDamageEntity loadedDamageEntity = await AddressableMissileDamageEntity
                 .GetOrLoadAssetAsyncOrUsePrefab(MissileDamageEntity);
             PrepareHitValidationData(loadedDamageEntity);
