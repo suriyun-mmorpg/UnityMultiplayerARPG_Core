@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using UnityEngine;
 
@@ -7,9 +6,9 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_FILE, menuName = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_MENU, order = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_ORDER)]
     public partial class PlayerCharacterEntityMetaData : BaseGameData
     {
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Header("Character Prefabs And Data")]
         [SerializeField]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [AddressableAssetConversion(nameof(addressableEntityPrefab))]
         protected BasePlayerCharacterEntity entityPrefab;
 #endif
@@ -111,7 +110,12 @@ namespace MultiplayerARPG
                 return null;
 #endif
             }
-            set { fpsModelPrefab = value; }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS
+                fpsModelPrefab = value;
+#endif
+            }
         }
 
         [SerializeField]
