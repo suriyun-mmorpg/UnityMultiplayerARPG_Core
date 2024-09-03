@@ -261,6 +261,7 @@ namespace MultiplayerARPG
         protected virtual async Task<List<PlayerCharacterData>> GetCreatableCharacters()
         {
             List<PlayerCharacterData> result = new List<PlayerCharacterData>();
+#if !EXCLUDE_PREFAB_REFS
             if (GameInstance.PlayerCharacterEntities.Count > 0)
             {
                 foreach (BasePlayerCharacterEntity prefab in GameInstance.PlayerCharacterEntities.Values)
@@ -273,6 +274,7 @@ namespace MultiplayerARPG
                     _playerCharactersByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
                 }
             }
+#endif
             if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
             {
                 List<AsyncOperationHandle<BasePlayerCharacterEntity>> asyncOps = new List<AsyncOperationHandle<BasePlayerCharacterEntity>>();
