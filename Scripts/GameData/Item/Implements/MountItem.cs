@@ -37,8 +37,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [Category(3, "Mount Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Category(3, "Mount Settings")]
         [SerializeField]
         [AddressableAssetConversion(nameof(addressableMountEntity))]
         private VehicleEntity mountEntity = null;
@@ -100,7 +100,9 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddVehicleEntities(VehicleEntity);
+#endif
             GameInstance.AddAssetReferenceVehicleEntities(AddressableVehicleEntity);
         }
     }

@@ -37,8 +37,8 @@ namespace MultiplayerARPG
             }
         }
 
-        [Category(3, "Building Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Category(3, "Building Settings")]
         [SerializeField]
         [AddressableAssetConversion(nameof(addressableBuildingEntity))]
         private BuildingEntity buildingEntity = null;
@@ -100,7 +100,9 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddBuildingEntities(BuildingEntity);
+#endif
             GameInstance.AddAssetReferenceBuildingEntities(AddressableBuildingEntity);
         }
     }

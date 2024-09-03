@@ -383,6 +383,7 @@ namespace MultiplayerARPG
                 }.ToArray();
                 hasChanges = true;
             }
+#if !EXCLUDE_PREFAB_REFS
             if (MigrateAudioClips(ref launchClip, ref launchClips, ref launchClipSettings))
                 hasChanges = true;
             if (MigrateAudioClips(ref reloadClip, ref reloadClips, ref reloadClipSettings))
@@ -391,9 +392,11 @@ namespace MultiplayerARPG
                 hasChanges = true;
             if (MigrateAudioClips(ref emptyClip, ref emptyClips, ref emptyClipSettings))
                 hasChanges = true;
+#endif
             return hasChanges || base.Validate();
         }
 
+#if !EXCLUDE_PREFAB_REFS
         private bool MigrateAudioClips(ref AudioClip singleClip, ref AudioClip[] multipleClips, ref AudioClipWithVolumeSettings[] destinationSettings)
         {
             if (singleClip == null && (multipleClips == null || multipleClips.Length == 0))
@@ -432,6 +435,7 @@ namespace MultiplayerARPG
             destinationSettings = clipSettings.ToArray();
             return true;
         }
+#endif
 
         public override void PrepareRelatesData()
         {
