@@ -89,7 +89,9 @@ namespace MultiplayerARPG
             languageSpecificDescriptions = descriptionLanguageDataList.ToArray();
             category = item.Category;
 #if UNITY_EDITOR || !UNITY_SERVER
+#if !EXCLUDE_PREFAB_REFS
             icon = item.Icon;
+#endif
             addressableIcon = item.AddressableIcon;
 #endif
             sellPriceCash = generatingData.sellPriceCash;
