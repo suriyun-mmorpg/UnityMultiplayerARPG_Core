@@ -28,6 +28,7 @@ namespace MultiplayerARPG
 
         private void MigrateAsset()
         {
+#if !EXCLUDE_PREFAB_REFS
             if (prefab == null && harvestableEntity != null)
             {
                 prefab = harvestableEntity;
@@ -43,12 +44,16 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
 #endif
             }
+#endif
         }
 
         public override void RegisterPrefabs()
         {
             base.RegisterPrefabs();
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddHarvestableEntities(prefab);
+#endif
+            GameInstance.AddAssetReferenceHarvestableEntities(addressablePrefab);
         }
 
         protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, AddressablePrefab addressablePrefab, int level)

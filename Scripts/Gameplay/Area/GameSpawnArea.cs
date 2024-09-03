@@ -36,7 +36,9 @@ namespace MultiplayerARPG
         [System.Serializable]
         public class SpawnPrefabData
         {
+#if !EXCLUDE_PREFAB_REFS
             public T prefab;
+#endif
             public AddressablePrefab addressablePrefab;
             [Min(1)]
             public int level;
@@ -45,8 +47,10 @@ namespace MultiplayerARPG
         }
 
         [Header("Spawning Data")]
+#if !EXCLUDE_PREFAB_REFS
         [FormerlySerializedAs("asset")]
         public T prefab;
+#endif
         public AddressablePrefab addressablePrefab;
         [FormerlySerializedAs("level")]
         [Min(1)]
@@ -69,14 +73,21 @@ namespace MultiplayerARPG
                 if (_respawnPendingEntitiesTimer >= respawnPendingEntitiesDelay)
                 {
                     _respawnPendingEntitiesTimer = 0f;
+                    T prefab;
+                    AddressablePrefab addressablePrefab;
                     foreach (SpawnPrefabData pendingEntry in _pending)
                     {
+                        prefab = null;
+#if !EXCLUDE_PREFAB_REFS
+                        prefab = pendingEntry.prefab;
+#endif
+                        addressablePrefab = pendingEntry.addressablePrefab;
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-                        Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {pendingEntry.prefab?.name ?? "None"}, Addressable: {pendingEntry.addressablePrefab?.RuntimeKey ?? "None"}, Amount: {pendingEntry.amount}.");
+                        Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {prefab?.name ?? "None"}, Addressable: {addressablePrefab?.RuntimeKey ?? "None"}, Amount: {pendingEntry.amount}.");
 #endif
                         for (int i = 0; i < pendingEntry.amount; ++i)
                         {
-                            Spawn(pendingEntry.prefab, pendingEntry.addressablePrefab, pendingEntry.level, 0);
+                            Spawn(prefab, addressablePrefab, pendingEntry.level, 0);
                         }
                     }
                     _pending.Clear();
@@ -113,6 +124,11 @@ namespace MultiplayerARPG
 
         public override void SpawnAll()
         {
+            T prefab = null;
+#if !EXCLUDE_PREFAB_REFS
+            prefab = this.prefab;
+#endif
+            AddressablePrefab addressablePrefab = this.addressablePrefab;
             if (prefab != null || addressablePrefab.IsDataValid())
             {
                 for (int i = 0; i < amount; ++i)
@@ -122,7 +138,12 @@ namespace MultiplayerARPG
             }
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
-                SpawnByAmount(spawningPrefab.prefab, spawningPrefab.addressablePrefab, spawningPrefab.level, spawningPrefab.amount);
+                prefab = null;
+#if !EXCLUDE_PREFAB_REFS
+                prefab = spawningPrefab.prefab;
+#endif
+                addressablePrefab = spawningPrefab.addressablePrefab;
+                SpawnByAmount(prefab, addressablePrefab, spawningPrefab.level, spawningPrefab.amount);
             }
         }
 
@@ -147,7 +168,9 @@ namespace MultiplayerARPG
             {
                 AddPending(new SpawnPrefabData()
                 {
+#if !EXCLUDE_PREFAB_REFS
                     prefab = prefab,
+#endif
                     addressablePrefab = addressablePrefab,
                     level = level,
                     amount = 1,

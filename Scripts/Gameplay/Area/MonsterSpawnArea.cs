@@ -29,6 +29,7 @@ namespace MultiplayerARPG
 
         private void MigrateAsset()
         {
+#if !EXCLUDE_PREFAB_REFS
             if (prefab == null && monsterCharacterEntity != null)
             {
                 prefab = monsterCharacterEntity;
@@ -44,12 +45,16 @@ namespace MultiplayerARPG
                 EditorUtility.SetDirty(this);
 #endif
             }
+#endif
         }
 
         public override void RegisterPrefabs()
         {
             base.RegisterPrefabs();
-            GameInstance.AddCharacterEntities(prefab);
+#if !EXCLUDE_PREFAB_REFS
+            GameInstance.AddMonsterCharacterEntities(prefab);
+#endif
+            GameInstance.AddAssetReferenceMonsterCharacterEntities(addressablePrefab);
         }
 
         protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab, AddressablePrefab addressablePrefab, int level)

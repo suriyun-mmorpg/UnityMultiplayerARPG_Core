@@ -9,7 +9,10 @@ namespace MultiplayerARPG
         public override void RegisterPrefabs()
         {
             base.RegisterPrefabs();
+#if !EXCLUDE_PREFAB_REFS
             GameInstance.AddItemDropEntities(prefab);
+#endif
+            GameInstance.AddAssetReferenceItemDropEntities(addressablePrefab);
         }
 
         protected override ItemDropEntity SpawnInternal(ItemDropEntity prefab, AddressablePrefab addressablePrefab, int level)

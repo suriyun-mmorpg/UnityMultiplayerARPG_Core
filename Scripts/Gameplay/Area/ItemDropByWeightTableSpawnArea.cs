@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
