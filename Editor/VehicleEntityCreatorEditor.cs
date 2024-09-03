@@ -170,6 +170,7 @@ namespace MultiplayerARPG
                 {
                     GameObject savedObject = AssetDatabase.LoadAssetAtPath<GameObject>(savePath);
                     VehicleEntity savedEntity = savedObject.GetComponent<VehicleEntity>();
+#if !EXCLUDE_PREFAB_REFS
                     if (savedEntity is VehicleEntity)
                     {
                         List<VehicleEntity> list = new List<VehicleEntity>(gameDatabase.vehicleEntities)
@@ -178,6 +179,7 @@ namespace MultiplayerARPG
                         };
                         gameDatabase.vehicleEntities = list.ToArray();
                     }
+#endif
                     EditorUtility.SetDirty(gameDatabase);
                 }
             }

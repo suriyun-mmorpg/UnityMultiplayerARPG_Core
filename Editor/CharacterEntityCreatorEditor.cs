@@ -296,6 +296,7 @@ namespace MultiplayerARPG
                 {
                     GameObject savedObject = AssetDatabase.LoadAssetAtPath<GameObject>(savePath);
                     BaseCharacterEntity savedEntity = savedObject.GetComponent<BaseCharacterEntity>();
+#if !EXCLUDE_PREFAB_REFS
                     if (savedEntity is BasePlayerCharacterEntity)
                     {
                         List<BasePlayerCharacterEntity> list = new List<BasePlayerCharacterEntity>(gameDatabase.playerCharacterEntities);
@@ -308,6 +309,7 @@ namespace MultiplayerARPG
                         list.Add(savedEntity as BaseMonsterCharacterEntity);
                         gameDatabase.monsterCharacterEntities = list.ToArray();
                     }
+#endif
                     EditorUtility.SetDirty(gameDatabase);
                 }
             }
