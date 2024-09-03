@@ -52,10 +52,10 @@ namespace MultiplayerARPG
         private IncrementalInt level;
         public IncrementalInt Level { get { return level; } }
 
-        public void ProceedAddressableAssetConversion()
+        public void ProceedAddressableAssetConversion(string groupName)
         {
 #if UNITY_EDITOR
-            AddressableEditorUtils.ConvertObjectRefToAddressable(ref monsterCharacterEntity, ref addressableMonsterCharacterEntity);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref monsterCharacterEntity, ref addressableMonsterCharacterEntity, groupName);
 #endif
         }
     }

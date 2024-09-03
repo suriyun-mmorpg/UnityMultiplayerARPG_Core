@@ -33,10 +33,10 @@ namespace MultiplayerARPG
             }
         }
 
-        public void ProceedAddressableAssetConversion()
+        public void ProceedAddressableAssetConversion(string groupName)
         {
 #if UNITY_EDITOR
-            AddressableEditorUtils.ConvertObjectRefToAddressable(ref mountEntity, ref addressableMountEntity);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref mountEntity, ref addressableMountEntity, groupName);
 #endif
         }
     }
