@@ -6,7 +6,7 @@ using UnityEngine.ResourceManagement.AsyncOperations;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class AssetReferenceBaseGameEntity<T> : AssetReferenceLiteNetLibBehaviour<BaseGameEntity>
+    public class AssetReferenceBaseGameEntity<T> : AssetReferenceLiteNetLibBehaviour<T>
         where T : BaseGameEntity
     {
         public AssetReferenceBaseGameEntity(string guid) : base(guid)

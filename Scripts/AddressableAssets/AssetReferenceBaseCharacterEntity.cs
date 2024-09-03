@@ -8,11 +8,5 @@ namespace MultiplayerARPG
         public AssetReferenceBaseCharacterEntity(string guid) : base(guid)
         {
         }
-
-#if UNITY_EDITOR
-        public AssetReferenceBaseCharacterEntity(LiteNetLibBehaviour behaviour) : base(behaviour)
-        {
-        }
-#endif
     }
 }
