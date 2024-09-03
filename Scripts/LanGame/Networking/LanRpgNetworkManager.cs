@@ -292,10 +292,12 @@ namespace MultiplayerARPG
                 {
                     playerCharacterEntity.Mount(null, addressablePrefab);
                 }
+#if !EXCLUDE_PREFAB_REFS
                 else if (GameInstance.VehicleEntities.TryGetValue(playerCharacterData.MountDataId, out VehicleEntity prefab))
                 {
                     playerCharacterEntity.Mount(prefab, null);
                 }
+#endif
                 // Summon monsters
                 for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                 {
