@@ -1151,7 +1151,6 @@ namespace MultiplayerARPG
             DamageElements.Clear();
             EquipmentSets.Clear();
             BuildingEntities.Clear();
-            CharacterEntities.Clear();
             PlayerCharacterEntities.Clear();
             MonsterCharacterEntities.Clear();
             ItemDropEntities.Clear();
@@ -1160,7 +1159,6 @@ namespace MultiplayerARPG
             WarpPortalEntities.Clear();
             NpcEntities.Clear();
             AddressableBuildingEntities.Clear();
-            AddressableCharacterEntities.Clear();
             AddressablePlayerCharacterEntities.Clear();
             AddressableMonsterCharacterEntities.Clear();
             AddressableItemDropEntities.Clear();
@@ -1172,7 +1170,6 @@ namespace MultiplayerARPG
             MapNpcs.Clear();
             MapInfos.Clear();
             Factions.Clear();
-            PoolingObjectPrefabs.Clear();
             OtherNetworkObjectPrefabs.Clear();
             AddressableOtherNetworkObjectPrefabs.Clear();
         }
@@ -1228,11 +1225,6 @@ namespace MultiplayerARPG
                 MonsterWeaponItem as BaseItem
             });
             MigrateLevelUpEffect();
-            AddPoolingObjects(LevelUpEffects);
-            AddPoolingObjects(StunEffects);
-            AddPoolingObjects(MuteEffects);
-            AddPoolingObjects(FreezeEffects);
-            AddPoolingObjects(DefaultDamageHitEffects);
 
             if (newCharacterSetting != null && newCharacterSetting.startItems != null)
                 AddItems(newCharacterSetting.startItems);
