@@ -507,6 +507,7 @@ namespace MultiplayerARPG
                             break;
                         }
                     }
+#if !EXCLUDE_PREFAB_REFS
                     if (targetMonster == null)
                     {
                         foreach (BaseMonsterCharacterEntity monster in GameInstance.MonsterCharacterEntities.Values)
@@ -522,6 +523,7 @@ namespace MultiplayerARPG
                             }
                         }
                     }
+#endif
                     int level;
                     int amount;
                     if (targetMonster == null)
@@ -633,7 +635,7 @@ namespace MultiplayerARPG
                 }
             }
 #endif
-            return response;
+                    return response;
         }
     }
 }
