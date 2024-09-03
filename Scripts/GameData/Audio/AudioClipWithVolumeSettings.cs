@@ -44,10 +44,10 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public void ProceedAddressableAssetConversion()
+        public void ProceedAddressableAssetConversion(string groupName)
         {
 #if UNITY_EDITOR
-            AddressableEditorUtils.ConvertObjectRefToAddressable(ref audioClip, ref addressableAudioClip);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref audioClip, ref addressableAudioClip, groupName);
 #endif
         }
     }

@@ -14,9 +14,9 @@ namespace MultiplayerARPG
         public AssetReferenceGameEffect addressablePrefab;
 #endif
 
-#if !UNITY_SERVER || UNITY_EDITOR
         public async void GetInstance()
         {
+#if !UNITY_SERVER
             GameEffect tempPrefab = null;
 #if !EXCLUDE_PREFAB_REFS
             tempPrefab = prefab;
@@ -25,13 +25,13 @@ namespace MultiplayerARPG
             GameEffect loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
             if (loadedPrefab != null)
                 PoolSystem.GetInstance(loadedPrefab, container.position, container.rotation).FollowingTarget = container;
-        }
 #endif
+        }
 
-        public void ProceedAddressableAssetConversion()
+        public void ProceedAddressableAssetConversion(string groupName)
         {
 #if UNITY_EDITOR
-            AddressableEditorUtils.ConvertObjectRefToAddressable(ref prefab, ref addressablePrefab);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref prefab, ref addressablePrefab, groupName);
 #endif
         }
     }

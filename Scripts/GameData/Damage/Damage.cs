@@ -223,12 +223,12 @@ namespace MultiplayerARPG
             return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.IsHeadshotInstantDeath() : false;
         }
 
-        public void ProceedAddressableAssetConversion()
+        public void ProceedAddressableAssetConversion(string groupName)
         {
 #if UNITY_EDITOR
-            AddressableEditorUtils.ConvertObjectRefToAddressable(ref missileDamageEntity, ref addressableMissileDamageEntity);
-            AddressableEditorUtils.ConvertObjectRefToAddressable(ref projectileEffect, ref addressableProjectEffect);
-            AddressableEditorUtils.ConvertObjectRefToAddressable(ref throwableDamageEntity, ref addressableThrowableDamageEntity);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref missileDamageEntity, ref addressableMissileDamageEntity, groupName);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref projectileEffect, ref addressableProjectEffect, groupName);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref throwableDamageEntity, ref addressableThrowableDamageEntity, groupName);
 #endif
         }
     }

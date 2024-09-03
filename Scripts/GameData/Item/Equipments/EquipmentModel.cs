@@ -17,8 +17,8 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("useInstantiatedObject")]
         public bool useInstantiatedObject;
 
-        [BoolShowConditional(nameof(useInstantiatedObject), false)]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [BoolShowConditional(nameof(useInstantiatedObject), false)]
         [SerializeField]
         [FormerlySerializedAs("model")]
         protected GameObject meshPrefab = null;
@@ -85,7 +85,9 @@ namespace MultiplayerARPG
 
         public EquipmentModel SetMeshPrefab(GameObject meshPrefab)
         {
+#if !EXCLUDE_PREFAB_REFS
             this.meshPrefab = meshPrefab;
+#endif
             return this;
         }
 
@@ -128,10 +130,10 @@ namespace MultiplayerARPG
                 onInstantiated.Invoke(this, modelObject, equipmentEntity, instantiatedObjectGroup, equipmentContainer);
         }
 
-        public void ProceedAddressableAssetConversion()
+        public void ProceedAddressableAssetConversion(string groupName)
         {
 #if UNITY_EDITOR
-            AddressableEditorUtils.ConvertObjectRefToAddressable(ref meshPrefab, ref addressableMeshPrefab);
+            AddressableEditorUtils.ConvertObjectRefToAddressable(ref meshPrefab, ref addressableMeshPrefab, groupName);
 #endif
         }
     }
