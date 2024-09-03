@@ -260,23 +260,19 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-            GameInstance.AddPoolingObjects(skillCastEffects);
-            GameInstance.AddPoolingObjects(skillActivateEffects);
             if (TryGetBuff(out Buff buff))
             {
-                GameInstance.AddPoolingObjects(buff.Effects);
                 buff.PrepareRelatesData();
             }
             if (TryGetDebuff(out Buff debuff))
             {
-                GameInstance.AddPoolingObjects(debuff.Effects);
                 debuff.PrepareRelatesData();
             }
             if (TryGetSummon(out SkillSummon summon))
             {
-                GameInstance.AddAssetReferenceCharacterEntities(summon.AddressableMonsterCharacterEntity);
+                GameInstance.AddAssetReferenceMonsterCharacterEntities(summon.AddressableMonsterCharacterEntity);
 #if !EXCLUDE_PREFAB_REFS
-                GameInstance.AddCharacterEntities(summon.MonsterCharacterEntity);
+                GameInstance.AddMonsterCharacterEntities(summon.MonsterCharacterEntity);
 #endif
             }
             if (TryGetMount(out SkillMount mount))

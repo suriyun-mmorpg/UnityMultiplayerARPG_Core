@@ -437,7 +437,6 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddDamageElements(DamageAmount);
-            GameInstance.AddPoolingWeaponLaunchEffects(OffHandEquipmentModels);
             GameInstance.AddWeaponTypes(WeaponType);
             // Data migration
             GameInstance.MigrateEquipmentEntities(OffHandEquipmentModels);
