@@ -1,8 +1,6 @@
-﻿using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
+﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -24,81 +22,6 @@ namespace MultiplayerARPG
             }
 
             return database;
-        }
-
-        public static bool TryGetEntityPrefab(this ICharacterData data, out BaseCharacterEntity prefab, out int? metaDataId)
-        {
-            int hashAssetId = GameInstance.GetCharacterEntityHashAssetId(data.EntityId, out metaDataId);
-            if (metaDataId.HasValue)
-            {
-                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.EntityPrefab != null)
-                {
-                    prefab = metaData.EntityPrefab;
-                    return true;
-                }
-            }
-            return GameInstance.CharacterEntities.TryGetValue(hashAssetId, out prefab);
-        }
-
-        public static bool TryGetEntityAddressablePrefab(this ICharacterData data, out AssetReferenceBaseCharacterEntity assetRef, out int? metaDataId)
-        {
-            int hashAssetId = GameInstance.GetCharacterEntityHashAssetId(data.EntityId, out metaDataId);
-            if (metaDataId.HasValue)
-            {
-                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.AddressableEntityPrefab.IsDataValid())
-                {
-                    assetRef = metaData.AddressableEntityPrefab;
-                    return true;
-                }
-            }
-            return GameInstance.AddressableCharacterEntities.TryGetValue(hashAssetId, out assetRef);
-        }
-
-        public static BaseCharacterModel InstantiateModel(this ICharacterData data, Transform parent)
-        {
-            BaseCharacterEntity result;
-            int? metaDataId;
-            if (data.TryGetEntityAddressablePrefab(out AssetReferenceBaseCharacterEntity assetRef, out metaDataId))
-            {
-                AsyncOperationHandle<BaseCharacterEntity> handler = assetRef.InstantiateAsync();
-                result = handler.WaitForCompletion();
-                result.gameObject.AddComponent<AssetReferenceReleaser>().Setup(handler);
-            }
-            else if (data.TryGetEntityPrefab(out BaseCharacterEntity prefab, out metaDataId))
-            {
-                result = Object.Instantiate(prefab);
-            }
-            else
-            {
-                Logging.LogWarning($"[InstantiateModel] Cannot find character entity with id: {data.EntityId}");
-                return null;
-            }
-            GameInstance.SetupByMetaData(result as BasePlayerCharacterEntity, metaDataId);
-            LiteNetLibBehaviour[] networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
-            foreach (LiteNetLibBehaviour networkBehaviour in networkBehaviours)
-            {
-                networkBehaviour.enabled = false;
-            }
-            IEntityMovementComponent movementComponent = result.GetComponent<IEntityMovementComponent>();
-            if (!movementComponent.IsNull())
-                movementComponent.Enabled = false;
-            GameObject[] ownerObjects = result.OwnerObjects;
-            foreach (GameObject ownerObject in ownerObjects)
-            {
-                ownerObject.SetActive(false);
-            }
-            GameObject[] nonOwnerObjects = result.NonOwnerObjects;
-            foreach (GameObject nonOwnerObject in nonOwnerObjects)
-            {
-                nonOwnerObject.SetActive(false);
-            }
-            result.gameObject.SetLayerRecursively(GameInstance.Singleton.playerLayer, true);
-            result.gameObject.SetActive(true);
-            result.transform.SetParent(parent);
-            result.transform.localPosition = Vector3.zero;
-            result.transform.localEulerAngles = Vector3.zero;
-            result.CharacterModel.DisableIKs = true;
-            return result.CharacterModel;
         }
 
         public static int GetNextLevelExp(this ICharacterData data)

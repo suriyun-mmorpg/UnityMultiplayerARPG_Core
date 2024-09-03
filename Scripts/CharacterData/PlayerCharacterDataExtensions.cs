@@ -1,8 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using Insthync.AddressableAssetTools;
+using LiteNetLibManager;
+using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
@@ -608,6 +611,86 @@ namespace MultiplayerARPG
         public static bool IsMuting(this IPlayerCharacterData character)
         {
             return character.UnmuteTime > 0 && character.UnmuteTime > (BaseGameNetworkManager.Singleton.ServerTimestamp / 1000);
+        }
+
+        public static bool TryGetEntityPrefab(this IPlayerCharacterData data, out BasePlayerCharacterEntity prefab, out int? metaDataId)
+        {
+            int hashAssetId = GameInstance.GetPlayerCharacterEntityHashAssetId(data.EntityId, out metaDataId);
+            if (metaDataId.HasValue)
+            {
+                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.EntityPrefab != null)
+                {
+                    prefab = metaData.EntityPrefab;
+                    return prefab != null;
+                }
+            }
+#if !EXCLUDE_PREFAB_REFS
+            return GameInstance.PlayerCharacterEntities.TryGetValue(hashAssetId, out prefab);
+#else
+            prefab = null;
+            return false;
+#endif
+        }
+
+        public static bool TryGetEntityAddressablePrefab(this IPlayerCharacterData data, out AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity> assetRef, out int? metaDataId)
+        {
+            int hashAssetId = GameInstance.GetPlayerCharacterEntityHashAssetId(data.EntityId, out metaDataId);
+            if (metaDataId.HasValue)
+            {
+                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.AddressableEntityPrefab.IsDataValid())
+                {
+                    assetRef = metaData.AddressableEntityPrefab;
+                    return assetRef.IsDataValid();
+                }
+            }
+            return GameInstance.AddressablePlayerCharacterEntities.TryGetValue(hashAssetId, out assetRef);
+        }
+
+        public static BaseCharacterModel InstantiateModel(this IPlayerCharacterData data, Transform parent)
+        {
+            BaseCharacterEntity result;
+            int? metaDataId;
+            if (data.TryGetEntityAddressablePrefab(out var assetRef, out metaDataId))
+            {
+                AsyncOperationHandle<BasePlayerCharacterEntity> handler = assetRef.InstantiateAsync();
+                result = handler.WaitForCompletion();
+                result.gameObject.AddComponent<AssetReferenceReleaser>().Setup(handler);
+            }
+            else if (data.TryGetEntityPrefab(out var prefab, out metaDataId))
+            {
+                result = Object.Instantiate(prefab);
+            }
+            else
+            {
+                Logging.LogWarning($"[InstantiateModel] Cannot find character entity with id: {data.EntityId}");
+                return null;
+            }
+            GameInstance.SetupByMetaData(result as BasePlayerCharacterEntity, metaDataId);
+            LiteNetLibBehaviour[] networkBehaviours = result.GetComponentsInChildren<LiteNetLibBehaviour>();
+            foreach (LiteNetLibBehaviour networkBehaviour in networkBehaviours)
+            {
+                networkBehaviour.enabled = false;
+            }
+            IEntityMovementComponent movementComponent = result.GetComponent<IEntityMovementComponent>();
+            if (!movementComponent.IsNull())
+                movementComponent.Enabled = false;
+            GameObject[] ownerObjects = result.OwnerObjects;
+            foreach (GameObject ownerObject in ownerObjects)
+            {
+                ownerObject.SetActive(false);
+            }
+            GameObject[] nonOwnerObjects = result.NonOwnerObjects;
+            foreach (GameObject nonOwnerObject in nonOwnerObjects)
+            {
+                nonOwnerObject.SetActive(false);
+            }
+            result.gameObject.SetLayerRecursively(GameInstance.Singleton.playerLayer, true);
+            result.gameObject.SetActive(true);
+            result.transform.SetParent(parent);
+            result.transform.localPosition = Vector3.zero;
+            result.transform.localEulerAngles = Vector3.zero;
+            result.CharacterModel.DisableIKs = true;
+            return result.CharacterModel;
         }
 
         public static void SetupModelBodyParts(this BaseCharacterModel characterModel, IPlayerCharacterData data)
