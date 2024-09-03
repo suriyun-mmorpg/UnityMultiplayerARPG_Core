@@ -84,7 +84,9 @@ namespace MultiplayerARPG
                 {
                     foreach (GameEffectPoolContainer container in poolingWeaponLaunchEffects)
                     {
+#if !EXCLUDE_PREFAB_REFS
                         effects.Add(container.prefab);
+#endif
                     }
                 }
 #endif

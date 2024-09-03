@@ -22,8 +22,8 @@ namespace MultiplayerARPG
         private BaseCharacterModel mainTpsModel = null;
         public BaseCharacterModel MainTpsModel { get { return mainTpsModel; } set { mainTpsModel = value; } }
 
-        [Header("FPS Model Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [Header("FPS Model Settings")]
         [AddressableAssetConversion(nameof(addressableFpsModelPrefab))]
         protected BaseCharacterModel fpsModelPrefab;
 #endif
@@ -126,7 +126,9 @@ namespace MultiplayerARPG
         public override void EntityOnDestroy()
         {
             mainTpsModel = null;
+#if !EXCLUDE_PREFAB_REFS
             fpsModelPrefab = null;
+#endif
             addressableFpsModelPrefab = null;
             ActiveTpsModel = null;
             ActiveFpsModel = null;
