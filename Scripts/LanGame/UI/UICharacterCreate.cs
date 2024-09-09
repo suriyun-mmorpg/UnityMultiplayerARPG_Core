@@ -277,18 +277,23 @@ namespace MultiplayerARPG
 #endif
             if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
             {
-                List<AsyncOperationHandle<BasePlayerCharacterEntity>> asyncOps = new List<AsyncOperationHandle<BasePlayerCharacterEntity>>();
-                List<Task<BasePlayerCharacterEntity>> loadTasks = new List<Task<BasePlayerCharacterEntity>>();
+                List<AsyncOperationHandle<GameObject>> asyncOps = new List<AsyncOperationHandle<GameObject>>();
+                List<Task<GameObject>> loadTasks = new List<Task<GameObject>>();
                 foreach (AssetReferenceBasePlayerCharacterEntity entry in GameInstance.AddressablePlayerCharacterEntities.Values)
                 {
-                    AsyncOperationHandle<BasePlayerCharacterEntity> asyncOp = entry.LoadAssetAsync();
+                    AsyncOperationHandle<GameObject> asyncOp = Addressables.LoadAssetAsync<GameObject>(entry.RuntimeKey);
                     asyncOps.Add(asyncOp);
                     loadTasks.Add(asyncOp.Task);
                 }
                 await Task.WhenAll(loadTasks);
                 for (int i = 0; i < loadTasks.Count; ++i)
                 {
-                    BasePlayerCharacterEntity prefab = asyncOps[i].Result;
+                    GameObject loadedObject = asyncOps[i].Result;
+                    if (!loadedObject.TryGetComponent(out BasePlayerCharacterEntity prefab))
+                    {
+                        Addressables.Release(asyncOps[i]);
+                        continue;
+                    }
                     if (RaceToggles.Count > 0 && prefab.Race != null && !SelectedRaces.Contains(prefab.Race))
                     {
                         Addressables.Release(asyncOps[i]);
@@ -304,8 +309,8 @@ namespace MultiplayerARPG
             }
             if (GameInstance.PlayerCharacterEntityMetaDataList.Count > 0)
             {
-                List<AsyncOperationHandle<BasePlayerCharacterEntity>> asyncOps = new List<AsyncOperationHandle<BasePlayerCharacterEntity>>();
-                List<Task<BasePlayerCharacterEntity>> loadTasks = new List<Task<BasePlayerCharacterEntity>>();
+                List<AsyncOperationHandle<GameObject>> asyncOps = new List<AsyncOperationHandle<GameObject>>();
+                List<Task<GameObject>> loadTasks = new List<Task<GameObject>>();
                 List<PlayerCharacterEntityMetaData> loadMetaDataList = new List<PlayerCharacterEntityMetaData>();
                 foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
                 {
@@ -313,7 +318,7 @@ namespace MultiplayerARPG
                         continue;
                     if (entry.AddressableEntityPrefab.IsDataValid())
                     {
-                        AsyncOperationHandle<BasePlayerCharacterEntity> asyncOp = entry.AddressableEntityPrefab.LoadAssetAsync();
+                        AsyncOperationHandle<GameObject> asyncOp = Addressables.LoadAssetAsync<GameObject>(entry.AddressableEntityPrefab.RuntimeKey);
                         asyncOps.Add(asyncOp);
                         loadTasks.Add(asyncOp.Task);
                         loadMetaDataList.Add(entry);
@@ -331,7 +336,12 @@ namespace MultiplayerARPG
                 await Task.WhenAll(loadTasks);
                 for (int i = 0; i < loadTasks.Count; ++i)
                 {
-                    BasePlayerCharacterEntity prefab = asyncOps[i].Result;
+                    GameObject loadedObject = asyncOps[i].Result;
+                    if (!loadedObject.TryGetComponent(out BasePlayerCharacterEntity prefab))
+                    {
+                        Addressables.Release(asyncOps[i]);
+                        continue;
+                    }
                     PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
                     data.CharacterName = loadMetaDataList[i].Title;
                     data.EntityId = loadMetaDataList[i].DataId;
