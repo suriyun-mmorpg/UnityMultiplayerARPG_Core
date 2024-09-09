@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
+using LiteNetLibManager;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -186,7 +187,27 @@ namespace MultiplayerARPG
         [ContextMenu("Force Validate")]
         public virtual bool Validate()
         {
-            return false;
+            return ValidateHashAssetID();
+        }
+
+        public virtual bool ValidateHashAssetID()
+        {
+            bool hasChanges = false;
+#if UNITY_EDITOR
+            List<FieldSourceInfo> fieldSourceInfos = this.FindFieldsOfType<AssetReferenceLiteNetLibIdentity>();
+            for (int i = 0; i < fieldSourceInfos.Count; ++i)
+            {
+                AssetReferenceLiteNetLibIdentity assetRefIdentity = fieldSourceInfos[i].Field.GetValue(fieldSourceInfos[i].Source) as AssetReferenceLiteNetLibIdentity;
+                if (assetRefIdentity == null)
+                    continue;
+                if (assetRefIdentity.ValidateHashAssetID())
+                {
+                    Debug.Log($"Hash asset ID validated, game data {this}");
+                    hasChanges = true;
+                }
+            }
+#endif
+            return hasChanges;
         }
 
         public virtual void PrepareRelatesData()
