@@ -186,22 +186,23 @@ namespace MultiplayerARPG
             Entity = GetComponent<BaseGameEntity>();
             if (Entity == null)
                 Entity = GetComponentInParent<BaseGameEntity>();
+            // Setup ID for caching, uses hashed asset ID if possible
             Id = GetInstanceID();
+            if (Entity != null && !string.IsNullOrWhiteSpace(Entity.Identity.AssetId))
+                Id = Entity.Identity.HashAssetId;
             // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
             if (Manager == null)
             {
-                if (Entity != null && Entity.Identity != null)
-                    Id = Entity.Identity.HashAssetId;
                 MainModel = this;
                 InitCacheData();
                 SwitchModel(null);
             }
             else
             {
-                byte id = Manager.InitTpsModel(this);
+                byte vehicleId = Manager.InitTpsModel(this);
                 unchecked
                 {
-                    Id = Entity.Identity.HashAssetId + id;
+                    Id += vehicleId;
                 }
             }
         }
