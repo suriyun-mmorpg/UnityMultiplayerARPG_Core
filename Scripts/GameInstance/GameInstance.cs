@@ -1,11 +1,9 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
@@ -461,16 +459,6 @@ namespace MultiplayerARPG
         public ItemAmount[] startItems = new ItemAmount[0];
         [Tooltip("If it is running in editor, and if this is not NULL, it will use data from this setting for testing purpose")]
         public NewCharacterSetting testingNewCharacterSetting;
-
-        [Header("Scene/Maps")]
-        public SceneField homeScene;
-        public AssetReferenceScene addressableHomeScene;
-        [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
-        public SceneField homeMobileScene;
-        public AssetReferenceScene addressableHomeMobileScene;
-        [Tooltip("If this is empty, it will use `Home Scene` as home scene")]
-        public SceneField homeConsoleScene;
-        public AssetReferenceScene addressableHomeConsoleScene;
 
         [Header("Server Settings")]
         public bool updateAnimationAtServer = true;
@@ -1261,76 +1249,6 @@ namespace MultiplayerARPG
                 OnGameDataLoadedEvent.Invoke();
             if (Application.isPlaying && !DoNotLoadHomeScene)
                 LoadHomeScene();
-        }
-
-        public void LoadHomeScene()
-        {
-            StartCoroutine(LoadHomeSceneRoutine());
-        }
-
-        IEnumerator LoadHomeSceneRoutine()
-        {
-            if (UISceneLoading.Singleton)
-            {
-                if (GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
-                {
-                    yield return UISceneLoading.Singleton.LoadScene(addressableScene);
-                }
-                else
-                {
-                    yield return UISceneLoading.Singleton.LoadScene(scene);
-                }
-            }
-            else
-            {
-                if (GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
-                {
-                    yield return addressableScene.LoadSceneAsync();
-                }
-                else
-                {
-                    yield return SceneManager.LoadSceneAsync(scene);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Return `TRUE` if it is addressable
-        /// </summary>
-        /// <param name="addressableScene"></param>
-        /// <param name="scene"></param>
-        /// <returns></returns>
-        public bool GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene)
-        {
-            addressableScene = null;
-            scene = default;
-            if (Application.isMobilePlatform || IsMobileTestInEditor())
-            {
-                if (addressableHomeMobileScene.IsDataValid())
-                {
-                    addressableScene = addressableHomeMobileScene;
-                    return true;
-                }
-                scene = homeMobileScene;
-                return false;
-            }
-            if (Application.isConsolePlatform || IsConsoleTestInEditor())
-            {
-                if (addressableHomeConsoleScene.IsDataValid())
-                {
-                    addressableScene = addressableHomeConsoleScene;
-                    return true;
-                }
-                scene = homeConsoleScene;
-                return false;
-            }
-            if (addressableHomeScene.IsDataValid())
-            {
-                addressableScene = addressableHomeScene;
-                return true;
-            }
-            scene = homeScene;
-            return false;
         }
 
         public List<string> GetGameMapIds()
