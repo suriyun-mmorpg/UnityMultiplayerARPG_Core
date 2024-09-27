@@ -41,6 +41,7 @@ namespace MultiplayerARPG
 
         public void PrepareTransforms(Animator src, Animator dst)
         {
+#if !UNITY_SERVER
             if (src == null || dst == null)
                 return;
             if (_dstTransforms.isCreated)
@@ -72,14 +73,18 @@ namespace MultiplayerARPG
                 }
             }
             _dstTransforms = new TransformAccessArray(tempDstTransforms.ToArray());
+#endif
         }
 
         private void OnDestroy()
         {
+#if !UNITY_SERVER
             if (_dstTransforms.isCreated)
                 _dstTransforms.Dispose();
+#endif
         }
 
+#if !UNITY_SERVER
         private void LateUpdate()
         {
             if (_srcTransforms.Count <= 0 || !_dstTransforms.isCreated)
@@ -110,7 +115,12 @@ namespace MultiplayerARPG
             JobHandle jobHandle = job.Schedule(_dstTransforms);
 
             jobHandle.Complete();
+
+            sourcePositions.Dispose();
+            sourceRotations.Dispose();
+            sourceLocalScales.Dispose();
         }
+#endif
 
         [BurstCompile]
         private struct CopyTransformsJob : IJobParallelForTransform
