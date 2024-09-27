@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         public UICharacterItem uiCharacterItem;
         public TextWrapper uiTextSellPrice;
         public UICurrencyAmounts uiSellPrices;
+        public UIInputDialog uiAmountInputDialog;
+        public TextWrapper uiTextCalculatedSellPrice;
 
         [Header("Options")]
         [Tooltip("If this is `TRUE`, `uiTextSellPrice` will be inactivated when item's sell price is 0")]
@@ -20,12 +22,22 @@ namespace MultiplayerARPG
 
         public int indexOfData { get; protected set; }
 
+        protected override void Awake()
+        {
+            base.Awake();
+            if (uiAmountInputDialog != null && uiAmountInputDialog.uiInputField != null)
+                uiAmountInputDialog.uiInputField.onValueChanged.AddListener(OnBuyAmountChanged);
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
             uiCharacterItem = null;
             uiTextSellPrice = null;
             uiSellPrices = null;
+            uiAmountInputDialog = null;
+            if (uiAmountInputDialog != null && uiAmountInputDialog.uiInputField != null)
+                uiAmountInputDialog.uiInputField.onValueChanged.RemoveListener(OnBuyAmountChanged);
         }
 
         public void Setup(NpcSellItem data, int indexOfData)
@@ -74,18 +86,43 @@ namespace MultiplayerARPG
                 return;
             }
 
-            UISceneGlobal.Singleton.ShowInputDialog(
-                LanguageManager.GetText(UITextKeys.UI_BUY_ITEM.ToString()),
-                LanguageManager.GetText(UITextKeys.UI_BUY_ITEM_DESCRIPTION.ToString()),
-                OnBuyAmountConfirmed,
-                1,  /* Min Amount */
-                null,
-                1   /* Start Amount */);
+            if (uiAmountInputDialog != null)
+            {
+                uiAmountInputDialog.Show(
+                    LanguageManager.GetText(UITextKeys.UI_BUY_ITEM.ToString()),
+                    LanguageManager.GetText(UITextKeys.UI_BUY_ITEM_DESCRIPTION.ToString()),
+                    OnBuyAmountConfirmed,
+                    1,  /* Min Amount */
+                    null,
+                    1   /* Start Amount */);
+            }
+            else
+            {
+                UISceneGlobal.Singleton.ShowInputDialog(
+                    LanguageManager.GetText(UITextKeys.UI_BUY_ITEM.ToString()),
+                    LanguageManager.GetText(UITextKeys.UI_BUY_ITEM_DESCRIPTION.ToString()),
+                    OnBuyAmountConfirmed,
+                    1,  /* Min Amount */
+                    null,
+                    1   /* Start Amount */);
+            }
         }
 
         private void OnBuyAmountConfirmed(int amount)
         {
             GameInstance.PlayingCharacterEntity.NpcAction.CallCmdBuyNpcItem(indexOfData, amount);
+        }
+
+        private void OnBuyAmountChanged(string amountText)
+        {
+            if (!int.TryParse(amountText, out int amount))
+            {
+                if (uiTextCalculatedSellPrice != null)
+                    uiTextCalculatedSellPrice.text = "0";
+                return;
+            }
+            if (uiTextCalculatedSellPrice != null)
+                uiTextCalculatedSellPrice.text = (amount * Data.sellPrice).ToString("N0");
         }
     }
 }
