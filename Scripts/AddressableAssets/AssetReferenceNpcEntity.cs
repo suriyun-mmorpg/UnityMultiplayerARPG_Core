@@ -1,7 +1,9 @@
+using LiteNetLibManager;
+
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class AssetReferenceNpcEntity : AssetReferenceBaseGameEntity<NpcEntity>
+    public class AssetReferenceNpcEntity : AssetReferenceLiteNetLibBehaviour<NpcEntity>
     {
         public AssetReferenceNpcEntity(string guid) : base(guid)
         {

@@ -3,7 +3,7 @@ using LiteNetLibManager;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class AssetReferenceBaseCharacterEntity : AssetReferenceBaseGameEntity<BaseCharacterEntity>
+    public class AssetReferenceBaseCharacterEntity : AssetReferenceLiteNetLibBehaviour<BaseCharacterEntity>
     {
         public AssetReferenceBaseCharacterEntity(string guid) : base(guid)
         {

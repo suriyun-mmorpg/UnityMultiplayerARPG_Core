@@ -1,7 +1,9 @@
+using LiteNetLibManager;
+
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public class AssetReferenceWarpPortalEntity : AssetReferenceBaseGameEntity<WarpPortalEntity>
+    public class AssetReferenceWarpPortalEntity : AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>
     {
         public AssetReferenceWarpPortalEntity(string guid) : base(guid)
         {
