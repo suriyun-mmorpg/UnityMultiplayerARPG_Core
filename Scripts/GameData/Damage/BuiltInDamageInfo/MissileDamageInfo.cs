@@ -47,7 +47,7 @@ namespace MultiplayerARPG
 
         protected void PrepareHitValidationData(MissileDamageEntity damageEntity)
         {
-            if (damageEntity != null)
+            if (damageEntity == null)
                 return;
             _hitDetectionMode = damageEntity.hitDetectionMode;
             _sphereCastRadius = damageEntity.sphereCastRadius;
