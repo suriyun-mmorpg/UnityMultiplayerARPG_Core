@@ -199,8 +199,17 @@ namespace MultiplayerARPG
                     gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                     return false;
                 }
+                // Update enhanced item, before make changes to other items
+                enhancedItem.sockets[socketIndex] = 0;
+                onRemoveEnhancer.Invoke(enhancedItem);
                 character.IncreaseItems(CharacterItem.Create(enhancerId));
                 inventoryChanged = true;
+            }
+            else
+            {
+                // Update enhanced item, before make changes to other items
+                enhancedItem.sockets[socketIndex] = 0;
+                onRemoveEnhancer.Invoke(enhancedItem);
             }
             if (GameInstance.Singleton.enhancerRemoval.RequireItems != null)
             {
@@ -213,9 +222,6 @@ namespace MultiplayerARPG
                 character.FillEmptySlots();
             // Decrease required gold
             GameInstance.Singleton.GameplayRule.DecreaseCurrenciesWhenRemoveEnhancer(character);
-            // Update enhanced item
-            enhancedItem.sockets[socketIndex] = 0;
-            onRemoveEnhancer.Invoke(enhancedItem);
             GameInstance.ServerLogHandlers.LogRemoveEnhancerFromItem(character, enhancedItem, enhancerItem);
             return true;
         }
