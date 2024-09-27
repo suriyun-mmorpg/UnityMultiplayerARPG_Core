@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public UICharacter uiAnotherCharacter;
         [Tooltip("These objects will be activated when owning character can invite to join party")]
         public GameObject[] partyInviteObjects = new GameObject[0];
+        public bool autoCreatePartyIfNotCreated = true;
         [Tooltip("These objects will be activated when owning character can invite to join guild")]
         public GameObject[] guildInviteObjects = new GameObject[0];
         [Tooltip("These objects will be activated when owning character can invite to deal")]
@@ -49,15 +50,19 @@ namespace MultiplayerARPG
                 return;
             }
             base.UpdateUI();
+            bool canInviteParty = Data.PartyId <= 0 && GameInstance.JoinedParty != null && GameInstance.JoinedParty.CanInvite(GameInstance.PlayingCharacter.Id);
+            if (!canInviteParty)
+                canInviteParty = autoCreatePartyIfNotCreated;
             foreach (GameObject obj in partyInviteObjects)
             {
                 if (obj != null)
-                    obj.SetActive(Data.PartyId <= 0 && GameInstance.JoinedParty != null && GameInstance.JoinedParty.CanInvite(GameInstance.PlayingCharacter.Id));
+                    obj.SetActive(canInviteParty);
             }
+            bool canInviteGuild = Data.GuildId <= 0 && GameInstance.JoinedGuild != null && GameInstance.JoinedGuild.CanInvite(GameInstance.PlayingCharacter.Id);
             foreach (GameObject obj in guildInviteObjects)
             {
                 if (obj != null)
-                    obj.SetActive(Data.GuildId <= 0 && GameInstance.JoinedGuild != null && GameInstance.JoinedGuild.CanInvite(GameInstance.PlayingCharacter.Id));
+                    obj.SetActive(canInviteGuild);
             }
             if (Data is BasePlayerCharacterEntity entity)
             {
@@ -121,6 +126,36 @@ namespace MultiplayerARPG
         }
 
         public void OnClickSendPartyInvitation()
+        {
+            if (GameInstance.JoinedParty == null)
+            {
+                if (!autoCreatePartyIfNotCreated)
+                    return;
+                // Create a party before proceed invitation
+                ProceedPartyCreateBeforeInvite();
+                return;
+            }
+            ProceedPartyInvitation();
+        }
+
+        public void ProceedPartyCreateBeforeInvite()
+        {
+            GameInstance.ClientPartyHandlers.RequestCreateParty(new RequestCreatePartyMessage()
+            {
+                shareExp = true,
+                shareItem = true,
+            }, SendPartyCreateCallback);
+        }
+
+        public void SendPartyCreateCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseCreatePartyMessage response)
+        {
+            ClientPartyActions.ResponseCreateParty(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
+                return;
+            ProceedPartyInvitation();
+        }
+
+        public void ProceedPartyInvitation()
         {
             GameInstance.ClientPartyHandlers.RequestSendPartyInvitation(new RequestSendPartyInvitationMessage()
             {
