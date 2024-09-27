@@ -16,10 +16,13 @@ namespace MultiplayerARPG
         private bool partyMemberCanInvite = false;
         [SerializeField]
         private bool partyMemberCanKick = false;
+        [SerializeField]
+        private float partyInvitationTimeout = 10f;
 
         public int MaxPartyMember { get { return maxPartyMember; } }
         public bool PartyMemberCanInvite { get { return partyMemberCanInvite; } }
         public bool PartyMemberCanKick { get { return partyMemberCanKick; } }
+        public float PartyInvitationTimeout { get { return partyInvitationTimeout; } }
 
         [Header("Guild Configs")]
         [SerializeField]
@@ -64,6 +67,8 @@ namespace MultiplayerARPG
         private int[] guildExpTree;
         [SerializeField]
         private ExpTable guildExpTable;
+        [SerializeField]
+        private float guildInvitationTimeout = 10f;
 
         public int MaxGuildMember { get { return maxGuildMember; } }
         public int MinGuildNameLength { get { return minGuildNameLength; } }
@@ -108,6 +113,7 @@ namespace MultiplayerARPG
             get { return guildExpTable; }
             set { guildExpTable = value; }
         }
+        public float GuildInvitationTimeout { get { return guildInvitationTimeout; } }
 
         public bool CanCreateGuild(IPlayerCharacterData character)
         {

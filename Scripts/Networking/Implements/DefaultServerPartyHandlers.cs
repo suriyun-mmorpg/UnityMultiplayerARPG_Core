@@ -7,7 +7,6 @@ namespace MultiplayerARPG
 {
     public partial class DefaultServerPartyHandlers : MonoBehaviour, IServerPartyHandlers
     {
-        public const int PartyInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, PartyData> Parties = new ConcurrentDictionary<int, PartyData>();
         public static readonly ConcurrentDictionary<long, PartyData> UpdatingPartyMembers = new ConcurrentDictionary<long, PartyData>();
         public static readonly HashSet<string> PartyInvitations = new HashSet<string>();
@@ -28,11 +27,7 @@ namespace MultiplayerARPG
         {
             if (partyData == null)
                 return;
-
-            if (Parties.ContainsKey(partyId))
-                Parties[partyId] = partyData;
-            else
-                Parties.TryAdd(partyId, partyData);
+            Parties[partyId] = partyData;
         }
 
         public void RemoveParty(int partyId)
@@ -71,7 +66,7 @@ namespace MultiplayerARPG
 
         private async UniTaskVoid DelayRemovePartyInvitation(int partyId, string characterId)
         {
-            await UniTask.Delay(PartyInvitationDuration);
+            await UniTask.WaitForSeconds(GameInstance.Singleton.SocialSystemSetting.PartyInvitationTimeout, true);
             RemovePartyInvitation(partyId, characterId);
         }
 

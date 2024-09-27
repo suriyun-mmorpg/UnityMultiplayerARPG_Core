@@ -7,7 +7,6 @@ namespace MultiplayerARPG
 {
     public partial class DefaultServerGuildHandlers : MonoBehaviour, IServerGuildHandlers
     {
-        public const int GuildInvitationDuration = 10000;
         public static readonly ConcurrentDictionary<int, GuildData> Guilds = new ConcurrentDictionary<int, GuildData>();
         public static readonly ConcurrentDictionary<long, GuildData> UpdatingGuildMembers = new ConcurrentDictionary<long, GuildData>();
         public static readonly HashSet<string> GuildInvitations = new HashSet<string>();
@@ -28,11 +27,7 @@ namespace MultiplayerARPG
         {
             if (guildData == null)
                 return;
-
-            if (Guilds.ContainsKey(guildId))
-                Guilds[guildId] = guildData;
-            else
-                Guilds.TryAdd(guildId, guildData);
+            Guilds[guildId] = guildData;
         }
 
         public void RemoveGuild(int guildId)
@@ -82,7 +77,7 @@ namespace MultiplayerARPG
 
         private async UniTaskVoid DelayRemoveGuildInvitation(int partyId, string characterId)
         {
-            await UniTask.Delay(GuildInvitationDuration);
+            await UniTask.WaitForSeconds(GameInstance.Singleton.SocialSystemSetting.GuildInvitationTimeout, true);
             RemoveGuildInvitation(partyId, characterId);
         }
 
