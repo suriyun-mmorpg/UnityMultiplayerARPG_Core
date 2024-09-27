@@ -61,7 +61,7 @@ namespace MultiplayerARPG
             if (CrosshairRect == null)
                 return;
             // Show cross hair if weapon's crosshair setting isn't hidden or there is a constructing building
-            CrosshairRect.gameObject.SetActive((!setting.hidden && !HideCrosshair) || Controller.ConstructingBuildingEntity != null);
+            CrosshairRect.gameObject.SetActive(((!setting.hidden && !HideCrosshair) || Controller.ConstructingBuildingEntity != null) && !UIBlockController.IsBlockController() && !UIBlockActionController.IsBlockController());
             // Not active?, don't update
             if (!CrosshairRect.gameObject)
                 return;

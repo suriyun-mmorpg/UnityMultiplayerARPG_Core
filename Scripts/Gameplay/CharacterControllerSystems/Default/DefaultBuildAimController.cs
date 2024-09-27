@@ -119,7 +119,7 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaByAxes(Vector2 aimAxes)
         {
-            if (UIBlockController.IsBlockController())
+            if (UIBlockController.IsBlockController() || UIBlockActionController.IsBlockController())
                 return;
             Vector3 raycastPosition = EntityTransform.position + (GameplayUtils.GetDirectionByAxes(_gameplayCameraController.CameraTransform, aimAxes.x, aimAxes.y) * ConstructingBuildingEntity.BuildDistance);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaByForwardAxes()
         {
-            if (UIBlockController.IsBlockController())
+            if (UIBlockController.IsBlockController() || UIBlockActionController.IsBlockController())
                 return;
             Vector3 raycastPosition = EntityTransform.position + (EntityTransform.forward * ConstructingBuildingEntity.BuildDistance * consoleDistanceRate);
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
 
         public void FindAndSetBuildingAreaByMousePosition()
         {
-            if (UIBlockController.IsBlockController())
+            if (UIBlockController.IsBlockController() || UIBlockActionController.IsBlockController())
                 return;
             LoopSetBuildingArea(_physicFunctions.RaycastPickObjects(_gameplayCameraController.Camera, InputManager.MousePosition(), CurrentGameInstance.GetBuildLayerMask(), 1000f, out _, QueryTriggerInteraction.Collide));
         }
