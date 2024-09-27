@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                 _currentVisibleMaterials = visibleMaterials;
             }
 
-            bool isVisible = CharacterModel.VisibleState == GameEntityModel.EVisibleState.Visible;
+            bool isVisible = CharacterModel == null || CharacterModel.VisibleState == GameEntityModel.EVisibleState.Visible;
             if (isVisible && _currentVisibleMaterials != null)
             {
                 // It is visible, so apply the materials
@@ -157,28 +157,31 @@ namespace MultiplayerARPG
         {
             if (_currentVisibleMaterials == null)
                 _currentVisibleMaterials = visibleMaterials;
-            switch (visibleState)
+            if (ModelHiddingUpdater)
             {
-                case GameEntityModel.EVisibleState.Visible:
-                    // Visible state is Visible, show all objects and renderers
-                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
-                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, false);
-                    _currentVisibleMaterials.ApplyMaterials();
-                    break;
-                case GameEntityModel.EVisibleState.Invisible:
-                    // Visible state is Invisible, hide all objects and renderers
-                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, true);
-                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
-                    invisibleMaterials.ApplyMaterials();
-                    break;
-                case GameEntityModel.EVisibleState.Fps:
-                    // Visible state is Fps, hide Fps objects and renderers
-                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
-                    ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
-                    fpsMaterials.ApplyMaterials();
-                    break;
+                switch (visibleState)
+                {
+                    case GameEntityModel.EVisibleState.Visible:
+                        // Visible state is Visible, show all objects and renderers
+                        ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
+                        ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, false);
+                        _currentVisibleMaterials.ApplyMaterials();
+                        break;
+                    case GameEntityModel.EVisibleState.Invisible:
+                        // Visible state is Invisible, hide all objects and renderers
+                        ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, true);
+                        ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
+                        invisibleMaterials.ApplyMaterials();
+                        break;
+                    case GameEntityModel.EVisibleState.Fps:
+                        // Visible state is Fps, hide Fps objects and renderers
+                        ModelHiddingUpdater.SetHiddingObjectsAndRenderers(hiddingObjects, hiddingRenderers, false);
+                        ModelHiddingUpdater.SetHiddingObjectsAndRenderers(fpsHiddingObjects, fpsHiddingRenderers, true);
+                        fpsMaterials.ApplyMaterials();
+                        break;
+                }
             }
-            bool isVisible = CharacterModel.VisibleState == GameEntityModel.EVisibleState.Visible;
+            bool isVisible = CharacterModel && CharacterModel.VisibleState == GameEntityModel.EVisibleState.Visible;
             if (_currentEffectObjects != null && _currentEffectObjects.Length > 0)
             {
                 foreach (GameObject effectObject in _currentEffectObjects)
