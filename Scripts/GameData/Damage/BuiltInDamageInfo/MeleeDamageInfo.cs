@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         [Tooltip("If this is TRUE, it will hit only selected target, if no selected target it will hit 1 random target")]
         public bool hitOnlySelectedTarget;
         public float hitDistance;
+        private float originOffsets = 1f;
         [Min(10f)]
         public float hitFov;
         public ImpactEffects impactEffects;
@@ -69,6 +70,19 @@ namespace MultiplayerARPG
                 Origin = damagePosition,
                 Direction = damageDirection,
             };
+            Vector3 damagePositionWithOffsets = damagePosition - (damageDirection * originOffsets);
+            float hitDistanceWithOffsets = hitDistance + originOffsets;
+#if UNITY_EDITOR
+            attacker.SetDebugDamage(new BaseCharacterEntity.DebugDamageLaunch()
+            {
+                position = damagePositionWithOffsets,
+                rotation = damageRotation,
+                direction = damageDirection,
+                isLeftHand = isLeftHand,
+                fov = hitFov,
+                distance = hitDistanceWithOffsets,
+            });
+#endif
 
             if (!isOwnedByServer && !isClient)
             {
@@ -79,7 +93,7 @@ namespace MultiplayerARPG
 
             // Find hitting objects
             int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
-            int tempHitCount = attacker.AttackPhysicFunctions.OverlapObjects(damagePosition, hitDistance, layerMask, true, QueryTriggerInteraction.Collide);
+            int tempHitCount = attacker.AttackPhysicFunctions.OverlapObjects(damagePositionWithOffsets, hitDistanceWithOffsets, layerMask, true, QueryTriggerInteraction.Collide);
             if (tempHitCount <= 0)
                 return default;
 
@@ -114,8 +128,15 @@ namespace MultiplayerARPG
                 hitObjects.Add(tempDamageableHitBox.GetObjectId());
 
                 // Target won't receive damage if dead or can't receive damage from this character
-                if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator) ||
-                    !attacker.IsPositionInFov(hitFov, tempDamageableHitBox.GetTransform().position))
+                if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator))
+                    continue;
+
+                // Target position is behind damage position?
+                if (!attacker.IsPositionInFov(damagePosition, 180f, tempDamageableHitBox.GetTransform().position))
+                    continue;
+
+                // Target position is not in hit fov?
+                if (!attacker.IsPositionInFov(damagePositionWithOffsets, hitFov, tempDamageableHitBox.GetTransform().position))
                     continue;
 
                 if (hitOnlySelectedTarget)
@@ -147,7 +168,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageableHitBox.EntityGameObject.tag;
-                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageableHitBox, damagePosition);
+                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageableHitBox, damagePositionWithOffsets);
                 }
             }
 
@@ -172,7 +193,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageTakenTarget.EntityGameObject.tag;
-                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageTakenTarget, damagePosition);
+                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageTakenTarget, damagePositionWithOffsets);
                 }
             }
 

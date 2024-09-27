@@ -82,7 +82,24 @@ namespace MultiplayerARPG
             }
             if (hitCount > pierceThroughEntities)
                 return false;
-            return true;
+            // Prevent pass through wall hacking
+            // It will raycast from origin to hit position
+            int layerMask = GameInstance.Singleton.GetAttackObstacleLayerMask();
+            RaycastHit[] tempWallHits;
+            RaycastHit2D[] tempWallHit2Ds;
+            int tempWallHitCount = 0;
+            switch (GameInstance.Singleton.DimensionType)
+            {
+                case DimensionType.Dimension3D:
+                    tempWallHits = new RaycastHit[pierceThroughEntities + 1];
+                    tempWallHitCount = PhysicUtils.SortedRaycastNonAlloc3D(new Ray(hitData.Origin, hitData.Direction), tempWallHits, Vector3.Distance(hitData.Origin, hitData.HitOrigin), layerMask, QueryTriggerInteraction.Ignore);
+                    break;
+                case DimensionType.Dimension2D:
+                    tempWallHit2Ds = new RaycastHit2D[pierceThroughEntities + 1];
+                    tempWallHitCount = PhysicUtils.SortedRaycastNonAlloc2D(new Ray2D(hitData.Origin, (Vector3)hitData.Direction), tempWallHit2Ds, Vector2.Distance(hitData.Origin, hitData.HitOrigin), layerMask);
+                    break;
+            }
+            return tempWallHitCount <= pierceThroughEntities;
         }
 
         public override bool IsHeadshotInstantDeath()
@@ -113,6 +130,17 @@ namespace MultiplayerARPG
                 Origin = damagePosition,
                 Direction = damageDirection,
             };
+#if UNITY_EDITOR
+            attacker.SetDebugDamage(new BaseCharacterEntity.DebugDamageLaunch()
+            {
+                position = damagePosition,
+                rotation = damageRotation,
+                direction = damageDirection,
+                isLeftHand = isLeftHand,
+                fov = GetFov(),
+                distance = GetDistance(),
+            });
+#endif
 
             if (!isOwnedByServer && !isClient)
             {
@@ -161,7 +189,7 @@ namespace MultiplayerARPG
                     continue;
 
                 tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
-                if (tempDamageableHitBox == null)
+                if (tempDamageableHitBox == null || !tempDamageableHitBox.Entity)
                 {
                     if (GameInstance.Singleton.IsDamageableLayer(tempGameObject.layer))
                     {
