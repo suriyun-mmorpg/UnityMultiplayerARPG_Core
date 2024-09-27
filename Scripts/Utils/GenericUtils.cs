@@ -46,7 +46,7 @@ public static partial class GenericUtils
     {
         if (list == null || list.Count == 0)
             return 0;
-        return UnityEngine.Random.Range(0, list.Count);
+        return Random.Range(0, list.Count);
     }
 
     public static T GetRandomObjectInArray<T>(this IList<T> list, out int index)
@@ -54,23 +54,7 @@ public static partial class GenericUtils
         index = -1;
         if (list == null || list.Count == 0)
             return default;
-        index = UnityEngine.Random.Range(0, list.Count);
-        return list[index];
-    }
-
-    public static T GetRandomObjectInArrayByEvenOdd<T>(this IList<T> list, bool isOdd)
-    {
-        if (list == null || list.Count == 0)
-            return default;
-
-        int startIndex = isOdd ? 1 : 0;
-
-        // Calculate how many elements are in the odd/even indexed positions
-        int count = Mathf.FloorToInt((list.Count - startIndex + 1) * 0.5f);
-
-        // Select a random index within the valid range of odd/even indices using UnityEngine.Random
-        int index = startIndex + UnityEngine.Random.Range(0, count) * 2;
-
+        index = Random.Range(0, list.Count);
         return list[index];
     }
 
