@@ -749,7 +749,7 @@ namespace MultiplayerARPG
                     EquipmentModel clonedModel = tempModel.Clone();
                     clonedModel.indexOfModel = i;
                     clonedModel.equipPosition = equipPosition;
-                    clonedModel.item = item;
+                    clonedModel.item = item.Clone(false);
                     clonedModel.onInstantiated = onInstantiated;
                     showingModels[equipSocket] = clonedModel;
                     storingModels[equipSocket] = clonedModel;

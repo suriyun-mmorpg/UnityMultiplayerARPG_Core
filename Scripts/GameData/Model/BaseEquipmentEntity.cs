@@ -22,7 +22,7 @@ namespace MultiplayerARPG
             get { return _item; }
             set
             {
-                if (!_item.IsDiffer(value, true))
+                if (_item.IsDiffer(value, true))
                 {
                     _item = value;
                     OnItemChanged(_item);
@@ -90,17 +90,24 @@ namespace MultiplayerARPG
                     }
                 }
 #endif
-                return effects;
+                        return effects;
             }
         }
 
         public virtual void Setup(BaseCharacterModel characterModel, string equipPosition, CharacterItem item)
         {
             CharacterModel = characterModel;
-            CharacterModel.onVisibleStateChange += SetVisibleState;
+            if (CharacterModel != null)
+                CharacterModel.onVisibleStateChange += SetVisibleState;
             EquipPosition = equipPosition;
             Item = item;
             onSetup.Invoke();
+        }
+
+        public void InvokeOnItemChanged()
+        {
+            OnItemChanged(_item);
+            onItemChanged.Invoke(_item);
         }
 
         protected virtual void Awake()
