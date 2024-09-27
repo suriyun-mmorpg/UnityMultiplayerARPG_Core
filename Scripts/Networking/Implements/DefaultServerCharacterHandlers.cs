@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             if (OnlineCharacterIds.TryGetValue(characterId, out float lastOnlineTime))
             {
                 // Notify back online character
-                Manager.ServerSendPacket(messageHandler.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
+                Manager.ServerSendPacket(messageHandler.ConnectionId, 0, DeliveryMethod.Sequenced, GameNetworkingConsts.NotifyOnlineCharacter, (writer) =>
                 {
                     writer.Put(characterId);
                     writer.PutPackedInt(Mathf.FloorToInt(Time.unscaledTime - lastOnlineTime));
@@ -38,8 +38,7 @@ namespace MultiplayerARPG
         {
             if (string.IsNullOrEmpty(characterId))
                 return;
-            OnlineCharacterIds.TryRemove(characterId, out _);
-            OnlineCharacterIds.TryAdd(characterId, Time.unscaledTime);
+            OnlineCharacterIds[characterId] = Time.unscaledTime;
         }
 
         public void ClearOnlineCharacters()
