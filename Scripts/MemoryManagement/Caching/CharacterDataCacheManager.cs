@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections.Concurrent;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public static class CharacterDataCacheManager
     {
-        private static readonly Dictionary<int, CharacterDataCache> s_caches = new Dictionary<int, CharacterDataCache>();
+        private static readonly ConcurrentDictionary<int, CharacterDataCache> s_caches = new ConcurrentDictionary<int, CharacterDataCache>();
 
         public static CharacterDataCache GetCaches(this ICharacterData characterData)
         {
@@ -41,7 +42,7 @@ namespace MultiplayerARPG
         {
             if (characterData == null)
                 return;
-            s_caches.Remove(characterData.GetHashCode());
+            s_caches.TryRemove(characterData.GetHashCode(), out _);
         }
 
         public static void Clear()
