@@ -12,7 +12,8 @@ namespace MultiplayerARPG
         public Transform uiCharacterSkillContainer;
         public Transform uiCharacterItemContainer;
         public Transform uiGuildSkillContainer;
-        public bool autoHideIfNothingToAssign;
+        public bool autoHideIfNothingToAssign = false;
+        public bool hideFoundUsableItems = true;
 
         private UIList _cacheSkillList;
         public UIList CacheSkillList
@@ -181,6 +182,7 @@ namespace MultiplayerARPG
             // Setup item list
             UICharacterItem tempUiCharacterItem;
             CacheItemList.HideAll();
+            Dictionary<int, UICharacterItem> foundUsableItemUIs = new Dictionary<int, UICharacterItem>();
             CacheItemList.Generate(GameInstance.PlayingCharacterEntity.NonEquipItems, (index, characterItem, ui) =>
             {
                 if (!ui)
@@ -188,10 +190,20 @@ namespace MultiplayerARPG
                 tempUiCharacterItem = ui.GetComponent<UICharacterItem>();
                 if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
                 {
-                    tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), GameInstance.PlayingCharacterEntity, index);
-                    tempUiCharacterItem.Show();
-                    CacheItemSelectionManager.Add(tempUiCharacterItem);
-                    ++countAssignable;
+                    IUsableItem usableItem = characterItem.GetUsableItem();
+                    if (hideFoundUsableItems && usableItem != null && foundUsableItemUIs.TryGetValue(usableItem.DataId, out UICharacterItem foundUI))
+                    {
+                        tempUiCharacterItem.Hide();
+                    }
+                    else
+                    {
+                        tempUiCharacterItem.Setup(new UICharacterItemData(characterItem, InventoryType.NonEquipItems), GameInstance.PlayingCharacterEntity, index);
+                        tempUiCharacterItem.Show();
+                        CacheItemSelectionManager.Add(tempUiCharacterItem);
+                        if (!foundUsableItemUIs.ContainsKey(usableItem.DataId))
+                            foundUsableItemUIs.Add(usableItem.DataId, tempUiCharacterItem);
+                        ++countAssignable;
+                    }
                 }
                 else
                 {

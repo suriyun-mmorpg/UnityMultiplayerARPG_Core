@@ -51,6 +51,7 @@ namespace MultiplayerARPG
             base.OnEnable();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
+            OnNonEquipItemsOperation(LiteNetLibSyncList.Operation.Dirty, 0);
         }
 
         protected override void OnDisable()

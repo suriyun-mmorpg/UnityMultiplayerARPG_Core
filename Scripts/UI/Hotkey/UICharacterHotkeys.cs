@@ -233,7 +233,7 @@ namespace MultiplayerARPG
                 return;
             HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
             // Click anywhere (on the map) to use skill
-            if (InputManager.GetMouseButtonDown(0) && !UsingHotkey.IsChanneledAbility() && !UIBlockController.IsBlockController())
+            if (InputManager.GetMouseButtonDown(0) && !UsingHotkey.IsChanneledAbility() && !UIBlockController.IsBlockController() && !UIBlockActionController.IsBlockController())
                 FinishHotkeyAimControls(false);
         }
 
@@ -267,7 +267,7 @@ namespace MultiplayerARPG
                 return;
             HotkeyAimPosition = UsingHotkey.UpdateAimControls(Vector2.zero);
             // Click anywhere (on the map) to use skill
-            if (InputManager.GetButtonDown(consoleConfirmButtonName) && !UsingHotkey.IsChanneledAbility() && !UIBlockController.IsBlockController())
+            if (InputManager.GetButtonDown(consoleConfirmButtonName) && !UsingHotkey.IsChanneledAbility() && !UIBlockController.IsBlockController() && !UIBlockActionController.IsBlockController())
                 FinishHotkeyAimControls(false);
         }
 
