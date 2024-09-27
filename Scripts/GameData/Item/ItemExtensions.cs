@@ -239,6 +239,22 @@ namespace MultiplayerARPG
                 return;
             equipmentItem.EnemyStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, CharacterItem.Empty, target);
         }
+
+        public static int IndexOfSocket<T>(this T equipmentItem, SocketEnhancerType type)
+            where T : IEquipmentItem
+        {
+            if (equipmentItem.AvailableSocketEnhancerTypes == null ||
+                equipmentItem.AvailableSocketEnhancerTypes.Length == 0)
+            {
+                return -1;
+            }
+            for (int i = 0; i < equipmentItem.AvailableSocketEnhancerTypes.Length; ++i)
+            {
+                if (equipmentItem.AvailableSocketEnhancerTypes[i] == type)
+                    return i;
+            }
+            return -1;
+        }
         #endregion
 
         #region Armor/Shield Extension
