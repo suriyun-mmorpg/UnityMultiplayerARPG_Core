@@ -139,6 +139,8 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<RequestSellItemMessage, ResponseSellItemMessage>(GameNetworkingConsts.SellItem, ServerInventoryMessageHandlers.HandleRequestSellItem);
                 RegisterRequestToServer<RequestSellItemsMessage, ResponseSellItemsMessage>(GameNetworkingConsts.SellItems, ServerInventoryMessageHandlers.HandleRequestSellItems);
                 RegisterRequestToServer<RequestSortItemsMessage, ResponseSortItemsMessage>(GameNetworkingConsts.SortItems, ServerInventoryMessageHandlers.HandleRequestSortItems);
+                RegisterRequestToServer<RequestChangeAmmoItemMessage, ResponseChangeAmmoItemMessage>(GameNetworkingConsts.ChangeAmmoItem, ServerInventoryMessageHandlers.HandleRequestChangeAmmoItem);
+                RegisterRequestToServer<RequestRemoveAmmoFromItemMessage, ResponseRemoveAmmoFromItemMessage>(GameNetworkingConsts.RemoveAmmoFromItem, ServerInventoryMessageHandlers.HandleRequestRemoveAmmoFromItem);
             }
             // Party
             if (ServerPartyMessageHandlers != null)
