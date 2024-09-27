@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         public override void OnStateEnter(Animator animator, AnimatorStateInfo stateInfo, int layerIndex)
         {
             if (_actionManager == null)
-                _actionManager = animator.gameObject.GetComponentInParent<CharacterActionComponentManager>();
+                _actionManager = animator.GetComponentInParent<CharacterActionComponentManager>();
             if (_actionManager == null)
                 return;
             s_triggerDurations.Clear();
