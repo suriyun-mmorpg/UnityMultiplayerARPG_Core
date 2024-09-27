@@ -260,6 +260,7 @@ namespace MultiplayerARPG
                     _reloadCancellationTokenSources[i].Cancel();
                 _reloadCancellationTokenSources.RemoveAt(i);
             }
+            IsReloading = false;
         }
 
         public virtual void Reload(bool isLeftHand)
