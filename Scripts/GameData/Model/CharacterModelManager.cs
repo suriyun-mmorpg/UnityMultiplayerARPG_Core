@@ -181,13 +181,15 @@ namespace MultiplayerARPG
             InitFpsModel(MainFpsModel);
             MainFpsModel.SetEquipItems(MainTpsModel.EquipItems, MainTpsModel.SelectableWeaponSets, MainTpsModel.EquipWeaponSet, MainTpsModel.IsWeaponsSheathed);
 #if UNITY_EDITOR
-            if (FpsModelPrefab != null)
+            IComponentWithPrefabRef[] refs = MainFpsModel.GetComponents<IComponentWithPrefabRef>();
+            for (int i = 0; i < refs.Length; ++i)
             {
-                IComponentWithPrefabRef[] refs = MainFpsModel.GetComponents<IComponentWithPrefabRef>();
-                for (int i = 0; i < refs.Length; ++i)
-                {
-                    refs[i].SetupRefToPrefab(FpsModelPrefab.gameObject);
-                }
+                GameObject editorAsset = null;
+                if (AddressableFpsModelPrefab.IsDataValid() && AddressableFpsModelPrefab.editorAsset is GameObject addressableEditorAsset)
+                    editorAsset = addressableEditorAsset;
+                if (editorAsset == null && FpsModelPrefab != null)
+                    editorAsset = FpsModelPrefab.gameObject;
+                refs[i].SetupRefToPrefab(editorAsset);
             }
 #endif
             return MainFpsModel;

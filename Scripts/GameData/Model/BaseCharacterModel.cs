@@ -1,9 +1,10 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UtilsComponents;
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -175,8 +176,7 @@ namespace MultiplayerARPG
         // Optimize garbage collector
         protected readonly List<string> _tempAddingKeys = new List<string>();
         protected readonly List<string> _tempCachedKeys = new List<string>();
-        protected bool _isEquipmentsUpdating = false;
-        protected bool _hasPendingEquipmentsUpdating = false;
+        protected CancellationTokenSource _updateEquipmentModelsCancellationTokenSource;
 
         protected override void Awake()
         {
@@ -186,23 +186,22 @@ namespace MultiplayerARPG
             Entity = GetComponent<BaseGameEntity>();
             if (Entity == null)
                 Entity = GetComponentInParent<BaseGameEntity>();
-            // Setup ID for caching, uses hashed asset ID if possible
             Id = GetInstanceID();
-            if (Entity != null && !string.IsNullOrWhiteSpace(Entity.Identity.AssetId))
-                Id = Entity.Identity.HashAssetId;
             // Can't find manager, this component may attached to non-character entities, so assume that this character model is main model
             if (Manager == null)
             {
+                if (Entity != null && Entity.Identity != null)
+                    Id = Entity.Identity.HashAssetId;
                 MainModel = this;
                 InitCacheData();
                 SwitchModel(null);
             }
             else
             {
-                byte vehicleId = Manager.InitTpsModel(this);
+                byte id = Manager.InitTpsModel(this);
                 unchecked
                 {
-                    Id += vehicleId;
+                    Id = Entity.Identity.HashAssetId + id;
                 }
             }
         }
@@ -420,14 +419,7 @@ namespace MultiplayerARPG
             SelectableWeaponSets = selectableWeaponSets;
             EquipWeaponSet = equipWeaponSet;
             IsWeaponsSheathed = isWeaponsSheathed;
-            if (_isEquipmentsUpdating)
-            {
-                _hasPendingEquipmentsUpdating = true;
-                return;
-            }
             await UpdateEquipmentModels(equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
-            if (_hasPendingEquipmentsUpdating)
-                SetEquipItemsImmediately(equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
         }
 
         public void SetEquipItemsImmediately(IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
@@ -439,9 +431,14 @@ namespace MultiplayerARPG
 
         public async UniTask UpdateEquipmentModels(IList<CharacterItem> equipItems, IList<EquipWeapons> selectableWeaponSets, byte equipWeaponSet, bool isWeaponsSheathed)
         {
-            if (_isEquipmentsUpdating)
-                return;
-            _isEquipmentsUpdating = true;
+            if (_updateEquipmentModelsCancellationTokenSource != null &&
+                !_updateEquipmentModelsCancellationTokenSource.IsCancellationRequested)
+            {
+                _updateEquipmentModelsCancellationTokenSource.Cancel();
+                _updateEquipmentModelsCancellationTokenSource = null;
+            }
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            _updateEquipmentModelsCancellationTokenSource = cancellationTokenSource;
 
             // Prepared data
             EquipmentContainer tempContainer;
@@ -455,7 +452,7 @@ namespace MultiplayerARPG
 
             // Setup appearances before equip items
             if (onBeforeUpdateEquipmentModels != null)
-                onBeforeUpdateEquipmentModels.Invoke(this, showingModels, storingModels, unequippingSockets);
+                onBeforeUpdateEquipmentModels.Invoke(cancellationTokenSource, this, showingModels, storingModels, unequippingSockets);
 
             // Setup equipping models from equip items
             if (equipItems != null && equipItems.Count > 0)
@@ -465,7 +462,12 @@ namespace MultiplayerARPG
                     IArmorItem armorItem = equipItem.GetArmorItem();
                     if (armorItem == null)
                         continue;
-                    await SetupEquippingModels(showingModels, storingModels, unequippingSockets, armorItem.EquipmentModels, armorItem.GetEquipPosition(), equipItem);
+                    await SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, armorItem.EquipmentModels, armorItem.GetEquipPosition(), equipItem);
+                    if (cancellationTokenSource.IsCancellationRequested)
+                    {
+                        cancellationTokenSource.Dispose();
+                        return;
+                    }
                 }
             }
 
@@ -492,11 +494,34 @@ namespace MultiplayerARPG
             IEquipmentItem rightHandItem = equipWeapons.GetRightHandEquipmentItem();
             IEquipmentItem leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
             if (rightHandItem != null && rightHandItem.IsWeapon())
-                await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).EquipmentModels, GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeapons.rightHand);
+            {
+                await SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).EquipmentModels, GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeapons.rightHand);
+                if (cancellationTokenSource.IsCancellationRequested)
+                {
+                    cancellationTokenSource.Dispose();
+                    return;
+                }
+            }
+
             if (leftHandItem != null && leftHandItem.IsWeapon())
-                await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandEquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
+            {
+                await SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandEquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
+                if (cancellationTokenSource.IsCancellationRequested)
+                {
+                    cancellationTokenSource.Dispose();
+                    return;
+                }
+            }
+
             if (leftHandItem != null && leftHandItem.IsShield())
-                await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
+            {
+                await SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).EquipmentModels, GameDataConst.EQUIP_POSITION_LEFT_HAND, equipWeapons.leftHand);
+                if (cancellationTokenSource.IsCancellationRequested)
+                {
+                    cancellationTokenSource.Dispose();
+                    return;
+                }
+            }
 
             if (selectableWeaponSets != null && selectableWeaponSets.Count > 0)
             {
@@ -507,12 +532,36 @@ namespace MultiplayerARPG
                         equipWeapons = selectableWeaponSets[i];
                         rightHandItem = equipWeapons.GetRightHandEquipmentItem();
                         leftHandItem = equipWeapons.GetLeftHandEquipmentItem();
+
                         if (rightHandItem != null && rightHandItem.IsWeapon())
-                            await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_RIGHT_HAND, "_", i), equipWeapons.rightHand, true, i);
+                        {
+                            await SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, (rightHandItem as IWeaponItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_RIGHT_HAND, "_", i), equipWeapons.rightHand, true, i);
+                            if (cancellationTokenSource.IsCancellationRequested)
+                            {
+                                cancellationTokenSource.Dispose();
+                                return;
+                            }
+                        }
+
                         if (leftHandItem != null && leftHandItem.IsWeapon())
-                            await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandSheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
+                        {
+                            await SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, (leftHandItem as IWeaponItem).OffHandSheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
+                            if (cancellationTokenSource.IsCancellationRequested)
+                            {
+                                cancellationTokenSource.Dispose();
+                                return;
+                            }
+                        }
+
                         if (leftHandItem != null && leftHandItem.IsShield())
-                            await SetupEquippingModels(showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
+                        {
+                            await SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, (leftHandItem as IShieldItem).SheathModels, ZString.Concat(GameDataConst.EQUIP_POSITION_LEFT_HAND, "_", i), equipWeapons.leftHand, true, i);
+                            if (cancellationTokenSource.IsCancellationRequested)
+                            {
+                                cancellationTokenSource.Dispose();
+                                return;
+                            }
+                        }
                     }
                 }
             }
@@ -578,6 +627,11 @@ namespace MultiplayerARPG
                     tempContainer.SetActiveDefaultModel(false);
                     tempContainer.SetActiveDefaultModelGroup(false);
                     GameObject meshPrefab = await tempEquipmentModel.GetMeshPrefab();
+                    if (cancellationTokenSource.IsCancellationRequested)
+                    {
+                        cancellationTokenSource.Dispose();
+                        return;
+                    }
                     if (tempContainer.transform != null)
                     {
                         tempEquipmentObject = Instantiate(meshPrefab, tempContainer.transform);
@@ -603,8 +657,14 @@ namespace MultiplayerARPG
                     if (tempEquipmentEntity != null)
                     {
                         tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.item);
-                        GameObject meshPrefab = await tempEquipmentModel.GetMeshPrefab();
-                        tempEquipmentEntity.SetupRefToPrefab(meshPrefab);
+#if UNITY_EDITOR
+                        GameObject editorAsset = null;
+                        if (tempEquipmentModel.AddressableMeshPrefab.IsDataValid())
+                            editorAsset = tempEquipmentModel.AddressableMeshPrefab.editorAsset;
+                        if (editorAsset == null)
+                            editorAsset = tempEquipmentModel.MeshPrefab;
+                        tempEquipmentEntity.SetupRefToPrefab(editorAsset);
+#endif
                     }
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
                         CacheRightHandEquipmentEntity = tempEquipmentEntity;
@@ -616,7 +676,6 @@ namespace MultiplayerARPG
                 OnInstantiatedEquipment(tempEquipmentModel, tempEquipmentObject, tempEquipmentEntity, tempEquipmentObjectGroup, tempContainer);
             }
             EquippedModels = storingModels;
-            _isEquipmentsUpdating = false;
         }
 
         private void ClearEquippedModel(string equipSocket)
@@ -636,7 +695,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public async UniTask SetupEquippingModels(Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, string equipPosition, CharacterItem item, bool isSheathModels = false, byte equipWeaponSet = 0, EquipmentModelDelegate onInstantiated = null)
+        public async UniTask SetupEquippingModels(CancellationTokenSource cancellationTokenSource, Dictionary<string, EquipmentModel> showingModels, Dictionary<string, EquipmentModel> storingModels, HashSet<string> unequippingSockets, EquipmentModel[] equipmentModels, string equipPosition, CharacterItem item, bool isSheathModels = false, byte equipWeaponSet = 0, EquipmentModelDelegate onInstantiated = null)
         {
             if (equipmentModels == null || equipmentModels.Length == 0 || string.IsNullOrWhiteSpace(equipPosition))
                 return;
@@ -646,6 +705,11 @@ namespace MultiplayerARPG
             {
                 tempModel = equipmentModels[i];
                 GameObject meshPrefab = await tempModel.GetMeshPrefab();
+                if (cancellationTokenSource != null && cancellationTokenSource.IsCancellationRequested)
+                {
+                    // Cancelled
+                    return;
+                }
                 if (string.IsNullOrEmpty(tempModel.equipSocket) || (!tempModel.useInstantiatedObject && meshPrefab == null))
                 {
                     // Required data are empty, skip it

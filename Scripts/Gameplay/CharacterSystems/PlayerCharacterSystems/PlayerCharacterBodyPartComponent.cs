@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -212,12 +213,13 @@ namespace MultiplayerARPG
         }
 
         private void OnBeforeUpdateEquipmentModels(
+            CancellationTokenSource cancellationTokenSource,
             BaseCharacterModel characterModel,
             Dictionary<string, EquipmentModel> showingModels,
             Dictionary<string, EquipmentModel> storingModels,
             HashSet<string> unequippingSockets)
         {
-            characterModel.SetupEquippingModels(showingModels, storingModels, unequippingSockets, options[_currentModelIndex].models, CreateFakeEquipPosition(), CreateFakeCharacterItem(), false, 0, OnShowEquipmentModel).Forget();
+            characterModel.SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, options[_currentModelIndex].models, CreateFakeEquipPosition(), CreateFakeCharacterItem(), false, 0, OnShowEquipmentModel).Forget();
         }
 
         private void OnPublicIntsOperation(LiteNetLibSyncList.Operation op, int index)

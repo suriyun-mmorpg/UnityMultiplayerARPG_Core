@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -138,6 +139,7 @@ namespace MultiplayerARPG
         float verticalVelocity);
 
     public delegate void UpdateEquipmentModelsDelegate(
+        CancellationTokenSource cancellationTokenSource,
         BaseCharacterModel characterModel,
         Dictionary<string, EquipmentModel> showingModels,
         Dictionary<string, EquipmentModel> storingModels,
