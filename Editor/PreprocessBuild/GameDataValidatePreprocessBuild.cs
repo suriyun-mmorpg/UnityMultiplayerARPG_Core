@@ -22,7 +22,7 @@ namespace MultiplayerARPG
                     continue;
                 // Validate only game data, so if it is not game data, skip it
                 System.Type assetType = AssetDatabase.GetMainAssetTypeAtPath(assetPath);
-                if (!assetType.IsSubclassOf(typeof(BaseGameData)))
+                if (assetType == null || !assetType.IsSubclassOf(typeof(BaseGameData)))
                     continue;
                 BaseGameData gameData = AssetDatabase.LoadAssetAtPath(assetPath, assetType) as BaseGameData;
                 if (gameData.ValidateHashAssetID())
