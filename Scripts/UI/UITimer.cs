@@ -48,7 +48,8 @@ public class UITimer : MonoBehaviour
     public void UpdateTime(float seconds)
     {
         float hrs = Mathf.FloorToInt(seconds / 60f / 60f);
-        float min = Mathf.FloorToInt(seconds / 60f);
+        float remainsSecFromHrs = seconds - (hrs * 60f * 60f);
+        float min = Mathf.FloorToInt(remainsSecFromHrs / 60f);
         float secWithMilli = seconds % 60f;
         float sec = Mathf.FloorToInt(secWithMilli);
         float milli = (secWithMilli - sec) * 100;
