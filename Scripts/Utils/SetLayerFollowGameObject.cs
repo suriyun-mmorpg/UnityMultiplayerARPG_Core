@@ -6,16 +6,16 @@ namespace UtilsComponents
     {
         public GameObject source;
         public bool setChildrenLayersRecursively = true;
-        private int dirtyLayer;
+        public bool includeInactiveLayers = false;
 
         private void LateUpdate()
         {
-            if (source != null && source.layer != dirtyLayer)
+            if (source != null)
             {
-                dirtyLayer = source.layer;
-                gameObject.layer = dirtyLayer;
                 if (setChildrenLayersRecursively)
-                    gameObject.SetLayerRecursively(dirtyLayer, true);
+                    gameObject.SetLayerRecursively(source.layer, includeInactiveLayers);
+                else
+                    gameObject.layer = source.layer;
             }
         }
     }
