@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             container.RemoveChildren();
             BaseCharacterModel characterModel = playerCharacter.InstantiateModel(container);
             characterModel.SetupModelBodyParts(playerCharacter);
-            characterModel.SetEquipItemsImmediately(playerCharacter.EquipItems, playerCharacter.SelectableWeaponSets, playerCharacter.EquipWeaponSet, false);
+            characterModel.SetEquipItemsImmediately(playerCharacter.EquipItems, playerCharacter.SelectableWeaponSets, playerCharacter.EquipWeaponSet, true);
         }
     }
 }
