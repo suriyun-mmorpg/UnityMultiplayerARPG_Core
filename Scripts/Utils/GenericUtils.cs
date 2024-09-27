@@ -2,7 +2,6 @@
 using TMPro;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -43,15 +42,49 @@ public static partial class GenericUtils
             rect1.Contains(rect2.center + (new Vector2(rect2.size.x, rect2.size.y) * 0.5f * rect2Scale));
     }
 
+    public static int GetRandomIndexInArray<T>(this IList<T> list)
+    {
+        if (list == null || list.Count == 0)
+            return 0;
+        return UnityEngine.Random.Range(0, list.Count);
+    }
+
+    public static T GetRandomObjectInArray<T>(this IList<T> list, out int index)
+    {
+        index = -1;
+        if (list == null || list.Count == 0)
+            return default;
+        index = UnityEngine.Random.Range(0, list.Count);
+        return list[index];
+    }
+
+    public static T GetRandomObjectInArrayByEvenOdd<T>(this IList<T> list, bool isOdd)
+    {
+        if (list == null || list.Count == 0)
+            return default;
+
+        int startIndex = isOdd ? 1 : 0;
+
+        // Calculate how many elements are in the odd/even indexed positions
+        int count = Mathf.FloorToInt((list.Count - startIndex + 1) * 0.5f);
+
+        // Select a random index within the valid range of odd/even indices using UnityEngine.Random
+        int index = startIndex + UnityEngine.Random.Range(0, count) * 2;
+
+        return list[index];
+    }
+
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
     {
         if (gameObject == null)
             return;
-        gameObject.layer = layerIndex;
+        if (gameObject.layer != layerIndex)
+            gameObject.layer = layerIndex;
         Transform[] childrenTransforms = gameObject.GetComponentsInChildren<Transform>(includeInactive);
         foreach (Transform childTransform in childrenTransforms)
         {
-            childTransform.gameObject.layer = layerIndex;
+            if (childTransform.gameObject.layer != layerIndex)
+                childTransform.gameObject.layer = layerIndex;
         }
     }
 
@@ -118,6 +151,11 @@ public static partial class GenericUtils
     }
 
     public static void RemoveChildren(this Transform transform, bool immediatelyMode = false)
+    {
+        transform.DestroyChildren(immediatelyMode);
+    }
+
+    public static void DestroyChildren(this Transform transform, bool immediatelyMode = false)
     {
         if (transform == null)
             return;
@@ -218,6 +256,35 @@ public static partial class GenericUtils
         return result;
     }
 
+    public static List<GameObject> GetGameObjectsFromAllLoadedScenes()
+    {
+        List<GameObject> gameObjects = new List<GameObject>();
+        for (int i = 0; i < SceneManager.sceneCount; i++)
+        {
+            Scene scene = SceneManager.GetSceneAt(i);
+            if (!scene.isLoaded)
+            {
+                continue;
+            }
+            GameObject[] rootGameObjects = scene.GetRootGameObjects();
+            foreach (GameObject rootObject in rootGameObjects)
+            {
+                gameObjects.AddRange(GetAllChildGameObjects(rootObject));
+            }
+        }
+        return gameObjects;
+    }
+
+    public static List<GameObject> GetAllChildGameObjects(GameObject parent)
+    {
+        List<GameObject> allObjects = new List<GameObject> { parent };
+        foreach (Transform child in parent.transform)
+        {
+            allObjects.AddRange(GetAllChildGameObjects(child.gameObject));
+        }
+        return allObjects;
+    }
+
     public static int GetNegativePositive()
     {
         return Random.value > 0.5f ? 1 : -1;
@@ -248,6 +315,11 @@ public static partial class GenericUtils
     public static Vector3 GetXY(this Vector3 position)
     {
         return new Vector3(position.x, position.y, 0f);
+    }
+
+    public static Vector2 GetVector2(this Vector3 position)
+    {
+        return new Vector2(position.x, position.y);
     }
 
     public static bool IsPointInBox(Vector3 center, Vector3 half, Vector3 dirX, Vector3 dirY, Vector3 dirZ, Vector3 point)
@@ -597,6 +669,27 @@ public static partial class GenericUtils
         }
     }
 
+    public static bool IsPositionInFov2D(this Vector2 origin, float fov, Vector2 position, Vector2 forward)
+    {
+        Vector2 targetDir = position - origin;
+        targetDir.Normalize();
+        // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
+        return Vector2.Angle(targetDir, forward) < fov * 0.5f;
+    }
+
+    public static bool IsPositionInFov3D(this Vector3 origin, float fov, Vector3 position, Vector3 forward)
+    {
+        // This is unsigned angle, so angle found from this function is 0 - 180
+        // if position forward from character this value will be 180
+        // so just find for angle > 180 - halfFov
+        Vector3 targetDir = position - origin;
+        targetDir.y = 0;
+        forward.y = 0;
+        targetDir.Normalize();
+        forward.Normalize();
+        return Vector3.Angle(targetDir, forward) < fov * 0.5f;
+    }
+
     static readonly string[] SizeSuffixes = { "bytes", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB" };
     public static string SizeSuffix(long value, int decimalPlaces = 1)
     {
@@ -651,49 +744,5 @@ public static partial class GenericUtils
             adjustedMinSize,
             adjustedMaxSize,
             SizeSuffixes[mag]);
-    }
-
-    public static bool HasAttribute<TAttributeType>(this FieldInfo field, bool inherit = false)
-        where TAttributeType : System.Attribute
-    {
-        return field.GetCustomAttributes(typeof(TAttributeType), inherit).Length > 0;
-    }
-
-    public static bool HasAttribute<TAttributeType>(this System.Type type, bool inherit = false)
-        where TAttributeType : System.Attribute
-    {
-        return type.GetCustomAttributes(typeof(TAttributeType), inherit).Length > 0;
-    }
-
-    public static bool HasInterface<TInterfaceType>(this System.Type type)
-    {
-        foreach (System.Type interfaceType in type.GetInterfaces())
-        {
-            if (interfaceType == typeof(TInterfaceType))
-            {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static bool IsListOrArray(this System.Type type, out System.Type itemType)
-    {
-        if (type.IsArray)
-        {
-            itemType = type.GetElementType();
-            return true;
-        }
-        foreach (System.Type interfaceType in type.GetInterfaces())
-        {
-            if (interfaceType.IsGenericType &&
-                interfaceType.GetGenericTypeDefinition() == typeof(IList<>))
-            {
-                itemType = type.GetGenericArguments()[0];
-                return true;
-            }
-        }
-        itemType = null;
-        return false;
     }
 }
