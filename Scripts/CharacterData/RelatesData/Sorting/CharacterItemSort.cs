@@ -37,17 +37,29 @@ namespace MultiplayerARPG
             if (x.IsEmptySlot() && y.IsEmptySlot()) return 0;
             else if (x.IsEmptySlot())
                 return -1;
-            else if (y.IsEmptySlot()) 
+            else if (y.IsEmptySlot())
                 return 1;
             int result = GetItemTypeWeight(x.GetItem().ItemType).CompareTo(GetItemTypeWeight(y.GetItem().ItemType));
             if (result != 0)
                 return result;
             if (x.GetArmorItem() != null && y.GetArmorItem() != null)
-                result = x.GetArmorItem().ArmorType.Id.CompareTo(y.GetArmorItem().ArmorType.Id);
+            {
+                if (x.GetArmorItem().ArmorType != null && y.GetArmorItem().ArmorType != null)
+                    result = x.GetArmorItem().ArmorType.Id.CompareTo(y.GetArmorItem().ArmorType.Id);
+            }
             if (x.GetWeaponItem() != null && y.GetWeaponItem() != null)
-                result = x.GetWeaponItem().WeaponType.Id.CompareTo(y.GetWeaponItem().WeaponType.Id);
+            {
+                if (x.GetWeaponItem().WeaponType != null && y.GetWeaponItem().WeaponType != null)
+                    result = x.GetWeaponItem().WeaponType.Id.CompareTo(y.GetWeaponItem().WeaponType.Id);
+            }
             if (x.GetAmmoItem() != null && y.GetAmmoItem() != null)
-                result = x.GetAmmoItem().AmmoType.Id.CompareTo(y.GetAmmoItem().AmmoType.Id);
+            {
+                if (x.GetAmmoItem().AmmoType != null && y.GetAmmoItem().AmmoType != null)
+                    result = x.GetAmmoItem().AmmoType.Id.CompareTo(y.GetAmmoItem().AmmoType.Id);
+            }
+            if (result != 0)
+                return result;
+            result = x.GetItem().Id.CompareTo(y.GetItem().Id);
             if (result != 0)
                 return result;
             return x.level.CompareTo(y.level);
