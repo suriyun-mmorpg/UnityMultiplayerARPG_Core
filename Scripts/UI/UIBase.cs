@@ -85,7 +85,8 @@ public class UIBase : MonoBehaviour
     {
         if (IsVisible())
             return;
-        _isAwaken = true;
+        if (!_isAwaken)
+            CacheRoot.SetActive(true);
         CacheComponents();
         if (overrideShow != null)
             overrideShow.Invoke(this);
@@ -113,7 +114,8 @@ public class UIBase : MonoBehaviour
     {
         if (!IsVisible())
             return;
-        _isAwaken = true;
+        if (!_isAwaken)
+            CacheRoot.SetActive(true);
         CacheComponents();
         if (overrideHide != null)
             overrideHide.Invoke(this);
