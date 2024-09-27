@@ -36,8 +36,10 @@ public static class ExternalTextureManager
             } while (s_loadingTextures.ContainsKey(url));
         }
 
-        if (s_loadedTextures.TryGetValue(url, out Texture2D loadedTexture))
+        if (s_loadedTextures.TryGetValue(url, out Texture2D loadedTexture) && loadedTexture != null)
+        {
             return loadedTexture;
+        }
 
         loadedTexture = null;
         s_loadingTextures.TryAdd(url, new object());
@@ -49,7 +51,7 @@ public static class ExternalTextureManager
         {
             onProgressUpdate?.Invoke(asyncOp.progress);
             await UniTask.NextFrame();
-        } while (asyncOp.isDone);
+        } while (!asyncOp.isDone);
 
         // Error occuring O_O
         if (request.result != UnityWebRequest.Result.Success)
@@ -65,7 +67,7 @@ public static class ExternalTextureManager
         request.Dispose();
 
         // Create a new texture with a lower bit depth format (e.g., RGB565)
-        loadedTexture = new Texture2D(originalTexture.width, originalTexture.height, TextureFormat.RGB565, false);
+        loadedTexture = new Texture2D(originalTexture.width, originalTexture.height, TextureFormat.RGBA32, false);
 
         // Copy the pixels from the original texture to the new texture
         loadedTexture.SetPixels(originalTexture.GetPixels());
