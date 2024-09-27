@@ -111,5 +111,7 @@
         public const ushort AvailableContents = 187;
         public const ushort UnlockContent = 188;
         public const ushort SafeDisconnect = 189;
+        public const ushort ChangeAmmoItem = 190;
+        public const ushort RemoveAmmoFromItem = 191;
     }
 }
