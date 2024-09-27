@@ -179,7 +179,8 @@ public class UIInputDialog : UIBase
                 minAmount = null;
                 Debug.LogWarning("min amount is more than max amount");
             }
-            uiInputField.onValueChanged.RemoveAllListeners();
+            uiInputField.onValueChanged.RemoveListener(ValidateIntAmount);
+            uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
             uiInputField.onValueChanged.AddListener(ValidateIntAmount);
         }
         ContentType = InputField.ContentType.IntegerNumber;
@@ -193,7 +194,8 @@ public class UIInputDialog : UIBase
         int amount = _intDefaultAmount;
         if (int.TryParse(result, out amount))
         {
-            uiInputField.onValueChanged.RemoveAllListeners();
+            uiInputField.onValueChanged.RemoveListener(ValidateIntAmount);
+            uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
             if (_intMinAmount.HasValue && amount < _intMinAmount.Value)
                 InputFieldText = _intMinAmount.Value.ToString();
             if (_intMaxAmount.HasValue && amount > _intMaxAmount.Value)
@@ -229,7 +231,8 @@ public class UIInputDialog : UIBase
                 minAmount = null;
                 Debug.LogWarning("min amount is more than max amount");
             }
-            uiInputField.onValueChanged.RemoveAllListeners();
+            uiInputField.onValueChanged.RemoveListener(ValidateIntAmount);
+            uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
             uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
         }
         ContentType = InputField.ContentType.DecimalNumber;
@@ -243,7 +246,8 @@ public class UIInputDialog : UIBase
         float amount = _floatDefaultAmount;
         if (float.TryParse(result, out amount))
         {
-            uiInputField.onValueChanged.RemoveAllListeners();
+            uiInputField.onValueChanged.RemoveListener(ValidateIntAmount);
+            uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
             if (_floatMinAmount.HasValue && amount < _floatMinAmount.Value)
                 InputFieldText = _floatMinAmount.Value.ToString();
             if (_floatMaxAmount.HasValue && amount > _floatMaxAmount.Value)
