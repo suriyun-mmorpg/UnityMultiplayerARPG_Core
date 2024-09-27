@@ -261,9 +261,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public void SetLookRotation(Quaternion rotation)
+        public void SetLookRotation(Quaternion rotation, bool immediately)
         {
-            if (!Entity.CanMove() || !Entity.CanTurn())
+            if (!Entity.CanTurn())
                 return;
             if (CanPredictMovement())
             {
@@ -275,6 +275,8 @@ namespace MultiplayerARPG
                     _targetYAngle = Quaternion.LookRotation(-LadderComponent.ClimbingLadder.ForwardWithYAngleOffsets).eulerAngles.y;
                 }
                 _lookRotationApplied = false;
+                if (immediately)
+                    TurnImmediately(_targetYAngle);
             }
         }
 

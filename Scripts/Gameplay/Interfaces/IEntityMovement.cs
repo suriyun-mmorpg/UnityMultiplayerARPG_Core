@@ -14,7 +14,7 @@ namespace MultiplayerARPG
         void KeyMovement(Vector3 moveDirection, MovementState movementState);
         void PointClickMovement(Vector3 position);
         void SetExtraMovementState(ExtraMovementState extraMovementState);
-        void SetLookRotation(Quaternion rotation);
+        void SetLookRotation(Quaternion rotation, bool immediately);
         Quaternion GetLookRotation();
         void SetSmoothTurnSpeed(float speed);
         float GetSmoothTurnSpeed();

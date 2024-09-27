@@ -321,9 +321,9 @@ namespace MultiplayerARPG
             Functions.SetExtraMovementState(extraMovementState);
         }
 
-        public void SetLookRotation(Quaternion rotation)
+        public void SetLookRotation(Quaternion rotation, bool immediately)
         {
-            Functions.SetLookRotation(rotation);
+            Functions.SetLookRotation(rotation, immediately);
         }
 
         public Quaternion GetLookRotation()

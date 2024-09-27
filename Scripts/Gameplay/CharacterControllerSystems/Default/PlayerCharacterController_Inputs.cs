@@ -431,7 +431,7 @@ namespace MultiplayerARPG
                     ClearTarget();
                 }
                 if (!PlayingCharacterEntity.IsPlayingActionAnimation())
-                    PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(moveDirection));
+                    PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(moveDirection), false);
             }
 
             // Attack when player pressed attack button
@@ -886,7 +886,7 @@ namespace MultiplayerARPG
         {
             Vector3 lookAtDirection = (position - EntityTransform.position).normalized;
             if (lookAtDirection.sqrMagnitude > 0)
-                PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
+                PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection), false);
         }
 
         public override void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition)

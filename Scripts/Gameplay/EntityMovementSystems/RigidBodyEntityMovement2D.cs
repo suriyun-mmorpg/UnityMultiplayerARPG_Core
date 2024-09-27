@@ -164,7 +164,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void SetLookRotation(Quaternion rotation)
+        public virtual void SetLookRotation(Quaternion rotation, bool immediately)
         {
             if (!Entity.CanMove() || !Entity.CanTurn())
                 return;

@@ -178,7 +178,7 @@ namespace MultiplayerARPG
                 CacheNavMeshAgent.isStopped = true;
         }
 
-        public void SetLookRotation(Quaternion rotation)
+        public void SetLookRotation(Quaternion rotation, bool immediately)
         {
             if (!Entity.CanMove() || !Entity.CanTurn())
                 return;
@@ -187,6 +187,8 @@ namespace MultiplayerARPG
                 // Always apply movement to owner client (it's client prediction for server auth movement)
                 _targetYAngle = rotation.eulerAngles.y;
                 _lookRotationApplied = false;
+                if (immediately)
+                    TurnImmediately(_targetYAngle);
             }
         }
 
