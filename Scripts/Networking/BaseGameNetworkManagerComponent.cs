@@ -1,6 +1,8 @@
+using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Net.Sockets;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -102,6 +104,61 @@ namespace MultiplayerARPG
         /// <param name="networkManager"></param>
         /// <param name="clientReadyToInstantiateObjectsStates"></param>
         public virtual void UpdateClientReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, Dictionary<string, bool> serverReadyToInstantiateObjectsStates)
+        {
+
+        }
+
+        public virtual void OnClientConnected(BaseGameNetworkManager networkManager)
+        {
+
+        }
+
+        public virtual void OnClientDisconnected(BaseGameNetworkManager networkManager, DisconnectReason reason, SocketError socketError, byte[] data)
+        {
+
+        }
+
+        public virtual void OnPeerConnected(BaseGameNetworkManager networkManager, long connectionId)
+        {
+
+        }
+
+        public virtual void OnPeerDisconnected(BaseGameNetworkManager networkManager, long connectionId, DisconnectReason reason, SocketError socketError)
+        {
+
+        }
+
+        public virtual void SendClientEnterGame(BaseGameNetworkManager networkManager)
+        {
+
+        }
+
+        public virtual void SendClientReady(BaseGameNetworkManager networkManager)
+        {
+
+        }
+
+        public virtual void SendClientNotReady(BaseGameNetworkManager networkManager)
+        {
+
+        }
+
+        public virtual void SendClientSafeDisconnect(BaseGameNetworkManager networkManager)
+        {
+
+        }
+
+        public virtual void HandleEnterGameResponse(BaseGameNetworkManager networkManager, ResponseHandlerData responseHandler, AckResponseCode responseCode, EnterGameResponseMessage response)
+        {
+
+        }
+
+        public virtual void HandleClientReadyResponse(BaseGameNetworkManager networkManager, ResponseHandlerData responseHandler, AckResponseCode responseCode, EmptyMessage response)
+        {
+
+        }
+
+        public virtual void HandleSafeDisconnectResponse(BaseGameNetworkManager networkManager, ResponseHandlerData responseHandler, AckResponseCode responseCode, EmptyMessage response)
         {
 
         }

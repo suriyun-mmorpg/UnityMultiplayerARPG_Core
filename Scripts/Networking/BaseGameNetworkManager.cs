@@ -216,7 +216,7 @@ namespace MultiplayerARPG
         {
             base.RegisterMessages();
             RegisterHandlerMessages();
-            RegisterRequestToServer<EmptyMessage, EmptyMessage>(GameNetworkingConsts.SafeDisconnect, HandleRequestSafeDisconnect);
+            RegisterRequestToServer<EmptyMessage, EmptyMessage>(GameNetworkingConsts.SafeDisconnect, HandleSafeDisconnectRequest, HandleSafeDisconnectResponse);
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
             this.InvokeInstanceDevExtMethods("RegisterClientMessages");
             this.InvokeInstanceDevExtMethods("RegisterServerMessages");
@@ -330,6 +330,11 @@ namespace MultiplayerARPG
 
         public override void OnClientConnected()
         {
+            this.InvokeInstanceDevExtMethods("OnClientConnected");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnClientConnected(this);
+            }
             ClientGenericActions.ClientConnected();
             base.OnClientConnected();
         }
@@ -343,13 +348,72 @@ namespace MultiplayerARPG
                 message = (UITextKeys)reader.GetPackedUShort();
             }
             UISceneGlobal.Singleton.ShowDisconnectDialog(reason, socketError, message);
+            this.InvokeInstanceDevExtMethods("OnClientDisconnected", reason, socketError, data);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnClientDisconnected(this, reason, socketError, data);
+            }
             ClientGenericActions.ClientDisconnected(reason, socketError, message);
         }
 
         public override void OnPeerConnected(long connectionId)
         {
             this.InvokeInstanceDevExtMethods("OnPeerConnected", connectionId);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnPeerConnected(this, connectionId);
+            }
             base.OnPeerConnected(connectionId);
+        }
+
+        public override void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
+        {
+            this.InvokeInstanceDevExtMethods("OnPeerDisconnected", connectionId, reason, socketError);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.OnPeerDisconnected(this, connectionId, reason, socketError);
+            }
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.UpdateClientReadyToInstantiateObjectsStates(this, _clientReadyToInstantiateObjectsStates);
+            }
+            base.OnPeerDisconnected(connectionId, reason, socketError);
+        }
+
+        public override void SendClientEnterGame()
+        {
+            if (!IsClientConnected)
+                return;
+            this.InvokeInstanceDevExtMethods("SendClientEnterGame");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.SendClientEnterGame(this);
+            }
+            base.SendClientEnterGame();
+        }
+
+        public override void SendClientReady()
+        {
+            if (!IsClientConnected)
+                return;
+            this.InvokeInstanceDevExtMethods("SendClientReady");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.SendClientReady(this);
+            }
+            base.SendClientReady();
+        }
+
+        public override void SendClientNotReady()
+        {
+            if (!IsClientConnected)
+                return;
+            this.InvokeInstanceDevExtMethods("SendClientNotReady");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.SendClientNotReady(this);
+            }
+            base.SendClientNotReady();
         }
 
         protected override UniTaskVoid HandleEnterGameRequest(RequestHandlerData requestHandler, EnterGameRequestMessage request, RequestProceedResultDelegate<EnterGameResponseMessage> result)
@@ -675,9 +739,25 @@ namespace MultiplayerARPG
             System.GC.Collect();
         }
 
+        protected override void HandleEnterGameResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EnterGameResponseMessage response)
+        {
+            base.HandleEnterGameResponse(responseHandler, responseCode, response);
+            this.InvokeInstanceDevExtMethods("HandleEnterGameResponse", responseHandler, responseCode, response);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.HandleEnterGameResponse(this, responseHandler, responseCode, response);
+            }
+        }
+
         protected override void HandleClientReadyResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EmptyMessage response)
         {
             base.HandleClientReadyResponse(responseHandler, responseCode, response);
+            this.InvokeInstanceDevExtMethods("HandleClientReadyResponse", responseHandler, responseCode, response);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.HandleClientReadyResponse(this, responseHandler, responseCode, response);
+            }
+            ClientGenericActions.OnClientReadyResponse(responseCode);
             if (responseCode != AckResponseCode.Success)
                 OnClientConnectionRefused();
         }
@@ -942,7 +1022,7 @@ namespace MultiplayerARPG
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
         {
-            ServerStorageHandlers.CloseStorage(connectionId).Forget();
+            ServerStorageHandlers.CloseAllStorages(connectionId).Forget();
             bool success = ServerUserHandlers.RemovePlayerCharacter(connectionId, out string characterId, out string userId);
             if (success)
             {
@@ -1121,12 +1201,34 @@ namespace MultiplayerARPG
             KickClient(connectionId, s_Writer.Data);
         }
 
-        protected virtual UniTaskVoid HandleRequestSafeDisconnect(
+        public virtual async UniTask<AsyncResponseData<EmptyMessage>> SendClientSafeDisconnect()
+        {
+            this.InvokeInstanceDevExtMethods("SendClientSafeDisconnect");
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.SendClientSafeDisconnect(this);
+            }
+            return await ClientSendRequestAsync<EmptyMessage, EmptyMessage>(GameNetworkingConsts.SafeDisconnect, EmptyMessage.Value);
+        }
+
+        protected virtual UniTaskVoid HandleSafeDisconnectRequest(
             RequestHandlerData requestHandler, EmptyMessage request,
             RequestProceedResultDelegate<EmptyMessage> result)
         {
             result.InvokeSuccess(EmptyMessage.Value);
             return default;
+        }
+
+        protected virtual void HandleSafeDisconnectResponse(
+            ResponseHandlerData responseHandler,
+            AckResponseCode responseCode,
+            EmptyMessage response)
+        {
+            this.InvokeInstanceDevExtMethods("HandleSafeDisconnectResponse", responseHandler, responseCode, response);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.HandleSafeDisconnectResponse(this, responseHandler, responseCode, response);
+            }
         }
     }
 }
