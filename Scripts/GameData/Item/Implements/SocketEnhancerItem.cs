@@ -1,4 +1,7 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
+using UnityEngine;
+using UnityEngine.AddressableAssets;
 
 namespace MultiplayerARPG
 {
@@ -30,6 +33,17 @@ namespace MultiplayerARPG
         {
             get { return socketEnhanceEffect; }
         }
+
+#if UNITY_EDITOR || !UNITY_SERVER
+        [Category(4, "In-Scene Objects/Appearance")]
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
+        [AddressableAssetConversion(nameof(addressableEquipModel))]
+        protected GameObject equipModel;
+#endif
+        [SerializeField]
+        protected AssetReferenceGameObject addressableEquipModel = null;
+#endif
 
         [SerializeField]
         private BaseWeaponAbility[] weaponAbilities = new BaseWeaponAbility[0];
@@ -66,6 +80,25 @@ namespace MultiplayerARPG
         {
             get { return enemyStatusEffectsWhenAttacked; }
         }
+
+#if UNITY_EDITOR || !UNITY_SERVER
+        public async UniTask<GameObject> GetEquipModel()
+        {
+            GameObject equipModel = null;
+#if !EXCLUDE_PREFAB_REFS
+            equipModel = this.equipModel;
+#endif
+            return await addressableEquipModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+        }
+
+        public IItem SetEquipModel(GameObject equipModel)
+        {
+#if !EXCLUDE_PREFAB_REFS
+            this.equipModel = equipModel;
+#endif
+            return this;
+        }
+#endif
 
         public override void PrepareRelatesData()
         {
