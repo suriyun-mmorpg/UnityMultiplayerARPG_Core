@@ -60,7 +60,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            GameInstance.ServerStorageHandlers.CloseStorage(requestHandler.ConnectionId);
+            GameInstance.ServerStorageHandlers.CloseAllStorages(requestHandler.ConnectionId);
             result.InvokeSuccess(new ResponseCloseStorageMessage());
             return default;
         }

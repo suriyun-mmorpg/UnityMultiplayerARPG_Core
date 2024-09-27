@@ -27,14 +27,14 @@ namespace MultiplayerARPG
         /// Close storage
         /// </summary>
         /// <param name="connectionId">Client who close the storage</param>
-        UniTaskVoid CloseStorage(long connectionId);
+        /// <param name="storageId">Which storage</param>
+        UniTaskVoid CloseStorage(long connectionId, StorageId storageId);
 
         /// <summary>
-        /// Get opened storage Id by connection Id
+        /// Close all storage
         /// </summary>
-        /// <param name="connectionId"></param>
-        /// <returns></returns>
-        bool TryGetOpenedStorageId(long connectionId, out StorageId storageId);
+        /// <param name="connectionId">Client who close the storage</param>
+        UniTaskVoid CloseAllStorages(long connectionId);
 
         /// <summary>
         /// Decrease items from storage, return items which going to drop on ground

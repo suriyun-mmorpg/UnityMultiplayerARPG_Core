@@ -21,6 +21,9 @@
                         return false;
                     storageId = new StorageId(storageType, buildingEntity.Id);
                     return true;
+                case StorageType.Protected:
+                    storageId = new StorageId(storageType, playerCharacter.UserId);
+                    return true;
             }
             return false;
         }
