@@ -1238,9 +1238,8 @@ namespace MultiplayerARPG
             if (Application.isPlaying)
                 InitializePurchasing();
 
-            OnGameDataLoaded();
-
             System.GC.Collect();
+            OnGameDataLoaded();
         }
 
         public void OnGameDataLoaded()
@@ -1263,8 +1262,9 @@ namespace MultiplayerARPG
             return mapIds;
         }
 
-        private int MixWithAttackObstacleLayers(int layerMask)
+        public int GetAttackObstacleLayerMask()
         {
+            int layerMask = 0;
             if (attackObstacleLayers.Length > 0)
             {
                 foreach (UnityLayer attackObstacleLayer in attackObstacleLayers)
@@ -1275,8 +1275,14 @@ namespace MultiplayerARPG
             return layerMask;
         }
 
-        private int MixWithIgnoreRaycastLayers(int layerMask)
+        public int MixWithAttackObstacleLayers(int layerMask)
         {
+            return layerMask | GetAttackObstacleLayerMask();
+        }
+
+        public int GetIgnoreRaycastLayerMask()
+        {
+            int layerMask = 0;
             if (ignoreRaycastLayers.Length > 0)
             {
                 foreach (UnityLayer ignoreRaycastLayer in ignoreRaycastLayers)
@@ -1286,6 +1292,11 @@ namespace MultiplayerARPG
             }
             layerMask = layerMask | 1 << PhysicLayers.IgnoreRaycast;
             return layerMask;
+        }
+
+        public int MixWithIgnoreRaycastLayers(int layerMask)
+        {
+            return layerMask | GetIgnoreRaycastLayerMask();
         }
 
         /// <summary>
