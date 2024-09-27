@@ -1,4 +1,3 @@
-using Cysharp.Text;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -45,7 +44,7 @@ namespace MultiplayerARPG
 
         public HitValidateData GetHitValidateData(BaseGameEntity attacker, int simulateSeed)
         {
-            string id = MakeValidateId(attacker.ObjectId, simulateSeed);
+            string id = HitRegistrationUtils.MakeValidateId(attacker.ObjectId, simulateSeed);
             if (s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
                 return hitValidateData;
             return null;
@@ -53,7 +52,7 @@ namespace MultiplayerARPG
 
         public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
-            string id = MakeValidateId(attacker.ObjectId, simulateSeed);
+            string id = HitRegistrationUtils.MakeValidateId(attacker.ObjectId, simulateSeed);
             bool appending = false;
             if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
             {
@@ -92,7 +91,7 @@ namespace MultiplayerARPG
             if (attacker == null)
                 return false;
 
-            string id = MakeValidateId(attacker.ObjectId, hitData.SimulateSeed);
+            string id = HitRegistrationUtils.MakeValidateId(attacker.ObjectId, hitData.SimulateSeed);
             if (!s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
             {
                 // No validating data
@@ -107,7 +106,7 @@ namespace MultiplayerARPG
             }
 
             uint objectId = hitData.HitObjectId;
-            string hitObjectId = MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.HitObjectId);
+            string hitObjectId = HitRegistrationUtils.MakeHitObjectId(hitData.TriggerIndex, hitData.SpreadIndex, hitData.HitObjectId);
             if (hitValidateData.HitObjects.Contains(hitObjectId))
             {
                 // Already hit
@@ -135,7 +134,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            string hitId = MakeHitRegId(hitData.TriggerIndex, hitData.SpreadIndex);
+            string hitId = HitRegistrationUtils.MakeHitRegId(hitData.TriggerIndex, hitData.SpreadIndex);
             if (!hitValidateData.HitsCount.TryGetValue(hitId, out int hitCount))
             {
                 // Set hit count to 0, if it is not in collection
@@ -160,21 +159,6 @@ namespace MultiplayerARPG
             Vector3 alignedHitPoint = _hitBoxTransform.InverseTransformPoint(hitData.HitOrigin);
             float maxExtents = Mathf.Max(transformHistory.Bounds.extents.x, transformHistory.Bounds.extents.y, transformHistory.Bounds.extents.z);
             return Vector3.Distance(Vector3.zero, alignedHitPoint) <= maxExtents + hitValidationBuffer;
-        }
-
-        private static string MakeValidateId(uint attackerId, int simulateSeed)
-        {
-            return ZString.Concat(attackerId, "_", simulateSeed);
-        }
-
-        private static string MakeHitRegId(byte triggerIndex, byte spreadIndex)
-        {
-            return ZString.Concat(triggerIndex, "_", spreadIndex);
-        }
-
-        private static string MakeHitObjectId(byte triggerIndex, byte spreadIndex, uint objectId)
-        {
-            return ZString.Concat(triggerIndex, "_", spreadIndex, "_", objectId);
         }
 
         public void ClearData()

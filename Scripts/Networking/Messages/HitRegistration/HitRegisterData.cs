@@ -1,5 +1,4 @@
-﻿using Cysharp.Text;
-using LiteNetLib.Utils;
+﻿using LiteNetLib.Utils;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -54,12 +53,12 @@ namespace MultiplayerARPG
 
         public string GetHitId()
         {
-            return ZString.Concat(TriggerIndex, "_", SpreadIndex);
+            return HitRegistrationUtils.MakeValidateId(TriggerIndex, SpreadIndex);
         }
 
         public string GetHitObjectId()
         {
-            return ZString.Concat(TriggerIndex, "_", SpreadIndex, "_", HitObjectId);
+            return HitRegistrationUtils.MakeHitObjectId(TriggerIndex, SpreadIndex, HitObjectId);
         }
     }
 }

@@ -50,5 +50,9 @@ namespace MultiplayerARPG
         /// If object were hit it might not allow to being hitted again (up to implementation)
         /// </summary>
         public HashSet<string> HitObjects { get; } = new HashSet<string>();
+        /// <summary>
+        /// Set any validator data here
+        /// </summary>
+        public object ValidatorData { get; set; }
     }
 }
