@@ -18,16 +18,6 @@ namespace MultiplayerARPG
         public SceneField homeConsoleScene;
         public AssetReferenceScene addressableHomeConsoleScene;
 
-        [Header("Lobby Scene")]
-        public SceneField lobbyScene;
-        public AssetReferenceScene addressableLobbyScene;
-        [Tooltip("If this is empty, it will use `Lobby Scene` as lobby scene")]
-        public SceneField lobbyMobileScene;
-        public AssetReferenceScene addressableLobbyMobileScene;
-        [Tooltip("If this is empty, it will use `Lobby Scene` as lobby scene")]
-        public SceneField lobbyConsoleScene;
-        public AssetReferenceScene addressableLobbyConsoleScene;
-
         public void LoadHomeScene()
         {
             StartCoroutine(LoadHomeSceneRoutine());
