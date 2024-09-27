@@ -114,5 +114,15 @@ namespace MultiplayerARPG
                 return false;
             return true;
         }
+
+        public virtual bool CanChangeAmmoItem()
+        {
+            return true;
+        }
+
+        public virtual bool CanRemoveAmmoFromItem()
+        {
+            return true;
+        }
     }
 }

@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                 return false;
             if (IsDealing)
                 return false;
-            if (!CanDoActions())
+            if (this.IsDead())
                 return false;
             return true;
         }
@@ -66,7 +66,7 @@ namespace MultiplayerARPG
                 return false;
             if (IsDealing)
                 return false;
-            if (!CanDoActions())
+            if (this.IsDead())
                 return false;
             return true;
         }
@@ -171,6 +171,32 @@ namespace MultiplayerARPG
             if (IsVendingStarted)
                 return false;
             return base.CanUseItem();
+        }
+
+        public override bool CanChangeAmmoItem()
+        {
+            if (IsWarping)
+                return false;
+            if (IsUpdatingItems)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
+        }
+
+        public override bool CanRemoveAmmoFromItem()
+        {
+            if (IsWarping)
+                return false;
+            if (IsUpdatingItems)
+                return false;
+            if (IsDealing)
+                return false;
+            if (!CanDoActions())
+                return false;
+            return true;
         }
     }
 }

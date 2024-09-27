@@ -4,7 +4,7 @@
     {
         public bool CallCmdPickup(uint objectId)
         {
-            if (!CanDoActions())
+            if (!CanPickup())
                 return false;
             RPC(CmdPickup, objectId);
             CallRpcPlayPickupAnimation();
@@ -13,7 +13,7 @@
 
         public bool CallCmdPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
-            if (!CanDoActions())
+            if (!CanPickup())
                 return false;
             RPC(CmdPickupItemFromContainer, objectId, itemsContainerIndex, amount);
             CallRpcPlayPickupAnimation();
@@ -22,7 +22,7 @@
 
         public bool CallCmdPickupAllItemsFromContainer(uint objectId)
         {
-            if (!CanDoActions())
+            if (!CanPickup())
                 return false;
             RPC(CmdPickupAllItemsFromContainer, objectId);
             CallRpcPlayPickupAnimation();
@@ -31,7 +31,7 @@
 
         public bool CallCmdPickupNearbyItems()
         {
-            if (!CanDoActions())
+            if (!CanPickup())
                 return false;
             RPC(CmdPickupNearbyItems);
             CallRpcPlayPickupAnimation();
@@ -40,7 +40,7 @@
 
         public bool CallCmdDropItem(int nonEquipIndex, int amount)
         {
-            if (amount <= 0 || !CanDoActions() || nonEquipIndex >= NonEquipItems.Count)
+            if (amount <= 0 || nonEquipIndex >= NonEquipItems.Count || !CanDropItem())
                 return false;
             RPC(CmdDropItem, nonEquipIndex, amount);
             return true;

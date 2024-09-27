@@ -185,6 +185,10 @@ namespace MultiplayerARPG
 
         protected override bool CanTurn_Implementation()
         {
+            if (this.IsDead())
+            {
+                return false;
+            }
             if (IsAttacking && MovementRestrictionWhileAttacking.turnRestricted)
             {
                 return false;

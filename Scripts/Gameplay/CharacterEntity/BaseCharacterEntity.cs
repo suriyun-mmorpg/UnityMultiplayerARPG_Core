@@ -80,14 +80,20 @@ namespace MultiplayerARPG
             set { chatBubbleTransform = value; }
         }
 
+        public class DebugDamageLaunch
+        {
+            public Vector3 position;
+            public Vector3 direction;
+            public Quaternion rotation;
+            public bool isLeftHand;
+            public float fov;
+            public float distance;
+        }
 #if UNITY_EDITOR
         [Category(200, "Debugging", false)]
         [FormerlySerializedAs("debugFovColor")]
         public Color debugDamageLaunchingColor = new Color(0, 1, 0, 0.04f);
-        public Vector3? debugDamageLaunchingPosition;
-        public Vector3? debugDamageLaunchingDirection;
-        public Quaternion? debugDamageLaunchingRotation;
-        public bool? debugDamageLaunchingIsLeftHand;
+        public DebugDamageLaunch debugDamageLaunchData;
 #endif
 
         [Category(5, "Character Settings")]
@@ -230,37 +236,34 @@ namespace MultiplayerARPG
         protected override void OnDrawGizmos()
         {
             base.OnDrawGizmos();
-            if (debugDamageLaunchingPosition.HasValue &&
-                debugDamageLaunchingDirection.HasValue &&
-                debugDamageLaunchingRotation.HasValue &&
-                debugDamageLaunchingIsLeftHand.HasValue)
+            if (debugDamageLaunchData != null)
             {
-                float atkHalfFov = GetAttackFov(debugDamageLaunchingIsLeftHand.Value) * 0.5f;
-                float atkDist = GetAttackDistance(debugDamageLaunchingIsLeftHand.Value);
+                float atkHalfFov = debugDamageLaunchData.fov * 0.5f;
+                float atkDist = debugDamageLaunchData.distance;
                 Handles.color = debugDamageLaunchingColor;
-                Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
-                Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, atkDist);
-                Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.right, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
-                Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.right, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, atkDist);
+                Handles.DrawSolidArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.up, debugDamageLaunchData.rotation * Vector3.forward, -atkHalfFov, atkDist);
+                Handles.DrawSolidArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.up, debugDamageLaunchData.rotation * Vector3.forward, atkHalfFov, atkDist);
+                Handles.DrawSolidArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.right, debugDamageLaunchData.rotation * Vector3.forward, -atkHalfFov, atkDist);
+                Handles.DrawSolidArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.right, debugDamageLaunchData.rotation * Vector3.forward, atkHalfFov, atkDist);
 
-                Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, 0);
-                Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, 0);
-                Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.right, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, 0);
-                Handles.DrawSolidArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.right, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, 0);
+                Handles.DrawSolidArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.up, debugDamageLaunchData.rotation * Vector3.forward, -atkHalfFov, 0);
+                Handles.DrawSolidArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.up, debugDamageLaunchData.rotation * Vector3.forward, atkHalfFov, 0);
+                Handles.DrawSolidArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.right, debugDamageLaunchData.rotation * Vector3.forward, -atkHalfFov, 0);
+                Handles.DrawSolidArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.right, debugDamageLaunchData.rotation * Vector3.forward, atkHalfFov, 0);
 
                 Handles.color = new Color(debugDamageLaunchingColor.r, debugDamageLaunchingColor.g, debugDamageLaunchingColor.b);
-                Handles.DrawWireArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
-                Handles.DrawWireArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, atkDist);
-                Handles.DrawWireArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, 0);
-                Handles.DrawWireArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.up, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, 0);
+                Handles.DrawWireArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.up, debugDamageLaunchData.rotation * Vector3.forward, -atkHalfFov, atkDist);
+                Handles.DrawWireArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.up, debugDamageLaunchData.rotation * Vector3.forward, atkHalfFov, atkDist);
+                Handles.DrawWireArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.up, debugDamageLaunchData.rotation * Vector3.forward, -atkHalfFov, 0);
+                Handles.DrawWireArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.up, debugDamageLaunchData.rotation * Vector3.forward, atkHalfFov, 0);
 
-                Handles.DrawWireArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.right, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, 0);
-                Handles.DrawWireArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.right, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, 0);
-                Handles.DrawWireArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.right, debugDamageLaunchingRotation.Value * Vector3.forward, -atkHalfFov, atkDist);
-                Handles.DrawWireArc(debugDamageLaunchingPosition.Value, debugDamageLaunchingRotation.Value * Vector3.right, debugDamageLaunchingRotation.Value * Vector3.forward, atkHalfFov, atkDist);
+                Handles.DrawWireArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.right, debugDamageLaunchData.rotation * Vector3.forward, -atkHalfFov, 0);
+                Handles.DrawWireArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.right, debugDamageLaunchData.rotation * Vector3.forward, atkHalfFov, 0);
+                Handles.DrawWireArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.right, debugDamageLaunchData.rotation * Vector3.forward, -atkHalfFov, atkDist);
+                Handles.DrawWireArc(debugDamageLaunchData.position, debugDamageLaunchData.rotation * Vector3.right, debugDamageLaunchData.rotation * Vector3.forward, atkHalfFov, atkDist);
 
                 Gizmos.color = Color.red;
-                Gizmos.DrawRay(debugDamageLaunchingPosition.Value, debugDamageLaunchingDirection.Value * atkDist);
+                Gizmos.DrawRay(debugDamageLaunchData.position, debugDamageLaunchData.direction * atkDist);
             }
         }
 #endif
@@ -297,7 +300,13 @@ namespace MultiplayerARPG
             }
             Profiler.EndSample();
 
-            bool tempEnableMovement = PassengingVehicleEntity == null;
+            bool tempEnableMovement = PassengingVehicleEntity.IsNull();
+            if (CurrentGameManager.ServerType.IsLobby())
+            {
+                tempEnableMovement = false;
+                EntityTransform.localPosition = Vector3.zero;
+                EntityTransform.localRotation = Quaternion.identity;
+            }
             Profiler.BeginSample("BaseCharacterEntity - UnderDeadYChecking");
             if (RespawnGroundedCheckCountDown > 0f)
             {
@@ -962,12 +971,9 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        public void SetDebugDamage(Vector3 damagePosition, Vector3 damageDirection, Quaternion damageRotation, bool isLeftHand)
+        public void SetDebugDamage(DebugDamageLaunch debugDamageLaunchData)
         {
-            debugDamageLaunchingPosition = damagePosition;
-            debugDamageLaunchingDirection = damageDirection;
-            debugDamageLaunchingRotation = damageRotation;
-            debugDamageLaunchingIsLeftHand = isLeftHand;
+            this.debugDamageLaunchData = debugDamageLaunchData;
         }
 #endif
         #endregion
@@ -1023,36 +1029,14 @@ namespace MultiplayerARPG
         #region Find objects helpers
         public bool IsPositionInFov(float fov, Vector3 position)
         {
-            return IsPositionInFov(fov, position, EntityTransform.forward);
+            return IsPositionInFov(EntityTransform.position, fov, position);
         }
 
-        public bool IsPositionInFov(float fov, Vector3 position, Vector3 forward)
+        public bool IsPositionInFov(Vector3 origin, float fov, Vector3 position)
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                return IsPositionInFov2D(fov, position, forward);
-            return IsPositionInFov3D(fov, position, forward);
-        }
-
-        protected bool IsPositionInFov2D(float fov, Vector3 position, Vector3 forward)
-        {
-            Vector2 targetDir = position - EntityTransform.position;
-            targetDir.Normalize();
-            float angle = Vector2.Angle(targetDir, Direction2D);
-            // Angle in forward position is 180 so we use this value to determine that target is in hit fov or not
-            return angle < fov * 0.5f;
-        }
-
-        protected bool IsPositionInFov3D(float fov, Vector3 position, Vector3 forward)
-        {
-            // This is unsigned angle, so angle found from this function is 0 - 180
-            // if position forward from character this value will be 180
-            // so just find for angle > 180 - halfFov
-            Vector3 targetDir = position - EntityTransform.position;
-            targetDir.y = 0;
-            forward.y = 0;
-            targetDir.Normalize();
-            forward.Normalize();
-            return Vector3.Angle(targetDir, forward) < fov * 0.5f;
+                return origin.GetVector2().IsPositionInFov2D(fov, position, Direction2D);
+            return origin.IsPositionInFov3D(fov, position, EntityTransform.forward);
         }
 
         public bool IsGameEntityInDistance<T>(T targetEntity, float distance, bool includeUnHittable = true)
