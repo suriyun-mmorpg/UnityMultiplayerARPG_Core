@@ -133,7 +133,7 @@ namespace MultiplayerARPG
         
         public override bool Validate()
         {
-            bool hasChanges = base.Validate();
+            bool hasChanges = false;
             IWeaponItem tempRightHandWeapon = null;
             IWeaponItem tempLeftHandWeapon = null;
             IShieldItem tempLeftHandShield = null;
@@ -226,7 +226,7 @@ namespace MultiplayerARPG
                     equipedPositions.Add((armorItem as IArmorItem).GetEquipPosition());
                 }
             }
-            return hasChanges;
+            return hasChanges || base.Validate();
         }
 
         public override void PrepareRelatesData()
