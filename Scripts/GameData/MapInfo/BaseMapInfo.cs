@@ -194,13 +194,50 @@ namespace MultiplayerARPG
 
         public async UniTask<Sprite> GetMinimapSprite()
         {
-#if !EXCLUDE_PREFAB_REFS
-            if (minimapSprite != null)
-                return minimapSprite;
+            return await AddressableMinimapSprite.GetOrLoadObjectAsyncOrUseAsset(MinimapSprite);
+        }
+
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [PreviewSprite(50)]
+        [AddressableAssetConversion(nameof(addressableMinimapSprite2))]
+        [SerializeField]
+        private Sprite minimapSprite2;
 #endif
-            if (addressableMinimapSprite.IsDataValid())
-                return await addressableMinimapSprite.LoadAssetAsync<Sprite>();
-            return null;
+        public Sprite MinimapSprite2
+        {
+            private get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return minimapSprite2;
+#else
+                return null;
+#endif
+            }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS
+                minimapSprite2 = value;
+#endif
+            }
+        }
+
+        [SerializeField]
+        protected AssetReferenceSprite addressableMinimapSprite2;
+        public AssetReferenceSprite AddressableMinimapSprite2
+        {
+            get
+            {
+                return addressableMinimapSprite2;
+            }
+            set
+            {
+                addressableMinimapSprite2 = value;
+            }
+        }
+
+        public async UniTask<Sprite> GetMinimapSprite2()
+        {
+            return await AddressableMinimapSprite2.GetOrLoadObjectAsyncOrUseAsset(MinimapSprite2);
         }
 
         [SerializeField]

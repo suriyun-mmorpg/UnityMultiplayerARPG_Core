@@ -12,13 +12,19 @@ namespace MultiplayerARPG
             public RectTransform Marker { get; set; }
             public Vector3 MarkerRotateOffsets { get; set; }
         }
-        public enum Mode
+        public enum MinimapMode
         {
             Default,
             FollowPlayingCharacter,
         }
+        public enum MinimapType
+        {
+            Type1,
+            Type2,
+        }
         [Header("Settings")]
-        public Mode mode;
+        public MinimapMode mode = MinimapMode.Default;
+        public MinimapType type = MinimapType.Type2;
         [Tooltip("Marker's anchor min, max and pivot must be 0.5")]
         public RectTransform playingCharacterMarker;
         public Vector3 playingCharacterRotateOffsets = Vector3.zero;
@@ -46,6 +52,7 @@ namespace MultiplayerARPG
         public float updateMarkerDuration = 1f;
         [Tooltip("Image's anchor min, max and pivot must be 0.5")]
         public Image imageMinimap;
+        public ScrollRect scrollRectMinimap;
         [Header("Testing")]
         public bool isTestMode;
         public BaseMapInfo testingMapInfo;
@@ -54,6 +61,16 @@ namespace MultiplayerARPG
         private float _updateMarkerCountdown;
         private BaseMapInfo _currentMapInfo;
         private List<MarkerData> _markers = new List<MarkerData>();
+
+        public void SetModeToDefault()
+        {
+            mode = MinimapMode.Default;
+        }
+
+        public void SetModeToFollowPlayingCharacter()
+        {
+            mode = MinimapMode.FollowPlayingCharacter;
+        }
 
         private void Update()
         {
@@ -71,17 +88,35 @@ namespace MultiplayerARPG
 
         private async void UpdateMinimap()
         {
+            // TODO: May calculate with marker's anchor to find proper marker's position
+
             // Use bounds size to calculate transforms
             float boundsWidth = _currentMapInfo.MinimapBoundsWidth;
             float boundsLength = _currentMapInfo.MinimapBoundsLength;
             float maxBoundsSize = Mathf.Max(boundsWidth, boundsLength);
 
             // Prepare target transform to follow
-            Transform playingCharacterTransform = isTestMode ? testingPlayingCharacterTransform : GameInstance.PlayingCharacterEntity.EntityTransform;
+            Transform playingCharacterTransform = null;
+            if (isTestMode)
+                playingCharacterTransform = testingPlayingCharacterTransform;
+            else if (GameInstance.PlayingCharacterEntity != null)
+                playingCharacterTransform = GameInstance.PlayingCharacterEntity.EntityTransform;
+            if (playingCharacterTransform == null)
+                return;
 
             if (imageMinimap != null)
             {
-                imageMinimap.sprite = await _currentMapInfo.GetMinimapSprite();
+                Sprite spr = null;
+                switch (type)
+                {
+                    case MinimapType.Type1:
+                        spr = await _currentMapInfo.GetMinimapSprite();
+                        break;
+                    case MinimapType.Type2:
+                        spr = await _currentMapInfo.GetMinimapSprite2();
+                        break;
+                }
+                imageMinimap.sprite = spr;
                 if (!imageMinimap.gameObject.activeSelf)
                     imageMinimap.gameObject.SetActive(true);
 
@@ -115,13 +150,37 @@ namespace MultiplayerARPG
                     SetMarkerPositionAndRotation(playingCharacterMarker, playingCharacterTransform, sizeRate, playingCharacterRotateOffsets);
                 }
 
-                if (mode == Mode.Default)
+                if (mode == MinimapMode.Default)
                 {
                     imageMinimap.transform.localPosition = Vector2.zero;
                 }
                 else
                 {
-                    imageMinimap.transform.localPosition = -new Vector2((_currentMapInfo.MinimapPosition.x - playingCharacterTransform.position.x) * sizeRate, (_currentMapInfo.MinimapPosition.z - playingCharacterTransform.position.z) * sizeRate);
+                    if (scrollRectMinimap != null)
+                    {
+                        // marker map pos
+                        GetMarkerPositionAndAngles(playingCharacterTransform.position, playingCharacterTransform.eulerAngles, sizeRate, followingCameraRotateOffsets, out Vector3 markerPosition, out _);
+                        float calcX = (markerPosition.x + (imageMinimap.rectTransform.sizeDelta.x * 0.5f)) / imageMinimap.rectTransform.sizeDelta.x;
+                        float calcY = (markerPosition.y + (imageMinimap.rectTransform.sizeDelta.y * 0.5f)) / imageMinimap.rectTransform.sizeDelta.y;
+                        scrollRectMinimap.normalizedPosition = new Vector2(calcX, calcY);
+                    }
+                    else
+                    {
+                        float x;
+                        float y;
+                        switch (GameInstance.Singleton.DimensionType)
+                        {
+                            case DimensionType.Dimension2D:
+                                x = _currentMapInfo.MinimapPosition.x - playingCharacterTransform.position.x;
+                                y = _currentMapInfo.MinimapPosition.y - playingCharacterTransform.position.y;
+                                break;
+                            default:
+                                x = _currentMapInfo.MinimapPosition.x - playingCharacterTransform.position.x;
+                                y = _currentMapInfo.MinimapPosition.z - playingCharacterTransform.position.z;
+                                break;
+                        }
+                        imageMinimap.transform.localPosition = -new Vector2(x * sizeRate, y * sizeRate);
+                    }
                 }
             }
         }
@@ -226,19 +285,26 @@ namespace MultiplayerARPG
 
         private void SetMarkerPositionAndRotation(RectTransform markerTransform, Vector3 position, Vector3 eulerAngles, float sizeRate, Vector3 markerRotateOffsets)
         {
+            GetMarkerPositionAndAngles(position, eulerAngles, sizeRate, markerRotateOffsets, out Vector3 markerPosition, out Vector3 markerEulerAngles);
+            markerTransform.localPosition = markerPosition;
+            markerTransform.localEulerAngles = markerEulerAngles;
+        }
+
+        private void GetMarkerPositionAndAngles(Vector3 position, Vector3 eulerAngles, float sizeRate, Vector3 markerRotateOffsets, out Vector3 markerPosition, out Vector3 markerEulerAngles)
+        {
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension2D:
-                    markerTransform.localPosition = imageMinimap.transform.localPosition + new Vector3(
+                    markerPosition = imageMinimap.transform.localPosition + new Vector3(
                         (_currentMapInfo.MinimapPosition.x - position.x) * sizeRate,
                         (_currentMapInfo.MinimapPosition.y - position.y) * sizeRate);
-                    markerTransform.localEulerAngles = Vector3.zero;
+                    markerEulerAngles = Vector3.zero;
                     break;
                 default:
-                    markerTransform.localPosition = imageMinimap.transform.localPosition + new Vector3(
+                    markerPosition = imageMinimap.transform.localPosition + new Vector3(
                         (_currentMapInfo.MinimapPosition.x - position.x) * sizeRate,
                         (_currentMapInfo.MinimapPosition.z - position.z) * sizeRate);
-                    markerTransform.localEulerAngles = markerRotateOffsets + (Vector3.back * eulerAngles.y);
+                    markerEulerAngles = markerRotateOffsets + (Vector3.back * eulerAngles.y);
                     break;
             }
         }
