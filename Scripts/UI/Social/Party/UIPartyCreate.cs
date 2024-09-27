@@ -3,7 +3,7 @@ using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
-    public class UIPartyCreate : UIBase
+    public partial class UIPartyCreate : UIBase
     {
         public Toggle toggleShareExp;
         public Toggle toggleShareItem;
