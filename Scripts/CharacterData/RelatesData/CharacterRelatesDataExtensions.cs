@@ -62,8 +62,22 @@ namespace MultiplayerARPG
         public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData, bool checkLevel = false)
         {
             if (checkLevel && data.level != anotherData.level)
+                return true;
+            return !string.Equals(data.id, anotherData.id) || data.dataId != anotherData.dataId;
+        }
+
+        public static bool IsDifferSockets(this CharacterItem data, CharacterItem anotherData)
+        {
+            if (data.sockets == null && anotherData.sockets == null)
                 return false;
-            return data.id != anotherData.id || data.dataId != anotherData.dataId;
+            if (data.sockets.Count != anotherData.sockets.Count)
+                return true;
+            for (int i = 0; i < data.sockets.Count; ++i)
+            {
+                if (data.sockets[i] != anotherData.sockets[i])
+                    return true;
+            }
+            return false;
         }
 
         public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData, out bool rightIsDiffer, out bool leftIsDiffer, bool checkLevel = false)
