@@ -2,6 +2,9 @@
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 using XNode;
 
 namespace MultiplayerARPG
@@ -83,6 +86,26 @@ namespace MultiplayerARPG
         // Repair Item
         [Output(connectionType = ConnectionType.Override)]
         public BaseNpcDialog repairItemCancelDialog;
+
+#if UNITY_EDITOR
+        [InspectorButton(nameof(SetAllAmountToItsMaxStack), "Set all amount to its max stack")]
+        public bool btnSetAllAmountToItsMaxStack;
+
+        public void SetAllAmountToItsMaxStack()
+        {
+            if (sellItems == null || sellItems.Length == 0)
+                return;
+            for (int i = 0; i < sellItems.Length; ++i)
+            {
+                NpcSellItem npcSellItem = sellItems[i];
+                if (npcSellItem.item == null)
+                    continue;
+                npcSellItem.amount = npcSellItem.item.MaxStack;
+                sellItems[i] = npcSellItem;
+            }
+            EditorUtility.SetDirty(this);
+        }
+#endif
 
         public override void PrepareRelatesData()
         {
