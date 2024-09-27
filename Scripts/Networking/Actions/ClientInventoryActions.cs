@@ -20,6 +20,8 @@ namespace MultiplayerARPG
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemMessage> onResponseSellItem;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSellItemsMessage> onResponseSellItems;
         public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseSortItemsMessage> onResponseSortItems;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseChangeAmmoItemMessage> onResponseChangeAmmoItem;
+        public static event System.Action<ResponseHandlerData, AckResponseCode, ResponseRemoveAmmoFromItemMessage> onResponseRemoveAmmoFromItem;
 
         public static void Clean()
         {
@@ -151,6 +153,20 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseSortItems != null)
                 onResponseSortItems.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseChangeAmmoItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseChangeAmmoItemMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseChangeAmmoItem != null)
+                onResponseChangeAmmoItem.Invoke(requestHandler, responseCode, response);
+        }
+
+        public static void ResponseRemoveAmmoFromItem(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseRemoveAmmoFromItemMessage response)
+        {
+            ClientGenericActions.ClientReceiveGameMessage(response.message);
+            if (onResponseRemoveAmmoFromItem != null)
+                onResponseRemoveAmmoFromItem.Invoke(requestHandler, responseCode, response);
         }
     }
 }

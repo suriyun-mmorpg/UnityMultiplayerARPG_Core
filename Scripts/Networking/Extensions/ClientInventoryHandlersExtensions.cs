@@ -1,4 +1,5 @@
 ﻿using LiteNetLibManager;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -15,6 +16,10 @@ namespace MultiplayerARPG
             IShieldItem equippingShieldItem = equippingItem.GetShieldItem();
             if (equippingWeaponItem != null)
             {
+                List<byte> equippableSlotIndexes = equippingWeaponItem.GetEquippableSetIndexes();
+                if (equippableSlotIndexes?.Count > 0 && !equippableSlotIndexes.Contains(equipWeaponSet))
+                    equipWeaponSet = equippingWeaponItem.WeaponType.EquippableSetIndexes[0];
+
                 if (equippingWeaponItem.GetEquipType() == WeaponItemEquipType.DualWieldable)
                 {
                     IWeaponItem rightWeapon = playerCharacter.EquipWeapons.GetRightHandWeaponItem();

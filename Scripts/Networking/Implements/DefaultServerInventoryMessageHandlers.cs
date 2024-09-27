@@ -175,13 +175,20 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanEquipItem())
+            if (playerCharacterEntity != null)
             {
-                result.InvokeError(new ResponseSwitchEquipWeaponSetMessage()
+                if (playerCharacterEntity.ReloadComponent.IsReloading)
                 {
-                    message = UITextKeys.UI_ERROR_CANNOT_EQUIP,
-                });
-                return default;
+                    playerCharacterEntity.ReloadComponent.CancelReload();
+                }
+                if (!playerCharacterEntity.CanEquipItem())
+                {
+                    result.InvokeError(new ResponseSwitchEquipWeaponSetMessage()
+                    {
+                        message = UITextKeys.UI_ERROR_CANNOT_EQUIP,
+                    });
+                    return default;
+                }
             }
 
             byte equipWeaponSet = request.equipWeaponSet;
@@ -288,6 +295,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
+
             result.InvokeSuccess(new ResponseEnhanceSocketItemMessage()
             {
                 message = gameMessage,
@@ -539,6 +547,88 @@ namespace MultiplayerARPG
                 nonEquipItems.Reverse();
             playerCharacterEntity.NonEquipItems = nonEquipItems;
             result.InvokeSuccess(new ResponseSortItemsMessage());
+            return default;
+        }
+
+        public UniTaskVoid HandleRequestChangeAmmoItem(RequestHandlerData requestHandler, RequestChangeAmmoItemMessage request, RequestProceedResultDelegate<ResponseChangeAmmoItemMessage> result)
+        {
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
+            {
+                result.InvokeError(new ResponseChangeAmmoItemMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return default;
+            }
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null)
+            {
+                if (!playerCharacterEntity.CanChangeAmmoItem())
+                {
+                    result.InvokeError(new ResponseChangeAmmoItemMessage());
+                    return default;
+                }
+            }
+
+            UITextKeys gameMessage;
+            int ammo = playerCharacter.GetAmmo(request.inventoryType, request.index);
+            if (ammo > 0)
+            {
+                if (!playerCharacter.RemoveAmmoFromItem(request.inventoryType, request.index, out gameMessage))
+                {
+                    result.InvokeError(new ResponseChangeAmmoItemMessage()
+                    {
+                        message = gameMessage,
+                    });
+                    return default;
+                }
+            }
+
+            if (!playerCharacter.PutAmmoToItem(request.inventoryType, request.index, request.ammoItemId, out gameMessage))
+            {
+                result.InvokeError(new ResponseChangeAmmoItemMessage()
+                {
+                    message = gameMessage,
+                });
+                return default;
+            }
+
+            result.InvokeSuccess(new ResponseChangeAmmoItemMessage());
+            return default;
+        }
+
+        public UniTaskVoid HandleRequestRemoveAmmoFromItem(RequestHandlerData requestHandler, RequestRemoveAmmoFromItemMessage request, RequestProceedResultDelegate<ResponseRemoveAmmoFromItemMessage> result)
+        {
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
+            {
+                result.InvokeError(new ResponseRemoveAmmoFromItemMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return default;
+            }
+
+            BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
+            if (playerCharacterEntity != null)
+            {
+                if (!playerCharacterEntity.CanRemoveAmmoFromItem())
+                {
+                    result.InvokeError(new ResponseRemoveAmmoFromItemMessage());
+                    return default;
+                }
+            }
+
+            if (!playerCharacter.RemoveAmmoFromItem(request.inventoryType, request.index, out UITextKeys gameMessage))
+            {
+                result.InvokeError(new ResponseRemoveAmmoFromItemMessage()
+                {
+                    message = gameMessage,
+                });
+                return default;
+            }
+
+            result.InvokeSuccess(new ResponseRemoveAmmoFromItemMessage());
             return default;
         }
     }

@@ -20,5 +20,7 @@ namespace MultiplayerARPG
         bool RequestSellItem(RequestSellItemMessage data, ResponseDelegate<ResponseSellItemMessage> callback);
         bool RequestSellItems(RequestSellItemsMessage data, ResponseDelegate<ResponseSellItemsMessage> callback);
         bool RequestSortItems(RequestSortItemsMessage data, ResponseDelegate<ResponseSortItemsMessage> callback);
+        bool RequestChangeAmmoItem(RequestChangeAmmoItemMessage data, ResponseDelegate<ResponseChangeAmmoItemMessage> callback);
+        bool RequestRemoveAmmoFromItem(RequestRemoveAmmoFromItemMessage data, ResponseDelegate<ResponseRemoveAmmoFromItemMessage> callback);
     }
 }

@@ -91,5 +91,15 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.SortItems, data, responseDelegate: callback);
         }
+
+        public bool RequestChangeAmmoItem(RequestChangeAmmoItemMessage data, ResponseDelegate<ResponseChangeAmmoItemMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.ChangeAmmoItem, data, responseDelegate: callback);
+        }
+
+        public bool RequestRemoveAmmoFromItem(RequestRemoveAmmoFromItemMessage data, ResponseDelegate<ResponseRemoveAmmoFromItemMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.RemoveAmmoFromItem, data, responseDelegate: callback);
+        }
     }
 }

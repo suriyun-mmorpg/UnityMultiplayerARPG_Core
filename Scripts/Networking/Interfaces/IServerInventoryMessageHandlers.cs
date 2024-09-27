@@ -68,5 +68,13 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestSortItems(
             RequestHandlerData requestHandler, RequestSortItemsMessage request,
             RequestProceedResultDelegate<ResponseSortItemsMessage> result);
+
+        UniTaskVoid HandleRequestChangeAmmoItem(
+            RequestHandlerData requestHandler, RequestChangeAmmoItemMessage request,
+            RequestProceedResultDelegate<ResponseChangeAmmoItemMessage> result);
+
+        UniTaskVoid HandleRequestRemoveAmmoFromItem(
+            RequestHandlerData requestHandler, RequestRemoveAmmoFromItemMessage request,
+            RequestProceedResultDelegate<ResponseRemoveAmmoFromItemMessage> result);
     }
 }
