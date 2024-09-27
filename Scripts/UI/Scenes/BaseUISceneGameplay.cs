@@ -201,6 +201,11 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public virtual bool IsBlockActionController()
+        {
+            return UIBlockActionController.IsBlockController();
+        }
+
         public virtual bool IsPointerOverUIObject()
         {
             return false;
