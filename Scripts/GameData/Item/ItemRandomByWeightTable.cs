@@ -1,5 +1,8 @@
 using System.Collections.Generic;
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -37,5 +40,25 @@ namespace MultiplayerARPG
                 return;
             onRandomItem.Invoke(randomedItem.item, randomedItem.GetRandomedLevel(), randomedItem.GetRandomedAmount());
         }
+
+#if UNITY_EDITOR
+        [ContextMenu("Set ammo drop amount to max stack")]
+        public void SetAmmoDropAmountToMaxStack()
+        {
+            for (int i = 0; i < randomItems.Length; ++i)
+            {
+                ItemRandomByWeight randomItem = randomItems[i];
+                if (randomItem.item == null)
+                    continue;
+                if (randomItem.item is IAmmoItem ammoItem)
+                {
+                    randomItem.minAmount = ammoItem.MaxStack;
+                    randomItem.maxAmount = ammoItem.MaxStack;
+                    randomItems[i] = randomItem;
+                }
+            }
+            EditorUtility.SetDirty(this);
+        }
+#endif
     }
 }
