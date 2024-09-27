@@ -4,6 +4,7 @@ using UnityEngine.Serialization;
 using LiteNetLib;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
+using TMPro;
 
 namespace MultiplayerARPG
 {
@@ -24,16 +25,30 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (MetaDataId.HasValue)
-                    return MetaDataId.Value;
+                if (MetaDataId != 0)
+                    return MetaDataId;
                 return HashAssetId;
             }
             set { }
         }
 
-        public int? MetaDataId
+        [SerializeField]
+        protected SyncFieldInt syncMetaDataId = new SyncFieldInt();
+        private int _metaDataId;
+        public int MetaDataId
         {
-            get; set;
+            get
+            {
+                if (syncMetaDataId.Value != 0)
+                    return syncMetaDataId.Value;
+                return _metaDataId;
+            }
+            set
+            {
+                if (CurrentGameManager.IsServer)
+                    syncMetaDataId.Value = value;
+                _metaDataId = value;
+            }
         }
 
         public bool ForceHide { get; set; }
@@ -301,6 +316,7 @@ namespace MultiplayerARPG
             if (onSetOwnerClient != null)
                 onSetOwnerClient.Invoke();
         }
+
         protected virtual void EntityOnSetOwnerClient()
         {
             foreach (GameObject ownerObject in ownerObjects)
@@ -338,6 +354,12 @@ namespace MultiplayerARPG
             if (!Movement.IsNull())
             {
                 bool tempEnableMovement = PassengingVehicleEntity.IsNull();
+                if (CurrentGameManager.ServerType.IsLobby())
+                {
+                    EntityTransform.localPosition = Vector3.zero;
+                    EntityTransform.localRotation = Quaternion.identity;
+                    tempEnableMovement = false;
+                }
                 // Enable movement or not
                 if (Movement.Enabled != tempEnableMovement)
                 {
@@ -475,6 +497,8 @@ namespace MultiplayerARPG
         {
             if (onSetupNetElements != null)
                 onSetupNetElements.Invoke();
+            syncMetaDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            syncMetaDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             syncTitle.deliveryMethod = DeliveryMethod.ReliableOrdered;
             syncTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
         }
@@ -520,6 +544,43 @@ namespace MultiplayerARPG
         protected virtual void CmdPerformHitRegValidation(HitRegisterData hitData)
         {
             CurrentGameManager.HitRegistrationManager.PerformValidation(this, hitData);
+        }
+
+        public virtual void CallTargetPlayItemUseEffect(int dataId, int playerDataId)
+        {
+            RPC(TargetPlayItemUseEffect, ConnectionId, dataId, playerDataId);
+        }
+
+        [TargetRpc]
+        protected async virtual void TargetPlayItemUseEffect(int dataId, int playerDataId)
+        {
+#if !UNITY_SERVER
+            // Play effects at clients only
+            if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item))
+                return;
+
+            if (!GameInstance.PlayerCharacters.TryGetValue(playerDataId, out PlayerCharacter playerChar))
+                return;
+
+            if (Entity is BaseCharacterEntity characterEntity)
+            {
+                EffectContainer tempContainer;
+
+                for (int i = 0; i < item.poolingUsingEffects.Length; i++)
+                {
+                    if (!characterEntity.CharacterModel.CacheEffectContainers.TryGetValue(item.poolingUsingEffects[i].effectSocket, out tempContainer))
+                        continue;
+
+                    GameEffectPoolContainer fxContainer = item.poolingUsingEffects[i];
+                    AudioClip sfxToPlay = await item.audioGenderSFX.GetRandomSound(playerChar.Gender);
+
+                    fxContainer.container = tempContainer.transform;
+                    fxContainer.GetInstance(sfxToPlay);
+                }
+            }
+
+            UISceneGameplayEvents.UISceneGameplay.AnimateFlash();
+#endif
         }
     }
 }

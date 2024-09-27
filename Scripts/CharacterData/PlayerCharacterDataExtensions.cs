@@ -613,12 +613,12 @@ namespace MultiplayerARPG
             return character.UnmuteTime > 0 && character.UnmuteTime > (BaseGameNetworkManager.Singleton.ServerTimestamp / 1000);
         }
 
-        public static bool TryGetEntityPrefab(this IPlayerCharacterData data, out BasePlayerCharacterEntity prefab, out int? metaDataId)
+        public static bool TryGetEntityPrefab(this IPlayerCharacterData data, out BasePlayerCharacterEntity prefab, out int metaDataId)
         {
             int hashAssetId = GameInstance.GetPlayerCharacterEntityHashAssetId(data.EntityId, out metaDataId);
-            if (metaDataId.HasValue)
+            if (metaDataId != 0)
             {
-                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.EntityPrefab != null)
+                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId, out PlayerCharacterEntityMetaData metaData) && metaData.EntityPrefab != null)
                 {
                     prefab = metaData.EntityPrefab;
                     return prefab != null;
@@ -632,12 +632,12 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool TryGetEntityAddressablePrefab(this IPlayerCharacterData data, out AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity> assetRef, out int? metaDataId)
+        public static bool TryGetEntityAddressablePrefab(this IPlayerCharacterData data, out AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity> assetRef, out int metaDataId)
         {
             int hashAssetId = GameInstance.GetPlayerCharacterEntityHashAssetId(data.EntityId, out metaDataId);
-            if (metaDataId.HasValue)
+            if (metaDataId != 0)
             {
-                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData) && metaData.AddressableEntityPrefab.IsDataValid())
+                if (GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId, out PlayerCharacterEntityMetaData metaData) && metaData.AddressableEntityPrefab.IsDataValid())
                 {
                     assetRef = metaData.AddressableEntityPrefab;
                     return assetRef.IsDataValid();
@@ -649,7 +649,7 @@ namespace MultiplayerARPG
         public static BaseCharacterModel InstantiateModel(this IPlayerCharacterData data, Transform parent)
         {
             BaseCharacterEntity result;
-            int? metaDataId;
+            int metaDataId;
             if (data.TryGetEntityAddressablePrefab(out var assetRef, out metaDataId))
             {
                 AsyncOperationHandle<BasePlayerCharacterEntity> handler = assetRef.InstantiateAsync();

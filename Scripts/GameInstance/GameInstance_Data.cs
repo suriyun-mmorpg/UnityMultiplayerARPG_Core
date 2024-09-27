@@ -1,4 +1,3 @@
-using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using System.Collections.Generic;
@@ -482,6 +481,11 @@ namespace MultiplayerARPG
         }
 
         public static void AddPlayerCharacterEntityMetaDataList(params PlayerCharacterEntityMetaData[] metaDataList)
+        {
+            AddManyGameData(PlayerCharacterEntityMetaDataList, metaDataList);
+        }
+
+        public static void AddPlayerCharacterEntityMetaDataList(IEnumerable<PlayerCharacterEntityMetaData> metaDataList)
         {
             AddManyGameData(PlayerCharacterEntityMetaDataList, metaDataList);
         }
@@ -1096,9 +1100,9 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public static int GetPlayerCharacterEntityHashAssetId(int entityId, out int? metaDataId)
+        public static int GetPlayerCharacterEntityHashAssetId(int entityId, out int metaDataId)
         {
-            metaDataId = null;
+            metaDataId = 0;
             if (PlayerCharacterEntityMetaDataList.TryGetValue(entityId, out PlayerCharacterEntityMetaData metaData))
             {
                 metaDataId = metaData.DataId;
@@ -1117,12 +1121,12 @@ namespace MultiplayerARPG
             return 0;
         }
 
-        public static void SetupByMetaData(BasePlayerCharacterEntity playerCharacterEntity, int? metaDataId)
+        public static void SetupByMetaData(BasePlayerCharacterEntity playerCharacterEntity, int metaDataId)
         {
             if (playerCharacterEntity == null)
                 return;
             playerCharacterEntity.MetaDataId = metaDataId;
-            if (!metaDataId.HasValue || !PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId.Value, out PlayerCharacterEntityMetaData metaData))
+            if (metaDataId == 0 || !PlayerCharacterEntityMetaDataList.TryGetValue(metaDataId, out PlayerCharacterEntityMetaData metaData))
                 return;
             metaData.Setup(playerCharacterEntity);
         }
