@@ -6,21 +6,41 @@ namespace UtilsComponents
     {
         public Camera copyFromCamera;
         public Camera copyToCamera;
+        public bool copyOrthographic = true;
+        public bool copyOrthographicSize = true;
+        public bool copyNearClipPlane = true;
+        public bool copyFarClipPlane = true;
+        public bool copyFieldOfView = true;
+        public bool copyRect = true;
+        public bool copyUsePhysicalProperties = true;
+        public bool copyFocalLength = true;
+        public bool copySensorSize = true;
+        public bool copyLensShift = true;
 
         void Update()
         {
             if (copyFromCamera == null || copyToCamera == null)
                 return;
-            copyToCamera.orthographic = copyFromCamera.orthographic;
-            copyToCamera.orthographicSize = copyFromCamera.orthographicSize;
-            copyToCamera.nearClipPlane = copyFromCamera.nearClipPlane;
-            copyToCamera.farClipPlane = copyFromCamera.farClipPlane;
-            copyToCamera.fieldOfView = copyFromCamera.fieldOfView;
-            copyToCamera.rect = copyFromCamera.rect;
-            copyToCamera.usePhysicalProperties = copyFromCamera.usePhysicalProperties;
-            copyToCamera.focalLength = copyFromCamera.focalLength;
-            copyToCamera.sensorSize = copyFromCamera.sensorSize;
-            copyToCamera.lensShift = copyFromCamera.lensShift;
+            if (copyOrthographic)
+                copyToCamera.orthographic = copyFromCamera.orthographic;
+            if (copyOrthographicSize)
+                copyToCamera.orthographicSize = copyFromCamera.orthographicSize;
+            if (copyNearClipPlane)
+                copyToCamera.nearClipPlane = copyFromCamera.nearClipPlane;
+            if (copyFarClipPlane)
+                copyToCamera.farClipPlane = copyFromCamera.farClipPlane;
+            if (copyFieldOfView)
+                copyToCamera.fieldOfView = copyFromCamera.fieldOfView;
+            if (copyRect)
+                copyToCamera.rect = copyFromCamera.rect;
+            if (copyUsePhysicalProperties)
+                copyToCamera.usePhysicalProperties = copyFromCamera.usePhysicalProperties;
+            if (copyFocalLength)
+                copyToCamera.focalLength = copyFromCamera.focalLength;
+            if (copySensorSize)
+                copyToCamera.sensorSize = copyFromCamera.sensorSize;
+            if (copyLensShift)
+                copyToCamera.lensShift = copyFromCamera.lensShift;
         }
     }
 }
