@@ -180,28 +180,28 @@ public static class PhysicUtils
         return count;
     }
 
-    public static Vector3 FindGroundedPosition(Vector3 origin, int raycastLength, float distance, int layerMask, Transform exceptionObject = null)
+    public static Vector3 FindGroundedPosition(Vector3 origin, int raycastLength, float distance, int layerMask, Transform excludingObject = null, float upOffsetsRate = 0.5f)
     {
-        return FindGroundedPosition(origin, new RaycastHit[raycastLength], distance, layerMask, exceptionObject);
+        return FindGroundedPosition(origin, new RaycastHit[raycastLength], distance, layerMask, excludingObject, upOffsetsRate);
     }
 
-    public static Vector3 FindGroundedPosition(Vector3 origin, RaycastHit[] allocHits, float distance, int layerMask, Transform exceptionObject = null)
+    public static Vector3 FindGroundedPosition(Vector3 origin, RaycastHit[] allocHits, float distance, int layerMask, Transform excludingObject = null, float upOffsetsRate = 0.5f)
     {
-        FindGroundedPosition(origin, allocHits, distance, layerMask, out Vector3 result, exceptionObject);
+        FindGroundedPosition(origin, allocHits, distance, layerMask, out Vector3 result, excludingObject, upOffsetsRate);
         return result;
     }
 
-    public static bool FindGroundedPosition(Vector3 origin, RaycastHit[] allocHits, float distance, int layerMask, out Vector3 result, Transform exceptionObject = null)
+    public static bool FindGroundedPosition(Vector3 origin, RaycastHit[] allocHits, float distance, int layerMask, out Vector3 result, Transform excludingObject = null, float upOffsetsRate = 0.5f)
     {
         result = origin;
         float nearestDistance = float.MaxValue;
         bool foundGround = false;
         float tempDistance;
         // Raycast to find hit floor
-        int hitCount = Physics.RaycastNonAlloc(origin + (Vector3.up * distance * 0.5f), Vector3.down, allocHits, distance, layerMask, QueryTriggerInteraction.Ignore);
+        int hitCount = Physics.RaycastNonAlloc(origin + (Vector3.up * distance * upOffsetsRate), Vector3.down, allocHits, distance, layerMask, QueryTriggerInteraction.Ignore);
         for (int i = 0; i < hitCount; ++i)
         {
-            if (exceptionObject != null && exceptionObject.root == allocHits[i].transform.root)
+            if (excludingObject != null && excludingObject.root == allocHits[i].transform.root)
                 continue;
             tempDistance = Vector3.Distance(origin, allocHits[i].point);
             if (tempDistance < nearestDistance)
