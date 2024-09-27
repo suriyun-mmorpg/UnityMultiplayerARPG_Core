@@ -224,7 +224,7 @@ namespace MultiplayerARPG
             if (otherGameData != null)
                 return Id.CompareTo(otherGameData.Id);
             else
-                throw new ArgumentException("Object is not a BaseGameData");
+                throw new ArgumentException("`Object` is not a `BaseGameData`");
         }
 
         public override string ToString()
