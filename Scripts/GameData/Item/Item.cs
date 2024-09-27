@@ -765,7 +765,7 @@ namespace MultiplayerARPG
                 return 0;
             }
         }
-        #endregion
+#endregion
 
         #region Implement ISocketEnhancerItem
         public SocketEnhancerType SocketEnhancerType
