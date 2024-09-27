@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         public float TotalWeight { get; private set; }
         public int UsedSlots { get; private set; }
 
-        private bool _doNotCloseStorageOnDisable;
+        private bool _doNotCloseStorageOnDisable = true;
 
         protected override void OnEnable()
         {
@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             // Close storage
             if (!_doNotCloseStorageOnDisable)
                 GameInstance.ClientStorageHandlers.RequestCloseStorage(ClientStorageActions.ResponseCloseStorage);
-            _doNotCloseStorageOnDisable = false;
+            _doNotCloseStorageOnDisable = true;
             // Clear data
             StorageType = StorageType.None;
             StorageOwnerId = string.Empty;
