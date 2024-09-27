@@ -51,6 +51,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
         [Tooltip("Format => {0} = {Amount}, {1} = {Max Stack}")]
         public UILocaleKeySetting formatKeyStack = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_STACK);
+        [Tooltip("Format => {0} = {Total item amount}")]
+        public UILocaleKeySetting formatKeyTotalItemAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Durability}, {1} = {Max Durability}")]
         public UILocaleKeySetting formatKeyDurability = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_DURABILITY);
         [Tooltip("Format => {0} = {Weight}")]
@@ -90,6 +92,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextItemType;
         public TextWrapper uiTextSellPrice;
         public TextWrapper uiTextStack;
+        public TextWrapper uiTextTotalItemAmount;
         public TextWrapper uiTextDurability;
         public UIGageValue uiGageDurability;
         public TextWrapper uiTextWeight;
@@ -255,6 +258,7 @@ namespace MultiplayerARPG
             uiTextItemType = null;
             uiTextSellPrice = null;
             uiTextStack = null;
+            uiTextTotalItemAmount = null;
             uiTextDurability = null;
             uiGageDurability = null;
             uiTextWeight = null;
@@ -671,7 +675,7 @@ namespace MultiplayerARPG
             }
 
             imageIcon.SetImageGameDataIcon(Item);
-            imageRarity.SetImageGameDataIcon(isEmpty ?  null : Item.ItemRefine);
+            imageRarity.SetImageGameDataIcon(isEmpty ? null : Item.ItemRefine);
 
             if (uiTextItemType != null)
             {
@@ -717,10 +721,18 @@ namespace MultiplayerARPG
                     stackString = ZString.Format(
                         LanguageManager.GetText(formatKeyStack),
                         CharacterItem.amount.ToString("N0"),
-                        Item.MaxStack);
+                        Item.MaxStack.ToString("N0"));
                 }
                 uiTextStack.SetGameObjectActive(!CharacterItem.IsEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
                 uiTextStack.text = stackString;
+            }
+
+            if (uiTextTotalItemAmount != null)
+            {
+                int total = Character.CountNonEquipItems(CharacterItem.dataId);
+                uiTextTotalItemAmount.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyTotalItemAmount),
+                        total.ToString("N0"));
             }
 
             if (EquipmentItem != null && EquipmentItem.MaxDurability > 0)
@@ -2115,6 +2127,8 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
             UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
+            if (uiStorageItems == null)
+                uiStorageItems = FindObjectOfType<UIStorageItems>();
             if (uiStorageItems == null)
             {
                 Debug.LogError("Unable to move from storage, no opened storage items UI");
