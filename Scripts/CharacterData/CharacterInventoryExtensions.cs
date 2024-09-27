@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public static class CharacterInventoryExtensions
+    public static partial class CharacterInventoryExtensions
     {
         public static bool MoveItemFromStorage(
             this IPlayerCharacterData playerCharacter,
@@ -1202,6 +1202,66 @@ namespace MultiplayerARPG
             }
             gameMessage = UITextKeys.NONE;
             return true;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static int GetAmmo(this IPlayerCharacterData character, InventoryType inventoryType, int index)
+        {
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    return GetAmmoNonEquipItem(character, index);
+                case InventoryType.EquipItems:
+                    return GetAmmoEquipItem(character, index);
+                case InventoryType.EquipWeaponRight:
+                    return GetAmmoRightHandItem(character);
+                case InventoryType.EquipWeaponLeft:
+                    return GetAmmoLeftHandItem(character);
+            }
+            return 0;
+        }
+
+        public static bool PutAmmoToItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, string ammoItemId, out UITextKeys gameMessage)
+        {
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    return PutAmmoToNonEquipItem(character, index, ammoItemId, out gameMessage);
+                case InventoryType.EquipItems:
+                    return PutAmmoToEquipItem(character, index, ammoItemId, out gameMessage);
+                case InventoryType.EquipWeaponRight:
+                    return PutAmmoToRightHandItem(character, ammoItemId, out gameMessage);
+                case InventoryType.EquipWeaponLeft:
+                    return PutAmmoToLeftHandItem(character, ammoItemId, out gameMessage);
+            }
+            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+            return false;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static bool RemoveAmmoFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, out UITextKeys gameMessage)
+        {
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    return RemoveAmmoFromNonEquipItem(character, index, true, out gameMessage);
+                case InventoryType.EquipItems:
+                    return RemoveAmmoFromEquipItem(character, index, true, out gameMessage);
+                case InventoryType.EquipWeaponRight:
+                    return RemoveAmmoFromRightHandItem(character, true, out gameMessage);
+                case InventoryType.EquipWeaponLeft:
+                    return RemoveAmmoFromLeftHandItem(character, true, out gameMessage);
+            }
+            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+            return false;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
             return false;
