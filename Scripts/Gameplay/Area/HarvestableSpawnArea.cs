@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             GameInstance.AddAssetReferenceHarvestableEntities(addressablePrefab);
         }
 
-        protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, AddressablePrefab addressablePrefab, int level)
+        protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, AddressablePrefab addressablePrefab, int level, float destroyRespawnDelay)
         {
             if (!GetRandomPosition(out Vector3 spawnPosition))
             {
@@ -78,6 +78,8 @@ namespace MultiplayerARPG
                     return null;
                 entity = spawnObj.GetComponent<HarvestableEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
+                if (destroyRespawnDelay > 0f)
+                    entity.DestroyRespawnDelay = destroyRespawnDelay;
             }
             else if (addressablePrefab.IsDataValid())
             {
@@ -88,6 +90,8 @@ namespace MultiplayerARPG
                     return null;
                 entity = spawnObj.GetComponent<HarvestableEntity>();
                 entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
+                if (destroyRespawnDelay > 0f)
+                    entity.DestroyRespawnDelay = destroyRespawnDelay;
             }
 
             if (entity == null)
@@ -170,6 +174,12 @@ namespace MultiplayerARPG
         public override void CountSpawningObjects()
         {
             base.CountSpawningObjects();
+        }
+
+        [ContextMenu("Fix invalid `respawnPendingEntitiesDelay` settings")]
+        public override void FixInvalidRespawnPendingEntitiesDelaySettings()
+        {
+            base.FixInvalidRespawnPendingEntitiesDelaySettings();
         }
 #endif
     }

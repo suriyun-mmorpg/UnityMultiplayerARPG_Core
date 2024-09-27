@@ -61,11 +61,13 @@ namespace MultiplayerARPG
         public float DestroyDelay
         {
             get { return destroyDelay; }
+            set { destroyDelay = value; }
         }
 
         public float DestroyRespawnDelay
         {
             get { return destroyRespawnDelay; }
+            set { destroyRespawnDelay = value; }
         }
 
         protected bool _isDestroyed;
@@ -222,13 +224,13 @@ namespace MultiplayerARPG
             _isDestroyed = true;
             // Tell clients that the harvestable destroy to play animation at client
             CallRpcOnHarvestableDestroy();
-            // Respawning later
-            if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
-            else if (Identity.IsSceneObject)
-                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
             // Destroy this entity
             NetworkDestroy(DestroyDelay);
+            // Respawning later
+            if (SpawnArea != null)
+                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
+            else if (Identity.IsSceneObject)
+                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
         }
 
         /// <summary>

@@ -141,11 +141,13 @@ namespace MultiplayerARPG
         public float DestroyDelay
         {
             get { return destroyDelay; }
+            set { destroyDelay = value; }
         }
 
         public float DestroyRespawnDelay
         {
             get { return destroyRespawnDelay; }
+            set { destroyRespawnDelay = value; }
         }
 
         protected bool _isDestroyed;
@@ -786,7 +788,7 @@ namespace MultiplayerARPG
             NetworkDestroy(DestroyDelay);
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay);
+                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
             else if (Identity.IsSceneObject)
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
         }
