@@ -103,7 +103,7 @@ namespace MultiplayerARPG
                     CloseAllStorages(connectionId).Forget();
                     continue;
                 }
-                if (!BaseGameNetworkManager.Singleton.ServerType.IsLobby() && !userUsingStorages.TryGetValue(connectionId, out List<UserUsingStorageData> oneUserUsingStorages))
+                if (userUsingStorages.TryGetValue(connectionId, out List<UserUsingStorageData> oneUserUsingStorages))
                 {
                     // Looking for far entities and close the storage
                     for (int i = oneUserUsingStorages.Count - 1; i >= 0; --i)
