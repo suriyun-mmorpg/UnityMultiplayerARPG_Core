@@ -8,9 +8,7 @@ namespace MultiplayerARPG
     public class ItemDropByWeightTableSpawnArea : GameSpawnArea
     {
         public ItemRandomByWeightTable weightTable;
-        public int amount = 5;
         public float respawnPickedupDelay = 10f;
-        public float respawnPendingEntitiesDelay = 5f;
         public float droppedItemDestroyDelay = 300f;
 
         protected float _respawnPendingEntitiesTimer = 0f;
