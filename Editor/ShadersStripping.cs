@@ -11,10 +11,9 @@ namespace MultiplayerARPG
 
         public void OnProcessShader(Shader shader, ShaderSnippetData snippet, IList<ShaderCompilerData> data)
         {
-#if !UNITY_SERVER
-            return;
-#endif
+#if UNITY_SERVER
             data.Clear();
+#endif
         }
     }
 }
