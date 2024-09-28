@@ -39,7 +39,7 @@ namespace MultiplayerARPG
 #endif
 
 #if UNITY_EDITOR || !UNITY_SERVER
-        public async UniTask<GameObject> GetEquipModel()
+        public async UniTask<GameObject> GetAmmoAttachModel()
         {
             GameObject equipModel = null;
 #if !EXCLUDE_PREFAB_REFS
@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             return await addressableEquipModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
         }
 
-        public IItem SetEquipModel(GameObject equipModel)
+        public IItem SetAmmoAttachModel(GameObject equipModel)
         {
 #if !EXCLUDE_PREFAB_REFS
             this.equipModel = equipModel;

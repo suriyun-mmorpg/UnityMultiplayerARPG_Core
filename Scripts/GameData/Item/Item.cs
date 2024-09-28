@@ -1,6 +1,8 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -299,6 +301,27 @@ namespace MultiplayerARPG
         {
             get { return ammoType; }
         }
+
+#if UNITY_EDITOR || !UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
+        [AddressableAssetConversion(nameof(addressableAmmoModel))]
+        protected GameObject ammoModel;
+#endif
+        [SerializeField]
+        protected AssetReferenceGameObject addressableAmmoModel = null;
+#endif
+
+#if UNITY_EDITOR || !UNITY_SERVER
+        public async UniTask<GameObject> GetAmmoAttachModel()
+        {
+            GameObject equipModel = null;
+#if !EXCLUDE_PREFAB_REFS
+            equipModel = ammoModel;
+#endif
+            return await addressableAmmoModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+        }
+#endif
         #endregion
 
         #region Implement IEquipmentItem
@@ -765,7 +788,7 @@ namespace MultiplayerARPG
                 return 0;
             }
         }
-#endregion
+        #endregion
 
         #region Implement ISocketEnhancerItem
         public SocketEnhancerType SocketEnhancerType
@@ -777,6 +800,27 @@ namespace MultiplayerARPG
         {
             get { return socketEnhanceEffect; }
         }
+
+#if UNITY_EDITOR || !UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
+        [AddressableAssetConversion(nameof(addressableSocketEnhancerModel))]
+        protected GameObject socketEnhancerModel;
+#endif
+        [SerializeField]
+        protected AssetReferenceGameObject addressableSocketEnhancerModel = null;
+#endif
+
+#if UNITY_EDITOR || !UNITY_SERVER
+        public async UniTask<GameObject> GetSocketEnhancerAttachModel()
+        {
+            GameObject equipModel = null;
+#if !EXCLUDE_PREFAB_REFS
+            equipModel = socketEnhancerModel;
+#endif
+            return await addressableSocketEnhancerModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+        }
+#endif
         #endregion
 
         public override bool Validate()

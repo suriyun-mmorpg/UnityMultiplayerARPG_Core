@@ -1,4 +1,7 @@
-﻿namespace MultiplayerARPG
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
+
+namespace MultiplayerARPG
 {
     public partial interface ISocketEnhancerItem : IItem, IItemWithStatusEffectApplyings
     {
@@ -14,5 +17,12 @@
         /// These abilities will replaces weapon's abilities by key, or add abilities that are not existed in the weapon
         /// </summary>
         BaseWeaponAbility[] WeaponAbilities { get; }
+#if UNITY_EDITOR || !UNITY_SERVER
+        /// <summary>
+        /// Get attach model (eg. scope, muzzle, and so on)
+        /// </summary>
+        /// <returns></returns>
+        UniTask<GameObject> GetSocketEnhancerAttachModel();
+#endif
     }
 }
