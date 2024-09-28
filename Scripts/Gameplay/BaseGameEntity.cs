@@ -354,12 +354,6 @@ namespace MultiplayerARPG
             if (!Movement.IsNull())
             {
                 bool tempEnableMovement = PassengingVehicleEntity.IsNull();
-                if (CurrentGameManager.ServerType.IsLobby())
-                {
-                    EntityTransform.localPosition = Vector3.zero;
-                    EntityTransform.localRotation = Quaternion.identity;
-                    tempEnableMovement = false;
-                }
                 // Enable movement or not
                 if (Movement.Enabled != tempEnableMovement)
                 {
@@ -544,43 +538,6 @@ namespace MultiplayerARPG
         protected virtual void CmdPerformHitRegValidation(HitRegisterData hitData)
         {
             CurrentGameManager.HitRegistrationManager.PerformValidation(this, hitData);
-        }
-
-        public virtual void CallTargetPlayItemUseEffect(int dataId, int playerDataId)
-        {
-            RPC(TargetPlayItemUseEffect, ConnectionId, dataId, playerDataId);
-        }
-
-        [TargetRpc]
-        protected async virtual void TargetPlayItemUseEffect(int dataId, int playerDataId)
-        {
-#if !UNITY_SERVER
-            // Play effects at clients only
-            if (!GameInstance.Items.TryGetValue(dataId, out BaseItem item))
-                return;
-
-            if (!GameInstance.PlayerCharacters.TryGetValue(playerDataId, out PlayerCharacter playerChar))
-                return;
-
-            if (Entity is BaseCharacterEntity characterEntity)
-            {
-                EffectContainer tempContainer;
-
-                for (int i = 0; i < item.poolingUsingEffects.Length; i++)
-                {
-                    if (!characterEntity.CharacterModel.CacheEffectContainers.TryGetValue(item.poolingUsingEffects[i].effectSocket, out tempContainer))
-                        continue;
-
-                    GameEffectPoolContainer fxContainer = item.poolingUsingEffects[i];
-                    AudioClip sfxToPlay = await item.audioGenderSFX.GetRandomSound(playerChar.Gender);
-
-                    fxContainer.container = tempContainer.transform;
-                    fxContainer.GetInstance(sfxToPlay);
-                }
-            }
-
-            UISceneGameplayEvents.UISceneGameplay.AnimateFlash();
-#endif
         }
     }
 }

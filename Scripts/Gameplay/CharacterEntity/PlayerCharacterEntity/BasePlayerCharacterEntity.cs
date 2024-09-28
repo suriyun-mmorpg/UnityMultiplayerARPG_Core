@@ -115,7 +115,7 @@ namespace MultiplayerARPG
         public bool TryGetMetaData(out PlayerCharacterEntityMetaData metaData)
         {
             metaData = null;
-            if (!MetaDataId.HasValue || !GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(MetaDataId.Value, out metaData))
+            if (MetaDataId == 0 || !GameInstance.PlayerCharacterEntityMetaDataList.TryGetValue(MetaDataId, out metaData))
                 return false;
             return true;
         }

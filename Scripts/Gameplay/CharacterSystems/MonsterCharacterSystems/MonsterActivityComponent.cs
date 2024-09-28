@@ -293,13 +293,13 @@ namespace MultiplayerARPG
                         lookRotationEuler.x = 0;
                         lookRotationEuler.z = 0;
                         currentLookAtRotation = Quaternion.RotateTowards(currentLookAtRotation, Quaternion.Euler(lookRotationEuler), turnToEnemySpeed * Time.deltaTime);
-                        Entity.SetLookRotation(currentLookAtRotation);
+                        Entity.SetLookRotation(currentLookAtRotation, false);
                         turnedToEnemy = Mathf.Abs(currentLookAtRotation.eulerAngles.y - lookRotationEuler.y) < 15f;
                     }
                     else
                     {
                         // Update 2D direction
-                        Entity.SetLookRotation(Quaternion.LookRotation(lookAtDirection));
+                        Entity.SetLookRotation(Quaternion.LookRotation(lookAtDirection), false);
                         turnedToEnemy = true;
                     }
                 }

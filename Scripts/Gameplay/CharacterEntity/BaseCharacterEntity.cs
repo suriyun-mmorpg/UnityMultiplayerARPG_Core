@@ -301,12 +301,6 @@ namespace MultiplayerARPG
             Profiler.EndSample();
 
             bool tempEnableMovement = PassengingVehicleEntity.IsNull();
-            if (CurrentGameManager.ServerType.IsLobby())
-            {
-                tempEnableMovement = false;
-                EntityTransform.localPosition = Vector3.zero;
-                EntityTransform.localRotation = Quaternion.identity;
-            }
             Profiler.BeginSample("BaseCharacterEntity - UnderDeadYChecking");
             if (RespawnGroundedCheckCountDown > 0f)
             {
