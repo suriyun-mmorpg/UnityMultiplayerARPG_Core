@@ -890,28 +890,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int[] enhancerDataIds, out UITextKeys gameMessage)
-        {
-#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            switch (inventoryType)
-            {
-                case InventoryType.NonEquipItems:
-                    return BaseItem.RefineNonEquipItem(character, index, enhancerDataIds, out gameMessage);
-                case InventoryType.EquipItems:
-                    return BaseItem.RefineEquipItem(character, index, enhancerDataIds, out gameMessage);
-                case InventoryType.EquipWeaponRight:
-                    return BaseItem.RefineRightHandItem(character, enhancerDataIds, out gameMessage);
-                case InventoryType.EquipWeaponLeft:
-                    return BaseItem.RefineLeftHandItem(character, enhancerDataIds, out gameMessage);
-            }
-            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
-            return false;
-#else
-            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
-            return false;
-#endif
-        }
-
         public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
