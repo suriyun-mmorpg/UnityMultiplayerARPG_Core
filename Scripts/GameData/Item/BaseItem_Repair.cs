@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-
 namespace MultiplayerARPG
 {
     public partial class BaseItem
