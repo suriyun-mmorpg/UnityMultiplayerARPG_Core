@@ -890,51 +890,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int enhancerId, int socketIndex, out UITextKeys gameMessage)
-        {
-#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            switch (inventoryType)
-            {
-                case InventoryType.NonEquipItems:
-                    return BaseItem.EnhanceSocketNonEquipItem(character, index, enhancerId, socketIndex, out gameMessage);
-                case InventoryType.EquipItems:
-                    return BaseItem.EnhanceSocketEquipItem(character, index, enhancerId, socketIndex, out gameMessage);
-                case InventoryType.EquipWeaponRight:
-                    return BaseItem.EnhanceSocketRightHandItem(character, enhancerId, socketIndex, out gameMessage);
-                case InventoryType.EquipWeaponLeft:
-                    return BaseItem.EnhanceSocketLeftHandItem(character, enhancerId, socketIndex, out gameMessage);
-            }
-            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
-            return false;
-#else
-            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
-            return false;
-#endif
-        }
-
-        public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int socketIndex, out UITextKeys gameMessage)
-        {
-#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            bool returnEnhancer = GameInstance.Singleton.enhancerRemoval.ReturnEnhancerItem;
-            switch (inventoryType)
-            {
-                case InventoryType.NonEquipItems:
-                    return BaseItem.RemoveEnhancerFromNonEquipItem(character, index, socketIndex, returnEnhancer, out gameMessage);
-                case InventoryType.EquipItems:
-                    return BaseItem.RemoveEnhancerFromEquipItem(character, index, socketIndex, returnEnhancer, out gameMessage);
-                case InventoryType.EquipWeaponRight:
-                    return BaseItem.RemoveEnhancerFromRightHandItem(character, socketIndex, returnEnhancer, out gameMessage);
-                case InventoryType.EquipWeaponLeft:
-                    return BaseItem.RemoveEnhancerFromLeftHandItem(character, socketIndex, returnEnhancer, out gameMessage);
-            }
-            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
-            return false;
-#else
-            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
-            return false;
-#endif
-        }
-
         public static bool SellItem(this IPlayerCharacterData character, int index, int amount, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
