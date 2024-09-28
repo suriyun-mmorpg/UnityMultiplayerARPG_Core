@@ -3,9 +3,8 @@
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct VehicleSeat
+    public class VehicleSeat
     {
-        public static readonly VehicleSeat Empty = new VehicleSeat();
         public Transform passengingTransform;
         public Transform exitTransform;
         public bool canAttack;

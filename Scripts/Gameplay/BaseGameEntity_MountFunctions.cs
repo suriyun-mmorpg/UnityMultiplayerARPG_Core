@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             {
                 if (!PassengingVehicleEntity.IsNull())
                     return PassengingVehicleEntity.Seats[PassengingVehicleSeatIndex];
-                return VehicleSeat.Empty;
+                return null;
             }
         }
 
