@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                 tempCharacterItem = selectedUI.Data.characterItem;
                 if (tempCharacterItem.IsEmptySlot() || selectedUI.InventoryType != InventoryType.NonEquipItems)
                     continue;
-                BaseItem.GetDismantleReturnItems(tempCharacterItem, tempCharacterItem.amount, out tempReturningItems, out tempReturningCurrencies);
+                tempCharacterItem.GetDismantleReturnItems(tempCharacterItem.amount, out tempReturningItems, out tempReturningCurrencies);
                 returningItems.AddRange(tempReturningItems);
                 returningCurrencies.AddRange(tempReturningCurrencies);
                 returnGold += tempCharacterItem.GetItem().DismantleReturnGold * tempCharacterItem.amount;

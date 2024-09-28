@@ -79,7 +79,7 @@ namespace MultiplayerARPG
 
             List<ItemAmount> returningItems;
             List<CurrencyAmount> returningCurrencies;
-            BaseItem.GetDismantleReturnItems(characterItem, DismantleAmount, out returningItems, out returningCurrencies);
+            characterItem.GetDismantleReturnItems(DismantleAmount, out returningItems, out returningCurrencies);
 
             if (uiReturnItems != null)
             {
