@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using LiteNetLibManager;
 using System.Net.Sockets;
 
 namespace MultiplayerARPG
@@ -17,6 +18,7 @@ namespace MultiplayerARPG
         public static event System.Action<RewardGivenType, int, int> onNotifyRewardItem;
         public static event System.Action<RewardGivenType, int, int> onNotifyRewardCurrency;
         public static event System.Action<int> onNotifyBattlePointsChanged;
+        public static event System.Action<AckResponseCode> onClientReadyResponse;
 
         public static void Clean()
         {
@@ -32,6 +34,7 @@ namespace MultiplayerARPG
             onNotifyRewardItem = null;
             onNotifyRewardCurrency = null;
             onNotifyBattlePointsChanged = null;
+            onClientReadyResponse = null;
         }
 
         public static void ClientConnected()
@@ -106,6 +109,12 @@ namespace MultiplayerARPG
         {
             if (onNotifyBattlePointsChanged != null)
                 onNotifyBattlePointsChanged.Invoke(amount);
+        }
+
+        public static void OnClientReadyResponse(AckResponseCode responseCode)
+        {
+            if (onClientReadyResponse != null)
+                onClientReadyResponse.Invoke(responseCode);
         }
     }
 }
