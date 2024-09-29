@@ -200,14 +200,18 @@ namespace MultiplayerARPG
             UnregisterOwningCharacterEvents();
             if (notForOwningCharacter || !GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onRecached += UpdateOwningCharacterData;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             GameInstance.PlayingCharacterEntity.onCurrenciesOperation += OnCurrenciesOperation;
+#endif
         }
 
         public void UnregisterOwningCharacterEvents()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onRecached -= UpdateOwningCharacterData;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             GameInstance.PlayingCharacterEntity.onCurrenciesOperation -= OnCurrenciesOperation;
+#endif
         }
 
         private void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
@@ -518,6 +522,7 @@ namespace MultiplayerARPG
                 }
             }
 
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             if (CacheUICharacterCurrencies.Count > 0 && playerCharacter != null)
             {
                 int tempIndexOfCurrency;
@@ -530,6 +535,7 @@ namespace MultiplayerARPG
                     CacheUICharacterCurrencies[currency].Show();
                 }
             }
+#endif
 
             if (uiCharacterBuffs != null)
                 uiCharacterBuffs.UpdateData(Data);
