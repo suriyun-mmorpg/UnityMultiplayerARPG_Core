@@ -18,8 +18,10 @@ namespace MultiplayerARPG
             format = format.Replace("@maxMp", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.GetCaches().MaxMp.ToString("N0") : "?");
             format = format.Replace("@currentMapName", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.CurrentMapName : "?");
             format = format.Replace("@currentPosition", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.CurrentPosition.ToString() : "?");
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             format = format.Replace("@respawnMapName", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.RespawnMapName : "?");
             format = format.Replace("@respawnPosition", GameInstance.PlayingCharacter != null ? GameInstance.PlayingCharacter.RespawnPosition.ToString() : "?");
+#endif
             return format;
         }
     }
