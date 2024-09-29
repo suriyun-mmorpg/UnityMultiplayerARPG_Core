@@ -18,20 +18,26 @@ namespace MultiplayerARPG
         public event System.Action<int> onIconDataIdChange;
         public event System.Action<int> onFrameDataIdChange;
         public event System.Action<int> onTitleDataIdChange;
+#if !DISABLE_CLASSIC_PK
         public event System.Action<bool> onIsPkOnChange;
         public event System.Action<int> onPkPointChange;
         public event System.Action<int> onConsecutivePkKillsChange;
+#endif
         public event System.Action<bool> onIsWarpingChange;
         // Sync lists
         public event System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
         public event System.Action<LiteNetLibSyncList.Operation, int> onCurrenciesOperation;
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
         public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateBoolsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateIntsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateFloatsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPublicBoolsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPublicIntsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPublicFloatsOperation;
+#endif
 
         public override void OnRewardItem(RewardGivenType givenType, BaseItem item, int amount)
         {
