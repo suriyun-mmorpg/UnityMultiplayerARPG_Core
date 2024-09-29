@@ -51,8 +51,10 @@ namespace MultiplayerARPG
             entity.onLevelChange += OnLevelChange;
             entity.onCurrentMpChange += OnCurrentMpChange;
             entity.onBuffsOperation += OnBuffsOperation;
+#if !DISABLE_CLASSIC_PK
             if (entity is BasePlayerCharacterEntity playerEntity)
                 playerEntity.onPkPointChange += OnPkPointChange;
+#endif
             GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
         }
@@ -66,8 +68,10 @@ namespace MultiplayerARPG
             entity.onLevelChange -= OnLevelChange;
             entity.onCurrentMpChange -= OnCurrentMpChange;
             entity.onBuffsOperation -= OnBuffsOperation;
+#if !DISABLE_CLASSIC_PK
             if (entity is BasePlayerCharacterEntity playerEntity)
                 playerEntity.onPkPointChange -= OnPkPointChange;
+#endif
             GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
         }
