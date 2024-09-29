@@ -43,30 +43,36 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
             _previousEntity = playerCharacterEntity;
             AddEvents(_previousEntity);
+#if !DISABLE_CLASSIC_PK
             if (playerCharacterEntity != null)
             {
                 PlayingCharacterEntity_onIsPkOnChange(playingCharacterData.IsPkOn);
                 PlayingCharacterEntity_onPkPointChange(playingCharacterData.PkPoint);
                 PlayingCharacterEntity_onConsecutivePkKillsChange(playingCharacterData.ConsecutivePkKills);
             }
+#endif
         }
 
         private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
         {
+#if !DISABLE_CLASSIC_PK
             if (PlayingCharacterEntity == null)
                 return;
             PlayingCharacterEntity.onIsPkOnChange += PlayingCharacterEntity_onIsPkOnChange;
             PlayingCharacterEntity.onPkPointChange += PlayingCharacterEntity_onPkPointChange;
             PlayingCharacterEntity.onConsecutivePkKillsChange += PlayingCharacterEntity_onConsecutivePkKillsChange;
+#endif
         }
 
         private void RemoveEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
         {
+#if !DISABLE_CLASSIC_PK
             if (PlayingCharacterEntity == null)
                 return;
             PlayingCharacterEntity.onIsPkOnChange -= PlayingCharacterEntity_onIsPkOnChange;
             PlayingCharacterEntity.onPkPointChange -= PlayingCharacterEntity_onPkPointChange;
             PlayingCharacterEntity.onConsecutivePkKillsChange -= PlayingCharacterEntity_onConsecutivePkKillsChange;
+#endif
         }
 
         private void PlayingCharacterEntity_onIsPkOnChange(bool val)
