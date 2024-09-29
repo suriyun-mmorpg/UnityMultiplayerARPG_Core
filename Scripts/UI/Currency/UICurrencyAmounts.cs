@@ -122,9 +122,11 @@ namespace MultiplayerARPG
                         // Get currency amount from character
                         if (GameInstance.PlayingCharacter != null)
                         {
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
                             int indexOfCurrency = GameInstance.PlayingCharacter.IndexOfCurrency(tempData.DataId);
                             if (indexOfCurrency >= 0)
                                 tempCurrentAmount = GameInstance.PlayingCharacter.Currencies[indexOfCurrency].amount;
+#endif
                         }
                         // Use difference format by option 
                         switch (displayType)
