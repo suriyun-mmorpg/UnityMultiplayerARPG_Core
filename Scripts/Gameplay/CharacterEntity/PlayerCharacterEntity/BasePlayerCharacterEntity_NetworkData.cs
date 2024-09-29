@@ -28,10 +28,12 @@ namespace MultiplayerARPG
         protected SyncFieldInt partyId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
+#if !DISABLE_DIFFER_MAP_RESPAWNING
         [SerializeField]
         protected SyncFieldString respawnMapName = new SyncFieldString();
         [SerializeField]
         protected SyncFieldVector3 respawnPosition = new SyncFieldVector3();
+#endif
         [SerializeField]
         protected SyncFieldInt iconDataId = new SyncFieldInt();
         [SerializeField]
@@ -133,6 +135,7 @@ namespace MultiplayerARPG
                 Direction2D = Quaternion.Euler(value) * Vector3.forward;
             }
         }
+#if !DISABLE_DIFFER_MAP_RESPAWNING
         public string RespawnMapName
         {
             get { return respawnMapName.Value; }
@@ -143,6 +146,7 @@ namespace MultiplayerARPG
             get { return respawnPosition.Value; }
             set { respawnPosition.Value = value; }
         }
+#endif
         public int MountDataId
         {
             get
@@ -351,10 +355,12 @@ namespace MultiplayerARPG
             partyId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             guildId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             guildId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             respawnMapName.deliveryMethod = DeliveryMethod.ReliableOrdered;
             respawnMapName.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             respawnPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
             respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+#endif
             iconDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             iconDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             frameDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
@@ -408,20 +414,26 @@ namespace MultiplayerARPG
             iconDataId.onChange += OnIconDataIdChange;
             frameDataId.onChange += OnFrameDataIdChange;
             titleDataId.onChange += OnTitleDataIdChange;
+#if !DISABLE_CLASSIC_PK
             isPkOn.onChange += OnIsPkOnChange;
             pkPoint.onChange += OnPkPointChange;
             consecutivePkKills.onChange += OnConsecutivePkKillsChange;
+#endif
             isWarping.onChange += OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
             quests.onOperation += OnQuestsOperation;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             currencies.onOperation += OnCurrenciesOperation;
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             privateBools.onOperation += OnPrivateBoolsOperation;
             privateInts.onOperation += OnPrivateIntsOperation;
             privateFloats.onOperation += OnPrivateFloatsOperation;
             publicBools.onOperation += OnPublicBoolsOperation;
             publicInts.onOperation += OnPublicIntsOperation;
             publicFloats.onOperation += OnPublicFloatsOperation;
+#endif
         }
 
         protected override void EntityOnDestroy()
@@ -442,20 +454,26 @@ namespace MultiplayerARPG
             iconDataId.onChange -= OnIconDataIdChange;
             frameDataId.onChange -= OnFrameDataIdChange;
             titleDataId.onChange -= OnTitleDataIdChange;
+#if !DISABLE_CLASSIC_PK
             isPkOn.onChange -= OnIsPkOnChange;
             pkPoint.onChange -= OnPkPointChange;
             consecutivePkKills.onChange -= OnConsecutivePkKillsChange;
+#endif
             isWarping.onChange -= OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
             quests.onOperation -= OnQuestsOperation;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             currencies.onOperation -= OnCurrenciesOperation;
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             privateBools.onOperation -= OnPrivateBoolsOperation;
             privateInts.onOperation -= OnPrivateIntsOperation;
             privateFloats.onOperation -= OnPrivateFloatsOperation;
             publicBools.onOperation -= OnPublicBoolsOperation;
             publicInts.onOperation -= OnPublicIntsOperation;
             publicFloats.onOperation -= OnPublicFloatsOperation;
+#endif
             // Unsubscribe this entity
             if (GameInstance.ClientCharacterHandlers != null)
                 GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(this);
@@ -654,6 +672,7 @@ namespace MultiplayerARPG
                 onTitleDataIdChange.Invoke(titleDataId);
         }
 
+#if !DISABLE_CLASSIC_PK
         private void OnIsPkOnChange(bool isInitial, bool isPkOn)
         {
             if (onIsPkOnChange != null)
@@ -671,6 +690,7 @@ namespace MultiplayerARPG
             if (onConsecutivePkKillsChange != null)
                 onConsecutivePkKillsChange.Invoke(consecutivePkKills);
         }
+#endif
 
         private void OnIsWarpingChange(bool isInitial, bool isWarping)
         {
@@ -692,12 +712,15 @@ namespace MultiplayerARPG
                 onQuestsOperation.Invoke(operation, index);
         }
 
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
         private void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (onCurrenciesOperation != null)
                 onCurrenciesOperation.Invoke(operation, index);
         }
+#endif
 
+#if !DISABLE_CUSTOM_CHARACTER_DATA
         private void OnPrivateBoolsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (onPrivateBoolsOperation != null)
@@ -733,6 +756,7 @@ namespace MultiplayerARPG
             if (onPublicFloatsOperation != null)
                 onPublicFloatsOperation.Invoke(operation, index);
         }
-        #endregion
+#endif
+		#endregion
     }
 }
