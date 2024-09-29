@@ -207,7 +207,7 @@ namespace MultiplayerARPG
 
                 if (weaponItem.RateOfFire > 0)
                 {
-                    _totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire);
+                    _totalDuration = RATE_OF_FIRE_BASE / weaponItem.RateOfFire;
                     _triggerDurations = new float[] { 0f };
                 }
 
