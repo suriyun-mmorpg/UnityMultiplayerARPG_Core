@@ -727,8 +727,10 @@ namespace MultiplayerARPG
                         case CONFIRM_MENU_INDEX:
                             if (PassConfirmConditions(characterEntity, out UITextKeys errorMessage))
                             {
+#if !DISABLE_DIFFER_MAP_RESPAWNING
                                 characterEntity.RespawnMapName = saveRespawnMap.Id;
                                 characterEntity.RespawnPosition = saveRespawnPosition;
+#endif
                                 await characterEntity.NpcAction.SetServerCurrentDialog(currentNpc, GetValidatedDialogOrNull(saveRespawnConfirmDialog, characterEntity));
                             }
                             else
