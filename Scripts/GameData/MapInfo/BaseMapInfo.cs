@@ -272,8 +272,13 @@ namespace MultiplayerARPG
         public virtual void GetRespawnPoint(IPlayerCharacterData playerCharacterData, out WarpPortalType portalType, out string mapName, out Vector3 position, out bool overrideRotation, out Vector3 rotation)
         {
             portalType = WarpPortalType.Default;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             mapName = playerCharacterData.RespawnMapName;
             position = playerCharacterData.RespawnPosition;
+#else
+            mapName = Id;
+            position = StartPosition;
+#endif
             overrideRotation = false;
             rotation = Vector3.zero;
         }
