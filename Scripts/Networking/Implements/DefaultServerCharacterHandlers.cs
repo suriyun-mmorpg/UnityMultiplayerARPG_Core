@@ -50,8 +50,13 @@ namespace MultiplayerARPG
         {
             GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
             WarpPortalType respawnPortalType = WarpPortalType.Default;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             string respawnMapName = playerCharacter.RespawnMapName;
             Vector3 respawnPosition = playerCharacter.RespawnPosition;
+#else
+            string respawnMapName = playerCharacter.CurrentMapName;
+            Vector3 respawnPosition = playerCharacter.CurrentPosition;
+#endif
             bool respawnOverrideRotation = false;
             Vector3 respawnRotation = Vector3.zero;
             if (BaseGameNetworkManager.CurrentMapInfo != null)
