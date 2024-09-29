@@ -100,8 +100,10 @@ namespace MultiplayerARPG
             {
                 SetupCharacterModelEvents(_models[i]);
             }
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             Entity.onPublicIntsOperation -= OnPublicIntsOperation;
             Entity.onPublicIntsOperation += OnPublicIntsOperation;
+#endif
         }
 
         public void ClearEvents()
@@ -113,7 +115,9 @@ namespace MultiplayerARPG
                     ClearCharacterModelEvents(_models[i]);
                 }
             }
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             Entity.onPublicIntsOperation -= OnPublicIntsOperation;
+#endif
         }
 
         public void SetupCharacterModelEvents(BaseCharacterModel model)
@@ -129,7 +133,9 @@ namespace MultiplayerARPG
 
         public void ApplyModelAndColorBySavedData()
         {
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             ApplyModelAndColorBySavedData(Entity.PublicInts);
+#endif
         }
 
         public void ApplyModelAndColorBySavedData(IList<CharacterDataInt32> publicInts)
