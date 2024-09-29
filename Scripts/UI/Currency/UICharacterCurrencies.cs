@@ -92,13 +92,17 @@ namespace MultiplayerARPG
         {
             UnregisterOwningCharacterEvents();
             if (notForOwningCharacter || !GameInstance.PlayingCharacterEntity) return;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             GameInstance.PlayingCharacterEntity.onCurrenciesOperation += OnCurrenciesOperation;
+#endif
         }
 
         public void UnregisterOwningCharacterEvents()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             GameInstance.PlayingCharacterEntity.onCurrenciesOperation -= OnCurrenciesOperation;
+#endif
         }
 
         private void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
@@ -139,7 +143,9 @@ namespace MultiplayerARPG
 
         public void UpdateData(IPlayerCharacterData character)
         {
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             UpdateData(character, character.Currencies);
+#endif
         }
 
         public void UpdateData(IPlayerCharacterData character, IList<CurrencyAmount> currencyAmounts)
