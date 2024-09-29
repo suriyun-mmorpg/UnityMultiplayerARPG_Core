@@ -147,20 +147,6 @@ namespace MultiplayerARPG
             set { respawnPosition.Value = value; }
         }
 #endif
-        public int MountDataId
-        {
-            get
-            {
-                if (PassengingVehicleEntity != null &&
-                    !PassengingVehicleEntity.Entity.IsSceneObject &&
-                    PassengingVehicleEntity.IsDriver(PassengingVehicleSeatIndex))
-                {
-                    return PassengingVehicleEntity.Entity.Identity.HashAssetId;
-                }
-                return 0;
-            }
-            set { }
-        }
         public override int IconDataId
         {
             get { return iconDataId.Value; }

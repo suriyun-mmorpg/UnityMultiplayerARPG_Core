@@ -43,7 +43,6 @@ namespace MultiplayerARPG
             info.AddValue("currentRotation", (Vector3)data.CurrentRotation);
             info.AddValue("respawnMapName", data.RespawnMapName);
             info.AddValue("respawnPosition", (Vector3)data.RespawnPosition);
-            info.AddValue("mountDataId", data.MountDataId);
             info.AddValue("iconDataId", data.IconDataId);
             info.AddValue("frameDataId", data.FrameDataId);
             info.AddValue("titleDataId", data.TitleDataId);
@@ -130,12 +129,6 @@ namespace MultiplayerARPG
             catch { }
             data.RespawnMapName = info.GetString("respawnMapName");
             data.RespawnPosition = (Vector3)info.GetValue("respawnPosition", typeof(Vector3));
-            // TODO: Backward compatible, this will be removed in future version
-            try
-            {
-                data.MountDataId = info.GetInt32("mountDataId");
-            }
-            catch { }
             // TODO: Backward compatible, this will be removed in future version
             try
             {
