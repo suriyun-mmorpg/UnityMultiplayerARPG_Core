@@ -31,19 +31,25 @@ namespace MultiplayerARPG
             onIconDataIdChange = null;
             onFrameDataIdChange = null;
             onTitleDataIdChange = null;
+#if !DISABLE_CLASSIC_PK
             onIsPkOnChange = null;
             onPkPointChange = null;
             onConsecutivePkKillsChange = null;
+#endif
             onIsWarpingChange = null;
             onHotkeysOperation = null;
             onQuestsOperation = null;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             onCurrenciesOperation = null;
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             onPrivateBoolsOperation = null;
             onPrivateIntsOperation = null;
             onPrivateFloatsOperation = null;
             onPublicBoolsOperation = null;
             onPublicIntsOperation = null;
             onPublicFloatsOperation = null;
+#endif
         }
     }
 }
