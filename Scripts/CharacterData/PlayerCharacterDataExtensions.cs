@@ -199,8 +199,10 @@ namespace MultiplayerARPG
             character.CurrentMapName = startMap.Id;
             character.CurrentPosition = startPosition;
             character.CurrentRotation = startRotation;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             character.RespawnMapName = startMap.Id;
             character.RespawnPosition = startPosition;
+#endif
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "SetNewCharacterData", character, characterName, dataId, entityId);
             return character;
         }
@@ -473,6 +475,7 @@ namespace MultiplayerARPG
             if (data == null)
                 return new Dictionary<Currency, int>();
             Dictionary<Currency, int> result = new Dictionary<Currency, int>();
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             foreach (CharacterCurrency characterCurrency in data.Currencies)
             {
                 Currency key = characterCurrency.GetCurrency();
@@ -484,7 +487,7 @@ namespace MultiplayerARPG
                 else
                     result[key] += value;
             }
-
+#endif
             return result;
         }
 
@@ -520,6 +523,7 @@ namespace MultiplayerARPG
 
         public static void IncreaseCurrency(this IPlayerCharacterData character, Currency currency, int amount)
         {
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             if (currency == null) return;
             int indexOfCurrency = character.IndexOfCurrency(currency.DataId);
             if (indexOfCurrency >= 0)
@@ -532,6 +536,7 @@ namespace MultiplayerARPG
             {
                 character.Currencies.Add(CharacterCurrency.Create(currency, amount));
             }
+#endif
         }
 
         public static void DecreaseCurrencies(this IPlayerCharacterData character, Dictionary<Currency, int> currencyAmounts, float multiplier = 1)
@@ -566,6 +571,7 @@ namespace MultiplayerARPG
 
         public static void DecreaseCurrency(this IPlayerCharacterData character, Currency currency, int amount)
         {
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             if (currency == null) return;
             int indexOfCurrency = character.IndexOfCurrency(currency.DataId);
             if (indexOfCurrency >= 0)
@@ -578,6 +584,7 @@ namespace MultiplayerARPG
             {
                 character.Currencies.Add(CharacterCurrency.Create(currency, -amount));
             }
+#endif
         }
 
         public static bool HasEnoughCurrencyAmounts(this IPlayerCharacterData data, Dictionary<Currency, int> requiredCurrencyAmounts, out UITextKeys gameMessage, out Dictionary<Currency, int> currentCurrencyAmounts, float multiplier = 1)
@@ -695,12 +702,14 @@ namespace MultiplayerARPG
 
         public static void SetupModelBodyParts(this BaseCharacterModel characterModel, IPlayerCharacterData data)
         {
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             PlayerCharacterBodyPartComponent[] comps = characterModel.GetComponentsInChildren<PlayerCharacterBodyPartComponent>();
             for (int i = 0; i < comps.Length; ++i)
             {
                 comps[i].SetupCharacterModelEvents(characterModel);
                 comps[i].ApplyModelAndColorBySavedData(data.PublicInts);
             }
+#endif
         }
     }
 }
