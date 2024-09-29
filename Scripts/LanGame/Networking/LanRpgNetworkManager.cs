@@ -242,12 +242,24 @@ namespace MultiplayerARPG
                 Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;
             }
+
+            // Store location when enter game
+            _characterLocationsWhenEnterGame[playerCharacterData.Id] = new EnterGameCharacterLocation()
+            {
+                mapName = playerCharacterData.CurrentMapName,
+                position = playerCharacterData.CurrentPosition,
+                rotation = playerCharacterData.CurrentRotation,
+            };
+
+            // Set proper spawn position
             CurrentMapInfo.GetEnterMapPoint(playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation);
             playerCharacterData.CurrentMapName = mapName;
             playerCharacterData.CurrentPosition = position;
             playerCharacterData.CurrentRotation = rotation;
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
                 playerCharacterData.CurrentPosition = _teleportPosition.HasValue ? _teleportPosition.Value : CurrentMapInfo.StartPosition;
+            
+            // Spawn character entity and set its data
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                 characterRotation = Quaternion.Euler(playerCharacterData.CurrentRotation);

@@ -1,9 +1,22 @@
-﻿using UnityEngine;
+﻿using System.Collections.Concurrent;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public partial class BaseGameNetworkManager
     {
+        public struct EnterGameCharacterLocation
+        {
+            public string mapName;
+            public Vector3 position;
+            public Vector3 rotation;
+        }
+
+        /// <summary>
+        /// Args: Character's ID, Location when enter server
+        /// </summary>
+        protected ConcurrentDictionary<string, EnterGameCharacterLocation> _characterLocationsWhenEnterGame = new ConcurrentDictionary<string, EnterGameCharacterLocation>();
+
         #region Activity validation functions
         public virtual bool CanWarpCharacter(BasePlayerCharacterEntity playerCharacterEntity)
         {
@@ -20,8 +33,12 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual string GetCurrentMapId(BasePlayerCharacterEntity playerCharacterEntity)
         {
+            if (IsInstanceMap())
+                return _characterLocationsWhenEnterGame[playerCharacterEntity.Id].mapName;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition || !CurrentMapInfo.SaveCurrentMapPosition)
                 return playerCharacterEntity.RespawnMapName;
+#endif
             return CurrentMapInfo.Id;
         }
 
@@ -32,8 +49,12 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public virtual Vector3 GetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity)
         {
+            if (IsInstanceMap())
+                return _characterLocationsWhenEnterGame[playerCharacterEntity.Id].position;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition || !CurrentMapInfo.SaveCurrentMapPosition)
                 return playerCharacterEntity.RespawnPosition;
+#endif
             Vector3 currentPosition = playerCharacterEntity.EntityTransform.position;
             if (!playerCharacterEntity.PassengingVehicleEntity.IsNull())
                 currentPosition.y = playerCharacterEntity.PassengingVehicleEntity.Entity.EntityTransform.position.y;
