@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public partial interface IUsableItem : IItem, ICustomAimController, IItemWithRequirement
     {
