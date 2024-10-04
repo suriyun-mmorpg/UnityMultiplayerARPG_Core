@@ -30,6 +30,11 @@ namespace MultiplayerARPG
         public IHitRegistrationManager HitRegistrationManager { get; protected set; }
         public BaseGameNetworkManagerComponent[] ManagerComponents { get; private set; }
 
+        public string ChannelId { get; set; } = string.Empty;
+        public string ChannelTitle { get; set; } = string.Empty;
+        public string ChannelDescription { get; set; } = string.Empty;
+        public string ChannelTag { get; set; } = string.Empty;
+        public string ChannelPassword { get; set; } = string.Empty;
         public static BaseMapInfo CurrentMapInfo { get; protected set; }
         public bool ShouldPhysicSyncTransforms { get; set; }
         public bool ShouldPhysicSyncTransforms2D { get; set; }
