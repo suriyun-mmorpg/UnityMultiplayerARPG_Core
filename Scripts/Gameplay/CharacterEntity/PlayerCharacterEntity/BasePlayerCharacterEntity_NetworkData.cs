@@ -44,12 +44,16 @@ namespace MultiplayerARPG
         protected SyncFieldLong lastDeadTime = new SyncFieldLong();
         [SerializeField]
         protected SyncFieldLong unmuteTime = new SyncFieldLong();
+#if !DISABLE_CLASSIC_PK
         [SerializeField]
         protected SyncFieldBool isPkOn = new SyncFieldBool();
         [SerializeField]
         protected SyncFieldInt pkPoint = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt consecutivePkKills = new SyncFieldInt();
+#endif
+        [SerializeField]
+        protected SyncFieldInt reputation = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldBool isWarping = new SyncFieldBool();
 
@@ -58,14 +62,17 @@ namespace MultiplayerARPG
         protected SyncListCharacterHotkey hotkeys = new SyncListCharacterHotkey();
         [SerializeField]
         protected SyncListCharacterQuest quests = new SyncListCharacterQuest();
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+        [SerializeField]
+        protected SyncListCharacterCurrency currencies = new SyncListCharacterCurrency();
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
         [SerializeField]
         private List<CharacterDataBoolean> serverBools = new List<CharacterDataBoolean>();
         [SerializeField]
         private List<CharacterDataInt32> serverInts = new List<CharacterDataInt32>();
         [SerializeField]
         private List<CharacterDataFloat32> serverFloats = new List<CharacterDataFloat32>();
-        [SerializeField]
-        protected SyncListCharacterCurrency currencies = new SyncListCharacterCurrency();
         [SerializeField]
         protected SyncListCharacterDataBoolean privateBools = new SyncListCharacterDataBoolean();
         [SerializeField]
@@ -78,6 +85,7 @@ namespace MultiplayerARPG
         protected SyncListCharacterDataInt32 publicInts = new SyncListCharacterDataInt32();
         [SerializeField]
         protected SyncListCharacterDataFloat32 publicFloats = new SyncListCharacterDataFloat32();
+#endif
         #endregion
 
         #region Fields/Interface/Getter/Setter implementation
@@ -111,6 +119,7 @@ namespace MultiplayerARPG
         public int SharedGuildExp { get; set; }
         public string UserId { get; set; }
         public byte UserLevel { get; set; }
+        public string CurrentChannel { get { return CurrentGameManager.GetCurrentChannel(this); } set { } }
         public string CurrentMapName { get { return CurrentGameManager.GetCurrentMapId(this); } set { } }
         public Vec3 CurrentPosition
         {
@@ -135,6 +144,7 @@ namespace MultiplayerARPG
                 Direction2D = Quaternion.Euler(value) * Vector3.forward;
             }
         }
+        public string CurrentSafeArea { get { return CurrentGameManager.GetCurrentSafeArea(this); } set { } }
 #if !DISABLE_DIFFER_MAP_RESPAWNING
         public string RespawnMapName
         {
@@ -173,6 +183,7 @@ namespace MultiplayerARPG
             set { unmuteTime.Value = value; }
         }
         public long LastUpdate { get; set; }
+#if !DISABLE_CLASSIC_PK
         public bool IsPkOn
         {
             get { return isPkOn.Value; }
@@ -191,6 +202,14 @@ namespace MultiplayerARPG
         }
         public int HighestPkPoint { get; set; }
         public int HighestConsecutivePkKills { get; set; }
+#endif
+
+        public int Reputation
+        {
+            get { return reputation.Value; }
+            set { reputation.Value = value; }
+        }
+
         public bool IsWarping
         {
             get { return isWarping.Value; }
@@ -217,6 +236,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
         public IList<CharacterCurrency> Currencies
         {
             get { return currencies; }
@@ -226,7 +246,9 @@ namespace MultiplayerARPG
                 currencies.AddRange(value);
             }
         }
+#endif
 
+#if !DISABLE_CUSTOM_CHARACTER_DATA
         public IList<CharacterDataBoolean> ServerBools
         {
             get { return serverBools; }
@@ -316,6 +338,7 @@ namespace MultiplayerARPG
                 publicFloats.AddRange(value);
             }
         }
+#endif
         #endregion
 
         #region Network setup functions
@@ -355,12 +378,16 @@ namespace MultiplayerARPG
             titleDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             lastDeadTime.deliveryMethod = DeliveryMethod.Sequenced;
             lastDeadTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+#if !DISABLE_CLASSIC_PK
             isPkOn.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isPkOn.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             pkPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
             pkPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             consecutivePkKills.deliveryMethod = DeliveryMethod.ReliableOrdered;
             consecutivePkKills.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+#endif
+            reputation.deliveryMethod = DeliveryMethod.Sequenced;
+            reputation.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isWarping.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
@@ -373,13 +400,17 @@ namespace MultiplayerARPG
             // Sync lists
             hotkeys.forOwnerOnly = true;
             quests.forOwnerOnly = true;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             currencies.forOwnerOnly = true;
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             privateBools.forOwnerOnly = true;
             privateInts.forOwnerOnly = true;
             privateFloats.forOwnerOnly = true;
             publicBools.forOwnerOnly = false;
             publicInts.forOwnerOnly = false;
             publicFloats.forOwnerOnly = false;
+#endif
         }
 
         public override void OnSetup()
@@ -405,6 +436,7 @@ namespace MultiplayerARPG
             pkPoint.onChange += OnPkPointChange;
             consecutivePkKills.onChange += OnConsecutivePkKillsChange;
 #endif
+            reputation.onChange += OnReputationChange;
             isWarping.onChange += OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation += OnHotkeysOperation;
@@ -445,6 +477,7 @@ namespace MultiplayerARPG
             pkPoint.onChange -= OnPkPointChange;
             consecutivePkKills.onChange -= OnConsecutivePkKillsChange;
 #endif
+            reputation.onChange -= OnReputationChange;
             isWarping.onChange -= OnIsWarpingChange;
             // On list changes events
             hotkeys.onOperation -= OnHotkeysOperation;
@@ -564,7 +597,7 @@ namespace MultiplayerARPG
                 }
             }
         }
-        #endregion
+#endregion
 
         #region Sync data changes callback
         private void OnPlayerIdChange(bool isInitial, string id)
@@ -678,6 +711,12 @@ namespace MultiplayerARPG
         }
 #endif
 
+        private void OnReputationChange(bool isInitial, int reputation)
+        {
+            if (onReputationChange != null)
+                onReputationChange.Invoke(reputation);
+        }
+
         private void OnIsWarpingChange(bool isInitial, bool isWarping)
         {
             if (onIsWarpingChange != null)
@@ -743,6 +782,6 @@ namespace MultiplayerARPG
                 onPublicFloatsOperation.Invoke(operation, index);
         }
 #endif
-		#endregion
+#endregion
     }
 }
