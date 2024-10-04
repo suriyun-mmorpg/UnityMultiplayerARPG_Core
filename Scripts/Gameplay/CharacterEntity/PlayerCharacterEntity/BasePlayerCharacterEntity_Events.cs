@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         public event System.Action<int> onPkPointChange;
         public event System.Action<int> onConsecutivePkKillsChange;
 #endif
+        public event System.Action<int> onReputationChange;
         public event System.Action<bool> onIsWarpingChange;
         // Sync lists
         public event System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
