@@ -7,9 +7,11 @@ namespace MultiplayerARPG
     {
         public struct EnterGameCharacterLocation
         {
+            public string channelId;
             public string mapName;
             public Vector3 position;
             public Vector3 rotation;
+            public string safeArea;
         }
 
         /// <summary>
@@ -25,6 +27,13 @@ namespace MultiplayerARPG
             return true;
         }
         #endregion
+
+        public virtual string GetCurrentChannel(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (IsInstanceMap())
+                return _characterLocationsWhenEnterGame[playerCharacterEntity.Id].channelId;
+            return ChannelId;
+        }
 
         /// <summary>
         /// Get current map Id for saving purpose
@@ -64,6 +73,13 @@ namespace MultiplayerARPG
         public virtual void SetCurrentPosition(BasePlayerCharacterEntity playerCharacterEntity, Vector3 position)
         {
             playerCharacterEntity.Teleport(position, Quaternion.LookRotation(-playerCharacterEntity.MovementTransform.forward), true);
+        }
+
+        public virtual string GetCurrentSafeArea(BasePlayerCharacterEntity playerCharacterEntity)
+        {
+            if (IsInstanceMap())
+                return _characterLocationsWhenEnterGame[playerCharacterEntity.Id].safeArea;
+            return playerCharacterEntity.SafeArea != null ? playerCharacterEntity.SafeArea.name : string.Empty;
         }
 
         public void WarpCharacter(WarpPortalType warpPortalType, BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
