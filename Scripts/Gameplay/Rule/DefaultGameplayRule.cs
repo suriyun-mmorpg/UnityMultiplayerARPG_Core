@@ -1091,12 +1091,14 @@ namespace MultiplayerARPG
 
         public override bool CanTurnPkOff(BasePlayerCharacterEntity player)
         {
+#if !DISABLE_CLASSIC_PK
             long currentTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             if (player.LastPkOnTime <= 0 || currentTime - player.LastPkOnTime > (60 * 60 * hoursBeforeTurnPkOff))
                 return true;
             long diff = currentTime - player.LastPkOnTime;
             double remainsHours = hoursBeforeTurnPkOff - ((double)diff / 60 / 60);
             GameInstance.ServerGameMessageHandlers.SendFormattedGameMessage(player.ConnectionId, UIFormatKeys.UI_FORMAT_PK_CAN_TURN_PK_AFTER_HOURS, remainsHours >= 1 ? remainsHours.ToString("N0") : remainsHours.ToString("N2"));
+#endif
             return false;
         }
 
@@ -1107,13 +1109,15 @@ namespace MultiplayerARPG
                 return false;
             if (entity is BasePlayerCharacterEntity player)
             {
+#if !DISABLE_CLASSIC_PK
                 if (player.IsPkOn && TryGetPkData(player, out PkData pkData))
                 {
                     color = pkData.nameColor;
                     return true;
                 }
+#endif
             }
-            else if (entity is BaseCharacterEntity character && !GameInstance.PlayingCharacterEntity.IsAlly(character.GetInfo()))
+            if (entity is BaseCharacterEntity character && !GameInstance.PlayingCharacterEntity.IsAlly(character.GetInfo()))
             {
                 if (character.Level - GameInstance.PlayingCharacter.Level > monsterTitleColorChangeLevel)
                 {
@@ -1132,6 +1136,7 @@ namespace MultiplayerARPG
         private bool TryGetPkData(BasePlayerCharacterEntity player, out PkData data)
         {
             data = default;
+#if !DISABLE_CLASSIC_PK
             for (int i = SortedPkDatas.Count - 1; i >= 0; --i)
             {
                 if (player.PkPoint >= SortedPkDatas[i].minPkPoint)
@@ -1140,6 +1145,7 @@ namespace MultiplayerARPG
                     return true;
                 }
             }
+#endif
             return false;
         }
     }
