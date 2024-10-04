@@ -663,9 +663,11 @@ namespace MultiplayerARPG
             PlayerCharacterData characterData = new PlayerCharacterData();
             characterData.Id = GenericUtils.GetUniqueId();
             characterData.SetNewPlayerCharacterData(characterName, SelectedDataId, SelectedEntityId, SelectedFactionId);
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             characterData.PublicBools = PublicBools;
             characterData.PublicInts = PublicInts;
             characterData.PublicFloats = PublicFloats;
+#endif
             GameInstance.Singleton.SaveSystem.SaveCharacter(characterData);
         }
     }
