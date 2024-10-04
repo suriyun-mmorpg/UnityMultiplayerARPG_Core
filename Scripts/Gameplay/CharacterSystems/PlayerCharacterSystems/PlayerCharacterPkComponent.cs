@@ -8,9 +8,12 @@ namespace MultiplayerARPG
     {
         public void TogglePkMode()
         {
+#if !DISABLE_CLASSIC_PK
             RPC(CmdTogglePkMode);
+#endif
         }
 
+#if !DISABLE_CLASSIC_PK
         [ServerRpc]
         protected void CmdTogglePkMode()
         {
@@ -32,5 +35,6 @@ namespace MultiplayerARPG
                 Entity.LastPkOnTime = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds();
             }
         }
+#endif
     }
 }
