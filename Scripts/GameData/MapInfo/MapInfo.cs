@@ -98,7 +98,11 @@ namespace MultiplayerARPG
                     case PvpMode.GuildPvp:
                         return targetEntity.GuildId != 0 && targetEntity.GuildId == playerCharacter.GuildId;
                     default:
+#if !DISABLE_CLASSIC_PK
                         return !EnablePkRules || !playerCharacter.IsPkOn || !targetPlayer.IsPkOn;
+#else
+                        return true;
+#endif
                 }
             }
 
@@ -202,7 +206,11 @@ namespace MultiplayerARPG
                     case PvpMode.GuildPvp:
                         return targetEntity.GuildId == 0 || targetEntity.GuildId != playerCharacter.GuildId;
                     default:
+#if !DISABLE_CLASSIC_PK
                         return EnablePkRules && playerCharacter.IsPkOn && targetPlayer.IsPkOn;
+#else
+                        return false;
+#endif
                 }
             }
 
