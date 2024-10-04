@@ -41,23 +41,30 @@ namespace MultiplayerARPG
             info.AddValue("currentMapName", data.CurrentMapName);
             info.AddValue("currentPosition", (Vector3)data.CurrentPosition);
             info.AddValue("currentRotation", (Vector3)data.CurrentRotation);
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             info.AddValue("respawnMapName", data.RespawnMapName);
             info.AddValue("respawnPosition", (Vector3)data.RespawnPosition);
+#endif
             info.AddValue("iconDataId", data.IconDataId);
             info.AddValue("frameDataId", data.FrameDataId);
             info.AddValue("titleDataId", data.TitleDataId);
             info.AddValue("lastDeadTime", data.LastDeadTime);
             info.AddValue("lastUpdate", data.LastUpdate);
+#if !DISABLE_CLASSIC_PK
             info.AddValue("isPkOn", data.IsPkOn);
             info.AddValue("lastPkOnTime", data.LastPkOnTime);
             info.AddValue("pkPoint", data.PkPoint);
             info.AddValue("consecutivePkKills", data.ConsecutivePkKills);
             info.AddValue("highestPkPoint", data.HighestPkPoint);
             info.AddValue("highestConsecutivePkKills", data.HighestConsecutivePkKills);
+#endif
+            info.AddValue("reputation", data.Reputation);
             info.AddListValue("hotkeys", data.Hotkeys);
             info.AddListValue("quests", data.Quests);
-            info.AddValue("equipWeapons", data.EquipWeapons);
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             info.AddListValue("currencies", data.Currencies);
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             info.AddListValue("serverBools", data.ServerBools);
             info.AddListValue("serverInts", data.ServerInts);
             info.AddListValue("serverFloats", data.ServerFloats);
@@ -67,6 +74,8 @@ namespace MultiplayerARPG
             info.AddListValue("publicBools", data.PublicBools);
             info.AddListValue("publicInts", data.PublicInts);
             info.AddListValue("publicFloats", data.PublicFloats);
+#endif
+            info.AddValue("equipWeapons", data.EquipWeapons);
             this.InvokeInstanceDevExtMethods("GetObjectData", obj, info, context);
         }
 
@@ -127,8 +136,10 @@ namespace MultiplayerARPG
                 data.CurrentRotation = (Vector3)info.GetValue("currentRotation", typeof(Vector3));
             }
             catch { }
+#if !DISABLE_DIFFER_MAP_RESPAWNING
             data.RespawnMapName = info.GetString("respawnMapName");
             data.RespawnPosition = (Vector3)info.GetValue("respawnPosition", typeof(Vector3));
+#endif
             // TODO: Backward compatible, this will be removed in future version
             try
             {
@@ -153,6 +164,8 @@ namespace MultiplayerARPG
                 data.LastDeadTime = info.GetInt64("lastDeadTime");
             }
             catch { }
+            data.LastUpdate = info.GetInt64("lastUpdate");
+#if !DISABLE_CLASSIC_PK
             // TODO: Backward compatible, this will be removed in future version
             try
             {
@@ -189,15 +202,24 @@ namespace MultiplayerARPG
                 data.HighestConsecutivePkKills = info.GetInt32("highestConsecutivePkKills");
             }
             catch { }
-            data.LastUpdate = info.GetInt64("lastUpdate");
+#endif
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.Reputation = info.GetInt32("reputation");
+            }
+            catch { }
             data.Hotkeys = info.GetListValue<CharacterHotkey>("hotkeys");
             data.Quests = info.GetListValue<CharacterQuest>("quests");
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             // TODO: Backward compatible, this will be removed in future version
             try
             {
                 data.Currencies = info.GetListValue<CharacterCurrency>("currencies");
             }
             catch { }
+#endif
+#if !DISABLE_CUSTOM_CHARACTER_DATA
             // TODO: Backward compatible, this will be removed in future version
             try
             {
@@ -252,6 +274,7 @@ namespace MultiplayerARPG
                 data.PublicFloats = info.GetListValue<CharacterDataFloat32>("publicFloats");
             }
             catch { }
+#endif
             data.EquipWeapons = (EquipWeapons)info.GetValue("equipWeapons", typeof(EquipWeapons));
             this.InvokeInstanceDevExtMethods("SetObjectData", obj, info, context, selector);
 
