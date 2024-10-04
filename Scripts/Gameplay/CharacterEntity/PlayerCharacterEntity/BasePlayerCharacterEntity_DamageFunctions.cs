@@ -59,6 +59,7 @@ namespace MultiplayerARPG
             CurrentGameInstance.GameplayRule.GetPlayerDeadPunishment(deadPunishmentType, this, attackerEntity, out int decraseExp, out int decreaseGold, out int decreaseItems, out int attackerPkPoint);
             if (deadPunishmentType == DeadPunishmentType.PK)
             {
+#if !DISABLE_CLASSIC_PK
                 attackPlayer.PkPoint += attackerPkPoint;
                 attackPlayer.ConsecutivePkKills++;
                 if (attackPlayer.PkPoint > attackPlayer.HighestPkPoint)
@@ -67,6 +68,7 @@ namespace MultiplayerARPG
                     attackPlayer.HighestConsecutivePkKills = attackPlayer.ConsecutivePkKills;
                 PkPoint = 0;
                 ConsecutivePkKills = 0;
+#endif
             }
 
             // Decrease Exp
