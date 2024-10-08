@@ -99,6 +99,8 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(StorageType storageType, string storageOwnerId, IList<CharacterItem> characterItems)
         {
+            if (storageType != StorageType || !string.Equals(storageOwnerId, StorageOwnerId))
+                return;
             UpdateData(GameInstance.PlayingCharacter, characterItems);
         }
 
