@@ -62,6 +62,8 @@ namespace MultiplayerARPG
         protected bool restrictDropping;
         [SerializeField]
         protected bool restrictSelling;
+        [SerializeField]
+        protected bool deadDropProtected;
 
 
         [Category(100, "Cash Shop Generating Settings")]
@@ -145,11 +147,13 @@ namespace MultiplayerARPG
 
         public CurrencyAmount[] DismantleReturnCurrencies { get => dismantleReturnCurrencies; set => dismantleReturnCurrencies = value; }
 
-        public bool RestrictDealing { get => restrictDealing; set => restrictDealing = value; }
+        public virtual bool RestrictDealing { get { return restrictDealing; } }
 
-        public bool RestrictDropping  { get => restrictDropping; set => restrictDropping = value; }
+        public virtual bool RestrictDropping { get { return restrictDropping; } }
 
-        public bool RestrictSelling { get => restrictSelling; set => restrictSelling = value; }
+        public virtual bool RestrictSelling { get { return restrictSelling; } }
+
+        public virtual bool DeadDropProtected { get { return deadDropProtected; } }
 
         public int MaxLevel
         {

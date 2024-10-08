@@ -310,6 +310,8 @@ namespace MultiplayerARPG
         {
             if (item == null)
                 return false;
+            if (item.DeadDropProtected)
+                return true;
             if (ExcludeItems.Count > 0 && ExcludeItems.Contains(item))
                 return true;
             if (ExcludeAmmoTypes.Count > 0 && item.IsAmmo() && ExcludeAmmoTypes.Contains((item as IAmmoItem).AmmoType))
