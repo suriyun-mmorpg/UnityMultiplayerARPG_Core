@@ -8,10 +8,5 @@ namespace MultiplayerARPG
         public static RandomCharacterStatsDelegate onRandomCharacterStats;
         public static CalculatedBuffDelegate onBuildCalculatedBuff;
         public static CalculatedItemBuffDelegate onBuildCalculatedItemBuff;
-
-        static GameExtensionInstance()
-        {
-            DevExtUtils.InvokeStaticDevExtMethods(typeof(GameExtensionInstance), "Init");
-        }
     }
 }
