@@ -170,7 +170,6 @@ public class UIInputDialog : UIBase
 
         Title = title;
         Description = description;
-        InputFieldText = defaultAmount.ToString();
         PlaceHolderText = placeHolder;
         if (uiInputField != null)
         {
@@ -183,6 +182,7 @@ public class UIInputDialog : UIBase
             uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
             uiInputField.onValueChanged.AddListener(ValidateIntAmount);
         }
+        InputFieldText = defaultAmount.ToString();
         ContentType = InputField.ContentType.IntegerNumber;
         CharacterLimit = 0;
         _onConfirmInteger = onConfirmInteger;
@@ -222,7 +222,6 @@ public class UIInputDialog : UIBase
         _floatMaxAmount = maxAmount;
         Title = title;
         Description = description;
-        InputFieldText = defaultAmount.ToString();
         PlaceHolderText = placeHolder;
         if (uiInputField != null)
         {
@@ -235,6 +234,7 @@ public class UIInputDialog : UIBase
             uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
             uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
         }
+        InputFieldText = defaultAmount.ToString();
         ContentType = InputField.ContentType.DecimalNumber;
         CharacterLimit = 0;
         _onConfirmDecimal = onConfirmDecimal;
