@@ -35,6 +35,8 @@ namespace MultiplayerARPG
         protected SyncFieldAimPosition aimPosition = new SyncFieldAimPosition();
         [SerializeField]
         protected SyncFieldUInt targetEntityId = new SyncFieldUInt();
+        [SerializeField]
+        protected SyncFieldCharacterMount mount = new SyncFieldCharacterMount();
 
         [Category(101, "Sync Lists", false)]
         [SerializeField]
@@ -115,6 +117,18 @@ namespace MultiplayerARPG
             set
             {
                 aimPosition.Value = value;
+            }
+        }
+
+        public CharacterMount Mount
+        {
+            get
+            {
+                return mount.Value;
+            }
+            set
+            {
+                mount.Value = value;
             }
         }
 
@@ -256,6 +270,8 @@ namespace MultiplayerARPG
             aimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            mount.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            mount.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
 
             selectableWeaponSets.forOwnerOnly = false;
             attributes.forOwnerOnly = false;
@@ -285,6 +301,7 @@ namespace MultiplayerARPG
             lookPosition.onChange += OnLookPositionChange;
             aimPosition.onChange += OnAimPositionChange;
             targetEntityId.onChange += OnTargetEntityIdChange;
+            mount.onChange += OnMountChange;
             // On list changed events
             selectableWeaponSets.onOperation += OnSelectableWeaponSetsOperation;
             attributes.onOperation += OnAttributesOperation;
@@ -314,6 +331,7 @@ namespace MultiplayerARPG
             lookPosition.onChange -= OnLookPositionChange;
             aimPosition.onChange -= OnAimPositionChange;
             targetEntityId.onChange -= OnTargetEntityIdChange;
+            mount.onChange -= OnMountChange;
             // On list changed events
             selectableWeaponSets.onOperation -= OnSelectableWeaponSetsOperation;
             attributes.onOperation -= OnAttributesOperation;
@@ -487,6 +505,17 @@ namespace MultiplayerARPG
         {
             if (onTargetEntityIdChange != null)
                 onTargetEntityIdChange.Invoke(targetEntityId);
+        }
+
+        /// <summary>
+        /// This will be called when mount changed
+        /// </summary>
+        /// <param name="isInitial"></param>
+        /// <param name="mount"></param>
+        private void OnMountChange(bool isInitial, CharacterMount mount)
+        {
+            if (onMountChange != null)
+                onMountChange.Invoke(mount);
         }
         #endregion
 

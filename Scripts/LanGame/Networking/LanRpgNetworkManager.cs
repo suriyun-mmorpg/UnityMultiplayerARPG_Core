@@ -303,12 +303,12 @@ namespace MultiplayerARPG
                 // Summon saved mount entity
                 if (GameInstance.AddressableVehicleEntities.TryGetValue(mountEntityId, out AssetReferenceLiteNetLibBehaviour<VehicleEntity> addressablePrefab))
                 {
-                    playerCharacterEntity.Mount(null, addressablePrefab);
+                    playerCharacterEntity.SpawnMount(null, addressablePrefab);
                 }
 #if !EXCLUDE_PREFAB_REFS
                 else if (GameInstance.VehicleEntities.TryGetValue(mountEntityId, out VehicleEntity prefab))
                 {
-                    playerCharacterEntity.Mount(prefab, null);
+                    playerCharacterEntity.SpawnMount(prefab, null);
                 }
 #endif
                 // Summon monsters

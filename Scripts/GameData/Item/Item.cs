@@ -1036,7 +1036,7 @@ namespace MultiplayerARPG
             if (!character.CanUseItem() || level <= 0)
                 return;
 
-            character.Mount(VehicleEntity, AddressableVehicleEntity);
+            character.SpawnMount(VehicleEntity, AddressableVehicleEntity);
         }
 
         protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)

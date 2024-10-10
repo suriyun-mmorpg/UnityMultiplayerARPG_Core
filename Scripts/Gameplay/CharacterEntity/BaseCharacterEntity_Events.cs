@@ -30,6 +30,7 @@ namespace MultiplayerARPG
         public event System.Action<Vector3> onLookPositionChange;
         public event System.Action<AimPosition> onAimPositionChange;
         public event System.Action<uint> onTargetEntityIdChange;
+        public event System.Action<CharacterMount> onMountChange;
         // Sync lists
         public event System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;

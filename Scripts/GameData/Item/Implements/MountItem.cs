@@ -74,7 +74,7 @@ namespace MultiplayerARPG
             if (!characterEntity.CanUseItem() || characterItem.level <= 0)
                 return;
 
-            characterEntity.Mount(VehicleEntity, AddressableVehicleEntity);
+            characterEntity.SpawnMount(VehicleEntity, AddressableVehicleEntity);
         }
 
         public bool HasCustomAimControls()
