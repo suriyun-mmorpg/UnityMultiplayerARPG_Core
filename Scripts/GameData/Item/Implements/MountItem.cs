@@ -63,6 +63,14 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private IncrementalFloat mountDuration;
+        public IncrementalFloat MountDuration { get { return mountDuration; } }
+
+        [SerializeField]
+        private bool noMountDuration;
+        public bool NoMountDuration { get { return noMountDuration; } }
+
+        [SerializeField]
         private float useItemCooldown = 0f;
         public float UseItemCooldown
         {
@@ -71,10 +79,10 @@ namespace MultiplayerARPG
 
         public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
-            if (!characterEntity.CanUseItem() || characterItem.level <= 0)
+            if (!characterEntity.CanUseItem())
                 return;
 
-            characterEntity.SpawnMount(VehicleEntity, AddressableVehicleEntity);
+            characterEntity.SpawnMount(MountType.MountItem, DataId, MountDuration.GetAmount(characterItem.level));
         }
 
         public bool HasCustomAimControls()

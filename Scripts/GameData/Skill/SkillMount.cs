@@ -33,6 +33,18 @@ namespace MultiplayerARPG
             }
         }
 
+        [SerializeField]
+        private IncrementalFloat duration;
+        public IncrementalFloat Duration { get { return duration; } }
+
+        [SerializeField]
+        private bool noDuration;
+        public bool NoDuration { get { return noDuration; } }
+
+        [SerializeField]
+        private IncrementalInt level;
+        public IncrementalInt Level { get { return level; } }
+
         public void ProceedAddressableAssetConversion(string groupName)
         {
 #if UNITY_EDITOR

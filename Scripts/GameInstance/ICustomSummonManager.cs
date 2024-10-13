@@ -11,5 +11,6 @@
         bool GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab);
         void UnSummon(CharacterSummon characterSummon);
         void Update(CharacterSummon characterSummon, float deltaTime);
+        bool ShouldRemove(CharacterSummon characterSummon);
     }
 }

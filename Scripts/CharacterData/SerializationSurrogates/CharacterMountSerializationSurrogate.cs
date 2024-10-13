@@ -12,8 +12,9 @@ namespace MultiplayerARPG
             CharacterMount data = (CharacterMount)obj;
             info.AddValue("type", (byte)data.type);
             info.AddValue("dataId", data.dataId);
+            info.AddValue("mountRemainsDuration", data.mountRemainsDuration);
             info.AddValue("level", data.level);
-            info.AddValue("exp", data.exp);
+            info.AddValue("currentHp", data.currentHp);
         }
 
         public object SetObjectData(
@@ -25,8 +26,9 @@ namespace MultiplayerARPG
             CharacterMount data = (CharacterMount)obj;
             data.type = (MountType)info.GetByte("type");
             data.dataId = info.GetInt32("dataId");
+            data.mountRemainsDuration = info.GetSingle("mountRemainsDuration");
             data.level = info.GetInt32("level");
-            data.exp = info.GetInt32("exp");
+            data.currentHp = info.GetInt32("currentHp");
             obj = data;
             return obj;
         }

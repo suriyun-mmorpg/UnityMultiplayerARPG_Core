@@ -1,7 +1,8 @@
-﻿using System.Collections;
+﻿using LiteNetLib;
+using LiteNetLibManager;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using LiteNetLibManager;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
@@ -37,10 +38,6 @@ namespace MultiplayerARPG
         [Tooltip("If this is `TRUE` this entity will be able to be attacked")]
         protected bool canBeAttacked = true;
 
-        // TODO: Vehicle can level up?
-        [SerializeField]
-        protected int level = 0;
-
         [SerializeField]
         protected IncrementalInt hp = default;
 
@@ -67,14 +64,17 @@ namespace MultiplayerARPG
 
         [Category("Sync Fields")]
         [SerializeField]
-        protected SyncListUInt syncPassengerIds = new SyncListUInt();
+        protected SyncFieldInt level = new SyncFieldInt();
+        [SerializeField]
+        protected SyncListUInt passengerIds = new SyncListUInt();
 
+        public int Level { get { return level.Value; } set { level.Value = value; } }
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
         public virtual bool HasDriver { get { return _passengers.ContainsKey(0); } }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
         public override bool IsImmune { get { return base.IsImmune || !canBeAttacked; } set { base.IsImmune = value; } }
-        public override int MaxHp { get { return canBeAttacked ? hp.GetAmount(level) : 1; } }
+        public override int MaxHp { get { return canBeAttacked ? hp.GetAmount(Level) : 1; } }
         public Vector3 SpawnPosition { get; protected set; }
         public float DestroyDelay { get { return destroyDelay; } }
         public float DestroyRespawnDelay { get { return destroyRespawnDelay; } }
@@ -93,10 +93,12 @@ namespace MultiplayerARPG
             _isDestroyed = false;
         }
 
-        protected virtual void InitStats()
+        public virtual void InitStats()
         {
             if (!IsServer)
                 return;
+            if (Level <= 0)
+                Level = 1;
             UpdateStats();
             CurrentHp = MaxHp;
         }
@@ -106,8 +108,20 @@ namespace MultiplayerARPG
         /// </summary>
         public void UpdateStats()
         {
-            Resistances = GameDataHelpers.CombineResistances(resistances, new Dictionary<DamageElement, float>(), level, 1);
-            Armors = GameDataHelpers.CombineArmors(armors, new Dictionary<DamageElement, float>(), level, 1);
+            Resistances = GameDataHelpers.CombineResistances(resistances, new Dictionary<DamageElement, float>(), Level, 1);
+            Armors = GameDataHelpers.CombineArmors(armors, new Dictionary<DamageElement, float>(), Level, 1);
+        }
+
+        protected override void SetupNetElements()
+        {
+            base.SetupNetElements();
+            level.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            level.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            isImmune.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isImmune.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentHp.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            currentHp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            passengerIds.forOwnerOnly = false;
         }
 
         public override void OnSetup()
@@ -115,13 +129,13 @@ namespace MultiplayerARPG
             base.OnSetup();
             InitStats();
             SpawnPosition = EntityTransform.position;
-            syncPassengerIds.onOperation += OnPassengerIdsOperation;
+            passengerIds.onOperation += OnPassengerIdsOperation;
             if (IsServer)
             {
                 // Prepare passengers data, add data at server then it wil be synced to clients
-                while (syncPassengerIds.Count < Seats.Count)
+                while (passengerIds.Count < Seats.Count)
                 {
-                    syncPassengerIds.Add(0);
+                    passengerIds.Add(0);
                 }
             }
             // Vehicle must not being destroyed when owner player is disconnect to avoid vehicle exiting issues
@@ -131,15 +145,15 @@ namespace MultiplayerARPG
         protected override void EntityOnDestroy()
         {
             base.EntityOnDestroy();
-            syncPassengerIds.onOperation -= OnPassengerIdsOperation;
+            passengerIds.onOperation -= OnPassengerIdsOperation;
         }
 
         private void OnPassengerIdsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
-            if (index >= syncPassengerIds.Count)
+            if (index >= passengerIds.Count)
                 return;
             // Set passenger entity to dictionary if the id > 0
-            uint passengerId = syncPassengerIds[index];
+            uint passengerId = passengerIds[index];
             if (passengerId == 0)
             {
                 _passengers.Remove((byte)index);
@@ -227,19 +241,19 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            syncPassengerIds[seatIndex] = gameEntity.ObjectId;
+            passengerIds[seatIndex] = gameEntity.ObjectId;
         }
 
         public virtual bool RemovePassenger(byte seatIndex)
         {
             if (!IsServer)
                 return false;
-            if (seatIndex >= syncPassengerIds.Count)
+            if (seatIndex >= passengerIds.Count)
                 return false;
             // Store exiting object ID
-            uint passengerId = syncPassengerIds[seatIndex];
+            uint passengerId = passengerIds[seatIndex];
             // Set passenger ID to `0` to tell clients that the passenger is exiting
-            syncPassengerIds[seatIndex] = 0;
+            passengerIds[seatIndex] = 0;
             // Move passenger to exit transform
             if (Manager.TryGetEntityByObjectId(passengerId, out BaseGameEntity passenger))
             {
@@ -263,7 +277,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            for (byte i = 0; i < syncPassengerIds.Count; ++i)
+            for (byte i = 0; i < passengerIds.Count; ++i)
             {
                 RemovePassenger(i);
             }
@@ -271,7 +285,7 @@ namespace MultiplayerARPG
 
         public bool IsSeatAvailable(byte seatIndex)
         {
-            return !_isDestroyed && seatIndex < syncPassengerIds.Count && syncPassengerIds[seatIndex] == 0;
+            return !_isDestroyed && seatIndex < passengerIds.Count && passengerIds[seatIndex] == 0;
         }
 
         public bool GetAvailableSeat(out byte seatIndex)
@@ -402,10 +416,10 @@ namespace MultiplayerARPG
 
         private void MakeCache()
         {
-            if (_dirtyLevel != level)
+            if (_dirtyLevel != Level)
             {
-                _dirtyLevel = level;
-                _cacheBuff.Build(buff, level);
+                _dirtyLevel = Level;
+                _cacheBuff.Build(buff, Level);
             }
         }
 

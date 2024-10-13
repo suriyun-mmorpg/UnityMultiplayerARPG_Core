@@ -39,20 +39,38 @@ namespace MultiplayerARPG
             {
                 float tempDuration;
                 int tempCount;
+                // Removing mount if it should
                 if (Entity.PassengingVehicleEntity != null)
                 {
-                    tempDuration = Entity.PassengingVehicleEntity.GetBuff().GetDuration();
-                    if (tempDuration > 0f)
+                    CharacterMount mount = Entity.Mount;
+                    if (mount.ShouldRemove())
                     {
-                        CharacterRecoveryData recoveryData;
-                        if (!_recoveryBuffs.TryGetValue(KEY_VEHICLE_BUFF, out recoveryData))
-                        {
-                            recoveryData = new CharacterRecoveryData(Entity);
-                            recoveryData.SetupByBuff(CharacterBuff.Empty, Entity.PassengingVehicleEntity.GetBuff());
-                            _recoveryBuffs.Add(KEY_VEHICLE_BUFF, recoveryData);
-                        }
-                        recoveryData.Apply(1 / tempDuration * _updatingTime);
+                        _recoveryBuffs.Remove(KEY_VEHICLE_BUFF);
+                        Entity.Mount = new CharacterMount();
                     }
+                    else
+                    {
+                        mount.Update(Entity.PassengingVehicleEntity, _updatingTime);
+                        Entity.Mount = mount;
+                        tempDuration = Entity.PassengingVehicleEntity.GetBuff().GetDuration();
+                        // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
+                        if (tempDuration > 0f)
+                        {
+                            CharacterRecoveryData recoveryData;
+                            if (!_recoveryBuffs.TryGetValue(KEY_VEHICLE_BUFF, out recoveryData))
+                            {
+                                recoveryData = new CharacterRecoveryData(Entity);
+                                recoveryData.SetupByBuff(CharacterBuff.Empty, Entity.PassengingVehicleEntity.GetBuff());
+                                _recoveryBuffs.Add(KEY_VEHICLE_BUFF, recoveryData);
+                            }
+                            recoveryData.Apply(1 / tempDuration * _updatingTime);
+                        }
+                    }
+                }
+                else
+                {
+                    _recoveryBuffs.Remove(KEY_VEHICLE_BUFF);
+                    Entity.Mount = new CharacterMount();
                 }
                 // Removing summons if it should
                 if (!Entity.IsDead())
@@ -62,7 +80,6 @@ namespace MultiplayerARPG
                     for (int i = tempCount - 1; i >= 0; --i)
                     {
                         summon = Entity.Summons[i];
-                        tempDuration = summon.GetBuff().GetDuration();
                         if (summon.ShouldRemove())
                         {
                             _recoveryBuffs.Remove(summon.id);
@@ -73,18 +90,19 @@ namespace MultiplayerARPG
                         {
                             summon.Update(_updatingTime);
                             Entity.Summons[i] = summon;
-                        }
-                        // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
-                        if (tempDuration > 0f)
-                        {
-                            CharacterRecoveryData recoveryData;
-                            if (!_recoveryBuffs.TryGetValue(summon.id, out recoveryData))
+                            tempDuration = summon.GetBuff().GetDuration();
+                            // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
+                            if (tempDuration > 0f)
                             {
-                                recoveryData = new CharacterRecoveryData(Entity);
-                                recoveryData.SetupByBuff(CharacterBuff.Empty, summon.GetBuff());
-                                _recoveryBuffs.Add(summon.id, recoveryData);
+                                CharacterRecoveryData recoveryData;
+                                if (!_recoveryBuffs.TryGetValue(summon.id, out recoveryData))
+                                {
+                                    recoveryData = new CharacterRecoveryData(Entity);
+                                    recoveryData.SetupByBuff(CharacterBuff.Empty, summon.GetBuff());
+                                    _recoveryBuffs.Add(summon.id, recoveryData);
+                                }
+                                recoveryData.Apply(1 / tempDuration * _updatingTime);
                             }
-                            recoveryData.Apply(1 / tempDuration * _updatingTime);
                         }
                         // Don't update next buffs if character dead
                         if (Entity.IsDead())
@@ -99,7 +117,6 @@ namespace MultiplayerARPG
                     for (int i = tempCount - 1; i >= 0; --i)
                     {
                         buff = Entity.Buffs[i];
-                        tempDuration = buff.GetBuff().GetDuration();
                         if (buff.ShouldRemove())
                         {
                             _recoveryBuffs.Remove(buff.id);
@@ -110,18 +127,19 @@ namespace MultiplayerARPG
                         {
                             buff.Update(_updatingTime);
                             Entity.Buffs[i] = buff;
-                        }
-                        // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
-                        if (tempDuration > 0f)
-                        {
-                            CharacterRecoveryData recoveryData;
-                            if (!_recoveryBuffs.TryGetValue(buff.id, out recoveryData))
+                            tempDuration = buff.GetBuff().GetDuration();
+                            // If duration is 0, damages / recoveries will applied immediately, so don't apply it here
+                            if (tempDuration > 0f)
                             {
-                                recoveryData = new CharacterRecoveryData(Entity);
-                                recoveryData.SetupByBuff(buff, buff.GetBuff());
-                                _recoveryBuffs.Add(buff.id, recoveryData);
+                                CharacterRecoveryData recoveryData;
+                                if (!_recoveryBuffs.TryGetValue(buff.id, out recoveryData))
+                                {
+                                    recoveryData = new CharacterRecoveryData(Entity);
+                                    recoveryData.SetupByBuff(buff, buff.GetBuff());
+                                    _recoveryBuffs.Add(buff.id, recoveryData);
+                                }
+                                recoveryData.Apply(1 / tempDuration * _updatingTime);
                             }
-                            recoveryData.Apply(1 / tempDuration * _updatingTime);
                         }
                         // Don't update next buffs if character dead
                         if (Entity.IsDead())

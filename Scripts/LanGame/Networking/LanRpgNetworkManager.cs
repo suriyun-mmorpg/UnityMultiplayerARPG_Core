@@ -299,18 +299,13 @@ namespace MultiplayerARPG
             if (!playerCharacterEntity.IsDead())
             {
                 playerCharacterEntity.CallRpcOnRespawn();
-                int mountEntityId = 0;
-                // Summon saved mount entity
-                if (GameInstance.AddressableVehicleEntities.TryGetValue(mountEntityId, out AssetReferenceLiteNetLibBehaviour<VehicleEntity> addressablePrefab))
-                {
-                    playerCharacterEntity.SpawnMount(null, addressablePrefab);
-                }
-#if !EXCLUDE_PREFAB_REFS
-                else if (GameInstance.VehicleEntities.TryGetValue(mountEntityId, out VehicleEntity prefab))
-                {
-                    playerCharacterEntity.SpawnMount(prefab, null);
-                }
-#endif
+                // Summon mount
+                playerCharacterEntity.SpawnMount(
+                    playerCharacterEntity.Mount.type,
+                    playerCharacterEntity.Mount.dataId,
+                    playerCharacterEntity.Mount.mountRemainsDuration,
+                    playerCharacterEntity.Mount.level,
+                    playerCharacterEntity.Mount.currentHp);
                 // Summon monsters
                 for (int i = 0; i < playerCharacterEntity.Summons.Count; ++i)
                 {

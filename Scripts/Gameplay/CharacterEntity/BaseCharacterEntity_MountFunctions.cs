@@ -1,7 +1,72 @@
-﻿namespace MultiplayerARPG
+﻿using Insthync.AddressableAssetTools;
+using LiteNetLibManager;
+using UnityEngine;
+
+namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
+
+        protected float _lastMountTime;
+
+        public virtual async void SpawnMount(MountType mountType, int mountDataId, float duration, int level = 1, int currentHp = 0)
+        {
+            if (!IsServer || Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
+                return;
+
+            _lastMountTime = Time.unscaledTime;
+
+            Vector3 enterPosition = EntityTransform.position;
+            if (PassengingVehicleEntity != null)
+            {
+                enterPosition = PassengingVehicleEntity.Entity.EntityTransform.position;
+                await ExitVehicle();
+            }
+
+            // Instantiate new mount entity
+            LiteNetLibIdentity spawnObj;
+            if (mountType.GetPrefab(mountDataId, out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab))
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    addressablePrefab.HashAssetId, enterPosition,
+                    Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
+            }
+            else
+            {
+                spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
+                    prefab.Identity.HashAssetId, enterPosition,
+                    Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
+            }
+
+            if (spawnObj == null)
+            {
+                return;
+            }
+
+            VehicleEntity vehicle = spawnObj.GetComponent<VehicleEntity>();
+            vehicle.InitStats();
+            vehicle.Level = level;
+            if (currentHp <= 0f)
+                currentHp = vehicle.MaxHp;
+            vehicle.CurrentHp = currentHp;
+            BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj, 0, ConnectionId);
+
+            // Seat index for mount entity always 0
+            await EnterVehicle(vehicle, 0);
+
+            if (mountType != MountType.None)
+            {
+                Mount = new CharacterMount()
+                {
+                    type = mountType,
+                    dataId = mountDataId,
+                    mountRemainsDuration = duration,
+                    level = level,
+                    currentHp = currentHp,
+                };
+            }
+        }
+
         public override void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
         {
             base.SetPassengingVehicle(seatIndex, vehicleEntity);

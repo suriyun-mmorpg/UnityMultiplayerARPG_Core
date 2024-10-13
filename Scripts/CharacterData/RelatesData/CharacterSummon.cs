@@ -72,7 +72,7 @@ namespace MultiplayerARPG
             {
                 case SummonType.PetItem:
                     // Return to character as a pet item
-                    CharacterItem newItem = CharacterItem.Create(dataId, Level, 1);
+                    CharacterItem newItem = CharacterItem.Create(dataId, Level, 1, 0);
                     newItem.exp = Exp;
                     newItem.Lock(CurrentHp <= 0 ?
                         GameInstance.Singleton.petDeadLockDuration :
@@ -116,17 +116,37 @@ namespace MultiplayerARPG
 
         public bool ShouldRemove()
         {
-            return (CacheEntity && CacheEntity.CurrentHp <= 0) || (type == SummonType.Skill && summonRemainsDuration <= 0f);
+            if (CacheEntity && CacheEntity.CurrentHp <= 0)
+                return true;
+            switch (type)
+            {
+                case SummonType.Skill:
+                    BaseSkill skill = GetSkill();
+                    if (skill == null || !skill.TryGetSummon(out SkillSummon summon))
+                        return true;
+                    if (summon.NoDuration)
+                        return false;
+                    return summonRemainsDuration <= 0f;
+                case SummonType.PetItem:
+                    IPetItem petItem = GetPetItem();
+                    if (petItem == null)
+                        return true;
+                    if (petItem.NoSummonDuration)
+                        return false;
+                    return summonRemainsDuration <= 0f;
+                case SummonType.Custom:
+                    return GameInstance.CustomSummonManager.ShouldRemove(this);
+            }
+            return false;
         }
 
         public void Update(float deltaTime)
         {
-            switch (type)
+            if (summonRemainsDuration > 0f)
             {
-                case SummonType.Skill:
-                    // Update remains duration when it reached 0 it will be unsummoned
-                    summonRemainsDuration -= deltaTime;
-                    break;
+                summonRemainsDuration -= deltaTime;
+                if (summonRemainsDuration < 0f)
+                    summonRemainsDuration = 0f;
             }
             // Makes update in main thread to collects data to use in other threads (save to database thread)
             level = Level;

@@ -63,6 +63,14 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        private IncrementalFloat summonDuration = default;
+        public IncrementalFloat SummonDuration { get { return summonDuration; } }
+
+        [SerializeField]
+        private bool noSummonDuration = true;
+        public bool NoSummonDuration { get { return noSummonDuration; } }
+
+        [SerializeField]
         private float useItemCooldown = 0f;
         public float UseItemCooldown
         {
@@ -71,7 +79,7 @@ namespace MultiplayerARPG
 
         public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
-            if (!characterEntity.CanUseItem() || characterItem.level <= 0 || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
+            if (!characterEntity.CanUseItem() || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             characterEntity.FillEmptySlots();
             // Clear all summoned pets

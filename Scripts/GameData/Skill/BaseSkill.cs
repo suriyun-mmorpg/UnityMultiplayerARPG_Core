@@ -717,7 +717,7 @@ namespace MultiplayerARPG
             if (!skillUser.IsServer)
                 return;
 
-            if (!TryGetSummon(out SkillSummon summon) || summon.MonsterCharacterEntity == null)
+            if (!TryGetSummon(out SkillSummon summon))
                 return;
 
             int i;
@@ -754,10 +754,13 @@ namespace MultiplayerARPG
             if (!skillUser.IsServer)
                 return;
 
-            if (!TryGetMount(out SkillMount mount) || mount.MountEntity == null)
+            if (!TryGetMount(out SkillMount mount))
                 return;
 
-            skillUser.SpawnMount(mount.MountEntity, mount.AddressableMountEntity);
+            skillUser.SpawnMount(
+                MountType.Skill, DataId,
+                mount.Duration.GetAmount(skillLevel),
+                mount.Level.GetAmount(skillLevel));
         }
 
         /// <summary>

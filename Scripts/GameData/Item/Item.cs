@@ -177,6 +177,8 @@ namespace MultiplayerARPG
         public BaseMonsterCharacterEntity petEntity;
 #endif
         public AssetReferenceBaseMonsterCharacterEntity addressablePetEntity;
+        public IncrementalFloat summonDuration;
+        public bool noSummonDuration;
 
         [Category(2, "Mount Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
@@ -184,6 +186,8 @@ namespace MultiplayerARPG
         public VehicleEntity mountEntity;
 #endif
         public AssetReferenceVehicleEntity addressableMountEntity;
+        public IncrementalFloat mountDuration;
+        public bool noMountDuration;
 
         [Category(2, "Socket Enhancer Settings")]
         public SocketEnhancerType socketEnhancerType = SocketEnhancerType.Type1;
@@ -727,6 +731,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public IncrementalFloat SummonDuration
+        {
+            get { return summonDuration; }
+        }
+
+        public bool NoSummonDuration
+        {
+            get { return noSummonDuration; }
+        }
+
         public VehicleEntity VehicleEntity
         {
             get
@@ -747,6 +761,16 @@ namespace MultiplayerARPG
                     return addressableMountEntity;
                 return null;
             }
+        }
+
+        public IncrementalFloat MountDuration
+        {
+            get { return mountDuration; }
+        }
+
+        public bool NoMountDuration
+        {
+            get { return noMountDuration; }
         }
 
         public BaseSkill SkillData
@@ -1036,7 +1060,7 @@ namespace MultiplayerARPG
             if (!character.CanUseItem() || level <= 0)
                 return;
 
-            character.SpawnMount(VehicleEntity, AddressableVehicleEntity);
+            character.SpawnMount(MountType.MountItem, DataId, MountDuration.GetAmount(level));
         }
 
         protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)

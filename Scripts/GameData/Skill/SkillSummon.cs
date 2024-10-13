@@ -35,10 +35,13 @@ namespace MultiplayerARPG
             }
         }
 
-        [Tooltip("If duration less than or equals to 0, summoned monster will die")]
         [SerializeField]
         private IncrementalFloat duration;
         public IncrementalFloat Duration { get { return duration; } }
+
+        [SerializeField]
+        private bool noDuration;
+        public bool NoDuration { get { return noDuration; } }
 
         [SerializeField]
         private IncrementalInt amountEachTime;

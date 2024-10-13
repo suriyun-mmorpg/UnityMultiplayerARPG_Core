@@ -56,45 +56,7 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public bool GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab)
         {
-            prefab = null;
-            addressablePrefab = null;
-            switch (_type)
-            {
-                case SummonType.Skill:
-                    if (GameInstance.Skills.TryGetValue(_dataId, out BaseSkill skill) && skill.TryGetSummon(out SkillSummon skillSummon))
-                    {
-                        if (skillSummon.MonsterCharacterEntity != null)
-                        {
-                            prefab = skillSummon.MonsterCharacterEntity;
-                            return false;
-                        }
-                        else if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
-                        {
-                            addressablePrefab = skillSummon.AddressableMonsterCharacterEntity;
-                            return true;
-                        }
-                    }
-                    break;
-                case SummonType.PetItem:
-                    if (GameInstance.Items.TryGetValue(_dataId, out BaseItem item) && item.IsPet())
-                    {
-                        IPetItem petItem = item as IPetItem;
-                        if (petItem.MonsterCharacterEntity != null)
-                        {
-                            prefab = petItem.MonsterCharacterEntity;
-                            return false;
-                        }
-                        else if (petItem.AddressableMonsterCharacterEntity.IsDataValid())
-                        {
-                            addressablePrefab = petItem.AddressableMonsterCharacterEntity;
-                            return true;
-                        }
-                    }
-                    break;
-                case SummonType.Custom:
-                    return GameInstance.CustomSummonManager.GetPrefab(out prefab, out addressablePrefab);
-            }
-            return false;
+            return _type.GetPrefab(_dataId, out prefab, out addressablePrefab);
         }
 
         public CalculatedBuff GetBuff()
