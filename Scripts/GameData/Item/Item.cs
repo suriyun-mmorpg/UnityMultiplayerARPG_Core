@@ -178,7 +178,7 @@ namespace MultiplayerARPG
 #endif
         public AssetReferenceBaseMonsterCharacterEntity addressablePetEntity;
         public IncrementalFloat summonDuration;
-        public bool noSummonDuration;
+        public bool noSummonDuration = true;
 
         [Category(2, "Mount Settings")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
@@ -187,7 +187,7 @@ namespace MultiplayerARPG
 #endif
         public AssetReferenceVehicleEntity addressableMountEntity;
         public IncrementalFloat mountDuration;
-        public bool noMountDuration;
+        public bool noMountDuration = true;
 
         [Category(2, "Socket Enhancer Settings")]
         public SocketEnhancerType socketEnhancerType = SocketEnhancerType.Type1;
