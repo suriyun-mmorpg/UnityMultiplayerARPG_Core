@@ -75,6 +75,7 @@ namespace MultiplayerARPG
             info.AddListValue("publicInts", data.PublicInts);
             info.AddListValue("publicFloats", data.PublicFloats);
 #endif
+            info.AddValue("mount", data.Mount);
             info.AddValue("equipWeapons", data.EquipWeapons);
             this.InvokeInstanceDevExtMethods("GetObjectData", obj, info, context);
         }
@@ -275,6 +276,12 @@ namespace MultiplayerARPG
             }
             catch { }
 #endif
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.Mount = (CharacterMount)info.GetValue("mount", typeof(CharacterMount));
+            }
+            catch { }
             data.EquipWeapons = (EquipWeapons)info.GetValue("equipWeapons", typeof(EquipWeapons));
             this.InvokeInstanceDevExtMethods("SetObjectData", obj, info, context, selector);
 

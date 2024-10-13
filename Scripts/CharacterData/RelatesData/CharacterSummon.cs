@@ -32,7 +32,7 @@ namespace MultiplayerARPG
                     GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner));
                 CacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             }
-            else
+            else if (prefab != null)
             {
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId,
@@ -40,8 +40,11 @@ namespace MultiplayerARPG
                     GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner));
                 CacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
             }
-            if (spawnObj == null)
+            else
+            {
                 return;
+            }
+
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
             CacheEntity.Summon(summoner, type, summonLevel);
             objectId = CacheEntity.ObjectId;

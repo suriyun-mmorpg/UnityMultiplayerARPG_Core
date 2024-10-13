@@ -219,6 +219,7 @@ namespace MultiplayerARPG
             CharacterSkillSerializationSurrogate skillSS = new CharacterSkillSerializationSurrogate();
             CharacterSkillUsageSerializationSurrogate skillUsageSS = new CharacterSkillUsageSerializationSurrogate();
             CharacterSummonSerializationSurrogate summonSS = new CharacterSummonSerializationSurrogate();
+            CharacterMountSerializationSurrogate mountSS = new CharacterMountSerializationSurrogate();
             surrogateSelector.AddSurrogate(typeof(PlayerCharacterData), new StreamingContext(StreamingContextStates.All), playerCharacterDataSS);
             surrogateSelector.AddSurrogate(typeof(CharacterAttribute), new StreamingContext(StreamingContextStates.All), attributeSS);
             surrogateSelector.AddSurrogate(typeof(CharacterBuff), new StreamingContext(StreamingContextStates.All), buffSS);
@@ -229,6 +230,7 @@ namespace MultiplayerARPG
             surrogateSelector.AddSurrogate(typeof(CharacterSkill), new StreamingContext(StreamingContextStates.All), skillSS);
             surrogateSelector.AddSurrogate(typeof(CharacterSkillUsage), new StreamingContext(StreamingContextStates.All), skillUsageSS);
             surrogateSelector.AddSurrogate(typeof(CharacterSummon), new StreamingContext(StreamingContextStates.All), summonSS);
+            surrogateSelector.AddSurrogate(typeof(CharacterMount), new StreamingContext(StreamingContextStates.All), mountSS);
             DevExtUtils.InvokeStaticDevExtMethods(ClassType, "AddAllCharacterRelatesDataSurrogate", surrogateSelector);
         }
 

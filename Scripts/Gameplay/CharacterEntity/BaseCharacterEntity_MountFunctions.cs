@@ -11,7 +11,13 @@ namespace MultiplayerARPG
 
         public virtual async void SpawnMount(MountType mountType, int mountDataId, float duration, int level = 1, int currentHp = 0)
         {
-            if (!IsServer || Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
+            if (!IsServer)
+                return;
+
+            if (mountType == MountType.None)
+                return;
+
+            if (Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
                 return;
 
             _lastMountTime = Time.unscaledTime;
@@ -31,14 +37,13 @@ namespace MultiplayerARPG
                     addressablePrefab.HashAssetId, enterPosition,
                     Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
             }
-            else
+            else if (prefab != null)
             {
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId, enterPosition,
                     Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
             }
-
-            if (spawnObj == null)
+            else
             {
                 return;
             }
@@ -54,17 +59,15 @@ namespace MultiplayerARPG
             // Seat index for mount entity always 0
             await EnterVehicle(vehicle, 0);
 
-            if (mountType != MountType.None)
+            // Update mount data
+            Mount = new CharacterMount()
             {
-                Mount = new CharacterMount()
-                {
-                    type = mountType,
-                    dataId = mountDataId,
-                    mountRemainsDuration = duration,
-                    level = level,
-                    currentHp = currentHp,
-                };
-            }
+                type = mountType,
+                dataId = mountDataId,
+                mountRemainsDuration = duration,
+                level = level,
+                currentHp = currentHp,
+            };
         }
 
         public override void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
