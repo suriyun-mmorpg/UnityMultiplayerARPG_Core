@@ -191,7 +191,7 @@ namespace MultiplayerARPG
                 if (uiCharacterHotkey.CanAssignCharacterItem(characterItem))
                 {
                     IUsableItem usableItem = characterItem.GetUsableItem();
-                    if (hideFoundUsableItems && usableItem != null && foundUsableItemUIs.TryGetValue(usableItem.DataId, out UICharacterItem foundUI))
+                    if (usableItem == null || (hideFoundUsableItems && foundUsableItemUIs.TryGetValue(usableItem.DataId, out UICharacterItem foundUI)))
                     {
                         tempUiCharacterItem.Hide();
                     }
