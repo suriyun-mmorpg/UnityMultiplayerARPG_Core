@@ -46,7 +46,7 @@ namespace MultiplayerARPG
                     if (mount.ShouldRemove())
                     {
                         _recoveryBuffs.Remove(KEY_VEHICLE_BUFF);
-                        Entity.Mount = new CharacterMount();
+                        Entity.ExitVehicleAndForget();
                     }
                     else
                     {
@@ -66,11 +66,6 @@ namespace MultiplayerARPG
                             recoveryData.Apply(1 / tempDuration * _updatingTime);
                         }
                     }
-                }
-                else
-                {
-                    _recoveryBuffs.Remove(KEY_VEHICLE_BUFF);
-                    Entity.Mount = new CharacterMount();
                 }
                 // Removing summons if it should
                 if (!Entity.IsDead())

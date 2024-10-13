@@ -53,7 +53,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual async UniTask<bool> EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
+        public virtual async UniTask<bool> EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
             if (!IsServer || vehicle.IsNull())
                 return false;
@@ -93,12 +93,12 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected virtual async void EnterVehicleAndForget(IVehicleEntity vehicle, byte seatIndex)
+        public async void EnterVehicleAndForget(IVehicleEntity vehicle, byte seatIndex)
         {
             await EnterVehicle(vehicle, seatIndex);
         }
 
-        protected virtual async UniTask<bool> ExitVehicle()
+        public virtual async UniTask<bool> ExitVehicle()
         {
             if (!IsServer || PassengingVehicleEntity.IsNull())
                 return false;
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected virtual async void ExitVehicleAndForget()
+        public async void ExitVehicleAndForget()
         {
             await ExitVehicle();
         }

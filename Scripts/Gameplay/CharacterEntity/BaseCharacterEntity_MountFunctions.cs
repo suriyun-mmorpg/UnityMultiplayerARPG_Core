@@ -1,4 +1,5 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -68,6 +69,16 @@ namespace MultiplayerARPG
                 level = level,
                 currentHp = currentHp,
             };
+        }
+
+        public async override UniTask<bool> ExitVehicle()
+        {
+            if (await base.ExitVehicle())
+            {
+                Mount = new CharacterMount();
+                return true;
+            }
+            return false;
         }
 
         public override void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
