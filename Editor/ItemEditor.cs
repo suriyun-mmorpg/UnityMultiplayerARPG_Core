@@ -134,6 +134,8 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.requirement));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.petEntity));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.addressablePetEntity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.summonDuration));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.noSummonDuration));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.useItemCooldown));
             // Socket Enhancer
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.SocketEnhancer), nameof(item.requirement));
@@ -148,6 +150,8 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.requirement));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.mountEntity));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.addressableMountEntity));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.mountDuration));
+            ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.noMountDuration));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.useItemCooldown));
             // Attribute Increase
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.AttributeIncrease), nameof(item.requirement));
