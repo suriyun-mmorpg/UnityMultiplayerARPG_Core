@@ -1939,8 +1939,7 @@ namespace MultiplayerARPG
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            // Controlling by hotkey controller
-            UICharacterHotkeys.SetupHotkeyForAimming(HotkeyType.Item, CharacterItem.id);
+            GameInstance.PlayingCharacterEntity.CallCmdUseItem(IndexOfData);
         }
 
         #region Drop Item Functions
