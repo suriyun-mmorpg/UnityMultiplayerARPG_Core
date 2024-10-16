@@ -63,7 +63,11 @@ namespace MultiplayerARPG
             {
 #if UNITY_EDITOR
                 if (!Application.isPlaying && _cacheAnimator == null)
+                {
                     _cacheAnimator = GetComponent<Animator>();
+                    if (_cacheAnimator == null)
+                        _cacheAnimator = GetComponentInChildren<Animator>();
+                }
 #endif
                 return _cacheAnimator;
             }
@@ -98,6 +102,8 @@ namespace MultiplayerARPG
         {
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
+            if (CacheAnimator == null)
+                CacheAnimator = GetComponentInChildren<Animator>();
             // Prepare character controller component
             CacheCharacterController = gameObject.GetOrAddComponent<CharacterController>();
             // Disable unused component

@@ -13,8 +13,10 @@ namespace MultiplayerARPG
         public Dictionary<DamageElement, float> Armors { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> RightHandDamages { get; private set; }
         public KeyValuePair<DamageElement, MinMaxFloat>? RightHandWeaponDamage { get; private set; }
+        public DamageInfo RightHandDamageInfo { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> LeftHandDamages { get; private set; }
         public KeyValuePair<DamageElement, MinMaxFloat>? LeftHandWeaponDamage { get; private set; }
+        public DamageInfo LeftHandDamageInfo { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamagesRate { get; private set; }
         public Dictionary<BaseSkill, int> Skills { get; private set; }
@@ -97,9 +99,11 @@ namespace MultiplayerARPG
             RightHandDamages.Clear();
             RightHandDamages = null;
             RightHandWeaponDamage = null;
+            RightHandDamageInfo = null;
             LeftHandDamages.Clear();
             LeftHandDamages = null;
             LeftHandWeaponDamage = null;
+            LeftHandDamageInfo = null;
             IncreaseDamages.Clear();
             IncreaseDamages = null;
             IncreaseDamagesRate.Clear();

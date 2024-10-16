@@ -40,6 +40,18 @@ namespace MultiplayerARPG
         [Tooltip("Increase character's damages rate.")]
         [ArrayElementTitle("damageElement")]
         public DamageIncremental[] increaseDamagesRate = new DamageIncremental[0];
+        [Tooltip("Increase character's skill level. Unlearn skills can be used if increased by this buff. Passive skills are excluded")]
+        [ArrayElementTitle("skill")]
+        public SkillIncremental[] increaseSkills = new SkillIncremental[0];
+        [Tooltip("If this is `TRUE`, it will override damage info to override character's attacking")]
+        public bool isReplaceDamageInfo;
+        [Tooltip("If `isReplaceDamageInfo` is `TRUE`, it will replace damage info when character attack")]
+        public DamageInfo replaceDamageInfo = new DamageInfo();
+        [Tooltip("Replace character's skills")]
+        [ArrayElementTitle("skill")]
+        public SkillIncremental[] replaceSkills = new SkillIncremental[0];
+        [Tooltip("Mount settings for buff")]
+        public BuffMount mount = new BuffMount();
         [Tooltip("Increase character's status effect resistance.")]
         [ArrayElementTitle("statusEffect")]
         public StatusEffectResistanceIncremental[] increaseStatusEffectResistances = new StatusEffectResistanceIncremental[0];
@@ -135,6 +147,22 @@ namespace MultiplayerARPG
             get { return addressableEffects; }
         }
 
+        public virtual bool TryGetMount(out BuffMount mount)
+        {
+            if (this.mount.MountEntity != null)
+            {
+                mount = this.mount;
+                return true;
+            }
+            else if (this.mount.AddressableMountEntity.IsDataValid())
+            {
+                mount = this.mount;
+                return true;
+            }
+            mount = null;
+            return false;
+        }
+
         public void PrepareRelatesData()
         {
             GameInstance.AddAttributes(increaseAttributes);
@@ -142,10 +170,19 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(increaseResistances);
             GameInstance.AddDamageElements(increaseArmors);
             GameInstance.AddDamageElements(increaseDamages);
+            GameInstance.AddSkills(increaseSkills);
+            GameInstance.AddSkills(replaceSkills);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacked);
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacked);
+            if (TryGetMount(out BuffMount mount))
+            {
+                GameInstance.AddAssetReferenceVehicleEntities(mount.AddressableMountEntity);
+#if !EXCLUDE_PREFAB_REFS
+                GameInstance.AddVehicleEntities(mount.MountEntity);
+#endif
+            }
         }
     }
 }
