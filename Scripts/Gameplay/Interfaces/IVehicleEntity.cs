@@ -9,7 +9,6 @@ namespace MultiplayerARPG
         VehicleType VehicleType { get; }
         List<VehicleSeat> Seats { get; }
         bool HasDriver { get; }
-        bool IsAttackable(byte seatIndex);
         bool CanBePassenger(byte seatIndex, BaseGameEntity gameEntity);
         BaseGameEntity GetPassenger(byte seatIndex);
         List<BaseGameEntity> GetAllPassengers();

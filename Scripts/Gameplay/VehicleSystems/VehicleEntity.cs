@@ -211,11 +211,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool IsAttackable(byte seatIndex)
-        {
-            return Seats[seatIndex].canAttack;
-        }
-
         public bool CanBePassenger(byte seatIndex, BaseGameEntity gameEntity)
         {
             return true;
