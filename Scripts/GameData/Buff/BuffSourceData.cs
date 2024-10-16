@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct BuffSourceData
+    public class BuffSourceData
     {
         public BuffType type;
         public BaseGameData data;

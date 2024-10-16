@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     public class BuffRemoval
     {
         [Tooltip("Source of buff (item level, skill level, status effect level and so on).")]
-        public BuffSourceData source;
+        public BuffSourceData source = new BuffSourceData();
         [Tooltip("Chance to remove buff will be calculated by buff's source level (item level, skill level, status effect level and so on).")]
         public IncrementalFloat removalChance;
         [Min(0f)]
