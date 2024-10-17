@@ -10,15 +10,15 @@ namespace MultiplayerARPG
         {
             GuildSkill guildSkill = CreateInstance<GuildSkill>();
             // Passive skill
-            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseMaxMember));
-            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseExpGainPercentage));
-            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseGoldGainPercentage));
-            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseShareExpGainPercentage));
-            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.increaseShareGoldGainPercentage));
-            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Passive), nameof(guildSkill.decreaseExpLostPercentage));
+            ShowOnEnum("skillType", nameof(SkillType.Passive), "increaseMaxMember");
+            ShowOnEnum("skillType", nameof(SkillType.Passive), "increaseExpGainPercentage");
+            ShowOnEnum("skillType", nameof(SkillType.Passive), "increaseGoldGainPercentage");
+            ShowOnEnum("skillType", nameof(SkillType.Passive), "increaseShareExpGainPercentage");
+            ShowOnEnum("skillType", nameof(SkillType.Passive), "increaseShareGoldGainPercentage");
+            ShowOnEnum("skillType", nameof(SkillType.Passive), "decreaseExpLostPercentage");
             // Active skill
-            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Active), nameof(guildSkill.coolDownDuration));
-            ShowOnEnum(nameof(guildSkill.skillType), nameof(SkillType.Active), nameof(guildSkill.buff));
+            ShowOnEnum("skillType", nameof(SkillType.Active), "coolDownDuration");
+            ShowOnEnum("skillType", nameof(SkillType.Active), "buff");
         }
     }
 }
