@@ -1298,5 +1298,32 @@ namespace MultiplayerARPG
             }
             return result;
         }
+
+        public static bool IsDifferMount(this ICharacterData data, MountType mountType, int mountDataId, int level)
+        {
+            if (data == null)
+                return false;
+
+            if (data.Mount.type == MountType.None && mountType == MountType.None)
+                return false;
+
+            if (data.Mount.type != mountType)
+                return true;
+
+            if (data.Mount.dataId != mountDataId)
+                return true;
+
+            if (data.Mount.level != level)
+                return true;
+
+            return false;
+        }
+
+        public static bool IsDifferMount(this ICharacterData data, CharacterBuff characterBuff)
+        {
+            if (!characterBuff.TryGetMountType(out MountType mountType))
+                return data.IsDifferMount(MountType.None, 0, 0);
+            return data.IsDifferMount(mountType, characterBuff.dataId, characterBuff.level);
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
+using System.Threading;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -8,7 +9,7 @@ namespace MultiplayerARPG
     {
         public byte PassengingVehicleSeatIndex { get; private set; }
 
-        private IVehicleEntity _passengingVehicleEntity;
+        private IVehicleEntity _passengingVehicleEntity = null;
         public IVehicleEntity PassengingVehicleEntity
         {
             get
@@ -53,6 +54,21 @@ namespace MultiplayerARPG
             }
         }
 
+        private CancellationTokenSource _enterVehicleCancellation = null;
+        private CancellationTokenSource _exitVehicleCancellation = null;
+
+        public void CancelEnterVehicleAwaiting()
+        {
+            if (_enterVehicleCancellation != null && !_enterVehicleCancellation.IsCancellationRequested)
+                _enterVehicleCancellation.Cancel();
+        }
+
+        public void CancelExitVehicleAwaiting()
+        {
+            if (_exitVehicleCancellation != null && !_exitVehicleCancellation.IsCancellationRequested)
+                _exitVehicleCancellation.Cancel();
+        }
+
         public virtual async UniTask<bool> EnterVehicle(IVehicleEntity vehicle, byte seatIndex)
         {
             if (!IsServer || vehicle.IsNull())
@@ -84,10 +100,23 @@ namespace MultiplayerARPG
                 enterDuration = vehicleEnterExitModel.GetEnterVehicleAnimationDuration(PassengingVehicleEntity);
             }
 
+            CancelEnterVehicleAwaiting();
+            CancelExitVehicleAwaiting();
+
             if (enterDuration > 0f)
             {
+                CancellationTokenSource cancellationSource = new CancellationTokenSource();
+                _enterVehicleCancellation = cancellationSource;
                 CallRpcPlayEnterVehicleAnimation();
-                await UniTask.Delay(Mathf.CeilToInt(enterDuration * 1000));
+                try
+                {
+                    await UniTask.Delay(Mathf.CeilToInt(enterDuration * 1000), true, cancellationToken: cancellationSource.Token, cancelImmediately: true);
+                }
+                catch { }
+                finally
+                {
+                    cancellationSource.Dispose();
+                }
             }
 
             return true;
@@ -113,10 +142,23 @@ namespace MultiplayerARPG
                 exitDuration = vehicleEnterExitModel.GetExitVehicleAnimationDuration(PassengingVehicleEntity);
             }
 
+            CancelEnterVehicleAwaiting();
+            CancelExitVehicleAwaiting();
+
             if (exitDuration > 0f)
             {
+                CancellationTokenSource cancellationSource = new CancellationTokenSource();
+                _exitVehicleCancellation = cancellationSource;
                 CallRpcPlayExitVehicleAnimation();
-                await UniTask.Delay(Mathf.CeilToInt(exitDuration * 1000));
+                try
+                {
+                    await UniTask.Delay(Mathf.CeilToInt(exitDuration * 1000), true, cancellationToken: cancellationSource.Token, cancelImmediately: true);
+                }
+                catch { }
+                finally
+                {
+                    cancellationSource.Dispose();
+                }
             }
 
             // Clear object owner from driver

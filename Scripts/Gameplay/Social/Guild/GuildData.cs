@@ -103,7 +103,7 @@ namespace MultiplayerARPG
         public bool IsSkillReachedMaxLevel(int dataId)
         {
             if (GameInstance.GuildSkills.ContainsKey(dataId) && skillLevels.ContainsKey(dataId))
-                return skillLevels[dataId] >= GameInstance.GuildSkills[dataId].maxLevel;
+                return skillLevels[dataId] >= GameInstance.GuildSkills[dataId].MaxLevel;
             return false;
         }
 

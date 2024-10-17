@@ -21,6 +21,8 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, float> _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
+        private Dictionary<BaseSkill, int> _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
+        private Dictionary<BaseSkill, int> _cacheReplaceSkills = new Dictionary<BaseSkill, int>();
         private Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
         private Dictionary<BuffRemoval, float> _cacheBuffRemovals = new Dictionary<BuffRemoval, float>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
@@ -30,6 +32,8 @@ namespace MultiplayerARPG
         private float _cacheRemoveBuffWhenUseItemChance;
         private float _cacheRemoveBuffWhenPickupItemChance;
         private int _cacheMaxStack;
+        private BuffMount _cacheMount;
+        private int _cacheMountLevel;
 
         public CalculatedBuff()
         {
@@ -57,12 +61,17 @@ namespace MultiplayerARPG
             _cacheIncreaseDamages = null;
             _cacheIncreaseDamagesRate.Clear();
             _cacheIncreaseDamagesRate = null;
+            _cacheIncreaseSkills.Clear();
+            _cacheIncreaseSkills = null;
+            _cacheReplaceSkills.Clear();
+            _cacheReplaceSkills = null;
             _cacheIncreaseStatusEffectResistances.Clear();
             _cacheIncreaseStatusEffectResistances = null;
             _cacheBuffRemovals.Clear();
             _cacheBuffRemovals = null;
             _cacheDamageOverTimes.Clear();
             _cacheDamageOverTimes = null;
+            _cacheMount = null;
         }
 
         public void Clear()
@@ -74,9 +83,12 @@ namespace MultiplayerARPG
             _cacheIncreaseArmorsRate.Clear();
             _cacheIncreaseDamages.Clear();
             _cacheIncreaseDamagesRate.Clear();
+            _cacheIncreaseSkills.Clear();
+            _cacheReplaceSkills.Clear();
             _cacheIncreaseStatusEffectResistances.Clear();
             _cacheBuffRemovals.Clear();
             _cacheDamageOverTimes.Clear();
+            _cacheMount = null;
         }
 
         public void Build(Buff buff, int level)
@@ -103,6 +115,8 @@ namespace MultiplayerARPG
                 _cacheIncreaseArmorsRate = buff.GetIncreaseArmorsRate(level, _cacheIncreaseArmorsRate);
                 _cacheIncreaseDamages = buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
                 _cacheIncreaseDamagesRate = buff.GetIncreaseDamagesRate(level, _cacheIncreaseDamagesRate);
+                _cacheIncreaseSkills = buff.GetIncreaseSkills(level, _cacheIncreaseSkills);
+                _cacheReplaceSkills = buff.GetReplaceSkills(level, _cacheReplaceSkills);
                 _cacheIncreaseStatusEffectResistances = buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
                 _cacheBuffRemovals = buff.GetBuffRemovals(level, _cacheBuffRemovals);
                 _cacheDamageOverTimes = buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
@@ -112,6 +126,12 @@ namespace MultiplayerARPG
                 _cacheRemoveBuffWhenUseItemChance = buff.GetRemoveBuffWhenUseItemChance(level);
                 _cacheRemoveBuffWhenPickupItemChance = buff.GetRemoveBuffWhenPickupItemChance(level);
                 _cacheMaxStack = buff.GetMaxStack(level);
+                _cacheMountLevel = 0;
+                if (buff.TryGetMount(out BuffMount mount))
+                {
+                    _cacheMount = mount;
+                    _cacheMountLevel = mount.Level.GetAmount(_level);
+                }
             }
 
             if (GameExtensionInstance.onBuildCalculatedBuff != null)
@@ -203,6 +223,16 @@ namespace MultiplayerARPG
             return _cacheIncreaseDamagesRate;
         }
 
+        public Dictionary<BaseSkill, int> GetIncreaseSkills()
+        {
+            return _cacheIncreaseSkills;
+        }
+
+        public Dictionary<BaseSkill, int> GetReplaceSkills()
+        {
+            return _cacheReplaceSkills;
+        }
+
         public Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances()
         {
             return _cacheIncreaseStatusEffectResistances;
@@ -246,6 +276,17 @@ namespace MultiplayerARPG
         public int MaxStack()
         {
             return _cacheMaxStack;
+        }
+
+        public bool TryGetMount(out BuffMount mount)
+        {
+            mount = _cacheMount;
+            return mount != null;
+        }
+
+        public int GetMountLevel()
+        {
+            return _cacheMountLevel;
         }
     }
 }

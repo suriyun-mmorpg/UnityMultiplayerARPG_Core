@@ -165,5 +165,53 @@ namespace MultiplayerARPG
             }
             return -1;
         }
+
+        public static bool TryGetMountType(this CharacterBuff data, out MountType mountType)
+        {
+            switch (data.type)
+            {
+                case BuffType.SkillBuff:
+                    mountType = MountType.SkillBuff;
+                    return true;
+                case BuffType.SkillDebuff:
+                    mountType = MountType.SkillDebuff;
+                    return true;
+                case BuffType.PotionBuff:
+                    mountType = MountType.PotionBuff;
+                    return true;
+                case BuffType.GuildSkillBuff:
+                    mountType = MountType.GuildSkillBuff;
+                    return true;
+                case BuffType.StatusEffect:
+                    mountType = MountType.StatusEffect;
+                    return true;
+            }
+            mountType = MountType.SkillBuff;
+            return false;
+        }
+
+        public static bool TryGetBuffType(this CharacterMount data, out BuffType mountType)
+        {
+            switch (data.type)
+            {
+                case MountType.SkillBuff:
+                    mountType = BuffType.SkillBuff;
+                    return true;
+                case MountType.SkillDebuff:
+                    mountType = BuffType.SkillDebuff;
+                    return true;
+                case MountType.PotionBuff:
+                    mountType = BuffType.PotionBuff;
+                    return true;
+                case MountType.GuildSkillBuff:
+                    mountType = BuffType.GuildSkillBuff;
+                    return true;
+                case MountType.StatusEffect:
+                    mountType = BuffType.StatusEffect;
+                    return true;
+            }
+            mountType = BuffType.SkillBuff;
+            return false;
+        }
     }
 }

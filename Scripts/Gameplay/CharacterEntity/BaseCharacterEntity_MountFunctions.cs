@@ -1,5 +1,4 @@
 ﻿using Cysharp.Threading.Tasks;
-using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -30,6 +29,16 @@ namespace MultiplayerARPG
                 await ExitVehicle();
             }
 
+            // Update mount data
+            Mount = new CharacterMount()
+            {
+                type = mountType,
+                dataId = mountDataId,
+                mountRemainsDuration = duration,
+                level = level,
+                currentHp = currentHp,
+            };
+
             // Instantiate new mount entity
             LiteNetLibIdentity spawnObj;
             if (mountType.GetPrefab(mountDataId, out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab))
@@ -59,16 +68,6 @@ namespace MultiplayerARPG
 
             // Seat index for mount entity always 0
             await EnterVehicle(vehicle, 0);
-
-            // Update mount data
-            Mount = new CharacterMount()
-            {
-                type = mountType,
-                dataId = mountDataId,
-                mountRemainsDuration = duration,
-                level = level,
-                currentHp = currentHp,
-            };
         }
 
         public async override UniTask<bool> ExitVehicle()

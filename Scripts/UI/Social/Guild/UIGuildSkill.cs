@@ -179,7 +179,7 @@ namespace MultiplayerARPG
         {
             UpdateCoolDownRemainsDuration();
 
-            if (GameInstance.PlayingCharacter != null && GuildSkill && Level < GuildSkill.maxLevel &&
+            if (GameInstance.PlayingCharacter != null && GuildSkill && Level < GuildSkill.MaxLevel &&
                 GameInstance.JoinedGuild != null &&
                 GameInstance.JoinedGuild.IsLeader(GameInstance.PlayingCharacter.Id) &&
                 GameInstance.JoinedGuild.skillPoint > 0)
@@ -192,7 +192,7 @@ namespace MultiplayerARPG
             }
 
             if (GameInstance.PlayingCharacter != null && GuildSkill && Level > 0 &&
-                GuildSkill.GetSkillType() == GuildSkillType.Active)
+                GuildSkill.SkillType == GuildSkillType.Active)
             {
                 onAbleToUse.Invoke();
             }
@@ -242,7 +242,7 @@ namespace MultiplayerARPG
 
             if (uiTextSkillType != null)
             {
-                switch (GuildSkill.GetSkillType())
+                switch (GuildSkill.SkillType)
                 {
                     case GuildSkillType.Active:
                         uiTextSkillType.text = ZString.Format(
@@ -326,7 +326,7 @@ namespace MultiplayerARPG
 
             if (uiNextLevelSkill != null)
             {
-                if (Level + 1 > GuildSkill.maxLevel)
+                if (Level + 1 > GuildSkill.MaxLevel)
                 {
                     uiNextLevelSkill.Hide();
                 }

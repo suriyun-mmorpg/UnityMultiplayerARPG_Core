@@ -13,24 +13,39 @@ namespace MultiplayerARPG
     {
         [Category("Skill Settings")]
         [Range(1, 100)]
-        public int maxLevel = 1;
-        public GuildSkillType skillType;
+        [SerializeField]
+        protected int maxLevel = 1;
+        [SerializeField]
+        protected GuildSkillType skillType;
 
         [Category(2, "Activation Settings")]
-        public IncrementalFloat coolDownDuration;
+        [SerializeField]
+        protected IncrementalFloat coolDownDuration;
 
         [Category(3, "Buff/Bonus Settings")]
-        public IncrementalInt increaseMaxMember;
-        public IncrementalFloat increaseExpGainPercentage;
-        public IncrementalFloat increaseGoldGainPercentage;
-        public IncrementalFloat increaseShareExpGainPercentage;
-        public IncrementalFloat increaseShareGoldGainPercentage;
-        public IncrementalFloat decreaseExpLostPercentage;
-        public Buff buff;
+        [SerializeField]
+        protected IncrementalInt increaseMaxMember;
+        [SerializeField]
+        protected IncrementalFloat increaseExpGainPercentage;
+        [SerializeField]
+        protected IncrementalFloat increaseGoldGainPercentage;
+        [SerializeField]
+        protected IncrementalFloat increaseShareExpGainPercentage;
+        [SerializeField]
+        protected IncrementalFloat increaseShareGoldGainPercentage;
+        [SerializeField]
+        protected IncrementalFloat decreaseExpLostPercentage;
+        [SerializeField]
+        protected Buff buff = new Buff();
 
-        public GuildSkillType GetSkillType()
+        public int MaxLevel
         {
-            return skillType;
+            get { return maxLevel; }
+        }
+
+        public GuildSkillType SkillType
+        {
+            get { return skillType; }
         }
 
         public int GetIncreaseMaxMember(int level)
