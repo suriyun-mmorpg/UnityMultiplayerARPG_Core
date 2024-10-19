@@ -926,48 +926,6 @@ namespace MultiplayerARPG
             return CurrentGameInstance.DefaultWeaponItem.CrosshairSetting;
         }
 
-        public virtual float GetAttackDistance(bool isLeftHand)
-        {
-            IWeaponItem rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
-            IWeaponItem leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
-            if (!isLeftHand)
-            {
-                if (rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.DamageInfo.GetDistance();
-                if (rightWeaponItem == null && leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.DamageInfo.GetDistance();
-            }
-            else
-            {
-                if (leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.DamageInfo.GetDistance();
-                if (leftWeaponItem == null && rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.DamageInfo.GetDistance();
-            }
-            return CurrentGameInstance.DefaultWeaponItem.WeaponType.DamageInfo.GetDistance();
-        }
-
-        public virtual float GetAttackFov(bool isLeftHand)
-        {
-            IWeaponItem rightWeaponItem = EquipWeapons.GetRightHandWeaponItem();
-            IWeaponItem leftWeaponItem = EquipWeapons.GetLeftHandWeaponItem();
-            if (!isLeftHand)
-            {
-                if (rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.DamageInfo.GetFov();
-                if (rightWeaponItem == null && leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.DamageInfo.GetFov();
-            }
-            else
-            {
-                if (leftWeaponItem != null)
-                    return leftWeaponItem.WeaponType.DamageInfo.GetFov();
-                if (leftWeaponItem == null && rightWeaponItem != null)
-                    return rightWeaponItem.WeaponType.DamageInfo.GetFov();
-            }
-            return CurrentGameInstance.DefaultWeaponItem.WeaponType.DamageInfo.GetFov();
-        }
-
 #if UNITY_EDITOR
         public void SetDebugDamage(DebugDamageLaunch debugDamageLaunchData)
         {

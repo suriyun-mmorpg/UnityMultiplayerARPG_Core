@@ -361,16 +361,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override float GetAttackDistance(bool isLeftHand)
-        {
-            return CharacterDatabase.DamageInfo.GetDistance();
-        }
-
-        public override float GetAttackFov(bool isLeftHand)
-        {
-            return CharacterDatabase.DamageInfo.GetFov();
-        }
-
         public override async void Killed(EntityInfo lastAttacker)
         {
             base.Killed(lastAttacker);

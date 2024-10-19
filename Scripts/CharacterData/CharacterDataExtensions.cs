@@ -794,6 +794,16 @@ namespace MultiplayerARPG
                 return cache.RightHandDamageInfo;
         }
 
+        public static float GetAttackDistance(this ICharacterData data, bool isLeftHand)
+        {
+            return data.GetAvailableWeaponDamageInfo(ref isLeftHand).GetDistance();
+        }
+
+        public static float GetAttackFov(this ICharacterData data, bool isLeftHand)
+        {
+            return data.GetAvailableWeaponDamageInfo(ref isLeftHand).GetDistance();
+        }
+
         public static float GetMoveSpeedRateWhileReloading(this ICharacterData data, IWeaponItem weaponItem)
         {
             if (data is BaseMonsterCharacterEntity)
