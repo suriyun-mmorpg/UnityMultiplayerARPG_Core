@@ -149,7 +149,7 @@ namespace MultiplayerARPG
             LoadedList.Clear();
             if (Character != null && Character.GetDatabase() != null)
             {
-                Character.GetAllStats(true, false, true, onGetSkills: skills => LoadedList = skills);
+                LoadedList = new Dictionary<BaseSkill, int>(Character.GetCaches().Skills);
             }
             GenerateList();
         }
