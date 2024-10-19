@@ -265,6 +265,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
         {
             if (buff.IsEmpty())
@@ -287,6 +288,8 @@ namespace MultiplayerARPG
                 onIncreasingDamages.Invoke(buff.GetBuff().GetIncreaseDamages());
             if (onIncreasingDamagesRate != null)
                 onIncreasingDamagesRate.Invoke(buff.GetBuff().GetIncreaseDamagesRate());
+            if (onIncreasingSkills != null)
+                onIncreasingSkills.Invoke(buff.GetBuff().GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
                 onIncreasingStatusEffectResistances.Invoke(buff.GetBuff().GetIncreaseStatusEffectResistances());
         }
@@ -301,6 +304,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
         {
             if (summon.IsEmpty())
@@ -323,6 +327,8 @@ namespace MultiplayerARPG
                 onIncreasingDamages.Invoke(summon.GetBuff().GetIncreaseDamages());
             if (onIncreasingDamagesRate != null)
                 onIncreasingDamagesRate.Invoke(summon.GetBuff().GetIncreaseDamagesRate());
+            if (onIncreasingSkills != null)
+                onIncreasingSkills.Invoke(summon.GetBuff().GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
                 onIncreasingStatusEffectResistances.Invoke(summon.GetBuff().GetIncreaseStatusEffectResistances());
         }
@@ -337,6 +343,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
         {
             if (vehicleEntity.IsNull())
@@ -359,6 +366,8 @@ namespace MultiplayerARPG
                 onIncreasingDamages.Invoke(vehicleEntity.GetBuff().GetIncreaseDamages());
             if (onIncreasingDamagesRate != null)
                 onIncreasingDamagesRate.Invoke(vehicleEntity.GetBuff().GetIncreaseDamagesRate());
+            if (onIncreasingSkills != null)
+                onIncreasingSkills.Invoke(vehicleEntity.GetBuff().GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
                 onIncreasingStatusEffectResistances.Invoke(vehicleEntity.GetBuff().GetIncreaseStatusEffectResistances());
         }
@@ -373,6 +382,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
         {
             if (title == null)
@@ -395,6 +405,8 @@ namespace MultiplayerARPG
                 onIncreasingDamages.Invoke(title.CacheBuff.GetIncreaseDamages());
             if (onIncreasingDamagesRate != null)
                 onIncreasingDamagesRate.Invoke(title.CacheBuff.GetIncreaseDamagesRate());
+            if (onIncreasingSkills != null)
+                onIncreasingSkills.Invoke(title.CacheBuff.GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
                 onIncreasingStatusEffectResistances.Invoke(title.CacheBuff.GetIncreaseStatusEffectResistances());
         }
@@ -409,6 +421,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
         {
             if (faction == null)
@@ -431,6 +444,8 @@ namespace MultiplayerARPG
                 onIncreasingDamages.Invoke(faction.CacheBuff.GetIncreaseDamages());
             if (onIncreasingDamagesRate != null)
                 onIncreasingDamagesRate.Invoke(faction.CacheBuff.GetIncreaseDamagesRate());
+            if (onIncreasingSkills != null)
+                onIncreasingSkills.Invoke(faction.CacheBuff.GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
                 onIncreasingStatusEffectResistances.Invoke(faction.CacheBuff.GetIncreaseStatusEffectResistances());
         }
@@ -445,6 +460,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
         {
             if (skill == null)
@@ -473,6 +489,8 @@ namespace MultiplayerARPG
                 onIncreasingDamages.Invoke(buff.GetIncreaseDamages(level));
             if (onIncreasingDamagesRate != null)
                 onIncreasingDamagesRate.Invoke(buff.GetIncreaseDamagesRate(level));
+            if (onIncreasingSkills != null)
+                onIncreasingSkills.Invoke(buff.GetIncreaseSkills(level));
             if (onIncreasingStatusEffectResistances != null)
                 onIncreasingStatusEffectResistances.Invoke(buff.GetIncreaseStatusEffectResistances(level));
         }
@@ -668,6 +686,7 @@ namespace MultiplayerARPG
                         !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
                         !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
                         !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                        !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills),
                         !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
                 }
                 // From faction
@@ -683,6 +702,7 @@ namespace MultiplayerARPG
                         !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
                         !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
                         !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                        !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills),
                         !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
                 }
             }
@@ -738,6 +758,7 @@ namespace MultiplayerARPG
                         !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
                         !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
                         !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                        !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills),
                         !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
                 }
                 // From summon
@@ -753,6 +774,7 @@ namespace MultiplayerARPG
                         !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
                         !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
                         !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                        !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills),
                         !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
                 }
                 // From mount
@@ -768,6 +790,7 @@ namespace MultiplayerARPG
                         !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
                         !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
                         !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                        !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills),
                         !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
                 }
             }
@@ -786,6 +809,7 @@ namespace MultiplayerARPG
                         !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
                         !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
                         !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                        !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills),
                         !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
                 }
             }
