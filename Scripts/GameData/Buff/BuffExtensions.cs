@@ -85,9 +85,9 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineSkills(buff.increaseSkills, result, level, 1f);
         }
 
-        public static Dictionary<BaseSkill, int> GetReplaceSkills(this Buff buff, int level, Dictionary<BaseSkill, int> result = null)
+        public static Dictionary<BaseSkill, int> GetOverrideSkills(this Buff buff, int level, Dictionary<BaseSkill, int> result = null)
         {
-            return GameDataHelpers.CombineSkills(buff.replaceSkills, result, level, 1f);
+            return GameDataHelpers.CombineSkills(buff.overrideSkills, result, level, 1f);
         }
 
         public static Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances(this Buff buff, int level, Dictionary<StatusEffect, float> result = null)

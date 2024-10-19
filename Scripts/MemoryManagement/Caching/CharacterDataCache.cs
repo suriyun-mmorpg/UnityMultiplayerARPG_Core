@@ -231,6 +231,28 @@ namespace MultiplayerARPG
 
             int oldBattlePoints = BattlePoints;
 
+            CalculatedBuff tempCalculatedBuff;
+            bool isOverrideDamageInfo = false;
+            DamageInfo overrideDamageInfo = null;
+            bool isOverrideSkills = false;
+            for (int i = characterData.Buffs.Count - 1; i >= 0; --i)
+            {
+                tempCalculatedBuff = characterData.Buffs[i].GetBuff();
+                if (!isOverrideDamageInfo && tempCalculatedBuff.IsOverrideDamageInfo())
+                {
+                    isOverrideDamageInfo = true;
+                    overrideDamageInfo = tempCalculatedBuff.GetOverrideDamageInfo();
+                }
+                if (!isOverrideSkills && tempCalculatedBuff.IsOverrideSkills())
+                {
+                    isOverrideSkills = true;
+                    Skills = null;
+                    Skills = new Dictionary<BaseSkill, int>(tempCalculatedBuff.GetOverrideSkills());
+                }
+                if (isOverrideDamageInfo && isOverrideSkills)
+                    break;
+            }
+
             characterData.GetAllStats(true, true, true,
                 SetStats,
                 SetAttributes,
@@ -240,7 +262,7 @@ namespace MultiplayerARPG
                 SetRightHandWeaponDamage,
                 SetLeftHandDamages,
                 SetLeftHandWeaponDamage,
-                SetSkills,
+                isOverrideSkills ? null : SetSkills,
                 SetStatusEffectResistances,
                 SetEquipmentSets,
                 onGetIncreasingDamages: SetIncreaseDamages,
@@ -325,7 +347,7 @@ namespace MultiplayerARPG
                 int skillLevel = Skills[tempSkill];
                 tempTotalBattlePoint += tempSkill.battlePointScore * skillLevel;
                 // Apply ailments by passive buff only
-                if (!allAilmentsWereApplied && !tempSkill.IsActive && tempSkill.TryGetBuff(out Buff tempBuff))
+                if (!allAilmentsWereApplied && tempSkill.IsPassive && tempSkill.TryGetBuff(out Buff tempBuff))
                 {
                     UpdateAppliedAilments(new CalculatedBuff(tempBuff, skillLevel));
                     allAilmentsWereApplied = AllAilmentsWereApplied();
@@ -394,7 +416,10 @@ namespace MultiplayerARPG
             {
                 IsRightHandItemAvailable = true;
                 RightHandItem = characterData.EquipWeapons.rightHand;
-                RightHandDamageInfo = rightWeaponItem.WeaponType.DamageInfo;
+                if (isOverrideDamageInfo)
+                    RightHandDamageInfo = overrideDamageInfo;
+                else
+                    RightHandDamageInfo = rightWeaponItem.WeaponType.DamageInfo;
                 if (rightWeaponItem.WeaponAbilities != null && rightWeaponItem.WeaponAbilities.Length > 0)
                     RightHandWeaponAbilities.AddRange(rightWeaponItem.WeaponAbilities);
                 AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandWeaponAbilityIndexes, RightHandItem.sockets);
@@ -405,7 +430,10 @@ namespace MultiplayerARPG
             {
                 IsLeftHandItemAvailable = true;
                 LeftHandItem = characterData.EquipWeapons.leftHand;
-                LeftHandDamageInfo = leftWeaponItem.WeaponType.DamageInfo;
+                if (isOverrideDamageInfo)
+                    LeftHandDamageInfo = overrideDamageInfo;
+                else
+                    LeftHandDamageInfo = leftWeaponItem.WeaponType.DamageInfo;
                 if (leftWeaponItem.WeaponAbilities != null && leftWeaponItem.WeaponAbilities.Length > 0)
                     LeftHandWeaponAbilities.AddRange(leftWeaponItem.WeaponAbilities);
                 AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandWeaponAbilityIndexes, LeftHandItem.sockets);
@@ -418,14 +446,20 @@ namespace MultiplayerARPG
                     // Monster has its own damage info set to game database
                     IsRightHandItemAvailable = true;
                     RightHandItem = CharacterItem.CreateMonsterWeapon();
-                    RightHandDamageInfo = monsterCharacterEntity.CharacterDatabase.DamageInfo;
+                    if (isOverrideDamageInfo)
+                        RightHandDamageInfo = overrideDamageInfo;
+                    else
+                        RightHandDamageInfo = monsterCharacterEntity.CharacterDatabase.DamageInfo;
                 }
                 else
                 {
                     // No equipped weapon?, use default one
                     IsRightHandItemAvailable = true;
                     RightHandItem = CharacterItem.CreateDefaultWeapon();
-                    RightHandDamageInfo = RightHandItem.GetWeaponItem().WeaponType.DamageInfo;
+                    if (isOverrideDamageInfo)
+                        RightHandDamageInfo = overrideDamageInfo;
+                    else
+                        RightHandDamageInfo = RightHandItem.GetWeaponItem().WeaponType.DamageInfo;
                 }
             }
 

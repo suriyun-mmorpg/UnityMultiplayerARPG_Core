@@ -22,7 +22,7 @@ namespace MultiplayerARPG
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
         private Dictionary<BaseSkill, int> _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
-        private Dictionary<BaseSkill, int> _cacheReplaceSkills = new Dictionary<BaseSkill, int>();
+        private Dictionary<BaseSkill, int> _cacheOverrideSkills = new Dictionary<BaseSkill, int>();
         private Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
         private Dictionary<BuffRemoval, float> _cacheBuffRemovals = new Dictionary<BuffRemoval, float>();
         private Dictionary<DamageElement, MinMaxFloat> _cacheDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
@@ -63,8 +63,8 @@ namespace MultiplayerARPG
             _cacheIncreaseDamagesRate = null;
             _cacheIncreaseSkills.Clear();
             _cacheIncreaseSkills = null;
-            _cacheReplaceSkills.Clear();
-            _cacheReplaceSkills = null;
+            _cacheOverrideSkills.Clear();
+            _cacheOverrideSkills = null;
             _cacheIncreaseStatusEffectResistances.Clear();
             _cacheIncreaseStatusEffectResistances = null;
             _cacheBuffRemovals.Clear();
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             _cacheIncreaseDamages.Clear();
             _cacheIncreaseDamagesRate.Clear();
             _cacheIncreaseSkills.Clear();
-            _cacheReplaceSkills.Clear();
+            _cacheOverrideSkills.Clear();
             _cacheIncreaseStatusEffectResistances.Clear();
             _cacheBuffRemovals.Clear();
             _cacheDamageOverTimes.Clear();
@@ -116,7 +116,8 @@ namespace MultiplayerARPG
                 _cacheIncreaseDamages = buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
                 _cacheIncreaseDamagesRate = buff.GetIncreaseDamagesRate(level, _cacheIncreaseDamagesRate);
                 _cacheIncreaseSkills = buff.GetIncreaseSkills(level, _cacheIncreaseSkills);
-                _cacheReplaceSkills = buff.GetReplaceSkills(level, _cacheReplaceSkills);
+                if (buff.isOverrideSkills)
+                    _cacheOverrideSkills = buff.GetOverrideSkills(level, _cacheOverrideSkills);
                 _cacheIncreaseStatusEffectResistances = buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
                 _cacheBuffRemovals = buff.GetBuffRemovals(level, _cacheBuffRemovals);
                 _cacheDamageOverTimes = buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
@@ -228,9 +229,24 @@ namespace MultiplayerARPG
             return _cacheIncreaseSkills;
         }
 
-        public Dictionary<BaseSkill, int> GetReplaceSkills()
+        public bool IsOverrideDamageInfo()
         {
-            return _cacheReplaceSkills;
+            return _buff.isOverrideDamageInfo;
+        }
+
+        public DamageInfo GetOverrideDamageInfo()
+        {
+            return _buff.overrideDamageInfo;
+        }
+
+        public bool IsOverrideSkills()
+        {
+            return _buff.isOverrideSkills;
+        }
+
+        public Dictionary<BaseSkill, int> GetOverrideSkills()
+        {
+            return _cacheOverrideSkills;
         }
 
         public Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances()

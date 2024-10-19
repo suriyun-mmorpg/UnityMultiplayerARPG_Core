@@ -43,13 +43,15 @@ namespace MultiplayerARPG
         [Tooltip("Increase character's skill level. Unlearn skills can be used if increased by this buff. Passive skills are excluded")]
         [ArrayElementTitle("skill")]
         public SkillIncremental[] increaseSkills = new SkillIncremental[0];
-        [Tooltip("If this is `TRUE`, it will override damage info to override character's attacking")]
+        [Tooltip("If this is `TRUE`, it will override character's attacking damage info by `overrideDamageInfo`")]
         public bool isOverrideDamageInfo;
-        [Tooltip("If `isOverrideDamageInfo` is `TRUE`, it will override damage info when character attack")]
-        public DamageInfo overrideDamageInfo = new DamageInfo();
-        [Tooltip("Replace character's skills")]
+        [Tooltip("If `isOverrideDamageInfo` is `TRUE`, it will override damage info to this instead")]
+        public DamageInfo overrideDamageInfo = null;
+        [Tooltip("If this is `TRUE`, it will override character's skills by `overrideSkills`")]
+        public bool isOverrideSkills;
+        [Tooltip("If `isOverrideSkills` is `TRUE`, it will override skills list to use this list instead")]
         [ArrayElementTitle("skill")]
-        public SkillIncremental[] replaceSkills = new SkillIncremental[0];
+        public SkillIncremental[] overrideSkills = null;
         [Tooltip("Mount settings for buff")]
         public BuffMount mount = new BuffMount();
         [Tooltip("Increase character's status effect resistance.")]
@@ -171,7 +173,7 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(increaseArmors);
             GameInstance.AddDamageElements(increaseDamages);
             GameInstance.AddSkills(increaseSkills);
-            GameInstance.AddSkills(replaceSkills);
+            GameInstance.AddSkills(overrideSkills);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacked);
