@@ -161,7 +161,8 @@ namespace MultiplayerARPG
                 ref isLeftHand,
                 out AnimActionType animActionType,
                 out int animActionDataId,
-                out CharacterItem weapon);
+                out CharacterItem weapon,
+                out DamageInfo damageInfo);
 
             // Prepare required data and get animation data
             Entity.GetRandomAnimationData(
@@ -282,7 +283,7 @@ namespace MultiplayerARPG
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, 0, skill.GetDamageInfo(Entity, isLeftHand), damageAmounts, isLeftHand, weapon, skill, skillLevel);
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, 0, damageInfo, damageAmounts, isLeftHand, weapon, skill, skillLevel);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon, skill, skillLevel);
 

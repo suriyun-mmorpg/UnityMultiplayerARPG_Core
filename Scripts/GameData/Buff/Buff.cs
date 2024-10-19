@@ -44,9 +44,9 @@ namespace MultiplayerARPG
         [ArrayElementTitle("skill")]
         public SkillIncremental[] increaseSkills = new SkillIncremental[0];
         [Tooltip("If this is `TRUE`, it will override damage info to override character's attacking")]
-        public bool isReplaceDamageInfo;
-        [Tooltip("If `isReplaceDamageInfo` is `TRUE`, it will replace damage info when character attack")]
-        public DamageInfo replaceDamageInfo = new DamageInfo();
+        public bool isOverrideDamageInfo;
+        [Tooltip("If `isOverrideDamageInfo` is `TRUE`, it will override damage info when character attack")]
+        public DamageInfo overrideDamageInfo = new DamageInfo();
         [Tooltip("Replace character's skills")]
         [ArrayElementTitle("skill")]
         public SkillIncremental[] replaceSkills = new SkillIncremental[0];

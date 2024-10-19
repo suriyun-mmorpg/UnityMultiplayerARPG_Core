@@ -522,7 +522,7 @@ namespace MultiplayerARPG
         protected Transform GetDamageTransform()
         {
             return _queueSkill != null ? _queueSkill.GetApplyTransform(Entity, _isLeftHandAttacking) :
-                Entity.GetWeaponDamageInfo(null).GetDamageTransform(Entity, _isLeftHandAttacking);
+                Entity.GetAvailableWeaponDamageInfo(ref _isLeftHandAttacking).GetDamageTransform(Entity, _isLeftHandAttacking);
         }
 
         protected float GetAttackDistance()

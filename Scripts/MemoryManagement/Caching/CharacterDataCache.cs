@@ -11,12 +11,16 @@ namespace MultiplayerARPG
         public Dictionary<Attribute, float> Attributes { get; private set; }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
+        public CharacterItem RightHandItem { get; private set; }
+        public DamageInfo RightHandDamageInfo { get; private set; }
+        public bool IsRightHandItemAvailable { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> RightHandDamages { get; private set; }
         public KeyValuePair<DamageElement, MinMaxFloat>? RightHandWeaponDamage { get; private set; }
-        public DamageInfo RightHandDamageInfo { get; private set; }
+        public CharacterItem LeftHandItem { get; private set; }
+        public DamageInfo LeftHandDamageInfo { get; private set; }
+        public bool IsLeftHandItemAvailable { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> LeftHandDamages { get; private set; }
         public KeyValuePair<DamageElement, MinMaxFloat>? LeftHandWeaponDamage { get; private set; }
-        public DamageInfo LeftHandDamageInfo { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamagesRate { get; private set; }
         public Dictionary<BaseSkill, int> Skills { get; private set; }
@@ -65,10 +69,6 @@ namespace MultiplayerARPG
         public bool HavingChanceToRemoveBuffWhenUseItem { get; private set; }
         public bool HavingChanceToRemoveBuffWhenPickupItem { get; private set; }
         public int BattlePoints { get; private set; }
-        public CharacterItem RightHandItem { get; private set; }
-        public CharacterItem LeftHandItem { get; private set; }
-        public bool IsRightHandItemAvailable { get; private set; }
-        public bool IsLeftHandItemAvailable { get; private set; }
 
         public CharacterDataCache()
         {
@@ -384,7 +384,9 @@ namespace MultiplayerARPG
                     ClientGenericActions.NotifyBattlePointsChanged(battlePointChange);
             }
 
+            RightHandDamageInfo = null;
             IsRightHandItemAvailable = false;
+            LeftHandDamageInfo = null;
             IsLeftHandItemAvailable = false;
 
             IWeaponItem rightWeaponItem = characterData.EquipWeapons.GetRightHandWeaponItem();
@@ -392,24 +394,39 @@ namespace MultiplayerARPG
             {
                 IsRightHandItemAvailable = true;
                 RightHandItem = characterData.EquipWeapons.rightHand;
+                RightHandDamageInfo = rightWeaponItem.WeaponType.DamageInfo;
                 if (rightWeaponItem.WeaponAbilities != null && rightWeaponItem.WeaponAbilities.Length > 0)
                     RightHandWeaponAbilities.AddRange(rightWeaponItem.WeaponAbilities);
                 AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandWeaponAbilityIndexes, RightHandItem.sockets);
             }
+
             IWeaponItem leftWeaponItem = characterData.EquipWeapons.GetLeftHandWeaponItem();
             if (leftWeaponItem != null)
             {
                 IsLeftHandItemAvailable = true;
                 LeftHandItem = characterData.EquipWeapons.leftHand;
+                LeftHandDamageInfo = leftWeaponItem.WeaponType.DamageInfo;
                 if (leftWeaponItem.WeaponAbilities != null && leftWeaponItem.WeaponAbilities.Length > 0)
                     LeftHandWeaponAbilities.AddRange(leftWeaponItem.WeaponAbilities);
                 AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandWeaponAbilityIndexes, LeftHandItem.sockets);
             }
+
             if (!IsLeftHandItemAvailable && !IsRightHandItemAvailable)
             {
-                // This one might be a monster character, so create a fake weapon item data
-                IsRightHandItemAvailable = true;
-                RightHandItem = CharacterItem.CreateDefaultWeapon();
+                if (characterData is BaseMonsterCharacterEntity monsterCharacterEntity)
+                {
+                    // Monster has its own damage info set to game database
+                    IsRightHandItemAvailable = true;
+                    RightHandItem = CharacterItem.CreateMonsterWeapon();
+                    RightHandDamageInfo = monsterCharacterEntity.CharacterDatabase.DamageInfo;
+                }
+                else
+                {
+                    // No equipped weapon?, use default one
+                    IsRightHandItemAvailable = true;
+                    RightHandItem = CharacterItem.CreateDefaultWeapon();
+                    RightHandDamageInfo = RightHandItem.GetWeaponItem().WeaponType.DamageInfo;
+                }
             }
 
             return this;

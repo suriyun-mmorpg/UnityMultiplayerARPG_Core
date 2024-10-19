@@ -752,52 +752,46 @@ namespace MultiplayerARPG
             return count;
         }
 
-        public static CharacterItem GetAvailableWeapon(this ICharacterData data, ref bool isLeftHand)
+        public static void GetAvailableWeapon(
+            this ICharacterData data, ref bool isLeftHand,
+            out CharacterItem characterItem,
+            out DamageInfo damageInfo)
         {
-            CharacterItem result;
-            bool foundItem;
+            CharacterDataCache cache = data.GetCaches();
+            if (isLeftHand && !cache.IsLeftHandItemAvailable)
+                isLeftHand = false;
             if (isLeftHand)
             {
-                // Left hand
-                result = data.EquipWeapons.leftHand;
-                foundItem = data.EquipWeapons.GetLeftHandWeaponItem() != null;
-                if (!foundItem)
-                {
-                    // Left hand not found, use right hand
-                    result = data.EquipWeapons.rightHand;
-                    foundItem = data.EquipWeapons.GetRightHandWeaponItem() != null;
-                    isLeftHand = false;
-                }
+                characterItem = cache.LeftHandItem;
+                damageInfo = cache.LeftHandDamageInfo;
             }
             else
             {
-                // Right hand
-                result = data.EquipWeapons.rightHand;
-                foundItem = data.EquipWeapons.GetRightHandWeaponItem() != null;
+                characterItem = cache.RightHandItem;
+                damageInfo = cache.RightHandDamageInfo;
             }
-            if (!foundItem)
-            {
-                // Really can't get the item, then it is a default one
-                result = CharacterItem.CreateDefaultWeapon();
-            }
-            return result;
         }
 
-        public static DamageInfo GetWeaponDamageInfo(this ICharacterData data, ref bool isLeftHand)
+        public static CharacterItem GetAvailableWeapon(this ICharacterData data, ref bool isLeftHand)
         {
-            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
-            {
+            CharacterDataCache cache = data.GetCaches();
+            if (isLeftHand && !cache.IsLeftHandItemAvailable)
                 isLeftHand = false;
-                return monsterCharacterEntity.CharacterDatabase.DamageInfo;
-            }
-            return data.GetAvailableWeapon(ref isLeftHand).GetWeaponItem().WeaponType.DamageInfo;
+            if (isLeftHand)
+                return cache.LeftHandItem;
+            else
+                return cache.RightHandItem;
         }
 
-        public static DamageInfo GetWeaponDamageInfo(this ICharacterData data, IWeaponItem weaponItem)
+        public static DamageInfo GetAvailableWeaponDamageInfo(this ICharacterData data, ref bool isLeftHand)
         {
-            if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
-                return monsterCharacterEntity.CharacterDatabase.DamageInfo;
-            return weaponItem.WeaponType.DamageInfo;
+            CharacterDataCache cache = data.GetCaches();
+            if (isLeftHand && !cache.IsLeftHandItemAvailable)
+                isLeftHand = false;
+            if (isLeftHand)
+                return cache.LeftHandDamageInfo;
+            else
+                return cache.RightHandDamageInfo;
         }
 
         public static float GetMoveSpeedRateWhileReloading(this ICharacterData data, IWeaponItem weaponItem)

@@ -1147,12 +1147,12 @@ namespace MultiplayerARPG
         {
             if (TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
                 return damageInfo;
-            return default;
+            return null;
         }
 
         public virtual bool TryGetDamageInfo(BaseCharacterEntity skillUser, bool isLeftHand, out DamageInfo damageInfo)
         {
-            damageInfo = default;
+            damageInfo = null;
             return false;
         }
 

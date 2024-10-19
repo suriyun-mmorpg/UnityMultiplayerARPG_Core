@@ -793,7 +793,7 @@ namespace MultiplayerARPG
 
         protected virtual void AttackOrMoveToEntity(IDamageableEntity entity, float distance, int layerMask)
         {
-            Transform damageTransform = PlayingCharacterEntity.GetWeaponDamageInfo(ref _isLeftHandAttacking).GetDamageTransform(PlayingCharacterEntity, _isLeftHandAttacking);
+            Transform damageTransform = PlayingCharacterEntity.GetAvailableWeaponDamageInfo(ref _isLeftHandAttacking).GetDamageTransform(PlayingCharacterEntity, _isLeftHandAttacking);
             Vector3 sourcePosition = damageTransform.position;
             Vector3 targetPosition = entity.OpponentAimTransform.position;
             if (OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))

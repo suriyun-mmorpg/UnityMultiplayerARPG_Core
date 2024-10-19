@@ -367,7 +367,16 @@ namespace MultiplayerARPG
 
         public static CharacterItem CreateDefaultWeapon()
         {
-            return Create(GameInstance.Singleton.DefaultWeaponItem.DataId, 1, 1, 0);
+            CharacterItem characterItem = Create(GameInstance.Singleton.DefaultWeaponItem.DataId, 1, 1, 0);
+            characterItem.id = GameDataConst.DEFAULT_WEAPON_ID;
+            return characterItem;
+        }
+
+        public static CharacterItem CreateMonsterWeapon()
+        {
+            CharacterItem characterItem = Create(GameInstance.Singleton.MonsterWeaponItem.DataId, 1, 1, 0);
+            characterItem.id = GameDataConst.DEFAULT_WEAPON_ID;
+            return characterItem;
         }
     }
 

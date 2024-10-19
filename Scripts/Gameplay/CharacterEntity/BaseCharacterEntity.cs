@@ -782,17 +782,17 @@ namespace MultiplayerARPG
 
         public AimPosition GetAttackAimPosition(ref bool isLeftHand)
         {
-            return GetAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand);
+            return GetAttackAimPosition(this.GetAvailableWeaponDamageInfo(ref isLeftHand), isLeftHand);
         }
 
         public AimPosition GetAttackAimPosition(ref bool isLeftHand, Vector3 targetPosition)
         {
-            return GetAttackAimPosition(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand, targetPosition);
+            return GetAttackAimPosition(this.GetAvailableWeaponDamageInfo(ref isLeftHand), isLeftHand, targetPosition);
         }
 
         public AimPosition GetAttackAimPositionByDirection(ref bool isLeftHand, Vector3 direction, bool aimToTargetIfExisted = true)
         {
-            return GetAttackAimPositionByDirection(this.GetWeaponDamageInfo(ref isLeftHand), isLeftHand, direction, aimToTargetIfExisted);
+            return GetAttackAimPositionByDirection(this.GetAvailableWeaponDamageInfo(ref isLeftHand), isLeftHand, direction, aimToTargetIfExisted);
         }
 
         public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand, bool aimToTargetIfExisted = true)
@@ -854,9 +854,10 @@ namespace MultiplayerARPG
             ref bool isLeftHand,
             out AnimActionType animActionType,
             out int animationDataId,
-            out CharacterItem weapon)
+            out CharacterItem weapon,
+            out DamageInfo damageInfo)
         {
-            weapon = this.GetAvailableWeapon(ref isLeftHand);
+            this.GetAvailableWeapon(ref isLeftHand, out weapon, out damageInfo);
             // Assign data id
             animationDataId = weapon.GetWeaponItem().WeaponType.DataId;
             // Assign animation action type
@@ -868,12 +869,13 @@ namespace MultiplayerARPG
             ref bool isLeftHand,
             out AnimActionType animActionType,
             out int animationDataId,
-            out CharacterItem weapon)
+            out CharacterItem weapon,
+            out DamageInfo damageInfo)
         {
             // Initialize data
             animActionType = AnimActionType.None;
             animationDataId = 0;
-            weapon = this.GetAvailableWeapon(ref isLeftHand);
+            this.GetAvailableWeapon(ref isLeftHand, out weapon, out damageInfo);
             // Prepare skill data
             if (skill == null)
                 return;
@@ -884,6 +886,8 @@ namespace MultiplayerARPG
             // Prepare animation
             if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack)
             {
+                if (skill.TryGetDamageInfo(this, isLeftHand, out DamageInfo skillDamageInfo))
+                    damageInfo = skillDamageInfo;
                 // Assign data id
                 animationDataId = weaponItem.WeaponType.DataId;
                 // Assign animation action type

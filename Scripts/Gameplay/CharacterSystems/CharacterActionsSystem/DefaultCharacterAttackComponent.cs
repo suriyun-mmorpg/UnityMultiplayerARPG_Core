@@ -112,7 +112,8 @@ namespace MultiplayerARPG
                 ref isLeftHand,
                 out AnimActionType animActionType,
                 out int animActionDataId,
-                out CharacterItem weapon);
+                out CharacterItem weapon,
+                out DamageInfo damageInfo);
 
             // Get playing animation index
             int randomMax = 1;
@@ -148,7 +149,6 @@ namespace MultiplayerARPG
 
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            DamageInfo damageInfo = Entity.GetWeaponDamageInfo(weaponItem);
             Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts;
             if (isLeftHand && Entity.CachedData.LeftHandDamages != null)
                 baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.LeftHandDamages);

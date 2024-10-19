@@ -361,59 +361,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void GetAttackingData(
-            ref bool isLeftHand,
-            out AnimActionType animActionType,
-            out int animationDataId,
-            out CharacterItem weapon)
-        {
-            // Monster animation always main-hand (right-hand) animation
-            isLeftHand = false;
-            // Monster animation always main-hand (right-hand) animation
-            animActionType = AnimActionType.AttackRightHand;
-            // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
-            animationDataId = 0;
-            // Monster will not have weapon data
-            weapon = CharacterItem.Create(CurrentGameInstance.MonsterWeaponItem.DataId);
-        }
-
-        public override void GetUsingSkillData(
-            BaseSkill skill,
-            ref bool isLeftHand,
-            out AnimActionType animActionType,
-            out int animationDataId,
-            out CharacterItem weapon)
-        {
-            // Monster animation always main-hand (right-hand) animation
-            isLeftHand = false;
-            // Monster animation always main-hand (right-hand) animation
-            animActionType = AnimActionType.AttackRightHand;
-            // Monster will not have weapon type so set dataId to `0`, then random attack animation from default attack animtions
-            animationDataId = 0;
-            // Monster will not have weapon data
-            weapon = CharacterItem.Create(CurrentGameInstance.MonsterWeaponItem.DataId);
-            // Prepare skill data
-            if (skill == null)
-                return;
-            // Get activate animation type which defined at character model
-            SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
-            // Prepare animation
-            if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack)
-            {
-                // Assign data id
-                animationDataId = 0;
-                // Assign animation action type
-                animActionType = AnimActionType.AttackRightHand;
-            }
-            else if (useSkillActivateAnimationType == SkillActivateAnimationType.UseActivateAnimation)
-            {
-                // Assign data id
-                animationDataId = skill.DataId;
-                // Assign animation action type
-                animActionType = AnimActionType.SkillRightHand;
-            }
-        }
-
         public override float GetAttackDistance(bool isLeftHand)
         {
             return CharacterDatabase.DamageInfo.GetDistance();

@@ -391,7 +391,7 @@ namespace MultiplayerARPG
                     damageInfo = this.damageInfo;
                     return true;
                 case SkillAttackType.BasedOnWeapon:
-                    damageInfo = skillUser.GetWeaponDamageInfo(ref isLeftHand);
+                    damageInfo = skillUser.GetAvailableWeaponDamageInfo(ref isLeftHand);
                     return true;
             }
             damageInfo = this.damageInfo;
