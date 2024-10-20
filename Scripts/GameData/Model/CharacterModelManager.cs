@@ -112,6 +112,9 @@ namespace MultiplayerARPG
         }
         public bool IsFps { get; private set; }
 
+        /// <summary>
+        /// Dictionary of hide setter (who is ordering to hide) and hidding state value
+        /// </summary>
         private readonly Dictionary<byte, bool> _hideStates = new Dictionary<byte, bool>();
         private int _dirtyVehicleDataId;
         private byte _dirtySeatIndex;
