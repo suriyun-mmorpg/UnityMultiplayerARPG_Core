@@ -3,7 +3,7 @@
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct MaterialCollection
+    public class MaterialCollection
     {
         [Tooltip("Renderer which will be applied by the materials")]
         public Renderer renderer;
