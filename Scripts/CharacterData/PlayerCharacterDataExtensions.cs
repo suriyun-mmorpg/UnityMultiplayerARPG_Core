@@ -663,7 +663,7 @@ namespace MultiplayerARPG
             {
                 AsyncOperationHandle<BasePlayerCharacterEntity> handler = assetRef.InstantiateAsync();
                 result = handler.WaitForCompletion();
-                result.gameObject.AddComponent<AssetReferenceReleaser>().Setup(handler);
+                result.gameObject.AddComponent<AssetReferenceReleaser>();
             }
             else if (data.TryGetEntityPrefab(out var prefab, out metaDataId))
             {
