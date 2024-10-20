@@ -6,6 +6,7 @@ namespace MultiplayerARPG
     public class VehicleSeat
     {
         public Transform passengingTransform;
+        public bool hidePassenger;
         public Transform exitTransform;
         [Tooltip("If this is not empty, it will used this transform instead of character's one")]
         public Transform meleeDamageTransform;
