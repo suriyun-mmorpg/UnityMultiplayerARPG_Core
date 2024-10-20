@@ -405,11 +405,19 @@ namespace MultiplayerARPG
 
         protected virtual void EntityLateUpdate()
         {
-            if (PassengingVehicleSeat != null && PassengingVehicleSeat.passengingTransform != null)
+            if (PassengingVehicleSeat != null)
             {
                 // Snap character to vehicle seat
-                EntityTransform.position = PassengingVehicleSeat.passengingTransform.position;
-                EntityTransform.rotation = PassengingVehicleSeat.passengingTransform.rotation;
+                if (PassengingVehicleSeat.passengingTransform != null)
+                {
+                    EntityTransform.position = PassengingVehicleSeat.passengingTransform.position;
+                    EntityTransform.rotation = PassengingVehicleSeat.passengingTransform.rotation;
+                }
+                else
+                {
+                    EntityTransform.position = PassengingVehicleEntity.EntityTransform.position;
+                    EntityTransform.rotation = PassengingVehicleEntity.EntityTransform.rotation;
+                }
             }
 
             if (_isTeleporting && ActiveMovement != null)
