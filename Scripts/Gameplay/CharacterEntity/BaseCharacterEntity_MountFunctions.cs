@@ -72,6 +72,10 @@ namespace MultiplayerARPG
 
         public async override UniTask<bool> ExitVehicle()
         {
+            // Can't exit from buff's mount
+            if (Mount.IsBuffMount())
+                return false;
+
             if (await base.ExitVehicle())
             {
                 Mount = new CharacterMount();
