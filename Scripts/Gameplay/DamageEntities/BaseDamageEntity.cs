@@ -41,12 +41,12 @@ namespace MultiplayerARPG
         }
 
         public Transform CacheTransform { get; private set; }
-        private FxCollection _fxCollection;
+        private FxCollection _fxCollection = null;
         public FxCollection FxCollection
         {
             get
             {
-                if (_fxCollection == null)
+                if (_fxCollection == null && gameObject != null)
                     _fxCollection = new FxCollection(gameObject);
                 return _fxCollection;
             }
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
                 Debug.LogWarning("The Base Damage Entity is null, this should not happens");
                 return;
             }
-            FxCollection.InitPrefab();
+            FxCollection?.InitPrefab();
             base.InitPrefab();
         }
 
@@ -165,13 +165,13 @@ namespace MultiplayerARPG
                 _playFxOnEnable = true;
                 return;
             }
-            FxCollection.Play();
+            FxCollection?.Play();
             _playFxOnEnable = false;
         }
 
         public virtual void StopFx()
         {
-            FxCollection.Stop();
+            FxCollection?.Stop();
         }
     }
 }
