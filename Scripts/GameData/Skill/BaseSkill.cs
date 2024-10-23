@@ -758,7 +758,7 @@ namespace MultiplayerARPG
                 return;
 
             skillUser.SpawnMount(
-                MountType.Skill, DataId,
+                MountType.Skill, Id,
                 mount.Duration.GetAmount(skillLevel),
                 mount.Level.GetAmount(skillLevel));
         }

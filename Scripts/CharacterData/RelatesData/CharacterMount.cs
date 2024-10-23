@@ -8,32 +8,38 @@ namespace MultiplayerARPG
         {
             if (type != MountType.Skill)
                 return null;
-            if (GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill))
+            if (GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(sourceId), out BaseSkill skill))
                 return skill;
             return null;
         }
 
-        public IMountItem GetMountItem()
+        public IMountItem GetMountItem(ICharacterData characterData)
         {
             if (type != MountType.MountItem)
                 return null;
-            if (GameInstance.Items.TryGetValue(dataId, out BaseItem item) && item.IsMount())
-                return item as IMountItem;
+            int tempIndexOfData = characterData.IndexOfNonEquipItem(sourceId);
+            if (tempIndexOfData < 0)
+                return null;
+            BaseItem tempItem = characterData.NonEquipItems[tempIndexOfData].GetItem();
+            if (tempItem.IsMount())
+                return tempItem as IMountItem;
             return null;
         }
 
-        /// <summary>
-        /// Return `TRUE` if it is addressable
-        /// </summary>
-        /// <param name="prefab"></param>
-        /// <param name="addressablePrefab"></param>
-        /// <returns></returns>
-        public bool GetPrefab(out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab)
+        public BuffMount GetBuffMount(ICharacterData characterData)
         {
-            return type.GetPrefab(dataId, out prefab, out addressablePrefab);
+            if (type != MountType.MountItem)
+                return null;
+            int tempIndexOfData = characterData.IndexOfBuff(sourceId);
+            if (tempIndexOfData < 0)
+                return null;
+            CalculatedBuff tempCalculatedBuff = characterData.Buffs[tempIndexOfData].GetBuff();
+            if (tempCalculatedBuff != null && tempCalculatedBuff.TryGetMount(out BuffMount tempBuffMount))
+                return tempBuffMount;
+            return null;
         }
 
-        public bool ShouldRemove()
+        public bool ShouldRemove(ICharacterData characterData)
         {
             switch (type)
             {
@@ -45,12 +51,17 @@ namespace MultiplayerARPG
                         return false;
                     return mountRemainsDuration <= 0f;
                 case MountType.MountItem:
-                    IMountItem mountItem = GetMountItem();
+                    IMountItem mountItem = GetMountItem(characterData);
                     if (mountItem == null)
                         return true;
                     if (mountItem.NoMountDuration)
                         return false;
                     return mountRemainsDuration <= 0f;
+                case MountType.Buff:
+                    BuffMount buffMount = GetBuffMount(characterData);
+                    if (buffMount == null)
+                        return true;
+                    return false;
                 case MountType.Custom:
                     // TODO: Implement this
                     return false;

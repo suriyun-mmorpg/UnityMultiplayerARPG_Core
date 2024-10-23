@@ -1003,13 +1003,13 @@ namespace MultiplayerARPG
             switch (itemType)
             {
                 case LegacyItemType.Potion:
-                    UseItemPotion(character, itemIndex, characterItem.level);
+                    UseItemPotion(character, itemIndex, characterItem);
                     break;
                 case LegacyItemType.Pet:
-                    UseItemPet(character, itemIndex, characterItem.level, characterItem.exp);
+                    UseItemPet(character, itemIndex, characterItem);
                     break;
                 case LegacyItemType.Mount:
-                    UseItemMount(character, itemIndex, characterItem.level);
+                    UseItemMount(character, characterItem);
                     break;
                 case LegacyItemType.AttributeIncrease:
                     UseItemAttributeIncrease(character as BasePlayerCharacterEntity, itemIndex);
@@ -1026,17 +1026,17 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void UseItemPotion(BaseCharacterEntity character, int itemIndex, int level)
+        protected void UseItemPotion(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
         {
-            if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1, false))
+            if (!character.CanUseItem() || !character.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             character.FillEmptySlots();
-            character.ApplyBuff(DataId, BuffType.PotionBuff, level, character.GetInfo(), CharacterItem.Empty);
+            character.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, character.GetInfo(), CharacterItem.Empty);
         }
 
-        protected void UseItemPet(BaseCharacterEntity character, int itemIndex, int level, int exp)
+        protected void UseItemPet(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
         {
-            if (!character.CanUseItem() || level <= 0 || !character.DecreaseItemsByIndex(itemIndex, 1, false))
+            if (!character.CanUseItem() || !character.DecreaseItemsByIndex(itemIndex, 1, false))
                 return;
             character.FillEmptySlots();
             // Clear all summoned pets
@@ -1051,16 +1051,15 @@ namespace MultiplayerARPG
             }
             // Summon new pet
             CharacterSummon newSummon = CharacterSummon.Create(SummonType.PetItem, DataId);
-            newSummon.Summon(character, level, 0f, exp);
+            newSummon.Summon(character, characterItem.level, 0f, characterItem.exp);
             character.Summons.Add(newSummon);
         }
 
-        protected void UseItemMount(BaseCharacterEntity character, int itemIndex, int level)
+        protected void UseItemMount(BaseCharacterEntity character, CharacterItem characterItem)
         {
-            if (!character.CanUseItem() || level <= 0)
+            if (!character.CanUseItem())
                 return;
-
-            character.SpawnMount(MountType.MountItem, DataId, MountDuration.GetAmount(level));
+            character.SpawnMount(MountType.MountItem, characterItem.id, MountDuration.GetAmount(characterItem.level));
         }
 
         protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)

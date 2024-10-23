@@ -255,6 +255,8 @@ namespace MultiplayerARPG
         protected void CmdExitVehicle()
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!PlayerCanExitVehicle())
+                return;
             ExitVehicleAndForget();
 #endif
         }
@@ -302,6 +304,11 @@ namespace MultiplayerARPG
         {
             if (Model is IVehicleEnterExitModel vehicleEnterExitModel)
                 vehicleEnterExitModel.PlayExitVehicleAnimation(PassengingVehicleEntity);
+        }
+
+        public virtual bool PlayerCanExitVehicle()
+        {
+            return true;
         }
     }
 }

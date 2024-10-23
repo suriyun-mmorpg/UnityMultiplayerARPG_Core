@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             if (!characterEntity.CanUseItem())
                 return;
 
-            characterEntity.SpawnMount(MountType.MountItem, DataId, MountDuration.GetAmount(characterItem.level));
+            characterEntity.SpawnMount(MountType.MountItem, characterItem.id, MountDuration.GetAmount(characterItem.level));
         }
 
         public bool HasCustomAimControls()

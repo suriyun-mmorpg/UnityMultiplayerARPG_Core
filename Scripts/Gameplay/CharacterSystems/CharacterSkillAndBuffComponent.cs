@@ -46,7 +46,7 @@ namespace MultiplayerARPG
                 {
                     CharacterMount mount = Entity.Mount;
                     tempCalculatedBuff = Entity.PassengingVehicleEntity.GetBuff();
-                    if (mount.ShouldRemove())
+                    if (mount.ShouldRemove(Entity))
                     {
                         _recoveryBuffs.Remove(KEY_VEHICLE_BUFF);
                         Entity.ExitVehicleAndForget();
@@ -119,13 +119,6 @@ namespace MultiplayerARPG
                         tempCalculatedBuff = buff.GetBuff();
                         if (buff.ShouldRemove())
                         {
-                            // Unmount
-                            if (tempCalculatedBuff.TryGetMount(out BuffMount tempBuffMount) && buff.TryGetMountType(out MountType tempMountType))
-                            {
-                                int tempMountLevel = tempCalculatedBuff.GetMountLevel();
-                                if (!Entity.IsDifferMount(tempMountType, buff.dataId, tempMountLevel))
-                                    Entity.ExitVehicleAndForget();
-                            }
                             _recoveryBuffs.Remove(buff.id);
                             Entity.OnRemoveBuff(buff, BuffRemoveReasons.Timeout);
                             Entity.Buffs.RemoveAt(i);
@@ -147,12 +140,12 @@ namespace MultiplayerARPG
                                 tempRecoveryData.Apply(1 / tempDuration * _updatingTime);
                             }
                             // Mount
-                            if (!foundBuffMount && tempCalculatedBuff.TryGetMount(out BuffMount tempBuffMount) && buff.TryGetMountType(out MountType tempMountType))
+                            if (!foundBuffMount && tempCalculatedBuff.TryGetMount(out BuffMount tempBuffMount))
                             {
                                 foundBuffMount = true;
                                 int tempMountLevel = tempCalculatedBuff.GetMountLevel();
-                                if (Entity.IsDifferMount(tempMountType, buff.dataId, tempMountLevel))
-                                    Entity.SpawnMount(tempMountType, buff.dataId, 0f, tempMountLevel, 0);
+                                if (Entity.IsDifferMount(MountType.Buff, buff.id, tempMountLevel))
+                                    Entity.SpawnMount(MountType.Buff, buff.id, 0f, tempMountLevel, 0);
                             }
                         }
                         // Don't update next buffs if character dead

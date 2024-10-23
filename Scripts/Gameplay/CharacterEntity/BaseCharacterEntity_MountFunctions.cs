@@ -9,7 +9,7 @@ namespace MultiplayerARPG
 
         protected float _lastMountTime;
 
-        public virtual async void SpawnMount(MountType mountType, int mountDataId, float duration, int level = 1, int currentHp = 0)
+        public virtual async void SpawnMount(MountType mountType, string sourceId, float duration, int level = 1, int currentHp = 0)
         {
             if (!IsServer)
                 return;
@@ -29,34 +29,44 @@ namespace MultiplayerARPG
                 await ExitVehicle();
             }
 
-            // Update mount data
-            Mount = new CharacterMount()
-            {
-                type = mountType,
-                dataId = mountDataId,
-                mountRemainsDuration = duration,
-                level = level,
-                currentHp = currentHp,
-            };
-
             // Instantiate new mount entity
             LiteNetLibIdentity spawnObj;
-            if (mountType.GetPrefab(mountDataId, out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab))
+            if (mountType.GetPrefab(this, sourceId, out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab))
             {
+                // Update mount data
+                Mount = new CharacterMount()
+                {
+                    type = mountType,
+                    sourceId = sourceId,
+                    mountRemainsDuration = duration,
+                    level = level,
+                    currentHp = currentHp,
+                };
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     addressablePrefab.HashAssetId, enterPosition,
                     Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
             }
             else if (prefab != null)
             {
+                // Update mount data
+                Mount = new CharacterMount()
+                {
+                    type = mountType,
+                    sourceId = sourceId,
+                    mountRemainsDuration = duration,
+                    level = level,
+                    currentHp = currentHp,
+                };
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     prefab.Identity.HashAssetId, enterPosition,
                     Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
             }
             else
             {
+                Mount = new CharacterMount();
                 return;
             }
+
 
             VehicleEntity vehicle = spawnObj.GetComponent<VehicleEntity>();
             vehicle.InitStats();
@@ -72,10 +82,6 @@ namespace MultiplayerARPG
 
         public async override UniTask<bool> ExitVehicle()
         {
-            // Can't exit from buff's mount
-            if (Mount.IsBuffMount())
-                return false;
-
             if (await base.ExitVehicle())
             {
                 Mount = new CharacterMount();
@@ -101,6 +107,14 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            return true;
+        }
+
+        public override bool PlayerCanExitVehicle()
+        {
+            // Can't exit from buff's mount
+            if (Mount.type == MountType.Buff)
+                return false;
             return true;
         }
     }

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
+    public class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
     {
         public void GetObjectData(
             object obj,

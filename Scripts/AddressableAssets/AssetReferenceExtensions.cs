@@ -56,20 +56,20 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool GetPrefab(this MountType mountType, int dataId, out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab)
+        public static bool GetPrefab(this MountType mountType, ICharacterData characterData, string sourceId,
+            out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab)
         {
             prefab = null;
             addressablePrefab = null;
+            int tempIndexOfData;
             BaseItem tempItem;
             BaseSkill tempSkill;
-            GuildSkill tempGuildSkill;
-            StatusEffect tempStatusEffect;
-            Buff tempBuff;
+            CalculatedBuff tempCalculatedBuff;
             BuffMount tempBuffMount;
             switch (mountType)
             {
                 case MountType.Skill:
-                    if (GameInstance.Skills.TryGetValue(dataId, out tempSkill) &&
+                    if (GameInstance.Skills.TryGetValue(BaseGameData.MakeDataId(sourceId), out tempSkill) &&
                         tempSkill.TryGetMount(out SkillMount skillMount))
                     {
                         if (skillMount.MountEntity != null)
@@ -85,8 +85,11 @@ namespace MultiplayerARPG
                     }
                     break;
                 case MountType.MountItem:
-                    if (GameInstance.Items.TryGetValue(dataId, out tempItem) &&
-                        tempItem.IsMount() && tempItem is IMountItem mountItem)
+                    tempIndexOfData = characterData.IndexOfNonEquipItem(sourceId);
+                    if (tempIndexOfData < 0)
+                        return false;
+                    tempItem = characterData.NonEquipItems[tempIndexOfData].GetItem();
+                    if (tempItem.IsMount() && tempItem is IMountItem mountItem)
                     {
                         if (mountItem.VehicleEntity != null)
                         {
@@ -100,76 +103,12 @@ namespace MultiplayerARPG
                         }
                     }
                     break;
-                case MountType.SkillBuff:
-                    if (GameInstance.Skills.TryGetValue(dataId, out tempSkill) &&
-                        tempSkill.TryGetBuff(out tempBuff) &&
-                        tempBuff.TryGetMount(out tempBuffMount))
-                    {
-                        if (tempBuffMount.MountEntity != null)
-                        {
-                            prefab = tempBuffMount.MountEntity;
-                            return false;
-                        }
-                        else if (tempBuffMount.AddressableMountEntity.IsDataValid())
-                        {
-                            addressablePrefab = tempBuffMount.AddressableMountEntity;
-                            return true;
-                        }
-                    }
-                    break;
-                case MountType.SkillDebuff:
-                    if (GameInstance.Skills.TryGetValue(dataId, out tempSkill) &&
-                        tempSkill.TryGetDebuff(out tempBuff) &&
-                        tempBuff.TryGetMount(out tempBuffMount))
-                    {
-                        if (tempBuffMount.MountEntity != null)
-                        {
-                            prefab = tempBuffMount.MountEntity;
-                            return false;
-                        }
-                        else if (tempBuffMount.AddressableMountEntity.IsDataValid())
-                        {
-                            addressablePrefab = tempBuffMount.AddressableMountEntity;
-                            return true;
-                        }
-                    }
-                    break;
-                case MountType.PotionBuff:
-                    if (GameInstance.Items.TryGetValue(dataId, out tempItem) &&
-                        tempItem.IsPotion() && tempItem is IPotionItem potionItem &&
-                        potionItem.BuffData.TryGetMount(out tempBuffMount))
-                    {
-                        if (tempBuffMount.MountEntity != null)
-                        {
-                            prefab = tempBuffMount.MountEntity;
-                            return false;
-                        }
-                        else if (tempBuffMount.AddressableMountEntity.IsDataValid())
-                        {
-                            addressablePrefab = tempBuffMount.AddressableMountEntity;
-                            return true;
-                        }
-                    }
-                    break;
-                case MountType.GuildSkillBuff:
-                    if (GameInstance.GuildSkills.TryGetValue(dataId, out tempGuildSkill) &&
-                        tempGuildSkill.Buff.TryGetMount(out tempBuffMount))
-                    {
-                        if (tempBuffMount.MountEntity != null)
-                        {
-                            prefab = tempBuffMount.MountEntity;
-                            return false;
-                        }
-                        else if (tempBuffMount.AddressableMountEntity.IsDataValid())
-                        {
-                            addressablePrefab = tempBuffMount.AddressableMountEntity;
-                            return true;
-                        }
-                    }
-                    break;
-                case MountType.StatusEffect:
-                    if (GameInstance.StatusEffects.TryGetValue(dataId, out tempStatusEffect) &&
-                        tempStatusEffect.Buff.TryGetMount(out tempBuffMount))
+                case MountType.Buff:
+                    tempIndexOfData = characterData.IndexOfBuff(sourceId);
+                    if (tempIndexOfData < 0)
+                        return false;
+                    tempCalculatedBuff = characterData.Buffs[tempIndexOfData].GetBuff();
+                    if (tempCalculatedBuff != null && tempCalculatedBuff.TryGetMount(out tempBuffMount))
                     {
                         if (tempBuffMount.MountEntity != null)
                         {
