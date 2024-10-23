@@ -11,5 +11,6 @@ namespace MultiplayerARPG
         RemoveByUseSkillRemoveChance,
         RemoveByUseItemRemoveChance,
         RemoveByPickupChance,
+        RemoveByToggle,
     }
 }

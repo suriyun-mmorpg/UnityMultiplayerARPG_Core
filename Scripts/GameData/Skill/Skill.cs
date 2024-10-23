@@ -174,7 +174,10 @@ namespace MultiplayerARPG
                 case SkillBuffType.Toggle:
                     int indexOfBuff = skillUser.IndexOfBuff(BuffType.SkillBuff, DataId);
                     if (indexOfBuff >= 0)
+                    {
+                        skillUser.OnRemoveBuff(skillUser.Buffs[indexOfBuff], BuffRemoveReasons.RemoveByToggle);
                         skillUser.Buffs.RemoveAt(indexOfBuff);
+                    }
                     else
                         skillUser.ApplyBuff(DataId, BuffType.SkillBuff, skillLevel, skillUserInfo, weapon);
                     break;
