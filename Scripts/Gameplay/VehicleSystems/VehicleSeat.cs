@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         public Transform missileDamageTransform;
         public bool canAttack;
         public bool canUseSkill;
+        public bool overrideActionAnimation;
         public VehicleSeatCameraTarget cameraTarget;
     }
 }

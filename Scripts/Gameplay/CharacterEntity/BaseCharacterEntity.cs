@@ -190,6 +190,19 @@ namespace MultiplayerARPG
             get { return ModelManager.ActiveFpsModel; }
         }
 
+        public BaseCharacterModel ActionModel
+        {
+            get
+            {
+                BaseCharacterModel model = null;
+                if (PassengingVehicleSeat != null && PassengingVehicleSeat.overrideActionAnimation)
+                    model = PassengingVehicleModel as BaseCharacterModel;
+                if (model == null)
+                    model = CharacterModel;
+                return model;
+            }
+        }
+
         public override void InitialRequiredComponents()
         {
             base.InitialRequiredComponents();
@@ -889,7 +902,7 @@ namespace MultiplayerARPG
             // Prepare weapon data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             // Get activate animation type which defined at character model
-            SkillActivateAnimationType useSkillActivateAnimationType = CharacterModel.UseSkillActivateAnimationType(skill);
+            SkillActivateAnimationType useSkillActivateAnimationType = ActionModel.UseSkillActivateAnimationType(skill);
             // Prepare animation
             if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack)
             {
@@ -1136,20 +1149,38 @@ namespace MultiplayerARPG
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
+            BaseCharacterModel model = ActionModel;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    model.GetRandomRightHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    model.GetRandomLeftHandAttackAnimation(skillOrWeaponTypeDataId, randomSeed, out animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    model.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
             }
+        }
+
+        public int GetRandomMaxAnimationData(
+            AnimActionType animActionType,
+            int skillOrWeaponTypeDataId)
+        {
+            int randomMax = 1;
+            switch (animActionType)
+            {
+                case AnimActionType.AttackLeftHand:
+                    randomMax = ActionModel.GetLeftHandAttackRandomMax(skillOrWeaponTypeDataId);
+                    break;
+                case AnimActionType.AttackRightHand:
+                    randomMax = ActionModel.GetRightHandAttackRandomMax(skillOrWeaponTypeDataId);
+                    break;
+            }
+            return randomMax;
         }
 
         public void GetAnimationData(
@@ -1163,24 +1194,25 @@ namespace MultiplayerARPG
             animSpeedRate = 1f;
             triggerDurations = new float[] { 0f };
             totalDuration = 0f;
+            BaseCharacterModel model = ActionModel;
             // Random animation
             switch (animActionType)
             {
                 case AnimActionType.AttackRightHand:
-                    CharacterModel.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    model.GetRightHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.AttackLeftHand:
-                    CharacterModel.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
+                    model.GetLeftHandAttackAnimation(skillOrWeaponTypeDataId, animationIndex, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.SkillRightHand:
                 case AnimActionType.SkillLeftHand:
-                    CharacterModel.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    model.GetSkillActivateAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.ReloadRightHand:
-                    CharacterModel.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    model.GetRightHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
                 case AnimActionType.ReloadLeftHand:
-                    CharacterModel.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
+                    model.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
             }
         }

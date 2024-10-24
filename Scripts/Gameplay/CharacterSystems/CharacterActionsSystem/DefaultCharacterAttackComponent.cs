@@ -116,16 +116,7 @@ namespace MultiplayerARPG
                 out DamageInfo damageInfo);
 
             // Get playing animation index
-            int randomMax = 1;
-            switch (animActionType)
-            {
-                case AnimActionType.AttackLeftHand:
-                    randomMax = Entity.CharacterModel.GetLeftHandAttackRandomMax(animActionDataId);
-                    break;
-                case AnimActionType.AttackRightHand:
-                    randomMax = Entity.CharacterModel.GetRightHandAttackRandomMax(animActionDataId);
-                    break;
-            }
+            int randomMax = Entity.GetRandomMaxAnimationData(animActionType, animActionDataId);
             if (time - LastAttackEndTime > animationResetDelay || _lastAttackDataId != animActionDataId)
                 _lastAttackAnimationIndex = 0;
             int animationIndex = _lastAttackAnimationIndex++;
