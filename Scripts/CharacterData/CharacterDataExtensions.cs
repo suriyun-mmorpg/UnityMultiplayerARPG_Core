@@ -758,6 +758,8 @@ namespace MultiplayerARPG
             out DamageInfo damageInfo)
         {
             CharacterDataCache cache = data.GetCaches();
+            if (!isLeftHand && !cache.IsRightHandItemAvailable)
+                isLeftHand = true;
             if (isLeftHand && !cache.IsLeftHandItemAvailable)
                 isLeftHand = false;
             if (isLeftHand)
@@ -775,6 +777,8 @@ namespace MultiplayerARPG
         public static CharacterItem GetAvailableWeapon(this ICharacterData data, ref bool isLeftHand)
         {
             CharacterDataCache cache = data.GetCaches();
+            if (!isLeftHand && !cache.IsRightHandItemAvailable)
+                isLeftHand = true;
             if (isLeftHand && !cache.IsLeftHandItemAvailable)
                 isLeftHand = false;
             if (isLeftHand)
@@ -786,6 +790,8 @@ namespace MultiplayerARPG
         public static DamageInfo GetAvailableWeaponDamageInfo(this ICharacterData data, ref bool isLeftHand)
         {
             CharacterDataCache cache = data.GetCaches();
+            if (!isLeftHand && !cache.IsRightHandItemAvailable)
+                isLeftHand = true;
             if (isLeftHand && !cache.IsLeftHandItemAvailable)
                 isLeftHand = false;
             if (isLeftHand)
@@ -796,11 +802,15 @@ namespace MultiplayerARPG
 
         public static float GetAttackDistance(this ICharacterData data, bool isLeftHand)
         {
+            if (data == null)
+                return 0f;
             return data.GetAvailableWeaponDamageInfo(ref isLeftHand).GetDistance();
         }
 
         public static float GetAttackFov(this ICharacterData data, bool isLeftHand)
         {
+            if (data == null)
+                return 0f;
             return data.GetAvailableWeaponDamageInfo(ref isLeftHand).GetDistance();
         }
 
