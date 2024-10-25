@@ -36,6 +36,7 @@ namespace MultiplayerARPG
         private Vector3? _teleportPosition;
         private readonly Dictionary<long, PlayerCharacterData> _pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
         private readonly Dictionary<long, List<CharacterBuff>> _pendingSpawnPlayerCharacterSummonBuffs = new Dictionary<long, List<CharacterBuff>>();
+        private readonly HashSet<string> _teleportingPlayerCharacterIds = new HashSet<string>();
 
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
         public BaseGameSaveSystem SaveSystem { get { return GameInstance.Singleton.SaveSystem; } }
@@ -45,6 +46,14 @@ namespace MultiplayerARPG
             CacheDiscovery = gameObject.GetOrAddComponent<LiteNetLibDiscovery>();
             PrepareLanRpgHandlers();
             base.Awake();
+        }
+
+        protected override void Clean()
+        {
+            base.Clean();
+            _pendingSpawnPlayerCharacters.Clear();
+            _pendingSpawnPlayerCharacterSummonBuffs.Clear();
+            _teleportingPlayerCharacterIds.Clear();
         }
 
         public void StartGame()
@@ -251,13 +260,18 @@ namespace MultiplayerARPG
                 rotation = playerCharacterData.CurrentRotation,
             };
 
+            if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName) || _teleportingPlayerCharacterIds.Contains(playerCharacterData.Id))
+            {
+                Vector3 targetPosition = _teleportPosition.HasValue ? _teleportPosition.Value : CurrentMapInfo.StartPosition;
+                playerCharacterData.CurrentPosition = targetPosition;
+            }
+            _teleportingPlayerCharacterIds.Remove(playerCharacterData.Id);
+
             // Set proper spawn position
             CurrentMapInfo.GetEnterMapPoint(playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation);
             playerCharacterData.CurrentMapName = mapName;
             playerCharacterData.CurrentPosition = position;
             playerCharacterData.CurrentRotation = rotation;
-            if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName))
-                playerCharacterData.CurrentPosition = _teleportPosition.HasValue ? _teleportPosition.Value : CurrentMapInfo.StartPosition;
             
             // Spawn character entity and set its data
             Quaternion characterRotation = Quaternion.identity;
@@ -395,6 +409,10 @@ namespace MultiplayerARPG
                 ServerStorageHandlers.ClearStorage();
                 SetMapInfo(mapInfo);
                 _teleportPosition = position;
+                foreach (IPlayerCharacterData playerCharacter in GameInstance.ServerUserHandlers.GetPlayerCharacters())
+                {
+                    _teleportingPlayerCharacterIds.Add(playerCharacter.Id);
+                }
                 Save((savingCharacter) =>
                 {
                     savingCharacter.CurrentMapName = mapInfo.Id;
