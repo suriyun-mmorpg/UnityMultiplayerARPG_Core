@@ -594,7 +594,7 @@ namespace MultiplayerARPG
         {
             if (InputManager.IsDraggingMobileInput)
                 return false;
-            if (UIDragHandler.DraggingObjects.Count > 0)
+            if (UIDragHandler.DraggingObject != null)
                 return true;
             if (EventSystem.current == null)
                 return false;

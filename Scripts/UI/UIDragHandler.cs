@@ -6,7 +6,7 @@ using UnityEngine.UI;
 
 public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public static readonly HashSet<GameObject> DraggingObjects = new HashSet<GameObject>();
+    public static GameObject DraggingObject = null;
     public enum ScrollRectAllowing
     {
         None,
@@ -65,6 +65,9 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public virtual void OnBeginDrag(PointerEventData eventData)
     {
+        if (DraggingObject != null)
+            return;
+
         if (scrollRect != null)
         {
             if (scrollRectAllowing == ScrollRectAllowing.AllowVerticalScrolling &&
@@ -84,15 +87,18 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
             }
         }
 
-        _defaultSiblingIndex = rootTransform.GetSiblingIndex();
+        if (rootTransform == null || rootTransform.parent == null)
+            return;
+
         _defaultParent = rootTransform.parent;
+        _defaultSiblingIndex = rootTransform.GetSiblingIndex();
         _defaultLocalPosition = rootTransform.localPosition;
         _defaultLocalScale = rootTransform.localScale;
 
         if (!CanDrag)
             return;
 
-        DraggingObjects.Add(gameObject);
+        DraggingObject = gameObject;
         IsDropped = false;
         rootTransform.SetParent(CacheCanvas.transform);
         rootTransform.SetAsLastSibling();
@@ -113,6 +119,8 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
 
     public virtual void OnDrag(PointerEventData eventData)
     {
+        if (DraggingObject != gameObject)
+            return;
         if (IsScrolling)
         {
             scrollRect.SendMessage("OnDrag", eventData);
@@ -120,22 +128,27 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
         }
         if (!CanDrag)
             return;
+        if (_defaultParent == null)
+            return;
         rootTransform.position = eventData.position;
     }
 
     public virtual void OnEndDrag(PointerEventData eventData)
     {
-        if (IsScrolling)
+        if (DraggingObject == gameObject)
+            DraggingObject = null;
+
+        if (_defaultParent != null)
         {
-            scrollRect.SendMessage("OnEndDrag", eventData);
-            IsScrolling = false;
-            return;
+            rootTransform.SetParent(_defaultParent);
+            rootTransform.SetSiblingIndex(_defaultSiblingIndex);
+            rootTransform.localPosition = _defaultLocalPosition;
+            rootTransform.localScale = _defaultLocalScale;
         }
-        DraggingObjects.Remove(gameObject);
-        rootTransform.SetParent(_defaultParent);
-        rootTransform.SetSiblingIndex(_defaultSiblingIndex);
-        rootTransform.localPosition = _defaultLocalPosition;
-        rootTransform.localScale = _defaultLocalScale;
+        else
+        {
+            Debug.LogError("[UIDragHandler] No `_defaultParent`");
+        }
 
         // Enable button to allow on click event after drag
         if (_attachedButton != null)
@@ -148,5 +161,9 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
         }
 
         onEndDrag.Invoke();
+
+        if (IsScrolling)
+            scrollRect.SendMessage("OnEndDrag", eventData);
+        IsScrolling = false;
     }
 }
