@@ -308,7 +308,7 @@ namespace MultiplayerARPG
             if (equipSlotIndexOrWeaponSet < 0 || equipSlotIndexOrWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
                 equipSlotIndexOrWeaponSet = playerCharacter.EquipWeaponSet;
             playerCharacter.FillWeaponSetsIfNeeded(equipSlotIndexOrWeaponSet);
-            EquipWeapons equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
+            EquipWeapons equipWeapons;
             bool shouldUnequipRightHand;
             bool shouldUnequipLeftHand;
             int unequippingIndex;
@@ -323,6 +323,7 @@ namespace MultiplayerARPG
                         if (!playerCharacter.UnEquipWeapon(equipSlotIndexOrWeaponSet, false, false, out gameMessage, out _))
                             return false;
                     }
+                    equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
                     // Just equip or swapping
                     if (equipWeapons.IsEmptyLeftHandSlot())
                     {
@@ -363,6 +364,7 @@ namespace MultiplayerARPG
                         if (!playerCharacter.UnEquipWeapon(equipSlotIndexOrWeaponSet, true, false, out gameMessage, out _))
                             return false;
                     }
+                    equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
                     // Just equip or swapping
                     if (equipWeapons.IsEmptyRightHandSlot())
                     {
