@@ -147,7 +147,7 @@ public partial class UIDragHandler : MonoBehaviour, IBeginDragHandler, IDragHand
         }
         else
         {
-            Debug.LogError("[UIDragHandler] No `_defaultParent`");
+            Debug.LogError("[UIDragHandler] No `_defaultParent`", gameObject);
         }
 
         // Enable button to allow on click event after drag
