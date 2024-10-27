@@ -260,7 +260,8 @@ namespace MultiplayerARPG
                 rotation = playerCharacterData.CurrentRotation,
             };
 
-            if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName) || _teleportingPlayerCharacterIds.Contains(playerCharacterData.Id))
+            if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName) ||
+                _teleportingPlayerCharacterIds.Contains(playerCharacterData.Id))
             {
                 Vector3 targetPosition = _teleportPosition.HasValue ? _teleportPosition.Value : CurrentMapInfo.StartPosition;
                 playerCharacterData.CurrentPosition = targetPosition;
