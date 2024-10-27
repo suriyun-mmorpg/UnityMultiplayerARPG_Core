@@ -293,6 +293,7 @@ namespace MultiplayerARPG
             exp.onChange += OnExpChange;
             isImmune.onChange += OnIsImmuneChange;
             currentMp.onChange += OnCurrentMpChange;
+            currentStamina.onChange += OnCurrentStaminaChange;
             currentFood.onChange += OnCurrentFoodChange;
             currentWater.onChange += OnCurrentWaterChange;
             equipWeaponSet.onChange += OnEquipWeaponSetChange;
@@ -323,6 +324,7 @@ namespace MultiplayerARPG
             exp.onChange -= OnExpChange;
             isImmune.onChange -= OnIsImmuneChange;
             currentMp.onChange -= OnCurrentMpChange;
+            currentStamina.onChange -= OnCurrentStaminaChange;
             currentFood.onChange -= OnCurrentFoodChange;
             currentWater.onChange -= OnCurrentWaterChange;
             equipWeaponSet.onChange -= OnEquipWeaponSetChange;
@@ -413,6 +415,17 @@ namespace MultiplayerARPG
         {
             if (onCurrentMpChange != null)
                 onCurrentMpChange.Invoke(currentMp);
+        }
+
+        /// <summary>
+        /// This will be called when current stamina changed
+        /// </summary>
+        /// <param name="isInitial"></param>
+        /// <param name="currentStamina"></param>
+        private void OnCurrentStaminaChange(bool isInitial, int currentStamina)
+        {
+            if (onCurrentStaminaChange != null)
+                onCurrentStaminaChange.Invoke(currentStamina);
         }
 
         /// <summary>

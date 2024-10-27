@@ -42,6 +42,7 @@
             onExpChange = null;
             onIsImmuneChange = null;
             onCurrentMpChange = null;
+            onCurrentStaminaChange = null;
             onCurrentFoodChange = null;
             onCurrentWaterChange = null;
             onEquipWeaponSetChange = null;

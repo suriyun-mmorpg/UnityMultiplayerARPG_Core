@@ -1,4 +1,5 @@
 ﻿using LiteNetLibManager;
+using NotifiableCollection;
 
 namespace MultiplayerARPG
 {
@@ -32,6 +33,9 @@ namespace MultiplayerARPG
         public event System.Action<LiteNetLibSyncList.Operation, int> onCurrenciesOperation;
 #endif
 #if !DISABLE_CUSTOM_CHARACTER_DATA
+        public event System.Action<NotifiableListAction, int> onServerBoolsOperation;
+        public event System.Action<NotifiableListAction, int> onServerIntsOperation;
+        public event System.Action<NotifiableListAction, int> onServerFloatsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateBoolsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateIntsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateFloatsOperation;

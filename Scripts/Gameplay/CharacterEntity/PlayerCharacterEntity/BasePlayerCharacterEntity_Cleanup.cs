@@ -43,6 +43,9 @@ namespace MultiplayerARPG
             onCurrenciesOperation = null;
 #endif
 #if !DISABLE_CUSTOM_CHARACTER_DATA
+            onServerBoolsOperation = null;
+            onServerIntsOperation = null;
+            onServerFloatsOperation = null;
             onPrivateBoolsOperation = null;
             onPrivateIntsOperation = null;
             onPrivateFloatsOperation = null;

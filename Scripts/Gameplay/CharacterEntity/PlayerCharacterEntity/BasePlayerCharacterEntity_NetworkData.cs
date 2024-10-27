@@ -1,6 +1,7 @@
 ﻿using Insthync.AddressableAssetTools;
 using LiteNetLib;
 using LiteNetLibManager;
+using NotifiableCollection;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -68,11 +69,11 @@ namespace MultiplayerARPG
 #endif
 #if !DISABLE_CUSTOM_CHARACTER_DATA
         [SerializeField]
-        private List<CharacterDataBoolean> serverBools = new List<CharacterDataBoolean>();
+        private NotifiableList<CharacterDataBoolean> serverBools = new NotifiableList<CharacterDataBoolean>();
         [SerializeField]
-        private List<CharacterDataInt32> serverInts = new List<CharacterDataInt32>();
+        private NotifiableList<CharacterDataInt32> serverInts = new NotifiableList<CharacterDataInt32>();
         [SerializeField]
-        private List<CharacterDataFloat32> serverFloats = new List<CharacterDataFloat32>();
+        private NotifiableList<CharacterDataFloat32> serverFloats = new NotifiableList<CharacterDataFloat32>();
         [SerializeField]
         protected SyncListCharacterDataBoolean privateBools = new SyncListCharacterDataBoolean();
         [SerializeField]
@@ -445,6 +446,9 @@ namespace MultiplayerARPG
             currencies.onOperation += OnCurrenciesOperation;
 #endif
 #if !DISABLE_CUSTOM_CHARACTER_DATA
+            serverBools.ListChanged += OnServerBoolsOperation;
+            serverInts.ListChanged += OnServerIntsOperation;
+            serverFloats.ListChanged += OnServerFloatsOperation;
             privateBools.onOperation += OnPrivateBoolsOperation;
             privateInts.onOperation += OnPrivateIntsOperation;
             privateFloats.onOperation += OnPrivateFloatsOperation;
@@ -486,6 +490,9 @@ namespace MultiplayerARPG
             currencies.onOperation -= OnCurrenciesOperation;
 #endif
 #if !DISABLE_CUSTOM_CHARACTER_DATA
+            serverBools.ListChanged -= OnServerBoolsOperation;
+            serverInts.ListChanged -= OnServerIntsOperation;
+            serverFloats.ListChanged -= OnServerFloatsOperation;
             privateBools.onOperation -= OnPrivateBoolsOperation;
             privateInts.onOperation -= OnPrivateIntsOperation;
             privateFloats.onOperation -= OnPrivateFloatsOperation;
@@ -746,6 +753,25 @@ namespace MultiplayerARPG
 #endif
 
 #if !DISABLE_CUSTOM_CHARACTER_DATA
+
+        private void OnServerBoolsOperation(object sender, NotifiableListAction action, int index)
+        {
+            if (onServerBoolsOperation != null)
+                onServerBoolsOperation.Invoke(action, index);
+        }
+
+        private void OnServerIntsOperation(object sender, NotifiableListAction action, int index)
+        {
+            if (onServerIntsOperation != null)
+                onServerIntsOperation.Invoke(action, index);
+        }
+
+        private void OnServerFloatsOperation(object sender, NotifiableListAction action, int index)
+        {
+            if (onServerFloatsOperation != null)
+                onServerFloatsOperation.Invoke(action, index);
+        }
+
         private void OnPrivateBoolsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (onPrivateBoolsOperation != null)
