@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             isReadyToSave = false;
         }
 
-        public override UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
+        public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
             storageItems.Clear();
@@ -50,7 +50,7 @@ namespace MultiplayerARPG
                     }
                     else
                     {
-                        BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
+                        await BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
                     }
                 }
                 // Setup building
@@ -71,7 +71,6 @@ namespace MultiplayerARPG
                 }
             }
             isReadyToSave = true;
-            return default;
         }
 
         public override void SaveCharacter(IPlayerCharacterData playerCharacterData)

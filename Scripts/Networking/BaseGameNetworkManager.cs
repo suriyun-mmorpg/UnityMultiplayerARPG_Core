@@ -1051,8 +1051,9 @@ namespace MultiplayerARPG
                 onUnregisterUser?.Invoke(connectionId, userId);
         }
 
-        public virtual BuildingEntity CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
+        public virtual async UniTask<BuildingEntity> CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
         {
+            await UniTask.Yield();
             LiteNetLibIdentity spawnObj;
             if (GameInstance.AddressableBuildingEntities.TryGetValue(saveData.EntityId, out AssetReferenceLiteNetLibBehaviour<BuildingEntity> addressablePrefab))
             {

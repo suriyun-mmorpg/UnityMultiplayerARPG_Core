@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             buildingSaveData.Rotation = rotation;
             buildingSaveData.CreatorId = Entity.Id;
             buildingSaveData.CreatorName = Entity.CharacterName;
-            CurrentGameManager.CreateBuildingEntity(buildingSaveData, false);
+            await CurrentGameManager.CreateBuildingEntity(buildingSaveData, false);
 #endif
         }
 
