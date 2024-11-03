@@ -426,7 +426,7 @@ namespace MultiplayerARPG
                                 GameInstance.ServerGameMessageHandlers.SendGameMessageByCharacterId(looterEntity.Id, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                                 continue;
                             }
-                            looterEntity.IncreaseItems(_droppingItems[i]);
+                            looterEntity.IncreaseItems(_droppingItems[i], characterItem => looterEntity.OnRewardItem(RewardGivenType.KillMonster, characterItem));
                         }
                     }
                     break;
