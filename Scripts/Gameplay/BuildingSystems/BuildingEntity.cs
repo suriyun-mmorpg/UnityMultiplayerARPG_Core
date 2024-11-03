@@ -655,7 +655,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override void OnNetworkDestroy(byte reasons)
+        public override async void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
             if (reasons == DestroyObjectReasons.RequestedToDestroy)
@@ -667,7 +667,7 @@ namespace MultiplayerARPG
                     child.Destroy();
                 }
                 _children.Clear();
-                CurrentGameManager.DestroyBuildingEntity(Id, IsSceneObject);
+                await CurrentGameManager.DestroyBuildingEntity(Id, IsSceneObject);
             }
         }
 

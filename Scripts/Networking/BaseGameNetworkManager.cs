@@ -1095,8 +1095,9 @@ namespace MultiplayerARPG
             return buildingEntity;
         }
 
-        public virtual void DestroyBuildingEntity(string id, bool isSceneObject)
+        public virtual async UniTask DestroyBuildingEntity(string id, bool isSceneObject)
         {
+            await UniTask.Yield();
             if (!isSceneObject)
                 ServerBuildingHandlers.RemoveBuilding(id);
         }
