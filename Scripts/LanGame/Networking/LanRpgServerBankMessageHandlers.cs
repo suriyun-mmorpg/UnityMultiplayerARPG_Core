@@ -8,6 +8,14 @@ namespace MultiplayerARPG
     {
         public UniTaskVoid HandleRequestDepositGuildGold(RequestHandlerData requestHandler, RequestDepositGuildGoldMessage request, RequestProceedResultDelegate<ResponseDepositGuildGoldMessage> result)
         {
+            if (request.gold <= 0)
+            {
+                result.InvokeError(new ResponseDepositGuildGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
+                });
+                return default;
+            }
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseDepositGuildGoldMessage()
@@ -42,6 +50,14 @@ namespace MultiplayerARPG
 
         public UniTaskVoid HandleRequestDepositUserGold(RequestHandlerData requestHandler, RequestDepositUserGoldMessage request, RequestProceedResultDelegate<ResponseDepositUserGoldMessage> result)
         {
+            if (request.gold <= 0)
+            {
+                result.InvokeError(new ResponseDepositUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
+                });
+                return default;
+            }
             if (GameInstance.Singleton.goldStoreMode == GoldStoreMode.UserGoldOnly)
             {
                 result.InvokeError(new ResponseDepositUserGoldMessage()
@@ -73,6 +89,14 @@ namespace MultiplayerARPG
 
         public UniTaskVoid HandleRequestWithdrawGuildGold(RequestHandlerData requestHandler, RequestWithdrawGuildGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawGuildGoldMessage> result)
         {
+            if (request.gold <= 0)
+            {
+                result.InvokeError(new ResponseWithdrawGuildGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
+                });
+                return default;
+            }
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseWithdrawGuildGoldMessage()
@@ -107,6 +131,14 @@ namespace MultiplayerARPG
 
         public UniTaskVoid HandleRequestWithdrawUserGold(RequestHandlerData requestHandler, RequestWithdrawUserGoldMessage request, RequestProceedResultDelegate<ResponseWithdrawUserGoldMessage> result)
         {
+            if (request.gold <= 0)
+            {
+                result.InvokeError(new ResponseWithdrawUserGoldMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD,
+                });
+                return default;
+            }
             if (GameInstance.Singleton.goldStoreMode == GoldStoreMode.UserGoldOnly)
             {
                 result.InvokeError(new ResponseWithdrawUserGoldMessage()
