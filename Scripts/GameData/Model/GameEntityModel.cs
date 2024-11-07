@@ -142,6 +142,8 @@ namespace MultiplayerARPG
             get { return _cacheEffectContainers; }
         }
 
+        public bool DisableAnimationLOD { get; set; }
+
         protected bool _isCacheDataInitialized = false;
 
         protected virtual void Awake()

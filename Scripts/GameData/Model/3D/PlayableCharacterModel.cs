@@ -100,6 +100,15 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         public override void UpdateAnimation(float deltaTime)
         {
+            if (DisableAnimationLOD)
+            {
+                if (!Graph.IsValid())
+                {
+                    return;
+                }
+                Graph.Evaluate(deltaTime);
+                return;
+            }
             animationLodUpdater.Graph = Graph;
             animationLodUpdater.Transform = Entity.GetTransform();
             animationLodUpdater.WatcherTransform = GameInstance.PlayingCharacterEntity.GetTransform();
