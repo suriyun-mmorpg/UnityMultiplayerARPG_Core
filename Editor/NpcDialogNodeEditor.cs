@@ -49,6 +49,7 @@ namespace MultiplayerARPG
                 case NpcDialogType.SaveRespawnPoint:
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.saveRespawnMap)));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.saveRespawnPosition)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.confirmRequirement)));
                     NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.saveRespawnConfirmDialog)));
                     NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.saveRespawnCancelDialog)));
                     break;
@@ -58,6 +59,7 @@ namespace MultiplayerARPG
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpPosition)));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpOverrideRotation)));
                     EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.warpRotation)));
+                    EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.confirmRequirement)));
                     NodeEditorGUILayout.PortField(target.GetOutputPort(nameof(node.warpCancelDialog)));
                     break;
                 case NpcDialogType.RefineItem:
