@@ -490,6 +490,50 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Decrease Items By Indexes
+        public static void DecreaseItemsByIndexes(this IList<CharacterItem> itemList, Dictionary<int, int> indexAndAmounts, bool isLimitInventorySlot)
+        {
+            foreach (KeyValuePair<int, int> kv in indexAndAmounts)
+            {
+                GameInstance.Singleton.InventoryManager.DecreaseItemsByIndex(itemList, kv.Key, kv.Value, isLimitInventorySlot, true);
+            }
+        }
+
+        public static void DecreaseItemsByIndexes(this ICharacterData data, Dictionary<int, int> indexAndAmounts)
+        {
+            DecreaseItemsByIndexes(data.NonEquipItems, indexAndAmounts, GameInstance.Singleton.IsLimitInventorySlot);
+        }
+        #endregion
+
+        #region Decrease Items By Id
+        public static bool DecreaseItemsById(this IList<CharacterItem> itemList, string id, int amount, bool isLimitInventorySlot, bool adjustMaxAmount)
+        {
+            return GameInstance.Singleton.InventoryManager.DecreaseItemsByIndex(itemList, itemList.IndexOf(id), amount, isLimitInventorySlot, adjustMaxAmount);
+        }
+
+        public static bool DecreaseItemsById(this ICharacterData data, string id, int amount, bool adjustMaxAmount)
+        {
+            if (DecreaseItemsById(data.NonEquipItems, id, amount, GameInstance.Singleton.IsLimitInventorySlot, adjustMaxAmount))
+                return true;
+            return false;
+        }
+        #endregion
+
+        #region Decrease Items By Ids
+        public static void DecreaseItemsByIds(this IList<CharacterItem> itemList, Dictionary<string, int> idAndAmounts, bool isLimitInventorySlot, bool adjustMaxAmount)
+        {
+            foreach (KeyValuePair<string, int> kv in idAndAmounts)
+            {
+                GameInstance.Singleton.InventoryManager.DecreaseItemsByIndex(itemList, itemList.IndexOf(kv.Key), kv.Value, isLimitInventorySlot, adjustMaxAmount);
+            }
+        }
+
+        public static void DecreaseItemsByIds(this ICharacterData data, Dictionary<string, int> idAndAmounts, bool adjustMaxAmount)
+        {
+            DecreaseItemsByIds(data.NonEquipItems, idAndAmounts, GameInstance.Singleton.IsLimitInventorySlot, adjustMaxAmount);
+        }
+        #endregion
+
         #region Ammo Functions
         public static bool DecreaseAmmos(this IList<CharacterItem> nonEquipItems, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
         {
