@@ -77,6 +77,8 @@ namespace MultiplayerARPG
         [SerializeField]
         private IncrementalMinMaxInt randomGold = default;
         [SerializeField]
+        private IncrementalFloat chanceToNotDropGold = default;
+        [SerializeField]
         [ArrayElementTitle("currency")]
         public CurrencyRandomAmount[] randomCurrencies = new CurrencyRandomAmount[0];
         public ItemDropManager itemDropManager = new ItemDropManager();
@@ -189,6 +191,11 @@ namespace MultiplayerARPG
         public virtual int RandomGold(int level)
         {
             return randomGold.GetAmount(level).Random();
+        }
+
+        public virtual float ChanceToNotDropGold(int level)
+        {
+            return chanceToNotDropGold.GetAmount(level);
         }
 
         public virtual void RandomItems(OnDropItemDelegate onRandomItem, float rate = 1f)

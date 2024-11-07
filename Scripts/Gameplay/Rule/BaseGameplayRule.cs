@@ -508,7 +508,8 @@ namespace MultiplayerARPG
         {
             Reward result = new Reward();
             result.exp = monster.RandomExp(level);
-            result.gold = monster.RandomGold(level);
+            if (Random.value > monster.ChanceToNotDropGold(level))
+                result.gold = monster.RandomGold(level);
             result.currencies = monster.RandomCurrencies();
             return result;
         }
