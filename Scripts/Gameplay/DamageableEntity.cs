@@ -397,6 +397,11 @@ namespace MultiplayerARPG
             return !IsAlly(instigator);
         }
 
+        public virtual bool IsHitBoxesOverridedByVehicle()
+        {
+            return PassengingVehicleSeat != null && PassengingVehicleSeat.overridePassengerHitBoxes;
+        }
+
         public bool IsAlly(EntityInfo entityInfo)
         {
             if (CurrentMapInfo == null)

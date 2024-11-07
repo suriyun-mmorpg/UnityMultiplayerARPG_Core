@@ -46,17 +46,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool IsSetDamageableEntity { get; private set; }
         private DamageableEntity _damageableEntity;
         public DamageableEntity DamageableEntity
         {
             get
             {
-                if (!IsSetDamageableEntity || _damageableEntity == null)
-                {
-                    IsSetDamageableEntity = false;
-                    return null;
-                }
                 return _damageableEntity;
             }
         }
@@ -191,7 +185,6 @@ namespace MultiplayerARPG
         private void Awake()
         {
             _damageableEntity = GetComponentInParent<DamageableEntity>();
-            IsSetDamageableEntity = _damageableEntity != null;
             CacheTransform = transform;
             CacheCollider = GetComponent<Collider>();
             if (CacheCollider != null)
@@ -212,18 +205,17 @@ namespace MultiplayerARPG
                     _boundsSize = capsuleCollider.radius * Vector3.one * 2f;
                     switch (capsuleCollider.direction)
                     {
-                        case 0:
-                            // X
-                            _boundsSize = new Vector3(capsuleCollider.height, _boundsSize.y, _boundsSize.z);
+                        case 1:
+                            // Y
+                            _boundsSize = new Vector3(_boundsSize.x, capsuleCollider.height, _boundsSize.z);
                             break;
-
                         case 2:
                             // Z
                             _boundsSize = new Vector3(_boundsSize.x, _boundsSize.y, capsuleCollider.height);
                             break;
                         default:
-                            // Y
-                            _boundsSize = new Vector3(_boundsSize.x, capsuleCollider.height, _boundsSize.z);
+                            // X
+                            _boundsSize = new Vector3(capsuleCollider.height, _boundsSize.y, _boundsSize.z);
                             break;
                     }
                 }
@@ -283,7 +275,6 @@ namespace MultiplayerARPG
         private void OnDestroy()
         {
             _damageableEntity = null;
-            IsSetDamageableEntity = false;
             CacheTransform = null;
             CacheCollider = null;
             CacheRigidbody = null;
@@ -323,19 +314,31 @@ namespace MultiplayerARPG
 
         public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
-            if (!DamageableEntity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
+            if (DamageableEntity == null || !DamageableEntity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
                 return;
             ReceiveDamageWithoutConditionCheck(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
         }
 
         public virtual void ReceiveDamageWithoutConditionCheck(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
+            if (DamageableEntity.IsHitBoxesOverridedByVehicle())
+                return;
             if (damageAmounts != null)
             {
                 List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
                 foreach (DamageElement key in keys)
                 {
                     damageAmounts[key] = damageAmounts[key] * damageRate;
+                }
+            }
+            if (DamageableEntity is IVehicleEntity vehicleEntity)
+            {
+                for (byte i = 0; i < vehicleEntity.Seats.Count; ++i)
+                {
+                    if (!vehicleEntity.Seats[i].overridePassengerHitBoxes)
+                        continue;
+                    if (vehicleEntity.GetPassenger(i) is DamageableEntity damageablePassenger)
+                        damageablePassenger.ApplyDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
                 }
             }
             DamageableEntity.ApplyDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);

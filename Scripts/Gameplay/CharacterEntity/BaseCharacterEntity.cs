@@ -195,7 +195,7 @@ namespace MultiplayerARPG
             get
             {
                 BaseCharacterModel model = null;
-                if (PassengingVehicleSeat != null && PassengingVehicleSeat.overrideActionAnimation)
+                if (PassengingVehicleSeat != null && PassengingVehicleSeat.overridePassengerActionAnimations)
                     model = PassengingVehicleModel as BaseCharacterModel;
                 if (model == null)
                     model = CharacterModel;
