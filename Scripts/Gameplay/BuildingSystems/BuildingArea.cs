@@ -69,7 +69,9 @@ namespace MultiplayerARPG
 
         public virtual bool AllowToBuild(BuildingEntity newBuilding)
         {
-            if (entity != null && !entity.IsCreator(newBuilding.Builder))
+            if (newBuilding == null || entity == null)
+                return false;
+            if (!entity.IsCreator(newBuilding.Builder))
                 return false;
             if (!newBuilding.BuildingTypes.Contains(buildingType))
                 return false;
