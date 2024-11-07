@@ -12,12 +12,15 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyEntriesOnly = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Status Effect Title}, {1} = {Entries}")]
         public UILocaleKeySetting formatKeyTitleWithEntries = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_REMOVAL_ENTRIES);
+        [Tooltip("Format => {0} = {Status Effect Title}")]
+        public UILocaleKeySetting formatKeyTitleWithoutEntries = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUFF_REMOVAL_NO_ENTRIES);
         public string entriesSeparator = ", ";
 
         [Header("UI Elements")]
         public UIGameDataElements uiGameDataElements;
         public TextWrapper uiTextEntriesOnly;
         public TextWrapper uiTextTitleWithEntries;
+        public TextWrapper uiTextTitleWithoutEntries;
 
         protected override void OnDestroy()
         {
@@ -25,6 +28,7 @@ namespace MultiplayerARPG
             uiGameDataElements = null;
             uiTextEntriesOnly = null;
             uiTextTitleWithEntries = null;
+            uiTextTitleWithoutEntries = null;
         }
 
         protected override void UpdateData()
@@ -47,6 +51,13 @@ namespace MultiplayerARPG
                     LanguageManager.GetText(formatKeyTitleWithEntries),
                     Data.removal.Title,
                     Data.removal.GetChanceEntriesText(Data.amount, LanguageManager.GetText(formatKeyEntry), entriesSeparator));
+            }
+
+            if (uiTextTitleWithoutEntries != null)
+            {
+                uiTextTitleWithoutEntries.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyTitleWithoutEntries),
+                    Data.removal.Title);
             }
         }
     }
