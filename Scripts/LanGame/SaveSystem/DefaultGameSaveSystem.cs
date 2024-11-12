@@ -22,7 +22,17 @@ namespace MultiplayerARPG
         public override async UniTask PreSpawnEntities(IPlayerCharacterData hostPlayerCharacterData, IDictionary<StorageId, List<CharacterItem>> storageItems)
         {
             isReadyToSave = false;
-            storageItems.Clear();
+            // Remove all building storage items, will fill with the new ones
+            List<StorageId> keys = new List<StorageId>(storageItems.Keys);
+            foreach (StorageId key in keys)
+            {
+                switch (key.storageType)
+                {
+                    case StorageType.Building:
+                        storageItems.Remove(key);
+                        break;
+                }
+            }
             if (hostPlayerCharacterData != null && !string.IsNullOrEmpty(hostPlayerCharacterData.Id))
             {
                 // Load and Spawn buildings
