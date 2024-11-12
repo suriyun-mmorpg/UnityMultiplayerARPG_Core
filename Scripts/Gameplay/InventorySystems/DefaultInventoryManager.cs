@@ -70,6 +70,7 @@ namespace MultiplayerARPG
             }
 
             int maxStack = itemData.MaxStack;
+            int slotCount = 0;
             // Loop to all slots to add amount to any slots that item amount not max in stack
             CharacterItem tempItem;
             for (int i = 0; i < itemList.Count; ++i)
@@ -86,29 +87,37 @@ namespace MultiplayerARPG
                     else
                         amount -= maxStack;
                 }
-                else if (tempItem.dataId == itemData.DataId)
+                else
                 {
-                    // If same item id, increase its amount
-                    if (tempItem.amount + amount <= maxStack)
+                    if (!tempItem.GetItem().NoSlotUsage)
+                        slotCount++;
+                    if (tempItem.dataId == itemData.DataId)
                     {
-                        // Can add all items, so assume that it is not overwhelming 
-                        return false;
+                        // If same item id, increase its amount
+                        if (tempItem.amount + amount <= maxStack)
+                        {
+                            // Can add all items, so assume that it is not overwhelming 
+                            return false;
+                        }
+                        else if (maxStack - tempItem.amount >= 0)
+                            amount -= maxStack - tempItem.amount;
                     }
-                    else if (maxStack - tempItem.amount >= 0)
-                        amount -= maxStack - tempItem.amount;
                 }
             }
 
-            int slotCount = itemList.Count;
+            bool noSlotUsage = itemData.NoSlotUsage;
             // Count adding slot here
             while (amount > 0)
             {
-                if (slotCount + 1 > slotLimit)
+                if (!noSlotUsage)
                 {
-                    // If adding slot is more than slot limit, assume that it is overwhelming 
-                    return true;
+                    if (slotCount + 1 > slotLimit)
+                    {
+                        // If adding slot is more than slot limit, assume that it is overwhelming 
+                        return true;
+                    }
+                    ++slotCount;
                 }
-                ++slotCount;
                 if (amount <= maxStack)
                 {
                     // Can add all items, so assume that it is not overwhelming 
