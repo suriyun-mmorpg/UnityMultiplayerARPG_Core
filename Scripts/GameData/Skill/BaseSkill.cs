@@ -12,7 +12,7 @@ namespace MultiplayerARPG
     public abstract partial class BaseSkill : BaseGameData, ICustomAimController
     {
         [Category("Skill Settings")]
-        [Range(1, 100)]
+        [Min(1)]
         public int maxLevel = 1;
         public float battlePointScore = 0;
         public bool cannotReset = false;
