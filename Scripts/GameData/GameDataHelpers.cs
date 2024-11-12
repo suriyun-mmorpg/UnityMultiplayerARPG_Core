@@ -696,7 +696,7 @@ namespace MultiplayerARPG
         {
             if (source.skill == null)
                 return new KeyValuePair<BaseSkill, int>();
-            return new KeyValuePair<BaseSkill, int>(source.skill, source.level);
+            return new KeyValuePair<BaseSkill, int>(source.skill, source.skillLevel.baseAmount);
         }
 
         /// <summary>

@@ -247,7 +247,7 @@ namespace MultiplayerARPG
                 if (random < monsterSkill.useRate && (monsterSkill.useWhenHpRate <= 0 || entity.HpRate <= monsterSkill.useWhenHpRate))
                 {
                     skill = monsterSkill.skill;
-                    level = monsterSkill.level;
+                    level = monsterSkill.skillLevel.GetAmount(entity.Level);
                     // Shuffle for next random
                     _tempRandomSkills.Shuffle();
                     return true;
@@ -344,6 +344,19 @@ namespace MultiplayerARPG
             {
                 hasChanges = true;
                 defaultLevel = 1;
+            }
+            if (skills != null && skills.Length > 0)
+            {
+                for (int i = 0; i < skills.Length; ++i)
+                {
+                    MonsterSkill skill = skills[i];
+                    if (skill.skillLevel.baseAmount < skill.level)
+                    {
+                        skill.skillLevel.baseAmount = skill.level;
+                        skills[i] = skill;
+                        hasChanges = true;
+                    }
+                }
             }
             if (AdjustDamageAmount())
                 hasChanges = true;
