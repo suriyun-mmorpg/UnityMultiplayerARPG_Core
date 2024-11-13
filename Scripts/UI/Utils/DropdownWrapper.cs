@@ -52,7 +52,11 @@ public class DropdownWrapper : MonoBehaviour
                 List<OptionData> options = new List<OptionData>();
                 foreach (Dropdown.OptionData entry in unityDropdown.options)
                 {
+#if UNITY_6000_0_OR_NEWER
+                    options.Add(new OptionData(entry.text, entry.image, Color.white));
+#else
                     options.Add(new OptionData(entry.text, entry.image));
+#endif
                 }
                 return options;
             }
@@ -63,7 +67,11 @@ public class DropdownWrapper : MonoBehaviour
                 var options = new List<OptionData>();
                 foreach (var entry in textMeshDropdown.options)
                 {
+#if UNITY_6000_0_OR_NEWER
+                    options.Add(new OptionData(entry.text, entry.image, entry.color));
+#else
                     options.Add(new OptionData(entry.text, entry.image));
+#endif
                 }
                 return options;
             }
@@ -95,7 +103,11 @@ public class DropdownWrapper : MonoBehaviour
                     var options = new List<TMP_Dropdown.OptionData>();
                     foreach (var entry in value)
                     {
+#if UNITY_6000_0_OR_NEWER
+                        options.Add(new TMP_Dropdown.OptionData(entry.text, entry.image, entry.color));
+#else
                         options.Add(new TMP_Dropdown.OptionData(entry.text, entry.image));
+#endif
                     }
                     textMeshDropdown.options = options;
                 }
@@ -154,28 +166,30 @@ public class DropdownWrapper : MonoBehaviour
 
     public class OptionData
     {
-        public OptionData() : this(string.Empty, null)
+        public OptionData() : this(string.Empty, null, Color.white)
         {
         }
 
-        public OptionData(string text) : this(text, null)
-        {
-
-        }
-
-        public OptionData(Sprite image) : this(string.Empty, image)
+        public OptionData(string text) : this(text, null, Color.white)
         {
 
         }
 
-        public OptionData(string text, Sprite image)
+        public OptionData(Sprite image) : this(string.Empty, image, Color.white)
+        {
+
+        }
+
+        public OptionData(string text, Sprite image, Color color)
         {
             this.text = text;
             this.image = image;
+            this.color = color;
         }
 
 
         public string text { get; set; }
         public Sprite image { get; set; }
+        public Color color { get; set; }
     }
 }
