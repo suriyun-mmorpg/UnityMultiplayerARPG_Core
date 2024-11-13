@@ -232,7 +232,7 @@ namespace MultiplayerARPG
             return userLevel > 0;
         }
 
-        public override string HandleGMCommand(string sender, BasePlayerCharacterEntity characterEntity, string chatMessage)
+        public override string HandleGMCommand(string sender, BasePlayerCharacterEntity senderCharacter, string chatMessage)
         {
             if (string.IsNullOrEmpty(chatMessage))
                 return string.Empty;
@@ -255,9 +255,9 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (characterEntity != null)
+                    else if (senderCharacter != null)
                     {
-                        characterEntity.Level = amount;
+                        senderCharacter.Level = amount;
                         response = $"Set character level to {amount}";
                     }
                 }
@@ -268,9 +268,9 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (characterEntity != null)
+                    else if (senderCharacter != null)
                     {
-                        characterEntity.StatPoint = amount;
+                        senderCharacter.StatPoint = amount;
                         response = $"Set character statpoint to {amount}";
                     }
                 }
@@ -281,9 +281,9 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (characterEntity != null)
+                    else if (senderCharacter != null)
                     {
-                        characterEntity.SkillPoint = amount;
+                        senderCharacter.SkillPoint = amount;
                         response = $"Set character skillpoint to {amount}";
                     }
                 }
@@ -294,9 +294,9 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (characterEntity != null)
+                    else if (senderCharacter != null)
                     {
-                        characterEntity.Gold = amount;
+                        senderCharacter.Gold = amount;
                         response = $"Set character gold to {amount}";
                     }
                 }
@@ -323,18 +323,16 @@ namespace MultiplayerARPG
                     {
                         response = "Cannot find the item";
                     }
-                    else if (characterEntity != null)
+                    else if (senderCharacter != null)
                     {
-                        if (amount > targetItem.MaxStack)
-                            amount = targetItem.MaxStack;
-                        if (characterEntity.IncreasingItemsWillOverwhelming(targetItem.DataId, amount))
+                        if (senderCharacter.IncreasingItemsWillOverwhelming(targetItem.DataId, amount))
                         {
                             response = $"Cannot add item {targetItem.Title}x{amount}, cannot carry any more of those items";
                         }
                         else
                         {
-                            characterEntity.AddOrSetNonEquipItems(CharacterItem.Create(targetItem, 1, amount));
-                            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(characterEntity.ConnectionId, RewardGivenType.GM, targetItem.DataId, amount);
+                            senderCharacter.IncreaseItems(CharacterItem.Create(targetItem, 1, amount));
+                            GameInstance.ServerGameMessageHandlers.NotifyRewardItem(senderCharacter.ConnectionId, RewardGivenType.GM, targetItem.DataId, amount);
                             response = $"Add item {targetItem.Title}x{amount} to character's inventory";
                         }
                     }
@@ -380,15 +378,13 @@ namespace MultiplayerARPG
                     }
                     else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(receiver, out targetCharacter))
                     {
-                        if (amount > targetItem.MaxStack)
-                            amount = targetItem.MaxStack;
                         if (targetCharacter.IncreasingItemsWillOverwhelming(targetItem.DataId, amount))
                         {
                             response = $"Cannot add item {targetItem.Title}x{amount} to {receiver}'s inventory, cannot carry any more of those items";
                         }
                         else
                         {
-                            targetCharacter.AddOrSetNonEquipItems(CharacterItem.Create(targetItem, 1, amount));
+                            targetCharacter.IncreaseItems(CharacterItem.Create(targetItem, 1, amount));
                             GameInstance.ServerGameMessageHandlers.NotifyRewardItem(targetCharacter.ConnectionId, RewardGivenType.GM, targetItem.DataId, amount);
                             response = $"Add item {targetItem.Title}x{amount} to {receiver}'s inventory";
                         }
@@ -438,10 +434,10 @@ namespace MultiplayerARPG
                     {
                         response = "Cannot find the map";
                     }
-                    else if (characterEntity != null)
+                    else if (senderCharacter != null)
                     {
                         BaseMapInfo mapInfo = GameInstance.MapInfos[data[1]];
-                        BaseGameNetworkManager.Singleton.WarpCharacter(characterEntity, data[1], mapInfo.StartPosition, false, Vector3.zero);
+                        BaseGameNetworkManager.Singleton.WarpCharacter(senderCharacter, data[1], mapInfo.StartPosition, false, Vector3.zero);
                         response = $"Warping to: {data[1]} {mapInfo.StartPosition}";
                     }
                 }
@@ -460,8 +456,8 @@ namespace MultiplayerARPG
                         }
                     }
                     float x, y, z;
-                    if (!float.TryParse(data[3], out x) || 
-                        !float.TryParse(data[4], out y) || 
+                    if (!float.TryParse(data[3], out x) ||
+                        !float.TryParse(data[4], out y) ||
                         !float.TryParse(data[5], out z))
                     {
                         response = "Wrong input data";
@@ -472,7 +468,7 @@ namespace MultiplayerARPG
                     }
                     else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
-                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, data[2], new Vector3(x,y,z), false, Vector3.zero);
+                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, data[2], new Vector3(x, y, z), false, Vector3.zero);
                     }
                 }
                 if (commandKey.ToLower().Equals(WarpToCharacter.ToLower()))
@@ -485,9 +481,9 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Summon.ToLower()))
                 {
-                    if (characterEntity != null)
+                    if (senderCharacter != null)
                     {
-                        string resendCommand = $"{WarpCharacter} {data[1]} {BaseGameNetworkManager.CurrentMapInfo.Id.Replace(' ', '_')} {characterEntity.MovementTransform.position.x} {characterEntity.MovementTransform.position.y} {characterEntity.MovementTransform.position.z}";
+                        string resendCommand = $"{WarpCharacter} {data[1]} {BaseGameNetworkManager.CurrentMapInfo.Id.Replace(' ', '_')} {senderCharacter.MovementTransform.position.x} {senderCharacter.MovementTransform.position.y} {senderCharacter.MovementTransform.position.z}";
                         BaseGameNetworkManager.Singleton.ServerSendLocalMessage(sender, resendCommand);
                     }
                 }
@@ -534,13 +530,13 @@ namespace MultiplayerARPG
                     {
                         response = "Wrong input data";
                     }
-                    else if (characterEntity != null)
+                    else if (senderCharacter != null)
                     {
                         for (int i = 0; i < amount; ++i)
                         {
                             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                                 targetMonster.Identity.HashAssetId,
-                                characterEntity.MovementTransform.position,
+                                senderCharacter.MovementTransform.position,
                                 Quaternion.identity);
                             BaseMonsterCharacterEntity entity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
                             entity.Level = level;
@@ -566,10 +562,10 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Suicide.ToLower()))
                 {
-                    if (characterEntity != null)
+                    if (senderCharacter != null)
                     {
-                        characterEntity.CurrentHp = 0;
-                        characterEntity.Killed(EntityInfo.Empty);
+                        senderCharacter.CurrentHp = 0;
+                        senderCharacter.Killed(EntityInfo.Empty);
                         response = "Suicided";
                     }
                 }
@@ -623,19 +619,19 @@ namespace MultiplayerARPG
                 }
                 if (commandKey.ToLower().Equals(Visible.ToLower()))
                 {
-                    if (characterEntity != null)
-                        characterEntity.ForceHide = false;
+                    if (senderCharacter != null)
+                        senderCharacter.ForceHide = false;
                     response = "Your character is shown to other players";
                 }
                 if (commandKey.ToLower().Equals(Invisible.ToLower()))
                 {
-                    if (characterEntity != null)
-                        characterEntity.ForceHide = true;
+                    if (senderCharacter != null)
+                        senderCharacter.ForceHide = true;
                     response = "Your character is hidden from other players";
                 }
             }
 #endif
-                    return response;
+            return response;
         }
     }
 }
