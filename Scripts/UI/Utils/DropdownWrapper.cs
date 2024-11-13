@@ -52,11 +52,7 @@ public class DropdownWrapper : MonoBehaviour
                 List<OptionData> options = new List<OptionData>();
                 foreach (Dropdown.OptionData entry in unityDropdown.options)
                 {
-#if UNITY_6000_0_OR_NEWER
                     options.Add(new OptionData(entry.text, entry.image, Color.white));
-#else
-                    options.Add(new OptionData(entry.text, entry.image));
-#endif
                 }
                 return options;
             }
@@ -70,7 +66,7 @@ public class DropdownWrapper : MonoBehaviour
 #if UNITY_6000_0_OR_NEWER
                     options.Add(new OptionData(entry.text, entry.image, entry.color));
 #else
-                    options.Add(new OptionData(entry.text, entry.image));
+                    options.Add(new OptionData(entry.text, entry.image, Color.white));
 #endif
                 }
                 return options;
