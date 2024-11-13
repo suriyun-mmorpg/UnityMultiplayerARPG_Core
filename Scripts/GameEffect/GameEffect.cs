@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class GameEffect : PoolDescriptor
+    public partial class GameEffect : PoolDescriptor
     {
         public enum PlayMode
         {
