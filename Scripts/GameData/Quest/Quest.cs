@@ -7,11 +7,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.QUEST_FILE, menuName = GameDataMenuConsts.QUEST_MENU, order = GameDataMenuConsts.QUEST_ORDER)]
     public partial class Quest : BaseGameData
     {
-        public static readonly QuestTask[] EmptyTasks = new QuestTask[0];
+        public static readonly QuestTask[] EmptyTasks = System.Array.Empty<QuestTask>();
 
         [Category("Quest Settings")]
         [Tooltip("Requirement to receive quest")]
-        public QuestRequirement requirement = default;
+        public QuestRequirement requirement = new QuestRequirement();
         // TODO: Deprecating, use random tasks
         [HideInInspector]
         [SerializeField]
@@ -20,10 +20,10 @@ namespace MultiplayerARPG
         [Tooltip("Quests which will be abandoned when accept this quest")]
         public Quest[] abandonQuests = new Quest[0];
         [Header("Rewarding")]
-        public bool resetAttributes;
-        public bool resetSkills;
-        public PlayerCharacter changeCharacterClass;
-        public Faction changeCharacterFaction;
+        public bool resetAttributes = false;
+        public bool resetSkills = false;
+        public PlayerCharacter changeCharacterClass = null;
+        public Faction changeCharacterFaction = null;
         public int rewardExp = 0;
         public int rewardGold = 0;
         public int rewardStatPoints = 0;
@@ -37,12 +37,12 @@ namespace MultiplayerARPG
         [ArrayElementTitle("item")]
         public ItemRandomByWeight[] randomRewardItems = new ItemRandomByWeight[0];
         [FormerlySerializedAs("canRepeat")]
-        public QuestRepeatType repeatType;
+        public QuestRepeatType repeatType = QuestRepeatType.None;
         public bool canAbandon = true;
         [FormerlySerializedAs("nextAssignQuest")]
         public Quest[] nextAssignQuests = new Quest[0];
         [FormerlySerializedAs("autoTrack")]
-        public bool autoTrackQuest;
+        public bool autoTrackQuest = false;
 
         [System.NonSerialized]
         private HashSet<int> _cacheKillMonsterIds;

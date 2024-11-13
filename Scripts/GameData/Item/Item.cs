@@ -46,7 +46,7 @@ namespace MultiplayerARPG
         public EquipmentModel[] offHandSheathModels;
 
         [Category(2, "Item Requirement Settings")]
-        public ItemRequirement requirement;
+        public ItemRequirement requirement = new ItemRequirement();
         [Category(3, "Equipment Settings")]
         [Header("Generic Equipment Settings")]
         public EquipmentSet equipmentSet;

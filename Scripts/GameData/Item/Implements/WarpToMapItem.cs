@@ -8,7 +8,7 @@ namespace MultiplayerARPG
     {
         [Category(2, "Requirements")]
         [SerializeField]
-        private ItemRequirement requirement = default;
+        private ItemRequirement requirement = new ItemRequirement();
         public ItemRequirement Requirement
         {
             get { return requirement; }

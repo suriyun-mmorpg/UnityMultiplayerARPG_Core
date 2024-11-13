@@ -1,14 +1,11 @@
-﻿using System.Runtime.InteropServices;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     [System.Serializable]
-    [StructLayout(LayoutKind.Auto)]
-    public partial struct QuestRequirement
+    public partial class QuestRequirement
     {
-        public PlayerCharacter character;
-        public Faction faction;
-        public int level;
-        public Quest[] completedQuests;
+        public PlayerCharacter character = null;
+        public Faction faction = null;
+        public int level = 0;
+        public Quest[] completedQuests = new Quest[0];
     }
 }

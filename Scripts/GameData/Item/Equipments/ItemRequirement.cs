@@ -1,31 +1,29 @@
 ﻿using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    [StructLayout(LayoutKind.Auto)]
-    public partial struct ItemRequirement
+    public partial class ItemRequirement
     {
         [Header("Class")]
         [FormerlySerializedAs("character")]
         [Tooltip("Which character classes can equip item. This is a part of `availableClasses`, just keep it for backward compatibility.")]
-        public PlayerCharacter availableClass;
+        public PlayerCharacter availableClass = null;
         [Tooltip("Which character classes can equip item.")]
-        public List<PlayerCharacter> availableClasses;
+        public List<PlayerCharacter> availableClasses = new List<PlayerCharacter>();
 
         [Header("Faction")]
         [Tooltip("Which character factions can equip item.")]
-        public List<Faction> availableFactions;
+        public List<Faction> availableFactions = new List<Faction>();
 
         [Header("Level and Attributes")]
         [Tooltip("Character must have level equals or more than this setting to equip item.")]
-        public int level;
+        public int level = 0;
         [Tooltip("Character must have attribute amounts equals or more than this setting to equip item.")]
         [ArrayElementTitle("attribute")]
-        public AttributeAmount[] attributeAmounts;
+        public AttributeAmount[] attributeAmounts = new AttributeAmount[0];
 
         public bool HasAvailableClasses()
         {
