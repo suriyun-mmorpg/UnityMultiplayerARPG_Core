@@ -602,7 +602,7 @@ namespace MultiplayerARPG
         {
             if (characterItem.GetMaxDurability() <= 0)
                 return 1;
-            float durabilityRate = (float)characterItem.durability / (float)characterItem.GetMaxDurability();
+            float durabilityRate = characterItem.durability / characterItem.GetMaxDurability();
             if (durabilityRate > 0.5f)
                 return 1f;
             else if (durabilityRate > 0.3f)
