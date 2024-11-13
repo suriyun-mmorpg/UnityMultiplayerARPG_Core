@@ -116,13 +116,21 @@ namespace MultiplayerARPG
             _throwedTime = Time.unscaledTime;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
+#if UNITY_6000_0_OR_NEWER
+                CacheRigidbody2D.linearVelocity = Vector2.zero;
+#else
                 CacheRigidbody2D.velocity = Vector2.zero;
+#endif
                 CacheRigidbody2D.angularVelocity = 0f;
                 CacheRigidbody2D.AddForce(CacheTransform.forward * _throwForce, ForceMode2D.Impulse);
             }
             else
             {
+#if UNITY_6000_0_OR_NEWER
+                CacheRigidbody.linearVelocity = Vector2.zero;
+#else
                 CacheRigidbody.velocity = Vector3.zero;
+#endif
                 CacheRigidbody.angularVelocity = Vector3.zero;
                 CacheRigidbody.AddForce(CacheTransform.forward * _throwForce, ForceMode.Impulse);
             }

@@ -388,7 +388,11 @@ namespace MultiplayerARPG
                 }
             }
             _currentInput = Entity.SetInputDirection2D(_currentInput, Direction2D);
+#if UNITY_6000_0_OR_NEWER
+            CacheRigidbody2D.linearVelocity = tempMoveVelocity + new Vector2(forceMotion.x, forceMotion.y);
+#else
             CacheRigidbody2D.velocity = tempMoveVelocity + new Vector2(forceMotion.x, forceMotion.y);
+#endif
         }
 
         private float CalculateCurrentMoveSpeed(float maxMoveSpeed, float deltaTime)

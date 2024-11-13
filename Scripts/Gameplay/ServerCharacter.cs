@@ -62,7 +62,13 @@ namespace MultiplayerARPG
             moveDirection = moveDirection.normalized;
 
             if (moveDirection.magnitude == 0 && isGrounded)
+            {
+#if UNITY_6000_0_OR_NEWER
+                CacheRigidbody.linearVelocity = new Vector3(0, CacheRigidbody.linearVelocity.y, 0);
+#else
                 CacheRigidbody.velocity = new Vector3(0, CacheRigidbody.velocity.y, 0);
+#endif
+            }
             if (!isJumping)
                 isJumping = isGrounded && isJump;
         }
@@ -82,7 +88,12 @@ namespace MultiplayerARPG
         private void FixedUpdate()
         {
             GameInstance gameInstance = GameInstance.Singleton;
-            Vector3 velocity = CacheRigidbody.velocity;
+            Vector3 velocity;
+#if UNITY_6000_0_OR_NEWER
+            velocity = CacheRigidbody.linearVelocity;
+#else
+            velocity = CacheRigidbody.velocity;
+#endif
             float moveDirectionMagnitude = moveDirection.magnitude;
             if (moveDirectionMagnitude != 0)
             {
@@ -104,7 +115,11 @@ namespace MultiplayerARPG
             // Jump
             if (isGrounded && isJumping)
             {
+#if UNITY_6000_0_OR_NEWER
+                CacheRigidbody.linearVelocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+#else
                 CacheRigidbody.velocity = new Vector3(velocity.x, CalculateJumpVerticalSpeed(), velocity.z);
+#endif
                 isJumping = false;
             }
 
