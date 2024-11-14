@@ -77,16 +77,30 @@ namespace MultiplayerARPG
             {
                 if (imageGage != null)
                 {
-                    if (_smoothingCoroutineForImage != null)
-                        imageGage.StopCoroutine(_smoothingCoroutineForImage);
-                    _smoothingCoroutineForImage = imageGage.StartCoroutine(SmoothUpdateImageGageRoutine(_targetRate));
+                    if (imageGage.isActiveAndEnabled)
+                    {
+                        if (_smoothingCoroutineForImage != null)
+                            imageGage.StopCoroutine(_smoothingCoroutineForImage);
+                        _smoothingCoroutineForImage = imageGage.StartCoroutine(SmoothUpdateImageGageRoutine(_targetRate));
+                    }
+                    else
+                    {
+                        imageGage.fillAmount = _targetRate;
+                    }
                 }
                 if (sliderGage != null)
                 {
                     sliderGage.maxValue = 1f;
-                    if (_smoothingCoroutineForSlider != null)
-                        sliderGage.StopCoroutine(_smoothingCoroutineForSlider);
-                    _smoothingCoroutineForSlider = sliderGage.StartCoroutine(SmoothUpdateSliderGageRoutine(_targetRate));
+                    if (sliderGage.isActiveAndEnabled)
+                    {
+                        if (_smoothingCoroutineForSlider != null)
+                            sliderGage.StopCoroutine(_smoothingCoroutineForSlider);
+                        _smoothingCoroutineForSlider = sliderGage.StartCoroutine(SmoothUpdateSliderGageRoutine(_targetRate));
+                    }
+                    else
+                    {
+                        sliderGage.value = _targetRate;
+                    }
                 }
             }
             else
