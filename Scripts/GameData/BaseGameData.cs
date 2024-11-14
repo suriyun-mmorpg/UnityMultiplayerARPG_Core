@@ -229,11 +229,15 @@ namespace MultiplayerARPG
 
         public override string ToString()
         {
+            if (this == null)
+                return null;
             return Id;
         }
 
         public override int GetHashCode()
         {
+            if (this == null)
+                return 0;
             return HashCode;
         }
 
