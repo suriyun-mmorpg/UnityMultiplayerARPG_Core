@@ -614,7 +614,6 @@ namespace MultiplayerARPG
         {
             character.GuildId = 0;
             character.GuildRole = 0;
-            character.SharedGuildExp = 0;
         }
 
         public static bool IsMuting(this IPlayerCharacterData character)

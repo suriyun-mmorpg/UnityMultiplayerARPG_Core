@@ -117,7 +117,6 @@ namespace MultiplayerARPG
         public int PartyId { get { return partyId.Value; } set { partyId.Value = value; } }
         public int GuildId { get { return guildId.Value; } set { guildId.Value = value; } }
         public byte GuildRole { get; set; }
-        public int SharedGuildExp { get; set; }
         public string UserId { get; set; }
         public byte UserLevel { get; set; }
         public string CurrentChannel { get { return CurrentGameManager.GetCurrentChannel(this); } set { } }

@@ -138,7 +138,6 @@ namespace MultiplayerARPG
             GameInstance.ServerGuildHandlers.SetGuild(guild.id, guild);
             playerCharacter.GuildId = guild.id;
             playerCharacter.GuildRole = guild.GetMemberRole(playerCharacter.Id);
-            playerCharacter.SharedGuildExp = 0;
             GameInstance.ServerGameMessageHandlers.SendSetFullGuildData(requestHandler.ConnectionId, guild);
             result.InvokeSuccess(new ResponseCreateGuildMessage());
             return default;
