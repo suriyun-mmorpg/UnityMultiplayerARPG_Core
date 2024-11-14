@@ -11,6 +11,10 @@ namespace MultiplayerARPG
         [Tooltip("Selling item")]
         public BaseItem item;
         /// <summary>
+        /// Item level
+        /// </summary>
+        public int level;
+        /// <summary>
         /// Amount of item
         /// </summary>
         public int amount;

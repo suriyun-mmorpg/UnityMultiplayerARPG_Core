@@ -392,10 +392,11 @@ namespace MultiplayerARPG
                 return;
             }
 
+            int dataId = sellItem.item.DataId;
+            int level = sellItem.level;
             int sellAmount = sellItem.amount > 0 ? sellItem.amount : sellItem.item.MaxStack;
 
             // Can carry or not?
-            int dataId = sellItem.item.DataId;
             if (Entity.IncreasingItemsWillOverwhelming(dataId, amount * sellAmount))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
@@ -406,7 +407,7 @@ namespace MultiplayerARPG
             CurrentGameplayRule.DecreaseCurrenciesWhenBuyItem(Entity, sellItem, amount);
 
             // Add item to inventory
-            Entity.IncreaseItems(CharacterItem.Create(dataId, 1, amount * sellAmount), characterItem => Entity.OnRewardItem(RewardGivenType.NpcShop, characterItem));
+            Entity.IncreaseItems(CharacterItem.Create(dataId, level, amount * sellAmount), characterItem => Entity.OnRewardItem(RewardGivenType.NpcShop, characterItem));
             Entity.FillEmptySlots();
 
             GameInstance.ServerLogHandlers.LogBuyNpcItem(Entity, sellItem, amount);

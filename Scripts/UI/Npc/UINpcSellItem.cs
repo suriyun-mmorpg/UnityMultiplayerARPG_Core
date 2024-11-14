@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(Data.item, 1, Data.amount > 0 ? Data.amount : Data.item.MaxStack), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(Data.item, Data.level, Data.amount > 0 ? Data.amount : Data.item.MaxStack), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
                     uiCharacterItem.Show();
                 }
             }
