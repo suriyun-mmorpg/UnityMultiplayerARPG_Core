@@ -28,7 +28,7 @@ namespace MultiplayerARPG
 
         public BuffMount GetBuffMount(ICharacterData characterData)
         {
-            if (type != MountType.MountItem)
+            if (type != MountType.Buff)
                 return null;
             int tempIndexOfData = characterData.IndexOfBuff(sourceId);
             if (tempIndexOfData < 0)
