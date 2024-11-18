@@ -168,6 +168,7 @@ namespace MultiplayerARPG
                 bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
+                bool overridePassengerActionAnimations = Entity.PassengingVehicleSeat != null && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
                 bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
 
                 // Prepare end time
@@ -176,24 +177,29 @@ namespace MultiplayerARPG
                 // Play action animation
                 if (weaponItem.DoRecoilingAsAttackAnimation)
                 {
-
                     _totalDuration = Entity.CharacterModel.CacheAttackRecoiler?.DefaultRecoilDuration ?? 1f;
                     _triggerDurations = new float[] { 0f };
-                    if (tpsModelAvailable)
-                        Entity.CharacterModel.CacheAttackRecoiler?.PlayRecoiling();
                     if (vehicleModelAvailable)
                         vehicleModel.CacheAttackRecoiler?.PlayRecoiling();
-                    if (fpsModelAvailable)
-                        Entity.FpsModel.CacheAttackRecoiler?.PlayRecoiling();
+                    if (!overridePassengerActionAnimations)
+                    {
+                        if (tpsModelAvailable)
+                            Entity.CharacterModel.CacheAttackRecoiler?.PlayRecoiling();
+                        if (fpsModelAvailable)
+                            Entity.FpsModel.CacheAttackRecoiler?.PlayRecoiling();
+                    }
                 }
                 else
                 {
-                    if (tpsModelAvailable)
-                        Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                     if (vehicleModelAvailable)
                         vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
-                    if (fpsModelAvailable)
-                        Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                    if (!overridePassengerActionAnimations)
+                    {
+                        if (tpsModelAvailable)
+                            Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                        if (fpsModelAvailable)
+                            Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                    }
                 }
 
                 if (weaponItem.RateOfFire > 0)
@@ -226,10 +232,17 @@ namespace MultiplayerARPG
                     if (IsClient)
                     {
                         // Play weapon launch special effects
-                        if (tpsModelAvailable)
-                            Entity.CharacterModel.PlayEquippedWeaponLaunch(isLeftHand);
-                        if (fpsModelAvailable)
-                            Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
+                        if (!overridePassengerActionAnimations)
+                        {
+                            if (tpsModelAvailable)
+                                Entity.CharacterModel.PlayEquippedWeaponLaunch(isLeftHand);
+                            if (fpsModelAvailable)
+                                Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
+                        }
+                        else if (vehicleModelAvailable)
+                        {
+                            vehicleModel.PlayEquippedWeaponLaunch(isLeftHand);
+                        }
                         // Play launch sfx
                         AudioClipWithVolumeSettings launchClip = weaponItem.LaunchClip;
                         if (Entity.GetCaches().TryGetWeaponAbility(isLeftHand, LaunchSfxWeaponAbility.KEY, out BaseWeaponAbility ability) && ability is LaunchSfxWeaponAbility launchSfxAbility)

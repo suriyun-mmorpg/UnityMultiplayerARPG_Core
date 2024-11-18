@@ -114,27 +114,38 @@ namespace MultiplayerARPG
                 bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
+                bool overridePassengerActionAnimations = Entity.PassengingVehicleSeat != null && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
                 bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
 
                 // Prepare end time
                 LastReloadEndTime = CharacterActionComponentManager.PrepareActionDefaultEndTime(_totalDuration, animSpeedRate);
 
                 // Play animation
-                if (tpsModelAvailable)
-                    Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
                 if (vehicleModelAvailable)
                     vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
-                if (fpsModelAvailable)
-                    Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _);
+                if (!overridePassengerActionAnimations)
+                {
+                    if (tpsModelAvailable)
+                        Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
+                    if (fpsModelAvailable)
+                        Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _);
+                }
 
                 // Special effects will plays on clients only
                 if (IsClient)
                 {
                     // Play weapon reload special effects
-                    if (tpsModelAvailable)
-                        Entity.CharacterModel.PlayEquippedWeaponReload(isLeftHand);
-                    if (fpsModelAvailable)
-                        Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
+                    if (!overridePassengerActionAnimations)
+                    {
+                        if (tpsModelAvailable)
+                            Entity.CharacterModel.PlayEquippedWeaponReload(isLeftHand);
+                        if (fpsModelAvailable)
+                            Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
+                    }
+                    else if (vehicleModelAvailable)
+                    {
+                        vehicleModel.PlayEquippedWeaponReload(isLeftHand);
+                    }
                     // Play reload sfx
                     weaponItem.ReloadClip?.Play(Entity.CharacterModel.GenericAudioSource);
                 }
@@ -158,10 +169,17 @@ namespace MultiplayerARPG
                     if (IsClient)
                     {
                         // Play weapon reload special effects
-                        if (tpsModelAvailable)
-                            Entity.CharacterModel.PlayEquippedWeaponReloaded(isLeftHand);
-                        if (fpsModelAvailable)
-                            Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
+                        if (!overridePassengerActionAnimations)
+                        {
+                            if (tpsModelAvailable)
+                                Entity.CharacterModel.PlayEquippedWeaponReloaded(isLeftHand);
+                            if (fpsModelAvailable)
+                                Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
+                        }
+                        else if (vehicleModelAvailable)
+                        {
+                            vehicleModel.PlayEquippedWeaponReload(isLeftHand);
+                        }
                         // Play reload sfx
                         weaponItem.ReloadedClip?.Play(Entity.CharacterModel.GenericAudioSource);
                     }
