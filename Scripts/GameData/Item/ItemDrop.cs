@@ -34,7 +34,7 @@ namespace MultiplayerARPG
         public int GetRandomedLevel()
         {
             GetMinMaxLevel(out int min, out int max);
-            return Random.Range(min, max);
+            return Random.Range(min, max + 1);
         }
 
         public void GetMinMaxAmount(out int min, out int max)
@@ -52,7 +52,7 @@ namespace MultiplayerARPG
         public int GetRandomedAmount()
         {
             GetMinMaxAmount(out int min, out int max);
-            return Random.Range(min, max);
+            return Random.Range(min, max + 1);
         }
     }
 }
