@@ -344,6 +344,13 @@ namespace MultiplayerARPG
                 Destroy();
         }
 
+        public override bool CanReceiveDamageFrom(EntityInfo instigator)
+        {
+            if (passengerIds.Contains(instigator.ObjectId))
+                return false;
+            return base.CanReceiveDamageFrom(instigator);
+        }
+
         public virtual void Destroy()
         {
             if (!IsServer)
