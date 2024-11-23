@@ -289,7 +289,10 @@ namespace MultiplayerARPG
         internal void ApplyDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
             ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
-            ApplyReceiveDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out CombatAmountType combatAmountType, out int totalDamage);
+            CombatAmountType combatAmountType = CombatAmountType.Immune;
+            int totalDamage = 0;
+            if (!IsImmune)
+                ApplyReceiveDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
             ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, CharacterBuff.Empty);
         }
 
@@ -375,9 +378,9 @@ namespace MultiplayerARPG
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
         {
-            if (IsImmune)
+            if (instigator.IsInSafeArea)
             {
-                // If this entity is in safe area it will not receives damages
+                // If attacker is in safe area, it will not receives damages
                 return false;
             }
 
@@ -385,12 +388,6 @@ namespace MultiplayerARPG
             {
                 // If attacker is unknow entity, can receive damages
                 return true;
-            }
-
-            if (instigator.IsInSafeArea)
-            {
-                // If attacker is in safe area, it will not receives damages
-                return false;
             }
 
             // If this character is not ally so it is enemy and also can receive damage

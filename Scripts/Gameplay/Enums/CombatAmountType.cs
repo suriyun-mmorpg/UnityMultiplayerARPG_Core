@@ -20,5 +20,6 @@
         MpLeech,
         StaminaLeech,
         FallDamage,
+        Immune,
     }
 }
