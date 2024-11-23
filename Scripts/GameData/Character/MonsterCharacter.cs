@@ -169,12 +169,15 @@ namespace MultiplayerARPG
             }
         }
 
+        [System.NonSerialized]
+        private Dictionary<BaseSkill, int> _cacheSkillLevels = null;
         public override Dictionary<BaseSkill, int> CacheSkillLevels
         {
             get
             {
-                Logging.LogWarning("[MonsterCharacter] `CacheSkillLevels` should not being used by monster character entity component (use `GetSkillLevels` function instead.)");
-                return null;
+                if (_cacheSkillLevels == null)
+                    _cacheSkillLevels = GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, int>(), 1);
+                return _cacheSkillLevels;
             }
         }
 
@@ -216,6 +219,18 @@ namespace MultiplayerARPG
                 });
             }
             return currencies.ToArray();
+        }
+
+        public virtual Dictionary<BaseSkill, int> GetSkillLevels(ICharacterData data)
+        {
+            if (data == null)
+                return null;
+            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
+            foreach (MonsterSkill skill in skills)
+            {
+                result = GameDataHelpers.CombineSkills(skills, result, data.Level);
+            }
+            return result;
         }
 
         public virtual bool RandomSkill(BaseMonsterCharacterEntity entity, out BaseSkill skill, out int level)
