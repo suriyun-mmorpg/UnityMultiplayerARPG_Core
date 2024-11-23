@@ -169,15 +169,12 @@ namespace MultiplayerARPG
             }
         }
 
-        [System.NonSerialized]
-        private Dictionary<BaseSkill, int> _cacheSkillLevels = null;
         public override Dictionary<BaseSkill, int> CacheSkillLevels
         {
             get
             {
-                if (_cacheSkillLevels == null)
-                    _cacheSkillLevels = GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, int>());
-                return _cacheSkillLevels;
+                Logging.LogWarning("[MonsterCharacter] `CacheSkillLevels` should not being used by monster character entity component (use `GetSkillLevels` function instead.)");
+                return null;
             }
         }
 

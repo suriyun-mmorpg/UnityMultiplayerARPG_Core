@@ -691,12 +691,13 @@ namespace MultiplayerARPG
         /// Make skill - level key-value pair
         /// </summary>
         /// <param name="source"></param>
+        /// <param name="characterLevel"></param>
         /// <returns></returns>
-        public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this MonsterSkill source)
+        public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this MonsterSkill source, int characterLevel)
         {
             if (source.skill == null)
                 return new KeyValuePair<BaseSkill, int>();
-            return new KeyValuePair<BaseSkill, int>(source.skill, source.skillLevel.baseAmount);
+            return new KeyValuePair<BaseSkill, int>(source.skill, source.skillLevel.GetAmount(characterLevel));
         }
 
         /// <summary>
@@ -1065,7 +1066,7 @@ namespace MultiplayerARPG
         /// <param name="sourceMonsterSkills"></param>
         /// <param name="resultDictionary"></param>
         /// <returns></returns>
-        public static Dictionary<BaseSkill, int> CombineSkills(IEnumerable<MonsterSkill> sourceMonsterSkills, Dictionary<BaseSkill, int> resultDictionary)
+        public static Dictionary<BaseSkill, int> CombineSkills(IEnumerable<MonsterSkill> sourceMonsterSkills, Dictionary<BaseSkill, int> resultDictionary, int characterLevel)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<BaseSkill, int>();
@@ -1074,7 +1075,7 @@ namespace MultiplayerARPG
             KeyValuePair<BaseSkill, int> pair;
             foreach (MonsterSkill sourceMonsterSkill in sourceMonsterSkills)
             {
-                pair = ToKeyValuePair(sourceMonsterSkill);
+                pair = ToKeyValuePair(sourceMonsterSkill, characterLevel);
                 resultDictionary = CombineSkills(resultDictionary, pair);
             }
             return resultDictionary;
