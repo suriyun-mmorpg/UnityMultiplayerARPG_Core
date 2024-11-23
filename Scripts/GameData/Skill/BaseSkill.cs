@@ -831,7 +831,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanLevelUp(IPlayerCharacterData character, int level, out UITextKeys gameMessage, bool checkSkillPoint = true, bool checkGold = true)
         {
-            if (character == null || !character.GetDatabase().CacheSkillLevels.ContainsKey(this))
+            if (character == null || !character.GetDatabase().GetLearnableSkillDataIds().Contains(DataId))
             {
                 gameMessage = UITextKeys.UI_ERROR_INVALID_CHARACTER_DATA;
                 return false;
@@ -849,7 +849,8 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (maxLevel > 0 && level + character.GetDatabase().CacheSkillLevels[this] >= maxLevel)
+            // Calculate with skill level when character's level is `1` only
+            if (maxLevel > 0 && level + character.GetDatabase().GetSkillLevels(1)[this] >= maxLevel)
             {
                 gameMessage = UITextKeys.UI_ERROR_SKILL_REACHED_MAX_LEVEL;
                 return false;

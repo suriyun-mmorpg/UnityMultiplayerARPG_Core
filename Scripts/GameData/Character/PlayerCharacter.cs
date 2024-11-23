@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -10,8 +10,9 @@ namespace MultiplayerARPG
     {
         [Category(3, "Character Stats")]
         [SerializeField]
+        [FormerlySerializedAs("skillLevels")]
         [ArrayElementTitle("skill")]
-        private SkillLevel[] skillLevels = new SkillLevel[0];
+        private PlayerSkill[] skills = new PlayerSkill[0];
 
         [Category(4, "Start Items")]
         [Header("Equipped Items")]
@@ -100,18 +101,6 @@ namespace MultiplayerARPG
             }
         }
 
-        [System.NonSerialized]
-        private Dictionary<BaseSkill, int> _cacheSkillLevels = null;
-        public override Dictionary<BaseSkill, int> CacheSkillLevels
-        {
-            get
-            {
-                if (_cacheSkillLevels == null)
-                    _cacheSkillLevels = GameDataHelpers.CombineSkills(skillLevels, new Dictionary<BaseSkill, int>(), 1f);
-                return _cacheSkillLevels;
-            }
-        }
-
         public void GetStartMapAndTransform(IPlayerCharacterData playerCharacterData, out BaseMapInfo startMap, out Vector3 position, out Vector3 rotation)
         {
             startMap = StartMap;
@@ -130,7 +119,45 @@ namespace MultiplayerARPG
                 }
             }
         }
-        
+
+        [System.NonSerialized]
+        private HashSet<int> _learnableSkillIds;
+        public override HashSet<int> GetLearnableSkillDataIds()
+        {
+            if (_learnableSkillIds == null)
+            {
+                _learnableSkillIds = new HashSet<int>();
+                foreach (PlayerSkill skill in skills)
+                {
+                    if (skill.skill == null)
+                        continue;
+                    _learnableSkillIds.Add(skill.skill.DataId);
+                }
+            }
+            return _learnableSkillIds;
+        }
+
+        public override Dictionary<BaseSkill, int> GetSkillLevels(int level)
+        {
+            if (level <= 0)
+                return new Dictionary<BaseSkill, int>();
+            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
+            foreach (PlayerSkill skill in skills)
+            {
+                result = GameDataHelpers.CombineSkills(skills, result, level);
+            }
+            return result;
+        }
+
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddItems(armorItems);
+            GameInstance.AddItems(rightHandEquipItem);
+            GameInstance.AddItems(leftHandEquipItem);
+            GameInstance.AddSkills(skills);
+        }
+
         public override bool Validate()
         {
             bool hasChanges = false;
@@ -226,15 +253,21 @@ namespace MultiplayerARPG
                     equipedPositions.Add((armorItem as IArmorItem).GetEquipPosition());
                 }
             }
+            if (skills != null && skills.Length > 0)
+            {
+                for (int i = 0; i < skills.Length; ++i)
+                {
+                    PlayerSkill skill = skills[i];
+                    if (skill.skillLevel.baseAmount < skill.level)
+                    {
+                        skill.skillLevel.baseAmount = skill.level;
+                        skill.level = 0;
+                        skills[i] = skill;
+                        hasChanges = true;
+                    }
+                }
+            }
             return hasChanges || base.Validate();
-        }
-
-        public override void PrepareRelatesData()
-        {
-            base.PrepareRelatesData();
-            GameInstance.AddItems(armorItems);
-            GameInstance.AddItems(rightHandEquipItem);
-            GameInstance.AddItems(leftHandEquipItem);
         }
     }
 }

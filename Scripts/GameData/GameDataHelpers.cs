@@ -693,6 +693,19 @@ namespace MultiplayerARPG
         /// <param name="source"></param>
         /// <param name="characterLevel"></param>
         /// <returns></returns>
+        public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this PlayerSkill source, int characterLevel)
+        {
+            if (source.skill == null)
+                return new KeyValuePair<BaseSkill, int>();
+            return new KeyValuePair<BaseSkill, int>(source.skill, source.skillLevel.GetAmount(characterLevel));
+        }
+
+        /// <summary>
+        /// Make skill - level key-value pair
+        /// </summary>
+        /// <param name="source"></param>
+        /// <param name="characterLevel"></param>
+        /// <returns></returns>
         public static KeyValuePair<BaseSkill, int> ToKeyValuePair(this MonsterSkill source, int characterLevel)
         {
             if (source.skill == null)
@@ -1055,6 +1068,27 @@ namespace MultiplayerARPG
             foreach (SkillIncremental sourceIncremental in sourceIncrementals)
             {
                 pair = ToKeyValuePair(sourceIncremental, level, rate);
+                resultDictionary = CombineSkills(resultDictionary, pair);
+            }
+            return resultDictionary;
+        }
+
+        /// <summary>
+        /// Combine player skills dictionary
+        /// </summary>
+        /// <param name="sourcePlayerSkills"></param>
+        /// <param name="resultDictionary"></param>
+        /// <returns></returns>
+        public static Dictionary<BaseSkill, int> CombineSkills(IEnumerable<PlayerSkill> sourcePlayerSkills, Dictionary<BaseSkill, int> resultDictionary, int characterLevel)
+        {
+            if (resultDictionary == null)
+                resultDictionary = new Dictionary<BaseSkill, int>();
+            if (sourcePlayerSkills == null)
+                return resultDictionary;
+            KeyValuePair<BaseSkill, int> pair;
+            foreach (PlayerSkill sourcePlayerSkill in sourcePlayerSkills)
+            {
+                pair = ToKeyValuePair(sourcePlayerSkill, characterLevel);
                 resultDictionary = CombineSkills(resultDictionary, pair);
             }
             return resultDictionary;

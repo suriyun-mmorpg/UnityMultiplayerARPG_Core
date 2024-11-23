@@ -43,8 +43,6 @@ namespace MultiplayerARPG
         private StatusEffectResistanceIncremental[] statusEffectResistances;
         public virtual StatusEffectResistanceIncremental[] StatusEffectResistances { get { return statusEffectResistances; } set { statusEffectResistances = value; } }
 
-        public abstract Dictionary<BaseSkill, int> CacheSkillLevels { get; }
-
         public CharacterStats GetCharacterStats(int level)
         {
             return Stats.GetCharacterStats(level);
@@ -70,6 +68,10 @@ namespace MultiplayerARPG
             return GameDataHelpers.CombineStatusEffectResistances(StatusEffectResistances, new Dictionary<StatusEffect, float>(), level, 1f);
         }
 
+        public abstract HashSet<int> GetLearnableSkillDataIds();
+
+        public abstract Dictionary<BaseSkill, int> GetSkillLevels(int level);
+
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
@@ -77,7 +79,6 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(Resistances);
             GameInstance.AddDamageElements(Armors);
             GameInstance.AddStatusEffects(StatusEffectResistances);
-            GameInstance.AddSkills(CacheSkillLevels.Keys);
         }
     }
 }

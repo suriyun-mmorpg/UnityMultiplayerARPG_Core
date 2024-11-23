@@ -314,6 +314,36 @@ namespace MultiplayerARPG
             }
         }
 
+        public static void AddSkills(params PlayerSkill[] skillLevels)
+        {
+            AddSkills((IEnumerable<PlayerSkill>)skillLevels);
+        }
+
+        public static void AddSkills(IEnumerable<PlayerSkill> skillLevels)
+        {
+            if (skillLevels == null)
+                return;
+            foreach (PlayerSkill skillLevel in skillLevels)
+            {
+                AddGameData(Skills, skillLevel.skill);
+            }
+        }
+
+        public static void AddSkills(params MonsterSkill[] skillLevels)
+        {
+            AddSkills((IEnumerable<MonsterSkill>)skillLevels);
+        }
+
+        public static void AddSkills(IEnumerable<MonsterSkill> skillLevels)
+        {
+            if (skillLevels == null)
+                return;
+            foreach (MonsterSkill skillLevel in skillLevels)
+            {
+                AddGameData(Skills, skillLevel.skill);
+            }
+        }
+
         public static void AddSkills(params BaseSkill[] skills)
         {
             AddSkills((IEnumerable<BaseSkill>)skills);

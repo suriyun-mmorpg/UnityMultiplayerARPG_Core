@@ -52,6 +52,7 @@ namespace MultiplayerARPG
         [Category(3, "Character Stats")]
         [SerializeField]
         [FormerlySerializedAs("monsterSkills")]
+        [ArrayElementTitle("skill")]
         private MonsterSkill[] skills = new MonsterSkill[0];
         [SerializeField]
         private Buff summonerBuff = new Buff();
@@ -169,18 +170,6 @@ namespace MultiplayerARPG
             }
         }
 
-        [System.NonSerialized]
-        private Dictionary<BaseSkill, int> _cacheSkillLevels = null;
-        public override Dictionary<BaseSkill, int> CacheSkillLevels
-        {
-            get
-            {
-                if (_cacheSkillLevels == null)
-                    _cacheSkillLevels = GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, int>(), 1);
-                return _cacheSkillLevels;
-            }
-        }
-
         private readonly List<MonsterSkill> _tempRandomSkills = new List<MonsterSkill>();
 
         public virtual int RandomExp(int level)
@@ -221,14 +210,31 @@ namespace MultiplayerARPG
             return currencies.ToArray();
         }
 
-        public virtual Dictionary<BaseSkill, int> GetSkillLevels(ICharacterData data)
+        [System.NonSerialized]
+        private HashSet<int> _learnableSkillIds;
+        public override HashSet<int> GetLearnableSkillDataIds()
         {
-            if (data == null)
-                return null;
+            if (_learnableSkillIds == null)
+            {
+                _learnableSkillIds = new HashSet<int>();
+                foreach (MonsterSkill skill in skills)
+                {
+                    if (skill.skill == null)
+                        continue;
+                    _learnableSkillIds.Add(skill.skill.DataId);
+                }
+            }
+            return _learnableSkillIds;
+        }
+
+        public override Dictionary<BaseSkill, int> GetSkillLevels(int level)
+        {
+            if (level <= 0)
+                return new Dictionary<BaseSkill, int>();
             Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
             foreach (MonsterSkill skill in skills)
             {
-                result = GameDataHelpers.CombineSkills(skills, result, data.Level);
+                result = GameDataHelpers.CombineSkills(skills, result, level);
             }
             return result;
         }
@@ -273,6 +279,7 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             DamageInfo.PrepareRelatesData();
             ItemDropManager.PrepareRelatesData();
+            GameInstance.AddSkills(skills);
         }
 
         public override bool Validate()
@@ -365,6 +372,7 @@ namespace MultiplayerARPG
                     if (skill.skillLevel.baseAmount < skill.level)
                     {
                         skill.skillLevel.baseAmount = skill.level;
+                        skill.level = 0;
                         skills[i] = skill;
                         hasChanges = true;
                     }

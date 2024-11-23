@@ -1220,7 +1220,7 @@ namespace MultiplayerARPG
 
             if (character is BaseMonsterCharacterEntity monsterCharacterEntity)
             {
-                if (!monsterCharacterEntity.CharacterDatabase.CacheSkillLevels.TryGetValue(skill, out skillLevel) ||
+                if (!monsterCharacterEntity.CharacterDatabase.GetSkillLevels(character.Level).TryGetValue(skill, out skillLevel) ||
                     !skill.CanUse(character, skillLevel, isLeftHand, targetObjectId, out gameMessage))
                     return false;
             }

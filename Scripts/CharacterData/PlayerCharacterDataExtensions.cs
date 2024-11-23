@@ -45,6 +45,7 @@ namespace MultiplayerARPG
             // Validating character skills
             int returningSkillPoint = 0;
             HashSet<int> validSkillIds = new HashSet<int>();
+            HashSet<int> learnableSkillDataIds = database.GetLearnableSkillDataIds();
             IList<CharacterSkill> characterSkills = character.Skills;
             for (int i = characterSkills.Count - 1; i >= 0; --i)
             {
@@ -52,7 +53,7 @@ namespace MultiplayerARPG
                 BaseSkill skill = characterSkill.GetSkill();
                 // If skill is invalid or this character database does not have skill
                 if (characterSkill.GetSkill() == null ||
-                    !database.CacheSkillLevels.ContainsKey(skill) ||
+                    !learnableSkillDataIds.Contains(skill.DataId) ||
                     validSkillIds.Contains(skill.DataId))
                 {
                     returningSkillPoint += characterSkill.level;
@@ -63,12 +64,12 @@ namespace MultiplayerARPG
             }
             character.SkillPoint += returningSkillPoint;
             // Add character's skills
-            foreach (BaseSkill skill in database.CacheSkillLevels.Keys)
+            foreach (int skillDataId in learnableSkillDataIds)
             {
                 // This skill is valid, so not have to add it
-                if (validSkillIds.Contains(skill.DataId))
+                if (validSkillIds.Contains(skillDataId))
                     continue;
-                character.Skills.Add(CharacterSkill.Create(skill.DataId, 0));
+                character.Skills.Add(CharacterSkill.Create(skillDataId, 0));
             }
             // Validating character equip weapons
             List<CharacterItem> returningItems = new List<CharacterItem>();
@@ -133,9 +134,11 @@ namespace MultiplayerARPG
             {
                 character.Attributes.Add(CharacterAttribute.Create(attribute.DataId, 0));
             }
-            foreach (BaseSkill skill in playerCharacter.CacheSkillLevels.Keys)
+            // Skills
+            HashSet<int> learnableSkillDataIds = playerCharacter.GetLearnableSkillDataIds();
+            foreach (int skillDataId in learnableSkillDataIds)
             {
-                character.Skills.Add(CharacterSkill.Create(skill.DataId, 0));
+                character.Skills.Add(CharacterSkill.Create(skillDataId, 0));
             }
             // Prepare weapon sets
             character.FillWeaponSetsIfNeeded(character.EquipWeaponSet);

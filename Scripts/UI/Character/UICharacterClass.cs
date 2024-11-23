@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             {
                 uiSkills.displayType = UISkillLevels.DisplayType.Simple;
                 uiSkills.isBonus = false;
-                uiSkills.Data = Data.CacheSkillLevels;
+                uiSkills.Data = Data.GetSkillLevels(1);
             }
         }
     }
