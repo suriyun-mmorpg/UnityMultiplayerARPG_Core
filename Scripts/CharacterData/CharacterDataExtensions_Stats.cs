@@ -38,9 +38,17 @@ namespace MultiplayerARPG
             BaseCharacter database = data.GetDatabase();
             // Skills from character database
             if (database == null)
+            {
                 result = new Dictionary<BaseSkill, int>();
+            }
+            else if (database is MonsterCharacter monsterCharacter)
+            {
+                result = monsterCharacter.GetSkillLevels(data);
+            }
             else
+            {
                 result = new Dictionary<BaseSkill, int>(database.CacheSkillLevels);
+            }
             // Combine with skills that character learnt
             for (int i = 0; i < data.Skills.Count; ++i)
             {
