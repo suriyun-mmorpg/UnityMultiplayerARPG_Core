@@ -243,18 +243,14 @@ namespace MultiplayerARPG
                     switch (hitEffectsSourceType)
                     {
                         case HitEffectsSourceType.DamageElement:
-                            if (GameInstance.DamageElements.TryGetValue(hitEffectsSourceDataId, out DamageElement damageElement) &&
-                                damageElement.DamageHitEffects != null &&
-                                damageElement.DamageHitEffects.Length > 0)
+                            if (GameInstance.DamageElements.TryGetValue(hitEffectsSourceDataId, out DamageElement damageElement))
                             {
                                 effects = damageElement.DamageHitEffects;
                                 addressableEffects = damageElement.AddressableDamageHitEffects;
                             }
                             break;
                         case HitEffectsSourceType.Skill:
-                            if (GameInstance.Skills.TryGetValue(hitEffectsSourceDataId, out BaseSkill skill) &&
-                                skill.DamageHitEffects != null &&
-                                skill.DamageHitEffects.Length > 0)
+                            if (GameInstance.Skills.TryGetValue(hitEffectsSourceDataId, out BaseSkill skill))
                             {
                                 effects = skill.DamageHitEffects;
                                 addressableEffects = skill.AddressableDamageHitEffects;
@@ -356,8 +352,7 @@ namespace MultiplayerARPG
                         {
                             foreach (DamageElement element in damageAmounts.Keys)
                             {
-                                if (element != null && element != CurrentGameInstance.DefaultDamageElement &&
-                                    element.DamageHitEffects != null && element.DamageHitEffects.Length > 0)
+                                if (element != null && element != CurrentGameInstance.DefaultDamageElement)
                                 {
                                     hitEffectsSourceDataId = element.DataId;
                                     break;
