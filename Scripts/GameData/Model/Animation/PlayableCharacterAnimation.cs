@@ -1,3 +1,5 @@
+using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -118,13 +120,29 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Tooltip("This will be in use with attacking/skill animations, This is duration after action animation clip played to add some delay before next animation")]
         public float extendDuration;
         [Tooltip("This will be in use with attacking/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
+#if !EXCLUDE_PREFAB_REFS
         public AudioClip[] audioClips = new AudioClip[0];
+#endif
+        public AssetReferenceAudioClip[] addressableAudioClips = new AssetReferenceAudioClip[0];
 
         public AudioClip GetRandomAudioClip()
         {
-            if (audioClips == null || audioClips.Length == 0)
-                return null;
-            return audioClips[Random.Range(0, audioClips.Length)];
+#if !UNITY_SERVER
+            AudioClip[] tempAudioClips = null;
+#if !EXCLUDE_PREFAB_REFS
+            tempAudioClips = audioClips;
+#endif
+            if (tempAudioClips != null && tempAudioClips.Length > 0)
+            {
+                return tempAudioClips[Random.Range(0, tempAudioClips.Length)];
+            }
+            else if (addressableAudioClips != null && addressableAudioClips.Length > 0)
+            {
+                AssetReferenceAudioClip clip = addressableAudioClips.GetRandomObjectInArray(out int index);
+                return clip.GetOrLoadObject<AudioClip>();
+            }
+#endif
+            return null;
         }
 
         public float GetClipLength()
