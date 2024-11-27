@@ -229,23 +229,6 @@ namespace MultiplayerARPG
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
-            else if (Identity.IsSceneObject)
-                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
-        }
-
-        /// <summary>
-        /// This function will be called if this object is placed in scene networked object
-        /// </summary>
-        /// <param name="delay"></param>
-        /// <returns></returns>
-        protected async UniTaskVoid RespawnRoutine(float delay)
-        {
-            await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
-            InitStats();
-            Manager.Assets.NetworkSpawnScene(
-                Identity.ObjectId,
-                SpawnPosition,
-                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
         public override bool CanReceiveDamageFrom(EntityInfo entityInfo)

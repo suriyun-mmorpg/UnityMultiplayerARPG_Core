@@ -726,25 +726,6 @@ namespace MultiplayerARPG
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
-            else if (Identity.IsSceneObject)
-                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
-        }
-
-        /// <summary>
-        /// This function will be called if this object is placed in scene networked object
-        /// </summary>
-        /// <param name="delay"></param>
-        /// <returns></returns>
-        private async UniTaskVoid RespawnRoutine(float delay)
-        {
-            await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
-            Teleport(SpawnPosition, EntityTransform.rotation, false);
-            InitStats();
-            Manager.Assets.NetworkSpawnScene(
-                Identity.ObjectId,
-                SpawnPosition,
-                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
-            OnRespawn();
         }
 
         public void Summon(BaseCharacterEntity summoner, SummonType summonType, int level)
