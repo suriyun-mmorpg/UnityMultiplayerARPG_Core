@@ -78,9 +78,9 @@ namespace MultiplayerARPG
                 recoilPitch = recoilYaw = recoilRoll = weaponItem.Recoil;
             }
 
-            recoilPitch *= recoilPitchScale;
-            recoilYaw *= recoilYawScale;
-            recoilRoll *= recoilRollScale;
+            recoilPitch *= recoilPitchScale * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
+            recoilYaw *= recoilYawScale * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
+            recoilRoll *= recoilRollScale * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
 
             if (recoilPitch > 0f || recoilYaw > 0f || recoilRoll > 0f)
             {
