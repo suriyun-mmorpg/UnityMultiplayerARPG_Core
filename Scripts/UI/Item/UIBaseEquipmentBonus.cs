@@ -64,6 +64,30 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyFallDamageAbsorbsStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FALL_DAMAGE_ABSORBS);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyGravityRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GRAVITY_RATE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyProtectedSlotLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_PROTECTED_SLOT_LIMIT);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyAmmoCapacityStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AMMO_CAPACITY);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyRecoilRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_RATE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyRateOfFireStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RATE_OF_FIRE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyReloadDurationStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RELOAD_DURATION);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyFireStaggerRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FIRE_STAGGER_RATE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyFireSpreadStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FIRE_SPREAD);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyDecreaseFoodDecreationStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DECREASE_FOOD_DECREATION);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyDecreaseWaterDecreationStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DECREASE_WATER_DECREATION);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyDecreaseStaminaDecreationStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DECREASE_STAMINA_DECREATION);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyBuyItemPriceRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUY_ITEM_PRICE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeySellItemPriceRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_ITEM_PRICE_RATE);
 
         [Header("String Formats (Stats Rate)")]
         [Tooltip("Format => {0} = {Amount * 100}")]
@@ -114,7 +138,7 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyExpRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_EXP_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyItemDropRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_DROP_RATE_RATE);
-        [Tooltip("Format => {0} = {Amount}")]
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyJumpHeightRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_JUMP_HEIGHT_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyHeadDamageAbsorbsRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_HEAD_DAMAGE_ABSORBS_RATE);
@@ -124,6 +148,30 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyFallDamageAbsorbsRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FALL_DAMAGE_ABSORBS_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyGravityRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GRAVITY_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyProtectedSlotLimitRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_PROTECTED_SLOT_LIMIT_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyAmmoCapacityRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AMMO_CAPACITY_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyRecoilRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyRateOfFireRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RATE_OF_FIRE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyReloadDurationRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RELOAD_DURATION_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyFireStaggerRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FIRE_STAGGER_RATE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyFireSpreadRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FIRE_SPREAD_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyDecreaseFoodDecreationRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DECREASE_FOOD_DECREATION_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyDecreaseWaterDecreationRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DECREASE_WATER_DECREATION_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyDecreaseStaminaDecreationRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DECREASE_STAMINA_DECREATION_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyBuyItemPriceRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUY_ITEM_PRICE_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeySellItemPriceRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_ITEM_PRICE_RATE);
 
         [Header("String Formats (Attribute/Damage Element/Skill)")]
         [Tooltip("Format => {0} = {Attribute Title}, {1} = {Amount}")]
@@ -145,6 +193,8 @@ namespace MultiplayerARPG
 
         [Header("UI Elements")]
         public TextWrapper uiTextAllBonus;
+        public Color bonusIncreaseColor = Color.green;
+        public Color bonusDecreaseColor = Color.red;
 
         protected override void OnDestroy()
         {
@@ -179,44 +229,6 @@ namespace MultiplayerARPG
                 //   generateTextData.customStat1StatsFormat = formatKeyCustomStat1RateStats;
                 //   generateTextData.uiTextCustomStat1 = uiTextCustomStat1;
                 // }
-                // Non-rate stats
-                generateTextData = new CharacterStatsTextGenerateData()
-                {
-                    data = equipmentBonus.stats,
-                    isRate = false,
-                    isBonus = true,
-                    hpStatsFormat = formatKeyHpStats,
-                    hpRecoveryStatsFormat = formatKeyHpRecoveryStats,
-                    hpLeechRateStatsFormat = formatKeyHpLeechRateStats,
-                    mpStatsFormat = formatKeyMpStats,
-                    mpRecoveryStatsFormat = formatKeyMpRecoveryStats,
-                    mpLeechRateStatsFormat = formatKeyMpLeechRateStats,
-                    staminaStatsFormat = formatKeyStaminaStats,
-                    staminaRecoveryStatsFormat = formatKeyStaminaRecoveryStats,
-                    staminaLeechRateStatsFormat = formatKeyStaminaLeechRateStats,
-                    foodStatsFormat = formatKeyFoodStats,
-                    waterStatsFormat = formatKeyWaterStats,
-                    accuracyStatsFormat = formatKeyAccuracyStats,
-                    evasionStatsFormat = formatKeyEvasionStats,
-                    criRateStatsFormat = formatKeyCriRateStats,
-                    criDmgRateStatsFormat = formatKeyCriDmgRateStats,
-                    blockRateStatsFormat = formatKeyBlockRateStats,
-                    blockDmgRateStatsFormat = formatKeyBlockDmgRateStats,
-                    moveSpeedStatsFormat = formatKeyMoveSpeedStats,
-                    atkSpeedStatsFormat = formatKeyAtkSpeedStats,
-                    weightLimitStatsFormat = formatKeyWeightLimitStats,
-                    slotLimitStatsFormat = formatKeySlotLimitStats,
-                    goldRateStatsFormat = formatKeyGoldRateStats,
-                    expRateStatsFormat = formatKeyExpRateStats,
-                    itemDropRateStatsFormat = formatKeyItemDropRateStats,
-                    jumpHeightStatsFormat = formatKeyJumpHeightStats,
-                    headDamageAbsorbsStatsFormat = formatKeyHeadDamageAbsorbsStats,
-                    bodyDamageAbsorbsStatsFormat = formatKeyBodyDamageAbsorbsStats,
-                    fallDamageAbsorbsStatsFormat = formatKeyFallDamageAbsorbsStats,
-                    gravityRateStatsFormat = formatKeyGravityRateStats,
-                };
-                this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
-                string statsText = generateTextData.GetText();
                 // Rate stats
                 generateTextData = new CharacterStatsTextGenerateData()
                 {
@@ -252,9 +264,72 @@ namespace MultiplayerARPG
                     bodyDamageAbsorbsStatsFormat = formatKeyBodyDamageAbsorbsRateStats,
                     fallDamageAbsorbsStatsFormat = formatKeyFallDamageAbsorbsRateStats,
                     gravityRateStatsFormat = formatKeyGravityRateRateStats,
+                    protectedSlotLimitFormat = formatKeyProtectedSlotLimitRateStats,
+                    ammoCapacityFormat = formatKeyAmmoCapacityRateStats,
+                    recoilRateFormat = formatKeyRecoilRateRateStats,
+                    rateOfFireFormat = formatKeyRateOfFireRateStats,
+                    reloadDurationFormat = formatKeyReloadDurationRateStats,
+                    fireStaggerRateFormat = formatKeyFireStaggerRateRateStats,
+                    fireSpreadFormat = formatKeyFireSpreadRateStats,
+                    decreaseFoodDecreationFormat = formatKeyDecreaseFoodDecreationRateStats,
+                    decreaseWaterDecreationFormat = formatKeyDecreaseWaterDecreationRateStats,
+                    decreaseStaminaDecreationFormat = formatKeyDecreaseStaminaDecreationRateStats,
+                    buyItemPriceRateFormat = formatKeyBuyItemPriceRateRateStats,
+                    sellItemPriceRateFormat = formatKeySellItemPriceRateRateStats,
                 };
                 this.InvokeInstanceDevExtMethods("SetRateStatsGenerateTextData", generateTextData);
-                string rateStatsText = generateTextData.GetText();
+                string rateStatsText = generateTextData.GetText(bonusIncreaseColor, bonusDecreaseColor);
+
+                // Non-rate stats
+                generateTextData = new CharacterStatsTextGenerateData()
+                {
+                    data = equipmentBonus.stats,
+                    isRate = false,
+                    isBonus = true,
+                    hpStatsFormat = formatKeyHpStats,
+                    hpRecoveryStatsFormat = formatKeyHpRecoveryStats,
+                    hpLeechRateStatsFormat = formatKeyHpLeechRateStats,
+                    mpStatsFormat = formatKeyMpStats,
+                    mpRecoveryStatsFormat = formatKeyMpRecoveryStats,
+                    mpLeechRateStatsFormat = formatKeyMpLeechRateStats,
+                    staminaStatsFormat = formatKeyStaminaStats,
+                    staminaRecoveryStatsFormat = formatKeyStaminaRecoveryStats,
+                    staminaLeechRateStatsFormat = formatKeyStaminaLeechRateStats,
+                    foodStatsFormat = formatKeyFoodStats,
+                    waterStatsFormat = formatKeyWaterStats,
+                    accuracyStatsFormat = formatKeyAccuracyStats,
+                    evasionStatsFormat = formatKeyEvasionStats,
+                    criRateStatsFormat = formatKeyCriRateStats,
+                    criDmgRateStatsFormat = formatKeyCriDmgRateStats,
+                    blockRateStatsFormat = formatKeyBlockRateStats,
+                    blockDmgRateStatsFormat = formatKeyBlockDmgRateStats,
+                    moveSpeedStatsFormat = formatKeyMoveSpeedStats,
+                    atkSpeedStatsFormat = formatKeyAtkSpeedStats,
+                    weightLimitStatsFormat = formatKeyWeightLimitStats,
+                    slotLimitStatsFormat = formatKeySlotLimitStats,
+                    goldRateStatsFormat = formatKeyGoldRateStats,
+                    expRateStatsFormat = formatKeyExpRateStats,
+                    itemDropRateStatsFormat = formatKeyItemDropRateStats,
+                    jumpHeightStatsFormat = formatKeyJumpHeightStats,
+                    headDamageAbsorbsStatsFormat = formatKeyHeadDamageAbsorbsStats,
+                    bodyDamageAbsorbsStatsFormat = formatKeyBodyDamageAbsorbsStats,
+                    fallDamageAbsorbsStatsFormat = formatKeyFallDamageAbsorbsStats,
+                    gravityRateStatsFormat = formatKeyGravityRateStats,
+                    protectedSlotLimitFormat = formatKeyProtectedSlotLimitStats,
+                    ammoCapacityFormat = formatKeyAmmoCapacityStats,
+                    recoilRateFormat = formatKeyRecoilRateStats,
+                    rateOfFireFormat = formatKeyRateOfFireStats,
+                    reloadDurationFormat = formatKeyReloadDurationStats,
+                    fireStaggerRateFormat = formatKeyFireStaggerRateStats,
+                    fireSpreadFormat = formatKeyFireSpreadStats,
+                    decreaseFoodDecreationFormat = formatKeyDecreaseFoodDecreationStats,
+                    decreaseWaterDecreationFormat = formatKeyDecreaseWaterDecreationStats,
+                    decreaseStaminaDecreationFormat = formatKeyDecreaseStaminaDecreationStats,
+                    buyItemPriceRateFormat = formatKeyBuyItemPriceRateStats,
+                    sellItemPriceRateFormat = formatKeySellItemPriceRateStats,
+                };
+                this.InvokeInstanceDevExtMethods("SetStatsGenerateTextData", generateTextData);
+                string statsText = generateTextData.GetText(bonusIncreaseColor, bonusDecreaseColor);
 
                 if (!string.IsNullOrEmpty(statsText))
                     result.Append(statsText);

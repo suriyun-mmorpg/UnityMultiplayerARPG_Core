@@ -37,6 +37,18 @@ namespace MultiplayerARPG
         public float bodyDamageAbsorbs;
         public float fallDamageAbsorbs;
         public float gravityRate;
+        public float protectedSlotLimit;
+        public float ammoCapacity;
+        public float recoilRate;
+        public float rateOfFire;
+        public float reloadDuration;
+        public float fireStaggerRate;
+        public float fireSpread;
+        public float decreaseFoodDecreation;
+        public float decreaseWaterDecreation;
+        public float decreaseStaminaDecreation;
+        public float buyItemPriceRate;
+        public float sellItemPriceRate;
 
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
         {
@@ -69,6 +81,18 @@ namespace MultiplayerARPG
             a.bodyDamageAbsorbs = a.bodyDamageAbsorbs + b.bodyDamageAbsorbs;
             a.fallDamageAbsorbs = a.fallDamageAbsorbs + b.fallDamageAbsorbs;
             a.gravityRate = a.gravityRate + b.gravityRate;
+            a.protectedSlotLimit = a.protectedSlotLimit + b.protectedSlotLimit;
+            a.ammoCapacity = a.ammoCapacity + b.ammoCapacity;
+            a.recoilRate = a.recoilRate + b.recoilRate;
+            a.rateOfFire = a.rateOfFire + b.rateOfFire;
+            a.reloadDuration = a.reloadDuration + b.reloadDuration;
+            a.fireStaggerRate = a.fireStaggerRate + b.fireStaggerRate;
+            a.fireSpread = a.fireSpread + b.fireSpread;
+            a.decreaseFoodDecreation = a.decreaseFoodDecreation + b.decreaseFoodDecreation;
+            a.decreaseWaterDecreation = a.decreaseWaterDecreation + b.decreaseWaterDecreation;
+            a.decreaseStaminaDecreation = a.decreaseStaminaDecreation + b.decreaseStaminaDecreation;
+            a.buyItemPriceRate = a.buyItemPriceRate + b.buyItemPriceRate;
+            a.sellItemPriceRate = a.sellItemPriceRate + b.sellItemPriceRate;
             if (GameExtensionInstance.onAddCharacterStats != null)
                 GameExtensionInstance.onAddCharacterStats(ref a, b);
             return a;
@@ -105,6 +129,18 @@ namespace MultiplayerARPG
             a.bodyDamageAbsorbs = a.bodyDamageAbsorbs * multiplier;
             a.fallDamageAbsorbs = a.fallDamageAbsorbs * multiplier;
             a.gravityRate = a.gravityRate * multiplier;
+            a.protectedSlotLimit = a.protectedSlotLimit * multiplier;
+            a.ammoCapacity = a.ammoCapacity * multiplier;
+            a.recoilRate = a.recoilRate * multiplier;
+            a.rateOfFire = a.rateOfFire * multiplier;
+            a.reloadDuration = a.reloadDuration * multiplier;
+            a.fireStaggerRate = a.fireStaggerRate * multiplier;
+            a.fireSpread = a.fireSpread * multiplier;
+            a.decreaseFoodDecreation = a.decreaseFoodDecreation * multiplier;
+            a.decreaseWaterDecreation = a.decreaseWaterDecreation * multiplier;
+            a.decreaseStaminaDecreation = a.decreaseStaminaDecreation * multiplier;
+            a.buyItemPriceRate = a.buyItemPriceRate * multiplier;
+            a.sellItemPriceRate = a.sellItemPriceRate * multiplier;
             if (GameExtensionInstance.onMultiplyCharacterStatsWithNumber != null)
                 GameExtensionInstance.onMultiplyCharacterStatsWithNumber(ref a, multiplier);
             return a;
@@ -141,6 +177,18 @@ namespace MultiplayerARPG
             a.bodyDamageAbsorbs = a.bodyDamageAbsorbs * b.bodyDamageAbsorbs;
             a.fallDamageAbsorbs = a.fallDamageAbsorbs * b.fallDamageAbsorbs;
             a.gravityRate = a.gravityRate * b.gravityRate;
+            a.protectedSlotLimit = a.protectedSlotLimit * b.protectedSlotLimit;
+            a.ammoCapacity = a.ammoCapacity * b.ammoCapacity;
+            a.recoilRate = a.recoilRate * b.recoilRate;
+            a.rateOfFire = a.rateOfFire * b.rateOfFire;
+            a.reloadDuration = a.reloadDuration * b.reloadDuration;
+            a.fireStaggerRate = a.fireStaggerRate * b.fireStaggerRate;
+            a.fireSpread = a.fireSpread * b.fireSpread;
+            a.decreaseFoodDecreation = a.decreaseFoodDecreation * b.decreaseFoodDecreation;
+            a.decreaseWaterDecreation = a.decreaseWaterDecreation * b.decreaseWaterDecreation;
+            a.decreaseStaminaDecreation = a.decreaseStaminaDecreation * b.decreaseStaminaDecreation;
+            a.buyItemPriceRate = a.buyItemPriceRate * b.buyItemPriceRate;
+            a.sellItemPriceRate = a.sellItemPriceRate * b.sellItemPriceRate;
             if (GameExtensionInstance.onMultiplyCharacterStats != null)
                 GameExtensionInstance.onMultiplyCharacterStats(ref a, b);
             return a;
