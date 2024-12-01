@@ -92,6 +92,14 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("This will be multiplied with character's movement speed while equipped this weapon")]
+        private float moveSpeedRateWhileEquipped = 1f;
+        public float MoveSpeedRateWhileEquipped
+        {
+            get { return moveSpeedRateWhileEquipped; }
+        }
+
+        [SerializeField]
         [Tooltip("This will be multiplied with character's movement speed while reloading this weapon")]
         private float moveSpeedRateWhileReloading = 1f;
         public float MoveSpeedRateWhileReloading
@@ -185,6 +193,22 @@ namespace MultiplayerARPG
         public int AmmoCapacity
         {
             get { return ammoCapacity; }
+        }
+
+        [SerializeField]
+        [Tooltip("If this is `TRUE`, ammo capacity will not overrided by ammo's setting")]
+        private bool noAmmoCapacityOverriding = false;
+        public bool NoAmmoCapacityOverriding
+        {
+            get { return noAmmoCapacityOverriding; }
+        }
+
+        [SerializeField]
+        [Tooltip("If this is `TRUE`, ammo data ID will not being changed by ammo item's data ID")]
+        private bool noAmmoDataIdChange = false;
+        public bool NoAmmoDataIdChange
+        {
+            get { return noAmmoDataIdChange; }
         }
 
         [HideInInspector]

@@ -71,6 +71,9 @@ namespace MultiplayerARPG
         public DamageIncremental damageAmount;
         public IncrementalMinMaxFloat harvestDamageAmount;
         [Range(0f, 1f)]
+        [Tooltip("This will be multiplied with character's movement speed while equipped this weapon")]
+        public float moveSpeedRateWhileEquipped = 1f;
+        [Range(0f, 1f)]
         [Tooltip("This is move speed rate while reloading this weapon")]
         public float moveSpeedRateWhileReloading = 1f;
         [Range(0f, 1f)]
@@ -86,7 +89,11 @@ namespace MultiplayerARPG
         public ActionRestriction reloadRestriction = default;
         public BaseItem[] ammoItems = new BaseItem[0];
         [Tooltip("For macine gun may set this to 30 as magazine capacity, if this is 0 it will not need to have ammo loaded to shoot but still need ammo in inventory")]
-        public int ammoCapacity;
+        public int ammoCapacity = 0;
+        [Tooltip("If this is `TRUE`, ammo capacity will not overrided by ammo's setting")]
+        public bool noAmmoCapacityOverriding = false;
+        [Tooltip("If this is `TRUE`, ammo data ID will not being changed by ammo item's data ID")]
+        public bool noAmmoDataIdChange = false;
         public BaseWeaponAbility weaponAbility;
         public BaseWeaponAbility[] weaponAbilities = new BaseWeaponAbility[0];
         public CrosshairSetting crosshairSetting = new CrosshairSetting()
@@ -515,6 +522,11 @@ namespace MultiplayerARPG
             get { return harvestDamageAmount; }
         }
 
+        public float MoveSpeedRateWhileEquipped
+        {
+            get { return moveSpeedRateWhileEquipped; }
+        }
+
         public float MoveSpeedRateWhileReloading
         {
             get { return moveSpeedRateWhileReloading; }
@@ -578,6 +590,16 @@ namespace MultiplayerARPG
         public int AmmoCapacity
         {
             get { return ammoCapacity; }
+        }
+
+        public bool NoAmmoCapacityOverriding
+        {
+            get { return noAmmoCapacityOverriding; }
+        }
+
+        public bool NoAmmoDataIdChange
+        {
+            get { return noAmmoDataIdChange; }
         }
 
         public BaseWeaponAbility[] WeaponAbilities

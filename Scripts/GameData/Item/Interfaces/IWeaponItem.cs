@@ -34,6 +34,10 @@ namespace MultiplayerARPG
         /// </summary>
         IncrementalMinMaxFloat HarvestDamageAmount { get; }
         /// <summary>
+        /// This will be multiplied with character's movement speed while equipped this weapon
+        /// </summary>
+        float MoveSpeedRateWhileEquipped { get; }
+        /// <summary>
         /// This will be multiplied with character's movement speed while reloading this weapon
         /// </summary>
         float MoveSpeedRateWhileReloading { get; }
@@ -59,6 +63,14 @@ namespace MultiplayerARPG
         /// How many ammo can store in the gun's magazine
         /// </summary>
         int AmmoCapacity { get; }
+        /// <summary>
+        /// If this is `TRUE`, ammo capacity will not overrided by ammo's setting
+        /// </summary>
+        bool NoAmmoCapacityOverriding { get; }
+        /// <summary>
+        /// If this is `TRUE`, ammo data ID will not being changed by ammo item's data ID
+        /// </summary>
+        bool NoAmmoDataIdChange { get; }
         /// <summary>
         /// Weapon ability such as zoom, change how to fire, change launch clip. (For now, it has only zoom)
         /// </summary>
