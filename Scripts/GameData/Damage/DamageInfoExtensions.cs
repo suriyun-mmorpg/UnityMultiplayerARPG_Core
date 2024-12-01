@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public static class DamageInfoExtensions
     {
-        public static void GetDamagePositionAndRotation(this IDamageInfo damageInfo, BaseCharacterEntity attacker, bool isLeftHand, AimPosition aimPosition, Vector3 stagger, out Vector3 position, out Vector3 direction, out Quaternion rotation)
+        public static void GetDamagePositionAndRotation(this IDamageInfo damageInfo, BaseCharacterEntity attacker, bool isLeftHand, AimPosition aimPosition, Vector3 spreadRange, out Vector3 position, out Vector3 direction, out Quaternion rotation)
         {
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
             {
@@ -17,7 +17,7 @@ namespace MultiplayerARPG
             if (aimPosition.type == AimPositionType.Direction)
             {
                 position = aimPosition.position;
-                rotation = Quaternion.Euler(Quaternion.LookRotation(aimPosition.direction).eulerAngles + stagger);
+                rotation = Quaternion.Euler(Quaternion.LookRotation(aimPosition.direction).eulerAngles + spreadRange);
                 direction = rotation * Vector3.forward;
             }
             else
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
                 // NOTE: Allow aim position type `None` here, may change it later
                 Transform damageTransform = damageInfo.GetDamageTransform(attacker, isLeftHand);
                 position = damageTransform.position;
-                GetDamageRotation3D(position, aimPosition.position, stagger, out rotation);
+                GetDamageRotation3D(position, aimPosition.position, spreadRange, out rotation);
                 direction = rotation * Vector3.forward;
             }
         }
@@ -35,9 +35,9 @@ namespace MultiplayerARPG
             rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(aimDirection.y, aimDirection.x) * (180 / Mathf.PI)) + 90);
         }
 
-        public static void GetDamageRotation3D(Vector3 damagePosition, Vector3 aimPosition, Vector3 stagger, out Quaternion rotation)
+        public static void GetDamageRotation3D(Vector3 damagePosition, Vector3 aimPosition, Vector3 spreadRange, out Quaternion rotation)
         {
-            rotation = Quaternion.Euler(Quaternion.LookRotation(aimPosition - damagePosition).eulerAngles + stagger);
+            rotation = Quaternion.Euler(Quaternion.LookRotation(aimPosition - damagePosition).eulerAngles + spreadRange);
         }
     }
 }

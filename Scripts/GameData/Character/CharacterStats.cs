@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         public float recoilRate;
         public float rateOfFire;
         public float reloadDuration;
-        public float fireStaggerRate;
+        public float fireSpreadRangeRate;
         public float fireSpread;
         public float decreaseFoodDecreation;
         public float decreaseWaterDecreation;
@@ -86,7 +86,7 @@ namespace MultiplayerARPG
             a.recoilRate = a.recoilRate + b.recoilRate;
             a.rateOfFire = a.rateOfFire + b.rateOfFire;
             a.reloadDuration = a.reloadDuration + b.reloadDuration;
-            a.fireStaggerRate = a.fireStaggerRate + b.fireStaggerRate;
+            a.fireSpreadRangeRate = a.fireSpreadRangeRate + b.fireSpreadRangeRate;
             a.fireSpread = a.fireSpread + b.fireSpread;
             a.decreaseFoodDecreation = a.decreaseFoodDecreation + b.decreaseFoodDecreation;
             a.decreaseWaterDecreation = a.decreaseWaterDecreation + b.decreaseWaterDecreation;
@@ -134,7 +134,7 @@ namespace MultiplayerARPG
             a.recoilRate = a.recoilRate * multiplier;
             a.rateOfFire = a.rateOfFire * multiplier;
             a.reloadDuration = a.reloadDuration * multiplier;
-            a.fireStaggerRate = a.fireStaggerRate * multiplier;
+            a.fireSpreadRangeRate = a.fireSpreadRangeRate * multiplier;
             a.fireSpread = a.fireSpread * multiplier;
             a.decreaseFoodDecreation = a.decreaseFoodDecreation * multiplier;
             a.decreaseWaterDecreation = a.decreaseWaterDecreation * multiplier;
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
             a.recoilRate = a.recoilRate * b.recoilRate;
             a.rateOfFire = a.rateOfFire * b.rateOfFire;
             a.reloadDuration = a.reloadDuration * b.reloadDuration;
-            a.fireStaggerRate = a.fireStaggerRate * b.fireStaggerRate;
+            a.fireSpreadRangeRate = a.fireSpreadRangeRate * b.fireSpreadRangeRate;
             a.fireSpread = a.fireSpread * b.fireSpread;
             a.decreaseFoodDecreation = a.decreaseFoodDecreation * b.decreaseFoodDecreation;
             a.decreaseWaterDecreation = a.decreaseWaterDecreation * b.decreaseWaterDecreation;

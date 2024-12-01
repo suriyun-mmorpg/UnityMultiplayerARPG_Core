@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         /// <param name="simulateSeed">Launch random seed</param>
         /// <param name="triggerIndex"></param>
         /// <param name="spreadIndex"></param>
-        /// <param name="fireStagger"></param>
+        /// <param name="fireSpreadRange"></param>
         /// <param name="damageAmounts">Damage amounts</param>
         /// <param name="skill">Which skill?</param>
         /// <param name="skillLevel">Which skill level?</param>
@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            Vector3 fireStagger,
+            Vector3 fireSpreadRange,
             List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
             BaseSkill skill,
             int skillLevel,

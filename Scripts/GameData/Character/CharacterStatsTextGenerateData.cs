@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         public string recoilRateFormat;
         public string rateOfFireFormat;
         public string reloadDurationFormat;
-        public string fireStaggerRateFormat;
+        public string fireSpreadRangeRateFormat;
         public string fireSpreadFormat;
         public string decreaseFoodDecreationFormat;
         public string decreaseWaterDecreationFormat;
@@ -85,7 +85,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextRecoilRate;
         public TextWrapper uiTextRateOfFire;
         public TextWrapper uiTextReloadDuration;
-        public TextWrapper uiTextFireStaggerRate;
+        public TextWrapper uiTextFireSpreadRangeRate;
         public TextWrapper uiTextFireSpread;
         public TextWrapper uiTextDecreaseFoodDecreation;
         public TextWrapper uiTextDecreaseWaterDecreation;
@@ -201,8 +201,8 @@ namespace MultiplayerARPG
             // Reload Duration
             GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(reloadDurationFormat), data.reloadDuration, uiTextReloadDuration, bonusIncreaseColor, bonusDecreaseColor);
 
-            // Fire Stagger Rate
-            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(fireStaggerRateFormat), data.fireStaggerRate, uiTextFireStaggerRate, bonusIncreaseColor, bonusDecreaseColor);
+            // Fire Spread Range Rate
+            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(fireSpreadRangeRateFormat), data.fireSpreadRangeRate, uiTextFireSpreadRangeRate, bonusIncreaseColor, bonusDecreaseColor);
 
             // Fire Spread
             GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(fireSpreadFormat), data.fireSpread, uiTextFireSpread, bonusIncreaseColor, bonusDecreaseColor);
