@@ -445,8 +445,8 @@ namespace MultiplayerARPG
         public Dictionary<Currency, int> GetRequireCurrencyAmounts(int level)
         {
             if (level >= requirementEachLevels.Count)
-                return GameDataHelpers.CombineCurrencies(requirementEachLevels[requirementEachLevels.Count - 1].currencyAmounts, null);
-            return GameDataHelpers.CombineCurrencies(requirementEachLevels[level].currencyAmounts, null);
+                return GameDataHelpers.CombineCurrencies(requirementEachLevels[requirementEachLevels.Count - 1].currencyAmounts, null, 1f);
+            return GameDataHelpers.CombineCurrencies(requirementEachLevels[level].currencyAmounts, null, 1f);
         }
 
         public Dictionary<BaseItem, int> GetRequireItemAmounts(int level)

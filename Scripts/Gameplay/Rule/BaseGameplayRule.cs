@@ -388,16 +388,20 @@ namespace MultiplayerARPG
 
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
-            if (character.Gold < sellItem.sellPrice * amount)
+            float rate = 1f + character.GetCaches().BuyItemPriceRate;
+            int sellPrice = Mathf.CeilToInt(sellItem.sellPrice * rate);
+            if (character.Gold < sellPrice * amount)
                 return false;
             if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
                 return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(sellItem.sellPrices, null), out _, out _, amount);
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(sellItem.sellPrices, null, rate), out _, out _, amount);
         }
 
         public virtual void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
-            character.Gold -= sellItem.sellPrice * amount;
+            float rate = 1f + character.GetCaches().BuyItemPriceRate;
+            int sellPrice = Mathf.CeilToInt(sellItem.sellPrice * rate);
+            character.Gold -= sellPrice * amount;
             if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
                 return;
             character.DecreaseCurrencies(sellItem.sellPrices, amount);
@@ -405,7 +409,9 @@ namespace MultiplayerARPG
 
         public virtual void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, int amount)
         {
-            character.Gold = character.Gold.Increase(item.SellPrice * amount);
+            float rate = 1f + character.GetCaches().SellItemPriceRate;
+            int sellPrice = Mathf.CeilToInt(item.SellPrice * rate);
+            character.Gold += sellPrice * amount;
         }
 
         public virtual bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
@@ -414,7 +420,7 @@ namespace MultiplayerARPG
                 return false;
             if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
                 return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, null), out _, out _);
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, null, 1f), out _, out _);
         }
 
         public virtual void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
@@ -439,7 +445,7 @@ namespace MultiplayerARPG
                 return false;
             if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
                 return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, null), out _, out _);
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, null, 1f), out _, out _);
         }
 
         public virtual void DecreaseCurrenciesWhenRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
@@ -456,7 +462,7 @@ namespace MultiplayerARPG
                 return false;
             if (itemCraft.RequireCurrencies == null || itemCraft.RequireCurrencies.Length == 0)
                 return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(itemCraft.RequireCurrencies, null), out _, out _);
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(itemCraft.RequireCurrencies, null, 1f), out _, out _);
         }
 
         public virtual void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
@@ -473,7 +479,7 @@ namespace MultiplayerARPG
                 return false;
             if (GameInstance.Singleton.enhancerRemoval.RequireCurrencies == null || GameInstance.Singleton.enhancerRemoval.RequireCurrencies.Length == 0)
                 return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, null), out _, out _);
+            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, null, 1f), out _, out _);
         }
 
         public virtual void DecreaseCurrenciesWhenRemoveEnhancer(IPlayerCharacterData character)

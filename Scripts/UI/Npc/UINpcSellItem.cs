@@ -61,19 +61,22 @@ namespace MultiplayerARPG
                 }
             }
 
+            // It's how much NPC selling item to player, so use `buyItemPriceRate`
+            float sellPriceRate = 1f + GameInstance.PlayingCharacter.GetCaches().BuyItemPriceRate;
             if (uiTextSellPrice != null)
             {
+                int sellPrice = Mathf.CeilToInt(Data.sellPrice * sellPriceRate);
                 uiTextSellPrice.text = ZString.Format(
                     LanguageManager.GetText(formatKeySellPrice),
-                    Data.sellPrice.ToString("N0"));
-                uiTextSellPrice.SetGameObjectActive(!inactiveSellPriceIfZero || Data.sellPrice != 0);
+                    sellPrice.ToString("N0"));
+                uiTextSellPrice.SetGameObjectActive(!inactiveSellPriceIfZero || sellPrice != 0);
             }
 
             if (uiSellPrices != null)
             {
                 uiSellPrices.displayType = UICurrencyAmounts.DisplayType.Simple;
                 uiSellPrices.isBonus = false;
-                uiSellPrices.Data = GameDataHelpers.CombineCurrencies(Data.sellPrices, null);
+                uiSellPrices.Data = GameDataHelpers.CombineCurrencies(Data.sellPrices, null, sellPriceRate);
             }
         }
 

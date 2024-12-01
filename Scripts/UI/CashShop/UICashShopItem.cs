@@ -180,7 +180,7 @@ namespace MultiplayerARPG
 
             if (uiReceiveCurrencies != null)
             {
-                uiReceiveCurrencies.Data = Data == null ? null : GameDataHelpers.CombineCurrencies(Data.ReceiveCurrencies, null);
+                uiReceiveCurrencies.Data = Data == null ? null : GameDataHelpers.CombineCurrencies(Data.ReceiveCurrencies, null, 1f);
             }
 
             if (uiReceiveItems != null)

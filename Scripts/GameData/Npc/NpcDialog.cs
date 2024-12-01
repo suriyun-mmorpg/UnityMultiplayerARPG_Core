@@ -893,7 +893,7 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
-            if (!character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(confirmRequirement.currencyAmounts, null), out gameMessage, out _))
+            if (!character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(confirmRequirement.currencyAmounts, null, 1f), out gameMessage, out _))
                 return false;
             if (!character.HasEnoughNonEquipItemAmounts(GameDataHelpers.CombineItems(confirmRequirement.itemAmounts, null), out gameMessage, out _))
                 return false;

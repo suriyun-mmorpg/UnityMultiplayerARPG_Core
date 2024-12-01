@@ -102,7 +102,7 @@ namespace MultiplayerARPG
                 {
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.Show();
-                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, null);
+                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, null, 1f);
                 }
             }
 

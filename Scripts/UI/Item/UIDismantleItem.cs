@@ -105,7 +105,7 @@ namespace MultiplayerARPG
                 {
                     uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
                     uiReturnCurrencies.Show();
-                    uiReturnCurrencies.Data = GameDataHelpers.CombineCurrencies(returningCurrencies, null);
+                    uiReturnCurrencies.Data = GameDataHelpers.CombineCurrencies(returningCurrencies, null, 1f);
                 }
             }
 

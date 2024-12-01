@@ -99,7 +99,7 @@ namespace MultiplayerARPG
             get
             {
                 if (_createGuildRequireCurrencies == null)
-                    _createGuildRequireCurrencies = GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, new Dictionary<Currency, int>());
+                    _createGuildRequireCurrencies = GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, null, 1f);
                 return _createGuildRequireCurrencies;
             }
         }

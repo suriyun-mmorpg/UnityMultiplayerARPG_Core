@@ -599,10 +599,11 @@ namespace MultiplayerARPG
         /// Make currency - amount key-value pair
         /// </summary>
         /// <param name="source"></param>
+        /// <param name="rate"></param>
         /// <returns></returns>
-        public static KeyValuePair<Currency, int> ToKeyValuePair(this CurrencyAmount source)
+        public static KeyValuePair<Currency, int> ToKeyValuePair(this CurrencyAmount source, float rate)
         {
-            return new KeyValuePair<Currency, int>(source.currency, source.amount);
+            return new KeyValuePair<Currency, int>(source.currency, Mathf.CeilToInt(source.amount * rate));
         }
 
         /// <summary>
@@ -915,15 +916,15 @@ namespace MultiplayerARPG
             }
             return resultDictionary;
         }
-
+        
         /// <summary>
         /// Combine currency amounts dictionary
         /// </summary>
         /// <param name="sourceAmounts"></param>
         /// <param name="resultDictionary"></param>
-        /// <param name="amount"></param>
+        /// <param name="rate"></param>
         /// <returns></returns>
-        public static Dictionary<Currency, int> CombineCurrencies(IEnumerable<CurrencyAmount> sourceAmounts, Dictionary<Currency, int> resultDictionary)
+        public static Dictionary<Currency, int> CombineCurrencies(IEnumerable<CurrencyAmount> sourceAmounts, Dictionary<Currency, int> resultDictionary, float rate)
         {
             if (resultDictionary == null)
                 resultDictionary = new Dictionary<Currency, int>();
@@ -932,7 +933,7 @@ namespace MultiplayerARPG
             KeyValuePair<Currency, int> pair;
             foreach (CurrencyAmount sourceAmount in sourceAmounts)
             {
-                pair = ToKeyValuePair(sourceAmount);
+                pair = ToKeyValuePair(sourceAmount, rate);
                 resultDictionary = CombineCurrencies(resultDictionary, pair);
             }
             return resultDictionary;
