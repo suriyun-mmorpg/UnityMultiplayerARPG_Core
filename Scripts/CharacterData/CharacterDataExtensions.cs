@@ -858,6 +858,15 @@ namespace MultiplayerARPG
             return data.GetAvailableWeaponDamageInfo(ref isLeftHand).GetDistance();
         }
 
+        public static float GetMoveSpeedRateWhileEquipped(this ICharacterData data, IWeaponItem weaponItem)
+        {
+            if (data is BaseMonsterCharacterEntity)
+                return 1f;
+            if (weaponItem == null)
+                return 1f;
+            return weaponItem.MoveSpeedRateWhileEquipped;
+        }
+
         public static float GetMoveSpeedRateWhileReloading(this ICharacterData data, IWeaponItem weaponItem)
         {
             if (data is BaseMonsterCharacterEntity)

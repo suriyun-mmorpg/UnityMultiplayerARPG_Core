@@ -49,6 +49,11 @@ namespace MultiplayerARPG
             {
                 moveSpeed *= MoveSpeedRateWhileCharging;
             }
+            else if (!IsWeaponsSheathed)
+            {
+                moveSpeed *= this.GetMoveSpeedRateWhileEquipped(EquipWeapons.rightHand.GetWeaponItem());
+            }
+
             if (movementState.Has(MovementState.IsUnderWater))
             {
                 moveSpeed *= CurrentGameplayRule.GetSwimMoveSpeedRate(this);
