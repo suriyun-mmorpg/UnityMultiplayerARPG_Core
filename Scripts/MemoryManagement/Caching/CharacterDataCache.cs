@@ -37,11 +37,26 @@ namespace MultiplayerARPG
         public int MaxWater => (int)_stats.water;
         public float AtkSpeed => _stats.atkSpeed;
         public float MoveSpeed => _stats.moveSpeed;
+        public float GoldRate => _stats.goldRate;
+        public float ExpRate => _stats.expRate;
+        public float ItemDropRate => _stats.itemDropRate;
         public float JumpHeight => _stats.jumpHeight;
         public float HeadDamageAbsorbs => _stats.headDamageAbsorbs;
         public float BodyDamageAbsorbs => _stats.bodyDamageAbsorbs;
         public float FallDamageAbsorbs => _stats.fallDamageAbsorbs;
         public float GravityRate => _stats.gravityRate;
+        public float ProtectedSlotLimit => _stats.protectedSlotLimit;
+        public float AmmoCapacity => _stats.ammoCapacity;
+        public float RecoilRate => _stats.recoilRate;
+        public float RateOfFire => _stats.rateOfFire;
+        public float ReloadDuration => _stats.reloadDuration;
+        public float FireSpreadRangeRate => _stats.fireSpreadRangeRate;
+        public float FireSpread => _stats.fireSpread;
+        public float DecreaseFoodDecreation => _stats.decreaseFoodDecreation;
+        public float DecreaseWaterDecreation => _stats.decreaseWaterDecreation;
+        public float DecreaseStaminaDecreation => _stats.decreaseStaminaDecreation;
+        public float BuyItemPriceRate => _stats.buyItemPriceRate;
+        public float SellItemPriceRate => _stats.sellItemPriceRate;
         public float BaseMoveSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
         public int TotalItemSlot { get; private set; }
