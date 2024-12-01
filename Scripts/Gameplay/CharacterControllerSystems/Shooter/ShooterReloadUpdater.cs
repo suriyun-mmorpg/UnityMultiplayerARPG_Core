@@ -77,7 +77,7 @@ namespace MultiplayerARPG
                 return false;
             if (!PlayingCharacterEntity.Reload(isLeftHand))
                 return false;
-            return weaponItem.MaxAmmoEachReload > 0 && ammoAmount - weaponItem.MaxAmmoEachReload > 0;
+            return weaponItem.MaxAmmoEachReload > 0 && ammoAmount - weaponItem.MaxAmmoEachReload >= 0;
         }
     }
 }
