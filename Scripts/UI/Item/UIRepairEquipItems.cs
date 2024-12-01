@@ -36,36 +36,28 @@ namespace MultiplayerARPG
             List<CurrencyAmount> requireCurrencies = new List<CurrencyAmount>();
             ItemRepairPrice tempRepairPrice;
             EquipWeapons equipWeapons = GameInstance.PlayingCharacterEntity.EquipWeapons;
-            if (!equipWeapons.IsEmptyRightHandSlot())
+            if (!equipWeapons.IsEmptyRightHandSlot() &&
+                equipWeapons.GetRightHandItem().TryGetRepairPrice(equipWeapons.rightHand.durability, out _, out tempRepairPrice))
             {
-                tempRepairPrice = equipWeapons.rightHand.GetItem().GetRepairPrice(equipWeapons.rightHand.durability);
-                if (tempRepairPrice != null)
-                {
-                    requireGold += tempRepairPrice.RequireGold;
-                    if (tempRepairPrice.RequireItems != null && tempRepairPrice.RequireItems.Length > 0)
-                        requireItems.AddRange(tempRepairPrice.RequireItems);
-                    if (tempRepairPrice.RequireCurrencies != null && tempRepairPrice.RequireCurrencies.Length > 0)
-                        requireCurrencies.AddRange(tempRepairPrice.RequireCurrencies);
-                }
+                requireGold += tempRepairPrice.RequireGold;
+                if (tempRepairPrice.RequireItems != null && tempRepairPrice.RequireItems.Length > 0)
+                    requireItems.AddRange(tempRepairPrice.RequireItems);
+                if (tempRepairPrice.RequireCurrencies != null && tempRepairPrice.RequireCurrencies.Length > 0)
+                    requireCurrencies.AddRange(tempRepairPrice.RequireCurrencies);
             }
-            if (!equipWeapons.IsEmptyLeftHandSlot())
+            if (!equipWeapons.IsEmptyLeftHandSlot() &&
+                equipWeapons.GetLeftHandItem().TryGetRepairPrice(equipWeapons.leftHand.durability, out _, out tempRepairPrice))
             {
-                tempRepairPrice = equipWeapons.leftHand.GetItem().GetRepairPrice(equipWeapons.leftHand.durability);
-                if (tempRepairPrice != null)
-                {
-                    requireGold += tempRepairPrice.RequireGold;
-                    if (tempRepairPrice.RequireItems != null && tempRepairPrice.RequireItems.Length > 0)
-                        requireItems.AddRange(tempRepairPrice.RequireItems);
-                    if (tempRepairPrice.RequireCurrencies != null && tempRepairPrice.RequireCurrencies.Length > 0)
-                        requireCurrencies.AddRange(tempRepairPrice.RequireCurrencies);
-                }
+                requireGold += tempRepairPrice.RequireGold;
+                if (tempRepairPrice.RequireItems != null && tempRepairPrice.RequireItems.Length > 0)
+                    requireItems.AddRange(tempRepairPrice.RequireItems);
+                if (tempRepairPrice.RequireCurrencies != null && tempRepairPrice.RequireCurrencies.Length > 0)
+                    requireCurrencies.AddRange(tempRepairPrice.RequireCurrencies);
             }
             foreach (CharacterItem equipItem in GameInstance.PlayingCharacterEntity.EquipItems)
             {
-                if (equipItem.IsEmptySlot())
-                    continue;
-                tempRepairPrice = equipItem.GetItem().GetRepairPrice(equipItem.durability);
-                if (tempRepairPrice != null)
+                if (!equipItem.IsEmptySlot() &&
+                    equipItem.GetItem().TryGetRepairPrice(equipItem.durability, out _, out tempRepairPrice))
                 {
                     requireGold += tempRepairPrice.RequireGold;
                     if (tempRepairPrice.RequireItems != null && tempRepairPrice.RequireItems.Length > 0)

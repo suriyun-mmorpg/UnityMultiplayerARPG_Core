@@ -4,11 +4,23 @@ namespace MultiplayerARPG
     {
         public bool TryGetItemRefineLevel(int level, out ItemRefineLevel refineLevel)
         {
-            refineLevel = default;
+            return TryGetItemRefineLevel(level, out refineLevel, out _);
+        }
+
+        public bool TryGetItemRefineLevel(int level, out ItemRefineLevel refineLevel, out UITextKeys gameMessage)
+        {
+            refineLevel = null;
+            gameMessage = UITextKeys.NONE;
             if (ItemRefine == null)
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_DATA;
                 return false;
+            }
             if (level - 1 >= ItemRefine.Levels.Length)
+            {
+                gameMessage = UITextKeys.UI_ERROR_REFINE_ITEM_REACHED_MAX_LEVEL;
                 return false;
+            }
             refineLevel = ItemRefine.Levels[level - 1];
             return true;
         }
@@ -22,29 +34,19 @@ namespace MultiplayerARPG
         {
             if (!this.IsEquipment())
             {
-                // Cannot refine because it's not equipment item
                 gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
-                return false;
-            }
-            if (ItemRefine == null)
-            {
-                // Cannot refine because there is no item refine info
-                gameMessage = UITextKeys.UI_ERROR_CANNOT_REFINE;
-                return false;
-            }
-            if (level - 1 >= ItemRefine.Levels.Length)
-            {
-                // Cannot refine because item reached max level
-                gameMessage = UITextKeys.UI_ERROR_REFINE_ITEM_REACHED_MAX_LEVEL;
                 return false;
             }
             if (GameInstance.Singleton.refineEnhancerItemsLimit > 0 && enhancerDataIds.Length > GameInstance.Singleton.refineEnhancerItemsLimit)
             {
-                // Cannot refine because enhancer items reached level
                 gameMessage = UITextKeys.UI_ERROR_REACHED_REFINE_ENHANCER_ITEMS_LIMIT;
                 return false;
             }
-            return ItemRefine.Levels[level - 1].CanRefine(character, enhancerDataIds, out gameMessage);
+            if (!TryGetItemRefineLevel(level, out ItemRefineLevel refineLevel, out gameMessage))
+            {
+                return false;
+            }
+            return refineLevel.CanRefine(character, enhancerDataIds, out gameMessage);
         }
     }
 }

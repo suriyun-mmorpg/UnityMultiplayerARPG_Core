@@ -90,18 +90,18 @@ namespace MultiplayerARPG
             }, out gameMessageType);
         }
 
-        private static bool RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out UITextKeys gameMessageType)
+        private static bool RepairItem(IPlayerCharacterData character, CharacterItem repairingItem, System.Action<CharacterItem> onRepaired, out UITextKeys gameMessage)
         {
             if (repairingItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
-                gameMessageType = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
+                gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_FOUND;
                 return false;
             }
             BaseItem equipmentItem = repairingItem.GetItem();
-            if (!equipmentItem.CanRepair(character, repairingItem.durability, out float maxDurability, out ItemRepairPrice repairPrice, out gameMessageType))
+            if (!equipmentItem.CanRepair(character, repairingItem.durability, out float maxDurability, out ItemRepairPrice repairPrice, out gameMessage))
                 return false;
-            gameMessageType = UITextKeys.UI_REPAIR_SUCCESS;
+            gameMessage = UITextKeys.UI_REPAIR_SUCCESS;
             // Repair item
             repairingItem.durability = maxDurability;
             onRepaired.Invoke(repairingItem);
