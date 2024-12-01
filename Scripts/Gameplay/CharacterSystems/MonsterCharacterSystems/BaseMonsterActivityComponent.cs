@@ -1,6 +1,6 @@
 ﻿namespace MultiplayerARPG
 {
-    public abstract class BaseMonsterActivityComponent : BaseGameEntityComponent<BaseMonsterCharacterEntity>
+    public abstract partial class BaseMonsterActivityComponent : BaseGameEntityComponent<BaseMonsterCharacterEntity>
     {
         public MonsterCharacter CharacterDatabase
         {
