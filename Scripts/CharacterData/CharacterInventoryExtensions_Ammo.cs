@@ -161,12 +161,14 @@ namespace MultiplayerARPG
             }
 
             int ammo;
-            if (ammoItemData.OverrideAmmoCapacity > 0)
+            if (!weaponItemData.NoAmmoCapacityOverriding && ammoItemData.OverrideAmmoCapacity > 0)
                 ammo = Mathf.Min(ammoItem.amount, ammoItemData.OverrideAmmoCapacity);
             else
                 ammo = Mathf.Min(ammoItem.amount, weaponItemData.AmmoCapacity);
 
             // Update weapon item, before make changes to other items
+            if (weaponItemData.NoAmmoDataIdChange)
+                ammoItemDataId = 0;
             weaponItem.ammoDataId = ammoItemDataId;
             weaponItem.ammo = ammo;
             onPutAmmo.Invoke(weaponItem);
