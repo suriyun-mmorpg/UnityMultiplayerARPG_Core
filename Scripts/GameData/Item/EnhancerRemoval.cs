@@ -3,37 +3,25 @@
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial struct EnhancerRemoval
+    public partial class EnhancerRemoval
     {
         [SerializeField]
-        private bool returnEnhancerItem;
+        private bool returnEnhancerItem = false;
         public bool ReturnEnhancerItem { get { return returnEnhancerItem; } }
 
         [SerializeField]
         [ArrayElementTitle("item")]
-        private ItemAmount[] requireItems;
+        private ItemAmount[] requireItems = new ItemAmount[0];
         public ItemAmount[] RequireItems { get { return requireItems; } }
 
         [SerializeField]
         [ArrayElementTitle("currency")]
-        private CurrencyAmount[] requireCurrencies;
+        private CurrencyAmount[] requireCurrencies = new CurrencyAmount[0];
         public CurrencyAmount[] RequireCurrencies { get { return requireCurrencies; } }
 
         [SerializeField]
-        private int requireGold;
+        private int requireGold = 0;
         public int RequireGold { get { return requireGold; } }
-
-        public EnhancerRemoval(
-            bool returnEnhancerItem,
-            ItemAmount[] requireItems,
-            CurrencyAmount[] requireCurrencies,
-            int requireGold)
-        {
-            this.returnEnhancerItem = returnEnhancerItem;
-            this.requireItems = requireItems;
-            this.requireCurrencies = requireCurrencies;
-            this.requireGold = requireGold;
-        }
 
         public bool CanRemove(IPlayerCharacterData character)
         {

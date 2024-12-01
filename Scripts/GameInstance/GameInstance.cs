@@ -427,7 +427,7 @@ namespace MultiplayerARPG
         public int baseSlotLimit = 0;
         public Storage playerStorage = default;
         public Storage guildStorage = default;
-        public EnhancerRemoval enhancerRemoval = default;
+        public EnhancerRemoval enhancerRemoval = new EnhancerRemoval();
 
         [Header("Gameplay Configs - Summon Monster")]
         [Tooltip("This is a distance that random summon around a character")]

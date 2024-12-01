@@ -214,7 +214,7 @@ namespace MultiplayerARPG
 
             if (uiTextRequireGold != null)
             {
-                if (refineLevel != null)
+                if (refineLevel == null)
                 {
                     uiTextRequireGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
@@ -233,11 +233,11 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), refineLevel != null ? "0" : refineLevel.RequireGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), refineLevel == null ? "0" : refineLevel.RequireGold.ToString("N0"));
 
             if (uiTextSuccessRate != null)
             {
-                if (refineLevel != null)
+                if (refineLevel == null)
                 {
                     uiTextSuccessRate.text = ZString.Format(
                         LanguageManager.GetText(formatKeySuccessRate),
@@ -253,7 +253,7 @@ namespace MultiplayerARPG
 
             if (uiTextRefiningLevel != null)
             {
-                if (refineLevel != null)
+                if (refineLevel == null)
                 {
                     uiTextRefiningLevel.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRefiningLevel),

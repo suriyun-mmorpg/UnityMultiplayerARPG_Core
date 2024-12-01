@@ -56,7 +56,7 @@ namespace MultiplayerARPG
 
             CanRepair = false;
             float maxDurability = 0f;
-            ItemRepairPrice repairPrice = default(ItemRepairPrice);
+            ItemRepairPrice repairPrice = null;
             if (!characterItem.IsEmptySlot())
                 CanRepair = EquipmentItem != null && characterItem.GetItem().CanRepair(GameInstance.PlayingCharacter, characterItem.durability, out maxDurability, out repairPrice);
 
@@ -75,7 +75,7 @@ namespace MultiplayerARPG
 
             if (uiRequireItemAmounts != null)
             {
-                if (repairPrice.RequireItems == null || repairPrice.RequireItems.Length == 0)
+                if (repairPrice == null || repairPrice.RequireItems == null || repairPrice.RequireItems.Length == 0)
                 {
                     uiRequireItemAmounts.Hide();
                 }
@@ -89,7 +89,7 @@ namespace MultiplayerARPG
 
             if (uiRequireCurrencyAmounts != null)
             {
-                if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
+                if (repairPrice == null || repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
                 {
                     uiRequireCurrencyAmounts.Hide();
                 }
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
 
             if (uiTextRequireGold != null)
             {
-                if (maxDurability <= 0)
+                if (repairPrice == null || maxDurability <= 0)
                 {
                     uiTextRequireGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyRequireGold),
@@ -122,11 +122,11 @@ namespace MultiplayerARPG
             }
 
             if (uiTextSimpleRequireGold != null)
-                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), maxDurability <= 0 ? "0" : repairPrice.RequireGold.ToString("N0"));
+                uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), (repairPrice == null || maxDurability <= 0) ? "0" : repairPrice.RequireGold.ToString("N0"));
 
             if (uiTextDurability != null)
             {
-                if (maxDurability <= 0)
+                if (repairPrice == null || maxDurability <= 0)
                 {
                     uiTextDurability.text = ZString.Format(
                         LanguageManager.GetText(formatKeyDurability),
