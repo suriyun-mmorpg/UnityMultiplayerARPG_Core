@@ -44,8 +44,11 @@ public class WeightedRandomizer<T>
     /// </summary>
     /// <param name="spawnRate">An ordered list withe the current spawn rates. The list will be updated so that selected items will have a smaller chance of being repeated.</param>
     /// <returns>The randomized item.</returns>
-    public T TakeOne()
+    public T TakeOne(int seed = 0)
     {
+        if (_weights == null || _weights.Count <= 0)
+            return default;
+
         // Sorts the spawn rate list
         List<KeyValuePair<T, int>> sortedSpawnRate = Sort(_weights);
 
@@ -57,9 +60,12 @@ public class WeightedRandomizer<T>
         }
 
         // Randomizes a number from Zero to Sum
-        int roll = _random.Next(0, sum + noResultWeight);
+        Random random = _random;
+        if (seed != 0)
+            random = new Random(seed);
+        int roll = random.Next(0, sum + noResultWeight);
         if (roll > sum)
-            return default(T);
+            return default;
 
         // Finds chosen item based on spawn rate
         T selected = sortedSpawnRate[sortedSpawnRate.Count - 1].Key;

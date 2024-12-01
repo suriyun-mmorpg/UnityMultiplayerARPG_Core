@@ -33,9 +33,25 @@ namespace MultiplayerARPG
             }
         }
 
-        public void RandomItem(OnDropItemDelegate onRandomItem)
+        public void RandomItem(OnDropItemDelegate onRandomItem, int seed = 0, HashSet<int> excludeItemDataIds = null)
         {
-            ItemRandomByWeight randomedItem = WeightedRandomizer.From(CacheRandomItems).TakeOne();
+            ItemRandomByWeight randomedItem;
+            if (CacheRandomItems.Count > 1 && excludeItemDataIds != null && excludeItemDataIds.Count > 0)
+            {
+                Dictionary<ItemRandomByWeight, int> randomItems = new Dictionary<ItemRandomByWeight, int>();
+                foreach (var kv in CacheRandomItems)
+                {
+                    if (!kv.Key.item || excludeItemDataIds.Contains(kv.Key.item.DataId))
+                        continue;
+                    randomItems.Add(kv.Key, kv.Value);
+                }
+                randomedItem = WeightedRandomizer.From(randomItems).TakeOne(seed);
+                randomItems.Clear();
+            }
+            else
+            {
+                randomedItem = WeightedRandomizer.From(CacheRandomItems).TakeOne(seed);
+            }
             if (randomedItem.item == null)
                 return;
             onRandomItem.Invoke(randomedItem.item, randomedItem.GetRandomedLevel(), randomedItem.GetRandomedAmount());
