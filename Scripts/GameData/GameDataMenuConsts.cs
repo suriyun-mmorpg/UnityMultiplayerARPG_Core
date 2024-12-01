@@ -155,6 +155,18 @@ namespace MultiplayerARPG
         public const string WARP_TO_RESPAWN_POINT_ITEM_MENU = "Create GameData/Item/Warp To Respawn Point Item";
         public const int WARP_TO_RESPAWN_POINT_ITEM_ORDER = -5685;
 
+        public const string WARP_TO_SAFE_AREA_ITEM_FILE = "Warp To Safe Area Item";
+        public const string WARP_TO_SAFE_AREA_ITEM_MENU = "Create GameData/Item/Warp To Safe Area Item";
+        public const int WARP_TO_SAFE_AREA_ITEM_ORDER = -5684;
+
+        public const string SPECIFIC_REWARDING_ITEM_FILE = "Specific Rewarding Item";
+        public const string SPECIFIC_REWARDING_ITEM_MENU = "Create GameData/Item/Specific Rewarding Item";
+        public const int SPECIFIC_REWARDING_ITEM_ORDER = -5683;
+
+        public const string RANDOM_REWARDING_ITEM_FILE = "Random Rewarding Item";
+        public const string RANDOM_REWARDING_ITEM_MENU = "Create GameData/Item/Random Rewarding Item";
+        public const int RANDOM_REWARDING_ITEM_ORDER = -5682;
+
         public const string ITEM_REFINE_FILE = "Item Refine";
         public const string ITEM_REFINE_MENU = "Create GameData/Item Refine";
         public const int ITEM_REFINE_ORDER = -5599;
