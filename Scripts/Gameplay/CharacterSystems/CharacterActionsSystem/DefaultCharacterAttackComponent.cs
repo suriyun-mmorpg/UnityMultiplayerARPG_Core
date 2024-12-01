@@ -204,7 +204,7 @@ namespace MultiplayerARPG
 
                 if (weaponItem.RateOfFire > 0)
                 {
-                    _totalDuration = RATE_OF_FIRE_BASE / weaponItem.RateOfFire;
+                    _totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire + Entity.CachedData.RateOfFire);
                     _triggerDurations = new float[] { 0f };
                 }
 
@@ -396,6 +396,10 @@ namespace MultiplayerARPG
                 fireSpreadAmount = weaponItem.FireSpreadAmount;
                 fireSpreadRange = weaponItem.FireSpreadRange;
             }
+
+            fireSpreadAmount += (byte)Mathf.CeilToInt(Entity.CachedData.FireSpread);
+            fireSpreadRange *= 1 + Entity.CachedData.FireSpreadRangeRate;
+
             // Make sure it won't increase damage to the wrong collction
             for (byte spreadIndex = 0; spreadIndex < fireSpreadAmount + 1; ++spreadIndex)
             {
