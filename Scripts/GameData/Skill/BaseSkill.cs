@@ -724,7 +724,7 @@ namespace MultiplayerARPG
             int amountEachTime = summon.AmountEachTime.GetAmount(skillLevel);
             for (i = 0; i < amountEachTime; ++i)
             {
-                CharacterSummon newSummon = CharacterSummon.Create(SummonType.Skill, DataId);
+                CharacterSummon newSummon = CharacterSummon.Create(SummonType.Skill, string.Empty, DataId);
                 newSummon.Summon(skillUser, summon.Level.GetAmount(skillLevel), summon.Duration.GetAmount(skillLevel));
                 skillUser.Summons.Add(newSummon);
             }

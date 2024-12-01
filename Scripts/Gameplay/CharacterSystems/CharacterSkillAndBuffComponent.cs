@@ -86,7 +86,7 @@ namespace MultiplayerARPG
                         }
                         else
                         {
-                            summon.Update(_updatingTime);
+                            summon.Update(Entity, _updatingTime);
                             Entity.Summons[i] = summon;
                             tempDuration = tempCalculatedBuff.GetDuration();
                             // If duration is 0, damages / recoveries will applied immediately, so don't apply it here

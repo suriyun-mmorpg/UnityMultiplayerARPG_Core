@@ -12,6 +12,7 @@ namespace MultiplayerARPG
             CharacterSummon data = (CharacterSummon)obj;
             info.AddValue("id", data.id);
             info.AddValue("type", (byte)data.type);
+            info.AddValue("sourceId", data.sourceId);
             info.AddValue("dataId", data.dataId);
             info.AddValue("summonRemainsDuration", data.summonRemainsDuration);
             info.AddValue("level", data.Level);
@@ -37,6 +38,12 @@ namespace MultiplayerARPG
                 data.id = GenericUtils.GetUniqueId();
             }
             data.type = (SummonType)info.GetByte("type");
+            // TODO: Backward compatible, this will be removed in future version
+            try
+            {
+                data.sourceId = info.GetString("sourceId");
+            }
+            catch { }
             data.dataId = info.GetInt32("dataId");
             data.summonRemainsDuration = info.GetSingle("summonRemainsDuration");
             data.level = info.GetInt32("level");

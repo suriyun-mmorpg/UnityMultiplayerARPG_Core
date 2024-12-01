@@ -1058,10 +1058,11 @@ namespace MultiplayerARPG
 
         protected void UseItemPet(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
         {
-            if (!character.CanUseItem() || !character.DecreaseItemsByIndex(itemIndex, 1, false))
+            if (!character.CanUseItem())
                 return;
             character.FillEmptySlots();
             // Clear all summoned pets
+            bool doNotSummonNewOne = false;
             CharacterSummon tempSummon;
             for (int i = character.Summons.Count - 1; i >= 0; --i)
             {
@@ -1070,9 +1071,13 @@ namespace MultiplayerARPG
                     continue;
                 character.Summons.RemoveAt(i);
                 tempSummon.UnSummon(character);
+                if (!doNotSummonNewOne && string.Equals(characterItem.id, tempSummon.sourceId))
+                    doNotSummonNewOne = true;
             }
+            if (doNotSummonNewOne)
+                return;
             // Summon new pet
-            CharacterSummon newSummon = CharacterSummon.Create(SummonType.PetItem, DataId);
+            CharacterSummon newSummon = CharacterSummon.Create(SummonType.PetItem, characterItem.id, DataId);
             newSummon.Summon(character, characterItem.level, 0f, characterItem.exp);
             character.Summons.Add(newSummon);
         }

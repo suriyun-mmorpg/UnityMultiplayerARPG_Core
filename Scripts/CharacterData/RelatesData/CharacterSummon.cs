@@ -74,13 +74,25 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case SummonType.PetItem:
-                    // Return to character as a pet item
-                    CharacterItem newItem = CharacterItem.Create(dataId, Level, 1, 0);
-                    newItem.exp = Exp;
-                    newItem.Lock(CurrentHp <= 0 ?
-                        GameInstance.Singleton.petDeadLockDuration :
-                        GameInstance.Singleton.petUnSummonLockDuration);
-                    summoner.AddOrSetNonEquipItems(newItem);
+                    // NOTE: For backward compatibility, create a new item if it is not existed
+                    int indexOfItem = summoner.NonEquipItems.IndexOf(sourceId);
+                    if (indexOfItem >= 0)
+                    {
+                        CharacterItem item = summoner.NonEquipItems[indexOfItem];
+                        item.Lock(CurrentHp <= 0 ?
+                            GameInstance.Singleton.petDeadLockDuration :
+                            GameInstance.Singleton.petUnSummonLockDuration);
+                        summoner.NonEquipItems[indexOfItem] = item;
+                    }
+                    else
+                    {
+                        CharacterItem newItem = CharacterItem.Create(dataId, Level, 1, 0);
+                        newItem.exp = Exp;
+                        newItem.Lock(CurrentHp <= 0 ?
+                            GameInstance.Singleton.petDeadLockDuration :
+                            GameInstance.Singleton.petUnSummonLockDuration);
+                        summoner.AddOrSetNonEquipItems(newItem);
+                    }
                     break;
                 case SummonType.Custom:
                     GameInstance.CustomSummonManager.UnSummon(this);
@@ -143,7 +155,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void Update(float deltaTime)
+        public void Update(BaseCharacterEntity summoner, float deltaTime)
         {
             if (summonRemainsDuration > 0f)
             {
@@ -156,6 +168,20 @@ namespace MultiplayerARPG
             exp = Exp;
             currentHp = CurrentHp;
             currentMp = CurrentMp;
+            // Update data to item in inventory
+            switch (type)
+            {
+                case SummonType.PetItem:
+                    int indexOfItem = summoner.NonEquipItems.IndexOf(sourceId);
+                    if (indexOfItem >= 0)
+                    {
+                        CharacterItem item = summoner.NonEquipItems[indexOfItem];
+                        item.level = level;
+                        item.exp = exp;
+                        summoner.NonEquipItems[indexOfItem] = item;
+                    }
+                    break;
+            }
         }
     }
 
