@@ -163,11 +163,13 @@ namespace MultiplayerARPG
                             continue;
                         amountInInventory += tempCharacterItem.amount;
                     }
+                    if (item.NoAmmoDataIdChange)
+                        reloadingAmmoDataId = -1;
                     if (amountInInventory > 0)
                         return true;
                 }
-                // Try find other ammo items from inventory
                 reloadingAmmoDataId = 0;
+                // Try find other ammo items from inventory
                 for (int i = 0; i < character.NonEquipItems.Count; ++i)
                 {
                     tempCharacterItem = character.NonEquipItems[i];
@@ -180,6 +182,8 @@ namespace MultiplayerARPG
                     if (reloadingAmmoDataId == tempCharacterItem.dataId)
                         amountInInventory += tempCharacterItem.amount;
                 }
+                if (item.NoAmmoDataIdChange)
+                    reloadingAmmoDataId = 0;
                 if (amountInInventory > 0)
                     return true;
             }
@@ -197,7 +201,7 @@ namespace MultiplayerARPG
             IWeaponItem item = GetWeaponItem();
             if (item == null)
                 return 0;
-            if (ammoDataId != 0 &&
+            if (ammoDataId != 0 && !item.NoAmmoCapacityOverriding &&
                 GameInstance.Items.TryGetValue(ammoDataId, out BaseItem prevAmmoItem) &&
                 prevAmmoItem.OverrideAmmoCapacity > 0)
             {
@@ -325,7 +329,7 @@ namespace MultiplayerARPG
                             newItem.ammoDataId = iterator.Current;
                             if (GameInstance.Items.TryGetValue(newItem.ammoDataId, out BaseItem ammoItem))
                             {
-                                if (ammoItem.OverrideAmmoCapacity > 0)
+                                if (!weaponItem.NoAmmoCapacityOverriding && ammoItem.OverrideAmmoCapacity > 0)
                                     newItem.ammo = ammoItem.OverrideAmmoCapacity;
                                 else
                                     newItem.ammo = weaponItem.AmmoCapacity;

@@ -151,7 +151,7 @@ namespace MultiplayerARPG
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, reloadCancellationTokenSource.Token);
+                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, Entity.CachedData.ReloadDuration, animSpeedRate, reloadCancellationTokenSource.Token);
 
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogReloadStart(_playerCharacterEntity, _triggerDurations);
@@ -341,12 +341,14 @@ namespace MultiplayerARPG
             reloadingWeapon.HasAmmoToReload(Entity, out int reloadingAmmoDataId, out int inventoryAmount);
 
             int ammoCapacity = reloadingWeaponItem.AmmoCapacity;
-            if (GameInstance.Items.TryGetValue(reloadingAmmoDataId, out BaseItem tempItem) &&
-                tempItem.OverrideAmmoCapacity > 0)
+            if (!reloadingWeaponItem.NoAmmoCapacityOverriding &&
+                GameInstance.Items.TryGetValue(reloadingAmmoDataId, out BaseItem ammoItem) &&
+                ammoItem.OverrideAmmoCapacity > 0)
             {
                 // Override capacity by the item
-                ammoCapacity = tempItem.OverrideAmmoCapacity;
+                ammoCapacity = ammoItem.OverrideAmmoCapacity;
             }
+            ammoCapacity += Mathf.CeilToInt(Entity.CachedData.AmmoCapacity);
 
             int reloadingAmmoAmount = 0;
             if (reloadingWeapon.ammoDataId != reloadingAmmoDataId)
