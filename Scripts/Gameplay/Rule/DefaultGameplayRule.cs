@@ -319,21 +319,30 @@ namespace MultiplayerARPG
                 !character.MovementState.Has(MovementState.Left) &&
                 !character.MovementState.Has(MovementState.Right)))
                 return 0f;
-            return staminaDecreasePerSeconds;
+            float amount = staminaDecreasePerSeconds - character.CachedData.DecreaseStaminaDecreation;
+            if (amount < 0)
+                amount = 0;
+            return amount;
         }
 
         public override float GetDecreasingFoodPerSeconds(BaseCharacterEntity character)
         {
             if (character is BaseMonsterCharacterEntity)
                 return 0f;
-            return foodDecreasePerSeconds;
+            float amount = foodDecreasePerSeconds - character.CachedData.DecreaseFoodDecreation;
+            if (amount < 0)
+                amount = 0;
+            return amount;
         }
 
         public override float GetDecreasingWaterPerSeconds(BaseCharacterEntity character)
         {
             if (character is BaseMonsterCharacterEntity)
                 return 0f;
-            return waterDecreasePerSeconds;
+            float amount = waterDecreasePerSeconds - character.CachedData.DecreaseWaterDecreation;
+            if (amount < 0)
+                amount = 0;
+            return amount;
         }
 
         public override void GetPlayerDeadPunishment(DeadPunishmentType type, BasePlayerCharacterEntity player, BaseCharacterEntity attacker, out int decreaseExp, out int decreaseGold, out int decreaseItems, out int attackerPkPoint)
@@ -468,12 +477,12 @@ namespace MultiplayerARPG
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
-                        exp = Mathf.CeilToInt(exp * multiplier * (ExpRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.expReductionRate : 0f) + playerCharacter.GetCaches().Stats.expRate));
+                        exp = Mathf.CeilToInt(exp * multiplier * (ExpRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.expReductionRate : 0f) + playerCharacter.GetCaches().ExpRate));
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += Mathf.CeilToInt(exp * guildData.IncreaseExpGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
-                        exp = Mathf.CeilToInt(exp * multiplier * (ExpRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.expReductionRate : 0f) + playerCharacter.GetCaches().Stats.expRate));
+                        exp = Mathf.CeilToInt(exp * multiplier * (ExpRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.expReductionRate : 0f) + playerCharacter.GetCaches().ExpRate));
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             exp += Mathf.CeilToInt(exp * guildData.IncreaseShareExpGainPercentage * 0.01f);
                         break;
@@ -569,12 +578,12 @@ namespace MultiplayerARPG
                 switch (rewardGivenType)
                 {
                     case RewardGivenType.KillMonster:
-                        gold = Mathf.CeilToInt(gold * multiplier * (GoldRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.goldReductionRate : 0f) + playerCharacter.GetCaches().Stats.goldRate));
+                        gold = Mathf.CeilToInt(gold * multiplier * (GoldRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.goldReductionRate : 0f) + playerCharacter.GetCaches().GoldRate));
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             gold += Mathf.CeilToInt(gold * guildData.IncreaseGoldGainPercentage * 0.01f);
                         break;
                     case RewardGivenType.PartyShare:
-                        gold = Mathf.CeilToInt(gold * multiplier * (GoldRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.goldReductionRate : 0f) + playerCharacter.GetCaches().Stats.goldRate));
+                        gold = Mathf.CeilToInt(gold * multiplier * (GoldRate - (TryGetPkData(playerCharacter, out pkData) ? pkData.goldReductionRate : 0f) + playerCharacter.GetCaches().GoldRate));
                         if (GameInstance.ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out guildData))
                             gold += Mathf.CeilToInt(gold * guildData.IncreaseShareGoldGainPercentage * 0.01f);
                         break;
