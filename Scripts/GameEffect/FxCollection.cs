@@ -2,7 +2,7 @@
 
 namespace MultiplayerARPG
 {
-    public class FxCollection
+    public partial class FxCollection
     {
         private ParticleSystem[] _particles;
         private LineRenderer[] _lineRenderers;
