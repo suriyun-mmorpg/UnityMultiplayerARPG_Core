@@ -186,7 +186,7 @@ namespace MultiplayerARPG
 
             if (uiRequireItemAmounts != null)
             {
-                if (refineLevel != null || refineLevel.RequireItems == null || refineLevel.RequireItems.Length == 0)
+                if (refineLevel == null || refineLevel.RequireItems == null || refineLevel.RequireItems.Length == 0)
                 {
                     uiRequireItemAmounts.Hide();
                 }
@@ -200,7 +200,7 @@ namespace MultiplayerARPG
 
             if (uiRequireCurrencyAmounts != null)
             {
-                if (refineLevel != null || refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
+                if (refineLevel == null || refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
                 {
                     uiRequireCurrencyAmounts.Hide();
                 }
