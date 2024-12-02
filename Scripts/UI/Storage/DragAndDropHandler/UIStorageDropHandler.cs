@@ -5,6 +5,8 @@ namespace MultiplayerARPG
 {
     public partial class UIStorageDropHandler : MonoBehaviour, IDropHandler
     {
+        public StorageType storageType;
+
         protected RectTransform _dropRect;
         public RectTransform DropRect
         {
@@ -35,7 +37,24 @@ namespace MultiplayerARPG
                 {
                     case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
                     case UICharacterItemDragHandler.SourceLocation.EquipItems:
-                        draggedItemUI.UIItem.OnClickMoveToStorage();
+                        switch (storageType)
+                        {
+                            case StorageType.Player:
+                                draggedItemUI.UIItem.OnClickMoveToStorage(storageType, GameInstance.UserId, -1);
+                                break;
+                            case StorageType.Guild:
+                                draggedItemUI.UIItem.OnClickMoveToStorage(storageType, (GameInstance.JoinedGuild != null ? GameInstance.JoinedGuild.id : 0).ToString(), -1);
+                                break;
+                            case StorageType.Building:
+                                draggedItemUI.UIItem.OnClickMoveToStorage();
+                                break;
+                            case StorageType.Protected:
+                                draggedItemUI.UIItem.OnClickMoveToStorage(storageType, GameInstance.UserId, -1);
+                                break;
+                            default:
+                                draggedItemUI.UIItem.OnClickMoveToStorage();
+                                break;
+                        }
                         break;
                 }
             }
