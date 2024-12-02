@@ -141,12 +141,7 @@ namespace MultiplayerARPG
         {
             if (level <= 0)
                 return new Dictionary<BaseSkill, int>();
-            Dictionary<BaseSkill, int> result = new Dictionary<BaseSkill, int>();
-            foreach (PlayerSkill skill in skills)
-            {
-                result = GameDataHelpers.CombineSkills(skills, result, level);
-            }
-            return result;
+            return GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, int>(), level);
         }
 
         public override void PrepareRelatesData()
