@@ -162,17 +162,18 @@ namespace MultiplayerARPG
         {
             Character = character;
             int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.characterCurrency.dataId : 0;
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             if (character == null || characterCurrencies == null || characterCurrencies.Count == 0)
             {
+                CacheSelectionManager.DeselectSelectedUI();
                 if (uiDialog != null)
                     uiDialog.Hide();
                 CacheList.HideAll();
                 return;
             }
 
+            UICharacterCurrency selectedUI = null;
             UICharacterCurrency tempUI;
             CacheList.Generate(characterCurrencies, (index, data, ui) =>
             {
@@ -181,8 +182,17 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if (selectedDataId == data.dataId)
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
             });
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
     }
 }

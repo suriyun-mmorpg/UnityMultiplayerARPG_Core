@@ -67,11 +67,12 @@ namespace MultiplayerARPG
             UpdateUIs();
 
             string selectedId = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.SelectedUI.Data.id : string.Empty;
-            MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
             SocialCharacterData[] members;
             party.GetSortedMembers(out members);
+
+            UISocialCharacter selectedUI = null;
             UISocialCharacter tempUI;
             MemberList.Generate(members, (index, data, ui) =>
             {
@@ -82,8 +83,17 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 MemberSelectionManager.Add(tempUI);
                 if (selectedId.Equals(data.id))
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
             });
+
+            if (selectedUI == null)
+            {
+                MemberSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
 
         public void OnClickCreateParty()

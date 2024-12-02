@@ -46,9 +46,9 @@ namespace MultiplayerARPG
             UpdateUIs();
 
             string selectedId = MemberSelectionManager.SelectedUI != null ? MemberSelectionManager.SelectedUI.Data.id : string.Empty;
-            MemberSelectionManager.DeselectSelectedUI();
             MemberSelectionManager.Clear();
 
+            UISocialCharacter selectedUI = null;
             UISocialCharacter tempUI;
             MemberList.Generate(friends, (index, data, ui) =>
             {
@@ -63,10 +63,20 @@ namespace MultiplayerARPG
                 tempUI.onGuildRequestDeclined.AddListener(Refresh);
                 MemberSelectionManager.Add(tempUI);
                 if (selectedId.Equals(data.id))
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
             });
+
             if (memberListEmptyObject != null)
                 memberListEmptyObject.SetActive(friends.Count == 0);
+
+            if (selectedUI == null)
+            {
+                MemberSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
 
         public override bool CanKick(string characterId)

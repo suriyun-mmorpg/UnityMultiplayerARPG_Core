@@ -27,7 +27,7 @@ public abstract class UISelectionManager<TData, TUI> : UISelectionManager
     where TUI : UISelectionEntry<TData>
 {
     [System.Serializable]
-    public class DataEvent: UnityEvent<TData>
+    public class DataEvent : UnityEvent<TData>
     {
 
     }
@@ -50,6 +50,7 @@ public abstract class UISelectionManager<TData, TUI> : UISelectionManager
 
     protected readonly List<TUI> uis = new List<TUI>();
     public TUI SelectedUI { get; protected set; }
+    public int SelectedIndex { get { return IndexOf(SelectedUI); } }
 
     public void Add(TUI ui)
     {
@@ -68,6 +69,8 @@ public abstract class UISelectionManager<TData, TUI> : UISelectionManager
 
     public int IndexOf(TUI ui)
     {
+        if (ui == null)
+            return -1;
         return uis.IndexOf(ui);
     }
 
@@ -97,6 +100,16 @@ public abstract class UISelectionManager<TData, TUI> : UISelectionManager
     public override sealed object GetSelectedUI()
     {
         return SelectedUI;
+    }
+
+    public List<TUI> GetAllUIs()
+    {
+        List<TUI> result = new List<TUI>();
+        foreach (TUI ui in uis)
+        {
+            result.Add(ui);
+        }
+        return result;
     }
 
     public override void Select(int index)
@@ -226,6 +239,7 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
 
     protected readonly List<TUI> uis = new List<TUI>();
     public TUI SelectedUI { get; protected set; }
+    public int SelectedIndex { get { return IndexOf(SelectedUI); } }
 
     public void Add(TUI ui)
     {
@@ -244,6 +258,8 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
 
     public int IndexOf(TUI ui)
     {
+        if (ui == null)
+            return -1;
         return uis.IndexOf(ui);
     }
 
@@ -354,6 +370,16 @@ public abstract class UISelectionManager<TData, TUI, TDataEvent, TUIEvent> : UIS
         {
             if (ui.IsSelected)
                 result.Add(ui);
+        }
+        return result;
+    }
+
+    public List<TUI> GetAllUIs()
+    {
+        List<TUI> result = new List<TUI>();
+        foreach (TUI ui in uis)
+        {
+            result.Add(ui);
         }
         return result;
     }

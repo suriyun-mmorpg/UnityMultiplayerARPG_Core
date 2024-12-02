@@ -116,10 +116,10 @@ namespace MultiplayerARPG
         {
             Character = character;
             uint selectedSummonObjectId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterSummon.objectId : 0;
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             Dictionary<int, UICharacterSummon> stackingSkillSummons = new Dictionary<int, UICharacterSummon>();
+            UICharacterSummon selectedUI = null;
             UICharacterSummon tempUI;
             CacheList.Generate(character.Summons, (index, data, ui) =>
             {
@@ -144,9 +144,18 @@ namespace MultiplayerARPG
                     }
                     CacheSelectionManager.Add(tempUI);
                     if (selectedSummonObjectId == data.objectId)
-                        tempUI.SelectByManager();
+                        selectedUI = tempUI;
                 }
             });
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
     }
 }

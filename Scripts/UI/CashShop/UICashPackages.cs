@@ -164,12 +164,12 @@ namespace MultiplayerARPG
         public virtual void GenerateList()
         {
             int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.DataId : 0;
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             List<CashPackage> filteredList = UICashPackagesUtils.GetFilteredList(LoadedList, filterCategories);
             if (filteredList.Count == 0)
             {
+                CacheSelectionManager.DeselectSelectedUI();
                 if (uiDialog != null)
                     uiDialog.Hide();
                 CacheList.HideAll();
@@ -181,6 +181,7 @@ namespace MultiplayerARPG
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(false);
 
+            UICashPackage selectedUI = null;
             UICashPackage tempUI;
             CacheList.Generate(filteredList, (index, data, ui) =>
             {
@@ -190,8 +191,17 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.DataId)
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
             });
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
     }
 }

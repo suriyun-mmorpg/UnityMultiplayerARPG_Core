@@ -54,6 +54,10 @@ namespace MultiplayerARPG
         public GameObject[] owningCharacterCanKickObjects;
         [Tooltip("These objects will be activated when owning character cannot kick")]
         public GameObject[] owningCharacterCannotKickObjects;
+        [Tooltip("These objects will be activated when selected character is leader")]
+        public GameObject[] selectedCharacterIsLeaderObjects;
+        [Tooltip("These objects will be activated when selected character is not leader")]
+        public GameObject[] selectedCharacterIsNotLeaderObjects;
 
         [Header("Events")]
         public UnityEvent onFriendAdded = new UnityEvent();
@@ -115,6 +119,8 @@ namespace MultiplayerARPG
             owningCharacterIsNotLeaderObjects.Nulling();
             owningCharacterCanKickObjects.Nulling();
             owningCharacterCannotKickObjects.Nulling();
+            selectedCharacterIsLeaderObjects.Nulling();
+            selectedCharacterIsNotLeaderObjects.Nulling();
             onFriendAdded?.RemoveAllListeners();
             onFriendAdded = null;
             onFriendRemoved?.RemoveAllListeners();
@@ -192,6 +198,12 @@ namespace MultiplayerARPG
 
         protected virtual void UpdateUIs()
         {
+            UpdateOwningCharacterSigns();
+            UpdateSelectedMemberSigns(MemberSelectionManager.SelectedUI);
+        }
+
+        public void UpdateOwningCharacterSigns()
+        {
             foreach (GameObject obj in owningCharacterIsInGroupObjects)
             {
                 if (obj != null)
@@ -226,6 +238,21 @@ namespace MultiplayerARPG
             {
                 if (obj != null)
                     obj.SetActive(!OwningCharacterCanKick());
+            }
+        }
+
+        public void UpdateSelectedMemberSigns(UISocialCharacter ui)
+        {
+            foreach (GameObject obj in selectedCharacterIsLeaderObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(ui != null && IsLeader(ui.Data.id));
+            }
+
+            foreach (GameObject obj in selectedCharacterIsNotLeaderObjects)
+            {
+                if (obj != null)
+                    obj.SetActive(ui != null && !IsLeader(ui.Data.id));
             }
         }
 
@@ -268,6 +295,7 @@ namespace MultiplayerARPG
                 uiMemberDialog.Data = ui.Data;
                 uiMemberDialog.Show();
             }
+            UpdateSelectedMemberSigns(ui);
         }
 
         protected void OnDeselectMember(UISocialCharacter ui)
@@ -278,6 +306,7 @@ namespace MultiplayerARPG
                 uiMemberDialog.Hide();
                 uiMemberDialog.onHide.AddListener(OnMemberDialogHide);
             }
+            UpdateSelectedMemberSigns(null);
         }
 
         public void OnClickAddFriend()

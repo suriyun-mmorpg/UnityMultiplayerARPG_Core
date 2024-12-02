@@ -107,9 +107,9 @@ namespace MultiplayerARPG
                 return;
 
             int selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.Id : 0;
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
+            UIGuildListEntry selectedUI = null;
             UIGuildListEntry tempUI;
             CacheList.Generate(foundGuilds, (index, data, ui) =>
             {
@@ -118,10 +118,20 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if (selectedId == data.Id)
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
             });
+
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(foundGuilds.Count == 0);
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
 
         public void OnClickFind()

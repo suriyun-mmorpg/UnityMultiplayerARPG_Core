@@ -100,12 +100,12 @@ namespace MultiplayerARPG
 
         public virtual void UpdateData(int selectedDataId)
         {
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             List<GuildIcon> list = new List<GuildIcon>(GameInstance.GuildIcons.Values);
             if (list.Count == 0)
             {
+                CacheSelectionManager.DeselectSelectedUI();
                 CacheList.HideAll();
                 if (listEmptyObject != null)
                     listEmptyObject.SetActive(true);
@@ -115,6 +115,7 @@ namespace MultiplayerARPG
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(false);
 
+            UIGuildIcon selectedUI = null;
             UIGuildIcon tempUI;
             CacheList.Generate(list, (index, data, ui) =>
             {
@@ -123,8 +124,17 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if (index == 0 || selectedDataId == data.DataId)
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
             });
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
 
         public virtual void UpdateSelectedIcons()
