@@ -106,6 +106,16 @@ namespace MultiplayerARPG
             StopDealing();
         }
 
+        public int GetRequiredGold()
+        {
+            return GameInstance.Singleton.GameplayRule.GetDealingTax(DealingItems) + DealingGold;
+        }
+
+        public bool HaveEnoughGold()
+        {
+            return Entity.Gold >= GetRequiredGold();
+        }
+
         public bool ExchangingDealingItemsWillOverwhelming()
         {
             if (DealingCharacter == null)
@@ -165,7 +175,7 @@ namespace MultiplayerARPG
             }
             Entity.FillEmptySlots();
             DealingCharacter.FillEmptySlots();
-            Entity.Gold -= DealingGold;
+            Entity.Gold -= GetRequiredGold();
             DealingCharacter.Gold = DealingCharacter.Gold.Increase(DealingGold);
             DealingCharacter.OnRewardGold(RewardGivenType.Dealing, DealingGold);
             GameInstance.ServerLogHandlers.LogExchangeDealingItemsAndGold(Entity, DealingCharacter, DealingGold, DealingItems);
@@ -415,6 +425,11 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
                 return;
             }
+            if (!HaveEnoughGold())
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
+                return;
+            }
             DealingState = DealingState.LockDealing;
 #endif
         }
@@ -434,10 +449,20 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
                 return;
             }
+            if (!HaveEnoughGold())
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
+                return;
+            }
             DealingState = DealingState.ConfirmDealing;
             if (DealingState == DealingState.ConfirmDealing && DealingCharacter.Dealing.DealingState == DealingState.ConfirmDealing)
             {
-                if (ExchangingDealingItemsWillOverwhelming())
+                if (!HaveEnoughGold() || !DealingCharacter.Dealing.HaveEnoughGold())
+                {
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
+                }
+                else if (ExchangingDealingItemsWillOverwhelming())
                 {
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ANOTHER_CHARACTER_WILL_OVERWHELMING);
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);

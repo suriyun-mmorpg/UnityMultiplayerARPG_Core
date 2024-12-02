@@ -386,6 +386,13 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public abstract bool GetEntityNameColor(BaseGameEntity entity, out Color color);
 
+        /// <summary>
+        /// Get dealing tax in-case that your game need it
+        /// </summary>
+        /// <param name="dealingItems"></param>
+        /// <returns></returns>
+        public abstract int GetDealingTax(DealingCharacterItems dealingItems);
+
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
             float rate = 1f + character.GetCaches().BuyItemPriceRate;

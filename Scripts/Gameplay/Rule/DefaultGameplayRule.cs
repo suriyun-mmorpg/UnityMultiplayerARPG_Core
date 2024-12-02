@@ -116,6 +116,11 @@ namespace MultiplayerARPG
         public Color monsterHighLevelTitleColor = Color.red;
         public Color monsterLowLevelTitleColor = Color.cyan;
 
+        [Header("Dealing")]
+        [Min(0.01f)]
+        public float taxByItemPriceRate = 0.05f;
+        public bool calculateTaxByStackedItems = false;
+
         [Header("PK")]
         public int minLevelToTurnPkOn = 10;
         public int pkPointEachKills = 10;
@@ -1140,6 +1145,18 @@ namespace MultiplayerARPG
                 }
             }
             return false;
+        }
+
+        public override int GetDealingTax(DealingCharacterItems dealingCharacterItems)
+        {
+            float totalTax = 0f;
+            foreach (CharacterItem item in dealingCharacterItems)
+            {
+                BaseItem itemData = item.GetItem();
+                float rate = calculateTaxByStackedItems ? 1f : ((float)item.amount / (float)itemData.MaxStack);
+                totalTax += (float)itemData.SellPrice * rate;
+            }
+            return Mathf.CeilToInt(totalTax);
         }
 
         private bool TryGetPkData(BasePlayerCharacterEntity player, out PkData data)
