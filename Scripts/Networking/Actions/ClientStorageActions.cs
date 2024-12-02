@@ -75,7 +75,7 @@ namespace MultiplayerARPG
         {
             StorageId storageId = new StorageId(type, ownerId);
             GameInstance.OpenedStorages.Remove(storageId);
-            GameInstance.ItemUIVisibilityManager.HideStorageDialog();
+            GameInstance.ItemUIVisibilityManager.HideStorageDialog(type, ownerId);
             if (onNotifyStorageClosed != null)
                 onNotifyStorageClosed.Invoke(type, ownerId);
         }
