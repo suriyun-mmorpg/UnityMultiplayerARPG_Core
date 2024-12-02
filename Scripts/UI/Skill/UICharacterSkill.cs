@@ -1,6 +1,5 @@
 ﻿using Cysharp.Text;
 using Insthync.AddressableAssetTools;
-using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -86,14 +85,19 @@ namespace MultiplayerARPG
         public UnityEvent onUnableToLevelUp = new UnityEvent();
         public UnityEvent onAbleToUse = new UnityEvent();
         public UnityEvent onUnableToUse = new UnityEvent();
+        public UnityEvent onMaxedLevel = new UnityEvent();
+        public UnityEvent onNotMaxedLevel = new UnityEvent();
 
         [Header("Options")]
         public UICharacterSkill uiNextLevelSkill;
+        public bool changeObjectNameByData = true;
 
         protected float _coolDownRemainsDuration;
         protected bool _dirtyIsCountDown;
         protected bool _dirtyAbleToLevelUp;
         protected bool _dirtyAbleToUse;
+        protected bool _dirtyMaxedLevel;
+        protected bool _forceUpdateUi = true;
 
         protected override void OnDestroy()
         {
@@ -137,6 +141,10 @@ namespace MultiplayerARPG
             onAbleToUse = null;
             onUnableToUse?.RemoveAllListeners();
             onUnableToUse = null;
+            onMaxedLevel?.RemoveAllListeners();
+            onMaxedLevel = null;
+            onNotMaxedLevel?.RemoveAllListeners();
+            onNotMaxedLevel = null;
             uiNextLevelSkill = null;
         }
 
@@ -187,7 +195,7 @@ namespace MultiplayerARPG
             }
 
             bool isCountDown = _coolDownRemainsDuration > 0f;
-            if (_dirtyIsCountDown != isCountDown)
+            if (_forceUpdateUi || _dirtyIsCountDown != isCountDown)
             {
                 _dirtyIsCountDown = isCountDown;
                 if (countDownObjects != null)
@@ -227,8 +235,8 @@ namespace MultiplayerARPG
             if (targetPlayer == null)
                 targetPlayer = GameInstance.PlayingCharacter;
 
-            bool ableToLevelUp = targetPlayer != null && Skill != null && Skill.CanLevelUp(targetPlayer, CharacterSkill.level, out _);
-            if (_dirtyAbleToLevelUp != ableToLevelUp)
+            bool ableToLevelUp = targetPlayer != null && Skill != null && Skill.CanLevelUp(targetPlayer, Level, out _);
+            if (_forceUpdateUi || _dirtyAbleToLevelUp != ableToLevelUp)
             {
                 _dirtyAbleToLevelUp = ableToLevelUp;
                 if (ableToLevelUp)
@@ -237,8 +245,8 @@ namespace MultiplayerARPG
                     onUnableToLevelUp.Invoke();
             }
 
-            bool ableToUse = targetPlayer != null && Skill != null && Skill.IsActive && CharacterSkill.level > 0;
-            if (_dirtyAbleToUse != ableToUse)
+            bool ableToUse = targetPlayer != null && Skill != null && Skill.IsActive && Level > 0;
+            if (_forceUpdateUi || _dirtyAbleToUse != ableToUse)
             {
                 _dirtyAbleToUse = ableToUse;
                 if (ableToUse)
@@ -246,10 +254,23 @@ namespace MultiplayerARPG
                 else
                     onUnableToUse.Invoke();
             }
+
+            bool maxedLevel = Skill != null && Skill.maxLevel <= Level;
+            if (_forceUpdateUi || _dirtyMaxedLevel != maxedLevel)
+            {
+                _dirtyMaxedLevel = maxedLevel;
+                if (maxedLevel)
+                    onMaxedLevel.Invoke();
+                else
+                    onNotMaxedLevel.Invoke();
+            }
         }
 
         protected override async void UpdateData()
         {
+            if (changeObjectNameByData)
+                name = $"(UICharacterSkill){(Skill == null ? string.Empty : Skill.Id)}";
+
             UpdateCoolDownRemainsDuration(1f);
 
             if (Level <= 0)

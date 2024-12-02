@@ -112,7 +112,7 @@ namespace MultiplayerARPG
             base.GenerateList();
         }
 
-        private void OnGenerateEntry(int indexOfData, CharacterItem characterItem)
+        private void OnGenerateEntry(int indexOfData, CharacterItem characterItem, int indexOfUi, UICharacterItem ui)
         {
             if (!characterItem.IsEmptySlot())
             {
@@ -121,6 +121,8 @@ namespace MultiplayerARPG
                 if (!characterItem.GetItem().NoSlotUsage)
                     UsedSlots++;
             }
+            ui.StorageType = StorageType;
+            ui.StorageOwnerId = StorageOwnerId;
         }
     }
 }

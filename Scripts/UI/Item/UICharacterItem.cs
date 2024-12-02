@@ -14,6 +14,8 @@ namespace MultiplayerARPG
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public int Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
+        public StorageType StorageType { get; set; }
+        public string StorageOwnerId { get; set; }
         public BaseItem Item { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetItem() : null; } }
         public IUsableItem UsableItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetUsableItem() : null; } }
         public IPotionItem PotionItem { get { return !CharacterItem.IsEmptySlot() ? CharacterItem.GetPotionItem() : null; } }
@@ -214,6 +216,8 @@ namespace MultiplayerARPG
         public UnityEvent onExitDealingState = new UnityEvent();
         public UnityEvent onStartVendingDialogAppear = new UnityEvent();
         public UnityEvent onStartVendingDialogDisappear = new UnityEvent();
+        public UnityEvent onSetEquipmentWithAmmo = new UnityEvent();
+        public UnityEvent onSetEquipmentWithoutAmmo = new UnityEvent();
 
         [Header("Options")]
         public UICharacterItemDragHandler uiDragging;
@@ -226,6 +230,7 @@ namespace MultiplayerARPG
         public bool dontAppendRefineLevelToTitle;
         public bool dontShowComparingEquipments;
         public bool dontCalculateRandomBonus;
+        public bool changeObjectNameByData = true;
 
         protected bool _isSellItemDialogAppeared;
         protected bool _isRefineItemDialogAppeared;
@@ -239,6 +244,7 @@ namespace MultiplayerARPG
         protected bool _dirtyIsLock;
         protected float _coolDownRemainsDuration;
         protected bool _dirtyIsCountDown;
+        protected bool _forceUpdateUi = true;
         protected CalculatedItemRandomBonus _randomBonus = null;
 
         public bool IsSetupAsEquipSlot { get; private set; }
@@ -363,6 +369,10 @@ namespace MultiplayerARPG
             onStartVendingDialogAppear = null;
             onStartVendingDialogDisappear?.RemoveAllListeners();
             onStartVendingDialogDisappear = null;
+            onSetEquipmentWithAmmo?.RemoveAllListeners();
+            onSetEquipmentWithAmmo = null;
+            onSetEquipmentWithoutAmmo?.RemoveAllListeners();
+            onSetEquipmentWithoutAmmo = null;
             uiDragging = null;
             uiNextLevelItem = null;
             uiComparingEquipments.Nulling();
@@ -463,7 +473,7 @@ namespace MultiplayerARPG
             }
 
             bool isLock = _lockRemainsDuration > 0f;
-            if (_dirtyIsLock != isLock)
+            if (_forceUpdateUi || _dirtyIsLock != isLock)
             {
                 _dirtyIsLock = isLock;
                 foreach (GameObject obj in lockObjects)
@@ -519,7 +529,7 @@ namespace MultiplayerARPG
             }
 
             bool isCountDown = _coolDownRemainsDuration > 0f;
-            if (_dirtyIsCountDown != isCountDown)
+            if (_forceUpdateUi || _dirtyIsCountDown != isCountDown)
             {
                 _dirtyIsCountDown = isCountDown;
                 foreach (GameObject obj in countDownObjects)
@@ -565,6 +575,9 @@ namespace MultiplayerARPG
 
         protected override async void UpdateData()
         {
+            if (changeObjectNameByData)
+                name = $"(UICharacterSkill){(Item == null ? string.Empty : Item.Id)}";
+
             bool isEmpty = Item == null;
             foreach (GameObject obj in emptyObjects)
             {
@@ -608,6 +621,10 @@ namespace MultiplayerARPG
                             onSetUnEquippedData.Invoke();
                         else
                             onSetEquippedData.Invoke();
+                        if (CharacterItem.ammo > 0)
+                            onSetEquipmentWithAmmo.Invoke();
+                        else
+                            onSetEquipmentWithoutAmmo.Invoke();
                     }
                     else
                     {
@@ -698,11 +715,14 @@ namespace MultiplayerARPG
                 }
             }
 
+            // It's how much player selling item to NPC, so use `sellItemPriceRate`
+            float sellPriceRate = 1f + GameInstance.PlayingCharacter.GetCaches().Stats.sellItemPriceRate;
             if (uiTextSellPrice != null)
             {
+                int sellPrice = Mathf.CeilToInt(Item.SellPrice * sellPriceRate);
                 uiTextSellPrice.text = ZString.Format(
                     LanguageManager.GetText(formatKeySellPrice),
-                    isEmpty ? "0" : Item.SellPrice.ToString("N0"));
+                    isEmpty ? "0" : sellPrice.ToString("N0"));
             }
 
             if (uiTextStack != null)
@@ -1930,6 +1950,19 @@ namespace MultiplayerARPG
                 ClientInventoryActions.ResponseUnEquipWeapon);
         }
 
+        public void OnClickRemoveAmmo()
+        {
+            // Only equipped equipment can be unequipped
+            if (!IsOwningCharacter())
+                return;
+
+            GameInstance.ClientInventoryHandlers.RequestRemoveAmmoFromItem(new RequestRemoveAmmoFromItemMessage()
+            {
+                inventoryType = InventoryType,
+                index = IndexOfData,
+            }, ClientInventoryActions.ResponseRemoveAmmoFromItem);
+        }
+
         public void OnClickUse()
         {
             if (!IsOwningCharacter())
@@ -2124,16 +2157,9 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
-            if (uiStorageItems == null)
-                uiStorageItems = FindObjectOfType<UIStorageItems>();
-            if (uiStorageItems == null)
-            {
-                Debug.LogError("Unable to move from storage, no opened storage items UI");
-                return;
-            }
-            StorageType storageType = uiStorageItems.StorageType;
-            string storageOwnerId = uiStorageItems.StorageOwnerId;
+
+            StorageType storageType = StorageType;
+            string storageOwnerId = StorageOwnerId;
             GameInstance.ClientStorageHandlers.RequestMoveItemFromStorage(new RequestMoveItemFromStorageMessage()
             {
                 storageType = storageType,

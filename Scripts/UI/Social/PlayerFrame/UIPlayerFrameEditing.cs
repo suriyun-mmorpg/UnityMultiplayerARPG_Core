@@ -118,12 +118,11 @@ namespace MultiplayerARPG
         public virtual void UpdateData(int selectedDataId)
         {
             _selectedDataId = selectedDataId;
-
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             if (_list.Count == 0)
             {
+                CacheSelectionManager.DeselectSelectedUI();
                 CacheList.HideAll();
                 if (listEmptyObject != null)
                     listEmptyObject.SetActive(true);
@@ -133,6 +132,7 @@ namespace MultiplayerARPG
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(false);
 
+            UIPlayerFrame selectedUI = null;
             UIPlayerFrame tempUI;
             CacheList.Generate(_list, (index, data, ui) =>
             {
@@ -144,9 +144,18 @@ namespace MultiplayerARPG
                 if ((selectedDataId == 0 && _availableFrameIds.Contains(data.DataId)) || selectedDataId == data.DataId)
                 {
                     selectedDataId = data.DataId;
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
                 }
             });
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
 
         public virtual void UpdateSelectedFrames()

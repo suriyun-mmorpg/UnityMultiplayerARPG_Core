@@ -49,7 +49,8 @@ namespace MultiplayerARPG
             }
         }
 
-        public System.Action<int, CharacterItem> onGenerateEntry = null;
+        public delegate void OnGenerateEntryDelegate(int indexOfData, CharacterItem uiCharacterItem, int indexOfUi, UICharacterItem ui);
+        public event OnGenerateEntryDelegate onGenerateEntry = null;
         public UICharacterItemsUtils.GetFilteredListDelegate overrideGetFilteredListFunction = null;
         public virtual ICharacterData Character { get; protected set; }
         public List<CharacterItem> LoadedList { get; private set; } = new List<CharacterItem>();
@@ -179,7 +180,6 @@ namespace MultiplayerARPG
         public virtual void GenerateList()
         {
             string selectedId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.CharacterItem.id : string.Empty;
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             List<KeyValuePair<int, CharacterItem>> filteredList;
@@ -189,6 +189,7 @@ namespace MultiplayerARPG
                 filteredList = UICharacterItemsUtils.GetFilteredList(LoadedList, filterCategories, filterItemTypes, filterSocketEnhancerTypes, doNotShowEmptySlots);
             if (Character == null || filteredList.Count == 0)
             {
+                CacheSelectionManager.DeselectSelectedUI();
                 if (uiDialog != null)
                     uiDialog.Hide();
                 CacheList.HideAll();
@@ -204,11 +205,11 @@ namespace MultiplayerARPG
             UICharacterItem tempUI;
             CacheList.Generate(filteredList, (index, data, ui) =>
             {
-                if (onGenerateEntry != null)
-                    onGenerateEntry.Invoke(data.Key, data.Value);
                 tempUI = ui.GetComponent<UICharacterItem>();
                 tempUI.Setup(new UICharacterItemData(data.Value, inventoryType), Character, data.Key);
                 tempUI.Show();
+                if (onGenerateEntry != null)
+                    onGenerateEntry.Invoke(data.Key, data.Value, index, tempUI);
                 UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
                 {

@@ -192,12 +192,12 @@ namespace MultiplayerARPG
         public virtual void GenerateList()
         {
             int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Skill.DataId : 0;
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
             Dictionary<BaseSkill, int> filteredList = UICharacterSkillsUtils.GetFilteredList(LoadedList, filterCategories, filterSkillTypes);
             if (Character == null || filteredList.Count == 0)
             {
+                CacheSelectionManager.DeselectSelectedUI();
                 if (uiDialog != null)
                     uiDialog.Hide();
                 CacheList.HideAll();
@@ -209,6 +209,7 @@ namespace MultiplayerARPG
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(false);
 
+            UICharacterSkill selectedUI = null;
             UICharacterSkill tempUI;
             int tempIndexOfLearnedSkill;
             int tempLearnedSkillLevel;
@@ -226,8 +227,17 @@ namespace MultiplayerARPG
                     dragHandler.SetupForSkills(tempUI);
                 CacheSelectionManager.Add(tempUI);
                 if (selectedDataId == data.Key.DataId)
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
             });
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
     }
 }

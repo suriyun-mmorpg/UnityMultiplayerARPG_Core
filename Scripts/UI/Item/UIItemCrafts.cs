@@ -128,9 +128,9 @@ namespace MultiplayerARPG
         protected virtual void UpdateData(IList<ItemCraft> itemCrafts)
         {
             int selectedDataId = CacheSelectionManager.SelectedUI != null ? CacheSelectionManager.SelectedUI.Data.CraftingItem.DataId : 0;
-            CacheSelectionManager.DeselectSelectedUI();
             CacheSelectionManager.Clear();
 
+            UIItemCraft selectedUI = null;
             UIItemCraft tempUI;
             CacheList.Generate(itemCrafts, (index, data, ui) =>
             {
@@ -139,10 +139,20 @@ namespace MultiplayerARPG
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
                 if ((selectFirstEntryByDefault && index == 0) || selectedDataId == data.CraftingItem.DataId)
-                    tempUI.SelectByManager();
+                    selectedUI = tempUI;
             });
+
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(itemCrafts.Count == 0);
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
     }
 }
