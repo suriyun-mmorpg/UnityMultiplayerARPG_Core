@@ -789,15 +789,6 @@ namespace MultiplayerARPG
 
         public override void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit)
         {
-            // Hide all of storage UIs
-            if (uiPlayerStorageItems != null)
-                uiPlayerStorageItems.Hide(true);
-            if (uiGuildStorageItems != null)
-                uiGuildStorageItems.Hide(true);
-            if (uiBuildingStorageItems != null)
-                uiBuildingStorageItems.Hide(true);
-            if (uiBuildingCampfireItems != null)
-                uiBuildingCampfireItems.Hide(true);
             // Show only selected storage type
             switch (storageType)
             {
@@ -840,17 +831,26 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void HideStorageDialog()
+        public override void HideStorageDialog(StorageType storageType, string storageOwnerId)
         {
             // Hide all of storage UIs
-            if (uiPlayerStorageItems != null)
-                uiPlayerStorageItems.Hide();
-            if (uiGuildStorageItems != null)
-                uiGuildStorageItems.Hide();
-            if (uiBuildingStorageItems != null)
-                uiBuildingStorageItems.Hide();
-            if (uiBuildingCampfireItems != null)
-                uiBuildingCampfireItems.Hide();
+            switch (storageType)
+            {
+                case StorageType.Player:
+                    if (uiPlayerStorageItems != null)
+                        uiPlayerStorageItems.Hide();
+                    break;
+                case StorageType.Guild:
+                    if (uiGuildStorageItems != null)
+                        uiGuildStorageItems.Hide();
+                    break;
+                case StorageType.Building:
+                    if (uiBuildingStorageItems != null)
+                        uiBuildingStorageItems.Hide();
+                    if (uiBuildingCampfireItems != null)
+                        uiBuildingCampfireItems.Hide();
+                    break;
+            }
         }
 
         public override void ShowItemsContainerDialog(ItemsContainerEntity itemsContainerEntity)
