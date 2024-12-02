@@ -1153,7 +1153,7 @@ namespace MultiplayerARPG
             foreach (CharacterItem item in dealingCharacterItems)
             {
                 BaseItem itemData = item.GetItem();
-                float rate = calculateTaxByStackedItems ? 1f : ((float)item.amount / (float)itemData.MaxStack);
+                float rate = (calculateTaxByStackedItems ? 1f : ((float)item.amount / (float)itemData.MaxStack)) * taxByItemPriceRate;
                 totalTax += (float)itemData.SellPrice * rate;
             }
             return Mathf.CeilToInt(totalTax);
