@@ -191,6 +191,12 @@ namespace MultiplayerARPG
                         selectedUI = tempUI;
                 }
             }
+
+            for (i = 0; i < character.SelectableWeaponSets.Count; ++i)
+            {
+                SetEquipWeapons(selectedId, ref selectedUI, character.SelectableWeaponSets[i], (byte)i);
+            }
+
             if (selectedUI == null)
             {
                 CacheSelectionManager.DeselectSelectedUI();
@@ -204,11 +210,6 @@ namespace MultiplayerARPG
                 if (uiDialog != null)
                     uiDialog.dontShowComparingEquipments = defaultDontShowComparingEquipments;
             }
-
-            for (i = 0; i < character.SelectableWeaponSets.Count; ++i)
-            {
-                SetEquipWeapons(selectedId, character.SelectableWeaponSets[i], (byte)i);
-            };
         }
 
         private void CacheEquipWeaponSlots(UICharacterItem rightHandSlot, UICharacterItem leftHandSlot, byte equipWeaponSet)
@@ -230,24 +231,24 @@ namespace MultiplayerARPG
             CacheSelectionManager.Add(slot);
         }
 
-        private void SetEquipWeapons(string selectedId, EquipWeapons equipWeapons, byte equipWeaponSet)
+        private void SetEquipWeapons(string selectedId, ref UICharacterItem selectedUI, EquipWeapons equipWeapons, byte equipWeaponSet)
         {
-            SetEquipWeapon(selectedId, equipWeapons.rightHand, false, equipWeaponSet);
-            SetEquipWeapon(selectedId, equipWeapons.leftHand, true, equipWeaponSet);
+            SetEquipWeapon(selectedId, ref selectedUI, equipWeapons.rightHand, false, equipWeaponSet);
+            SetEquipWeapon(selectedId, ref selectedUI, equipWeapons.leftHand, true, equipWeaponSet);
         }
 
-        private void SetEquipWeapon(string selectedId, CharacterItem equipWeapon, bool isLeftHand, byte equipWeaponSet)
+        private void SetEquipWeapon(string selectedId, ref UICharacterItem selectedUI, CharacterItem equipWeapon, bool isLeftHand, byte equipWeaponSet)
         {
             string tempPosition = GetEquipPosition(isLeftHand ? GameDataConst.EQUIP_POSITION_LEFT_HAND : GameDataConst.EQUIP_POSITION_RIGHT_HAND, equipWeaponSet);
-            UICharacterItem tempSlot;
-            if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempSlot))
+            UICharacterItem tempUI;
+            if (CacheEquipItemSlots.TryGetValue(tempPosition, out tempUI))
             {
                 if (equipWeapon.GetEquipmentItem() != null)
                 {
                     equipWeapon.equipSlotIndex = equipWeaponSet;
-                    tempSlot.Setup(new UICharacterItemData(equipWeapon, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), Character, 0);
+                    tempUI.Setup(new UICharacterItemData(equipWeapon, isLeftHand ? InventoryType.EquipWeaponLeft : InventoryType.EquipWeaponRight), Character, 0);
                     if (selectedId.Equals(equipWeapon.id))
-                        tempSlot.SelectByManager();
+                        selectedUI = tempUI;
                 }
             }
         }
