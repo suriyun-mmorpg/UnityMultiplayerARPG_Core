@@ -76,13 +76,9 @@ namespace MultiplayerARPG
             // Find bounds
             Bounds bounds = default;
             bool setBoundsOnce = false;
-            for (int i = 0; i < SceneManager.sceneCount; ++i)
+            for (int i = 0; i < SceneManager.loadedSceneCount; ++i)
             {
                 Scene scene = SceneManager.GetSceneAt(i);
-                if (!scene.isLoaded)
-                {
-                    continue;
-                }
                 GameObject[] rootGameObjects = scene.GetRootGameObjects();
                 for (int j = 0; j < rootGameObjects.Length; ++j)
                 {
