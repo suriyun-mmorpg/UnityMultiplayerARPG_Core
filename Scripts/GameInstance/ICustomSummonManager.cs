@@ -9,8 +9,8 @@
         /// <param name="addressablePrefab"></param>
         /// <returns></returns>
         bool GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab);
-        void UnSummon(CharacterSummon characterSummon);
+        void UnSummon(CharacterSummon characterSummon, BaseCharacterEntity summoner);
         void Update(CharacterSummon characterSummon, float deltaTime);
-        bool ShouldRemove(CharacterSummon characterSummon);
+        bool ShouldRemove(CharacterSummon characterSummon, ICharacterData characterData);
     }
 }

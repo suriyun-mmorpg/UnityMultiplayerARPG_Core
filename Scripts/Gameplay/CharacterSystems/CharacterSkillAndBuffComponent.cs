@@ -78,7 +78,7 @@ namespace MultiplayerARPG
                     {
                         summon = Entity.Summons[i];
                         tempCalculatedBuff = summon.GetBuff();
-                        if (summon.ShouldRemove())
+                        if (summon.ShouldRemove(Entity))
                         {
                             _recoveryBuffs.Remove(summon.id);
                             Entity.Summons.RemoveAt(i);

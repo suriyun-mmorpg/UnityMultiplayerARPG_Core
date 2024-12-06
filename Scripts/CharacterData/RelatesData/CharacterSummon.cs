@@ -95,7 +95,7 @@ namespace MultiplayerARPG
                     }
                     break;
                 case SummonType.Custom:
-                    GameInstance.CustomSummonManager.UnSummon(this);
+                    GameInstance.CustomSummonManager.UnSummon(this, summoner);
                     break;
             }
 
@@ -129,7 +129,7 @@ namespace MultiplayerARPG
             return MemoryManager.CharacterSummons.GetBuff(in this);
         }
 
-        public bool ShouldRemove()
+        public bool ShouldRemove(ICharacterData characterData)
         {
             if (CacheEntity && CacheEntity.CurrentHp <= 0)
                 return true;
@@ -143,6 +143,12 @@ namespace MultiplayerARPG
                         return false;
                     return summonRemainsDuration <= 0f;
                 case SummonType.PetItem:
+                    if (!string.IsNullOrWhiteSpace(sourceId))
+                    {
+                        int tempIndexOfItem = characterData.IndexOfNonEquipItem(sourceId);
+                        if (tempIndexOfItem < 0)
+                            return true;
+                    }
                     IPetItem petItem = GetPetItem();
                     if (petItem == null)
                         return true;
@@ -150,7 +156,7 @@ namespace MultiplayerARPG
                         return false;
                     return summonRemainsDuration <= 0f;
                 case SummonType.Custom:
-                    return GameInstance.CustomSummonManager.ShouldRemove(this);
+                    return GameInstance.CustomSummonManager.ShouldRemove(this, characterData);
             }
             return false;
         }
