@@ -674,12 +674,8 @@ namespace MultiplayerARPG
                 increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                 return false;
             }
-            if (!isLeftHand && !string.Equals(data.EquipWeapons.rightHand.id, weapon.id))
-            {
-                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-                return false;
-            }
-            if (isLeftHand && !string.Equals(data.EquipWeapons.leftHand.id, weapon.id))
+            if ((isLeftHand && !data.EquipWeapons.leftHand.IsDiffer(weapon)) ||
+                (!isLeftHand && data.EquipWeapons.rightHand.IsDiffer(weapon)))
             {
                 increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                 return false;
