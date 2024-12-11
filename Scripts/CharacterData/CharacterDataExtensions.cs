@@ -669,6 +669,21 @@ namespace MultiplayerARPG
 
         public static bool DecreaseAmmos(this ICharacterData data, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true, bool applyChanges = true)
         {
+            if (data.CurrentHp <= 0)
+            {
+                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                return false;
+            }
+            if (!isLeftHand && !string.Equals(data.EquipWeapons.rightHand.id, weapon.id))
+            {
+                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                return false;
+            }
+            if (isLeftHand && !string.Equals(data.EquipWeapons.leftHand.id, weapon.id))
+            {
+                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                return false;
+            }
             EquipWeapons equipWeapons = data.EquipWeapons.Clone();
             IList<CharacterItem> nonEquipItems = applyChanges ? data.NonEquipItems : new List<CharacterItem>(data.NonEquipItems);
             if (!DecreaseAmmos(ref equipWeapons, nonEquipItems, GameInstance.Singleton.IsLimitInventorySlot, data.GetCaches().LimitItemSlot, weapon, isLeftHand, amount, out increaseDamages, validIfNoRequireAmmoType))
