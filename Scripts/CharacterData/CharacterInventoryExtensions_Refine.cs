@@ -159,7 +159,7 @@ namespace MultiplayerARPG
                         onDestroy.Invoke();
                     }
                 }
-                else
+                if (!isDestroy)
                 {
                     // If condition when fail is reduce its level
                     if (Random.value > chanceToNotDecreaseLevels)
