@@ -220,6 +220,11 @@ namespace MultiplayerARPG
         {
             base.OnSetup();
             itemDropData.onChange += OnItemDropDataChange;
+            if (IsServer && IsSceneObject)
+            {
+                // Init just once when started, if this entity is scene object
+                Init();
+            }
         }
 
         protected override void SetupNetElements()
@@ -312,6 +317,24 @@ namespace MultiplayerARPG
             // Respawning later
             if (SpawnArea != null)
                 SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
+            else if (Identity.IsSceneObject)
+                RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
+        }
+
+        /// <summary>
+        /// This function will be called if this object is placed in scene networked object
+        /// </summary>
+        /// <param name="delay"></param>
+        /// <returns></returns>
+        protected async UniTaskVoid RespawnRoutine(float delay)
+        {
+            await UniTask.Delay(Mathf.CeilToInt(delay * 1000));
+            Looters.Clear();
+            Init();
+            Manager.Assets.NetworkSpawnScene(
+                Identity.ObjectId,
+                EntityTransform.position,
+                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
         public static async UniTask<ItemDropEntity> Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)

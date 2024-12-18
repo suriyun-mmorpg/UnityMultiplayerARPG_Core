@@ -363,8 +363,22 @@ namespace MultiplayerARPG
             RemoveAllPassengers();
             // Tell clients that the vehicle destroy to play animation at client
             CallRpcOnVehicleDestroy();
+            // Respawning later
+            if (Identity.IsSceneObject)
+                Manager.StartCoroutine(RespawnRoutine());
             // Destroy this entity
             NetworkDestroy(destroyDelay);
+        }
+
+        protected IEnumerator RespawnRoutine()
+        {
+            yield return new WaitForSecondsRealtime(destroyDelay + destroyRespawnDelay);
+            _isDestroyed = false;
+            InitStats();
+            Manager.Assets.NetworkSpawnScene(
+                Identity.ObjectId,
+                SpawnPosition,
+                CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
         public virtual float GetActivatableDistance()
