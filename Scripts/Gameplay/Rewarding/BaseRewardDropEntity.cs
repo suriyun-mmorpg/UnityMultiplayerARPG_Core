@@ -258,6 +258,7 @@ namespace MultiplayerARPG
             Init();
             Manager.Assets.NetworkSpawnScene(
                 Identity.ObjectId,
+                Identity.HashSceneObjectId,
                 EntityTransform.position,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
