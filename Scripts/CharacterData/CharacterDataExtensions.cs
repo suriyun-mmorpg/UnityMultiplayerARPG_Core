@@ -266,7 +266,7 @@ namespace MultiplayerARPG
             foreach (ItemAmount increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
-                increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount);
+                increasedItem = CharacterItem.Create(increasingItem.item.DataId, increasingItem.level, increasingItem.amount);
                 if (IncreaseItems(itemList, increasedItem))
                 {
                     if (onIncrease != null)
@@ -339,7 +339,7 @@ namespace MultiplayerARPG
             foreach (ItemAmount increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
-                increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount);
+                increasedItem = CharacterItem.Create(increasingItem.item.DataId, increasingItem.level, increasingItem.amount);
                 if (IncreaseItems(data.NonEquipItems, increasedItem))
                 {
                     if (onIncrease != null)
@@ -359,7 +359,7 @@ namespace MultiplayerARPG
             foreach (RewardedItem increasingItem in increasingItems)
             {
                 if (increasingItem.item == null || increasingItem.amount <= 0) continue;
-                increasedItem = CharacterItem.Create(increasingItem.item.DataId, 1, increasingItem.amount, increasingItem.randomSeed);
+                increasedItem = CharacterItem.Create(increasingItem.item.DataId, increasingItem.level, increasingItem.amount, increasingItem.randomSeed);
                 if (IncreaseItems(data.NonEquipItems, increasedItem))
                 {
                     if (onIncrease != null)
