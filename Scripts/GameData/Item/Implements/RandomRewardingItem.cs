@@ -77,8 +77,10 @@ namespace MultiplayerARPG
                 return;
             int seed = characterItem.id.GenerateHashId();
             List<ItemAmount> rewardingItems = new List<ItemAmount>();
-            for (int i = 0; i < maxDropAmount; ++i) {
-                unchecked {
+            for (int i = 0; i < maxDropAmount; ++i)
+            {
+                unchecked
+                {
                     seed += i * 512;
                 }
                 rewardingItemsTable.RandomItem((item, level, amount) =>
@@ -87,7 +89,7 @@ namespace MultiplayerARPG
                     {
                         item = item,
                         level = level,
-                        amount = level,
+                        amount = amount,
                     });
                 }, seed);
             }
