@@ -331,7 +331,7 @@ namespace MultiplayerARPG
                     buildingMaterial.CurrentState = canBuild ? BuildingMaterial.State.CanBuild : BuildingMaterial.State.CannotBuild;
                 }
                 // Clear all triggered, `BuildingMaterialBuildModeHandler` will try to add them later
-                if (Time.frameCount > _lastAddedTriggerObjectFrame)
+                if (Time.frameCount > _lastAddedTriggerObjectFrame + 1)
                     _triggerObjects.Clear();
             }
             // Setup parent which when it's destroying it will destroy children (chain destroy)
