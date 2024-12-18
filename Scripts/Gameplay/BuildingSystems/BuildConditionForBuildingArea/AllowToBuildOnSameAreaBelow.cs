@@ -18,7 +18,9 @@ namespace MultiplayerARPG
                 if (_raycastHits[i].transform == sourceArea.transform)
                     continue;
                 tempBuildingArea = _raycastHits[i].transform.GetComponent<BuildingArea>();
-                if (tempBuildingArea != null && newBuilding.BuildingTypes.Contains(tempBuildingArea.buildingType))
+                if (tempBuildingArea == null)
+                    continue;
+                if (newBuilding.CanBuildOnAnySurface || newBuilding.BuildingTypes.Contains(tempBuildingArea.buildingType))
                     return true;
             }
             return false;
