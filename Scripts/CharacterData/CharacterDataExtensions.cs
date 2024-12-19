@@ -674,8 +674,25 @@ namespace MultiplayerARPG
                 increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                 return false;
             }
-            if ((isLeftHand && !data.EquipWeapons.leftHand.IsDiffer(weapon)) ||
-                (!isLeftHand && data.EquipWeapons.rightHand.IsDiffer(weapon)))
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (weaponItem == null)
+            {
+                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                return true;
+            }
+            bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
+            bool hasAmmoItems = weaponItem.AmmoItemIds.Count > 0;
+            if (!hasAmmoType && !hasAmmoItems)
+            {
+                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                return true;
+            }
+            if (isLeftHand && data.EquipWeapons.leftHand.IsDiffer(weapon))
+            {
+                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                return false;
+            }
+            if (!isLeftHand && data.EquipWeapons.rightHand.IsDiffer(weapon))
             {
                 increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                 return false;
