@@ -374,14 +374,6 @@ namespace MultiplayerARPG
                         weaponItem.LaunchClip?.Play(Entity.CharacterModel.GenericAudioSource);
                     }
 
-                    await UniTask.Yield(skillCancellationTokenSource.Token);
-
-                    if (Entity.IsDead())
-                    {
-                        ClearUseSkillStates();
-                        return;
-                    }
-
                     // Get aim position by character's forward
                     AimPosition aimPosition;
                     if (skill.HasCustomAimControls() && skillAimPosition.type == AimPositionType.Position)
@@ -465,7 +457,6 @@ namespace MultiplayerARPG
                     GameInstance.ServerLogHandlers.LogUseSkillEnd(_playerCharacterEntity, simulateSeed);
                 OnUseSkillEnd?.Invoke();
             }
-            await UniTask.Yield();
             // Clear action states at clients and server
             ClearUseSkillStates();
         }
