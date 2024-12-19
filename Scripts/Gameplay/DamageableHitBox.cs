@@ -323,13 +323,19 @@ namespace MultiplayerARPG
         {
             if (DamageableEntity.IsHitBoxesOverridedByVehicle())
                 return;
+            Dictionary<DamageElement, MinMaxFloat> multipliedDamageAmounts;
             if (damageAmounts != null)
             {
-                List<DamageElement> keys = new List<DamageElement>(damageAmounts.Keys);
+                multipliedDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(damageAmounts);
+                List<DamageElement> keys = new List<DamageElement>(multipliedDamageAmounts.Keys);
                 foreach (DamageElement key in keys)
                 {
-                    damageAmounts[key] = damageAmounts[key] * damageRate;
+                    multipliedDamageAmounts[key] = multipliedDamageAmounts[key] * damageRate;
                 }
+            }
+            else
+            {
+                multipliedDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             }
             if (DamageableEntity is IVehicleEntity vehicleEntity)
             {
@@ -338,10 +344,10 @@ namespace MultiplayerARPG
                     if (!vehicleEntity.Seats[i].overridePassengerHitBoxes)
                         continue;
                     if (vehicleEntity.GetPassenger(i) is DamageableEntity damageablePassenger)
-                        damageablePassenger.ApplyDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+                        damageablePassenger.ApplyDamage(position, fromPosition, instigator, multipliedDamageAmounts, weapon, skill, skillLevel, randomSeed);
                 }
             }
-            DamageableEntity.ApplyDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
+            DamageableEntity.ApplyDamage(position, fromPosition, instigator, multipliedDamageAmounts, weapon, skill, skillLevel, randomSeed);
         }
 
         public virtual void PrepareRelatesData()
