@@ -25,6 +25,10 @@ namespace MultiplayerARPG
         public float ReloadTotalDuration { get { return _totalDuration; } set { _totalDuration = value; } }
         protected float[] _triggerDurations;
         public float[] ReloadTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
+        public System.Action OnReloadStart { get; set; }
+        public System.Action<int> OnReloadTrigger { get; set; }
+        public System.Action OnReloadEnd { get; set; }
+        public System.Action OnReloadInterupted { get; set; }
         public AnimActionType AnimActionType { get; protected set; }
 
         protected CharacterActionComponentManager _manager;
@@ -150,20 +154,39 @@ namespace MultiplayerARPG
                     weaponItem.ReloadClip?.Play(Entity.CharacterModel.GenericAudioSource);
                 }
 
+                if (Entity.IsDead())
+                {
+                    ClearReloadStates();
+                    return;
+                }
+
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, Entity.CachedData.ReloadDuration, animSpeedRate, reloadCancellationTokenSource.Token);
 
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogReloadStart(_playerCharacterEntity, _triggerDurations);
+                OnReloadStart?.Invoke();
 
                 bool reloaded = false;
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
                 {
+                    if (Entity.IsDead())
+                    {
+                        ClearReloadStates();
+                        return;
+                    }
+
                     // Wait until triggger before reload ammo
                     tempTriggerDuration = _triggerDurations[triggerIndex];
                     _remainsDurationWithoutSpeedRate -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
+
+                    if (Entity.IsDead())
+                    {
+                        ClearReloadStates();
+                        return;
+                    }
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -184,12 +207,11 @@ namespace MultiplayerARPG
                         weaponItem.ReloadedClip?.Play(Entity.CharacterModel.GenericAudioSource);
                     }
 
-                    await UniTask.Yield(reloadCancellationTokenSource.Token);
-
                     // Reload / Fill ammo
                     if (!reloaded)
                     {
                         reloaded = true;
+                        OnReloadTrigger?.Invoke(triggerIndex);
                         ActionTrigger(reloadingAmmoDataId, reloadingAmmoAmount, triggerIndex, isLeftHand, weapon);
                     }
 
@@ -205,11 +227,18 @@ namespace MultiplayerARPG
                     // Wait until animation ends to stop actions
                     await UniTask.Delay((int)(_remainsDurationWithoutSpeedRate / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
                 }
+
+                if (Entity.IsDead())
+                {
+                    ClearReloadStates();
+                    return;
+                }
             }
             catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
                 LastReloadEndTime = Time.unscaledTime;
+                OnReloadInterupted?.Invoke();
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogReloadInterrupt(_playerCharacterEntity);
             }
@@ -224,6 +253,7 @@ namespace MultiplayerARPG
                 _reloadCancellationTokenSources.Remove(reloadCancellationTokenSource);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogReloadEnd(_playerCharacterEntity);
+                OnReloadEnd?.Invoke();
             }
             // Clear action states at clients and server
             ClearReloadStates();
@@ -232,6 +262,8 @@ namespace MultiplayerARPG
         protected virtual void ActionTrigger(int reloadingAmmoDataId, int reloadingAmmoAmount, byte triggerIndex, bool isLeftHand, CharacterItem weapon)
         {
             if (!IsServer)
+                return;
+            if (Entity.IsDead())
                 return;
             // Prepare and validate item
             EquipWeapons equipWeapons = Entity.EquipWeapons;
