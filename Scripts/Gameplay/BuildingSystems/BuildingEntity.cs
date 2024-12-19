@@ -658,6 +658,8 @@ namespace MultiplayerARPG
         public override async void OnNetworkDestroy(byte reasons)
         {
             base.OnNetworkDestroy(reasons);
+            if (!IsServer)
+                return;
             if (reasons == DestroyObjectReasons.RequestedToDestroy)
             {
                 // Chain destroy
