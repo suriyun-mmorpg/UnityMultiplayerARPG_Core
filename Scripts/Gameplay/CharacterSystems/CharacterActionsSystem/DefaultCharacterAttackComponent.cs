@@ -37,6 +37,10 @@ namespace MultiplayerARPG
         public float AttackTotalDuration { get { return _totalDuration; } set { _totalDuration = value; } }
         protected float[] _triggerDurations;
         public float[] AttackTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
+        public System.Action OnAttackStart { get; set; }
+        public System.Action<int> OnAttackTrigger { get; set; }
+        public System.Action OnAttackEnd { get; set; }
+        public System.Action OnAttackInterupted { get; set; }
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
         public IHitRegistrationManager HitRegistrationManager { get { return BaseGameNetworkManager.Singleton.HitRegistrationManager; } }
@@ -219,14 +223,27 @@ namespace MultiplayerARPG
                     HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, weaponItem.FireSpreadAmount, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogAttackStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon);
+                OnAttackStart?.Invoke();
 
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
                 {
+                    if (Entity.IsDead())
+                    {
+                        ClearAttackStates();
+                        return;
+                    }
+
                     // Wait until triggger before play special effects
                     tempTriggerDuration = _triggerDurations[triggerIndex];
                     _remainsDurationWithoutSpeedRate -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
+
+                    if (Entity.IsDead())
+                    {
+                        ClearAttackStates();
+                        return;
+                    }
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -250,9 +267,17 @@ namespace MultiplayerARPG
                         launchClip?.Play(Entity.CharacterModel.GenericAudioSource);
                     }
 
-                    await UniTask.Yield(attackCancellationTokenSource.Token);
+                    if (Entity.IsDead())
+                    {
+                        ClearAttackStates();
+                        return;
+                    }
+
                     // Get aim position by character's forward
                     AimPosition aimPosition = Entity.AimPosition;
+
+                    // Trigger attack event
+                    OnAttackTrigger?.Invoke(triggerIndex);
 
                     // Call on attack to extend attack functionality while attacking
                     bool overrideDefaultAttack = false;
@@ -314,16 +339,29 @@ namespace MultiplayerARPG
                     Entity.EquipWeapons = equipWeapons;
                 }
 
+                if (Entity.IsDead())
+                {
+                    ClearAttackStates();
+                    return;
+                }
+
                 if (_remainsDurationWithoutSpeedRate > 0f)
                 {
                     // Wait until animation ends to stop actions
                     await UniTask.Delay((int)(_remainsDurationWithoutSpeedRate / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
+                }
+
+                if (Entity.IsDead())
+                {
+                    ClearAttackStates();
+                    return;
                 }
             }
             catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
                 LastAttackEndTime = Time.unscaledTime;
+                OnAttackInterupted?.Invoke();
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogAttackInterrupt(_playerCharacterEntity, simulateSeed);
             }
@@ -338,6 +376,7 @@ namespace MultiplayerARPG
                 _attackCancellationTokenSources.Remove(attackCancellationTokenSource);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogAttackEnd(_playerCharacterEntity, simulateSeed);
+                OnAttackEnd?.Invoke();
             }
             await UniTask.Yield();
             // Clear action states at clients and server
@@ -398,7 +437,7 @@ namespace MultiplayerARPG
             }
 
             fireSpreadAmount += (byte)Mathf.CeilToInt(Entity.CachedData.FireSpread);
-            fireSpreadRange *= 1 + Entity.CachedData.FireSpreadRangeRate;
+            fireSpreadRange *= 1 + Entity.CachedData.FireSpreadRateRange;
 
             // Make sure it won't increase damage to the wrong collction
             for (byte spreadIndex = 0; spreadIndex < fireSpreadAmount + 1; ++spreadIndex)
