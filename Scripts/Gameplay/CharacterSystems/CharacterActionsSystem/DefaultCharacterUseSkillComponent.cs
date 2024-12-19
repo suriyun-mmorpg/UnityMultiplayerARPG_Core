@@ -65,6 +65,12 @@ namespace MultiplayerARPG
         public float UseSkillTotalDuration { get { return _totalDuration; } set { _totalDuration = value; } }
         protected float[] _triggerDurations;
         public float[] UseSkillTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
+        public System.Action OnCastSkillStart { get; set; }
+        public System.Action OnCastSkillEnd { get; set; }
+        public System.Action OnUseSkillStart { get; set; }
+        public System.Action<int> OnUseSkillTrigger { get; set; }
+        public System.Action OnUseSkillEnd { get; set; }
+        public System.Action OnSkillInterupted { get; set; }
         public AnimActionType AnimActionType { get; protected set; }
         public int AnimActionDataId { get; protected set; }
         public IHitRegistrationManager HitRegistrationManager { get { return BaseGameNetworkManager.Singleton.HitRegistrationManager; } }
@@ -248,8 +254,15 @@ namespace MultiplayerARPG
                     }
                 }
 
+                if (Entity.IsDead())
+                {
+                    ClearUseSkillStates();
+                    return;
+                }
+
                 if (CastingSkillDuration > 0f)
                 {
+                    OnCastSkillStart?.Invoke();
                     // Play cast animation
                     if (vehicleModelAvailable)
                         vehicleModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _skipMovementValidation, out _shouldUseRootMotion);
@@ -262,6 +275,13 @@ namespace MultiplayerARPG
                     }
                     // Wait until end of cast duration
                     await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
+                    OnCastSkillEnd?.Invoke();
+                }
+
+                if (Entity.IsDead())
+                {
+                    ClearUseSkillStates();
+                    return;
                 }
 
                 // Play special effect
@@ -301,6 +321,12 @@ namespace MultiplayerARPG
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token);
 
+                if (Entity.IsDead())
+                {
+                    ClearUseSkillStates();
+                    return;
+                }
+
                 // Prepare damage amounts
                 List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, _triggerDurations.Length);
 
@@ -309,14 +335,27 @@ namespace MultiplayerARPG
                     HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, 0, damageInfo, damageAmounts, isLeftHand, weapon, skill, skillLevel);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon, skill, skillLevel);
+                OnUseSkillStart?.Invoke();
 
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
                 {
+                    if (Entity.IsDead())
+                    {
+                        ClearUseSkillStates();
+                        return;
+                    }
+
                     // Play special effects after trigger duration
                     tempTriggerDuration = _triggerDurations[triggerIndex];
                     _remainsDurationWithoutSpeedRate -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
+
+                    if (Entity.IsDead())
+                    {
+                        ClearUseSkillStates();
+                        return;
+                    }
 
                     // Special effects will plays on clients only
                     if (IsClient && (AnimActionType == AnimActionType.AttackRightHand || AnimActionType == AnimActionType.AttackLeftHand))
@@ -337,6 +376,12 @@ namespace MultiplayerARPG
 
                     await UniTask.Yield(skillCancellationTokenSource.Token);
 
+                    if (Entity.IsDead())
+                    {
+                        ClearUseSkillStates();
+                        return;
+                    }
+
                     // Get aim position by character's forward
                     AimPosition aimPosition;
                     if (skill.HasCustomAimControls() && skillAimPosition.type == AimPositionType.Position)
@@ -345,6 +390,7 @@ namespace MultiplayerARPG
                         aimPosition = Entity.AimPosition;
 
                     // Trigger skill event
+                    OnUseSkillTrigger?.Invoke(triggerIndex);
                     Entity.OnUseSkillRoutine(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
 
                     // Apply skill buffs, summons and attack damages
@@ -391,11 +437,18 @@ namespace MultiplayerARPG
                     // Wait until animation ends to stop actions
                     await UniTask.Delay((int)(_remainsDurationWithoutSpeedRate / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
                 }
+
+                if (Entity.IsDead())
+                {
+                    ClearUseSkillStates();
+                    return;
+                }
             }
             catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
                 LastUseSkillEndTime = Time.unscaledTime;
+                OnSkillInterupted?.Invoke();
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillInterrupt(_playerCharacterEntity, simulateSeed);
             }
@@ -410,6 +463,7 @@ namespace MultiplayerARPG
                 _skillCancellationTokenSources.Remove(skillCancellationTokenSource);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillEnd(_playerCharacterEntity, simulateSeed);
+                OnUseSkillEnd?.Invoke();
             }
             await UniTask.Yield();
             // Clear action states at clients and server
