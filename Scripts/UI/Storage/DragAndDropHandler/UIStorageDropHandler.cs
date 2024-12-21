@@ -49,7 +49,7 @@ namespace MultiplayerARPG
                                 draggedItemUI.UIItem.OnClickMoveToStorage();
                                 break;
                             case StorageType.Protected:
-                                draggedItemUI.UIItem.OnClickMoveToStorage(storageType, GameInstance.UserId, -1);
+                                draggedItemUI.UIItem.OnClickMoveToStorage(storageType, GameInstance.PlayingCharacter.Id, -1);
                                 break;
                             default:
                                 draggedItemUI.UIItem.OnClickMoveToStorage();
