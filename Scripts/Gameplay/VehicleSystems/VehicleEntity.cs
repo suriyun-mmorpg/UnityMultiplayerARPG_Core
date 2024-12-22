@@ -148,6 +148,24 @@ namespace MultiplayerARPG
             passengerIds.onOperation -= OnPassengerIdsOperation;
         }
 
+        protected override void EntityUpdate()
+        {
+            base.EntityUpdate();
+            if (IsServer && HasDriver)
+            {
+                BaseGameEntity driver = GetPassenger(0);
+                if (driver != null)
+                {
+                    if (driver.ForceHide != ForceHide)
+                        ForceHide = driver.ForceHide;
+                }
+                else if (ForceHide)
+                {
+                    ForceHide = false;
+                }
+            }
+        }
+
         private void OnPassengerIdsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             if (index >= passengerIds.Count)
