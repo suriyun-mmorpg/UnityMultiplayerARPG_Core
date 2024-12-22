@@ -198,7 +198,7 @@ namespace MultiplayerARPG
         {
             if (_passengers.TryGetValue(0, out BaseGameEntity driver))
                 return driver.CanMove();
-            return false;
+            return true;
         }
 
         protected override bool CanJump_Implementation()
