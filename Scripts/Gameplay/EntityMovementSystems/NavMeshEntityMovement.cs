@@ -222,12 +222,16 @@ namespace MultiplayerARPG
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
             result = fromPosition;
-            if (NavMesh.SamplePosition(fromPosition, out NavMeshHit navHit, findDistance, NavMesh.AllAreas))
+            float findDist = 1f;
+            NavMeshHit navHit;
+            while (!NavMesh.SamplePosition(fromPosition, out navHit, findDist, NavMesh.AllAreas))
             {
-                result = navHit.position;
-                return true;
+                findDist += 1f;
+                if (findDist > findDistance)
+                    return false;
             }
-            return false;
+            result = navHit.position;
+            return true;
         }
 
         public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
