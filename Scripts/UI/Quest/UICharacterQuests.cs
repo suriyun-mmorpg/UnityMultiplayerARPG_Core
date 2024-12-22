@@ -161,6 +161,7 @@ namespace MultiplayerARPG
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(false);
 
+            UICharacterQuest selectedUI = null;
             UICharacterQuest tempUI;
             CacheList.Generate(filteredList, (index, data, ui) =>
             {
@@ -168,9 +169,18 @@ namespace MultiplayerARPG
                 tempUI.Setup(data, GameInstance.PlayingCharacter, index);
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if (selectedDataId == data.dataId)
-                    tempUI.SelectByManager();
+                if (index == 0 || selectedDataId == data.dataId)
+                    selectedUI = tempUI;
             });
+
+            if (selectedUI == null)
+            {
+                CacheSelectionManager.DeselectSelectedUI();
+            }
+            else
+            {
+                selectedUI.SelectByManager();
+            }
         }
     }
 }

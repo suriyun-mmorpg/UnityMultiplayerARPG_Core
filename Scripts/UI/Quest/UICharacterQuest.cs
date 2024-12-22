@@ -314,6 +314,18 @@ namespace MultiplayerARPG
                     tempUiQuestTask.Show();
                 });
             }
+
+            bool isComplete = CharacterQuest.isComplete;
+            bool isAllTasksDone = CharacterQuest.IsAllTasksDone(GameInstance.PlayingCharacter, out bool hasCompleteAfterTalkedTask);
+
+            string titleFormat = isComplete ?
+                LanguageManager.GetText(formatKeyTitleComplete) :
+                (isAllTasksDone && !hasCompleteAfterTalkedTask ?
+                    LanguageManager.GetText(formatKeyTitleTasksComplete) :
+                    LanguageManager.GetText(formatKeyTitleOnGoing));
+
+            if (uiTextTitle != null)
+                uiTextTitle.text = ZString.Format(titleFormat, Quest == null ? LanguageManager.GetUnknowTitle() : Quest.Title);
         }
 
         protected override void UpdateData()
