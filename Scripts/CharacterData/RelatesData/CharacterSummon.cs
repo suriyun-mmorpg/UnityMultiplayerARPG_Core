@@ -74,7 +74,6 @@ namespace MultiplayerARPG
             switch (type)
             {
                 case SummonType.PetItem:
-                    // NOTE: For backward compatibility, create a new item if it is not existed
                     int indexOfItem = summoner.NonEquipItems.IndexOf(sourceId);
                     if (indexOfItem >= 0)
                     {
@@ -83,15 +82,6 @@ namespace MultiplayerARPG
                             GameInstance.Singleton.petDeadLockDuration :
                             GameInstance.Singleton.petUnSummonLockDuration);
                         summoner.NonEquipItems[indexOfItem] = item;
-                    }
-                    else
-                    {
-                        CharacterItem newItem = CharacterItem.Create(dataId, Level, 1, 0);
-                        newItem.exp = Exp;
-                        newItem.Lock(CurrentHp <= 0 ?
-                            GameInstance.Singleton.petDeadLockDuration :
-                            GameInstance.Singleton.petUnSummonLockDuration);
-                        summoner.AddOrSetNonEquipItems(newItem);
                     }
                     break;
                 case SummonType.Custom:
