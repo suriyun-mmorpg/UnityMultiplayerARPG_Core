@@ -7,7 +7,7 @@ public class UIBaseEvent : UnityEvent<UIBase>
 
 }
 
-public class UIBase : MonoBehaviour
+public partial class UIBase : MonoBehaviour
 {
     public bool hideOnAwake = false;
     public bool moveToLastSiblingOnShow = false;
