@@ -464,17 +464,13 @@ namespace MultiplayerARPG
         public virtual void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             if (Movement != null)
-            {
                 Movement.ReadClientStateAtServer(peerTimestamp, reader);
-            }
         }
 
         public virtual void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (Movement != null)
-            {
                 Movement.ReadServerStateAtClient(peerTimestamp, reader);
-            }
         }
 
         protected virtual void OnValidate()
