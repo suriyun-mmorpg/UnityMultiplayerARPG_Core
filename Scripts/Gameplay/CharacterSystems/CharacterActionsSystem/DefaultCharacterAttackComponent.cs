@@ -468,7 +468,7 @@ namespace MultiplayerARPG
 
         public virtual void Attack(bool isLeftHand)
         {
-            long timestamp = Manager.Timestamp;
+            long timestamp = Manager.ServerTimestamp;
             if (!IsServer && IsOwnerClient)
             {
                 ProceedAttack(timestamp, isLeftHand);
@@ -488,9 +488,6 @@ namespace MultiplayerARPG
 
         protected void PreceedCmdAttack(long peerTimestamp, bool isLeftHand)
         {
-            if (!_manager.IsAcceptNewAction())
-                return;
-            _manager.ActionAccepted();
             ProceedAttack(peerTimestamp, isLeftHand);
             RPC(RpcAttack, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, isLeftHand);
         }

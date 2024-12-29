@@ -335,9 +335,6 @@ namespace MultiplayerARPG
         protected void ProceedCmdReload(bool isLeftHand)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (!_manager.IsAcceptNewAction())
-                return;
-
             // Prevent speed hack and also prevent data error
             // Reload is unlike attacking, I think it won't have someone who want to play reload very fast like attacking
             if (Time.unscaledTime - LastReloadEndTime < 0f)
@@ -412,7 +409,6 @@ namespace MultiplayerARPG
                 return;
             }
 
-            _manager.ActionAccepted();
             ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
             RPC(RpcReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
 #endif

@@ -10,21 +10,9 @@ namespace MultiplayerARPG
         public const float DEFAULT_TRIGGER_DURATION = 1f;
         public const float DEFAULT_STATE_SETUP_DELAY = 1f;
 
-        public float actionAcceptanceDuration = 0.05f;
-        protected float _lastAcceptTime;
         protected float[] _preparingTriggerDurations;
         protected float _preparingTotalDuration;
         protected float _preparingTotalDurationChange;
-
-        public bool IsAcceptNewAction()
-        {
-            return Time.unscaledTime - _lastAcceptTime > actionAcceptanceDuration;
-        }
-
-        public void ActionAccepted()
-        {
-            _lastAcceptTime = Time.unscaledTime;
-        }
 
         public static float PrepareActionDefaultEndTime(float totalDuration, float animSpeedRate, float additionalTime = 0f)
         {

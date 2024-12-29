@@ -518,7 +518,7 @@ namespace MultiplayerARPG
 
         public virtual void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            long timestamp = Manager.Timestamp;
+            long timestamp = Manager.ServerTimestamp;
             if (!IsServer && IsOwnerClient)
             {
                 if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out UITextKeys gameMessage))
@@ -543,11 +543,8 @@ namespace MultiplayerARPG
 
         protected void ProceedCmdUseSkill(long peerTimestamp, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            if (!_manager.IsAcceptNewAction())
-                return;
             if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                 return;
-            _manager.ActionAccepted();
             ProceedUseSkill(peerTimestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
             RPC(RpcUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, dataId, skillLevel, isLeftHand, targetObjectId, aimPosition);
         }
@@ -607,11 +604,8 @@ namespace MultiplayerARPG
 
         protected void ProceedCmdUseSkillItem(long peerTimestamp, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            if (!_manager.IsAcceptNewAction())
-                return;
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
-            _manager.ActionAccepted();
             ProceedUseSkillItem(peerTimestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
             RPC(RpcUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, skillItem.DataId, isLeftHand, targetObjectId, aimPosition);
         }

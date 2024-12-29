@@ -154,9 +154,6 @@ namespace MultiplayerARPG
 
         protected void ProceedCmdStartCharge(bool isLeftHand)
         {
-            if (!_manager.IsAcceptNewAction())
-                return;
-            _manager.ActionAccepted();
             PlayChargeAnimation(isLeftHand);
             RPC(RpcStartCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
         }
