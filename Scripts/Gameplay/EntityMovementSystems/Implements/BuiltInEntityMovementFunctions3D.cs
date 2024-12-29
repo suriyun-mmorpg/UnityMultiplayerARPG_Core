@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     public partial class BuiltInEntityMovementFunctions3D
     {
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
-        private static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
+        private static readonly long s_lagBuffer = 200; // 200 ms
         private static readonly int s_forceGroundedFramesAfterTeleport = 3;
         private static readonly float s_minDistanceToSimulateMovement = 0.01f;
         private static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
@@ -1295,8 +1295,8 @@ namespace MultiplayerARPG
                         CacheTransform.position = newPos;
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
                         // Update character rotation
-                        _lastServerValidateHorDistDiff = horMoveableDist - clientHorMoveDist;
-                        _lastServerValidateVerDistDiff = verMoveableDist - clientVerMoveDist;
+                        _lastServerValidateHorDistDiff = (horMoveableDist - clientHorMoveDist) * 0.5f;
+                        _lastServerValidateVerDistDiff = (verMoveableDist - clientVerMoveDist) * 0.5f;
                         RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                     }
                     else
