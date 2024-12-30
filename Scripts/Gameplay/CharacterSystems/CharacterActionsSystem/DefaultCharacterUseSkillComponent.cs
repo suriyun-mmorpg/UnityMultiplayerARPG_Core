@@ -578,7 +578,7 @@ namespace MultiplayerARPG
 
         public virtual void UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
         {
-            long timestamp = Manager.Timestamp;
+            long timestamp = Manager.ServerTimestamp;
             if (!IsServer && IsOwnerClient)
             {
                 if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out UITextKeys gameMessage))

@@ -150,7 +150,7 @@ namespace MultiplayerARPG
 
         private bool IsHit(BaseGameEntity attacker, HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox)
         {
-            long timestamp = BaseGameNetworkManager.Singleton.Timestamp;
+            long timestamp = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long halfRtt = attacker.Player != null ? (attacker.Player.Rtt / 2) : 0;
             long targetTime = timestamp - halfRtt;
             DamageableHitBox.TransformHistory transformHistory = hitBox.GetTransformHistory(timestamp, targetTime);

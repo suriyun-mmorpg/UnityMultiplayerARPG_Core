@@ -112,7 +112,7 @@ namespace MultiplayerARPG
                     SimulateSeed = simulateSeed,
                     TriggerIndex = triggerIndex,
                     SpreadIndex = spreadIndex,
-                    LaunchTimestamp = BaseGameNetworkManager.Singleton.Timestamp,
+                    LaunchTimestamp = BaseGameNetworkManager.Singleton.ServerTimestamp,
                     Origin = aimPosition.position,
                     Direction = aimPosition.direction,
                 };

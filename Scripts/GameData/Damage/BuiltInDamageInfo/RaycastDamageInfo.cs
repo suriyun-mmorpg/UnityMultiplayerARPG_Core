@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                 SimulateSeed = simulateSeed,
                 TriggerIndex = triggerIndex,
                 SpreadIndex = spreadIndex,
-                LaunchTimestamp = BaseGameNetworkManager.Singleton.Timestamp,
+                LaunchTimestamp = BaseGameNetworkManager.Singleton.ServerTimestamp,
                 Origin = damagePosition,
                 Direction = damageDirection,
             };
@@ -242,7 +242,7 @@ namespace MultiplayerARPG
                 // Prepare hit reg because it is hitting
                 if (isOwnerClient && willProceedHitRegByClient)
                 {
-                    hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.Timestamp;
+                    hitRegData.HitTimestamp = BaseGameNetworkManager.Singleton.ServerTimestamp;
                     hitRegData.HitObjectId = tempDamageableHitBox.GetObjectId();
                     hitRegData.HitBoxIndex = tempDamageableHitBox.Index;
                     hitRegData.HitOrigin = tempHitPoint;

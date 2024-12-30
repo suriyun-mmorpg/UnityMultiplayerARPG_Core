@@ -126,7 +126,7 @@ namespace MultiplayerARPG
 
             if (isOwnerClient && willProceedHitRegByClient)
             {
-                _hitRegisterData.HitTimestamp = CurrentGameManager.Timestamp;
+                _hitRegisterData.HitTimestamp = CurrentGameManager.ServerTimestamp;
                 _hitRegisterData.HitObjectId = target.GetObjectId();
                 _hitRegisterData.HitBoxIndex = target.Index;
                 _hitRegisterData.HitOrigin = CacheTransform.position;

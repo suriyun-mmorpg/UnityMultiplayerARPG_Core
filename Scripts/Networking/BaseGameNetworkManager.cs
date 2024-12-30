@@ -180,7 +180,7 @@ namespace MultiplayerARPG
         {
             base.OnServerUpdate(updater);
             Profiler.BeginSample("BaseGameNetworkManager - SendServerState");
-            long timestamp = Timestamp;
+            long timestamp = ServerTimestamp;
             foreach (BaseGameEntity entity in _setOfGameEntity)
             {
                 if (!entity.enabled)
@@ -196,7 +196,7 @@ namespace MultiplayerARPG
             if (IsServer)
                 return;
             Profiler.BeginSample("BaseGameNetworkManager - SendClientState");
-            long timestamp = Timestamp;
+            long timestamp = ServerTimestamp;
             foreach (BaseGameEntity entity in _setOfGameEntity)
             {
                 if (!entity.enabled)
