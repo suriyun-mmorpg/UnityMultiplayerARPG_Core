@@ -323,8 +323,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Attack when no queue skill
-                    bool isLeftHand = false;
-                    Entity.Attack(ref isLeftHand);
+                    Entity.Attack(ref _isLeftHandAttacking);
                 }
 
                 ClearActionState();
