@@ -37,6 +37,9 @@ namespace MultiplayerARPG
         private ushort allyId = 0;
         public ushort AllyId { get { return allyId; } }
         [SerializeField]
+        private int reputation;
+        public int Reputation { get { return reputation; } }
+        [SerializeField]
         [Tooltip("This move speed will be applies when it's wandering. if it's going to chase enemy, stats'moveSpeed will be applies")]
         private float wanderMoveSpeed = 1f;
         public float WanderMoveSpeed { get { return wanderMoveSpeed; } }

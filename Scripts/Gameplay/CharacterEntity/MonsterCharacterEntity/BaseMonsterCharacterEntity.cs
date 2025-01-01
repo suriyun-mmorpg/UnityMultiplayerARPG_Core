@@ -138,6 +138,12 @@ namespace MultiplayerARPG
             set { }
         }
 
+        public override int Reputation
+        {
+            get { return CharacterDatabase.Reputation; }
+            set { }
+        }
+
         public float DestroyDelay
         {
             get { return destroyDelay; }

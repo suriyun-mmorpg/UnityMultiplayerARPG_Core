@@ -204,7 +204,7 @@ namespace MultiplayerARPG
         public int HighestConsecutivePkKills { get; set; }
 #endif
 
-        public int Reputation
+        public override int Reputation
         {
             get { return reputation.Value; }
             set { reputation.Value = value; }
