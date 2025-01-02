@@ -478,5 +478,17 @@ namespace MultiplayerARPG
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             onGuildMemberKicked.Invoke();
         }
+
+        public void OnClickCopyCharacterId()
+        {
+            GUIUtility.systemCopyBuffer = Data.id;
+            ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_CHARACTER_ID_COPIED);
+        }
+
+        public void OnClickCopyUserId()
+        {
+            GUIUtility.systemCopyBuffer = Data.userId;
+            ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_USER_ID_COPIED);
+        }
     }
 }
