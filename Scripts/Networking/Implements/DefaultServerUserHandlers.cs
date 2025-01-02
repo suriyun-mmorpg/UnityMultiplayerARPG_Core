@@ -128,12 +128,15 @@ namespace MultiplayerARPG
 
         public virtual void MuteCharacterByName(string characterName, int minutes)
         {
-            throw new System.NotImplementedException();
+            long time = System.DateTimeOffset.UtcNow.ToUnixTimeSeconds() + (60 * minutes);
+            if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter))
+                playerCharacter.UnmuteTime = time;
         }
 
         public virtual void UnmuteCharacterByName(string characterName)
         {
-            throw new System.NotImplementedException();
+            if (TryGetPlayerCharacterByName(characterName, out IPlayerCharacterData playerCharacter))
+                playerCharacter.UnmuteTime = 0;
         }
 
         public virtual void ChangeUserGold(string userId, int gold)

@@ -7,9 +7,30 @@ namespace MultiplayerARPG
 {
     public class DefaultServerChatHandlers : MonoBehaviour, IServerChatHandlers
     {
-        public const float CHAT_DELAY = 3f;
-        private ConcurrentDictionary<string, float> _characterChatTimes = new ConcurrentDictionary<string, float>();
-        private ConcurrentDictionary<string, int> _characterChatFloods = new ConcurrentDictionary<string, int>();
+        private class ChatStats
+        {
+            public float lastChatTime = 0;
+            public float lastMuteTime = 0;
+            public int floodCount = 0;
+            public int muteCount = 0;
+        }
+
+        public float chatDelay = 3f;
+        public float floodCountBeforeMute = 3;
+        /// <summary>
+        /// Mute durations in minutes
+        /// </summary>
+        public int[] muteDurations = new int[]
+        {
+            5,
+            15,
+            30,
+        };
+        /// <summary>
+        /// Unmute duration in minutes
+        /// </summary>
+        public float unmuteDuration = 10;
+        private ConcurrentDictionary<string, ChatStats> _characterChatStats = new ConcurrentDictionary<string, ChatStats>();
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 
         private void Awake()
@@ -120,8 +141,13 @@ namespace MultiplayerARPG
             }
             if (!string.IsNullOrEmpty(message.senderId))
             {
-                _characterChatFloods[message.senderId] = 0;
-                _characterChatTimes[message.senderId] = Time.unscaledTime;
+                if (!_characterChatStats.TryGetValue(message.senderId, out ChatStats chatStats))
+                    chatStats = new ChatStats();
+                chatStats.floodCount = 0;
+                if (Time.unscaledTime - chatStats.lastMuteTime >= unmuteDuration * 60)
+                    chatStats.muteCount = 0;
+                chatStats.lastChatTime = Time.unscaledTime;
+                _characterChatStats[message.senderId] = chatStats;
             }
         }
 
@@ -137,17 +163,31 @@ namespace MultiplayerARPG
 
         public bool ChatTooFast(string senderId)
         {
-            if (!_characterChatTimes.TryGetValue(senderId, out float time))
+            if (!_characterChatStats.TryGetValue(senderId, out ChatStats chatStats))
                 return false;
-            return Time.unscaledTime - time < CHAT_DELAY;
+            return Time.unscaledTime - chatStats.lastChatTime < chatDelay;
         }
 
         public void ChatFlooded(string senderId)
         {
-            if (!_characterChatFloods.TryGetValue(senderId, out int floodCount))
-                floodCount = 0;
-            floodCount++;
-            _characterChatFloods[senderId] = floodCount;
+            if (!_characterChatStats.TryGetValue(senderId, out ChatStats chatStats))
+                chatStats = new ChatStats();
+            chatStats.floodCount++;
+            if (chatStats.floodCount >= floodCountBeforeMute)
+            {
+                chatStats.floodCount = 0;
+                if (muteDurations != null && chatStats.muteCount > muteDurations.Length - 1)
+                    chatStats.muteCount = muteDurations.Length - 1;
+                if (chatStats.muteCount >= 0)
+                {
+                    // Mute
+                    if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(senderId, out IPlayerCharacterData playerCharacter))
+                        GameInstance.ServerUserHandlers.MuteCharacterByName(playerCharacter.CharacterName, muteDurations[chatStats.muteCount]);
+                }
+                chatStats.lastMuteTime = Time.unscaledTime;
+                chatStats.muteCount++;
+            }
+            _characterChatStats[senderId] = chatStats;
         }
     }
 }
