@@ -7,5 +7,7 @@
     {
         void OnChatMessage(ChatMessage message);
         bool CanSendSystemAnnounce(string senderId);
+        bool ChatTooFast(string senderId);
+        void ChatFlooded(string senderId);
     }
 }

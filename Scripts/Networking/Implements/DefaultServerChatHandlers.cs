@@ -1,4 +1,5 @@
 ﻿using LiteNetLib;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -6,6 +7,9 @@ namespace MultiplayerARPG
 {
     public class DefaultServerChatHandlers : MonoBehaviour, IServerChatHandlers
     {
+        public const float CHAT_DELAY = 3f;
+        private ConcurrentDictionary<string, float> _characterChatTimes = new ConcurrentDictionary<string, float>();
+        private ConcurrentDictionary<string, int> _characterChatFloods = new ConcurrentDictionary<string, int>();
         public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
 
         private void Awake()
@@ -114,16 +118,36 @@ namespace MultiplayerARPG
                     Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
                     break;
             }
+            if (!string.IsNullOrEmpty(message.senderId))
+            {
+                _characterChatFloods[message.senderId] = 0;
+                _characterChatTimes[message.senderId] = Time.unscaledTime;
+            }
         }
 
-        public bool CanSendSystemAnnounce(string sender)
+        public bool CanSendSystemAnnounce(string senderName)
         {
             // TODO: Don't use fixed user level
             BasePlayerCharacterEntity playerCharacter;
-            return (!string.IsNullOrEmpty(sender) &&
-                    GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(sender, out playerCharacter) &&
+            return (!string.IsNullOrEmpty(senderName) &&
+                    GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(senderName, out playerCharacter) &&
                     playerCharacter.UserLevel > 0) ||
-                    BaseGameNetworkManager.CHAT_SYSTEM_ANNOUNCER_SENDER.Equals(sender);
+                    BaseGameNetworkManager.CHAT_SYSTEM_ANNOUNCER_SENDER.Equals(senderName);
+        }
+
+        public bool ChatTooFast(string senderId)
+        {
+            if (!_characterChatTimes.TryGetValue(senderId, out float time))
+                return false;
+            return Time.unscaledTime - time < CHAT_DELAY;
+        }
+
+        public void ChatFlooded(string senderId)
+        {
+            if (!_characterChatFloods.TryGetValue(senderId, out int floodCount))
+                floodCount = 0;
+            floodCount++;
+            _characterChatFloods[senderId] = floodCount;
         }
     }
 }

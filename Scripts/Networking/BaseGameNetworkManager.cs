@@ -543,6 +543,9 @@ namespace MultiplayerARPG
             // Set guild data
             if (playerCharacter != null)
             {
+                message.senderId = playerCharacter.Id;
+                message.senderUserId = playerCharacter.UserId;
+                message.senderName = playerCharacter.CharacterName;
                 if (ServerGuildHandlers.TryGetGuild(playerCharacter.GuildId, out GuildData guildData))
                 {
                     message.guildId = playerCharacter.GuildId;
@@ -550,18 +553,21 @@ namespace MultiplayerARPG
                 }
             }
             // Character muted?
-            if (!message.sendByServer && playerCharacter != null && playerCharacter.IsMuting())
+            if (!message.sendByServer && playerCharacter != null)
             {
-                long connectionId;
-                if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out connectionId))
+                if (playerCharacter.IsMuting())
                 {
-                    ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
-                    {
-                        channel = ChatChannel.System,
-                        message = "You have been muted.",
-                    });
+                    if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out long connectionId))
+                        ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHAT_MUTED);
+                    return;
                 }
-                return;
+                if (ServerChatHandlers.ChatTooFast(playerCharacter.Id))
+                {
+                    ServerChatHandlers.ChatFlooded(playerCharacter.Id);
+                    if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out long connectionId))
+                        ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHAT_ENTER_TOO_FAST);
+                    return;
+                }
             }
             if (message.channel != ChatChannel.System || ServerChatHandlers.CanSendSystemAnnounce(message.senderName))
             {
