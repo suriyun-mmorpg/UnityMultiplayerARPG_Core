@@ -42,6 +42,7 @@ namespace MultiplayerARPG
         public Buff BuffData
         {
             get { return buff; }
+            set { buff = value; }
         }
 
         [SerializeField]
