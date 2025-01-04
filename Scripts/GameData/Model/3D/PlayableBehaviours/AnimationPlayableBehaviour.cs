@@ -992,6 +992,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
                 // Set clip info
                 stateUpdateData.clipSpeed = stateInfos[playingStateId].GetSpeed(_moveAnimationSpeedMultiplier > 0f ? _moveAnimationSpeedMultiplier : 1f);
+                if (playingStateId.Contains(CLIP_JUMP) || playingStateId.Contains(CLIP_FALL) || playingStateId.Contains(CLIP_LANDED))
+                    stateUpdateData.clipSpeed = 1f;
                 // Set transition duration
                 stateUpdateData.transitionDuration = stateInfos[playingStateId].GetTransitionDuration();
                 if (stateUpdateData.transitionDuration <= 0f)
