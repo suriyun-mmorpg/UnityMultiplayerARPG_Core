@@ -84,11 +84,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
         [SerializeField]
+        protected Vector3 tpsTargetOffsetWhileSprinting = new Vector3(0.75f, 0.5f, 0f);
+        [SerializeField]
         protected Vector3 tpsTargetOffsetWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
         [SerializeField]
         protected Vector3 tpsTargetOffsetWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
-        [SerializeField]
-        protected Vector3 tpsTargetOffsetWhileSprinting = new Vector3(0.75f, 0.5f, 0f);
         [SerializeField]
         protected float tpsTargetOffsetDamping = 10f;
         [SerializeField]
