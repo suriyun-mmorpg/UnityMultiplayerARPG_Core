@@ -37,7 +37,8 @@ namespace MultiplayerARPG
         public bool autoSwimToSurface;
 
         [Header("Ground checking")]
-        public float groundCheckYOffsets = 0.1f;
+        public float groundCheckOffsets = 0.14f;
+        public float groundCheckRadius = 0.28f;
         public float forceUngroundAfterJumpDuration = 0.1f;
         public Color groundCheckGizmosColor = Color.blue;
 
@@ -240,20 +241,12 @@ namespace MultiplayerARPG
                 return false;
             if (CacheCharacterController.isGrounded)
                 return true;
-            float radius = GetGroundCheckRadius();
-            return Physics.CheckSphere(GetGroundCheckCenter(radius), radius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+            return Physics.CheckSphere(GetGroundCheckCenter(), groundCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
         }
 
-        private Vector3 GetGroundCheckCenter(float radius)
+        private Vector3 GetGroundCheckCenter()
         {
-            return new Vector3(CacheTransform.position.x, CacheTransform.position.y + radius - groundCheckYOffsets, CacheTransform.position.z);
-        }
-
-        private float GetGroundCheckRadius()
-        {
-            if (CacheCharacterController == null || CacheTransform == null)
-                return 0f;
-            return CacheCharacterController.radius * Mathf.Max(Mathf.Max(CacheTransform.lossyScale.x, CacheTransform.lossyScale.y), CacheTransform.lossyScale.z);
+            return new Vector3(CacheTransform.position.x, CacheTransform.position.y - groundCheckOffsets, CacheTransform.position.z);
         }
 
 #if UNITY_EDITOR
@@ -261,8 +254,7 @@ namespace MultiplayerARPG
         {
             Color prevColor = Gizmos.color;
             Gizmos.color = groundCheckGizmosColor;
-            float radius = GetGroundCheckRadius();
-            Gizmos.DrawWireSphere(GetGroundCheckCenter(radius), radius);
+            Gizmos.DrawWireSphere(GetGroundCheckCenter(), groundCheckRadius);
             Gizmos.color = prevColor;
         }
 #endif
