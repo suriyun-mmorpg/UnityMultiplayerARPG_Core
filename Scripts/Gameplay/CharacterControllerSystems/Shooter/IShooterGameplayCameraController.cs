@@ -14,6 +14,8 @@
         float AimAssistYSpeed { get; set; }
         float AimAssistMaxAngleFromFollowingTarget { get; set; }
         float CameraRotationSpeedScale { get; set; }
+        bool IsLeftViewSide { get; set; }
+        bool IsZoomAimming { get; set; }
         void Recoil(float pitch, float yaw, float roll);
     }
 }

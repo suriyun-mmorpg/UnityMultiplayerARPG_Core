@@ -16,8 +16,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("rotationSpeedScaleWhileZooming")]
         public float cameraRotationSpeedScaleWhileZooming = 0.5f;
         public string cameraRotationSpeedScaleSaveKey = string.Empty;
-        [FormerlySerializedAs("disableRenderersOnZoom")]
-        public bool forceUseFpsViewMode;
+        public string gyroscopeCameraRotationSpeedScaleSaveKey = string.Empty;
         public Sprite zoomCrosshair;
         public bool hideCrosshairWhileZooming;
         public bool shouldDeactivateOnReload;
@@ -32,9 +31,7 @@ namespace MultiplayerARPG
         [System.NonSerialized]
         private IZoomWeaponAbilityController _zoomWeaponAbilityController;
         [System.NonSerialized]
-        private ShooterControllerViewMode? _preActivateViewMode;
-        [System.NonSerialized]
-        private ShooterControllerViewMode _activatedViewMode;
+        private bool _shouldActivateAfterSprint = false;
 
         public override bool ShouldDeactivateOnReload { get => shouldDeactivateOnReload; }
 
@@ -57,8 +54,6 @@ namespace MultiplayerARPG
 
         public override void ForceDeactivated()
         {
-            if (_preActivateViewMode.HasValue)
-                _zoomWeaponAbilityController.ViewMode = _preActivateViewMode.Value;
             _zoomWeaponAbilityController.ShowZoomCrosshair = false;
             _zoomWeaponAbilityController.HideCrosshair = false;
             _zoomWeaponAbilityController.UpdateCameraSettings();
@@ -67,30 +62,45 @@ namespace MultiplayerARPG
 
         public override void OnPreActivate()
         {
-            _preActivateViewMode = _zoomWeaponAbilityController.ViewMode;
+            _shouldActivateAfterSprint = false;
             if (zoomCrosshair)
             {
-                _zoomWeaponAbilityController.ViewMode = ShooterControllerViewMode.Fps;
                 _zoomWeaponAbilityController.SetZoomCrosshairSprite(zoomCrosshair);
             }
             _currentZoomInterpTime = 0f;
             _currentZoomFov = _zoomWeaponAbilityController.CurrentCameraFov;
+            _zoomWeaponAbilityController.IsZoomAimming = true;
             OnActivateZoomAbility?.Invoke();
+        }
+
+        public override void OnPreDeactivate()
+        {
+            _shouldActivateAfterSprint = false;
+            _currentZoomInterpTime = 0f;
+            _currentZoomFov = _zoomWeaponAbilityController.CurrentCameraFov;
+            _zoomWeaponAbilityController.IsZoomAimming = false;
+            OnDeactivateZoomAbility?.Invoke();
         }
 
         public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime)
         {
+            bool isSprinting = _controller.PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsSprinting;
             switch (state)
             {
                 case WeaponAbilityState.Deactivated:
                     // Deactivated, do nothing
+                    if (!isSprinting && _shouldActivateAfterSprint)
+                    {
+                        OnPreActivate();
+                        state = WeaponAbilityState.Activating;
+                    }
                     return state;
                 case WeaponAbilityState.Activated:
                     _zoomWeaponAbilityController.CameraRotationSpeedScale = CameraRotationSpeedScale;
-                    if (_zoomWeaponAbilityController.ViewMode != _activatedViewMode)
+                    if (isSprinting)
                     {
-                        // Deactivate when player character view mode while zooming
-                        ForceDeactivated();
+                        OnPreDeactivate();
+                        _shouldActivateAfterSprint = true;
                         return WeaponAbilityState.Deactivating;
                     }
                     return state;
@@ -112,8 +122,13 @@ namespace MultiplayerARPG
                     {
                         // Zooming updated, change state to activated
                         _currentZoomInterpTime = 0;
-                        _activatedViewMode = _zoomWeaponAbilityController.ViewMode;
                         state = WeaponAbilityState.Activated;
+                    }
+                    if (isSprinting)
+                    {
+                        OnPreDeactivate();
+                        _shouldActivateAfterSprint = true;
+                        state = WeaponAbilityState.Deactivating;
                     }
                     break;
             }
@@ -123,18 +138,7 @@ namespace MultiplayerARPG
             _zoomWeaponAbilityController.ShowZoomCrosshair = zoomCrosshair && isActive;
             _zoomWeaponAbilityController.HideCrosshair = (hideCrosshairWhileZooming || zoomCrosshair) && isActive;
 
-            if (isActive && forceUseFpsViewMode)
-                _zoomWeaponAbilityController.ViewMode = ShooterControllerViewMode.Fps;
-
             return state;
-        }
-
-        public override void OnPreDeactivate()
-        {
-            _zoomWeaponAbilityController.ViewMode = _preActivateViewMode.Value;
-            _currentZoomInterpTime = 0f;
-            _currentZoomFov = _zoomWeaponAbilityController.CurrentCameraFov;
-            OnDeactivateZoomAbility?.Invoke();
         }
     }
 }

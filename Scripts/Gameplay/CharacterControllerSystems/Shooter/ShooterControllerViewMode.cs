@@ -4,5 +4,6 @@
     {
         Tps,
         Fps,
+        Shoulder,
     }
 }

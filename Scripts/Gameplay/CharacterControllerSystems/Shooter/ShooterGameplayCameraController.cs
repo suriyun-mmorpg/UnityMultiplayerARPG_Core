@@ -16,6 +16,8 @@ namespace MultiplayerARPG
         public float AimAssistYSpeed { get { return CameraControls.aimAssistYSpeed; } set { CameraControls.aimAssistYSpeed = value; } }
         public float AimAssistMaxAngleFromFollowingTarget { get { return CameraControls.aimAssistMaxAngleFromFollowingTarget; } set { CameraControls.aimAssistMaxAngleFromFollowingTarget = value; } }
         public float CameraRotationSpeedScale { get { return CameraControls.rotationSpeedScale; } set { CameraControls.rotationSpeedScale = value; } }
+        public bool IsLeftViewSide { get; set; }
+        public bool IsZoomAimming { get; set; }
 
         public override void Init()
         {

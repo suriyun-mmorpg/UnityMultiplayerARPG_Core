@@ -6,8 +6,6 @@ namespace MultiplayerARPG
     {
         ShooterControllerViewMode ViewMode { get; set; }
         float CameraZoomDistance { get; }
-        float CameraMinZoomDistance { get; }
-        float CameraMaxZoomDistance { get; }
         Vector3 CameraTargetOffset { get; }
         float CameraFov { get; }
         float CameraNearClipPlane { get; }
@@ -17,6 +15,8 @@ namespace MultiplayerARPG
         float FirstPersonCameraRotationSpeedScale { get; }
         float CameraRotationSpeedScale { get; set; }
         bool HideCrosshair { get; set; }
+        bool IsLeftViewSide { get; set; }
+        bool IsZoomAimming { get; set; }
         void UpdateCameraSettings();
     }
 }
