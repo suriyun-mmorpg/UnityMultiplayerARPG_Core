@@ -408,6 +408,9 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
+            if (_forceUpdateUi)
+                _updateCountDown = 0f;
+
             base.Update();
 
             float deltaTime = Time.deltaTime;
@@ -427,6 +430,8 @@ namespace MultiplayerARPG
                 if (imageCoolDownGage != null)
                     imageCoolDownGage.gameObject.SetActive(false);
             }
+
+            _forceUpdateUi = false;
         }
 
         private void UpdateExpireTime()

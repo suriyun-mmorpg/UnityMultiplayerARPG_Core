@@ -156,6 +156,9 @@ namespace MultiplayerARPG
 
         protected override void Update()
         {
+            if (_forceUpdateUi)
+                _updateCountDown = 0f;
+
             base.Update();
 
             if (_coolDownRemainsDuration > 0f)
@@ -213,6 +216,8 @@ namespace MultiplayerARPG
                     }
                 }
             }
+
+            _forceUpdateUi = false;
         }
 
         protected void UpdateCoolDownRemainsDuration(float diffToChangeRemainsDuration = 0f)
