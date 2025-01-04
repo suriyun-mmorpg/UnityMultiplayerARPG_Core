@@ -62,8 +62,8 @@ namespace MultiplayerARPG
             },
         };
 #if UNITY_EDITOR
-        [InspectorButton(nameof(MakeRequirementEachLevels))]
-        public bool makeRequirementEachLevels;
+        [InspectorButton(nameof(MakeRequirementEachLevels), "Make Requirement Each Levels")]
+        public bool btnMakeRequirementEachLevels;
 #endif
 
         [Header("Requirements to Levelup (Data)")]
