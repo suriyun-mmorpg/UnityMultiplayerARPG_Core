@@ -557,8 +557,11 @@ namespace MultiplayerARPG
             {
                 if (!useRootMotionForFall && !forceUseRootMotion)
                 {
-                    _verticalVelocity -= CalculateGravity() * deltaTime;
-                    _verticalVelocity = Mathf.Max(_verticalVelocity, -CalculateMaxFallVelocity());
+                    float gravity = CalculateGravity();
+                    float maxFallVelocity = CalculateMaxFallVelocity();
+                    _verticalVelocity -= gravity * deltaTime;
+                    if (_verticalVelocity < -maxFallVelocity)
+                        _verticalVelocity = -maxFallVelocity;
                 }
                 else
                 {
@@ -781,7 +784,7 @@ namespace MultiplayerARPG
                     _previousPlatformPosition = _groundedTransform.position;
                 }
             }
-            Vector3 stickGroundMotion = _isGrounded && !_isUnderWater && platformMotion.y <= 0f ? (Vector3.down * stickGroundForce) : Vector3.zero;
+            Vector3 stickGroundMotion = (_isGrounded && !_isUnderWater && platformMotion.y <= 0f) ? (Vector3.down * stickGroundForce) : Vector3.zero;
             _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion + forceMotion) * deltaTime;
             if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent && 
                 LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder &&
