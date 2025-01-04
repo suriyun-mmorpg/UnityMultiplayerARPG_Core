@@ -4,9 +4,9 @@
     public partial class SkillRequirement
     {
         public bool disallow = false;
-        public IncrementalInt characterLevel = default;
-        public IncrementalFloat skillPoint = default;
-        public IncrementalInt gold = default;
+        public IncrementalInt characterLevel = new IncrementalInt();
+        public IncrementalFloat skillPoint = new IncrementalFloat();
+        public IncrementalInt gold = new IncrementalInt();
         [ArrayElementTitle("attribute")]
         public AttributeAmount[] attributeAmounts = new AttributeAmount[0];
         [ArrayElementTitle("skill")]
