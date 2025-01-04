@@ -140,7 +140,7 @@ namespace MultiplayerARPG
                             continue;
                         }
                         // Buff removed
-                        OnRemoveBuff(Buffs[i], BuffRemoveReasons.RemoveByOtherBuffs);
+                        OnRemoveBuff(characterBuff, BuffRemoveReasons.RemoveByOtherBuffs);
                         Buffs.RemoveAt(i);
                     }
                     if (Buffs.Count == 0)
