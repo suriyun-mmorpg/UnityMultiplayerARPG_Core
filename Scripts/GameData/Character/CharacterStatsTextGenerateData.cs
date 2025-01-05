@@ -245,7 +245,7 @@ namespace MultiplayerARPG
             //   if (uiTextCustomStat1 != null)
             //       uiTextCustomStat1.text = statsStringPart;
             // }
-            this.InvokeInstanceDevExtMethods("GetText", statsStringBuilder);
+            this.InvokeInstanceDevExtMethods("GetText", statsStringBuilder, bonusIncreaseColor, bonusDecreaseColor);
 
             return statsStringBuilder.ToString();
         }
