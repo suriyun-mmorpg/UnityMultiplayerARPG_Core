@@ -11,7 +11,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Add some distant to avoid character falling under ground
         /// </summary>
-        private const float ABOVE_GROUND_OFFSETS = 0.1f;
+        private const float ABOVE_GROUND_OFFSETS = 0.25f;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
         private static readonly long s_lagBuffer = 200; // 200 ms
         private static readonly int s_forceGroundedFramesAfterTeleport = 3;
