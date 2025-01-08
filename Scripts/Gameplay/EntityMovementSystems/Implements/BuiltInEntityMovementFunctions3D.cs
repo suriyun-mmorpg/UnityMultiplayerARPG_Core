@@ -8,6 +8,10 @@ namespace MultiplayerARPG
 {
     public partial class BuiltInEntityMovementFunctions3D
     {
+        /// <summary>
+        /// Add some distant to avoid character falling under ground
+        /// </summary>
+        private const float ABOVE_GROUND_OFFSETS = 0.1f;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
         private static readonly long s_lagBuffer = 200; // 200 ms
         private static readonly int s_forceGroundedFramesAfterTeleport = 3;
@@ -309,7 +313,13 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            return PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform);
+            if (PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform))
+            {
+                result = result + Vector3.up * ABOVE_GROUND_OFFSETS;
+                return true;
+            }
+            result = fromPosition + Vector3.up * ABOVE_GROUND_OFFSETS;
+            return false;
         }
 
         public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
