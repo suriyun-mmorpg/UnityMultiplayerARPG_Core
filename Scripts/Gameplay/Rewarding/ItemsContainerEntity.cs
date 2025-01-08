@@ -10,9 +10,6 @@ namespace MultiplayerARPG
 {
     public partial class ItemsContainerEntity : BaseGameEntity, IActivatableEntity
     {
-        public const float GROUND_DETECTION_Y_OFFSETS = 3f;
-        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
-
         [Category(5, "Items Container Settings")]
         [Tooltip("Delay before the entity destroyed, you may set some delay to play destroyed animation by `onItemDropDestroy` event before it's going to be destroyed from the game.")]
         [SerializeField]
@@ -133,7 +130,7 @@ namespace MultiplayerARPG
                     if (randomPosition)
                     {
                         // Random position around dropper with its height
-                        dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, GROUND_DETECTION_Y_OFFSETS, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                        dropPosition = DropEntityUtils.GetDroppedPosition3D(dropPosition, GameInstance.Singleton.dropDistance);
                     }
                     if (randomRotation)
                     {
@@ -145,7 +142,7 @@ namespace MultiplayerARPG
                     if (randomPosition)
                     {
                         // Random position around dropper
-                        dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                        dropPosition = DropEntityUtils.GetDroppedPosition2D(dropPosition, GameInstance.Singleton.dropDistance);
                     }
                     break;
             }
@@ -157,11 +154,6 @@ namespace MultiplayerARPG
             if (prefab == null)
                 return null;
 
-            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
-            {
-                // Find drop position on ground
-                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, s_findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
-            }
             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                 prefab.Identity.HashAssetId,
                 dropPosition, dropRotation);

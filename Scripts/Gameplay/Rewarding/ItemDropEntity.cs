@@ -14,8 +14,6 @@ namespace MultiplayerARPG
 {
     public partial class ItemDropEntity : BaseGameEntity, IPickupActivatableEntity
     {
-        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
-
         [Category("Relative GameObjects/Transforms")]
         [Tooltip("Item's `dropModel` will be instantiated to this transform for items which drops from characters")]
         [SerializeField]
@@ -357,13 +355,13 @@ namespace MultiplayerARPG
             {
                 case DimensionType.Dimension3D:
                     // Random position around dropper with its height
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, 0f, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    dropPosition = DropEntityUtils.GetDroppedPosition3D(dropPosition, GameInstance.Singleton.dropDistance);
                     // Random rotation
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
                     break;
                 case DimensionType.Dimension2D:
                     // Random position around dropper
-                    dropPosition += new Vector3(Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance, Random.Range(-1f, 1f) * GameInstance.Singleton.dropDistance);
+                    dropPosition = DropEntityUtils.GetDroppedPosition2D(dropPosition, GameInstance.Singleton.dropDistance);
                     break;
             }
             return Drop(prefab, dropPosition, dropRotation, givenType, dropData, looters, appearDuration);
@@ -374,11 +372,6 @@ namespace MultiplayerARPG
             if (prefab == null)
                 return null;
 
-            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
-            {
-                // Find drop position on ground
-                dropPosition = PhysicUtils.FindGroundedPosition(dropPosition, s_findGroundRaycastHits, GROUND_DETECTION_DISTANCE, GameInstance.Singleton.GetItemDropGroundDetectionLayerMask());
-            }
             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                 prefab.Identity.HashAssetId,
                 dropPosition, dropRotation);
