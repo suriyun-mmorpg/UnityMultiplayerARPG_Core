@@ -3,7 +3,9 @@
 [System.Serializable]
 public struct IncrementalMinMaxInt
 {
+    [Tooltip("Amount at level 1")]
     public MinMaxInt baseAmount;
+    [Tooltip("Increase amount when level > 1 (it will be decreasing when level < 0)")]
     public MinMaxFloat amountIncreaseEachLevel;
     [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
     public IncrementalMinMaxIntByLevel[] amountIncreaseEachLevelByLevels;
@@ -17,7 +19,7 @@ public struct IncrementalMinMaxInt
         };
         if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
         {
-            result += amountIncreaseEachLevel * (level - 1);
+            result += amountIncreaseEachLevel * (level - (level > 0 ? 1 : 0));
             return new MinMaxInt()
             {
                 min = (int)result.min,

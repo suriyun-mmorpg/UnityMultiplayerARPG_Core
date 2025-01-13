@@ -198,7 +198,9 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct CharacterStatsIncremental
     {
+        [Tooltip("Amount at level 1")]
         public CharacterStats baseStats;
+        [Tooltip("Increase amount when level > 1 (it will be decreasing when level < 0)")]
         public CharacterStats statsIncreaseEachLevel;
         [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
         public CharacterStatsIncrementalByLevel[] statsIncreaseEachLevelByLevels;
@@ -206,7 +208,7 @@ namespace MultiplayerARPG
         public CharacterStats GetCharacterStats(int level)
         {
             if (statsIncreaseEachLevelByLevels == null || statsIncreaseEachLevelByLevels.Length == 0)
-                return baseStats + (statsIncreaseEachLevel * (level - 1));
+                return baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0)));
             CharacterStats result = baseStats;
             int countLevel = 2;
             int indexOfIncremental = 0;
