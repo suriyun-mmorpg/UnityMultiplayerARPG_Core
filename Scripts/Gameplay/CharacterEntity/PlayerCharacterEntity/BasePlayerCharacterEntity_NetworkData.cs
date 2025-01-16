@@ -87,6 +87,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncListCharacterDataFloat32 publicFloats = new SyncListCharacterDataFloat32();
 #endif
+        [SerializeField]
+        protected SyncListCharacterSkill guildSkills = new SyncListCharacterSkill();
         #endregion
 
         #region Fields/Interface/Getter/Setter implementation
@@ -339,6 +341,16 @@ namespace MultiplayerARPG
             }
         }
 #endif
+
+        public IList<CharacterSkill> GuildSkills
+        {
+            get { return guildSkills; }
+            set
+            {
+                guildSkills.Clear();
+                guildSkills.AddRange(value);
+            }
+        }
         #endregion
 
         #region Network setup functions
@@ -411,6 +423,7 @@ namespace MultiplayerARPG
             publicInts.forOwnerOnly = false;
             publicFloats.forOwnerOnly = false;
 #endif
+            guildSkills.forOwnerOnly = false;
         }
 
         public override void OnSetup()
@@ -455,6 +468,7 @@ namespace MultiplayerARPG
             publicInts.onOperation += OnPublicIntsOperation;
             publicFloats.onOperation += OnPublicFloatsOperation;
 #endif
+            guildSkills.onOperation += OnGuildSkillsOperation;
         }
 
         protected override void EntityOnDestroy()
@@ -499,6 +513,8 @@ namespace MultiplayerARPG
             publicInts.onOperation -= OnPublicIntsOperation;
             publicFloats.onOperation -= OnPublicFloatsOperation;
 #endif
+            guildSkills.onOperation -= OnGuildSkillsOperation;
+
             // Unsubscribe this entity
             if (GameInstance.ClientCharacterHandlers != null)
                 GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(this);
@@ -807,6 +823,13 @@ namespace MultiplayerARPG
                 onPublicFloatsOperation.Invoke(operation, index);
         }
 #endif
-#endregion
+
+        private void OnGuildSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        {
+            _isRecaching = true;
+            if (onGuildSkillsOperation != null)
+                onGuildSkillsOperation.Invoke(operation, index);
+        }
+        #endregion
     }
 }

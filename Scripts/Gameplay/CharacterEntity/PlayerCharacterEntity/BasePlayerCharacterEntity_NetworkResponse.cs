@@ -12,7 +12,7 @@ namespace MultiplayerARPG
                 return;
 
             GuildSkill guildSkill;
-            if (!GameInstance.GuildSkills.TryGetValue(dataId, out guildSkill) || guildSkill.SkillType != GuildSkillType.Active)
+            if (!GameInstance.GuildSkills.TryGetValue(dataId, out guildSkill) || !guildSkill.IsActive)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_GUILD_SKILL_DATA);
                 return;

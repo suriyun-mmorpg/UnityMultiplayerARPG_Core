@@ -77,10 +77,15 @@ namespace MultiplayerARPG
         {
             return decreaseExpLostPercentage.GetAmount(level);
         }
-        
+
         public bool IsActive
         {
             get { return skillType == GuildSkillType.Active; }
+        }
+
+        public bool IsPassive
+        {
+            get { return skillType == GuildSkillType.Passive; }
         }
 
         public Buff Buff

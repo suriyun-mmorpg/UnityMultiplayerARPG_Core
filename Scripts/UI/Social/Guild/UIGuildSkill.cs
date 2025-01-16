@@ -1,6 +1,7 @@
 ﻿using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace MultiplayerARPG
@@ -46,6 +47,7 @@ namespace MultiplayerARPG
 
         [Header("Buff")]
         public UIBuff uiSkillBuff;
+        public bool showBuff;
 
         [Header("Events")]
         public UnityEvent onSetLevelZeroData = new UnityEvent();
@@ -54,12 +56,18 @@ namespace MultiplayerARPG
         public UnityEvent onUnableToLevelUp = new UnityEvent();
         public UnityEvent onAbleToUse = new UnityEvent();
         public UnityEvent onUnableToUse = new UnityEvent();
+        public UnityEvent onMaxedLevel = new UnityEvent();
+        public UnityEvent onNotMaxedLevel = new UnityEvent();
 
         [Header("Options")]
         public UIGuildSkill uiNextLevelSkill;
 
         protected float _coolDownRemainsDuration;
         protected bool _dirtyIsCountDown;
+        protected bool _dirtyAbleToLevelUp;
+        protected bool _dirtyAbleToUse;
+        protected bool _dirtyMaxedLevel;
+        protected bool _forceUpdateUi = true;
 
         protected override void OnDestroy()
         {
@@ -93,6 +101,10 @@ namespace MultiplayerARPG
             onAbleToUse = null;
             onUnableToUse?.RemoveAllListeners();
             onUnableToUse = null;
+            onMaxedLevel?.RemoveAllListeners();
+            onMaxedLevel = null;
+            onNotMaxedLevel?.RemoveAllListeners();
+            onNotMaxedLevel = null;
             uiNextLevelSkill = null;
         }
 
@@ -143,7 +155,7 @@ namespace MultiplayerARPG
             }
 
             bool isCountDown = _coolDownRemainsDuration > 0f;
-            if (_dirtyIsCountDown != isCountDown)
+            if (_forceUpdateUi || _dirtyIsCountDown != isCountDown)
             {
                 _dirtyIsCountDown = isCountDown;
                 if (countDownObjects != null)
@@ -177,28 +189,41 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            UpdateCoolDownRemainsDuration();
+            UpdateCoolDownRemainsDuration(0f);
+            IPlayerCharacterData targetPlayer = GameInstance.PlayingCharacter;
 
-            if (GameInstance.PlayingCharacter != null && GuildSkill && Level < GuildSkill.MaxLevel &&
+            bool ableToLevelUp = targetPlayer != null &&
+                GuildSkill != null && Level < GuildSkill.MaxLevel &&
                 GameInstance.JoinedGuild != null &&
-                GameInstance.JoinedGuild.IsLeader(GameInstance.PlayingCharacter.Id) &&
-                GameInstance.JoinedGuild.skillPoint > 0)
+                GameInstance.JoinedGuild.IsLeader(targetPlayer.Id) &&
+                GameInstance.JoinedGuild.skillPoint > 0;
+            if (_forceUpdateUi || _dirtyAbleToLevelUp != ableToLevelUp)
             {
-                onAbleToLevelUp.Invoke();
-            }
-            else
-            {
-                onUnableToLevelUp.Invoke();
+                _dirtyAbleToLevelUp = ableToLevelUp;
+                if (ableToLevelUp)
+                    onAbleToLevelUp.Invoke();
+                else
+                    onUnableToLevelUp.Invoke();
             }
 
-            if (GameInstance.PlayingCharacter != null && GuildSkill && Level > 0 &&
-                GuildSkill.SkillType == GuildSkillType.Active)
+            bool ableToUse = targetPlayer != null && GuildSkill != null && GuildSkill.IsActive && Level > 0;
+            if (_forceUpdateUi || _dirtyAbleToUse != ableToUse)
             {
-                onAbleToUse.Invoke();
+                _dirtyAbleToUse = ableToUse;
+                if (ableToUse)
+                    onAbleToUse.Invoke();
+                else
+                    onUnableToUse.Invoke();
             }
-            else
+
+            bool maxedLevel = GuildSkill != null && GuildSkill.MaxLevel <= Level;
+            if (_forceUpdateUi || _dirtyMaxedLevel != maxedLevel)
             {
-                onUnableToUse.Invoke();
+                _dirtyMaxedLevel = maxedLevel;
+                if (maxedLevel)
+                    onMaxedLevel.Invoke();
+                else
+                    onNotMaxedLevel.Invoke();
             }
         }
 
@@ -313,7 +338,7 @@ namespace MultiplayerARPG
 
             if (uiSkillBuff != null)
             {
-                if (!GuildSkill.IsActive)
+                if (!GuildSkill.IsActive && !showBuff)
                 {
                     uiSkillBuff.Hide();
                 }

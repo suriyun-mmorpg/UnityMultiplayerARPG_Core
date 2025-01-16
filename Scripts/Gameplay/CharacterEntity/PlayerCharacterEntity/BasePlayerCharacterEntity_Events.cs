@@ -43,6 +43,7 @@ namespace MultiplayerARPG
         public event System.Action<LiteNetLibSyncList.Operation, int> onPublicIntsOperation;
         public event System.Action<LiteNetLibSyncList.Operation, int> onPublicFloatsOperation;
 #endif
+        public event System.Action<LiteNetLibSyncList.Operation, int> onGuildSkillsOperation;
 
         public override void OnRewardItem(RewardGivenType givenType, BaseItem item, int amount)
         {
