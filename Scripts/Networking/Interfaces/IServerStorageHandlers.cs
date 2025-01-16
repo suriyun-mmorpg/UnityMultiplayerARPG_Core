@@ -21,28 +21,29 @@ namespace MultiplayerARPG
         /// <param name="playerCharacter">Character which open the storage</param>
         /// <param name="storageEntity">The storage entity</param>
         /// <param name="storageId">Opening storage ID</param>
-        UniTaskVoid OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, IActivatableEntity storageEntity, StorageId storageId);
+        void OpenStorage(long connectionId, IPlayerCharacterData playerCharacter, IActivatableEntity storageEntity, StorageId storageId);
 
         /// <summary>
         /// Close storage
         /// </summary>
         /// <param name="connectionId">Client who close the storage</param>
         /// <param name="storageId">Which storage</param>
-        UniTaskVoid CloseStorage(long connectionId, StorageId storageId);
+        void CloseStorage(long connectionId, StorageId storageId);
 
         /// <summary>
         /// Close all storage
         /// </summary>
         /// <param name="connectionId">Client who close the storage</param>
-        UniTaskVoid CloseAllStorages(long connectionId);
+        void CloseAllStorages(long connectionId);
 
         /// <summary>
         /// Decrease items from storage, return items which going to drop on ground
         /// </summary>
         /// <param name="storageId"></param>
         /// <param name="convertItems"></param>
+        /// <param name="droppingItems"></param>
         /// <returns></returns>
-        UniTask<List<CharacterItem>> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems);
+        UniTask<bool> ConvertStorageItems(StorageId storageId, List<StorageConvertItemsEntry> convertItems, List<CharacterItem> droppingItems);
 
         /// <summary>
         /// Get storage items by storage Id
@@ -83,10 +84,12 @@ namespace MultiplayerARPG
         /// <summary>
         /// Can access storage or not?
         /// </summary>
-        /// <param name="storageId"></param>
         /// <param name="playerCharacter"></param>
+        /// <param name="storageEntity"></param>
+        /// <param name="storageId"></param>
+        /// <param name="uiTextKeys"></param>
         /// <returns></returns>
-        bool CanAccessStorage(IPlayerCharacterData playerCharacter, StorageId storageId);
+        bool CanAccessStorage(IPlayerCharacterData playerCharacter, IActivatableEntity storageEntity, StorageId storageId, out UITextKeys uiTextKeys);
 
         /// <summary>
         /// This will be used to clear data relates to storage system

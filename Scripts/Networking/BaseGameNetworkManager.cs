@@ -1033,7 +1033,7 @@ namespace MultiplayerARPG
 
         public virtual void UnregisterPlayerCharacter(long connectionId)
         {
-            ServerStorageHandlers.CloseAllStorages(connectionId).Forget();
+            ServerStorageHandlers.CloseAllStorages(connectionId);
             bool success = ServerUserHandlers.RemovePlayerCharacter(connectionId, out string characterId, out string userId);
             if (success)
             {

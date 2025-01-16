@@ -76,7 +76,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
+            if (!playerCharacter.CanAccessStorage(storageId))
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
@@ -119,7 +119,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
+            if (!playerCharacter.CanAccessStorage(storageId))
             {
                 result.InvokeError(new ResponseMoveItemToStorageMessage()
                 {
@@ -166,7 +166,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            if (!GameInstance.ServerStorageHandlers.CanAccessStorage(playerCharacter, storageId))
+            if (!playerCharacter.CanAccessStorage(storageId))
             {
                 result.InvokeError(new ResponseSwapOrMergeStorageItemMessage()
                 {
