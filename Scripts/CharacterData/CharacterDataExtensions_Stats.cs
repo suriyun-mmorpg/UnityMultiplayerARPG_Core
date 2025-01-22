@@ -540,6 +540,38 @@ namespace MultiplayerARPG
                 onIncreasingStatusEffectResistances.Invoke(buff.GetIncreaseStatusEffectResistances(level));
         }
 
+        public static Dictionary<DamageElement, MinMaxFloat> GetWeaponDamages(CharacterItem characterItem, IWeaponItem weaponItem, KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount,
+            Dictionary<Attribute, float> attributes, Dictionary<DamageElement, MinMaxFloat> buffDamages, Dictionary<DamageElement, MinMaxFloat> buffDamagesRate)
+        {
+            Dictionary<DamageElement, MinMaxFloat> resultDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            if (weaponItem != null)
+                weaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(weaponItem.WeaponType.CacheEffectivenessAttributes, attributes, weaponDamageAmount);
+            resultDamages = GameDataHelpers.CombineDamages(resultDamages, weaponDamageAmount);
+            resultDamages = GameDataHelpers.CombineDamages(resultDamages, attributes.GetIncreaseDamages());
+            resultDamages = GameDataHelpers.CombineDamages(resultDamages, buffDamages);
+            resultDamages = GameDataHelpers.CombineDamages(resultDamages, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(resultDamages), buffDamagesRate));
+            /*
+            // Sum with ammo
+            if (weaponItem != null)
+            {
+                // Ammo stored in magazine?
+                if (weaponItem.AmmoCapacity > 0)
+                {
+                    // Sum with ammo only when it have ammo in magazine
+                    if (characterItem.ammo > 0 && GameInstance.Items.TryGetValue(characterItem.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
+                        resultDamages = GameDataHelpers.CombineDamages(resultDamages, tempAmmoItem.GetIncreaseDamages());
+                }
+                else
+                {
+                    // No special condition, just sum with ammo
+                    if (GameInstance.Items.TryGetValue(characterItem.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
+                        resultDamages = GameDataHelpers.CombineDamages(resultDamages, tempAmmoItem.GetIncreaseDamages());
+                }
+            }
+            */
+            return resultDamages;
+        }
+
         public static void GetAllStats(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, bool sumWithSkills,
             System.Action<CharacterStats> onGetStats = null,
             System.Action<Dictionary<Attribute, float>> onGetAttributes = null,
@@ -919,12 +951,7 @@ namespace MultiplayerARPG
             }
             if (isCalculateRightHandWeaponDamages && foundEquippedRightHandWeapon)
             {
-                if (rightHandWeapon != null)
-                    rightHandWeaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(rightHandWeapon.WeaponType.CacheEffectivenessAttributes, resultAttributes, rightHandWeaponDamageAmount);
-                resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, rightHandWeaponDamageAmount);
-                resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, resultAttributes.GetIncreaseDamages());
-                resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, buffDamages);
-                resultRightHandDamages = GameDataHelpers.CombineDamages(resultRightHandDamages, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(resultRightHandDamages), buffDamagesRate));
+                resultRightHandDamages = GetWeaponDamages(data.EquipWeapons.rightHand, rightHandWeapon, rightHandWeaponDamageAmount, resultAttributes, buffDamages, buffDamagesRate);
                 if (onGetRightHandDamages != null)
                     onGetRightHandDamages.Invoke(resultRightHandDamages);
                 if (onGetRightHandWeaponDamage != null)
@@ -932,12 +959,7 @@ namespace MultiplayerARPG
             }
             if (isCalculateLeftHandWeaponDamages && foundEquippedLeftHandWeapon)
             {
-                if (leftHandWeapon != null)
-                    leftHandWeaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(leftHandWeapon.WeaponType.CacheEffectivenessAttributes, resultAttributes, leftHandWeaponDamageAmount);
-                resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, leftHandWeaponDamageAmount);
-                resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, resultAttributes.GetIncreaseDamages());
-                resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, buffDamages);
-                resultLeftHandDamages = GameDataHelpers.CombineDamages(resultLeftHandDamages, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(resultLeftHandDamages), buffDamagesRate));
+                resultLeftHandDamages = GetWeaponDamages(data.EquipWeapons.leftHand, leftHandWeapon, leftHandWeaponDamageAmount, resultAttributes, buffDamages, buffDamagesRate);
                 if (onGetLeftHandDamages != null)
                     onGetLeftHandDamages.Invoke(resultLeftHandDamages);
                 if (onGetLeftHandWeaponDamage != null)
