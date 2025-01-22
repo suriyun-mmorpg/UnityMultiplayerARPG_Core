@@ -560,7 +560,7 @@ namespace MultiplayerARPG
             else if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 // Prepare time
-                long lagDeltaTime = Entity.Manager.Rtt;
+                long lagDeltaTime = BaseGameNetworkManager.Singleton.ServerTimestamp - peerTimestamp;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
@@ -614,6 +614,11 @@ namespace MultiplayerARPG
                 // Waiting for teleport confirming
                 return;
             }
+            if (peerTimestamp > BaseGameNetworkManager.Singleton.ServerTimestamp)
+            {
+                // Peer's Timestamp is more than servers', might be hacking
+                return;
+            }
             if (!Entity.CanMove())
             {
                 // It can't move, so don't move
@@ -622,7 +627,7 @@ namespace MultiplayerARPG
             if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 // Prepare time
-                long lagDeltaTime = Entity.Player.Rtt;
+                long lagDeltaTime = BaseGameNetworkManager.Singleton.ServerTimestamp - peerTimestamp;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
                 _tempExtraMovementState = entityMovementInput.ExtraMovementState;
@@ -673,10 +678,15 @@ namespace MultiplayerARPG
                 // Waiting for teleport confirming
                 return;
             }
+            if (peerTimestamp > BaseGameNetworkManager.Singleton.ServerTimestamp)
+            {
+                // Peer's Timestamp is more than servers', might be hacking
+                return;
+            }
             if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 // Prepare time
-                long lagDeltaTime = Entity.Player.Rtt;
+                long lagDeltaTime = BaseGameNetworkManager.Singleton.ServerTimestamp - peerTimestamp;
                 long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
                 float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
                 // Prepare movement state
