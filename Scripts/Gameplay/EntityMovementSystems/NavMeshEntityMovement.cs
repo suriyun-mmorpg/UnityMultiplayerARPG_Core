@@ -10,7 +10,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(NavMeshAgent))]
     public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        protected static readonly long s_lagBuffer = System.TimeSpan.TicksPerMillisecond * 200;
         protected static readonly float s_minMagnitudeToDetermineMoving = 0.01f;
         protected static readonly float s_minDistanceToSimulateMovement = 0.01f;
         protected static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
@@ -615,11 +614,6 @@ namespace MultiplayerARPG
                 // Waiting for teleport confirming
                 return;
             }
-            if (Mathf.Abs(peerTimestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
-            {
-                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
-                return;
-            }
             if (!Entity.CanMove())
             {
                 // It can't move, so don't move
@@ -677,11 +671,6 @@ namespace MultiplayerARPG
             if (_isServerWaitingTeleportConfirm)
             {
                 // Waiting for teleport confirming
-                return;
-            }
-            if (Mathf.Abs(peerTimestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
-            {
-                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
             if (_acceptedPositionTimestamp <= peerTimestamp)

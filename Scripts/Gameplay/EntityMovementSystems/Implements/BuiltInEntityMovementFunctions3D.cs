@@ -13,7 +13,6 @@ namespace MultiplayerARPG
         /// </summary>
         private const float ABOVE_GROUND_OFFSETS = 0.25f;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
-        private static readonly long s_lagBuffer = 200; // 200 ms
         private static readonly int s_forceGroundedFramesAfterTeleport = 3;
         private static readonly float s_minDistanceToSimulateMovement = 0.01f;
         private static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
@@ -1179,11 +1178,6 @@ namespace MultiplayerARPG
                 // Waiting for teleport confirming
                 return;
             }
-            if (Mathf.Abs(peerTimestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
-            {
-                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
-                return;
-            }
             if (!Entity.CanMove())
             {
                 // It can't move, so don't move
@@ -1261,11 +1255,6 @@ namespace MultiplayerARPG
             if (_isServerWaitingTeleportConfirm)
             {
                 // Waiting for teleport confirming
-                return;
-            }
-            if (Mathf.Abs(peerTimestamp - BaseGameNetworkManager.Singleton.ServerTimestamp) > s_lagBuffer)
-            {
-                // Timestamp is a lot difference to server's timestamp, player might try to hack a game or packet may corrupted occurring, so skip it
                 return;
             }
             if (_acceptedPositionTimestamp <= peerTimestamp)
