@@ -392,7 +392,7 @@ namespace MultiplayerARPG
                             continue;
                         if (!IsOwnerClient && !IsOwnedByServer)
                             continue;
-                        RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
+                        RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, new SimulateActionTriggerData()
                         {
                             simulateSeed = simulateSeed,
                             triggerIndex = triggerIndex,
@@ -403,7 +403,7 @@ namespace MultiplayerARPG
                     }
                     else if (IsOwnerClient)
                     {
-                        RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
+                        RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, new SimulateActionTriggerData()
                         {
                             simulateSeed = simulateSeed,
                             triggerIndex = triggerIndex,
@@ -477,7 +477,7 @@ namespace MultiplayerARPG
                     GameInstance.ServerLogHandlers.LogUseSkillTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NotEnoughResources);
                 return;
             }
-            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, data);
             ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageAmounts, data.targetObjectId, data.aimPosition);
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogUseSkillTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
@@ -527,7 +527,7 @@ namespace MultiplayerARPG
                     return;
                 }
                 ProceedUseSkill(timestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-                RPC(CmdUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, dataId, isLeftHand, targetObjectId, aimPosition);
+                RPC(CmdUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, timestamp, dataId, isLeftHand, targetObjectId, aimPosition);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -546,7 +546,7 @@ namespace MultiplayerARPG
             if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                 return;
             ProceedUseSkill(peerTimestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-            RPC(RpcUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, dataId, skillLevel, isLeftHand, targetObjectId, aimPosition);
+            RPC(RpcUseSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, peerTimestamp, dataId, skillLevel, isLeftHand, targetObjectId, aimPosition);
         }
 
         [AllRpc]
@@ -588,7 +588,7 @@ namespace MultiplayerARPG
                 }
                 Entity.LastUseItemTime = Time.unscaledTime;
                 ProceedUseSkillItem(timestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-                RPC(CmdUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
+                RPC(CmdUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, timestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -607,7 +607,7 @@ namespace MultiplayerARPG
             if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
             ProceedUseSkillItem(peerTimestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-            RPC(RpcUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, skillItem.DataId, isLeftHand, targetObjectId, aimPosition);
+            RPC(RpcUseSkillItem, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, peerTimestamp, skillItem.DataId, isLeftHand, targetObjectId, aimPosition);
         }
 
         [AllRpc]
@@ -642,14 +642,14 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                RPC(CmdInterruptCastingSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+                RPC(CmdInterruptCastingSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced);
                 return;
             }
             if (IsCastingSkillCanBeInterrupted && !IsCastingSkillInterrupted)
             {
                 IsCastingSkillInterrupted = true;
                 ProceedInterruptCastingSkill();
-                RPC(RpcInterruptCastingSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+                RPC(RpcInterruptCastingSkill, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced);
             }
         }
 

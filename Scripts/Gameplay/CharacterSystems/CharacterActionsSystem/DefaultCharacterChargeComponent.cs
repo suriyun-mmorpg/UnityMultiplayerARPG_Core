@@ -137,7 +137,7 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 PlayChargeAnimation(isLeftHand);
-                RPC(CmdStartCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
+                RPC(CmdStartCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -155,7 +155,7 @@ namespace MultiplayerARPG
         protected void ProceedCmdStartCharge(bool isLeftHand)
         {
             PlayChargeAnimation(isLeftHand);
-            RPC(RpcStartCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
+            RPC(RpcStartCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, isLeftHand);
         }
 
         [AllRpc]
@@ -174,7 +174,7 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 StopChargeAnimation();
-                RPC(CmdStopCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+                RPC(CmdStopCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -192,7 +192,7 @@ namespace MultiplayerARPG
         protected void ProceedCmdStopCharge()
         {
             StopChargeAnimation();
-            RPC(RpcStopCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered);
+            RPC(RpcStopCharge, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced);
         }
 
         [AllRpc]

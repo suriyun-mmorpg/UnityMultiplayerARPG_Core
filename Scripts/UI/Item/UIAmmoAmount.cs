@@ -44,13 +44,15 @@ namespace MultiplayerARPG
         {
             UpdateOwningCharacterData();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onRecached += UpdateOwningCharacterData;
+            GameInstance.PlayingCharacterEntity.onUpdateRightWeaponAmmoSim += OnUpdateRightWeaponAmmoSim;
+            GameInstance.PlayingCharacterEntity.onUpdateLeftWeaponAmmoSim += OnUpdateLeftWeaponAmmoSim;
         }
 
         protected virtual void OnDisable()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onRecached -= UpdateOwningCharacterData;
+            GameInstance.PlayingCharacterEntity.onUpdateRightWeaponAmmoSim -= OnUpdateRightWeaponAmmoSim;
+            GameInstance.PlayingCharacterEntity.onUpdateLeftWeaponAmmoSim -= OnUpdateLeftWeaponAmmoSim;
         }
 
         public void UpdateOwningCharacterData()
@@ -61,11 +63,21 @@ namespace MultiplayerARPG
 
         public void UpdateData()
         {
-            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandRequireAmmoSymbols, rightHandNoRequireAmmoSymbols, gageRightHandAmmo, GameInstance.PlayingCharacterEntity.EquipWeapons.rightHand);
-            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandRequireAmmoSymbols, leftHandNoRequireAmmoSymbols, gageLeftHandAmmo, GameInstance.PlayingCharacterEntity.EquipWeapons.leftHand);
+            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandRequireAmmoSymbols, rightHandNoRequireAmmoSymbols, gageRightHandAmmo, GameInstance.PlayingCharacterEntity.EquipWeapons.rightHand, false);
+            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandRequireAmmoSymbols, leftHandNoRequireAmmoSymbols, gageLeftHandAmmo, GameInstance.PlayingCharacterEntity.EquipWeapons.leftHand, true);
         }
 
-        protected virtual void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject[] requireAmmoSymbols, GameObject[] noRequireAmmoSymbols, UIGageValue gageAmmo, CharacterItem characterItem)
+        public void OnUpdateRightWeaponAmmoSim(int ammo)
+        {
+            UpdateUI(uiRightHandAmmoRoot, uiTextRightHandCurrentAmmo, uiTextRightHandReserveAmmo, uiTextRightHandSumAmmo, rightHandRequireAmmoSymbols, rightHandNoRequireAmmoSymbols, gageRightHandAmmo, GameInstance.PlayingCharacterEntity.EquipWeapons.rightHand, false);
+        }
+
+        public void OnUpdateLeftWeaponAmmoSim(int ammo)
+        {
+            UpdateUI(uiLeftHandAmmoRoot, uiTextLeftHandCurrentAmmo, uiTextLeftHandReserveAmmo, uiTextLeftHandSumAmmo, leftHandRequireAmmoSymbols, leftHandNoRequireAmmoSymbols, gageLeftHandAmmo, GameInstance.PlayingCharacterEntity.EquipWeapons.leftHand, true);
+        }
+
+        protected virtual void UpdateUI(GameObject root, TextWrapper textCurrentAmmo, TextWrapper textReserveAmmo, TextWrapper textSumAmmo, GameObject[] requireAmmoSymbols, GameObject[] noRequireAmmoSymbols, UIGageValue gageAmmo, CharacterItem characterItem, bool isLeftHand)
         {
             IWeaponItem weaponItem = characterItem.GetWeaponItem();
             bool isActive = weaponItem != null && (weaponItem.WeaponType.AmmoType != null || weaponItem.AmmoItemIds.Count > 0);
@@ -74,8 +86,19 @@ namespace MultiplayerARPG
 
             int currentAmmo = characterItem.ammo;
             int reserveAmmo = 0;
+
             if (GameInstance.PlayingCharacterEntity && isActive)
+            {
+                if (!isLeftHand)
+                {
+                    currentAmmo = GameInstance.PlayingCharacterEntity.RightWeaponAmmoSim;
+                }
+                else
+                {
+                    currentAmmo = GameInstance.PlayingCharacterEntity.LeftWeaponAmmoSim;
+                }
                 reserveAmmo = GameInstance.PlayingCharacterEntity.CountAllAmmos(weaponItem);
+            }
 
             if (textCurrentAmmo != null)
             {
