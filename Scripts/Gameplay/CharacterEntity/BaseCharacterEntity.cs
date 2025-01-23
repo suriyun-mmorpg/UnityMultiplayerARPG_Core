@@ -428,7 +428,7 @@ namespace MultiplayerARPG
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
                 s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
-                ClientSendMessage(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
+                ClientSendMessage(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableSequenced : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
@@ -441,7 +441,7 @@ namespace MultiplayerARPG
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
                 s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
-                ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
+                ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableSequenced : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
