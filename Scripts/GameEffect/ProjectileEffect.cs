@@ -36,14 +36,14 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < _impacts.Count; ++i)
                 {
-                    _impactEffects.PlayEffect(_impacts[i].tag, _impacts[i].point, Quaternion.LookRotation(Vector3.up, _impacts[i].normal));
+                    _impactEffects.PlayEffect(_impacts[i].tag, _impacts[i].point, Quaternion.LookRotation(_impacts[i].normal));
                 }
                 _impacts.Clear();
                 return;
             }
             while (_impacts.Count > 0 && (transform.position - _launchOrigin).sqrMagnitude > (_impacts[0].point - _launchOrigin).sqrMagnitude)
             {
-                _impactEffects.PlayEffect(_impacts[0].tag, _impacts[0].point, Quaternion.LookRotation(Vector3.up, _impacts[0].normal));
+                _impactEffects.PlayEffect(_impacts[0].tag, _impacts[0].point, Quaternion.LookRotation(_impacts[0].normal));
                 _impacts.RemoveAt(0);
             }
         }
