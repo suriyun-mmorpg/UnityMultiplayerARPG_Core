@@ -298,7 +298,8 @@ namespace MultiplayerARPG
                         // Apply attack damages
                         if (IsServer)
                         {
-                            Entity.DecreaseAmmos(weapon, isLeftHand, 1, out _);
+                            if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out _))
+                                continue;
                             if (!IsOwnerClient && !IsOwnedByServer)
                                 continue;
                             if (!isLeftHand)
