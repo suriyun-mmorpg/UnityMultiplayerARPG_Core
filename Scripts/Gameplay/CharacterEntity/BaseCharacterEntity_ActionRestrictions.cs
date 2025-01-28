@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual bool CanDismentleItem()
+        public virtual bool CanDismantleItem()
         {
             return true;
         }

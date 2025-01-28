@@ -213,7 +213,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanDismentleItem())
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDismantleItem())
             {
                 result.InvokeError(new ResponseDismantleItemMessage());
                 return default;
@@ -247,7 +247,7 @@ namespace MultiplayerARPG
             }
 
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
-            if (playerCharacterEntity != null && !playerCharacterEntity.CanDismentleItem())
+            if (playerCharacterEntity != null && !playerCharacterEntity.CanDismantleItem())
             {
                 result.InvokeError(new ResponseDismantleItemsMessage());
                 return default;

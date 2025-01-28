@@ -4,10 +4,10 @@ namespace MultiplayerARPG
 {
     public static partial class CharacterInventoryExtensions
     {
-        public static bool VerifyDismantleItem(this IPlayerCharacterData character, int index, int amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out ItemAmount dismentleItem, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
+        public static bool VerifyDismantleItem(this IPlayerCharacterData character, int index, int amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out ItemAmount dismantleItem, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
         {
             gameMessage = UITextKeys.NONE;
-            dismentleItem = new ItemAmount();
+            dismantleItem = new ItemAmount();
             returningGold = 0;
             returningItems = null;
             returningCurrencies = null;
@@ -54,7 +54,7 @@ namespace MultiplayerARPG
                 return false;
             }
             BaseItem item = nonEquipItem.GetItem();
-            dismentleItem = new ItemAmount()
+            dismantleItem = new ItemAmount()
             {
                 item = item,
                 amount = amount,
@@ -67,14 +67,14 @@ namespace MultiplayerARPG
         public static bool DismantleItem(this IPlayerCharacterData character, int index, int amount, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            ItemAmount dismentleItem;
+            ItemAmount dismantleItem;
             int returningGold;
             List<ItemAmount> returningItems;
             List<CurrencyAmount> returningCurrencies;
             List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
-            if (!character.VerifyDismantleItem(index, amount, simulatingNonEquipItems, out gameMessage, out dismentleItem, out returningGold, out returningItems, out returningCurrencies))
+            if (!character.VerifyDismantleItem(index, amount, simulatingNonEquipItems, out gameMessage, out dismantleItem, out returningGold, out returningItems, out returningCurrencies))
                 return false;
-            List<ItemAmount> dismentleItems = new List<ItemAmount>() { dismentleItem };
+            List<ItemAmount> dismantleItems = new List<ItemAmount>() { dismantleItem };
             List<CharacterItem> increasedItems = new List<CharacterItem>();
             List<CharacterItem> droppedItems = new List<CharacterItem>();
             character.Gold = character.Gold.Increase(returningGold);
@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             character.IncreaseItems(returningItems);
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
-            GameInstance.ServerLogHandlers.LogDismentleItems(character, dismentleItems);
+            GameInstance.ServerLogHandlers.LogDismantleItems(character, dismantleItems);
             return true;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
@@ -98,13 +98,13 @@ namespace MultiplayerARPG
             indexes.Sort();
             Dictionary<int, int> indexAmountPairs = new Dictionary<int, int>();
             List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
-            List<ItemAmount> dismentleItems = new List<ItemAmount>();
+            List<ItemAmount> dismantleItems = new List<ItemAmount>();
             int returningGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
             List<CurrencyAmount> returningCurrencies = new List<CurrencyAmount>();
             int tempIndex;
             int tempAmount;
-            ItemAmount tempDismentleItem;
+            ItemAmount tempDismantleItem;
             int tempReturningGold;
             List<ItemAmount> tempReturningItems;
             List<CurrencyAmount> tempReturningCurrencies;
@@ -116,9 +116,9 @@ namespace MultiplayerARPG
                 if (tempIndex >= character.NonEquipItems.Count)
                     continue;
                 tempAmount = character.NonEquipItems[tempIndex].amount;
-                if (!character.VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out gameMessage, out tempDismentleItem, out tempReturningGold, out tempReturningItems, out tempReturningCurrencies))
+                if (!character.VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out gameMessage, out tempDismantleItem, out tempReturningGold, out tempReturningItems, out tempReturningCurrencies))
                     return false;
-                dismentleItems.Add(tempDismentleItem);
+                dismantleItems.Add(tempDismantleItem);
                 returningGold += tempReturningGold;
                 returningItems.AddRange(tempReturningItems);
                 returningCurrencies.AddRange(tempReturningCurrencies);
@@ -135,7 +135,7 @@ namespace MultiplayerARPG
             character.IncreaseItems(returningItems);
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
-            GameInstance.ServerLogHandlers.LogDismentleItems(character, dismentleItems);
+            GameInstance.ServerLogHandlers.LogDismantleItems(character, dismantleItems);
             return true;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;

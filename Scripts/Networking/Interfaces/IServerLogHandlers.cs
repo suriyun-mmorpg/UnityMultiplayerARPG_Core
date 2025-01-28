@@ -38,7 +38,7 @@ namespace MultiplayerARPG
         void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker);
 
         void LogCraftItem(IPlayerCharacterData playerCharacter, ItemCraft itemCraft);
-        void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems);
+        void LogDismantleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismantleItems);
         void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, ItemRefineLevel itemRefineLevel, bool isReturning, ItemRefineFailReturning itemRefineFailReturning);
         void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, ItemRepairPrice itemRepairPrice);
         void LogEnhanceSocketItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem enhancerItem);

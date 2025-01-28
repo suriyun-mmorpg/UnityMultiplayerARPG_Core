@@ -123,7 +123,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool CanDismentleItem()
+        public override bool CanDismantleItem()
         {
             if (IsWarping)
                 return false;
