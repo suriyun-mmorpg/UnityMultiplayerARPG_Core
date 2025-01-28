@@ -606,12 +606,12 @@ namespace MultiplayerARPG
             {
                 CharacterItem equippedRightHand = GameInstance.PlayingCharacter.EquipWeapons.rightHand;
                 bool isEmptyRightHand = equippedRightHand.IsEmptySlot();
-                bool isThisRightHand = equippedRightHand.id.Equals(CharacterItem.id);
+                bool isThisRightHand = string.Equals(equippedRightHand.id, CharacterItem.id);
                 IWeaponItem rightHandWeapon = isEmptyRightHand ? null : equippedRightHand.GetWeaponItem();
 
                 CharacterItem equippedLeftHand = GameInstance.PlayingCharacter.EquipWeapons.leftHand;
                 bool isEmptyLeftHand = equippedLeftHand.IsEmptySlot();
-                bool isThisLeftHand = equippedLeftHand.id.Equals(CharacterItem.id);
+                bool isThisLeftHand = string.Equals(equippedLeftHand.id, CharacterItem.id);
                 IWeaponItem leftHandWeapon = isEmptyLeftHand ? null : equippedLeftHand.GetWeaponItem();
 
                 int currentAmmo = CharacterItem.ammo;
@@ -710,13 +710,13 @@ namespace MultiplayerARPG
 
             CharacterItem equippedRightHand = GameInstance.PlayingCharacter.EquipWeapons.rightHand;
             bool isEmptyRightHand = equippedRightHand.IsEmptySlot();
-            bool isThisRightHand = equippedRightHand.id.Equals(CharacterItem.id);
+            bool isThisRightHand = string.Equals(equippedRightHand.id, CharacterItem.id);
             IWeaponItem rightHandWeapon = isEmptyRightHand ? null : equippedRightHand.GetWeaponItem();
             IShieldItem rightHandShield = isEmptyRightHand ? null : equippedRightHand.GetShieldItem();
 
             CharacterItem equippedLeftHand = GameInstance.PlayingCharacter.EquipWeapons.leftHand;
             bool isEmptyLeftHand = equippedLeftHand.IsEmptySlot();
-            bool isThisLeftHand = equippedLeftHand.id.Equals(CharacterItem.id);
+            bool isThisLeftHand = string.Equals(equippedLeftHand.id, CharacterItem.id);
             IWeaponItem leftHandWeapon = isEmptyLeftHand ? null : equippedLeftHand.GetWeaponItem();
             IShieldItem leftHandShield = isEmptyLeftHand ? null : equippedLeftHand.GetShieldItem();
 
@@ -1677,7 +1677,7 @@ namespace MultiplayerARPG
                         {
                             equipItem = GameInstance.PlayingCharacter.EquipItems[equipItemIndex];
                             if (!equipItem.IsEmptySlot() &&
-                                !equipItem.id.Equals(CharacterItem.id) &&
+                                !string.Equals(equipItem.id, CharacterItem.id) &&
                                 equipItem.GetArmorItem() != null &&
                                 equipItem.GetArmorItem().ArmorType == ArmorItem.ArmorType)
                             {
