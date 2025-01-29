@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         public void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker) { }
 
         public void LogCraftItem(IPlayerCharacterData playerCharacter, ItemCraft itemCraft) { }
-        public void LogDismentleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismentleItems) { }
+        public void LogDismantleItems(IPlayerCharacterData playerCharacter, IList<ItemAmount> dismantleItems) { }
         public void LogRefine(IPlayerCharacterData playerCharacter, CharacterItem refinedItem, IList<BaseItem> enhancerItems, float increaseSuccessRate, float decreaseRequireGoldRate, float chanceToNotDecreaseLevels, float chanceToNotDestroyItem, bool isSuccess, bool isDestroy, ItemRefineLevel itemRefineLevel, bool isReturning, ItemRefineFailReturning itemRefineFailReturning) { }
         public void LogRepair(IPlayerCharacterData playerCharacter, CharacterItem repairedItem, ItemRepairPrice itemRepairPrice) { }
         public void LogEnhanceSocketItem(IPlayerCharacterData playerCharacter, CharacterItem enhancedItem, BaseItem enhancerItem) { }
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         public void LogQuestAbandon(IPlayerCharacterData character, Quest quest) { }
         public void LogQuestComplete(IPlayerCharacterData character, Quest quest, byte selectedRewardIndex) { }
 
-        public void LogMoveItemFromStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, int storageItemAmount, InventoryType inventoryType, int inventoryItemIndex, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage) { }
+        public void LogMoveItemFromStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitWeight, float storageWeightLimit, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, int storageItemAmount, InventoryType inventoryType, int inventoryItemIndex, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage) { }
         public void LogMoveItemToStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitWeight, float storageWeightLimit, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, InventoryType inventoryType, int inventoryItemIndex, int inventoryItemAmount, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage) { }
         public void LogSwapOrMergeStorageItem(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int fromIndex, int toIndex, bool success, UITextKeys gameMessage) { }
     }

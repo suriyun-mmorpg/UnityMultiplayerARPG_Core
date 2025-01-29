@@ -251,20 +251,30 @@ namespace MultiplayerARPG
             level.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             exp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             exp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            isImmune.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isImmune.deliveryMethod = DeliveryMethod.Sequenced;
             isImmune.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentHp.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            isImmune.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
+            currentHp.deliveryMethod = DeliveryMethod.Sequenced;
             currentHp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentMp.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            currentHp.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
+            currentMp.deliveryMethod = DeliveryMethod.Sequenced;
             currentMp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentFood.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            currentMp.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
+            currentStamina.deliveryMethod = DeliveryMethod.Sequenced;
+            currentStamina.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentStamina.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
+            currentFood.deliveryMethod = DeliveryMethod.Sequenced;
             currentFood.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentWater.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            currentFood.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
+            currentWater.deliveryMethod = DeliveryMethod.Sequenced;
             currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            equipWeaponSet.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            currentWater.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
+            equipWeaponSet.deliveryMethod = DeliveryMethod.Sequenced;
             equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            isWeaponsSheathed.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            equipWeaponSet.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
+            isWeaponsSheathed.deliveryMethod = DeliveryMethod.Sequenced;
             isWeaponsSheathed.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+            isWeaponsSheathed.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             aimPosition.deliveryMethod = DeliveryMethod.Sequenced;
@@ -459,6 +469,7 @@ namespace MultiplayerARPG
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             MarkToUpdateAppearances();
+            UpdateAmmoSim();
             _isRecaching = true;
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
@@ -542,6 +553,7 @@ namespace MultiplayerARPG
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             MarkToUpdateAppearances();
+            UpdateAmmoSim();
             _selectableWeaponSetsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,

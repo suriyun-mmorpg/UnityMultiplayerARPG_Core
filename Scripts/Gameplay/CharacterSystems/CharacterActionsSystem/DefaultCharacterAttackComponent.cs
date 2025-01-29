@@ -302,7 +302,11 @@ namespace MultiplayerARPG
                                 continue;
                             if (!IsOwnerClient && !IsOwnedByServer)
                                 continue;
-                            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
+                            if (!isLeftHand)
+                                Entity.RightWeaponAmmoSim -= 1;
+                            else
+                                Entity.LeftWeaponAmmoSim -= 1;
+                            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, new SimulateActionTriggerData()
                             {
                                 simulateSeed = simulateSeed,
                                 triggerIndex = triggerIndex,
@@ -312,7 +316,11 @@ namespace MultiplayerARPG
                         }
                         else if (IsOwnerClient)
                         {
-                            RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, new SimulateActionTriggerData()
+                            if (!isLeftHand)
+                                Entity.RightWeaponAmmoSim -= 1;
+                            else
+                                Entity.LeftWeaponAmmoSim -= 1;
+                            RPC(CmdSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, new SimulateActionTriggerData()
                             {
                                 simulateSeed = simulateSeed,
                                 triggerIndex = triggerIndex,
@@ -398,7 +406,7 @@ namespace MultiplayerARPG
                     GameInstance.ServerLogHandlers.LogAttackTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NotEnoughResources);
                 return;
             }
-            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
+            RPC(RpcSimulateActionTrigger, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, data);
             ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogAttackTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
@@ -472,7 +480,7 @@ namespace MultiplayerARPG
             if (!IsServer && IsOwnerClient)
             {
                 ProceedAttack(timestamp, isLeftHand);
-                RPC(CmdAttack, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, isLeftHand);
+                RPC(CmdAttack, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, timestamp, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -489,7 +497,7 @@ namespace MultiplayerARPG
         protected void PreceedCmdAttack(long peerTimestamp, bool isLeftHand)
         {
             ProceedAttack(peerTimestamp, isLeftHand);
-            RPC(RpcAttack, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, isLeftHand);
+            RPC(RpcAttack, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, peerTimestamp, isLeftHand);
         }
 
         [AllRpc]

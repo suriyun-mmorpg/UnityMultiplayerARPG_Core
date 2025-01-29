@@ -167,6 +167,10 @@ namespace MultiplayerARPG
         public const string RANDOM_REWARDING_ITEM_MENU = "Create GameData/Item/Random Rewarding Item";
         public const int RANDOM_REWARDING_ITEM_ORDER = -5682;
 
+        public const string CHARACTER_NAME_CHANGE_ITEM_FILE = "Character Name Change Item";
+        public const string CHARACTER_NAME_CHANGE_ITEM_MENU = "Create GameData/Item/Character Name Change Item";
+        public const int CHARACTER_NAME_CHANGE_ITEM_ORDER = -5681;
+
         public const string ITEM_REFINE_FILE = "Item Refine";
         public const string ITEM_REFINE_MENU = "Create GameData/Item Refine";
         public const int ITEM_REFINE_ORDER = -5599;

@@ -254,6 +254,28 @@ namespace MultiplayerARPG
         }
         #endregion
 
+        #region Decrease Then Increase Items
+        public static bool AbleToDecreaseThenIncreaseItem(this IList<CharacterItem> itemList, int decreasingItemDataId, int decreasingItemAmount, int increasingItemDataId, int increasingItemAmount, bool isLimitWeight, float weightLimit, bool isLimitSlot, int slotLimit)
+        {
+            List<CharacterItem> tempItemList = new List<CharacterItem>(itemList);
+            if (!tempItemList.DecreaseItems(decreasingItemDataId, decreasingItemAmount, isLimitSlot))
+            {
+                tempItemList.Clear();
+                tempItemList = null;
+                return false;
+            }
+            if (tempItemList.IncreasingItemsWillOverwhelming(increasingItemDataId, increasingItemAmount, isLimitWeight, weightLimit, tempItemList.GetTotalItemWeight(), isLimitSlot, slotLimit))
+            {
+                tempItemList.Clear();
+                tempItemList = null;
+                return false;
+            }
+            tempItemList.Clear();
+            tempItemList = null;
+            return true;
+        }
+        #endregion
+
         #region Increase Items
         public static bool IncreaseItems(this IList<CharacterItem> itemList, CharacterItem increasingItem)
         {
@@ -592,6 +614,12 @@ namespace MultiplayerARPG
 
         public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
         {
+            if (data.CurrentHp <= 0)
+            {
+                increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+                decreaseItems = new Dictionary<CharacterItem, int>();
+                return false;
+            }
             return data.NonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts, out decreaseItems);
         }
 
@@ -602,6 +630,11 @@ namespace MultiplayerARPG
 
         public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
         {
+            if (data.CurrentHp <= 0)
+            {
+                increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+                return false;
+            }
             return data.NonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts);
         }
 
@@ -899,12 +932,16 @@ namespace MultiplayerARPG
         {
             if (data is BaseMonsterCharacterEntity)
                 return 1f;
+            if (weaponItem == null)
+                return 1f;
             return weaponItem.MoveSpeedRateWhileReloading;
         }
 
         public static MovementRestriction GetMovementRestrictionWhileReloading(this ICharacterData data, IWeaponItem weaponItem)
         {
             if (data is BaseMonsterCharacterEntity)
+                return MovementRestriction.None;
+            if (weaponItem == null)
                 return MovementRestriction.None;
             return weaponItem.MovementRestrictionWhileReloading;
         }
@@ -913,12 +950,16 @@ namespace MultiplayerARPG
         {
             if (data is BaseMonsterCharacterEntity)
                 return 1f;
+            if (weaponItem == null)
+                return 1f;
             return weaponItem.MoveSpeedRateWhileCharging;
         }
 
         public static MovementRestriction GetMovementRestrictionWhileCharging(this ICharacterData data, IWeaponItem weaponItem)
         {
             if (data is BaseMonsterCharacterEntity)
+                return MovementRestriction.None;
+            if (weaponItem == null)
                 return MovementRestriction.None;
             return weaponItem.MovementRestrictionWhileCharging;
         }
@@ -927,12 +968,16 @@ namespace MultiplayerARPG
         {
             if (data is BaseMonsterCharacterEntity monsterCharacterEntity)
                 return monsterCharacterEntity.CharacterDatabase.MoveSpeedRateWhileAttacking;
+            if (weaponItem == null)
+                return 1f;
             return weaponItem.MoveSpeedRateWhileAttacking;
         }
 
         public static MovementRestriction GetMovementRestrictionWhileAttacking(this ICharacterData data, IWeaponItem weaponItem)
         {
             if (data is BaseMonsterCharacterEntity)
+                return MovementRestriction.None;
+            if (weaponItem == null)
                 return MovementRestriction.None;
             return weaponItem.MovementRestrictionWhileAttacking;
         }

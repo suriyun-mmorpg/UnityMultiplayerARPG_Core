@@ -140,6 +140,17 @@ namespace MultiplayerARPG
             return ammo >= GetAmmoCapacity();
         }
 
+        public bool IsRewardingItem()
+        {
+            BaseItem item = GetItem();
+            return item is RandomRewardingItem || item is SpecificRewardingItem;
+        }
+
+        public bool IsCharacterNameChangeItem()
+        {
+            return GetItem() is CharacterNameChangeItem;
+        }
+
         public bool HasAmmoToReload(ICharacterData character, out int reloadingAmmoDataId, out int amountInInventory)
         {
             reloadingAmmoDataId = 0;

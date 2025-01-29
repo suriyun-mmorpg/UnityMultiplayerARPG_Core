@@ -393,6 +393,14 @@ namespace MultiplayerARPG
             return _randomBonus;
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onUpdateRightWeaponAmmoSim += OnUpdateRightWeaponAmmoSim;
+            GameInstance.PlayingCharacterEntity.onUpdateLeftWeaponAmmoSim += OnUpdateLeftWeaponAmmoSim;
+        }
+
         protected override void OnDisable()
         {
             base.OnDisable();
@@ -404,7 +412,11 @@ namespace MultiplayerARPG
                     uiComparingEquipment.Hide();
                 }
             }
+            if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onUpdateRightWeaponAmmoSim -= OnUpdateRightWeaponAmmoSim;
+            GameInstance.PlayingCharacterEntity.onUpdateLeftWeaponAmmoSim -= OnUpdateLeftWeaponAmmoSim;
         }
+
 
         protected override void Update()
         {
@@ -578,12 +590,136 @@ namespace MultiplayerARPG
             UpdateStartVendingUIVisibility(false);
         }
 
+        public void OnUpdateRightWeaponAmmoSim(int ammo)
+        {
+            UpdateAmmo();
+        }
+
+        public void OnUpdateLeftWeaponAmmoSim(int ammo)
+        {
+            UpdateAmmo();
+        }
+
+        protected void UpdateAmmo()
+        {
+            if (WeaponItem != null && (WeaponItem.WeaponType.AmmoType != null || WeaponItem.AmmoItemIds.Count > 0))
+            {
+                CharacterItem equippedRightHand = GameInstance.PlayingCharacter.EquipWeapons.rightHand;
+                bool isEmptyRightHand = equippedRightHand.IsEmptySlot();
+                bool isThisRightHand = string.Equals(equippedRightHand.id, CharacterItem.id);
+                IWeaponItem rightHandWeapon = isEmptyRightHand ? null : equippedRightHand.GetWeaponItem();
+
+                CharacterItem equippedLeftHand = GameInstance.PlayingCharacter.EquipWeapons.leftHand;
+                bool isEmptyLeftHand = equippedLeftHand.IsEmptySlot();
+                bool isThisLeftHand = string.Equals(equippedLeftHand.id, CharacterItem.id);
+                IWeaponItem leftHandWeapon = isEmptyLeftHand ? null : equippedLeftHand.GetWeaponItem();
+
+                int currentAmmo = CharacterItem.ammo;
+                if (!isEmptyRightHand &&
+                    isThisRightHand &&
+                    rightHandWeapon != null)
+                {
+                    currentAmmo = GameInstance.PlayingCharacterEntity.RightWeaponAmmoSim;
+                }
+                if (!isEmptyLeftHand &&
+                    isThisLeftHand &&
+                    leftHandWeapon != null)
+                {
+                    currentAmmo = GameInstance.PlayingCharacterEntity.LeftWeaponAmmoSim;
+                }
+                int reserveAmmo = GameInstance.PlayingCharacter.CountAllAmmos(WeaponItem);
+
+                if (uiTextCurrentAmmo != null)
+                {
+                    uiTextCurrentAmmo.SetGameObjectActive(WeaponItem.AmmoCapacity > 0);
+                    uiTextCurrentAmmo.text = currentAmmo.ToString("N0");
+                }
+
+                if (uiTextReserveAmmo != null)
+                {
+                    uiTextReserveAmmo.SetGameObjectActive(true);
+                    uiTextReserveAmmo.text = reserveAmmo.ToString("N0");
+                }
+
+                if (uiTextSumAmmo != null)
+                {
+                    uiTextSumAmmo.SetGameObjectActive(true);
+                    uiTextSumAmmo.text = (currentAmmo + reserveAmmo).ToString("N0");
+                }
+
+                if (requireAmmoSymbols != null)
+                {
+                    foreach (GameObject symbol in requireAmmoSymbols)
+                    {
+                        symbol.SetActive(true);
+                    }
+                }
+
+                if (noRequireAmmoSymbols != null)
+                {
+                    foreach (GameObject symbol in noRequireAmmoSymbols)
+                    {
+                        symbol.SetActive(false);
+                    }
+                }
+
+                if (gageAmmo != null)
+                {
+                    gageAmmo.SetVisible(WeaponItem.AmmoCapacity > 0);
+                    gageAmmo.Update(currentAmmo, WeaponItem.AmmoCapacity);
+                }
+            }
+            else
+            {
+                if (uiTextCurrentAmmo != null)
+                    uiTextCurrentAmmo.SetGameObjectActive(false);
+
+                if (uiTextReserveAmmo != null)
+                    uiTextReserveAmmo.SetGameObjectActive(false);
+
+                if (uiTextSumAmmo != null)
+                    uiTextSumAmmo.SetGameObjectActive(false);
+
+                if (requireAmmoSymbols != null)
+                {
+                    foreach (GameObject symbol in requireAmmoSymbols)
+                    {
+                        symbol.SetActive(false);
+                    }
+                }
+
+                if (noRequireAmmoSymbols != null)
+                {
+                    foreach (GameObject symbol in noRequireAmmoSymbols)
+                    {
+                        symbol.SetActive(true);
+                    }
+                }
+
+                if (gageAmmo != null)
+                    gageAmmo.SetVisible(false);
+            }
+        }
+
         protected override async void UpdateData()
         {
             if (changeObjectNameByData)
                 name = $"(UICharacterSkill){(Item == null ? string.Empty : Item.Id)}";
 
             bool isEmpty = Item == null;
+
+            CharacterItem equippedRightHand = GameInstance.PlayingCharacter.EquipWeapons.rightHand;
+            bool isEmptyRightHand = equippedRightHand.IsEmptySlot();
+            bool isThisRightHand = string.Equals(equippedRightHand.id, CharacterItem.id);
+            IWeaponItem rightHandWeapon = isEmptyRightHand ? null : equippedRightHand.GetWeaponItem();
+            IShieldItem rightHandShield = isEmptyRightHand ? null : equippedRightHand.GetShieldItem();
+
+            CharacterItem equippedLeftHand = GameInstance.PlayingCharacter.EquipWeapons.leftHand;
+            bool isEmptyLeftHand = equippedLeftHand.IsEmptySlot();
+            bool isThisLeftHand = string.Equals(equippedLeftHand.id, CharacterItem.id);
+            IWeaponItem leftHandWeapon = isEmptyLeftHand ? null : equippedLeftHand.GetWeaponItem();
+            IShieldItem leftHandShield = isEmptyLeftHand ? null : equippedLeftHand.GetShieldItem();
+
             foreach (GameObject obj in emptyObjects)
             {
                 obj.SetActive(isEmpty);
@@ -785,83 +921,7 @@ namespace MultiplayerARPG
                     uiGageDurability.SetVisible(false);
             }
 
-            if (WeaponItem != null && (WeaponItem.WeaponType.AmmoType != null || WeaponItem.AmmoItemIds.Count > 0))
-            {
-                int currentAmmo = CharacterItem.ammo;
-                int reserveAmmo = 0;
-                if (GameInstance.PlayingCharacter != null)
-                    reserveAmmo = GameInstance.PlayingCharacter.CountAllAmmos(WeaponItem);
-
-                if (uiTextCurrentAmmo != null)
-                {
-                    uiTextCurrentAmmo.SetGameObjectActive(WeaponItem.AmmoCapacity > 0);
-                    uiTextCurrentAmmo.text = currentAmmo.ToString("N0");
-                }
-
-                if (uiTextReserveAmmo != null)
-                {
-                    uiTextReserveAmmo.SetGameObjectActive(true);
-                    uiTextReserveAmmo.text = reserveAmmo.ToString("N0");
-                }
-
-                if (uiTextSumAmmo != null)
-                {
-                    uiTextSumAmmo.SetGameObjectActive(true);
-                    uiTextSumAmmo.text = (currentAmmo + reserveAmmo).ToString("N0");
-                }
-
-                if (requireAmmoSymbols != null)
-                {
-                    foreach (GameObject symbol in requireAmmoSymbols)
-                    {
-                        symbol.SetActive(true);
-                    }
-                }
-
-                if (noRequireAmmoSymbols != null)
-                {
-                    foreach (GameObject symbol in noRequireAmmoSymbols)
-                    {
-                        symbol.SetActive(false);
-                    }
-                }
-
-                if (gageAmmo != null)
-                {
-                    gageAmmo.SetVisible(WeaponItem.AmmoCapacity > 0);
-                    gageAmmo.Update(currentAmmo, WeaponItem.AmmoCapacity);
-                }
-            }
-            else
-            {
-                if (uiTextCurrentAmmo != null)
-                    uiTextCurrentAmmo.SetGameObjectActive(false);
-
-                if (uiTextReserveAmmo != null)
-                    uiTextReserveAmmo.SetGameObjectActive(false);
-
-                if (uiTextSumAmmo != null)
-                    uiTextSumAmmo.SetGameObjectActive(false);
-
-                if (requireAmmoSymbols != null)
-                {
-                    foreach (GameObject symbol in requireAmmoSymbols)
-                    {
-                        symbol.SetActive(false);
-                    }
-                }
-
-                if (noRequireAmmoSymbols != null)
-                {
-                    foreach (GameObject symbol in noRequireAmmoSymbols)
-                    {
-                        symbol.SetActive(true);
-                    }
-                }
-
-                if (gageAmmo != null)
-                    gageAmmo.SetVisible(false);
-            }
+            UpdateAmmo();
 
             if (uiTextWeight != null)
             {
@@ -1570,42 +1630,42 @@ namespace MultiplayerARPG
                     int comparingEquipmentIndex = 0;
                     if (WeaponItem != null)
                     {
-                        if (!GameInstance.PlayingCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
-                            !GameInstance.PlayingCharacter.EquipWeapons.rightHand.id.Equals(CharacterItem.id) &&
-                            GameInstance.PlayingCharacter.EquipWeapons.rightHand.GetWeaponItem() != null)
+                        if (!isEmptyRightHand &&
+                            !isThisRightHand &&
+                            rightHandWeapon != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
-                                GameInstance.PlayingCharacter.EquipWeapons.rightHand,
+                                equippedRightHand,
                                 InventoryType.EquipWeaponRight, 0);
                             comparingEquipmentIndex++;
                         }
-                        if (!GameInstance.PlayingCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
-                            !GameInstance.PlayingCharacter.EquipWeapons.leftHand.id.Equals(CharacterItem.id) &&
-                            GameInstance.PlayingCharacter.EquipWeapons.leftHand.GetWeaponItem() != null)
+                        if (!isEmptyLeftHand &&
+                            !isThisLeftHand &&
+                            leftHandWeapon != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
-                                GameInstance.PlayingCharacter.EquipWeapons.leftHand,
+                                equippedLeftHand,
                                 InventoryType.EquipWeaponLeft, 0);
                             comparingEquipmentIndex++;
                         }
                     }
                     if (ShieldItem != null)
                     {
-                        if (!GameInstance.PlayingCharacter.EquipWeapons.rightHand.IsEmptySlot() &&
-                            !GameInstance.PlayingCharacter.EquipWeapons.rightHand.id.Equals(CharacterItem.id) &&
-                            GameInstance.PlayingCharacter.EquipWeapons.rightHand.GetShieldItem() != null)
+                        if (!isEmptyRightHand &&
+                            !isThisRightHand &&
+                            rightHandShield != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
-                                GameInstance.PlayingCharacter.EquipWeapons.rightHand,
+                                equippedRightHand,
                                 InventoryType.EquipWeaponRight, 0);
                             comparingEquipmentIndex++;
                         }
-                        if (!GameInstance.PlayingCharacter.EquipWeapons.leftHand.IsEmptySlot() &&
-                            !GameInstance.PlayingCharacter.EquipWeapons.leftHand.id.Equals(CharacterItem.id) &&
-                            GameInstance.PlayingCharacter.EquipWeapons.leftHand.GetShieldItem() != null)
+                        if (!isEmptyLeftHand &&
+                            !isThisLeftHand &&
+                            leftHandShield != null)
                         {
                             SetupAndShowUIComparingEquipment(comparingEquipmentIndex,
-                                GameInstance.PlayingCharacter.EquipWeapons.leftHand,
+                                equippedLeftHand,
                                 InventoryType.EquipWeaponLeft, 0);
                             comparingEquipmentIndex++;
                         }
@@ -1617,7 +1677,7 @@ namespace MultiplayerARPG
                         {
                             equipItem = GameInstance.PlayingCharacter.EquipItems[equipItemIndex];
                             if (!equipItem.IsEmptySlot() &&
-                                !equipItem.id.Equals(CharacterItem.id) &&
+                                !string.Equals(equipItem.id, CharacterItem.id) &&
                                 equipItem.GetArmorItem() != null &&
                                 equipItem.GetArmorItem().ArmorType == ArmorItem.ArmorType)
                             {

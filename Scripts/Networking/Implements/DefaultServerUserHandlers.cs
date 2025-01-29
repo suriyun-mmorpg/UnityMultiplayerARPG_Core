@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -151,6 +152,11 @@ namespace MultiplayerARPG
             if (!TryGetPlayerCharacterByUserId(userId, out IPlayerCharacterData playerCharacter))
                 return;
             playerCharacter.UserCash = playerCharacter.UserCash.Increase(cash);
+        }
+
+        public virtual UniTask<UITextKeys> DetectCharacterNameExistance(string characterName)
+        {
+            return new UniTask<UITextKeys>(UITextKeys.NONE);
         }
     }
 }

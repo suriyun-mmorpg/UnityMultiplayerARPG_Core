@@ -13,7 +13,8 @@ namespace MultiplayerARPG
                 return false;
 
             float time = Time.unscaledTime;
-            if (time - LastUseItemTime < CurrentGameInstance.useItemDelay)
+
+            if (!nonEquipItems.Get(itemIndex).IsRewardingItem() && time - LastUseItemTime < CurrentGameInstance.useItemDelay)
                 return false;
 
             if (!this.ValidateUsableItemToUse(itemIndex, out _, out UITextKeys gameMessage))
@@ -30,7 +31,20 @@ namespace MultiplayerARPG
         {
             if (!ValidateRequestUseItem(index))
                 return false;
-            RPC(CmdUseItem, index);
+            if (nonEquipItems.Get(index).IsCharacterNameChangeItem())
+            {
+                UISceneGlobal.Singleton.ShowInputDialog(
+                    LanguageManager.GetText(UITextKeys.UI_CHARACTER_NAME_CHANGE.ToString()),
+                    LanguageManager.GetText(UITextKeys.UI_CHARACTER_NAME_CHANGE_DESCRIPTION.ToString()),
+                    (newCharacterName) =>
+                    {
+                        RPC(CmdUseCharacterNameChangeItem, index, newCharacterName);
+                    }, CharacterName);
+            }
+            else
+            {
+                RPC(CmdUseItem, index);
+            }
             return true;
         }
 

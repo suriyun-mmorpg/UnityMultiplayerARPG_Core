@@ -9,8 +9,7 @@ namespace MultiplayerARPG
     {
         public UniTaskVoid HandleRequestOpenStorage(RequestHandlerData requestHandler, RequestOpenStorageMessage request, RequestProceedResultDelegate<ResponseOpenStorageMessage> result)
         {
-            if (request.storageType == StorageType.None ||
-                request.storageType == StorageType.Building)
+            if (request.storageType == StorageType.None)
             {
                 result.InvokeError(new ResponseOpenStorageMessage()
                 {
@@ -90,9 +89,11 @@ namespace MultiplayerARPG
 
             // Prepare storage data
             Storage storage = GameInstance.ServerStorageHandlers.GetStorage(storageId, out _);
+            bool isLimitWeight = storage.weightLimit > 0;
             bool isLimitSlot = storage.slotLimit > 0;
+            int weightLimit = storage.weightLimit;
             int slotLimit = storage.slotLimit;
-            if (!playerCharacter.MoveItemFromStorage(storageId, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
+            if (!playerCharacter.MoveItemFromStorage(storageId, isLimitWeight, weightLimit, isLimitSlot, slotLimit, storageItems, request.storageItemIndex, request.storageItemAmount, request.inventoryType, request.inventoryItemIndex, request.equipSlotIndexOrWeaponSet, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseMoveItemFromStorageMessage()
                 {
