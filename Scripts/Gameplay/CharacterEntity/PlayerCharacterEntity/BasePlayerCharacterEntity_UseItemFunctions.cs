@@ -32,5 +32,38 @@ namespace MultiplayerARPG
             SkillAndBuffComponent.OnUseItem();
 #endif
         }
+
+        [ServerRpc]
+        protected async void CmdUseCharacterNameChangeItem(int itemIndex, string newCharacterName)
+        {
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!CanUseItem())
+                return;
+
+            if (!this.ValidateUsableItemToUse(itemIndex, out IUsableItem usableItem, out UITextKeys gameMessage))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, gameMessage);
+                return;
+            }
+
+            // Validate item
+            if (usableItem is not CharacterNameChangeItem)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_DATA);
+                return;
+            }
+
+            // Validate new character name
+            UITextKeys detectNameExistance = await GameInstance.ServerUserHandlers.DetectCharacterNameExistance(newCharacterName);
+            if (detectNameExistance != UITextKeys.NONE)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, detectNameExistance);
+                return;
+            }
+
+            // Use item
+            usableItem.UseItem(this, itemIndex, nonEquipItems[itemIndex]);
+#endif
+        }
     }
 }
