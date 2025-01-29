@@ -616,13 +616,13 @@ namespace MultiplayerARPG
 
                 int currentAmmo = CharacterItem.ammo;
                 if (!isEmptyRightHand &&
-                    !isThisRightHand &&
+                    isThisRightHand &&
                     rightHandWeapon != null)
                 {
                     currentAmmo = GameInstance.PlayingCharacterEntity.RightWeaponAmmoSim;
                 }
                 if (!isEmptyLeftHand &&
-                    !isThisLeftHand &&
+                    isThisLeftHand &&
                     leftHandWeapon != null)
                 {
                     currentAmmo = GameInstance.PlayingCharacterEntity.LeftWeaponAmmoSim;
