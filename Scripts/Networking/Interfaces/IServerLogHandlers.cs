@@ -68,7 +68,7 @@ namespace MultiplayerARPG
         void LogQuestAbandon(IPlayerCharacterData character, Quest quest);
         void LogQuestComplete(IPlayerCharacterData character, Quest quest, byte selectedRewardIndex);
 
-        void LogMoveItemFromStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, int storageItemAmount, InventoryType inventoryType, int inventoryItemIndex, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage);
+        void LogMoveItemFromStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitWeight, float storageWeightLimit, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, int storageItemAmount, InventoryType inventoryType, int inventoryItemIndex, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage);
         void LogMoveItemToStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitWeight, float storageWeightLimit, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, InventoryType inventoryType, int inventoryItemIndex, int inventoryItemAmount, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage);
         void LogSwapOrMergeStorageItem(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int fromIndex, int toIndex, bool success, UITextKeys gameMessage);
     }

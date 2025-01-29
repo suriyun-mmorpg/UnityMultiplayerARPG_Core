@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -154,5 +155,12 @@ namespace MultiplayerARPG
         /// <param name="userId"></param>
         /// <param name="cash"></param>
         void ChangeUserCash(string userId, int cash);
+
+        /// <summary>
+        /// Check if the character name is existed or not
+        /// </summary>
+        /// <param name="characterName"></param>
+        /// <returns></returns>
+        UniTask<UITextKeys> DetectCharacterNameExistance(string characterName);
     }
 }

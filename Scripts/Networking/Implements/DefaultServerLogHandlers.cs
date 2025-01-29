@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         public void LogQuestAbandon(IPlayerCharacterData character, Quest quest) { }
         public void LogQuestComplete(IPlayerCharacterData character, Quest quest, byte selectedRewardIndex) { }
 
-        public void LogMoveItemFromStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, int storageItemAmount, InventoryType inventoryType, int inventoryItemIndex, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage) { }
+        public void LogMoveItemFromStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitWeight, float storageWeightLimit, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, int storageItemAmount, InventoryType inventoryType, int inventoryItemIndex, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage) { }
         public void LogMoveItemToStorage(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitWeight, float storageWeightLimit, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int storageItemIndex, InventoryType inventoryType, int inventoryItemIndex, int inventoryItemAmount, byte equipSlotIndexOrWeaponSet, bool success, UITextKeys gameMessage) { }
         public void LogSwapOrMergeStorageItem(IPlayerCharacterData character, StorageId storageId, bool storageIsLimitSlot, int storageSlotLimit, IList<CharacterItem> storageItems, int fromIndex, int toIndex, bool success, UITextKeys gameMessage) { }
     }

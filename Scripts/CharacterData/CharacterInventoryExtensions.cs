@@ -7,6 +7,8 @@ namespace MultiplayerARPG
         public static bool MoveItemFromStorage(
             this IPlayerCharacterData playerCharacter,
             StorageId storageId,
+            bool storageIsLimitWeight,
+            float storageWeightLimit,
             bool storageIsLimitSlot,
             int storageSlotLimit,
             IList<CharacterItem> storageItems,
@@ -23,9 +25,9 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponLeft:
                 case InventoryType.EquipWeaponRight:
                 case InventoryType.EquipItems:
-                    if (!playerCharacter.SwapStorageItemWithEquipmentItem(storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, equipSlotIndexOrWeaponSet, out gameMessage))
+                    if (!playerCharacter.SwapStorageItemWithEquipmentItem(storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, equipSlotIndexOrWeaponSet, out gameMessage))
                     {
-                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
+                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     break;
@@ -33,13 +35,13 @@ namespace MultiplayerARPG
                     if (storageItems[storageItemIndex].IsEmptySlot())
                     {
                         gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
-                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
+                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     if (storageItems[storageItemIndex].amount < storageItemAmount)
                     {
                         gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
-                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
+                        GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                         return false;
                     }
                     CharacterItem movingItem = storageItems[storageItemIndex];
@@ -53,7 +55,7 @@ namespace MultiplayerARPG
                         if (isOverwhelming || !playerCharacter.IncreaseItems(movingItem))
                         {
                             gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
-                            GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
+                            GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                             return false;
                         }
                         // Remove from storage
@@ -80,7 +82,7 @@ namespace MultiplayerARPG
                                 if (nonEquipItem.GetItem().RestrictDealing)
                                 {
                                     gameMessage = UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED;
-                                    GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
+                                    GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, false, gameMessage);
                                     return false;
                                 }
                             }
@@ -96,7 +98,7 @@ namespace MultiplayerARPG
             storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
             playerCharacter.FillEmptySlots();
             gameMessage = UITextKeys.NONE;
-            GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, true, gameMessage);
+            GameInstance.ServerLogHandlers.LogMoveItemFromStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, storageItemAmount, inventoryType, inventoryItemIndex, equipSlotIndexOrWeaponSet, true, gameMessage);
             return true;
         }
 
@@ -230,7 +232,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Swapping
-                        if (!playerCharacter.SwapStorageItemWithEquipmentItem(storageId, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, equipSlotIndexOrWeaponSet, out gameMessage))
+                        if (!playerCharacter.SwapStorageItemWithEquipmentItem(storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, equipSlotIndexOrWeaponSet, out gameMessage))
                         {
                             GameInstance.ServerLogHandlers.LogMoveItemToStorage(playerCharacter, storageId, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit, storageItems, storageItemIndex, inventoryType, inventoryItemIndex, inventoryItemAmount, equipSlotIndexOrWeaponSet, false, gameMessage);
                             return false;
@@ -285,6 +287,8 @@ namespace MultiplayerARPG
         public static bool SwapStorageItemWithEquipmentItem(
             this IPlayerCharacterData playerCharacter,
             StorageId storageId,
+            bool storageIsLimitWeight,
+            float storageWeightLimit,
             bool storageIsLimitSlot,
             int storageSlotLimit,
             IList<CharacterItem> storageItems,
@@ -298,24 +302,27 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                 return false;
             }
-            CharacterItem movingItem = storageItems[storageItemIndex].Clone(true);
-            if (movingItem.IsEmptySlot())
+            CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
+            if (storageItem.IsEmptySlot())
             {
                 gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
                 return false;
             }
+            int storageItemAmount = storageItem.amount;
+            // Can equip only one item, not stackable
+            storageItem.amount = 1;
             // Prepare variables that being used in switch scope
             if (equipSlotIndexOrWeaponSet < 0 || equipSlotIndexOrWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
                 equipSlotIndexOrWeaponSet = playerCharacter.EquipWeaponSet;
             playerCharacter.FillWeaponSetsIfNeeded(equipSlotIndexOrWeaponSet);
-            EquipWeapons equipWeapons;
+            EquipWeapons equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
             bool shouldUnequipRightHand;
             bool shouldUnequipLeftHand;
             int unequippingIndex;
             switch (inventoryType)
             {
                 case InventoryType.EquipWeaponLeft:
-                    if (!playerCharacter.CanEquipWeapon(movingItem, equipSlotIndexOrWeaponSet, true, out gameMessage, out shouldUnequipRightHand, out shouldUnequipLeftHand))
+                    if (!playerCharacter.CanEquipWeapon(storageItem, equipSlotIndexOrWeaponSet, true, out gameMessage, out shouldUnequipRightHand, out shouldUnequipLeftHand))
                         return false;
                     // Validate unequipping right-hand item only, for the left one it will be swapped with storage item
                     if (shouldUnequipRightHand)
@@ -323,95 +330,19 @@ namespace MultiplayerARPG
                         if (!playerCharacter.UnEquipWeapon(equipSlotIndexOrWeaponSet, false, false, out gameMessage, out _))
                             return false;
                     }
-                    equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
                     // Just equip or swapping
                     if (equipWeapons.IsEmptyLeftHandSlot())
                     {
                         // Just equip
-                        equipWeapons.leftHand = movingItem;
-                        playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
-                        // Remove from storage
-                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot, true);
-                    }
-                    else
-                    {
-                        // Swapping
-                        CharacterItem equipmentItem = equipWeapons.leftHand;
-
-                        // Prevent item dealing by using storage
-                        if (storageId.storageType != StorageType.Player)
-                        {
-                            if (equipmentItem.GetItem().RestrictDealing)
-                            {
-                                gameMessage = UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED;
-                                return false;
-                            }
-                        }
-
-                        CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
-                        equipmentItem = equipmentItem.Clone(true);
-                        storageItems[storageItemIndex] = equipmentItem;
                         equipWeapons.leftHand = storageItem;
                         playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
-                    }
-                    return true;
-                case InventoryType.EquipWeaponRight:
-                    if (!playerCharacter.CanEquipWeapon(movingItem, equipSlotIndexOrWeaponSet, false, out gameMessage, out shouldUnequipRightHand, out shouldUnequipLeftHand))
-                        return false;
-                    // Validate unequipping left-hand item only, for the right one it will be swapped with storage item
-                    if (shouldUnequipLeftHand)
-                    {
-                        if (!playerCharacter.UnEquipWeapon(equipSlotIndexOrWeaponSet, true, false, out gameMessage, out _))
-                            return false;
-                    }
-                    equipWeapons = playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet];
-                    // Just equip or swapping
-                    if (equipWeapons.IsEmptyRightHandSlot())
-                    {
-                        // Just equip
-                        equipWeapons.rightHand = movingItem;
-                        playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
                         // Remove from storage
-                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot, true);
+                        storageItems.DecreaseItemsByIndex(storageItemIndex, storageItem.amount, storageIsLimitSlot, true);
                     }
                     else
                     {
                         // Swapping
-                        CharacterItem equipmentItem = equipWeapons.rightHand;
-
-                        // Prevent item dealing by using storage
-                        if (storageId.storageType != StorageType.Player)
-                        {
-                            if (equipmentItem.GetItem().RestrictDealing)
-                            {
-                                gameMessage = UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED;
-                                return false;
-                            }
-                        }
-
-                        CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
-                        equipmentItem = equipmentItem.Clone(true);
-                        storageItems[storageItemIndex] = equipmentItem;
-                        equipWeapons.rightHand = storageItem;
-                        playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
-                    }
-                    return true;
-                case InventoryType.EquipItems:
-                    if (!playerCharacter.CanEquipItem(movingItem, equipSlotIndexOrWeaponSet, out gameMessage, out unequippingIndex))
-                        return false;
-                    // Just equip or swapping
-                    if (unequippingIndex < 0)
-                    {
-                        // Just equip
-                        movingItem.equipSlotIndex = equipSlotIndexOrWeaponSet;
-                        playerCharacter.EquipItems.Add(movingItem);
-                        // Remove from storage
-                        storageItems.DecreaseItemsByIndex(storageItemIndex, movingItem.amount, storageIsLimitSlot, true);
-                    }
-                    else
-                    {
-                        // Swapping
-                        CharacterItem equipItem = playerCharacter.EquipItems[unequippingIndex];
+                        CharacterItem equipItem = equipWeapons.leftHand;
 
                         // Prevent item dealing by using storage
                         if (storageId.storageType != StorageType.Player)
@@ -423,11 +354,120 @@ namespace MultiplayerARPG
                             }
                         }
 
-                        CharacterItem storageItem = storageItems[storageItemIndex].Clone(true);
+                        if (storageItemAmount > 1)
+                        {
+                            if (!storageItems.AbleToDecreaseThenIncreaseItem(storageItem.dataId, storageItem.amount, equipItem.dataId, equipItem.amount, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit))
+                                return false;
+                            equipItem.equipSlotIndex = 0;
+                            storageItems.DecreaseItemsByIndex(storageItemIndex, storageItem.amount, storageIsLimitSlot, true);
+                            storageItems.IncreaseItems(equipItem);
+                            storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
+                        }
+                        else
+                        {
+                            // Just swap items
+                            equipItem.equipSlotIndex = 0;
+                            storageItems[storageItemIndex] = equipItem;
+                        }
+                        equipWeapons.leftHand = storageItem;
+                        playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
+                    }
+                    return true;
+                case InventoryType.EquipWeaponRight:
+                    if (!playerCharacter.CanEquipWeapon(storageItem, equipSlotIndexOrWeaponSet, false, out gameMessage, out shouldUnequipRightHand, out shouldUnequipLeftHand))
+                        return false;
+                    // Validate unequipping left-hand item only, for the right one it will be swapped with storage item
+                    if (shouldUnequipLeftHand)
+                    {
+                        if (!playerCharacter.UnEquipWeapon(equipSlotIndexOrWeaponSet, true, false, out gameMessage, out _))
+                            return false;
+                    }
+                    // Just equip or swapping
+                    if (equipWeapons.IsEmptyRightHandSlot())
+                    {
+                        // Just equip
+                        equipWeapons.rightHand = storageItem;
+                        playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
+                        // Remove from storage
+                        storageItems.DecreaseItemsByIndex(storageItemIndex, storageItem.amount, storageIsLimitSlot, true);
+                    }
+                    else
+                    {
+                        // Swapping
+                        CharacterItem equipItem = equipWeapons.rightHand;
+
+                        // Prevent item dealing by using storage
+                        if (storageId.storageType != StorageType.Player)
+                        {
+                            if (equipItem.GetItem().RestrictDealing)
+                            {
+                                gameMessage = UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED;
+                                return false;
+                            }
+                        }
+
+                        if (storageItemAmount > 1)
+                        {
+                            if (!storageItems.AbleToDecreaseThenIncreaseItem(storageItem.dataId, storageItem.amount, equipItem.dataId, equipItem.amount, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit))
+                                return false;
+                            equipItem.equipSlotIndex = 0;
+                            storageItems.DecreaseItemsByIndex(storageItemIndex, storageItem.amount, storageIsLimitSlot, true);
+                            storageItems.IncreaseItems(equipItem);
+                            storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
+                        }
+                        else
+                        {
+                            // Just swap items
+                            equipItem.equipSlotIndex = 0;
+                            storageItems[storageItemIndex] = equipItem;
+                        }
+                        equipWeapons.rightHand = storageItem;
+                        playerCharacter.SelectableWeaponSets[equipSlotIndexOrWeaponSet] = equipWeapons;
+                    }
+                    return true;
+                case InventoryType.EquipItems:
+                    if (!playerCharacter.CanEquipItem(storageItem, equipSlotIndexOrWeaponSet, out gameMessage, out unequippingIndex))
+                        return false;
+                    // Just equip or swapping
+                    if (unequippingIndex < 0)
+                    {
+                        // Just equip
                         storageItem.equipSlotIndex = equipSlotIndexOrWeaponSet;
-                        equipItem = equipItem.Clone(true);
-                        equipItem.equipSlotIndex = 0;
-                        storageItems[storageItemIndex] = equipItem;
+                        playerCharacter.EquipItems.Add(storageItem);
+                        // Remove from storage
+                        storageItems.DecreaseItemsByIndex(storageItemIndex, storageItem.amount, storageIsLimitSlot, true);
+                    }
+                    else
+                    {
+                        // Swapping
+                        CharacterItem equipItem = playerCharacter.EquipItems[unequippingIndex].Clone(true);
+
+                        // Prevent item dealing by using storage
+                        if (storageId.storageType != StorageType.Player)
+                        {
+                            if (equipItem.GetItem().RestrictDealing)
+                            {
+                                gameMessage = UITextKeys.UI_ERROR_ITEM_DEALING_RESTRICTED;
+                                return false;
+                            }
+                        }
+
+                        if (storageItemAmount > 1)
+                        {
+                            if (!storageItems.AbleToDecreaseThenIncreaseItem(storageItem.dataId, storageItem.amount, equipItem.dataId, equipItem.amount, storageIsLimitWeight, storageWeightLimit, storageIsLimitSlot, storageSlotLimit))
+                                return false;
+                            equipItem.equipSlotIndex = 0;
+                            storageItems.DecreaseItemsByIndex(storageItemIndex, storageItem.amount, storageIsLimitSlot, true);
+                            storageItems.IncreaseItems(equipItem);
+                            storageItems.FillEmptySlots(storageIsLimitSlot, storageSlotLimit);
+                        }
+                        else
+                        {
+                            // Just swap items
+                            equipItem.equipSlotIndex = 0;
+                            storageItems[storageItemIndex] = equipItem;
+                        }
+                        storageItem.equipSlotIndex = equipSlotIndexOrWeaponSet;
                         playerCharacter.EquipItems[unequippingIndex] = storageItem;
                     }
                     return true;
