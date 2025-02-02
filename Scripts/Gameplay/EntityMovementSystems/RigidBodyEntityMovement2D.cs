@@ -67,11 +67,9 @@ namespace MultiplayerARPG
         protected long _acceptedPositionTimestamp;
 
         // Server validate codes
-        protected float _lastServerValidateDistDiff;
-        protected bool _isServerWaitingTeleportConfirm;
-
-        // Client confirm codes
-        protected bool _isClientConfirmingTeleport;
+        private Vector3? _acceptedPosition = null;
+        private float _accumulateDeltaTime = 0f;
+        private float _accumulateDiffMoveDist = 0f;
 
         public override void EntityAwake()
         {
@@ -87,11 +85,6 @@ namespace MultiplayerARPG
             // Setup
             CacheRigidbody2D.gravityScale = 0;
             StopMoveFunction();
-        }
-
-        public override void EntityStart()
-        {
-            _isClientConfirmingTeleport = true;
         }
 
         public override void ComponentOnEnable()
@@ -440,14 +433,8 @@ namespace MultiplayerARPG
                 {
                     MovementState &= ~MovementState.IsDash;
                 }
-                if (_isClientConfirmingTeleport)
-                {
-                    shouldSendReliably = true;
-                    MovementState |= MovementState.IsTeleport;
-                }
                 this.ClientWriteSyncTransform2D(writer);
                 _sendingDash = false;
-                _isClientConfirmingTeleport = false;
                 return true;
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
@@ -462,11 +449,6 @@ namespace MultiplayerARPG
                 {
                     _currentInput = Entity.ClearInputDash(_currentInput);
                 }
-                if (_isClientConfirmingTeleport)
-                {
-                    shouldSendReliably = true;
-                    _currentInput.MovementState |= MovementState.IsTeleport;
-                }
                 if (Entity.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
                 {
                     if (!_currentInput.IsKeyMovement)
@@ -476,7 +458,6 @@ namespace MultiplayerARPG
                     }
                     this.ClientWriteMovementInput2D(writer, inputState, _currentInput);
                     _sendingDash = false;
-                    _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
                     return true;
@@ -591,47 +572,37 @@ namespace MultiplayerARPG
                 return;
             }
             reader.ReadMovementInputMessage2D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
-            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
-            {
-                // Teleport confirming from client
-                _isServerWaitingTeleportConfirm = false;
-            }
-            if (_isServerWaitingTeleportConfirm)
-            {
-                // Waiting for teleport confirming
-                return;
-            }
-            if (peerTimestamp > BaseGameNetworkManager.Singleton.ServerTimestamp)
-            {
-                // Peer's Timestamp is more than servers', might be hacking
-                return;
-            }
             if (!Entity.CanMove())
             {
                 // It can't move, so don't move
                 return;
             }
-            if (_acceptedPositionTimestamp <= peerTimestamp)
+            if (_acceptedPositionTimestamp > peerTimestamp)
             {
-                NavPaths = null;
-                _tempMovementState = entityMovementInput.MovementState;
-                _tempExtraMovementState = entityMovementInput.ExtraMovementState;
-                if (inputState.Has(EntityMovementInputState.PositionChanged))
-                {
-                    _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
-                    SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
-                }
-                Direction2D = entityMovementInput.Direction2D;
-                if (entityMovementInput.MovementState.Has(MovementState.IsDash))
-                {
-                    _acceptedDash = true;
-                }
-                if (inputState.Has(EntityMovementInputState.IsStopped))
-                {
-                    StopMoveFunction();
-                }
-                _acceptedPositionTimestamp = peerTimestamp;
+                // Invalid timestamp
+                return;
             }
+            // Prepare time
+            long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            NavPaths = null;
+            _tempMovementState = entityMovementInput.MovementState;
+            _tempExtraMovementState = entityMovementInput.ExtraMovementState;
+            if (inputState.Has(EntityMovementInputState.PositionChanged))
+            {
+                _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
+                SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
+            }
+            Direction2D = entityMovementInput.Direction2D;
+            if (entityMovementInput.MovementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+            }
+            if (inputState.Has(EntityMovementInputState.IsStopped))
+            {
+                StopMoveFunction();
+            }
+            _acceptedPositionTimestamp = peerTimestamp;
         }
 
         public void ReadSyncTransformAtServer(long peerTimestamp, NetDataReader reader)
@@ -647,73 +618,83 @@ namespace MultiplayerARPG
                 return;
             }
             reader.ServerReadSyncTransformMessage2D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector2 position, out DirectionVector2 direction2D);
-            if (movementState.Has(MovementState.IsTeleport))
+            if (_acceptedPositionTimestamp > peerTimestamp)
             {
-                // Teleport confirming from client
-                _isServerWaitingTeleportConfirm = false;
-            }
-            if (_isServerWaitingTeleportConfirm)
-            {
-                // Waiting for teleport confirming
+                // Invalid timestamp
                 return;
             }
-            if (peerTimestamp > BaseGameNetworkManager.Singleton.ServerTimestamp)
+            // Prepare time
+            long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            // Prepare movement state
+            Direction2D = direction2D;
+            MovementState = movementState;
+            ExtraMovementState = extraMovementState;
+            // Prepare data for validation
+            Vector3 oldPos = _acceptedPosition.HasValue ? _acceptedPosition.Value : CacheTransform.position;
+            Vector3 newPos = position;
+            // Calculate moveable distance
+            float moveSpd = Entity.GetMoveSpeed(movementState, extraMovementState);
+            float moveableDist = moveSpd * unityDeltaTime;
+            if (moveableDist < 0.001f)
+                moveableDist = 0.001f;
+            // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
+            float clientMoveDist = Vector3.Distance(oldPos.GetXY(), newPos.GetXY());
+            // Increase accumulate data to detect hacking
+            float moveDistDiff = clientMoveDist > moveableDist ? (clientMoveDist - moveableDist) : 0f;
+            _accumulateDeltaTime += unityDeltaTime;
+            _accumulateDiffMoveDist += moveDistDiff;
+            float moveDiffTime = moveDistDiff / moveSpd;
+            if (!IsClient)
             {
-                // Peer's Timestamp is more than servers', might be hacking
-                return;
-            }
-            if (_acceptedPositionTimestamp <= peerTimestamp)
-            {
-                // Prepare time
-                long lagDeltaTime = BaseGameNetworkManager.Singleton.ServerTimestamp - peerTimestamp;
-                long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
-                // Prepare movement state
-                Direction2D = direction2D;
-                MovementState = movementState;
-                ExtraMovementState = extraMovementState;
-                if (!IsClient)
+                // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
+                if (moveDiffTime < 0.05f)
                 {
-                    Vector3 oldPos = CacheTransform.position;
-                    Vector3 newPos = position;
-                    // Calculate moveable distance
-                    float moveSpd = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
-                    float moveableDist = (float)moveSpd * unityDeltaTime;
-                    if (moveableDist < 0.001f)
-                        moveableDist = 0.001f;
-                    // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
-                    float clientMoveDist = Vector3.Distance(oldPos.GetXY(), newPos.GetXY());
-                    if (clientMoveDist <= 0.001f || clientMoveDist <= moveableDist + _lastServerValidateDistDiff)
+                    // Allow to move to the position
+                    _acceptedPosition = newPos;
+                    CacheTransform.position = newPos;
+                    CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
+                }
+                else
+                {
+                    // Client moves too fast, adjust it
+                    _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
+                    // And also adjust client's position
+                    Teleport(newPos, Quaternion.identity, true);
+                }
+            }
+            else
+            {
+                // It's both server and client, simulate movement
+                if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
+                {
+                    if (moveDiffTime < 0.05f)
                     {
                         // Allow to move to the position
-                        CacheTransform.position = newPos;
-                        CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
-                        _lastServerValidateDistDiff = moveableDist - clientMoveDist;
+                        _acceptedPosition = newPos;
                     }
                     else
                     {
                         // Client moves too fast, adjust it
-                        Vector3 dir = (newPos.GetXY() - oldPos.GetXY()).normalized;
-                        Vector3 deltaMove = dir * Mathf.Min(clientMoveDist, moveableDist);
-                        newPos = oldPos + deltaMove;
+                        _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.identity, true);
-                        // Reset distance difference
-                        _lastServerValidateDistDiff = 0f;
                     }
+                    SetMovePaths(position, false);
                 }
-                else
-                {
-                    // It's both server and client, translate position (it's a host so don't do speed hack validation)
-                    if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
-                        SetMovePaths(position, false);
-                }
-                if (movementState.Has(MovementState.IsDash))
-                {
-                    _acceptedDash = true;
-                }
-                _acceptedPositionTimestamp = peerTimestamp;
             }
+            if (movementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+            }
+            _acceptedPositionTimestamp = peerTimestamp;
+        }
+
+        protected virtual Vector3 GetMoveablePosition(Vector3 oldPos, Vector3 newPos, float clientMoveDist, float moveableDist)
+        {
+            Vector3 dir = (newPos.GetXY() - oldPos.GetXY()).normalized;
+            Vector3 deltaMove = dir * Mathf.Min(clientMoveDist, moveableDist);
+            return oldPos + deltaMove;
         }
 
         protected virtual void OnTeleport(Vector2 position, bool stillMoveAfterTeleport)
@@ -722,10 +703,6 @@ namespace MultiplayerARPG
                 NavPaths = null;
             CacheTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
-            if (IsServer && !IsOwnedByServer)
-                _isServerWaitingTeleportConfirm = true;
-            if (!IsServer && IsOwnerClient)
-                _isClientConfirmingTeleport = true;
         }
 
         public bool CanPredictMovement()

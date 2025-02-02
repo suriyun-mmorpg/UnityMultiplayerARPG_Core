@@ -147,13 +147,11 @@ namespace MultiplayerARPG
         private long _acceptedPositionTimestamp;
 
         // Server validate codes
-        private float _lastServerValidateHorDistDiff;
-        private float _lastServerValidateVerDistDiff;
+        private Vector3? _acceptedPosition = null;
+        private float _accumulateDeltaTime = 0f;
+        private float _accumulateDiffHorMoveDist = 0f;
+        private float _accumulateDiffVerMoveDist = 0f;
         private float _lastServerHorSpdBeforeAirborne;
-        private bool _isServerWaitingTeleportConfirm;
-
-        // Client confirm codes
-        private bool _isClientConfirmingTeleport;
 
         public BuiltInEntityMovementFunctions3D(BaseGameEntity entity, Animator animator, IBuiltInEntityMovement3D entityMovement)
         {
@@ -167,7 +165,6 @@ namespace MultiplayerARPG
 
         public void EntityStart()
         {
-            _isClientConfirmingTeleport = true;
             _yAngle = CacheTransform.eulerAngles.y;
             _verticalVelocity = 0;
             _lastTeleportFrame = Time.frameCount;
@@ -795,7 +792,7 @@ namespace MultiplayerARPG
             }
             Vector3 stickGroundMotion = (_isGrounded && !_isUnderWater && platformMotion.y <= 0f) ? (Vector3.down * stickGroundForce) : Vector3.zero;
             _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion + forceMotion) * deltaTime;
-            if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent && 
+            if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent &&
                 LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder &&
                 LadderComponent.EnterExitState == EnterExitState.None &&
                 LadderComponent.EnterExitState != EnterExitState.ConfirmAwaiting &&
@@ -982,15 +979,9 @@ namespace MultiplayerARPG
                 {
                     MovementState &= ~MovementState.IsDash;
                 }
-                if (_isClientConfirmingTeleport)
-                {
-                    shouldSendReliably = true;
-                    MovementState |= MovementState.IsTeleport;
-                }
                 Entity.ClientWriteSyncTransform3D(writer);
                 _sendingJump = false;
                 _sendingDash = false;
-                _isClientConfirmingTeleport = false;
                 return true;
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
@@ -1014,11 +1005,6 @@ namespace MultiplayerARPG
                 {
                     _currentInput = Entity.ClearInputDash(_currentInput);
                 }
-                if (_isClientConfirmingTeleport)
-                {
-                    shouldSendReliably = true;
-                    _currentInput.MovementState |= MovementState.IsTeleport;
-                }
                 if (Entity.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
                 {
                     if (!_currentInput.IsKeyMovement)
@@ -1034,7 +1020,6 @@ namespace MultiplayerARPG
                     Entity.ClientWriteMovementInput3D(writer, inputState, _currentInput);
                     _sendingJump = false;
                     _sendingDash = false;
-                    _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
                     return true;
@@ -1116,9 +1101,8 @@ namespace MultiplayerARPG
             else if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 // Prepare time
-                long lagDeltaTime = BaseGameNetworkManager.Singleton.ServerTimestamp - peerTimestamp;
-                long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
+                long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+                float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
@@ -1168,62 +1152,48 @@ namespace MultiplayerARPG
                 return;
             }
             reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
-            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
-            {
-                // Teleport confirming from client
-                _isServerWaitingTeleportConfirm = false;
-            }
-            if (_isServerWaitingTeleportConfirm)
-            {
-                // Waiting for teleport confirming
-                return;
-            }
-            if (peerTimestamp > BaseGameNetworkManager.Singleton.ServerTimestamp)
-            {
-                // Peer's Timestamp is more than servers', might be hacking
-                return;
-            }
             if (!Entity.CanMove())
             {
                 // It can't move, so don't move
                 return;
             }
-            if (_acceptedPositionTimestamp <= peerTimestamp)
+            if (_acceptedPositionTimestamp > peerTimestamp)
             {
-                // Prepare time
-                long lagDeltaTime = BaseGameNetworkManager.Singleton.ServerTimestamp - peerTimestamp;
-                long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
-                _tempMovementState = entityMovementInput.MovementState;
-                _tempExtraMovementState = entityMovementInput.ExtraMovementState;
-                _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
-                if (inputState.Has(EntityMovementInputState.PositionChanged))
-                {
-                    if (!UseRootMotion() || entityMovementInput.MovementState.HasDirectionMovement())
-                        SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
-                }
-                if (inputState.Has(EntityMovementInputState.RotationChanged))
-                {
-                    RemoteTurnSimulation(_simulatingKeyMovement, entityMovementInput.YAngle, unityDeltaTime);
-                }
-                if (entityMovementInput.MovementState.Has(MovementState.IsJump))
-                {
-                    _acceptedJump = true;
-                }
-                if (entityMovementInput.MovementState.Has(MovementState.IsDash))
-                {
-                    _acceptedDash = true;
-                    if (_remoteTargetYAngle.HasValue)
-                        TurnImmediately(_remoteTargetYAngle.Value);
-                    else
-                        TurnImmediately(_targetYAngle);
-                }
-                if (inputState.Has(EntityMovementInputState.IsStopped))
-                {
-                    StopMoveFunction();
-                }
-                _acceptedPositionTimestamp = peerTimestamp;
+                // Invalid timestamp
+                return;
             }
+            // Prepare time
+            long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            _tempMovementState = entityMovementInput.MovementState;
+            _tempExtraMovementState = entityMovementInput.ExtraMovementState;
+            _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
+            if (inputState.Has(EntityMovementInputState.PositionChanged))
+            {
+                if (!UseRootMotion() || entityMovementInput.MovementState.HasDirectionMovement())
+                    SetMovePaths(entityMovementInput.Position, !_simulatingKeyMovement);
+            }
+            if (inputState.Has(EntityMovementInputState.RotationChanged))
+            {
+                RemoteTurnSimulation(_simulatingKeyMovement, entityMovementInput.YAngle, unityDeltaTime);
+            }
+            if (entityMovementInput.MovementState.Has(MovementState.IsJump))
+            {
+                _acceptedJump = true;
+            }
+            if (entityMovementInput.MovementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+                if (_remoteTargetYAngle.HasValue)
+                    TurnImmediately(_remoteTargetYAngle.Value);
+                else
+                    TurnImmediately(_targetYAngle);
+            }
+            if (inputState.Has(EntityMovementInputState.IsStopped))
+            {
+                StopMoveFunction();
+            }
+            _acceptedPositionTimestamp = peerTimestamp;
         }
 
         public float GetHorizontalMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
@@ -1234,7 +1204,7 @@ namespace MultiplayerARPG
             return _lastServerHorSpdBeforeAirborne;
         }
 
-        public float GetVericalMoveSpeed(bool falling)
+        public float GetVericalMoveSpeed(MovementState movementState, bool falling)
         {
             return falling ? CalculateMaxFallVelocity() : CalculateJumpVerticalSpeed();
         }
@@ -1252,99 +1222,108 @@ namespace MultiplayerARPG
                 return;
             }
             reader.ServerReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
-            if (movementState.Has(MovementState.IsTeleport))
+            if (_acceptedPositionTimestamp > peerTimestamp)
             {
-                // Teleport confirming from client
-                _isServerWaitingTeleportConfirm = false;
-            }
-            if (_isServerWaitingTeleportConfirm)
-            {
-                // Waiting for teleport confirming
+                // Invalid timestamp
                 return;
             }
-            if (peerTimestamp > BaseGameNetworkManager.Singleton.ServerTimestamp)
+            // Prepare time
+            long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            // Prepare movement state
+            MovementState = _tempMovementState = movementState;
+            ExtraMovementState = _tempExtraMovementState = extraMovementState;
+            // Prepare data for validation
+            Vector3 oldPos = _acceptedPosition.HasValue ? _acceptedPosition.Value : CacheTransform.position;
+            Vector3 newPos = position;
+            bool falling = newPos.y < oldPos.y;
+            // Calculate moveable distance
+            float horMoveSpd = GetHorizontalMoveSpeed(movementState, extraMovementState);
+            float horMoveableDist = horMoveSpd * unityDeltaTime;
+            if (horMoveableDist < 0.001f)
+                horMoveableDist = 0.001f;
+            // Calculate jump/fall distance
+            float verMoveSpd = GetVericalMoveSpeed(movementState, falling);
+            float verMoveableDist = verMoveSpd * unityDeltaTime;
+            if (verMoveableDist < 0.001f)
+                verMoveableDist = 0.001f;
+            // Set current move speed, in-case someone may use it for UIs
+            CurrentMoveSpeed = horMoveSpd;
+            // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
+            float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
+            float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
+            bool skipValidation = UseRootMotion();
+            if (Entity.SkipMovementValidation)
+                skipValidation = true;
+            // Increase accumulate data to detect hacking
+            float horMoveDistDiff = clientHorMoveDist > horMoveableDist ? (clientHorMoveDist - horMoveableDist) : 0f;
+            float verMoveDistDiff = clientVerMoveDist > verMoveableDist ? (clientVerMoveDist - verMoveableDist) : 0f;
+            _accumulateDeltaTime += unityDeltaTime;
+            _accumulateDiffHorMoveDist += horMoveDistDiff;
+            _accumulateDiffVerMoveDist += verMoveDistDiff;
+            float horMoveDiffTime = horMoveDistDiff / horMoveSpd;
+            float verMoveDiffTime = verMoveDistDiff / verMoveSpd;
+            if (!IsClient)
             {
-                // Peer's Timestamp is more than servers', might be hacking
-                return;
-            }
-            if (_acceptedPositionTimestamp <= peerTimestamp)
-            {
-                // Prepare time
-                long lagDeltaTime = BaseGameNetworkManager.Singleton.ServerTimestamp - peerTimestamp;
-                long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * 0.001f;
-                // Prepare movement state
-                MovementState = _tempMovementState = movementState;
-                ExtraMovementState = _tempExtraMovementState = extraMovementState;
-                // Skip simulation because while playing root motion animation it will also move charcter by root motion at server too, can determined that it is simulated
-                if (!IsClient)
+                // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
+                if (skipValidation || horMoveDiffTime < 0.05f)
                 {
-                    // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
-                    Vector3 oldPos = CacheTransform.position;
-                    Vector3 newPos = position;
-                    bool falling = newPos.y < oldPos.y;
-                    // Calculate moveable distance
-                    float horMoveSpd = GetHorizontalMoveSpeed(movementState, extraMovementState);
-                    float horMoveableDist = (float)horMoveSpd * unityDeltaTime;
-                    if (horMoveableDist < 0.001f)
-                        horMoveableDist = 0.001f;
-                    // Calculate jump/fall distance
-                    float verMoveSpd = GetVericalMoveSpeed(falling);
-                    float verMoveableDist = (float)verMoveSpd * unityDeltaTime;
-                    if (verMoveableDist < 0.001f)
-                        verMoveableDist = 0.001f;
-                    // Set current move speed, in-case someone may use it for UIs
-                    CurrentMoveSpeed = horMoveSpd;
-                    // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
-                    float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
-                    float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
-                    bool skipValidation = UseRootMotion();
-                    if (Entity.SkipMovementValidation)
-                        skipValidation = true;
-                    if (skipValidation || ((clientHorMoveDist <= 0.001f || clientHorMoveDist <= horMoveableDist + _lastServerValidateHorDistDiff) && (clientVerMoveDist <= 0.001f || clientVerMoveDist <= verMoveableDist + _lastServerValidateVerDistDiff)))
+                    // Allow to move to the position
+                    _acceptedPosition = newPos;
+                    CacheTransform.position = newPos;
+                    CurrentGameManager.ShouldPhysicSyncTransforms = true;
+                    // Update character rotation
+                    RemoteTurnSimulation(true, yAngle, unityDeltaTime);
+                }
+                else
+                {
+                    // Client moves too fast, adjust it
+                    _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, falling, clientHorMoveDist, horMoveableDist, clientVerMoveDist, verMoveableDist);
+                    // And also adjust client's position
+                    Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
+                }
+            }
+            else
+            {
+                // It's both server and client, simulate movement
+                if (Vector3.Distance(position, oldPos) > s_minDistanceToSimulateMovement)
+                {
+                    if (skipValidation || horMoveDiffTime < 0.05f)
                     {
-                        // Allow to move to the position
-                        CacheTransform.position = newPos;
-                        CurrentGameManager.ShouldPhysicSyncTransforms = true;
-                        // Update character rotation
-                        _lastServerValidateHorDistDiff = (horMoveableDist - clientHorMoveDist) * 0.5f;
-                        _lastServerValidateVerDistDiff = (verMoveableDist - clientVerMoveDist) * 0.5f;
-                        RemoteTurnSimulation(true, yAngle, unityDeltaTime);
+                        // Jumped position
+                        if (falling && CacheTransform.position.y < newPos.y)
+                            CacheTransform.position = new Vector3(CacheTransform.position.x, newPos.y, CacheTransform.position.z);
+                        _acceptedPosition = newPos;
                     }
                     else
                     {
                         // Client moves too fast, adjust it
-                        Vector3 dir = (newPos.GetXZ() - oldPos.GetXZ()).normalized;
-                        Vector3 deltaMove = (dir * Mathf.Min(clientHorMoveDist, horMoveableDist)) + ((falling ? Vector3.down : Vector3.up) * Mathf.Min(clientVerMoveDist, verMoveableDist));
-                        newPos = oldPos + deltaMove;
+                        _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, falling, clientHorMoveDist, horMoveableDist, clientVerMoveDist, verMoveableDist);
                         // And also adjust client's position
-                        Teleport(newPos, Quaternion.Euler(0f, _yAngle, 0f), true);
-                        // Reset distance difference
-                        _lastServerValidateHorDistDiff = 0f;
-                        _lastServerValidateVerDistDiff = 0f;
+                        Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
                     }
+                    _simulatingKeyMovement = true;
+                    SetMovePaths(position, false);
                 }
-                else
-                {
-                    // It's both server and client, simulate movement (it's a host so don't do speed hack validation)
-                    if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
-                    {
-                        _simulatingKeyMovement = true;
-                        SetMovePaths(position, false);
-                    }
-                    RemoteTurnSimulation(true, yAngle, unityDeltaTime);
-                }
-                if (movementState.Has(MovementState.IsJump))
-                {
-                    _acceptedJump = true;
-                }
-                if (movementState.Has(MovementState.IsDash))
-                {
-                    _acceptedDash = true;
-                    TurnImmediately(yAngle);
-                }
-                _acceptedPositionTimestamp = peerTimestamp;
+                RemoteTurnSimulation(true, yAngle, unityDeltaTime);
             }
+            if (movementState.Has(MovementState.IsJump))
+            {
+                _acceptedJump = true;
+            }
+            if (movementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+                TurnImmediately(yAngle);
+            }
+            _acceptedPositionTimestamp = peerTimestamp;
+        }
+
+        protected virtual Vector3 GetMoveablePosition(Vector3 oldPos, Vector3 newPos, bool falling, float clientHorMoveDist, float horMoveableDist, float clientVerMoveDist, float verMoveableDist)
+        {
+            Vector3 dir = (newPos.GetXZ() - oldPos.GetXZ()).normalized;
+            Vector3 deltaMove = (dir * Mathf.Min(clientHorMoveDist, horMoveableDist)) + ((falling ? Vector3.down : Vector3.up) * Mathf.Min(clientVerMoveDist, verMoveableDist));
+            return oldPos + deltaMove;
         }
 
         private void OnTeleport(Vector3 position, float yAngle, bool stillMoveAfterTeleport)
@@ -1356,10 +1335,6 @@ namespace MultiplayerARPG
             CacheTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             TurnImmediately(yAngle);
-            if (IsServer && !IsOwnedByServer)
-                _isServerWaitingTeleportConfirm = true;
-            if (!IsServer && IsOwnerClient)
-                _isClientConfirmingTeleport = true;
             _lastTeleportFrame = Time.frameCount;
             _previousPosition = CacheTransform.position;
         }
