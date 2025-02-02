@@ -388,7 +388,7 @@ namespace MultiplayerARPG
             frameDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             titleDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             titleDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            lastDeadTime.deliveryMethod = DeliveryMethod.Sequenced;
+            lastDeadTime.deliveryMethod = DeliveryMethod.ReliableOrdered;
             lastDeadTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
 #if !DISABLE_CLASSIC_PK
             isPkOn.deliveryMethod = DeliveryMethod.ReliableOrdered;
@@ -398,7 +398,7 @@ namespace MultiplayerARPG
             consecutivePkKills.deliveryMethod = DeliveryMethod.ReliableOrdered;
             consecutivePkKills.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
 #endif
-            reputation.deliveryMethod = DeliveryMethod.Sequenced;
+            reputation.deliveryMethod = DeliveryMethod.ReliableOrdered;
             reputation.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
             isWarping.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
@@ -406,7 +406,7 @@ namespace MultiplayerARPG
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             lookPosition.deliveryMethod = DeliveryMethod.Sequenced;
             lookPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
-            targetEntityId.clientDataChannel = STATE_DATA_CHANNEL;
+            targetEntityId.clientDataChannel = ACTION_DATA_CHANNEL;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             // Sync lists

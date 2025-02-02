@@ -317,7 +317,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer && IsOwnerClient)
             {
-                RPC(CmdReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, isLeftHand);
+                RPC(CmdReload, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -410,7 +410,7 @@ namespace MultiplayerARPG
             }
 
             ReloadRoutine(isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount).Forget();
-            RPC(RpcReload, BaseGameEntity.STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
+            RPC(RpcReload, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, isLeftHand, reloadingAmmoDataId, reloadingAmmoAmount);
 #endif
         }
 

@@ -11,7 +11,8 @@ namespace MultiplayerARPG
     [DefaultExecutionOrder(DefaultExecutionOrders.BASE_GAME_ENTITY)]
     public abstract partial class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
     {
-        public const byte STATE_DATA_CHANNEL = 3;
+        public const byte MOVEMENT_DATA_CHANNEL = 2;
+        public const byte ACTION_DATA_CHANNEL = 3;
         protected static readonly NetDataWriter s_EntityStateMessageWriter = new NetDataWriter();
         protected static readonly NetDataWriter s_EntityStateDataWriter = new NetDataWriter();
 
@@ -439,7 +440,7 @@ namespace MultiplayerARPG
                     s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
                     s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                     s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
-                    ClientSendMessage(STATE_DATA_CHANNEL, DeliveryMethod.Unreliable, s_EntityStateMessageWriter);
+                    ClientSendMessage(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, s_EntityStateMessageWriter);
                 }
             }
         }
@@ -456,7 +457,7 @@ namespace MultiplayerARPG
                     s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
                     s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                     s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
-                    ServerSendMessageToSubscribers(STATE_DATA_CHANNEL, DeliveryMethod.Unreliable, s_EntityStateMessageWriter);
+                    ServerSendMessageToSubscribers(MOVEMENT_DATA_CHANNEL, DeliveryMethod.Unreliable, s_EntityStateMessageWriter);
                 }
             }
         }
@@ -534,7 +535,7 @@ namespace MultiplayerARPG
 
         public virtual void CallCmdPerformHitRegValidation(HitRegisterData hitData)
         {
-            RPC(CmdPerformHitRegValidation, STATE_DATA_CHANNEL, DeliveryMethod.Sequenced, hitData);
+            RPC(CmdPerformHitRegValidation, ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, hitData);
         }
 
         [ServerRpc]
