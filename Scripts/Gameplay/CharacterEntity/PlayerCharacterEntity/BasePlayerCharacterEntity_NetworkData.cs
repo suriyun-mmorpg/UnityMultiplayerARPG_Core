@@ -360,54 +360,76 @@ namespace MultiplayerARPG
             // Sync fields
             dataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             dataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             factionId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             factionId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             statPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
             statPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+
             skillPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
             skillPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+
             gold.deliveryMethod = DeliveryMethod.ReliableOrdered;
             gold.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+
             userGold.deliveryMethod = DeliveryMethod.ReliableOrdered;
             userGold.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+
             userCash.deliveryMethod = DeliveryMethod.ReliableOrdered;
             userCash.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+
             partyId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             partyId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             guildId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             guildId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 #if !DISABLE_DIFFER_MAP_RESPAWNING
             respawnMapName.deliveryMethod = DeliveryMethod.ReliableOrdered;
             respawnMapName.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+
             respawnPosition.deliveryMethod = DeliveryMethod.ReliableOrdered;
             respawnPosition.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
 #endif
             iconDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             iconDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             frameDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             frameDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             titleDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             titleDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             lastDeadTime.deliveryMethod = DeliveryMethod.ReliableOrdered;
             lastDeadTime.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
 #if !DISABLE_CLASSIC_PK
             isPkOn.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isPkOn.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             pkPoint.deliveryMethod = DeliveryMethod.ReliableOrdered;
             pkPoint.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             consecutivePkKills.deliveryMethod = DeliveryMethod.ReliableOrdered;
             consecutivePkKills.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
 #endif
             reputation.deliveryMethod = DeliveryMethod.ReliableOrdered;
             reputation.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             isWarping.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isWarping.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
+
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
+            pitch.clientDeliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+
             lookPosition.deliveryMethod = DeliveryMethod.Sequenced;
+            lookPosition.clientDeliveryMethod = DeliveryMethod.Sequenced;
             lookPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+
+            targetEntityId.dataChannel = ACTION_DATA_CHANNEL;
             targetEntityId.clientDataChannel = ACTION_DATA_CHANNEL;
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
+            targetEntityId.clientDeliveryMethod = DeliveryMethod.ReliableOrdered;
             targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
             // Sync lists
             hotkeys.forOwnerOnly = true;

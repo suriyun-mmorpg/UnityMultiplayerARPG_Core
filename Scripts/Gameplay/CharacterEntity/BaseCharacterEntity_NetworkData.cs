@@ -247,31 +247,44 @@ namespace MultiplayerARPG
             base.SetupNetElements();
             id.deliveryMethod = DeliveryMethod.ReliableOrdered;
             id.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             level.deliveryMethod = DeliveryMethod.ReliableOrdered;
             level.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             exp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             exp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             isImmune.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isImmune.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             currentHp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentHp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             currentMp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentMp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             currentFood.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentFood.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             currentWater.deliveryMethod = DeliveryMethod.ReliableOrdered;
             currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             equipWeaponSet.deliveryMethod = DeliveryMethod.ReliableOrdered;
             equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             isWeaponsSheathed.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isWeaponsSheathed.clientDeliveryMethod = DeliveryMethod.ReliableOrdered;
             isWeaponsSheathed.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+
             pitch.deliveryMethod = DeliveryMethod.Sequenced;
             pitch.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             aimPosition.deliveryMethod = DeliveryMethod.Sequenced;
             aimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
+
             targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
             targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+
             mount.deliveryMethod = DeliveryMethod.ReliableOrdered;
             mount.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
 
