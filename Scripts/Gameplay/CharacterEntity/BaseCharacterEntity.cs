@@ -288,11 +288,7 @@ namespace MultiplayerARPG
             Profiler.EndSample();
             float deltaTime = Time.unscaledDeltaTime;
 
-            Profiler.BeginSample("BaseCharacterEntity - AddHitBoxesTransformHistory");
-            if (IsServer && CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
-                AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
-            Profiler.EndSample();
-
+            UpdateHitboxesTransformHistory();
             Profiler.BeginSample("BaseCharacterEntity - ApplyFallDamage");
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {

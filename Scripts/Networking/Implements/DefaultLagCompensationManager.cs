@@ -8,15 +8,31 @@ namespace MultiplayerARPG
     public class DefaultLagCompensationManager : MonoBehaviour, ILagCompensationManager
     {
         [SerializeField]
+        private bool isDisabled = false;
+        public bool IsDisabled => isDisabled;
+
+
+        [SerializeField]
         private float snapShotInterval = 0.06f;
-        public float SnapShotInterval { get { return snapShotInterval; } }
+        public float SnapShotInterval => snapShotInterval;
 
         [SerializeField]
         private int maxHistorySize = 16;
-        public int MaxHistorySize { get { return maxHistorySize; } }
+        public int MaxHistorySize => maxHistorySize;
 
-        private bool _shouldStoreHitboxesTransformHistory = false;
-        public bool ShouldStoreHitBoxesTransformHistory { get { return _shouldStoreHitboxesTransformHistory; } }
+        public bool ShouldStoreHitBoxesTransformHistory
+        {
+            get
+            {
+                if (isDisabled)
+                    return false;
+                float time = Time.unscaledTime;
+                bool should = time - _lastHistoryStoreTime < SnapShotInterval;
+                if (should)
+                    _lastHistoryStoreTime = time;
+                return should;
+            }
+        }
 
         private Dictionary<uint, DamageableEntity> _damageableEntities = new Dictionary<uint, DamageableEntity>();
         private List<DamageableEntity> _simulatedDamageableEntities = new List<DamageableEntity>();
@@ -91,15 +107,6 @@ namespace MultiplayerARPG
         public void RemoveDamageableEntity(DamageableEntity entity)
         {
             _damageableEntities.Remove(entity.ObjectId);
-        }
-
-        private void LateUpdate()
-        {
-            float currentTime = Time.unscaledTime;
-            _shouldStoreHitboxesTransformHistory = !(currentTime - _lastHistoryStoreTime < SnapShotInterval);
-            if (!_shouldStoreHitboxesTransformHistory)
-                return;
-            _lastHistoryStoreTime = currentTime;
         }
     }
 }

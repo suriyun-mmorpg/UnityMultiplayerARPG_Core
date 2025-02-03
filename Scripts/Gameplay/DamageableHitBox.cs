@@ -450,6 +450,13 @@ namespace MultiplayerARPG
             });
         }
 
+        public void ClearTransformHistory()
+        {
+            if (_histories.Count == 0)
+                return;
+            _histories.Clear();
+        }
+
         public bool SetAsTargetInOneClick()
         {
             if (BaseActivatableEntity != null)

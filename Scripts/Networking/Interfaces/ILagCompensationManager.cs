@@ -2,6 +2,7 @@
 {
     public interface ILagCompensationManager
     {
+        bool IsDisabled { get; }
         float SnapShotInterval { get; }
         int MaxHistorySize { get; }
         bool ShouldStoreHitBoxesTransformHistory { get; }

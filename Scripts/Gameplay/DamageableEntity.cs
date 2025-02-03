@@ -4,6 +4,7 @@ using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -164,9 +165,20 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             SetModelIsDead(this.IsDead());
-            if (IsServer && CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
-                AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
+            UpdateHitboxesTransformHistory();
             base.EntityUpdate();
+        }
+
+        public void UpdateHitboxesTransformHistory()
+        {
+            if (!IsServer)
+                return;
+            Profiler.BeginSample("BaseCharacterEntity - AddHitBoxesTransformHistory");
+            if (CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
+                AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
+            else if (CurrentGameManager.LagCompensationManager.IsDisabled)
+                ClearHitBoxesTransformHistory();
+            Profiler.EndSample();
         }
 
         public void AddHitBoxesTransformHistory(long time)
@@ -176,6 +188,16 @@ namespace MultiplayerARPG
             for (int i = 0; i < HitBoxes.Length; ++i)
             {
                 HitBoxes[i].AddTransformHistory(time);
+            }
+        }
+
+        public void ClearHitBoxesTransformHistory()
+        {
+            if (isStaticHitBoxes)
+                return;
+            for (int i = 0; i < HitBoxes.Length; ++i)
+            {
+                HitBoxes[i].ClearTransformHistory();
             }
         }
 
