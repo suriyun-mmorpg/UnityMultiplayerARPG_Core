@@ -1204,7 +1204,7 @@ namespace MultiplayerARPG
             return _lastServerHorSpdBeforeAirborne;
         }
 
-        public float GetVericalMoveSpeed(MovementState movementState, bool falling)
+        public float GetVericalMoveSpeed(bool falling)
         {
             return falling ? CalculateMaxFallVelocity() : CalculateJumpVerticalSpeed();
         }
@@ -1243,7 +1243,7 @@ namespace MultiplayerARPG
             if (horMoveableDist < 0.001f)
                 horMoveableDist = 0.001f;
             // Calculate jump/fall distance
-            float verMoveSpd = GetVericalMoveSpeed(movementState, falling);
+            float verMoveSpd = GetVericalMoveSpeed(falling);
             float verMoveableDist = verMoveSpd * unityDeltaTime;
             if (verMoveableDist < 0.001f)
                 verMoveableDist = 0.001f;
