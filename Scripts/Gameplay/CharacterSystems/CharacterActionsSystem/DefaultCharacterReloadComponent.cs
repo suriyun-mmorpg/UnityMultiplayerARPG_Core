@@ -156,12 +156,6 @@ namespace MultiplayerARPG
                     weaponItem.ReloadClip?.Play(tpsModel.GenericAudioSource);
                 }
 
-                if (Entity.IsDead())
-                {
-                    ClearReloadStates();
-                    return;
-                }
-
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, Entity.CachedData.ReloadDuration, animSpeedRate, reloadCancellationTokenSource.Token);
 
@@ -173,38 +167,19 @@ namespace MultiplayerARPG
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
                 {
-                    if (Entity.IsDead())
-                    {
-                        ClearReloadStates();
-                        return;
-                    }
-
                     // Wait until triggger before reload ammo
                     tempTriggerDuration = _triggerDurations[triggerIndex];
                     _remainsDurationWithoutSpeedRate -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
 
-                    if (Entity.IsDead())
-                    {
-                        ClearReloadStates();
-                        return;
-                    }
-
                     // Special effects will plays on clients only
                     if (IsClient)
                     {
                         // Play weapon reload special effects
-                        if (!overridePassengerActionAnimations)
-                        {
-                            if (tpsModelAvailable)
-                                tpsModel.PlayEquippedWeaponReloaded(isLeftHand);
-                            if (fpsModelAvailable)
-                                fpsModel.PlayEquippedWeaponReloaded(isLeftHand);
-                        }
-                        else if (vehicleModelAvailable)
-                        {
-                            vehicleModel.PlayEquippedWeaponReload(isLeftHand);
-                        }
+                        if (tpsModelAvailable)
+                            tpsModel.PlayEquippedWeaponReloaded(isLeftHand);
+                        if (fpsModelAvailable)
+                            fpsModel.PlayEquippedWeaponReloaded(isLeftHand);
                         // Play reload sfx
                         weaponItem.ReloadedClip?.Play(tpsModel.GenericAudioSource);
                     }
@@ -229,12 +204,6 @@ namespace MultiplayerARPG
                     // Wait until animation ends to stop actions
                     await UniTask.Delay((int)(_remainsDurationWithoutSpeedRate / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
                 }
-
-                if (Entity.IsDead())
-                {
-                    ClearReloadStates();
-                    return;
-                }
             }
             catch (System.OperationCanceledException)
             {
@@ -247,7 +216,8 @@ namespace MultiplayerARPG
             catch (System.Exception ex)
             {
                 // Other errors
-                Logging.LogException(LogTag, ex);
+                Debug.LogError("Error occuring in `DefaultCharacterReloadComponent` -> `ReloadRoutine`, " + this);
+                Debug.LogException(ex);
             }
             finally
             {

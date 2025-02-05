@@ -239,12 +239,6 @@ namespace MultiplayerARPG
                     }
                 }
 
-                if (Entity.IsDead())
-                {
-                    ClearUseSkillStates();
-                    return;
-                }
-
                 if (CastingSkillDuration > 0f)
                 {
                     OnCastSkillStart?.Invoke();
@@ -261,12 +255,6 @@ namespace MultiplayerARPG
                     // Wait until end of cast duration
                     await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
                     OnCastSkillEnd?.Invoke();
-                }
-
-                if (Entity.IsDead())
-                {
-                    ClearUseSkillStates();
-                    return;
                 }
 
                 // Play special effect
@@ -306,12 +294,6 @@ namespace MultiplayerARPG
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
                 await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token);
 
-                if (Entity.IsDead())
-                {
-                    ClearUseSkillStates();
-                    return;
-                }
-
                 // Prepare damage amounts
                 List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, _triggerDurations.Length);
 
@@ -325,22 +307,10 @@ namespace MultiplayerARPG
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
                 {
-                    if (Entity.IsDead())
-                    {
-                        ClearUseSkillStates();
-                        return;
-                    }
-
                     // Play special effects after trigger duration
                     tempTriggerDuration = _triggerDurations[triggerIndex];
                     _remainsDurationWithoutSpeedRate -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
-
-                    if (Entity.IsDead())
-                    {
-                        ClearUseSkillStates();
-                        return;
-                    }
 
                     // Special effects will plays on clients only
                     if (IsClient && (AnimActionType == AnimActionType.AttackRightHand || AnimActionType == AnimActionType.AttackLeftHand))
@@ -414,12 +384,6 @@ namespace MultiplayerARPG
                     // Wait until animation ends to stop actions
                     await UniTask.Delay((int)(_remainsDurationWithoutSpeedRate / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
                 }
-
-                if (Entity.IsDead())
-                {
-                    ClearUseSkillStates();
-                    return;
-                }
             }
             catch (System.OperationCanceledException)
             {
@@ -432,7 +396,8 @@ namespace MultiplayerARPG
             catch (System.Exception ex)
             {
                 // Other errors
-                Logging.LogException(LogTag, ex);
+                Debug.LogError("Error occuring in `DefaultCharacterUseSkillComponent` -> `UseSkillRoutine`, " + this);
+                Debug.LogException(ex);
             }
             finally
             {

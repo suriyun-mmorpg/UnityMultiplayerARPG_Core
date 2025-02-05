@@ -100,6 +100,7 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid AttackRoutine(long peerTimestamp, AttackState simulateState)
         {
+            CharacterDataCache entityCaches = Entity.GetCaches();
             int simulateSeed = GetSimulateSeed(peerTimestamp);
             bool isLeftHand = simulateState.IsLeftHand;
             if (simulateState.SimulateSeed == 0)
@@ -145,10 +146,10 @@ namespace MultiplayerARPG
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts;
-            if (isLeftHand && Entity.CachedData.LeftHandDamages != null)
-                baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.LeftHandDamages);
+            if (isLeftHand && entityCaches.LeftHandDamages != null)
+                baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(entityCaches.LeftHandDamages);
             else
-                baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(Entity.CachedData.RightHandDamages);
+                baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(entityCaches.RightHandDamages);
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttacking = Entity.GetMoveSpeedRateWhileAttacking(weaponItem);
@@ -210,13 +211,18 @@ namespace MultiplayerARPG
 
                 if (weaponItem.RateOfFire > 0)
                 {
-                    _totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire + Entity.CachedData.RateOfFire);
+                    _totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire + entityCaches.RateOfFire);
                     _triggerDurations = new float[] { 0f };
                 }
+                else
+                {
+                    // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
+                    await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, attackCancellationTokenSource.Token);
 
-                // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, attackCancellationTokenSource.Token);
-
+                    // `_triggerDurations` must not be `NULL`
+                    if (_triggerDurations == null)
+                        _triggerDurations = new float[] { 0.5f };
+                }
                 // Prepare damage amounts
                 List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = Entity.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, _triggerDurations.Length, 1);
 
@@ -230,22 +236,10 @@ namespace MultiplayerARPG
                 float tempTriggerDuration;
                 for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
                 {
-                    if (Entity.IsDead())
-                    {
-                        ClearAttackStates();
-                        return;
-                    }
-
                     // Wait until triggger before play special effects
                     tempTriggerDuration = _triggerDurations[triggerIndex];
                     _remainsDurationWithoutSpeedRate -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
-
-                    if (Entity.IsDead())
-                    {
-                        ClearAttackStates();
-                        return;
-                    }
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -264,15 +258,9 @@ namespace MultiplayerARPG
                         }
                         // Play launch sfx
                         AudioClipWithVolumeSettings launchClip = weaponItem.LaunchClip;
-                        if (Entity.GetCaches().TryGetWeaponAbility(isLeftHand, LaunchSfxWeaponAbility.KEY, out BaseWeaponAbility ability) && ability is LaunchSfxWeaponAbility launchSfxAbility)
+                        if (entityCaches.TryGetWeaponAbility(isLeftHand, LaunchSfxWeaponAbility.KEY, out BaseWeaponAbility ability) && ability is LaunchSfxWeaponAbility launchSfxAbility)
                             launchClip = launchSfxAbility.LaunchClip;
                         launchClip?.Play(tpsModel.GenericAudioSource);
-                    }
-
-                    if (Entity.IsDead())
-                    {
-                        ClearAttackStates();
-                        return;
                     }
 
                     // Get aim position by character's forward
@@ -283,7 +271,7 @@ namespace MultiplayerARPG
 
                     // Call on attack to extend attack functionality while attacking
                     bool overrideDefaultAttack = false;
-                    foreach (KeyValuePair<BaseSkill, int> skillLevel in Entity.CachedData.Skills)
+                    foreach (KeyValuePair<BaseSkill, int> skillLevel in entityCaches.Skills)
                     {
                         if (skillLevel.Value <= 0)
                             continue;
@@ -314,7 +302,7 @@ namespace MultiplayerARPG
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
-                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
+                            ApplyAttack(entityCaches, isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                         }
                         else if (IsOwnerClient)
                         {
@@ -328,7 +316,7 @@ namespace MultiplayerARPG
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
-                            ApplyAttack(isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
+                            ApplyAttack(entityCaches, isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                         }
                     }
 
@@ -349,22 +337,10 @@ namespace MultiplayerARPG
                     Entity.EquipWeapons = equipWeapons;
                 }
 
-                if (Entity.IsDead())
-                {
-                    ClearAttackStates();
-                    return;
-                }
-
                 if (_remainsDurationWithoutSpeedRate > 0f)
                 {
                     // Wait until animation ends to stop actions
                     await UniTask.Delay((int)(_remainsDurationWithoutSpeedRate / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
-                }
-
-                if (Entity.IsDead())
-                {
-                    ClearAttackStates();
-                    return;
                 }
             }
             catch (System.OperationCanceledException)
@@ -378,7 +354,8 @@ namespace MultiplayerARPG
             catch (System.Exception ex)
             {
                 // Other errors
-                Logging.LogException(LogTag, ex);
+                Debug.LogError("Error occuring in `DefaultCharacterAttackComponent` -> `AttackRoutine`, " + this);
+                Debug.LogException(ex);
             }
             finally
             {
@@ -409,7 +386,7 @@ namespace MultiplayerARPG
                 return;
             }
             RPC(RpcSimulateActionTrigger, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
-            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
+            ApplyAttack(Entity.GetCaches(), validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogAttackTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
         }
@@ -424,10 +401,10 @@ namespace MultiplayerARPG
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
             if (validateData == null)
                 return;
-            ApplyAttack(validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
+            ApplyAttack(Entity.GetCaches(), validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
         }
 
-        protected virtual async void ApplyAttack(bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition)
+        protected virtual async void ApplyAttack(CharacterDataCache entityCaches, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition)
         {
             if (triggerIndex >= damageAmounts.Count)
             {
@@ -445,8 +422,7 @@ namespace MultiplayerARPG
                 fireSpreadRange = weaponItem.FireSpreadRange;
             }
 
-            fireSpreadAmount += (byte)Mathf.CeilToInt(Entity.CachedData.FireSpread);
-            fireSpreadRange *= 1 + Entity.CachedData.FireSpreadRangeRate;
+            fireSpreadAmount += (byte)Mathf.CeilToInt(entityCaches.FireSpread);
 
             // Make sure it won't increase damage to the wrong collction
             for (byte spreadIndex = 0; spreadIndex < fireSpreadAmount + 1; ++spreadIndex)
