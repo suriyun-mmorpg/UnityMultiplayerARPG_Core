@@ -28,6 +28,8 @@ namespace MultiplayerARPG
         }
         public float MoveSpeedRateWhileCharging { get; protected set; }
         public MovementRestriction MovementRestrictionWhileCharging { get; protected set; }
+        public System.Action OnChargeStart { get; set; }
+        public System.Action OnChargeEnd { get; set; }
 
         protected CharacterActionComponentManager _manager;
         protected float _chargeStartTime;
@@ -64,11 +66,14 @@ namespace MultiplayerARPG
             // Get weapon type data
             IWeaponItem weaponItem = Entity.GetAvailableWeapon(ref isLeftHand).GetWeaponItem();
             int weaponTypeDataId = weaponItem.WeaponType.DataId;
-            // Vehicle model
+            // Play animation
+            BaseCharacterModel tpsModel = Entity.CharacterModel;
+            bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
             BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
             bool vehicleModelAvailable = vehicleModel != null;
-            bool overridePassengerActionAnimations = Entity.PassengingVehicleSeat != null && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
-            // Play animation
+            bool overridePassengerActionAnimations = vehicleModelAvailable && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
+            BaseCharacterModel fpsModel = Entity.FpsModel;
+            bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
             if (vehicleModelAvailable)
             {
                 // Vehicle model
@@ -77,17 +82,17 @@ namespace MultiplayerARPG
             }
             if (!overridePassengerActionAnimations)
             {
-                if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                if (tpsModelAvailable)
                 {
                     // TPS model
-                    Entity.CharacterModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand, out _skipMovementValidation, out _shouldUseRootMotion);
-                    Entity.CharacterModel.PlayEquippedWeaponCharge(isLeftHand);
+                    tpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand, out _skipMovementValidation, out _shouldUseRootMotion);
+                    tpsModel.PlayEquippedWeaponCharge(isLeftHand);
                 }
-                if (IsClient && Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                if (fpsModelAvailable)
                 {
                     // FPS model
-                    Entity.FpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand, out _, out _);
-                    Entity.FpsModel.PlayEquippedWeaponCharge(isLeftHand);
+                    fpsModel.PlayWeaponChargeClip(weaponTypeDataId, isLeftHand, out _, out _);
+                    fpsModel.PlayEquippedWeaponCharge(isLeftHand);
                 }
             }
             // Set weapon charging state
@@ -98,16 +103,20 @@ namespace MultiplayerARPG
             _chargeDuration = weaponItem.ChargeDuration;
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogChargeStart(_playerCharacterEntity);
+            OnChargeStart?.Invoke();
         }
 
         protected virtual void StopChargeAnimation()
         {
             bool doActionWhenStopCharging = WillDoActionWhenStopCharging;
-            // Vehicle model
+            // Play animation
+            BaseCharacterModel tpsModel = Entity.CharacterModel;
+            bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
             BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
             bool vehicleModelAvailable = vehicleModel != null;
-            bool overridePassengerActionAnimations = Entity.PassengingVehicleSeat != null && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
-            // Play animation
+            bool overridePassengerActionAnimations = vehicleModelAvailable && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
+            BaseCharacterModel fpsModel = Entity.FpsModel;
+            bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
             if (vehicleModelAvailable)
             {
                 // Vehicle model
@@ -115,21 +124,22 @@ namespace MultiplayerARPG
             }
             if (!overridePassengerActionAnimations)
             {
-                if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
+                if (tpsModelAvailable)
                 {
                     // TPS model
-                    Entity.CharacterModel.StopWeaponChargeAnimation();
+                    tpsModel.StopWeaponChargeAnimation();
                 }
-                if (IsClient && Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+                if (fpsModelAvailable)
                 {
                     // FPS model
-                    Entity.FpsModel.StopWeaponChargeAnimation();
+                    fpsModel.StopWeaponChargeAnimation();
                 }
             }
             // Set weapon charging state
             IsCharging = false;
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogChargeEnd(_playerCharacterEntity, doActionWhenStopCharging);
+            OnChargeEnd?.Invoke();
         }
 
         public virtual void StartCharge(bool isLeftHand)

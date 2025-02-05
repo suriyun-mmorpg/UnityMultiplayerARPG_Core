@@ -205,11 +205,13 @@ namespace MultiplayerARPG
 
             try
             {
-                bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
+                BaseCharacterModel tpsModel = Entity.CharacterModel;
+                bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
-                bool overridePassengerActionAnimations = Entity.PassengingVehicleSeat != null && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
-                bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
+                bool overridePassengerActionAnimations = vehicleModelAvailable && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
+                BaseCharacterModel fpsModel = Entity.FpsModel;
+                bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
                 // Prepare end time
                 LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionDefaultEndTime(_totalDuration, animSpeedRate, CastingSkillDuration);
@@ -221,13 +223,13 @@ namespace MultiplayerARPG
                     {
                         if (tpsModelAvailable)
                         {
-                            Entity.CharacterModel.InstantiateEffect(skill.SkillCastEffects);
-                            Entity.CharacterModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
+                            tpsModel.InstantiateEffect(skill.SkillCastEffects);
+                            tpsModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
                         }
                         if (fpsModelAvailable)
                         {
-                            Entity.FpsModel.InstantiateEffect(skill.SkillCastEffects);
-                            Entity.FpsModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
+                            fpsModel.InstantiateEffect(skill.SkillCastEffects);
+                            fpsModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
                         }
                     }
                     else if (vehicleModelAvailable)
@@ -252,9 +254,9 @@ namespace MultiplayerARPG
                     if (!overridePassengerActionAnimations)
                     {
                         if (tpsModelAvailable)
-                            Entity.CharacterModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _skipMovementValidation, out _shouldUseRootMotion);
+                            tpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _skipMovementValidation, out _shouldUseRootMotion);
                         if (fpsModelAvailable)
-                            Entity.FpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _, out _);
+                            fpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _, out _);
                     }
                     // Wait until end of cast duration
                     await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
@@ -279,13 +281,13 @@ namespace MultiplayerARPG
                     {
                         if (tpsModelAvailable)
                         {
-                            Entity.CharacterModel.InstantiateEffect(skill.SkillActivateEffects);
-                            Entity.CharacterModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+                            tpsModel.InstantiateEffect(skill.SkillActivateEffects);
+                            tpsModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
                         }
                         if (fpsModelAvailable)
                         {
-                            Entity.FpsModel.InstantiateEffect(skill.SkillActivateEffects);
-                            Entity.FpsModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+                            fpsModel.InstantiateEffect(skill.SkillActivateEffects);
+                            fpsModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
                         }
                     }
                 }
@@ -296,9 +298,9 @@ namespace MultiplayerARPG
                 if (!overridePassengerActionAnimations)
                 {
                     if (tpsModelAvailable)
-                        Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                        tpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                     if (fpsModelAvailable)
-                        Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                        fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
@@ -349,12 +351,12 @@ namespace MultiplayerARPG
                         if (!overridePassengerActionAnimations)
                         {
                             if (tpsModelAvailable)
-                                Entity.CharacterModel.PlayEquippedWeaponLaunch(isLeftHand);
+                                tpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                             if (fpsModelAvailable)
-                                Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
+                                fpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         }
                         // Play launch sfx
-                        weaponItem.LaunchClip?.Play(Entity.CharacterModel.GenericAudioSource);
+                        weaponItem.LaunchClip?.Play(tpsModel.GenericAudioSource);
                     }
 
                     // Get aim position by character's forward
@@ -658,26 +660,34 @@ namespace MultiplayerARPG
             IsCastingSkillInterrupted = true;
             CastingSkillDuration = CastingSkillCountDown = 0;
             CancelSkill();
-            if (Entity.PassengingVehicleModel && Entity.PassengingVehicleModel is BaseCharacterModel vehicleModel)
+
+            BaseCharacterModel tpsModel = Entity.CharacterModel;
+            bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
+            BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
+            bool vehicleModelAvailable = vehicleModel != null;
+            BaseCharacterModel fpsModel = Entity.FpsModel;
+            bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
+
+            if (tpsModelAvailable)
+            {
+                // TPS model
+                tpsModel.StopActionAnimation();
+                tpsModel.StopSkillCastAnimation();
+                tpsModel.StopWeaponChargeAnimation();
+            }
+            if (vehicleModelAvailable)
             {
                 // Vehicle model
                 vehicleModel.StopActionAnimation();
                 vehicleModel.StopSkillCastAnimation();
                 vehicleModel.StopWeaponChargeAnimation();
             }
-            if (Entity.CharacterModel && Entity.CharacterModel.gameObject.activeSelf)
-            {
-                // TPS model
-                Entity.CharacterModel.StopActionAnimation();
-                Entity.CharacterModel.StopSkillCastAnimation();
-                Entity.CharacterModel.StopWeaponChargeAnimation();
-            }
-            if (IsClient && Entity.FpsModel && Entity.FpsModel.gameObject.activeSelf)
+            if (fpsModelAvailable)
             {
                 // FPS model
-                Entity.FpsModel.StopActionAnimation();
-                Entity.FpsModel.StopSkillCastAnimation();
-                Entity.FpsModel.StopWeaponChargeAnimation();
+                fpsModel.StopActionAnimation();
+                fpsModel.StopSkillCastAnimation();
+                fpsModel.StopWeaponChargeAnimation();
             }
         }
 

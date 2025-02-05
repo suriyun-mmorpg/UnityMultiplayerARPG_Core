@@ -115,11 +115,13 @@ namespace MultiplayerARPG
 
             try
             {
-                bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
+                BaseCharacterModel tpsModel = Entity.CharacterModel;
+                bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
-                bool overridePassengerActionAnimations = Entity.PassengingVehicleSeat != null && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
-                bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
+                bool overridePassengerActionAnimations = vehicleModelAvailable && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
+                BaseCharacterModel fpsModel = Entity.FpsModel;
+                bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
                 // Prepare end time
                 LastReloadEndTime = CharacterActionComponentManager.PrepareActionDefaultEndTime(_totalDuration, animSpeedRate);
@@ -130,9 +132,9 @@ namespace MultiplayerARPG
                 if (!overridePassengerActionAnimations)
                 {
                     if (tpsModelAvailable)
-                        Entity.CharacterModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
+                        tpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
                     if (fpsModelAvailable)
-                        Entity.FpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _);
+                        fpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _);
                 }
 
                 // Special effects will plays on clients only
@@ -142,16 +144,16 @@ namespace MultiplayerARPG
                     if (!overridePassengerActionAnimations)
                     {
                         if (tpsModelAvailable)
-                            Entity.CharacterModel.PlayEquippedWeaponReload(isLeftHand);
+                            tpsModel.PlayEquippedWeaponReload(isLeftHand);
                         if (fpsModelAvailable)
-                            Entity.FpsModel.PlayEquippedWeaponReload(isLeftHand);
+                            fpsModel.PlayEquippedWeaponReload(isLeftHand);
                     }
                     else if (vehicleModelAvailable)
                     {
                         vehicleModel.PlayEquippedWeaponReload(isLeftHand);
                     }
                     // Play reload sfx
-                    weaponItem.ReloadClip?.Play(Entity.CharacterModel.GenericAudioSource);
+                    weaponItem.ReloadClip?.Play(tpsModel.GenericAudioSource);
                 }
 
                 if (Entity.IsDead())
@@ -195,16 +197,16 @@ namespace MultiplayerARPG
                         if (!overridePassengerActionAnimations)
                         {
                             if (tpsModelAvailable)
-                                Entity.CharacterModel.PlayEquippedWeaponReloaded(isLeftHand);
+                                tpsModel.PlayEquippedWeaponReloaded(isLeftHand);
                             if (fpsModelAvailable)
-                                Entity.FpsModel.PlayEquippedWeaponReloaded(isLeftHand);
+                                fpsModel.PlayEquippedWeaponReloaded(isLeftHand);
                         }
                         else if (vehicleModelAvailable)
                         {
                             vehicleModel.PlayEquippedWeaponReload(isLeftHand);
                         }
                         // Play reload sfx
-                        weaponItem.ReloadedClip?.Play(Entity.CharacterModel.GenericAudioSource);
+                        weaponItem.ReloadedClip?.Play(tpsModel.GenericAudioSource);
                     }
 
                     // Reload / Fill ammo

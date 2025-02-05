@@ -169,11 +169,13 @@ namespace MultiplayerARPG
 
             try
             {
-                bool tpsModelAvailable = Entity.CharacterModel != null && Entity.CharacterModel.gameObject.activeSelf;
+                BaseCharacterModel tpsModel = Entity.CharacterModel;
+                bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
-                bool overridePassengerActionAnimations = Entity.PassengingVehicleSeat != null && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
-                bool fpsModelAvailable = IsClient && Entity.FpsModel != null && Entity.FpsModel.gameObject.activeSelf;
+                bool overridePassengerActionAnimations = vehicleModelAvailable && Entity.PassengingVehicleSeat.overridePassengerActionAnimations;
+                BaseCharacterModel fpsModel = Entity.FpsModel;
+                bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
                 // Prepare end time
                 LastAttackEndTime = CharacterActionComponentManager.PrepareActionDefaultEndTime(_totalDuration, animSpeedRate);
@@ -181,16 +183,16 @@ namespace MultiplayerARPG
                 // Play action animation
                 if (weaponItem.DoRecoilingAsAttackAnimation)
                 {
-                    _totalDuration = Entity.CharacterModel.CacheAttackRecoiler?.DefaultRecoilDuration ?? 1f;
+                    _totalDuration = tpsModel.CacheAttackRecoiler?.DefaultRecoilDuration ?? 1f;
                     _triggerDurations = new float[] { 0f };
                     if (vehicleModelAvailable)
                         vehicleModel.CacheAttackRecoiler?.PlayRecoiling();
                     if (!overridePassengerActionAnimations)
                     {
                         if (tpsModelAvailable)
-                            Entity.CharacterModel.CacheAttackRecoiler?.PlayRecoiling();
+                            tpsModel.CacheAttackRecoiler?.PlayRecoiling();
                         if (fpsModelAvailable)
-                            Entity.FpsModel.CacheAttackRecoiler?.PlayRecoiling();
+                            fpsModel.CacheAttackRecoiler?.PlayRecoiling();
                     }
                 }
                 else
@@ -200,9 +202,9 @@ namespace MultiplayerARPG
                     if (!overridePassengerActionAnimations)
                     {
                         if (tpsModelAvailable)
-                            Entity.CharacterModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                            tpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
                         if (fpsModelAvailable)
-                            Entity.FpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                            fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
                     }
                 }
 
@@ -252,9 +254,9 @@ namespace MultiplayerARPG
                         if (!overridePassengerActionAnimations)
                         {
                             if (tpsModelAvailable)
-                                Entity.CharacterModel.PlayEquippedWeaponLaunch(isLeftHand);
+                                tpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                             if (fpsModelAvailable)
-                                Entity.FpsModel.PlayEquippedWeaponLaunch(isLeftHand);
+                                fpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         }
                         else if (vehicleModelAvailable)
                         {
@@ -264,7 +266,7 @@ namespace MultiplayerARPG
                         AudioClipWithVolumeSettings launchClip = weaponItem.LaunchClip;
                         if (Entity.GetCaches().TryGetWeaponAbility(isLeftHand, LaunchSfxWeaponAbility.KEY, out BaseWeaponAbility ability) && ability is LaunchSfxWeaponAbility launchSfxAbility)
                             launchClip = launchSfxAbility.LaunchClip;
-                        launchClip?.Play(Entity.CharacterModel.GenericAudioSource);
+                        launchClip?.Play(tpsModel.GenericAudioSource);
                     }
 
                     if (Entity.IsDead())
