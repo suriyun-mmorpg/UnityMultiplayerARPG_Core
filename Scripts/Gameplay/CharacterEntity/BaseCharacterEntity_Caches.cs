@@ -2,7 +2,17 @@
 {
     public partial class BaseCharacterEntity
     {
-        public CharacterDataCache CachedData { get; protected set; }
+        private CharacterDataCache _cachedData;
+        public CharacterDataCache CachedData
+        {
+            get
+            {
+                if (_cachedData == null)
+                    _cachedData = this.GetCaches();
+                return _cachedData;
+            }
+            set => _cachedData = value;
+        }
         /// <summary>
         /// This variable will be TRUE when cache data have to re-cache
         /// </summary>
@@ -50,7 +60,6 @@
 
             // Make caches with cache manager
             this.MarkToMakeCaches();
-            CachedData = this.GetCaches();
 
             CallRecachingEvents();
 
