@@ -120,7 +120,7 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.onQuestsOperation -= OnQuestsOperation;
         }
 
-        private void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnQuestsOperation(LiteNetLibSyncListOp operation, int index, CharacterQuest oldItem, CharacterQuest newItem)
         {
             UpdateData();
         }

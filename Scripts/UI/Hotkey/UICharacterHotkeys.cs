@@ -167,9 +167,21 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.onHotkeysOperation -= PlayingCharacterEntity_onHotkeysOperation;
         }
 
-        private void PlayingCharacterEntity_onHotkeysOperation(LiteNetLibSyncList.Operation arg1, int arg2)
+        private void PlayingCharacterEntity_onHotkeysOperation(LiteNetLibSyncListOp operation, int index, CharacterHotkey oldItem, CharacterHotkey newItem)
         {
-            UpdateData();
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (!string.Equals(oldItem.hotkeyId, newItem.hotkeyId) ||
+                        oldItem.type != newItem.type ||
+                        !string.Equals(oldItem.relateId, newItem.relateId))
+                        UpdateData();
+                    break;
+                default:
+                    UpdateData();
+                    break;
+            }
         }
 
         private void Update()

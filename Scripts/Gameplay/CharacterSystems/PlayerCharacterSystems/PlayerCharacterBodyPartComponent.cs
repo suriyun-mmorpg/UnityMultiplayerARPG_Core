@@ -228,9 +228,19 @@ namespace MultiplayerARPG
             characterModel.SetupEquippingModels(cancellationTokenSource, showingModels, storingModels, unequippingSockets, options[_currentModelIndex].models, CreateFakeEquipPosition(), CreateFakeCharacterItem(), false, 0, OnShowEquipmentModel).Forget();
         }
 
-        private void OnPublicIntsOperation(LiteNetLibSyncList.Operation op, int index)
+        private void OnPublicIntsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
         {
-            ApplyModelAndColorBySavedData();
+            switch(operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.hashedKey != newItem.hashedKey || oldItem.value != newItem.value)
+                        ApplyModelAndColorBySavedData();
+                    break;
+                default:
+                    ApplyModelAndColorBySavedData();
+                    break;
+            }
         }
 
         protected virtual void OnShowEquipmentModel(EquipmentModel model, GameObject modelObject, BaseEquipmentEntity equipmentEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)

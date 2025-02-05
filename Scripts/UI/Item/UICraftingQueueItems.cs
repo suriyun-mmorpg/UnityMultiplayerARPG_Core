@@ -167,7 +167,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void OnCraftingQueueItemsOperation(LiteNetLibSyncList.Operation op, int itemIndex)
+        protected void OnCraftingQueueItemsOperation(LiteNetLibSyncListOp operation, int index, CraftingQueueItem oldItem, CraftingQueueItem newItem)
         {
             UpdateData();
         }

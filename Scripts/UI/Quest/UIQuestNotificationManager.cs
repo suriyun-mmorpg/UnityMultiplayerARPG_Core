@@ -97,7 +97,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation op, int index)
+        private void OnNonEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
             float currentTime = Time.unscaledTime;
             TextWrapper newMessage;
@@ -105,12 +105,12 @@ namespace MultiplayerARPG
             CharacterQuest tempCharacterQuest;
             Quest tempQuestData;
             QuestTask[] tempTasks;
-            switch (op)
+            switch (operation)
             {
-                case LiteNetLibSyncList.Operation.Add:
-                case LiteNetLibSyncList.Operation.Insert:
-                case LiteNetLibSyncList.Operation.Set:
-                case LiteNetLibSyncList.Operation.Dirty:
+                case LiteNetLibSyncListOp.Add:
+                case LiteNetLibSyncListOp.Insert:
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
                     for (int i = 0; i < character.Quests.Count; ++i)
                     {
                         tempCharacterQuest = character.Quests[i];
@@ -146,10 +146,10 @@ namespace MultiplayerARPG
                         } // End for
                     }
                     break;
-                case LiteNetLibSyncList.Operation.Clear:
-                case LiteNetLibSyncList.Operation.RemoveAt:
-                case LiteNetLibSyncList.Operation.RemoveFirst:
-                case LiteNetLibSyncList.Operation.RemoveLast:
+                case LiteNetLibSyncListOp.Clear:
+                case LiteNetLibSyncListOp.RemoveAt:
+                case LiteNetLibSyncListOp.RemoveFirst:
+                case LiteNetLibSyncListOp.RemoveLast:
                     for (int i = 0; i < character.Quests.Count; ++i)
                     {
                         tempCharacterQuest = character.Quests[i];
@@ -172,20 +172,20 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnQuestsOperation(LiteNetLibSyncList.Operation op, int index)
+        private void OnQuestsOperation(LiteNetLibSyncListOp operation, int index, CharacterQuest oldItem, CharacterQuest newItem)
         {
             float currentTime = Time.unscaledTime;
             TextWrapper newMessage;
             BasePlayerCharacterEntity character = GameInstance.PlayingCharacterEntity;
             CharacterQuest tempCharacterQuest;
             Quest tempQuestData;
-            switch (op)
+            switch (operation)
             {
-                case LiteNetLibSyncList.Operation.Clear:
+                case LiteNetLibSyncListOp.Clear:
                     comparingQuests.Clear();
                     break;
-                case LiteNetLibSyncList.Operation.Add:
-                case LiteNetLibSyncList.Operation.Insert:
+                case LiteNetLibSyncListOp.Add:
+                case LiteNetLibSyncListOp.Insert:
                     tempCharacterQuest = character.Quests[index];
                     tempQuestData = tempCharacterQuest.GetQuest();
                     if (currentTime - awakenTime >= delayBeforeShowingMessages)
@@ -195,8 +195,8 @@ namespace MultiplayerARPG
                     }
                     comparingQuests.Add(MakeRecord(tempCharacterQuest));
                     break;
-                case LiteNetLibSyncList.Operation.Set:
-                case LiteNetLibSyncList.Operation.Dirty:
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
                     tempCharacterQuest = character.Quests[index];
                     tempQuestData = tempCharacterQuest.GetQuest();
                     if (comparingQuests[index].isComplete && !tempCharacterQuest.isComplete)
@@ -261,13 +261,13 @@ namespace MultiplayerARPG
                         } // End for
                     }
                     break;
-                case LiteNetLibSyncList.Operation.RemoveAt:
+                case LiteNetLibSyncListOp.RemoveAt:
                     comparingQuests.RemoveAt(index);
                     break;
-                case LiteNetLibSyncList.Operation.RemoveFirst:
+                case LiteNetLibSyncListOp.RemoveFirst:
                     comparingQuests.RemoveAt(0);
                     break;
-                case LiteNetLibSyncList.Operation.RemoveLast:
+                case LiteNetLibSyncListOp.RemoveLast:
                     comparingQuests.RemoveAt(comparingQuests.Count - 1);
                     break;
             }

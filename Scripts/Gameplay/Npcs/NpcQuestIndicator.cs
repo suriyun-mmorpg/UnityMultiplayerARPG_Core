@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -64,7 +65,7 @@ namespace MultiplayerARPG
             playingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
         }
 
-        private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
+        private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibSyncListOp op, int index, CharacterQuest oldItem, CharacterQuest newItem)
         {
             UpdateStatus();
         }

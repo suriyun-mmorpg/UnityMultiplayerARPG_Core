@@ -791,19 +791,19 @@ namespace MultiplayerARPG
 
 #if !DISABLE_CUSTOM_CHARACTER_DATA
 
-        private void OnServerBoolsOperation(object sender, NotifiableListAction action, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
+        private void OnServerBoolsOperation(NotifiableListAction action, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
         {
             if (onServerBoolsOperation != null)
                 onServerBoolsOperation.Invoke(action, index, oldItem, newItem);
         }
 
-        private void OnServerIntsOperation(object sender, NotifiableListAction action, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
+        private void OnServerIntsOperation(NotifiableListAction action, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
         {
             if (onServerIntsOperation != null)
                 onServerIntsOperation.Invoke(action, index, oldItem, newItem);
         }
 
-        private void OnServerFloatsOperation(object sender, NotifiableListAction action, int index, CharacterDataFloat32 oldItem, CharacterDataFloat32 newItem)
+        private void OnServerFloatsOperation(NotifiableListAction action, int index, CharacterDataFloat32 oldItem, CharacterDataFloat32 newItem)
         {
             if (onServerFloatsOperation != null)
                 onServerFloatsOperation.Invoke(action, index, oldItem, newItem);

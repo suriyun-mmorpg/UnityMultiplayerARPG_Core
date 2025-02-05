@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -83,7 +84,7 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.onQuestsOperation -= PlayingCharacterEntity_onQuestsOperation;
         }
 
-        private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
+        private void PlayingCharacterEntity_onQuestsOperation(LiteNetLibSyncListOp operation, int index, CharacterQuest oldItem, CharacterQuest newItem)
         {
             ReRenderUI();
         }

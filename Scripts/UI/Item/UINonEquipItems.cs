@@ -19,9 +19,19 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         }
 
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnNonEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
-            UpdateOwningCharacterData();
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.IsDiffer(newItem, true, true))
+                        UpdateOwningCharacterData();
+                    break;
+                default:
+                    UpdateOwningCharacterData();
+                    break;
+            }
         }
 
         public void UpdateOwningCharacterData()

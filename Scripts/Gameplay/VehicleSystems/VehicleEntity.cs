@@ -166,7 +166,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void OnPassengerIdsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnPassengerIdsOperation(LiteNetLibSyncListOp operation, int index, uint oldItem, uint newItem)
         {
             if (index >= passengerIds.Count)
                 return;

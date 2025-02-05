@@ -51,7 +51,10 @@ namespace MultiplayerARPG
             base.OnEnable();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += OnNonEquipItemsOperation;
-            OnNonEquipItemsOperation(LiteNetLibSyncList.Operation.Dirty, 0);
+            if (GameInstance.PlayingCharacterEntity.NonEquipItems.Count > 0)
+                OnNonEquipItemsOperation(LiteNetLibSyncListOp.Dirty, 0, GameInstance.PlayingCharacterEntity.NonEquipItems[0], GameInstance.PlayingCharacterEntity.NonEquipItems[0]);
+            else
+                OnNonEquipItemsOperation(LiteNetLibSyncListOp.Clear, -1, default, default);
         }
 
         protected override void OnDisable()
@@ -61,7 +64,7 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
         }
 
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnNonEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
             if (!autoAssignItem)
                 return;

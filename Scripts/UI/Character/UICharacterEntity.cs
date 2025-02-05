@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -92,9 +93,22 @@ namespace MultiplayerARPG
             UpdateMp();
         }
 
-        protected void OnBuffsOperation(LiteNetLibManager.LiteNetLibSyncList.Operation op, int index)
+        protected void OnBuffsOperation(LiteNetLibSyncListOp operation, int index, CharacterBuff oldItem, CharacterBuff newItem)
         {
-            UpdateBuffs();
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (!string.Equals(oldItem.id, newItem.id) ||
+                        oldItem.type != newItem.type ||
+                        oldItem.dataId != newItem.dataId ||
+                        oldItem.level != newItem.level)
+                        UpdateBuffs();
+                    break;
+                default:
+                    UpdateBuffs();
+                    break;
+            }
         }
 
         protected void OnPkPointChange(int pkPoint)

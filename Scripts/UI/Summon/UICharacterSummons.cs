@@ -76,9 +76,23 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.onSummonsOperation -= OnSummonsOperation;
         }
 
-        private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSummonsOperation(LiteNetLibSyncListOp operation, int index, CharacterSummon oldItem, CharacterSummon newItem)
         {
-            UpdateOwningCharacterData();
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (!string.Equals(oldItem.id, newItem.id) ||
+                        oldItem.type != newItem.type ||
+                        !string.Equals(oldItem.sourceId, newItem.sourceId) ||
+                        oldItem.dataId != newItem.dataId ||
+                        oldItem.objectId != newItem.objectId)
+                        UpdateOwningCharacterData();
+                    break;
+                default:
+                    UpdateOwningCharacterData();
+                    break;
+            }
         }
 
         public void UpdateOwningCharacterData()
