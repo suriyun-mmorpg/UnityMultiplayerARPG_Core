@@ -24,14 +24,6 @@ namespace MultiplayerARPG
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
         public const int FRAMES_BEFORE_UPDATE_APPEARANCES = 1;
 
-        protected struct SyncListRecachingState
-        {
-            public static readonly SyncListRecachingState Empty = new SyncListRecachingState();
-            public bool isRecaching;
-            public LiteNetLibSyncList.Operation operation;
-            public int index;
-        }
-
         [Category("Relative GameObjects/Transforms")]
         [Tooltip("When character attack with melee weapon, it will cast sphere from this transform to detect hit objects")]
         [SerializeField]
@@ -326,8 +318,6 @@ namespace MultiplayerARPG
                         CurrentHp = 0;
                         Killed(GetInfo());
                     }
-                    // Disable movement when character dead
-                    tempEnableMovement = false;
                 }
             }
             Profiler.EndSample();
@@ -342,6 +332,8 @@ namespace MultiplayerARPG
             {
                 // Clear data when character dead
                 ExitVehicleAndForget();
+                // Disable movement when character dead
+                tempEnableMovement = false;
             }
 
             Profiler.BeginSample("BaseCharacterEntity - MovementEnablingUpdate");
@@ -366,7 +358,7 @@ namespace MultiplayerARPG
             {
                 --_countDownToUpdateAppearances;
                 if (_countDownToUpdateAppearances <= 0)
-                    SetEquipItemsModels();
+                    UpdateAppearances();
             }
 
             if (_countDownToUpdateAmmoSim > 0)
@@ -1187,19 +1179,22 @@ namespace MultiplayerARPG
         #region Character model updating
         public void MarkToUpdateAppearances()
         {
-            _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
+            if (_countDownToUpdateAppearances > 0)
+                _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         }
 
-        protected void SetEquipItemsModels()
+        protected void UpdateAppearances()
         {
+            Profiler.BeginSample("BaseCharacterEntity - UpdateAppearances");
             CharacterModel.SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
             if (IsOwnerClient && FpsModel != null)
                 FpsModel.SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
+            Profiler.EndSample();
         }
 
         protected void UpdateModelManager(float deltaTime)
         {
-            Profiler.BeginSample("BaseCharacterEntity - ModelManagerUpdate");
+            Profiler.BeginSample("BaseCharacterEntity - UpdateModelManager");
             // Update character model handler based on passenging vehicle
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicleSeatIndex);
             // Set character model hide state
@@ -1216,7 +1211,7 @@ namespace MultiplayerARPG
 
         protected void UpdateCharacterModel(float deltaTime)
         {
-            Profiler.BeginSample("BaseCharacterEntity - CharacterModelUpdate");
+            Profiler.BeginSample("BaseCharacterEntity - UpdateCharacterModel");
             // Update model animations
             if (IsClient || GameInstance.Singleton.updateAnimationAtServer)
             {
@@ -1234,7 +1229,7 @@ namespace MultiplayerARPG
 
         protected void UpdateFpsModel(float deltaTime)
         {
-            Profiler.BeginSample("BaseCharacterEntity - FPSModelUpdate");
+            Profiler.BeginSample("BaseCharacterEntity - UpdateFpsModel");
             // Update FPS model
             if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
             {

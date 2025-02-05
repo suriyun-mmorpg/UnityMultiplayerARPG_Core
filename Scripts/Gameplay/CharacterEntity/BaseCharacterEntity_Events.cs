@@ -33,14 +33,14 @@ namespace MultiplayerARPG
         public event System.Action<uint> onTargetEntityIdChange;
         public event System.Action<CharacterMount> onMountChange;
         // Sync lists
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSelectableWeaponSetsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onAttributesOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSkillUsagesOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onBuffsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onEquipItemsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onNonEquipItemsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onSummonsOperation;
+        public event LiteNetLibSyncList<EquipWeapons>.OnOperationDelegate onSelectableWeaponSetsOperation;
+        public event LiteNetLibSyncList<CharacterAttribute>.OnOperationDelegate onAttributesOperation;
+        public event LiteNetLibSyncList<CharacterSkill>.OnOperationDelegate onSkillsOperation;
+        public event LiteNetLibSyncList<CharacterSkillUsage>.OnOperationDelegate onSkillUsagesOperation;
+        public event LiteNetLibSyncList<CharacterBuff>.OnOperationDelegate onBuffsOperation;
+        public event LiteNetLibSyncList<CharacterItem>.OnOperationDelegate onEquipItemsOperation;
+        public event LiteNetLibSyncList<CharacterItem>.OnOperationDelegate onNonEquipItemsOperation;
+        public event LiteNetLibSyncList<CharacterSummon>.OnOperationDelegate onSummonsOperation;
         // Action events
         public event AttackRoutineDelegate onAttackRoutine;
         public event UseSkillRoutineDelegate onUseSkillRoutine;

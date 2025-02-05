@@ -641,7 +641,7 @@ namespace MultiplayerARPG
                 }
             }
         }
-#endregion
+        #endregion
 
         #region Sync data changes callback
         private void OnPlayerIdChange(bool isInitial, string id)
@@ -658,14 +658,14 @@ namespace MultiplayerARPG
 
         private void OnDataIdChange(bool isInitial, int dataId)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onDataIdChange != null)
                 onDataIdChange.Invoke(dataId);
         }
 
         private void OnFactionIdChange(bool isInitial, int factionId)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onFactionIdChange != null)
                 onFactionIdChange.Invoke(factionId);
         }
@@ -702,35 +702,35 @@ namespace MultiplayerARPG
 
         private void OnPartyIdChange(bool isInitial, int partyId)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onPartyIdChange != null)
                 onPartyIdChange.Invoke(partyId);
         }
 
         private void OnGuildIdChange(bool isInitial, int guildId)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onGuildIdChange != null)
                 onGuildIdChange.Invoke(guildId);
         }
 
         private void OnIconDataIdChange(bool isInitial, int iconDataId)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onIconDataIdChange != null)
                 onIconDataIdChange.Invoke(iconDataId);
         }
 
         private void OnFrameDataIdChange(bool isInitial, int frameDataId)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onFrameDataIdChange != null)
                 onFrameDataIdChange.Invoke(frameDataId);
         }
 
         private void OnTitleDataIdChange(bool isInitial, int titleDataId)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onTitleDataIdChange != null)
                 onTitleDataIdChange.Invoke(titleDataId);
         }
@@ -769,88 +769,88 @@ namespace MultiplayerARPG
         #endregion
 
         #region Net functions operation callback
-        private void OnHotkeysOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnHotkeysOperation(LiteNetLibSyncListOp operation, int index, CharacterHotkey oldItem, CharacterHotkey newItem)
         {
             if (onHotkeysOperation != null)
-                onHotkeysOperation.Invoke(operation, index);
+                onHotkeysOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        private void OnQuestsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnQuestsOperation(LiteNetLibSyncListOp operation, int index, CharacterQuest oldItem, CharacterQuest newItem)
         {
             if (onQuestsOperation != null)
-                onQuestsOperation.Invoke(operation, index);
+                onQuestsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
 #if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
-        private void OnCurrenciesOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnCurrenciesOperation(LiteNetLibSyncListOp operation, int index, CharacterCurrency oldItem, CharacterCurrency newItem)
         {
             if (onCurrenciesOperation != null)
-                onCurrenciesOperation.Invoke(operation, index);
+                onCurrenciesOperation.Invoke(operation, index, oldItem, newItem);
         }
 #endif
 
 #if !DISABLE_CUSTOM_CHARACTER_DATA
 
-        private void OnServerBoolsOperation(object sender, NotifiableListAction action, int index)
+        private void OnServerBoolsOperation(object sender, NotifiableListAction action, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
         {
             if (onServerBoolsOperation != null)
-                onServerBoolsOperation.Invoke(action, index);
+                onServerBoolsOperation.Invoke(action, index, oldItem, newItem);
         }
 
-        private void OnServerIntsOperation(object sender, NotifiableListAction action, int index)
+        private void OnServerIntsOperation(object sender, NotifiableListAction action, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
         {
             if (onServerIntsOperation != null)
-                onServerIntsOperation.Invoke(action, index);
+                onServerIntsOperation.Invoke(action, index, oldItem, newItem);
         }
 
-        private void OnServerFloatsOperation(object sender, NotifiableListAction action, int index)
+        private void OnServerFloatsOperation(object sender, NotifiableListAction action, int index, CharacterDataFloat32 oldItem, CharacterDataFloat32 newItem)
         {
             if (onServerFloatsOperation != null)
-                onServerFloatsOperation.Invoke(action, index);
+                onServerFloatsOperation.Invoke(action, index, oldItem, newItem);
         }
 
-        private void OnPrivateBoolsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnPrivateBoolsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
         {
             if (onPrivateBoolsOperation != null)
-                onPrivateBoolsOperation.Invoke(operation, index);
+                onPrivateBoolsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        private void OnPrivateIntsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnPrivateIntsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
         {
             if (onPrivateIntsOperation != null)
-                onPrivateIntsOperation.Invoke(operation, index);
+                onPrivateIntsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        private void OnPrivateFloatsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnPrivateFloatsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataFloat32 oldItem, CharacterDataFloat32 newItem)
         {
             if (onPrivateFloatsOperation != null)
-                onPrivateFloatsOperation.Invoke(operation, index);
+                onPrivateFloatsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        private void OnPublicBoolsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnPublicBoolsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
         {
             if (onPublicBoolsOperation != null)
-                onPublicBoolsOperation.Invoke(operation, index);
+                onPublicBoolsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        private void OnPublicIntsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnPublicIntsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataInt32 oldItem, CharacterDataInt32 newItem)
         {
             if (onPublicIntsOperation != null)
-                onPublicIntsOperation.Invoke(operation, index);
+                onPublicIntsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        private void OnPublicFloatsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnPublicFloatsOperation(LiteNetLibSyncListOp operation, int index, CharacterDataFloat32 oldItem, CharacterDataFloat32 newItem)
         {
             if (onPublicFloatsOperation != null)
-                onPublicFloatsOperation.Invoke(operation, index);
+                onPublicFloatsOperation.Invoke(operation, index, oldItem, newItem);
         }
 #endif
 
-        private void OnGuildSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnGuildSkillsOperation(LiteNetLibSyncListOp operation, int index, CharacterSkill oldItem, CharacterSkill newItem)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onGuildSkillsOperation != null)
-                onGuildSkillsOperation.Invoke(operation, index);
+                onGuildSkillsOperation.Invoke(operation, index, oldItem, newItem);
         }
         #endregion
     }

@@ -27,23 +27,23 @@ namespace MultiplayerARPG
         public event System.Action<int> onReputationChange;
         public event System.Action<bool> onIsWarpingChange;
         // Sync lists
-        public event System.Action<LiteNetLibSyncList.Operation, int> onHotkeysOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onQuestsOperation;
+        public event LiteNetLibSyncList<CharacterHotkey>.OnOperationDelegate onHotkeysOperation;
+        public event LiteNetLibSyncList<CharacterQuest>.OnOperationDelegate onQuestsOperation;
 #if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
-        public event System.Action<LiteNetLibSyncList.Operation, int> onCurrenciesOperation;
+        public event LiteNetLibSyncList<CharacterCurrency>.OnOperationDelegate onCurrenciesOperation;
 #endif
 #if !DISABLE_CUSTOM_CHARACTER_DATA
-        public event System.Action<NotifiableListAction, int> onServerBoolsOperation;
-        public event System.Action<NotifiableListAction, int> onServerIntsOperation;
-        public event System.Action<NotifiableListAction, int> onServerFloatsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateBoolsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateIntsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onPrivateFloatsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onPublicBoolsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onPublicIntsOperation;
-        public event System.Action<LiteNetLibSyncList.Operation, int> onPublicFloatsOperation;
+        public event NotifiableList<CharacterDataBoolean>.OnChangedDelegate onServerBoolsOperation;
+        public event NotifiableList<CharacterDataInt32>.OnChangedDelegate onServerIntsOperation;
+        public event NotifiableList<CharacterDataFloat32>.OnChangedDelegate onServerFloatsOperation;
+        public event LiteNetLibSyncList<CharacterDataBoolean>.OnOperationDelegate onPrivateBoolsOperation;
+        public event LiteNetLibSyncList<CharacterDataInt32>.OnOperationDelegate onPrivateIntsOperation;
+        public event LiteNetLibSyncList<CharacterDataFloat32>.OnOperationDelegate onPrivateFloatsOperation;
+        public event LiteNetLibSyncList<CharacterDataBoolean>.OnOperationDelegate onPublicBoolsOperation;
+        public event LiteNetLibSyncList<CharacterDataInt32>.OnOperationDelegate onPublicIntsOperation;
+        public event LiteNetLibSyncList<CharacterDataFloat32>.OnOperationDelegate onPublicFloatsOperation;
 #endif
-        public event System.Action<LiteNetLibSyncList.Operation, int> onGuildSkillsOperation;
+        public event LiteNetLibSyncList<CharacterSkill>.OnOperationDelegate onGuildSkillsOperation;
 
         public override void OnRewardItem(RewardGivenType givenType, BaseItem item, int amount)
         {

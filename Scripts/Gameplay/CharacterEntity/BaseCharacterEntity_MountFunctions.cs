@@ -93,7 +93,7 @@ namespace MultiplayerARPG
         public override void SetPassengingVehicle(byte seatIndex, IVehicleEntity vehicleEntity)
         {
             base.SetPassengingVehicle(seatIndex, vehicleEntity);
-            _isRecaching = true;
+            IsRecaching = true;
         }
 
         public override bool CanEnterVehicle(IVehicleEntity vehicleEntity, byte seatIndex, out UITextKeys gameMessage)

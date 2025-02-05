@@ -365,275 +365,141 @@ namespace MultiplayerARPG
         #endregion
 
         #region Sync data changed callback
-        /// <summary>
-        /// This will be called when id changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="id"></param>
         private void OnIdChange(bool isInitial, string id)
         {
             if (onIdChange != null)
                 onIdChange.Invoke(id);
         }
 
-        /// <summary>
-        /// This will be called when character name changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="characterName"></param>
         private void OnCharacterNameChange(bool isInitial, string characterName)
         {
             if (onCharacterNameChange != null)
                 onCharacterNameChange.Invoke(characterName);
         }
 
-        /// <summary>
-        /// This will be called when level changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="level"></param>
         private void OnLevelChange(bool isInitial, int level)
         {
-            _isRecaching = true;
+            IsRecaching = true;
             if (onLevelChange != null)
                 onLevelChange.Invoke(level);
         }
 
-        /// <summary>
-        /// This will be called when exp changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="exp"></param>
         private void OnExpChange(bool isInitial, int exp)
         {
             if (onExpChange != null)
                 onExpChange.Invoke(exp);
         }
 
-        /// <summary>
-        /// This will be called when is immune changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="isImmune"></param>
         private void OnIsImmuneChange(bool isInitial, bool isImmune)
         {
             if (onIsImmuneChange != null)
                 onIsImmuneChange.Invoke(isImmune);
         }
 
-        /// <summary>
-        /// This will be called when current mp changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="currentMp"></param>
         private void OnCurrentMpChange(bool isInitial, int currentMp)
         {
             if (onCurrentMpChange != null)
                 onCurrentMpChange.Invoke(currentMp);
         }
 
-        /// <summary>
-        /// This will be called when current stamina changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="currentStamina"></param>
         private void OnCurrentStaminaChange(bool isInitial, int currentStamina)
         {
             if (onCurrentStaminaChange != null)
                 onCurrentStaminaChange.Invoke(currentStamina);
         }
 
-        /// <summary>
-        /// This will be called when current food changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="currentFood"></param>
         private void OnCurrentFoodChange(bool isInitial, int currentFood)
         {
             if (onCurrentFoodChange != null)
                 onCurrentFoodChange.Invoke(currentFood);
         }
 
-        /// <summary>
-        /// This will be called when current water changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="currentWater"></param>
         private void OnCurrentWaterChange(bool isInitial, int currentWater)
         {
             if (onCurrentWaterChange != null)
                 onCurrentWaterChange.Invoke(currentWater);
         }
 
-        /// <summary>
-        /// This will be called when equip weapon set changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="equipWeaponSet"></param>
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             MarkToUpdateAppearances();
             MarkToUpdateAmmoSim();
-            _isRecaching = true;
+            IsRecaching = true;
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
         }
 
-        /// <summary>
-        /// This will be called when is weapons sheathed changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="isWeaponsSheathed"></param>
         protected virtual void OnIsWeaponsSheathedChange(bool isInitial, bool isWeaponsSheathed)
         {
             MarkToUpdateAppearances();
-            _isRecaching = true;
+            IsRecaching = true;
             if (onIsWeaponsSheathedChange != null)
                 onIsWeaponsSheathedChange.Invoke(isWeaponsSheathed);
         }
 
-        /// <summary>
-        /// This will be called when pitch changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="pitch"></param>
         private void OnPitchChange(bool isInitial, ushort pitch)
         {
             if (onPitchChange != null)
                 onPitchChange.Invoke(pitch);
         }
 
-        /// <summary>
-        /// This will be called when look position changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="lookPosition"></param>
         private void OnLookPositionChange(bool isInitial, Vector3 lookPosition)
         {
             if (onLookPositionChange != null)
                 onLookPositionChange.Invoke(lookPosition);
         }
 
-        /// <summary>
-        /// This will be called when aim position changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="aimPosition"></param>
         private void OnAimPositionChange(bool isInitial, AimPosition aimPosition)
         {
             if (onAimPositionChange != null)
                 onAimPositionChange.Invoke(aimPosition);
         }
 
-        /// <summary>
-        /// This will be called when target entity id changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="targetEntityId"></param>
         private void OnTargetEntityIdChange(bool isInitial, uint targetEntityId)
         {
             if (onTargetEntityIdChange != null)
                 onTargetEntityIdChange.Invoke(targetEntityId);
         }
 
-        /// <summary>
-        /// This will be called when mount changed
-        /// </summary>
-        /// <param name="isInitial"></param>
-        /// <param name="mount"></param>
         private void OnMountChange(bool isInitial, CharacterMount mount)
         {
+            IsRecaching = true;
             if (onMountChange != null)
                 onMountChange.Invoke(mount);
         }
         #endregion
 
         #region Net functions operation callback
-        /// <summary>
-        /// This will be called when equip weapons changed
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="index"></param>
-        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSelectableWeaponSetsOperation(LiteNetLibSyncListOp operation, int index, EquipWeapons oldItem, EquipWeapons newItem)
         {
             MarkToUpdateAppearances();
             MarkToUpdateAmmoSim();
-            _selectableWeaponSetsRecachingState = new SyncListRecachingState()
-            {
-                isRecaching = true,
-                operation = operation,
-                index = index
-            };
+            IsRecaching = true;
+            if (onSelectableWeaponSetsOperation != null)
+                onSelectableWeaponSetsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        /// <summary>
-        /// This will be called when attributes changed
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="index"></param>
-        private void OnAttributesOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnAttributesOperation(LiteNetLibSyncListOp operation, int index, CharacterAttribute oldItem, CharacterAttribute newItem)
         {
-            _attributesRecachingState = new SyncListRecachingState()
-            {
-                isRecaching = true,
-                operation = operation,
-                index = index
-            };
+            IsRecaching = true;
+            if (onAttributesOperation != null)
+                onAttributesOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        /// <summary>
-        /// This will be called when skills changed
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="index"></param>
-        private void OnSkillsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSkillsOperation(LiteNetLibSyncListOp operation, int index, CharacterSkill oldItem, CharacterSkill newItem)
         {
-            _skillsRecachingState = new SyncListRecachingState()
-            {
-                isRecaching = true,
-                operation = operation,
-                index = index
-            };
+            IsRecaching = true;
+            if (onSkillsOperation != null)
+                onSkillsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        /// <summary>
-        /// This will be called when skill usages changed
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="index"></param>
-        private void OnSkillUsagesOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSkillUsagesOperation(LiteNetLibSyncListOp operation, int index, CharacterSkillUsage oldItem, CharacterSkillUsage newItem)
         {
             if (onSkillUsagesOperation != null)
-                onSkillUsagesOperation.Invoke(operation, index);
-
-            // Call update skill operations to update uis
-            switch (operation)
-            {
-                case LiteNetLibSyncList.Operation.Add:
-                case LiteNetLibSyncList.Operation.AddInitial:
-                case LiteNetLibSyncList.Operation.Insert:
-                case LiteNetLibSyncList.Operation.Set:
-                case LiteNetLibSyncList.Operation.Dirty:
-                    int skillIndex = this.IndexOfSkill(SkillUsages[index].dataId);
-                    if (skillIndex >= 0)
-                    {
-                        _skillsRecachingState = new SyncListRecachingState()
-                        {
-                            isRecaching = true,
-                            operation = operation,
-                            index = skillIndex
-                        };
-                    }
-                    break;
-            }
+                onSkillUsagesOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        /// <summary>
-        /// This will be called when buffs changed
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="index"></param>
-        private void OnBuffsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnBuffsOperation(LiteNetLibSyncListOp operation, int index, CharacterBuff oldItem, CharacterBuff newItem)
         {
             // Update model's buffs effects
             CharacterModel.SetBuffs(buffs);
@@ -642,67 +508,40 @@ namespace MultiplayerARPG
 
             switch (operation)
             {
-                case LiteNetLibSyncList.Operation.Add:
-                case LiteNetLibSyncList.Operation.AddInitial:
-                case LiteNetLibSyncList.Operation.Insert:
+                case LiteNetLibSyncListOp.Add:
+                case LiteNetLibSyncListOp.AddInitial:
+                case LiteNetLibSyncListOp.Insert:
                     // Check last buff to update disallow status
                     if (buffs.Count > 0 && buffs[buffs.Count - 1].GetBuff().GetBuff().disallowMove)
                         StopMove();
                     break;
             }
 
-            _buffsRecachingState = new SyncListRecachingState()
-            {
-                isRecaching = true,
-                operation = operation,
-                index = index
-            };
+            IsRecaching = true;
+            if (onBuffsOperation != null)
+                onBuffsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        /// <summary>
-        /// This will be called when equip items changed
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="index"></param>
-        private void OnEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
             MarkToUpdateAppearances();
-            _equipItemsRecachingState = new SyncListRecachingState()
-            {
-                isRecaching = true,
-                operation = operation,
-                index = index
-            };
+            IsRecaching = true;
+            if (onEquipItemsOperation != null)
+                onEquipItemsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        /// <summary>
-        /// This will be called when non equip items changed
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="index"></param>
-        private void OnNonEquipItemsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnNonEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
-            _nonEquipItemsRecachingState = new SyncListRecachingState()
-            {
-                isRecaching = true,
-                operation = operation,
-                index = index
-            };
+            IsRecaching = true;
+            if (onNonEquipItemsOperation != null)
+                onNonEquipItemsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
-        /// <summary>
-        /// This will be called when summons changed
-        /// </summary>
-        /// <param name="operation"></param>
-        /// <param name="index"></param>
-        private void OnSummonsOperation(LiteNetLibSyncList.Operation operation, int index)
+        private void OnSummonsOperation(LiteNetLibSyncListOp operation, int index, CharacterSummon oldItem, CharacterSummon newItem)
         {
-            _summonsRecachingState = new SyncListRecachingState()
-            {
-                isRecaching = true,
-                operation = operation,
-                index = index
-            };
+            IsRecaching = true;
+            if (onSummonsOperation != null)
+                onSummonsOperation.Invoke(operation, index, oldItem, newItem);
         }
         #endregion
     }
