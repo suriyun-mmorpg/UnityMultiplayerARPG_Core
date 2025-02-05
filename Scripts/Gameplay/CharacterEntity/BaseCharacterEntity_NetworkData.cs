@@ -473,7 +473,7 @@ namespace MultiplayerARPG
         protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
         {
             MarkToUpdateAppearances();
-            UpdateAmmoSim();
+            MarkToUpdateAmmoSim();
             _isRecaching = true;
             if (onEquipWeaponSetChange != null)
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
@@ -557,7 +557,7 @@ namespace MultiplayerARPG
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncList.Operation operation, int index)
         {
             MarkToUpdateAppearances();
-            UpdateAmmoSim();
+            MarkToUpdateAmmoSim();
             _selectableWeaponSetsRecachingState = new SyncListRecachingState()
             {
                 isRecaching = true,

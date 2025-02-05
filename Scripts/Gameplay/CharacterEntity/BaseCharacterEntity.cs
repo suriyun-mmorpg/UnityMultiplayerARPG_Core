@@ -283,9 +283,7 @@ namespace MultiplayerARPG
 
         protected override void EntityUpdate()
         {
-            Profiler.BeginSample("BaseCharacterEntity - MakeCaches");
             MakeCaches();
-            Profiler.EndSample();
             float deltaTime = Time.unscaledDeltaTime;
 
             UpdateHitboxesTransformHistory();
@@ -360,59 +358,23 @@ namespace MultiplayerARPG
             }
             Profiler.EndSample();
 
-            Profiler.BeginSample("BaseCharacterEntity - ModelManagerUpdate");
-            // Update character model handler based on passenging vehicle
-            ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicleSeatIndex);
-            // Set character model hide state
-            bool isHide = false;
-            // If this entity is hidding from playing character then hide it.
-            if (GameInstance.PlayingCharacterEntity != null ? this.IsHideFrom(GameInstance.PlayingCharacterEntity) : false)
-                isHide = true;
-            // If passenging vehicle seat want to hide it, then hide it.
-            if (!isHide && PassengingVehicleSeat != null && PassengingVehicleSeat.hidePassenger)
-                isHide = true;
-            ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, isHide);
-            Profiler.EndSample();
+            UpdateModelManager(deltaTime);
+            UpdateCharacterModel(deltaTime);
+            UpdateFpsModel(deltaTime);
 
-
-            Profiler.BeginSample("BaseCharacterEntity - CharacterModelUpdate");
-            // Update model animations
-            if (IsClient || GameInstance.Singleton.updateAnimationAtServer)
-            {
-                // Update is dead state
-                CharacterModel.SetIsDead(this.IsDead());
-                // Update move speed multiplier
-                CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                // Update movement state
-                CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
-                // Update animation
-                CharacterModel.UpdateAnimation(deltaTime);
-            }
-            Profiler.EndSample();
-
-            Profiler.BeginSample("BaseCharacterEntity - FPSModelUpdate");
-            // Update FPS model
-            if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
-            {
-                // Update is dead state
-                FpsModel.SetIsDead(this.IsDead());
-                // Update move speed multiplier
-                FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                // Update movement state
-                FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
-                // Update animation
-                FpsModel.UpdateAnimation(deltaTime);
-            }
-            Profiler.EndSample();
-
-            Profiler.BeginSample("BaseCharacterEntity - SetEquipItemsModels");
             if (_countDownToUpdateAppearances > 0)
             {
                 --_countDownToUpdateAppearances;
                 if (_countDownToUpdateAppearances <= 0)
                     SetEquipItemsModels();
             }
-            Profiler.EndSample();
+
+            if (_countDownToUpdateAmmoSim > 0)
+            {
+                --_countDownToUpdateAmmoSim;
+                if (_countDownToUpdateAmmoSim <= 0)
+                    UpdateAmmoSim();
+            }
         }
 
         public override void SendClientState(long writeTimestamp)
@@ -1222,7 +1184,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Equip items models setting
+        #region Character model updating
         public void MarkToUpdateAppearances()
         {
             _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
@@ -1233,6 +1195,59 @@ namespace MultiplayerARPG
             CharacterModel.SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
             if (IsOwnerClient && FpsModel != null)
                 FpsModel.SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
+        }
+
+        protected void UpdateModelManager(float deltaTime)
+        {
+            Profiler.BeginSample("BaseCharacterEntity - ModelManagerUpdate");
+            // Update character model handler based on passenging vehicle
+            ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicleSeatIndex);
+            // Set character model hide state
+            bool isHide = false;
+            // If this entity is hidding from playing character then hide it.
+            if (GameInstance.PlayingCharacterEntity != null ? this.IsHideFrom(GameInstance.PlayingCharacterEntity) : false)
+                isHide = true;
+            // If passenging vehicle seat want to hide it, then hide it.
+            if (!isHide && PassengingVehicleSeat != null && PassengingVehicleSeat.hidePassenger)
+                isHide = true;
+            ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, isHide);
+            Profiler.EndSample();
+        }
+
+        protected void UpdateCharacterModel(float deltaTime)
+        {
+            Profiler.BeginSample("BaseCharacterEntity - CharacterModelUpdate");
+            // Update model animations
+            if (IsClient || GameInstance.Singleton.updateAnimationAtServer)
+            {
+                // Update is dead state
+                CharacterModel.SetIsDead(this.IsDead());
+                // Update move speed multiplier
+                CharacterModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                // Update movement state
+                CharacterModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
+                // Update animation
+                CharacterModel.UpdateAnimation(deltaTime);
+            }
+            Profiler.EndSample();
+        }
+
+        protected void UpdateFpsModel(float deltaTime)
+        {
+            Profiler.BeginSample("BaseCharacterEntity - FPSModelUpdate");
+            // Update FPS model
+            if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
+            {
+                // Update is dead state
+                FpsModel.SetIsDead(this.IsDead());
+                // Update move speed multiplier
+                FpsModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                // Update movement state
+                FpsModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, CachedData.FreezeAnimation);
+                // Update animation
+                FpsModel.UpdateAnimation(deltaTime);
+            }
+            Profiler.EndSample();
         }
         #endregion
 

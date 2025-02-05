@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using UnityEngine.Profiling;
+
+namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
@@ -58,8 +60,11 @@
 
             _isRecaching = false;
 
+            Profiler.BeginSample("BaseCharacterEntity - MakeCaches");
             // Make caches with cache manager
             this.MarkToMakeCaches();
+            CachedData = this.GetCaches();
+            Profiler.EndSample();
 
             CallRecachingEvents();
 
