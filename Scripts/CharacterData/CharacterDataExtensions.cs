@@ -1430,6 +1430,23 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public static void AddOrUpdateSkillUsage(this BaseCharacterEntity character, SkillUsageType type, int dataId, int skillLevel)
+        {
+            int index = character.IndexOfSkillUsage(type, dataId);
+            if (index >= 0)
+            {
+                CharacterSkillUsage newSkillUsage = character.SkillUsages[index];
+                newSkillUsage.Use(character, skillLevel);
+                character.SkillUsages[index] = newSkillUsage;
+            }
+            else
+            {
+                CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(type, dataId);
+                newSkillUsage.Use(character, skillLevel);
+                character.SkillUsages.Add(newSkillUsage);
+            }
+        }
+
         public static bool IsDifferMount(this ICharacterData data, MountType mountType, string sourceId, int level)
         {
             if (data == null)

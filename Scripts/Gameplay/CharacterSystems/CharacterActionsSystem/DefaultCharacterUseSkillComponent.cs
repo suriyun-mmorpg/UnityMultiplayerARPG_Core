@@ -130,23 +130,6 @@ namespace MultiplayerARPG
             LastUseSkillEndTime = endTime;
         }
 
-        protected virtual void AddOrUpdateSkillUsage(SkillUsageType type, int dataId, int skillLevel)
-        {
-            int index = Entity.IndexOfSkillUsage(type, dataId);
-            if (index >= 0)
-            {
-                CharacterSkillUsage newSkillUsage = Entity.SkillUsages[index];
-                newSkillUsage.Use(Entity, skillLevel);
-                Entity.SkillUsages[index] = newSkillUsage;
-            }
-            else
-            {
-                CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(type, dataId);
-                newSkillUsage.Use(Entity, skillLevel);
-                Entity.SkillUsages.Add(newSkillUsage);
-            }
-        }
-
         protected virtual async UniTaskVoid UseSkillRoutine(long peerTimestamp, UseSkillState simulateState)
         {
             int simulateSeed = GetSimulateSeed(peerTimestamp);
@@ -188,11 +171,11 @@ namespace MultiplayerARPG
                 // Update skill usage states at server only
                 if (itemDataId.HasValue)
                 {
-                    AddOrUpdateSkillUsage(SkillUsageType.UsableItem, itemDataId.Value, skillLevel);
+                    Entity.AddOrUpdateSkillUsage(SkillUsageType.UsableItem, itemDataId.Value, skillLevel);
                 }
                 else
                 {
-                    AddOrUpdateSkillUsage(SkillUsageType.Skill, skill.DataId, skillLevel);
+                    Entity.AddOrUpdateSkillUsage(SkillUsageType.Skill, skill.DataId, skillLevel);
                 }
                 // Do something with buffs when use skill
                 Entity.SkillAndBuffComponent.OnUseSkill();

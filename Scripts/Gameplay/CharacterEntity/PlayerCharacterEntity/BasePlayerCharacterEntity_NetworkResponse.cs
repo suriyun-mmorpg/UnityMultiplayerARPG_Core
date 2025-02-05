@@ -38,10 +38,9 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // Apply guild skill to guild members in the same map
-            CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.GuildSkill, dataId);
-            newSkillUsage.Use(this, level);
-            skillUsages.Add(newSkillUsage);
+            // Set cooldown to user
+            this.AddOrUpdateSkillUsage(SkillUsageType.GuildSkill, dataId, level);
+
             SocialCharacterData[] members = guild.GetMembers();
             BasePlayerCharacterEntity memberEntity;
             foreach (SocialCharacterData member in members)

@@ -22,10 +22,9 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // Set cooldown
-            CharacterSkillUsage newSkillUsage = CharacterSkillUsage.Create(SkillUsageType.UsableItem, nonEquipItems[itemIndex].dataId);
-            newSkillUsage.Use(this, 1);
-            SkillUsages.Add(newSkillUsage);
+            // Set cooldown to user
+            this.AddOrUpdateSkillUsage(SkillUsageType.UsableItem, nonEquipItems[itemIndex].dataId, 1);
+
             // Use item
             usableItem.UseItem(this, itemIndex, nonEquipItems[itemIndex]);
             // Do something with buffs when use item
