@@ -848,7 +848,18 @@ namespace MultiplayerARPG
 
         private void OnGuildSkillsOperation(LiteNetLibSyncListOp operation, int index, CharacterSkill oldItem, CharacterSkill newItem)
         {
-            IsRecaching = true;
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.dataId != newItem.dataId ||
+                        oldItem.level != newItem.level)
+                        IsRecaching = true;
+                    break;
+                default:
+                    IsRecaching = true;
+                    break;
+            }
             if (onGuildSkillsOperation != null)
                 onGuildSkillsOperation.Invoke(operation, index, oldItem, newItem);
         }

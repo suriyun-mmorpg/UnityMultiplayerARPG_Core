@@ -472,23 +472,58 @@ namespace MultiplayerARPG
         #region Net functions operation callback
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncListOp operation, int index, EquipWeapons oldItem, EquipWeapons newItem)
         {
-            MarkToUpdateAppearances();
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.IsDiffer(newItem, out _, out _, true, false))
+                    {
+                        MarkToUpdateAppearances();
+                        IsRecaching = true;
+                    }
+                    break;
+                default:
+                    MarkToUpdateAppearances();
+                    IsRecaching = true;
+                    break;
+            }
             MarkToUpdateAmmoSim();
-            IsRecaching = true;
             if (onSelectableWeaponSetsOperation != null)
                 onSelectableWeaponSetsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
         private void OnAttributesOperation(LiteNetLibSyncListOp operation, int index, CharacterAttribute oldItem, CharacterAttribute newItem)
         {
-            IsRecaching = true;
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.dataId != newItem.dataId ||
+                        oldItem.amount != newItem.amount)
+                        IsRecaching = true;
+                    break;
+                default:
+                    IsRecaching = true;
+                    break;
+            }
             if (onAttributesOperation != null)
                 onAttributesOperation.Invoke(operation, index, oldItem, newItem);
         }
 
         private void OnSkillsOperation(LiteNetLibSyncListOp operation, int index, CharacterSkill oldItem, CharacterSkill newItem)
         {
-            IsRecaching = true;
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.dataId != newItem.dataId ||
+                        oldItem.level != newItem.level)
+                        IsRecaching = true;
+                    break;
+                default:
+                    IsRecaching = true;
+                    break;
+            }
             if (onSkillsOperation != null)
                 onSkillsOperation.Invoke(operation, index, oldItem, newItem);
         }
@@ -517,22 +552,59 @@ namespace MultiplayerARPG
                     break;
             }
 
-            IsRecaching = true;
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (!string.Equals(oldItem.id, newItem.id) ||
+                        oldItem.type != newItem.type ||
+                        oldItem.dataId != newItem.dataId ||
+                        oldItem.level != newItem.level)
+                        IsRecaching = true;
+                    break;
+                default:
+                    IsRecaching = true;
+                    break;
+            }
+
             if (onBuffsOperation != null)
                 onBuffsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
         private void OnEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
-            MarkToUpdateAppearances();
-            IsRecaching = true;
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.IsDiffer(newItem, true, false))
+                    {
+                        MarkToUpdateAppearances();
+                        IsRecaching = true;
+                    }
+                    break;
+                default:
+                    MarkToUpdateAppearances();
+                    IsRecaching = true;
+                    break;
+            }
             if (onEquipItemsOperation != null)
                 onEquipItemsOperation.Invoke(operation, index, oldItem, newItem);
         }
 
         private void OnNonEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
-            IsRecaching = true;
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.IsDiffer(newItem, true, false))
+                        IsRecaching = true;
+                    break;
+                default:
+                    IsRecaching = true;
+                    break;
+            }
             if (onNonEquipItemsOperation != null)
                 onNonEquipItemsOperation.Invoke(operation, index, oldItem, newItem);
         }
