@@ -700,8 +700,9 @@ namespace MultiplayerARPG
             return validIfNoRequireAmmoType;
         }
 
-        public static bool DecreaseAmmos(this ICharacterData data, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true, bool applyChanges = true)
+        public static bool DecreaseAmmos(this ICharacterData data, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true, bool applyChanges = true)
         {
+            CharacterItem weapon = isLeftHand ? data.EquipWeapons.leftHand : data.EquipWeapons.rightHand;
             if (data.CurrentHp <= 0)
             {
                 increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
@@ -1417,13 +1418,13 @@ namespace MultiplayerARPG
             return validIfNoRequireAmmoType;
         }
 
-        public static List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(this ICharacterData data, CharacterItem weapon, bool isLeftHand, Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts, int triggerCount, int ammoAmountEachTrigger, bool validIfNoRequireAmmoType = true)
+        public static List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(this ICharacterData data, bool isLeftHand, Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts, int triggerCount, int ammoAmountEachTrigger, bool validIfNoRequireAmmoType = true)
         {
             List<Dictionary<DamageElement, MinMaxFloat>> result = new List<Dictionary<DamageElement, MinMaxFloat>>();
             Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamageAmounts;
             for (int i = 0; i < triggerCount; ++i)
             {
-                if (!DecreaseAmmos(data, weapon, isLeftHand, ammoAmountEachTrigger, out tempIncreaseDamageAmounts, validIfNoRequireAmmoType, false))
+                if (!DecreaseAmmos(data, isLeftHand, ammoAmountEachTrigger, out tempIncreaseDamageAmounts, validIfNoRequireAmmoType, false))
                     break;
                 result.Add(GameDataHelpers.CombineDamages(new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts), tempIncreaseDamageAmounts));
             }

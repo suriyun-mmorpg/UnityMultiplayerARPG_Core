@@ -652,7 +652,7 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts,
             int triggerCount)
         {
-            return skillUser.PrepareDamageAmounts(skillUser.GetAvailableWeapon(ref isLeftHand), isLeftHand, baseDamageAmounts, triggerCount, requireAmmoAmount, true);
+            return skillUser.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, triggerCount, requireAmmoAmount, true);
         }
 
         /// <summary>
@@ -1124,7 +1124,7 @@ namespace MultiplayerARPG
             switch (requireAmmoType)
             {
                 case RequireAmmoType.BasedOnWeapon:
-                    return character.DecreaseAmmos(character.GetAvailableWeapon(ref isLeftHand), isLeftHand, requireAmmoAmount, out increaseDamageAmounts, false);
+                    return character.DecreaseAmmos(isLeftHand, requireAmmoAmount, out increaseDamageAmounts, false);
                 case RequireAmmoType.BasedOnSkill:
                     if (HasEnoughAmmos(character, isLeftHand, out ammoType, out amount))
                     {

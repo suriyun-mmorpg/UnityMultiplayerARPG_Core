@@ -216,7 +216,7 @@ namespace MultiplayerARPG
                 await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, attackCancellationTokenSource.Token);
 
                 // Prepare damage amounts
-                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = Entity.PrepareDamageAmounts(weapon, isLeftHand, baseDamageAmounts, _triggerDurations.Length, 1);
+                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = Entity.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, _triggerDurations.Length, 1);
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
@@ -298,7 +298,7 @@ namespace MultiplayerARPG
                         // Apply attack damages
                         if (IsServer)
                         {
-                            if (!Entity.DecreaseAmmos(weapon, isLeftHand, 1, out _))
+                            if (!Entity.DecreaseAmmos(isLeftHand, 1, out _))
                                 continue;
                             if (!IsOwnerClient && !IsOwnedByServer)
                                 continue;
