@@ -59,9 +59,11 @@ namespace MultiplayerARPG
             return data.Equals(CharacterSummon.Empty);
         }
 
-        public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData, bool checkLevel = false)
+        public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData, bool checkLevel = false, bool checkSockets = false)
         {
             if (checkLevel && data.level != anotherData.level)
+                return true;
+            if (checkSockets && IsDifferSockets(data, anotherData))
                 return true;
             return !string.Equals(data.id, anotherData.id) || data.dataId != anotherData.dataId;
         }
@@ -70,6 +72,8 @@ namespace MultiplayerARPG
         {
             if (data.sockets == null && anotherData.sockets == null)
                 return false;
+            if (data.sockets == null || anotherData.sockets == null)
+                return true;
             if (data.sockets.Count != anotherData.sockets.Count)
                 return true;
             for (int i = 0; i < data.sockets.Count; ++i)
@@ -80,10 +84,10 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData, out bool rightIsDiffer, out bool leftIsDiffer, bool checkLevel = false)
+        public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData, out bool rightIsDiffer, out bool leftIsDiffer, bool checkLevel = false, bool checkSockets = false)
         {
-            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand, checkLevel);
-            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand, checkLevel);
+            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand, checkLevel, checkSockets);
+            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand, checkLevel, checkSockets);
             return rightIsDiffer || leftIsDiffer;
         }
 
