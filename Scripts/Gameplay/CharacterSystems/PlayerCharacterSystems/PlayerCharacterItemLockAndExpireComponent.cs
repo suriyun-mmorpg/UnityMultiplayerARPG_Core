@@ -18,7 +18,7 @@ namespace MultiplayerARPG
             _deltaTime = Time.unscaledDeltaTime;
             _updatingTime += _deltaTime;
 
-            if (Entity.IsRecaching || Entity.IsDead())
+            if (Entity.IsDead())
                 return;
 
             if (_updatingTime >= ITEM_UPDATE_DURATION)

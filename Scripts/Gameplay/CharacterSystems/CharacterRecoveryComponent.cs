@@ -27,9 +27,6 @@ namespace MultiplayerARPG
 
             _deltaTime = Time.unscaledDeltaTime;
 
-            if (Entity.IsRecaching)
-                return;
-
             if (Entity.IsDead())
             {
                 if (!_isClearRecoveryData)
