@@ -57,7 +57,7 @@ namespace MultiplayerARPG
                     }
                     break;
             }
-            callback.Invoke(new ResponseHandlerData(), AckResponseCode.Success, new ResponseAvailableContentsMessage()
+            callback.Invoke(default, AckResponseCode.Success, new ResponseAvailableContentsMessage()
             {
                 message = UITextKeys.NONE,
                 contents = contents.ToArray(),
@@ -74,7 +74,7 @@ namespace MultiplayerARPG
         private async UniTaskVoid ResponseUnlockContent(RequestUnlockContentMessage data, ResponseDelegate<ResponseUnlockContentMessage> callback)
         {
             await UniTask.NextFrame();
-            callback.Invoke(new ResponseHandlerData(), AckResponseCode.Success, new ResponseUnlockContentMessage()
+            callback.Invoke(default, AckResponseCode.Success, new ResponseUnlockContentMessage()
             {
                 message = UITextKeys.NONE,
             });
