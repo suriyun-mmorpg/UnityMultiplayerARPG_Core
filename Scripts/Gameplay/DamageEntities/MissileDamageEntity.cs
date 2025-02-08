@@ -160,6 +160,8 @@ namespace MultiplayerARPG
             float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
             // Raycast to previous position to check is it hitting something or not
             // If hit, explode
+            bool queriesHitBackfaces = Physics.queriesHitBackfaces;
+            Physics.queriesHitBackfaces = true;
             switch (hitDetectionMode)
             {
                 case HitDetectionMode.Raycast:
@@ -181,6 +183,7 @@ namespace MultiplayerARPG
                         hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, layerMask);
                     break;
             }
+            Physics.queriesHitBackfaces = queriesHitBackfaces;
             for (int i = 0; i < hitCount; ++i)
             {
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D && _hits2D[i].transform != null)
