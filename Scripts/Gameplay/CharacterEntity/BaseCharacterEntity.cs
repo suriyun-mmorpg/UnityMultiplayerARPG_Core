@@ -113,16 +113,12 @@ namespace MultiplayerARPG
         public bool IsSkipMovementValidationWhileAttacking { get { return AttackComponent.IsSkipMovementValidationWhileAttacking; } }
         public float MoveSpeedRateWhileAttacking { get { return AttackComponent.MoveSpeedRateWhileAttacking; } }
         public MovementRestriction MovementRestrictionWhileAttacking { get { return AttackComponent.MovementRestrictionWhileAttacking; } }
-        public float AttackTotalDuration { get { return AttackComponent.AttackTotalDuration; } set { AttackComponent.AttackTotalDuration = value; } }
-        public float[] AttackTriggerDurations { get { return AttackComponent.AttackTriggerDurations; } set { AttackComponent.AttackTriggerDurations = value; } }
         public bool IsUsingSkill { get { return UseSkillComponent.IsUsingSkill; } }
         public float LastUseSkillEndTime { get { return UseSkillComponent.LastUseSkillEndTime; } }
         public bool IsUseRootMotionWhileUsingSkill { get { return UseSkillComponent.IsUseRootMotionWhileUsingSkill; } }
         public bool IsSkipMovementValidationWhileUsingSkill { get { return UseSkillComponent.IsSkipMovementValidationWhileUsingSkill; } }
         public float MoveSpeedRateWhileUsingSkill { get { return UseSkillComponent.MoveSpeedRateWhileUsingSkill; } }
         public MovementRestriction MovementRestrictionWhileUsingSkill { get { return UseSkillComponent.MovementRestrictionWhileUsingSkill; } }
-        public float UseSkillTotalDuration { get { return UseSkillComponent.UseSkillTotalDuration; } set { UseSkillComponent.UseSkillTotalDuration = value; } }
-        public float[] UseSkillTriggerDurations { get { return UseSkillComponent.UseSkillTriggerDurations; } set { UseSkillComponent.UseSkillTriggerDurations = value; } }
         public BaseSkill UsingSkill { get { return UseSkillComponent.UsingSkill; } }
         public int UsingSkillLevel { get { return UseSkillComponent.UsingSkillLevel; } }
         public bool IsCastingSkillCanBeInterrupted { get { return UseSkillComponent.IsCastingSkillCanBeInterrupted; } }
@@ -136,8 +132,6 @@ namespace MultiplayerARPG
         public bool IsSkipMovementValidationWhileReloading { get { return ReloadComponent.IsSkipMovementValidationWhileReloading; } }
         public float MoveSpeedRateWhileReloading { get { return ReloadComponent.MoveSpeedRateWhileReloading; } }
         public MovementRestriction MovementRestrictionWhileReloading { get { return ReloadComponent.MovementRestrictionWhileReloading; } }
-        public float ReloadTotalDuration { get { return ReloadComponent.ReloadTotalDuration; } set { ReloadComponent.ReloadTotalDuration = value; } }
-        public float[] ReloadTriggerDurations { get { return ReloadComponent.ReloadTriggerDurations; } set { ReloadComponent.ReloadTriggerDurations = value; } }
         public bool IsCharging { get { return ChargeComponent.IsCharging; } }
         public bool IsUseRootMotionWhileCharging { get { return ChargeComponent.IsUseRootMotionWhileCharging; } }
         public bool IsSkipMovementValidationWhileCharging { get { return ChargeComponent.IsSkipMovementValidationWhileCharging; } }

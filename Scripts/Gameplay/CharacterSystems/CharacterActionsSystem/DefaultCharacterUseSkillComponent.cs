@@ -8,7 +8,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterActionComponentManager))]
-    public class DefaultCharacterUseSkillComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterUseSkillComponent, ICharacterActionComponentPreparation
+    public class DefaultCharacterUseSkillComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterUseSkillComponent
     {
         protected struct UseSkillState
         {
@@ -61,10 +61,6 @@ namespace MultiplayerARPG
         public float CastingSkillCountDown { get; protected set; }
         public float MoveSpeedRateWhileUsingSkill { get; protected set; }
         public MovementRestriction MovementRestrictionWhileUsingSkill { get; protected set; }
-        protected float _totalDuration;
-        public float UseSkillTotalDuration { get { return _totalDuration; } set { _totalDuration = value; } }
-        protected float[] _triggerDurations;
-        public float[] UseSkillTriggerDurations { get { return _triggerDurations; } set { _triggerDurations = value; } }
         public System.Action OnCastSkillStart { get; set; }
         public System.Action OnCastSkillEnd { get; set; }
         public System.Action OnUseSkillStart { get; set; }
@@ -76,7 +72,6 @@ namespace MultiplayerARPG
         public IHitRegistrationManager HitRegistrationManager { get { return BaseGameNetworkManager.Singleton.HitRegistrationManager; } }
 
         protected CharacterActionComponentManager _manager;
-        protected float _remainsDurationWithoutSpeedRate = 0f;
         // Network data sending
         protected UseSkillState? _simulateState;
         // Logging data
@@ -122,14 +117,6 @@ namespace MultiplayerARPG
             _simulateState = null;
         }
 
-        public void OnPrepareActionDurations(float[] triggerDurations, float totalDuration, float remainsDurationWithoutSpeedRate, float endTime)
-        {
-            _triggerDurations = triggerDurations;
-            _totalDuration = totalDuration;
-            _remainsDurationWithoutSpeedRate = remainsDurationWithoutSpeedRate;
-            LastUseSkillEndTime = endTime;
-        }
-
         protected virtual async UniTaskVoid UseSkillRoutine(long peerTimestamp, UseSkillState simulateState)
         {
             int simulateSeed = GetSimulateSeed(peerTimestamp);
@@ -160,8 +147,8 @@ namespace MultiplayerARPG
                 simulateSeed,
                 out int animationIndex,
                 out float animSpeedRate,
-                out _triggerDurations,
-                out _totalDuration);
+                out float[] triggerDurations,
+                out float totalDuration);
 
             // Set doing action state at clients and server
             SetUseSkillActionStates(animActionType, animActionDataId, simulateState);
@@ -214,7 +201,7 @@ namespace MultiplayerARPG
                 bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
                 // Prepare end time
-                LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionDefaultEndTime(_totalDuration, animSpeedRate, CastingSkillDuration);
+                LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate, CastingSkillDuration);
 
                 // Play special effect
                 if (IsClient)
@@ -292,39 +279,41 @@ namespace MultiplayerARPG
                 }
 
                 // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                await _manager.PrepareActionDurations(this, _triggerDurations, _totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token);
+                float remainsDuration = totalDuration;
+                await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token,
+                    (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
+                    {
+                        triggerDurations = __triggerDurations;
+                        totalDuration = __totalDuration;
+                        remainsDuration = __remainsDuration;
+                        LastUseSkillEndTime = __endTime;
+                    });
 
                 // Prepare damage amounts
-                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, _triggerDurations.Length);
+                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, triggerDurations.Length);
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, _triggerDurations, 0, damageInfo, damageAmounts, isLeftHand, weapon, skill, skillLevel);
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, 0, damageInfo, damageAmounts, isLeftHand, weapon, skill, skillLevel);
                 if (_entityIsPlayer && IsServer)
-                    GameInstance.ServerLogHandlers.LogUseSkillStart(_playerCharacterEntity, simulateSeed, _triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon, skill, skillLevel);
+                    GameInstance.ServerLogHandlers.LogUseSkillStart(_playerCharacterEntity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon, skill, skillLevel);
                 OnUseSkillStart?.Invoke();
 
-                float tempTriggerDuration;
-                for (byte triggerIndex = 0; triggerIndex < _triggerDurations.Length; ++triggerIndex)
+                for (byte triggerIndex = 0; triggerIndex < triggerDurations.Length; ++triggerIndex)
                 {
                     // Play special effects after trigger duration
-                    tempTriggerDuration = _triggerDurations[triggerIndex];
-                    _remainsDurationWithoutSpeedRate -= tempTriggerDuration;
+                    float tempTriggerDuration = triggerDurations[triggerIndex];
+                    remainsDuration -= tempTriggerDuration;
                     await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient && (AnimActionType == AnimActionType.AttackRightHand || AnimActionType == AnimActionType.AttackLeftHand))
                     {
                         // Play weapon launch special effects
-                        if (vehicleModelAvailable)
-                            vehicleModel.PlayEquippedWeaponLaunch(isLeftHand);
-                        if (!overridePassengerActionAnimations)
-                        {
-                            if (tpsModelAvailable)
-                                tpsModel.PlayEquippedWeaponLaunch(isLeftHand);
-                            if (fpsModelAvailable)
-                                fpsModel.PlayEquippedWeaponLaunch(isLeftHand);
-                        }
+                        if (tpsModelAvailable)
+                            tpsModel.PlayEquippedWeaponLaunch(isLeftHand);
+                        if (fpsModelAvailable)
+                            fpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
                         weaponItem.LaunchClip?.Play(tpsModel.GenericAudioSource);
                     }
@@ -368,7 +357,7 @@ namespace MultiplayerARPG
                         ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
                     }
 
-                    if (_remainsDurationWithoutSpeedRate <= 0f)
+                    if (remainsDuration <= 0f)
                     {
                         // Stop trigger animations loop
                         break;
@@ -379,16 +368,15 @@ namespace MultiplayerARPG
                 if (IsServer && itemDataId.HasValue && Entity.DecreaseItems(itemDataId.Value, 1))
                     Entity.FillEmptySlots();
 
-                if (_remainsDurationWithoutSpeedRate > 0f)
+                if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(_remainsDurationWithoutSpeedRate / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)
             {
                 // Catch the cancellation
-                LastUseSkillEndTime = Time.unscaledTime;
                 OnSkillInterupted?.Invoke();
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillInterrupt(_playerCharacterEntity, simulateSeed);
@@ -401,6 +389,7 @@ namespace MultiplayerARPG
             }
             finally
             {
+                LastUseSkillEndTime = Time.unscaledTime;
                 skillCancellationTokenSource.Dispose();
                 _skillCancellationTokenSources.Remove(skillCancellationTokenSource);
                 if (_entityIsPlayer && IsServer)

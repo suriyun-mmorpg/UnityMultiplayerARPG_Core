@@ -9,8 +9,6 @@
         bool IsUseRootMotionWhileReloading { get; }
         float MoveSpeedRateWhileReloading { get; }
         MovementRestriction MovementRestrictionWhileReloading { get; }
-        float ReloadTotalDuration { get; set; }
-        float[] ReloadTriggerDurations { get; set; }
 
         void CancelReload();
         void ClearReloadStates();

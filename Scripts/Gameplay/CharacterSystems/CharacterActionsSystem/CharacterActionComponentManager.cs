@@ -6,15 +6,15 @@ namespace MultiplayerARPG
 {
     public class CharacterActionComponentManager : MonoBehaviour
     {
-        public const float DEFAULT_TOTAL_DURATION = 2f;
-        public const float DEFAULT_TRIGGER_DURATION = 1f;
-        public const float DEFAULT_STATE_SETUP_DELAY = 1f;
+        public delegate void PrepareActionDurationsResultDelegate(float[] triggerDurations, float totalDuration, float remainsDuration, float endTime);
+        public delegate void PrepareActionDurationsDelegate(float[] triggerDurations, float totalDuration);
 
-        protected float[] _preparingTriggerDurations;
-        protected float _preparingTotalDuration;
-        protected float _preparingTotalDurationChange;
+        public const float DEFAULT_TOTAL_DURATION = 1f;
+        public const float DEFAULT_TRIGGER_DURATION = 0.5f;
+        public const float STATE_PREPARING_DURATION = 1f;
+        private PrepareActionDurationsDelegate _onSetPreparingActionDurations = null;
 
-        public static float PrepareActionDefaultEndTime(float totalDuration, float animSpeedRate, float additionalTime = 0f)
+        public static float PrepareActionEndTime(float totalDuration, float animSpeedRate, float additionalTime = 0f)
         {
             if (totalDuration <= 0f)
                 totalDuration = DEFAULT_TOTAL_DURATION;
@@ -23,52 +23,58 @@ namespace MultiplayerARPG
 
         /// <summary>
         /// Calculate times for animation playing
-        /// <param name="listener"></param>
         /// <param name="triggerDurations"></param>
         /// <param name="totalDuration"></param>
         /// <param name="totalDurationChange"></param>
         /// <param name="animSpeedRate"></param>
         /// <param name="cancellationToken"></param>
+        /// <param name="resultCallback"></param>
         /// <returns></returns>
         /// </summary>
-        public async UniTask PrepareActionDurations(ICharacterActionComponentPreparation listener, float[] triggerDurations, float totalDuration, float totalDurationChange, float animSpeedRate, CancellationToken cancellationToken)
+        public async UniTask PrepareActionDurations(float[] triggerDurations, float totalDuration, float totalDurationChange, float animSpeedRate, CancellationToken cancellationToken, PrepareActionDurationsResultDelegate resultCallback)
         {
-            float remainsDurationWithoutSpeedRate = totalDuration + totalDurationChange;
+            float remainsDuration = totalDuration + totalDurationChange;
             // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
             if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
             {
-                _preparingTriggerDurations = triggerDurations;
-                _preparingTotalDuration = totalDuration;
-                _preparingTotalDurationChange = totalDurationChange;
-                // Wait some components to setup proper `attackTriggerDurations` and `attackTotalDuration` within `DEFAULT_STATE_SETUP_DELAY`
-                float setupDelayCountDown = DEFAULT_STATE_SETUP_DELAY;
+                _onSetPreparingActionDurations += (__triggerDurations, __totalDuration) =>
+                {
+                    triggerDurations = __triggerDurations;
+                    totalDuration = __totalDuration;
+                };
+                // Wait some components to setup proper `triggerDurations` and `totalDuration` within `STATE_PREPARING_DURATION`
+                float setupDelayCountDown = STATE_PREPARING_DURATION;
                 do
                 {
                     await UniTask.Yield(cancellationToken);
                     setupDelayCountDown -= Time.unscaledDeltaTime;
-                } while (setupDelayCountDown > 0 && (_preparingTriggerDurations == null || _preparingTriggerDurations.Length == 0 || _preparingTotalDuration < 0f));
+                } while (setupDelayCountDown > 0 && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
                 if (setupDelayCountDown > 0f)
                 {
-                    remainsDurationWithoutSpeedRate = _preparingTotalDuration + _preparingTotalDurationChange;
-                    triggerDurations = _preparingTriggerDurations;
+                    remainsDuration = totalDuration + totalDurationChange;
                 }
                 else
                 {
                     // Can't setup properly, so try to setup manually to make it still workable
-                    remainsDurationWithoutSpeedRate = DEFAULT_TOTAL_DURATION - DEFAULT_STATE_SETUP_DELAY;
+                    remainsDuration = DEFAULT_TOTAL_DURATION + totalDurationChange;
                     triggerDurations = new float[1]
                     {
                         DEFAULT_TRIGGER_DURATION,
                     };
                 }
             }
-            listener?.OnPrepareActionDurations(triggerDurations, totalDuration, remainsDurationWithoutSpeedRate, PrepareActionDefaultEndTime(remainsDurationWithoutSpeedRate, animSpeedRate));
+            resultCallback?.Invoke(triggerDurations, totalDuration, remainsDuration, PrepareActionEndTime(remainsDuration, animSpeedRate));
         }
 
-        public void SetPreparingActionDurations(float[] preparingTriggerDurations, float preparingTotalDuration)
+        public bool ShouldPrepareActionDurations()
         {
-            _preparingTriggerDurations = preparingTriggerDurations;
-            _preparingTotalDuration = preparingTotalDuration;
+            return _onSetPreparingActionDurations != null;
+        }
+
+        public void PrepareActionDurations(float[] triggerDurations, float totalDuration)
+        {
+            _onSetPreparingActionDurations?.Invoke(triggerDurations, totalDuration);
+            _onSetPreparingActionDurations = null;
         }
     }
 }
