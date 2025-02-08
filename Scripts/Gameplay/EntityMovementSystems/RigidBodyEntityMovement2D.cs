@@ -190,6 +190,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(RigidBodyEntityMovement2D), "Teleport function shouldn't be called at client [" + name + "]");
                 return;
             }
+            _acceptedPosition = position;
             _isTeleporting = true;
             _stillMoveAfterTeleport = stillMoveAfterTeleport;
             OnTeleport(position, stillMoveAfterTeleport);
@@ -648,7 +649,7 @@ namespace MultiplayerARPG
             if (!IsClient)
             {
                 // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
-                if (moveDiffTime < 0.05f)
+                if (moveDiffTime < 0.1f)
                 {
                     // Allow to move to the position
                     _acceptedPosition = newPos;
@@ -658,7 +659,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Client moves too fast, adjust it
-                    _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
+                    newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
                     // And also adjust client's position
                     Teleport(newPos, Quaternion.identity, true);
                 }
@@ -668,7 +669,7 @@ namespace MultiplayerARPG
                 // It's both server and client, simulate movement
                 if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
                 {
-                    if (moveDiffTime < 0.05f)
+                    if (moveDiffTime < 0.1f)
                     {
                         // Allow to move to the position
                         _acceptedPosition = newPos;
@@ -676,7 +677,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Client moves too fast, adjust it
-                        _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
+                        newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.identity, true);
                     }

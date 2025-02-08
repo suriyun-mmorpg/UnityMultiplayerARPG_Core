@@ -302,6 +302,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(BuiltInEntityMovementFunctions3D), $"Teleport function shouldn't be called at client [{Entity.name}]");
                 return;
             }
+            _acceptedPosition = position;
             _isTeleporting = true;
             _stillMoveAfterTeleport = stillMoveAfterTeleport;
             OnTeleport(position, rotation.eulerAngles.y, stillMoveAfterTeleport);
@@ -1266,7 +1267,7 @@ namespace MultiplayerARPG
             if (!IsClient)
             {
                 // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
-                if (skipValidation || horMoveDiffTime < 0.05f)
+                if (skipValidation || horMoveDiffTime < 0.1f)
                 {
                     // Allow to move to the position
                     _acceptedPosition = newPos;
@@ -1278,7 +1279,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Client moves too fast, adjust it
-                    _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, falling, clientHorMoveDist, horMoveableDist, clientVerMoveDist, verMoveableDist);
+                    newPos = GetMoveablePosition(oldPos, newPos, falling, clientHorMoveDist, horMoveableDist, clientVerMoveDist, verMoveableDist);
                     // And also adjust client's position
                     Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
                 }
@@ -1288,7 +1289,7 @@ namespace MultiplayerARPG
                 // It's both server and client, simulate movement
                 if (Vector3.Distance(position, oldPos) > s_minDistanceToSimulateMovement)
                 {
-                    if (skipValidation || horMoveDiffTime < 0.05f)
+                    if (skipValidation || horMoveDiffTime < 0.1f)
                     {
                         // Jumped position
                         if (falling && CacheTransform.position.y < newPos.y)
@@ -1298,7 +1299,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Client moves too fast, adjust it
-                        _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, falling, clientHorMoveDist, horMoveableDist, clientVerMoveDist, verMoveableDist);
+                        newPos = GetMoveablePosition(oldPos, newPos, falling, clientHorMoveDist, horMoveableDist, clientVerMoveDist, verMoveableDist);
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
                     }

@@ -206,6 +206,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(NavMeshEntityMovement), "Teleport function shouldn't be called at client [" + name + "]");
                 return;
             }
+            _acceptedPosition = position;
             _isTeleporting = true;
             _stillMoveAfterTeleport = stillMoveAfterTeleport;
             OnTeleport(position, rotation.eulerAngles.y, stillMoveAfterTeleport);
@@ -541,9 +542,8 @@ namespace MultiplayerARPG
             else if (_acceptedPositionTimestamp <= peerTimestamp)
             {
                 // Prepare time
-                long lagDeltaTime = BaseGameNetworkManager.Singleton.ServerTimestamp - peerTimestamp;
-                long deltaTime = lagDeltaTime + peerTimestamp - _acceptedPositionTimestamp;
-                float unityDeltaTime = (float)deltaTime * s_timestampToUnityTimeMultiplier;
+                long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+                float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
@@ -664,7 +664,7 @@ namespace MultiplayerARPG
             if (!IsClient)
             {
                 // If it is not a client, don't have to simulate movement, just set the position
-                if (moveDiffTime < 0.05f)
+                if (moveDiffTime < 0.1f)
                 {
                     // Allow to move to the position
                     _acceptedPosition = newPos;
@@ -676,7 +676,7 @@ namespace MultiplayerARPG
                 else
                 {
                     // Client moves too fast, adjust it
-                    _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
+                    newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
                     // And also adjust client's position
                     Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
                 }
@@ -686,7 +686,7 @@ namespace MultiplayerARPG
                 // It's both server and client, simulate movement
                 if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
                 {
-                    if (moveDiffTime < 0.05f)
+                    if (moveDiffTime < 0.1f)
                     {
                         // Allow to move to the position
                         _acceptedPosition = newPos;
@@ -694,7 +694,7 @@ namespace MultiplayerARPG
                     else
                     {
                         // Client moves too fast, adjust it
-                        _acceptedPosition = newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
+                        newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
                         // And also adjust client's position
                         Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
                     }
