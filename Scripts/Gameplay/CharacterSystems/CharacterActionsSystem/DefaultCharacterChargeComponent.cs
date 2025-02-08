@@ -67,7 +67,7 @@ namespace MultiplayerARPG
             IWeaponItem weaponItem = Entity.GetAvailableWeapon(ref isLeftHand).GetWeaponItem();
             int weaponTypeDataId = weaponItem.WeaponType.DataId;
             // Play animation
-            BaseCharacterModel tpsModel = Entity.CharacterModel;
+            BaseCharacterModel tpsModel = Entity.ActionModel;
             bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
             BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
             bool vehicleModelAvailable = vehicleModel != null;
@@ -110,7 +110,7 @@ namespace MultiplayerARPG
         {
             bool doActionWhenStopCharging = WillDoActionWhenStopCharging;
             // Play animation
-            BaseCharacterModel tpsModel = Entity.CharacterModel;
+            BaseCharacterModel tpsModel = Entity.ActionModel;
             bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
             BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
             bool vehicleModelAvailable = vehicleModel != null;

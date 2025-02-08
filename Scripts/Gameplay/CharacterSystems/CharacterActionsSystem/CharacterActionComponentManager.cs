@@ -14,11 +14,11 @@ namespace MultiplayerARPG
         public const float STATE_PREPARING_DURATION = 1f;
         private PrepareActionDurationsDelegate _onSetPreparingActionDurations = null;
 
-        public static float PrepareActionEndTime(float totalDuration, float animSpeedRate, float additionalTime = 0f)
+        public static float PrepareActionEndTime(float totalDuration, float animSpeedRate)
         {
             if (totalDuration <= 0f)
                 totalDuration = DEFAULT_TOTAL_DURATION;
-            return Time.unscaledTime + (totalDuration / animSpeedRate) + additionalTime;
+            return Time.unscaledTime + (totalDuration / animSpeedRate);
         }
 
         /// <summary>
@@ -34,6 +34,7 @@ namespace MultiplayerARPG
         public async UniTask PrepareActionDurations(float[] triggerDurations, float totalDuration, float totalDurationChange, float animSpeedRate, CancellationToken cancellationToken, PrepareActionDurationsResultDelegate resultCallback)
         {
             float remainsDuration = totalDuration + totalDurationChange;
+            float setupDelayCounter = 0f;
             // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
             if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
             {
@@ -43,13 +44,12 @@ namespace MultiplayerARPG
                     totalDuration = __totalDuration;
                 };
                 // Wait some components to setup proper `triggerDurations` and `totalDuration` within `STATE_PREPARING_DURATION`
-                float setupDelayCountDown = STATE_PREPARING_DURATION;
                 do
                 {
                     await UniTask.Yield(cancellationToken);
-                    setupDelayCountDown -= Time.unscaledDeltaTime;
-                } while (setupDelayCountDown > 0 && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
-                if (setupDelayCountDown > 0f)
+                    setupDelayCounter += Time.unscaledDeltaTime;
+                } while (setupDelayCounter < STATE_PREPARING_DURATION && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
+                if (setupDelayCounter < STATE_PREPARING_DURATION)
                 {
                     remainsDuration = totalDuration + totalDurationChange;
                 }
@@ -63,7 +63,7 @@ namespace MultiplayerARPG
                     };
                 }
             }
-            resultCallback?.Invoke(triggerDurations, totalDuration, remainsDuration, PrepareActionEndTime(remainsDuration, animSpeedRate));
+            resultCallback?.Invoke(triggerDurations, totalDuration, remainsDuration, PrepareActionEndTime(remainsDuration, animSpeedRate) + setupDelayCounter);
         }
 
         public bool ShouldPrepareActionDurations()

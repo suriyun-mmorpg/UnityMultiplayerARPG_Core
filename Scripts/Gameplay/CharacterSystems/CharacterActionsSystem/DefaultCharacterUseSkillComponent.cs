@@ -192,7 +192,7 @@ namespace MultiplayerARPG
 
             try
             {
-                BaseCharacterModel tpsModel = Entity.CharacterModel;
+                BaseCharacterModel tpsModel = Entity.ActionModel;
                 bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
@@ -200,8 +200,24 @@ namespace MultiplayerARPG
                 BaseCharacterModel fpsModel = Entity.FpsModel;
                 bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
-                // Prepare end time
-                LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate, CastingSkillDuration);
+                // Prepare action durations
+                LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate) + CastingSkillDuration;
+                float remainsDuration = totalDuration;
+                await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token,
+                    (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
+                    {
+                        triggerDurations = __triggerDurations;
+                        totalDuration = __totalDuration;
+                        remainsDuration = __remainsDuration;
+                        LastUseSkillEndTime = __endTime + CastingSkillDuration;
+                    });
+
+                // Prepare damage amounts
+                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, triggerDurations.Length);
+
+                // Prepare hit register validation, it will be used later when receive attack start/end events from clients
+                if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, 0, damageInfo, damageAmounts, isLeftHand, weapon, skill, skillLevel);
 
                 // Play special effect
                 if (IsClient)
@@ -226,10 +242,9 @@ namespace MultiplayerARPG
                     }
                 }
 
+                // Play cast animation
                 if (CastingSkillDuration > 0f)
                 {
-                    OnCastSkillStart?.Invoke();
-                    // Play cast animation
                     if (vehicleModelAvailable)
                         vehicleModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _skipMovementValidation, out _shouldUseRootMotion);
                     if (!overridePassengerActionAnimations)
@@ -240,6 +255,7 @@ namespace MultiplayerARPG
                             fpsModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _, out _);
                     }
                     // Wait until end of cast duration
+                    OnCastSkillStart?.Invoke();
                     await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
                     OnCastSkillEnd?.Invoke();
                 }
@@ -278,23 +294,7 @@ namespace MultiplayerARPG
                         fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
                 }
 
-                // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                float remainsDuration = totalDuration;
-                await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token,
-                    (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
-                    {
-                        triggerDurations = __triggerDurations;
-                        totalDuration = __totalDuration;
-                        remainsDuration = __remainsDuration;
-                        LastUseSkillEndTime = __endTime;
-                    });
-
-                // Prepare damage amounts
-                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, triggerDurations.Length);
-
-                // Prepare hit register validation, it will be used later when receive attack start/end events from clients
-                if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, 0, damageInfo, damageAmounts, isLeftHand, weapon, skill, skillLevel);
+                // Use skill starts
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillStart(_playerCharacterEntity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon, skill, skillLevel);
                 OnUseSkillStart?.Invoke();
@@ -615,7 +615,7 @@ namespace MultiplayerARPG
             CastingSkillDuration = CastingSkillCountDown = 0;
             CancelSkill();
 
-            BaseCharacterModel tpsModel = Entity.CharacterModel;
+            BaseCharacterModel tpsModel = Entity.ActionModel;
             bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
             BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
             bool vehicleModelAvailable = vehicleModel != null;

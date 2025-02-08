@@ -102,7 +102,7 @@ namespace MultiplayerARPG
 
             try
             {
-                BaseCharacterModel tpsModel = Entity.CharacterModel;
+                BaseCharacterModel tpsModel = Entity.ActionModel;
                 bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
@@ -110,8 +110,17 @@ namespace MultiplayerARPG
                 BaseCharacterModel fpsModel = Entity.FpsModel;
                 bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
-                // Prepare end time
+                // Prepare action durations
+                float remainsDuration = totalDuration;
                 LastReloadEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                await _manager.PrepareActionDurations(triggerDurations, totalDuration, Entity.CachedData.ReloadDuration, animSpeedRate, reloadCancellationTokenSource.Token,
+                    (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
+                    {
+                        triggerDurations = __triggerDurations;
+                        totalDuration = __totalDuration;
+                        remainsDuration = __remainsDuration;
+                        LastReloadEndTime = __endTime;
+                    });
 
                 // Play animation
                 if (vehicleModelAvailable)
@@ -143,17 +152,7 @@ namespace MultiplayerARPG
                     weaponItem.ReloadClip?.Play(tpsModel.GenericAudioSource);
                 }
 
-                // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                float remainsDuration = totalDuration;
-                await _manager.PrepareActionDurations(triggerDurations, totalDuration, Entity.CachedData.ReloadDuration, animSpeedRate, reloadCancellationTokenSource.Token,
-                    (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
-                    {
-                        triggerDurations = __triggerDurations;
-                        totalDuration = __totalDuration;
-                        remainsDuration = __remainsDuration;
-                        LastReloadEndTime = __endTime;
-                    });
-
+                // Reload starts
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogReloadStart(_playerCharacterEntity, triggerDurations);
                 OnReloadStart?.Invoke();

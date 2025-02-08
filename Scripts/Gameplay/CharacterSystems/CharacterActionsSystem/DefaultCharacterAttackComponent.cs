@@ -157,7 +157,7 @@ namespace MultiplayerARPG
 
             try
             {
-                BaseCharacterModel tpsModel = Entity.CharacterModel;
+                BaseCharacterModel tpsModel = Entity.ActionModel;
                 bool tpsModelAvailable = tpsModel != null && tpsModel.gameObject.activeSelf;
                 BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
                 bool vehicleModelAvailable = vehicleModel != null;
@@ -165,14 +165,43 @@ namespace MultiplayerARPG
                 BaseCharacterModel fpsModel = Entity.FpsModel;
                 bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
-                // Prepare end time
-                LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                // Prepare action durations
+                float remainsDuration = totalDuration;
+                if (weaponItem.RateOfFire > 0)
+                {
+                    remainsDuration = totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire + entityCaches.RateOfFire);
+                    triggerDurations = new float[] { 0f };
+                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                }
+                else if (weaponItem.DoRecoilingAsAttackAnimation)
+                {
+                    remainsDuration = totalDuration = tpsModel.CacheAttackRecoiler?.DefaultRecoilDuration ?? 1f;
+                    triggerDurations = new float[] { 0f };
+                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                }
+                else
+                {
+                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                    await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, attackCancellationTokenSource.Token,
+                        (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
+                        {
+                            triggerDurations = __triggerDurations;
+                            totalDuration = __totalDuration;
+                            remainsDuration = __remainsDuration;
+                            LastAttackEndTime = __endTime;
+                        });
+                }
 
-                // Play action animation
+                // Prepare damage amounts
+                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = Entity.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, triggerDurations.Length, 1);
+
+                // Prepare hit register validation, it will be used later when receive attack start/end events from clients
+                if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
+
+                // Play animation
                 if (weaponItem.DoRecoilingAsAttackAnimation)
                 {
-                    totalDuration = tpsModel.CacheAttackRecoiler?.DefaultRecoilDuration ?? 1f;
-                    triggerDurations = new float[] { 0f };
                     if (vehicleModelAvailable)
                         vehicleModel.CacheAttackRecoiler?.PlayRecoiling();
                     if (!overridePassengerActionAnimations)
@@ -182,6 +211,7 @@ namespace MultiplayerARPG
                         if (fpsModelAvailable)
                             fpsModel.CacheAttackRecoiler?.PlayRecoiling();
                     }
+                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
                 }
                 else
                 {
@@ -196,30 +226,7 @@ namespace MultiplayerARPG
                     }
                 }
 
-                float remainsDuration = totalDuration;
-                if (weaponItem.RateOfFire > 0)
-                {
-                    remainsDuration = totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire + entityCaches.RateOfFire);
-                    triggerDurations = new float[] { 0f };
-                }
-                else
-                {
-                    // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
-                    await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, attackCancellationTokenSource.Token,
-                        (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
-                        {
-                            triggerDurations = __triggerDurations;
-                            totalDuration = __totalDuration;
-                            remainsDuration = __remainsDuration;
-                            LastAttackEndTime = __endTime;
-                        });
-                }
-                // Prepare damage amounts
-                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = Entity.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, triggerDurations.Length, 1);
-
-                // Prepare hit register validation, it will be used later when receive attack start/end events from clients
-                if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
+                // Attack starts
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogAttackStart(_playerCharacterEntity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon);
                 OnAttackStart?.Invoke();
