@@ -420,6 +420,7 @@ namespace MultiplayerARPG
             }
 
             fireSpreadAmount += (byte)Mathf.CeilToInt(entityCaches.FireSpread);
+            fireSpreadRange *= 1 + entityCaches.FireSpreadRangeRate;
 
             // Make sure it won't increase damage to the wrong collction
             for (byte spreadIndex = 0; spreadIndex < fireSpreadAmount + 1; ++spreadIndex)
