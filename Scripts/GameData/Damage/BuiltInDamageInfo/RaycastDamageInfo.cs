@@ -156,7 +156,10 @@ namespace MultiplayerARPG
             float projectileDistance = missileDistance;
             List<ImpactEffectPlayingData> impactEffectsData = new List<ImpactEffectPlayingData>();
             int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
+            bool queriesHitBackfaces = Physics.queriesHitBackfaces;
+            Physics.queriesHitBackfaces = true;
             int tempHitCount = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, layerMask, QueryTriggerInteraction.Collide);
+            Physics.queriesHitBackfaces = queriesHitBackfaces;
             if (tempHitCount <= 0)
             {
                 // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
