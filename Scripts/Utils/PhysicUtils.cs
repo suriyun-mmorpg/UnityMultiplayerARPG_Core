@@ -238,6 +238,24 @@ public static class PhysicUtils
         }
     }
 
+    /// <summary>
+    /// Sort ASC by distance from position to collider's position
+    /// </summary>
+    public struct ColliderHitComparer : IComparer<ColliderHit>
+    {
+        private Vector3 position;
+        public ColliderHitComparer(Vector3 position)
+        {
+            this.position = position;
+        }
+
+        public int Compare(ColliderHit x, ColliderHit y)
+        {
+            return Vector3.Distance(position, x.collider.transform.position)
+                .CompareTo(Vector3.Distance(position, y.collider.transform.position));
+        }
+    }
+
 
     /// <summary>
     /// Sort ASC by distance from origin to impact point
