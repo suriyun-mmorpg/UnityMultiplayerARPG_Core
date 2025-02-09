@@ -2,7 +2,6 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using LiteNetLibManager.SuperGrid2D;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
 using Cysharp.Threading.Tasks;
@@ -264,16 +263,6 @@ namespace MultiplayerARPG
 
         public override bool StartServer()
         {
-            // Prepare grid manager
-            GridManager gridManager = gameObject.GetComponent<GridManager>();
-            if (gridManager != null)
-            {
-                // Make sure that grid manager -> axis mode set correctly for current dimension type
-                if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
-                    gridManager.axisMode = GridManager.EAxisMode.XZ;
-                else
-                    gridManager.axisMode = GridManager.EAxisMode.XY;
-            }
             InitPrefabs();
             return base.StartServer();
         }
