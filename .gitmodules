@@ -22,9 +22,6 @@
 [submodule "SerializableCallback"]
 	path = SerializableCallback
 	url = https://github.com/insthync/SerializableCallback.git
-[submodule "SuperGrid2DVisibleChecker"]
-	path = SuperGrid2DVisibleChecker
-	url = https://github.com/insthync/LiteNetLib-SuperGrid2D-Integration.git
 [submodule "GraphicSettings"]
 	path = GraphicSettings
 	url = https://github.com/insthync/unity-graphic-settings.git
@@ -38,4 +35,8 @@
 [submodule "AddressableAssetTools"]
 	path = AddressableAssetTools
 	url = https://github.com/insthync/unity-addressable-asset-tools.git
+	branch = main
+[submodule "SpatialPartitioningSystems"]
+	path = SpatialPartitioningSystems
+	url = https://github.com/insthync/SpatialPartitioningSystems.git
 	branch = main
