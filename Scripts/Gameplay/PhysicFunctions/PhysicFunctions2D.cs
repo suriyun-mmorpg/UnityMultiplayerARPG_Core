@@ -25,7 +25,7 @@ namespace MultiplayerARPG
             _overlapColliders2D = null;
         }
 
-        public bool SingleRaycast(Vector3 start, Vector3 end, out PhysicRaycastResult result, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public bool SingleRaycast(Vector3 start, Vector3 end, out PhysicRaycastResult result, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             result = new PhysicRaycastResult();
             RaycastHit2D hit = Physics2D.Raycast(start, (end - start).normalized, Vector3.Distance(start, end), layerMask);
@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool SingleRaycast(Vector3 origin, Vector3 direction, out PhysicRaycastResult result, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public bool SingleRaycast(Vector3 origin, Vector3 direction, out PhysicRaycastResult result, float distance, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             result = new PhysicRaycastResult();
             RaycastHit2D hit = Physics2D.Raycast(origin, direction, distance, layerMask);
@@ -55,24 +55,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public int Raycast(Vector3 start, Vector3 end, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int Raycast(Vector3 start, Vector3 end, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             return PhysicUtils.SortedRaycastNonAlloc2D(start, (end - start).normalized, _raycasts2D, Vector3.Distance(start, end), layerMask);
         }
 
-        public int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             return PhysicUtils.SortedRaycastNonAlloc2D(origin, direction, _raycasts2D, distance, layerMask);
         }
 
-        public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 raycastPosition, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 raycastPosition, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             raycastPosition = camera.ScreenToWorldPoint(mousePosition);
             raycastPosition.z = 0;
             return PhysicUtils.SortedLinecastNonAlloc2D(raycastPosition, raycastPosition, _raycasts2D, layerMask);
         }
 
-        public int RaycastDown(Vector3 position, int layerMask, float distance = 100f, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int RaycastDown(Vector3 position, int layerMask, float distance = 100f, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             return PhysicUtils.SortedLinecastNonAlloc2D(position, position, _raycasts2D, layerMask);
         }
@@ -117,7 +117,7 @@ namespace MultiplayerARPG
             return _raycasts2D[index].collider.ClosestPoint(position);
         }
 
-        public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             return sort ? PhysicUtils.SortedOverlapCircleNonAlloc(position, radius, _overlapColliders2D, layerMask) :
                 Physics2D.OverlapCircleNonAlloc(position, radius, _overlapColliders2D, layerMask);

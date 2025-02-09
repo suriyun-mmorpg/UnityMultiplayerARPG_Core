@@ -28,16 +28,16 @@ namespace MultiplayerARPG
             Clean();
         }
 
-        public bool SingleRaycast(Vector3 start, Vector3 end, out PhysicRaycastResult result, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public bool SingleRaycast(Vector3 start, Vector3 end, out PhysicRaycastResult result, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
-            return SingleRaycast(start, (end - start).normalized, out result, Vector3.Distance(start, end), layerMask, queryTriggerInteraction);
+            return SingleRaycast(start, (end - start).normalized, out result, Vector3.Distance(start, end), layerMask, hitTriggers, hitBackfaces, hitMultipleFaces);
         }
 
-        public bool SingleRaycast(Vector3 origin, Vector3 direction, out PhysicRaycastResult result, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public bool SingleRaycast(Vector3 origin, Vector3 direction, out PhysicRaycastResult result, float distance, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             result = new PhysicRaycastResult();
             NativeArray<RaycastCommand> tempCommands = new NativeArray<RaycastCommand>(1, Allocator.TempJob);
-            QueryParameters queryParameters = new QueryParameters(layerMask, false, queryTriggerInteraction, false);
+            QueryParameters queryParameters = new QueryParameters(layerMask, hitMultipleFaces, hitTriggers, hitBackfaces);
             tempCommands[0] = new RaycastCommand(origin, direction, queryParameters, distance);
             JobHandle handle = RaycastCommand.ScheduleBatch(tempCommands, _raycastResults, 1, 1);
             handle.Complete();
@@ -53,15 +53,15 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public int Raycast(Vector3 start, Vector3 end, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int Raycast(Vector3 start, Vector3 end, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
-            return Raycast(start, (end - start).normalized, Vector3.Distance(start, end), layerMask, queryTriggerInteraction);
+            return Raycast(start, (end - start).normalized, Vector3.Distance(start, end), layerMask, hitTriggers, hitBackfaces, hitMultipleFaces);
         }
 
-        public int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             NativeArray<RaycastCommand> tempCommands = new NativeArray<RaycastCommand>(1, Allocator.TempJob);
-            QueryParameters queryParameters = new QueryParameters(layerMask, false, queryTriggerInteraction, false);
+            QueryParameters queryParameters = new QueryParameters(layerMask, hitMultipleFaces, hitTriggers, hitBackfaces);
             tempCommands[0] = new RaycastCommand(origin, direction, queryParameters, distance);
             JobHandle handle = RaycastCommand.ScheduleBatch(tempCommands, _raycastResults, 1, _allocSize);
             handle.Complete();
@@ -76,25 +76,25 @@ namespace MultiplayerARPG
             return _raycastResults.Length;
         }
 
-        public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 raycastPosition, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 raycastPosition, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             Ray ray = camera.ScreenPointToRay(mousePosition);
             raycastPosition = ray.origin;
-            return Raycast(ray.origin, ray.direction, distance, layerMask, queryTriggerInteraction);
+            return Raycast(ray.origin, ray.direction, distance, layerMask, hitTriggers, hitBackfaces, hitMultipleFaces);
         }
 
-        public int RaycastDown(Vector3 position, int layerMask, float distance = 100, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int RaycastDown(Vector3 position, int layerMask, float distance = 100, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             // Raycast to find hit floor
-            int hitCount = Raycast(position + (Vector3.up * distance * 0.5f), Vector3.down * distance, layerMask, queryTriggerInteraction);
+            int hitCount = Raycast(position + (Vector3.up * distance * 0.5f), Vector3.down * distance, layerMask, hitTriggers, hitBackfaces, hitMultipleFaces);
             //System.Array.Sort(_raycasts, 0, hitCount, new PhysicUtils.RaycastHitComparerCustomOrigin(position));
             return hitCount;
         }
 
-        public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             NativeArray<OverlapSphereCommand> tempCommands = new NativeArray<OverlapSphereCommand>(1, Allocator.TempJob);
-            QueryParameters queryParameters = new QueryParameters(layerMask, false, queryTriggerInteraction, false);
+            QueryParameters queryParameters = new QueryParameters(layerMask, hitMultipleFaces, hitTriggers, hitBackfaces);
             tempCommands[0] = new OverlapSphereCommand(position, radius, queryParameters);
             JobHandle handle = OverlapSphereCommand.ScheduleBatch(tempCommands, _overlapResults, 1, _allocSize);
             handle.Complete();

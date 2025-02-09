@@ -8,7 +8,7 @@ namespace MultiplayerARPG
         public static bool IsGameEntityInDistance<T>(this IPhysicFunctions functions, T targetEntity, Vector3 position, float distance, bool includeUnHittable)
             where T : class, ITargetableEntity
         {
-            int tempOverlapSize = functions.OverlapObjects(position, distance, 1 << targetEntity.EntityGameObject.layer, queryTriggerInteraction: QueryTriggerInteraction.Collide);
+            int tempOverlapSize = functions.OverlapObjects(position, distance, 1 << targetEntity.EntityGameObject.layer, hitTriggers: QueryTriggerInteraction.Collide);
             if (tempOverlapSize == 0)
                 return false;
             ITargetableEntity tempTargetableEntity;
@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         public static bool IsGameEntityHitBoxInDistance<T>(this IPhysicFunctions functions, T targetEntity, Vector3 position, float distance, bool includeUnHittable)
             where T : class, IGameEntity
         {
-            int tempOverlapSize = functions.OverlapObjects(position, distance, 1 << targetEntity.GetGameObject().layer, queryTriggerInteraction: QueryTriggerInteraction.Collide);
+            int tempOverlapSize = functions.OverlapObjects(position, distance, 1 << targetEntity.GetGameObject().layer, hitTriggers: QueryTriggerInteraction.Collide);
             if (tempOverlapSize == 0)
                 return false;
             DamageableHitBox tempBaseEntity;
@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             where T : class, IGameEntity
         {
             List<T> result = new List<T>();
-            int tempOverlapSize = functions.OverlapObjects(position, distance, layerMask, queryTriggerInteraction: QueryTriggerInteraction.Collide);
+            int tempOverlapSize = functions.OverlapObjects(position, distance, layerMask, hitTriggers: QueryTriggerInteraction.Collide);
             if (tempOverlapSize == 0)
                 return result;
             IGameEntity tempBaseEntity;
