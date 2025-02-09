@@ -1,16 +1,26 @@
-﻿using UnityEngine;
+﻿using Unity.Collections;
+using Unity.Jobs;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class PhysicFunctions : IPhysicFunctions
     {
-        private RaycastHit[] _raycasts;
-        private Collider[] _overlapColliders;
+        private NativeArray<RaycastHit> _raycastResults;
+        private NativeArray<ColliderHit> _overlapResults;
+        private int _allocSize;
 
         public PhysicFunctions(int allocSize)
         {
-            _raycasts = new RaycastHit[allocSize];
-            _overlapColliders = new Collider[allocSize];
+            _allocSize = allocSize;
+            _raycastResults = new NativeArray<RaycastHit>(allocSize, Allocator.Persistent);
+            _overlapResults = new NativeArray<ColliderHit>(allocSize, Allocator.Persistent);
+        }
+
+        public void Clean()
+        {
+            if (_raycastResults.IsCreated) _raycastResults.Dispose();
+            if (_overlapResults.IsCreated) _overlapResults.Dispose();
         }
 
         ~PhysicFunctions()
@@ -18,38 +28,26 @@ namespace MultiplayerARPG
             Clean();
         }
 
-        public void Clean()
-        {
-            _raycasts = null;
-            _overlapColliders.Nulling();
-            _overlapColliders = null;
-        }
-
         public bool SingleRaycast(Vector3 start, Vector3 end, out PhysicRaycastResult result, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            result = new PhysicRaycastResult();
-            RaycastHit hit;
-            if (Physics.Raycast(start, (end - start).normalized, out hit, Vector3.Distance(start, end), layerMask, queryTriggerInteraction))
-            {
-                result.point = hit.point;
-                result.normal = hit.normal;
-                result.distance = hit.distance;
-                result.transform = hit.transform;
-                return true;
-            }
-            return false;
+            return SingleRaycast(start, (end - start).normalized, out result, Vector3.Distance(start, end), layerMask, queryTriggerInteraction);
         }
 
         public bool SingleRaycast(Vector3 origin, Vector3 direction, out PhysicRaycastResult result, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
             result = new PhysicRaycastResult();
-            RaycastHit hit;
-            if (Physics.Raycast(origin, direction, out hit, distance, layerMask, queryTriggerInteraction))
+            NativeArray<RaycastCommand> tempCommands = new NativeArray<RaycastCommand>(1, Allocator.TempJob);
+            QueryParameters queryParameters = new QueryParameters(layerMask, false, queryTriggerInteraction, false);
+            tempCommands[0] = new RaycastCommand(origin, direction, queryParameters, distance);
+            JobHandle handle = RaycastCommand.ScheduleBatch(tempCommands, _raycastResults, 1, 1);
+            handle.Complete();
+            tempCommands.Dispose();
+            if (_raycastResults[0].collider != null)
             {
-                result.point = hit.point;
-                result.normal = hit.normal;
-                result.distance = hit.distance;
-                result.transform = hit.transform;
+                result.point = _raycastResults[0].point;
+                result.normal = _raycastResults[0].normal;
+                result.distance = _raycastResults[0].distance;
+                result.transform = _raycastResults[0].transform;
                 return true;
             }
             return false;
@@ -57,88 +55,74 @@ namespace MultiplayerARPG
 
         public int Raycast(Vector3 start, Vector3 end, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            return PhysicUtils.SortedRaycastNonAlloc3D(start, (end - start).normalized, _raycasts, Vector3.Distance(start, end), layerMask, queryTriggerInteraction);
+            return Raycast(start, (end - start).normalized, Vector3.Distance(start, end), layerMask, queryTriggerInteraction);
         }
 
         public int Raycast(Vector3 origin, Vector3 direction, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            return PhysicUtils.SortedRaycastNonAlloc3D(origin, direction, _raycasts, distance, layerMask, queryTriggerInteraction);
+            NativeArray<RaycastCommand> tempCommands = new NativeArray<RaycastCommand>(1, Allocator.TempJob);
+            QueryParameters queryParameters = new QueryParameters(layerMask, false, queryTriggerInteraction, false);
+            tempCommands[0] = new RaycastCommand(origin, direction, queryParameters, distance);
+            JobHandle handle = RaycastCommand.ScheduleBatch(tempCommands, _raycastResults, 1, _allocSize);
+            handle.Complete();
+            tempCommands.Dispose();
+            for (int i = 0; i < _raycastResults.Length; ++i)
+            {
+                if (_raycastResults[i].collider == null)
+                {
+                    return i;
+                }
+            }
+            return _raycastResults.Length;
         }
 
         public int RaycastPickObjects(Camera camera, Vector3 mousePosition, int layerMask, float distance, out Vector3 raycastPosition, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
             Ray ray = camera.ScreenPointToRay(mousePosition);
             raycastPosition = ray.origin;
-            return PhysicUtils.SortedRaycastNonAlloc3D(ray, _raycasts, distance, layerMask, queryTriggerInteraction);
+            return Raycast(ray.origin, ray.direction, distance, layerMask, queryTriggerInteraction);
         }
 
-        public int RaycastDown(Vector3 position, int layerMask, float distance = 100f, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+        public int RaycastDown(Vector3 position, int layerMask, float distance = 100, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
             // Raycast to find hit floor
-            int hitCount = Physics.RaycastNonAlloc(position + (Vector3.up * distance * 0.5f), Vector3.down, _raycasts, distance, layerMask, queryTriggerInteraction);
-            System.Array.Sort(_raycasts, 0, hitCount, new PhysicUtils.RaycastHitComparerCustomOrigin(position));
+            int hitCount = Raycast(position + (Vector3.up * distance * 0.5f), Vector3.down * distance, layerMask, queryTriggerInteraction);
+            //System.Array.Sort(_raycasts, 0, hitCount, new PhysicUtils.RaycastHitComparerCustomOrigin(position));
             return hitCount;
-        }
-
-        public bool GetRaycastIsTrigger(int index)
-        {
-            return _raycasts[index].collider.isTrigger;
-        }
-
-        public Vector3 GetRaycastPoint(int index)
-        {
-            return _raycasts[index].point;
-        }
-
-        public Vector3 GetRaycastNormal(int index)
-        {
-            return _raycasts[index].normal;
-        }
-
-        public Bounds GetRaycastColliderBounds(int index)
-        {
-            return _raycasts[index].collider.bounds;
-        }
-
-        public float GetRaycastDistance(int index)
-        {
-            return _raycasts[index].distance;
-        }
-
-        public Transform GetRaycastTransform(int index)
-        {
-            return _raycasts[index].transform;
-        }
-
-        public GameObject GetRaycastObject(int index)
-        {
-            return _raycasts[index].transform.gameObject;
-        }
-
-        public Vector3 GetRaycastColliderClosestPoint(int index, Vector3 position)
-        {
-            return _raycasts[index].collider.ClosestPoint(position);
         }
 
         public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
         {
-            return sort ? PhysicUtils.SortedOverlapSphereNonAlloc(position, radius, _overlapColliders, layerMask, queryTriggerInteraction) :
-                Physics.OverlapSphereNonAlloc(position, radius, _overlapColliders, layerMask, queryTriggerInteraction);
+            NativeArray<OverlapSphereCommand> tempCommands = new NativeArray<OverlapSphereCommand>(1, Allocator.TempJob);
+            QueryParameters queryParameters = new QueryParameters(layerMask, false, queryTriggerInteraction, false);
+            tempCommands[0] = new OverlapSphereCommand(position, radius, queryParameters);
+            JobHandle handle = OverlapSphereCommand.ScheduleBatch(tempCommands, _overlapResults, 1, _allocSize);
+            handle.Complete();
+            tempCommands.Dispose();
+            for (int i = 0; i < _overlapResults.Length; ++i)
+            {
+                if (_overlapResults[i].collider == null)
+                {
+                    return i;
+                }
+            }
+            return _overlapResults.Length;
         }
 
-        public GameObject GetOverlapObject(int index)
-        {
-            return _overlapColliders[index].gameObject;
-        }
+        public bool GetRaycastIsTrigger(int index) => _raycastResults[index].collider.isTrigger;
+        public Vector3 GetRaycastPoint(int index) => _raycastResults[index].point;
+        public Vector3 GetRaycastNormal(int index) => _raycastResults[index].normal;
+        public Bounds GetRaycastColliderBounds(int index) => _raycastResults[index].collider.bounds;
+        public float GetRaycastDistance(int index) => _raycastResults[index].distance;
+        public Transform GetRaycastTransform(int index) => _raycastResults[index].transform;
+        public GameObject GetRaycastObject(int index) => _raycastResults[index].transform.gameObject;
+        public Vector3 GetRaycastColliderClosestPoint(int index, Vector3 position) => _raycastResults[index].collider.ClosestPoint(position);
 
-        public Vector3 GetOverlapColliderClosestPoint(int index, Vector3 position)
-        {
-            return _overlapColliders[index].ClosestPoint(position);
-        }
-
+        public GameObject GetOverlapObject(int index) => _overlapResults[index].collider.gameObject;
+        public Vector3 GetOverlapColliderClosestPoint(int index, Vector3 position) => _overlapResults[index].collider.ClosestPoint(position);
         public bool GetOverlapColliderRaycast(int index, Vector3 origin, Vector3 direction, out Vector3 point, out Vector3 normal, out float distance, out Transform transform, float maxDistance)
         {
-            if (_overlapColliders[index].Raycast(new Ray(origin, direction), out RaycastHit hitInfo, maxDistance))
+            if (_overlapResults[index].collider.Raycast(new Ray(origin, direction), out RaycastHit hitInfo, maxDistance))
             {
                 point = hitInfo.point;
                 normal = hitInfo.normal;
