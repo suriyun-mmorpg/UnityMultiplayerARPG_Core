@@ -92,12 +92,15 @@ namespace MultiplayerARPG
 
         public override void UpdateInterestManagement(float deltaTime)
         {
+            if (_system == null)
+                return;
+
             _updateCountDown -= deltaTime;
             if (_updateCountDown > 0)
                 return;
             _updateCountDown = updateInterval;
-            Profiler.BeginSample("JobifiedGridSpatialPartitioningAOI - Update");
 
+            Profiler.BeginSample("JobifiedGridSpatialPartitioningAOI - Update");
             _spatialObjects.Clear();
             foreach (LiteNetLibIdentity spawnedObject in Manager.Assets.GetSpawnedObjects())
             {
