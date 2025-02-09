@@ -8,7 +8,6 @@ namespace MultiplayerARPG
 {
     public class JobifiedGridSpatialPartitioningAOI : BaseInterestManager
     {
-        public bool includeInactiveComponents = true;
         public float cellSize = 64f;
         public int maxObjects = 10000;
         [Tooltip("Update every ? seconds")]
