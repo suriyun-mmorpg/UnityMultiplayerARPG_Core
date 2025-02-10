@@ -182,7 +182,8 @@ namespace MultiplayerARPG
                     {
                         reloaded = true;
                         OnReloadTrigger?.Invoke(triggerIndex);
-                        ActionTrigger(reloadingAmmoDataId, reloadingAmmoAmount, triggerIndex, isLeftHand, weapon);
+                        ActionTrigger(reloadingAmmoDataId, reloadingAmmoAmount, triggerIndex, isLeftHand, weapon.id);
+
                     }
 
                     if (remainsDuration <= 0f)
@@ -224,7 +225,7 @@ namespace MultiplayerARPG
             ClearReloadStates();
         }
 
-        protected virtual void ActionTrigger(int reloadingAmmoDataId, int reloadingAmmoAmount, byte triggerIndex, bool isLeftHand, CharacterItem weapon)
+        protected virtual void ActionTrigger(int reloadingAmmoDataId, int reloadingAmmoAmount, byte triggerIndex, bool isLeftHand, string id)
         {
             if (!IsServer)
                 return;
@@ -232,12 +233,13 @@ namespace MultiplayerARPG
                 return;
             // Prepare and validate item
             EquipWeapons equipWeapons = Entity.EquipWeapons;
-            if ((isLeftHand && equipWeapons.leftHand.IsDiffer(weapon)) ||
-                (!isLeftHand && equipWeapons.rightHand.IsDiffer(weapon)))
+            if ((isLeftHand && !string.Equals(equipWeapons.leftHand.id, id)) ||
+                (!isLeftHand && !string.Equals(equipWeapons.rightHand.id, id)))
             {
                 // Invalid item, player may change the item before the reloading is done
                 return;
             }
+            CharacterItem weapon = isLeftHand ? equipWeapons.leftHand : equipWeapons.rightHand;
             if (!Entity.DecreaseItems(reloadingAmmoDataId, reloadingAmmoAmount))
             {
                 if (_entityIsPlayer && IsServer)
