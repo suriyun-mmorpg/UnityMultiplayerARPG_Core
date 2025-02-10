@@ -78,7 +78,7 @@ namespace MultiplayerARPG
             entity.SyncTitle.onChange -= OnSyncTitleChanged;
         }
 
-        protected void OnSyncTitleChanged(bool isInitial, string value)
+        protected void OnSyncTitleChanged(bool isInitial, string oldTitle, string title)
         {
             UpdateTitle();
         }

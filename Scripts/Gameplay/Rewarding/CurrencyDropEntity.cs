@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             currencyDataId.onChange -= OnCurrencyDataIdChange;
         }
 
-        protected virtual void OnCurrencyDataIdChange(bool isInitial, int dataId)
+        protected virtual void OnCurrencyDataIdChange(bool isInitial, int oldDataId, int dataId)
         {
             // Instantiate model at clients
             if (!IsClient)

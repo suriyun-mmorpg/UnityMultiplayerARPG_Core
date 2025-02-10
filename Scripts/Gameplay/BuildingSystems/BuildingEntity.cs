@@ -387,7 +387,7 @@ namespace MultiplayerARPG
                 onBuildingConstruct.Invoke();
         }
 
-        private void OnParentIdChange(bool isInitial, string parentId)
+        private void OnParentIdChange(bool isInitial, string oldParentId, string parentId)
         {
             _parentFound = false;
         }

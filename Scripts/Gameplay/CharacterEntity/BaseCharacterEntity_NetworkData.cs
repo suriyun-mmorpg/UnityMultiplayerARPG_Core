@@ -365,62 +365,62 @@ namespace MultiplayerARPG
         #endregion
 
         #region Sync data changed callback
-        private void OnIdChange(bool isInitial, string id)
+        private void OnIdChange(bool isInitial, string oldId, string id)
         {
             if (onIdChange != null)
                 onIdChange.Invoke(id);
         }
 
-        private void OnCharacterNameChange(bool isInitial, string characterName)
+        private void OnCharacterNameChange(bool isInitial, string oldCharacterName, string characterName)
         {
             if (onCharacterNameChange != null)
                 onCharacterNameChange.Invoke(characterName);
         }
 
-        private void OnLevelChange(bool isInitial, int level)
+        private void OnLevelChange(bool isInitial, int oldLevel, int level)
         {
             IsRecaching = true;
             if (onLevelChange != null)
                 onLevelChange.Invoke(level);
         }
 
-        private void OnExpChange(bool isInitial, int exp)
+        private void OnExpChange(bool isInitial, int oldExp, int exp)
         {
             if (onExpChange != null)
                 onExpChange.Invoke(exp);
         }
 
-        private void OnIsImmuneChange(bool isInitial, bool isImmune)
+        private void OnIsImmuneChange(bool isInitial, bool oldIsImmune, bool isImmune)
         {
             if (onIsImmuneChange != null)
                 onIsImmuneChange.Invoke(isImmune);
         }
 
-        private void OnCurrentMpChange(bool isInitial, int currentMp)
+        private void OnCurrentMpChange(bool isInitial, int oldCurrentMp, int currentMp)
         {
             if (onCurrentMpChange != null)
                 onCurrentMpChange.Invoke(currentMp);
         }
 
-        private void OnCurrentStaminaChange(bool isInitial, int currentStamina)
+        private void OnCurrentStaminaChange(bool isInitial, int oldCurrentStamina, int currentStamina)
         {
             if (onCurrentStaminaChange != null)
                 onCurrentStaminaChange.Invoke(currentStamina);
         }
 
-        private void OnCurrentFoodChange(bool isInitial, int currentFood)
+        private void OnCurrentFoodChange(bool isInitial, int oldCurrentFood, int currentFood)
         {
             if (onCurrentFoodChange != null)
                 onCurrentFoodChange.Invoke(currentFood);
         }
 
-        private void OnCurrentWaterChange(bool isInitial, int currentWater)
+        private void OnCurrentWaterChange(bool isInitial, int oldCurrentWater, int currentWater)
         {
             if (onCurrentWaterChange != null)
                 onCurrentWaterChange.Invoke(currentWater);
         }
 
-        protected virtual void OnEquipWeaponSetChange(bool isInitial, byte equipWeaponSet)
+        protected virtual void OnEquipWeaponSetChange(bool isInitial, byte oldEquipWeaponSet, byte equipWeaponSet)
         {
             MarkToUpdateAppearances();
             MarkToUpdateAmmoSim();
@@ -429,7 +429,7 @@ namespace MultiplayerARPG
                 onEquipWeaponSetChange.Invoke(equipWeaponSet);
         }
 
-        protected virtual void OnIsWeaponsSheathedChange(bool isInitial, bool isWeaponsSheathed)
+        protected virtual void OnIsWeaponsSheathedChange(bool isInitial, bool oldIsWeaponsSheathed, bool isWeaponsSheathed)
         {
             MarkToUpdateAppearances();
             IsRecaching = true;
@@ -437,31 +437,31 @@ namespace MultiplayerARPG
                 onIsWeaponsSheathedChange.Invoke(isWeaponsSheathed);
         }
 
-        private void OnPitchChange(bool isInitial, ushort pitch)
+        private void OnPitchChange(bool isInitial, ushort oldPitch, ushort pitch)
         {
             if (onPitchChange != null)
                 onPitchChange.Invoke(pitch);
         }
 
-        private void OnLookPositionChange(bool isInitial, Vector3 lookPosition)
+        private void OnLookPositionChange(bool isInitial, Vector3 oldLookPosition, Vector3 lookPosition)
         {
             if (onLookPositionChange != null)
                 onLookPositionChange.Invoke(lookPosition);
         }
 
-        private void OnAimPositionChange(bool isInitial, AimPosition aimPosition)
+        private void OnAimPositionChange(bool isInitial, AimPosition oldAimPosition, AimPosition aimPosition)
         {
             if (onAimPositionChange != null)
                 onAimPositionChange.Invoke(aimPosition);
         }
 
-        private void OnTargetEntityIdChange(bool isInitial, uint targetEntityId)
+        private void OnTargetEntityIdChange(bool isInitial, uint oldTargetEntityId, uint targetEntityId)
         {
             if (onTargetEntityIdChange != null)
                 onTargetEntityIdChange.Invoke(targetEntityId);
         }
 
-        private void OnMountChange(bool isInitial, CharacterMount mount)
+        private void OnMountChange(bool isInitial, CharacterMount oldMount, CharacterMount mount)
         {
             IsRecaching = true;
             if (onMountChange != null)

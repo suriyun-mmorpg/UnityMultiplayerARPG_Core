@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             isOpen.onChange -= OnIsOpenChange;
         }
 
-        private void OnIsOpenChange(bool isInitial, bool isOpen)
+        private void OnIsOpenChange(bool isInitial, bool oldIsOpen, bool isOpen)
         {
             if (isInitial)
             {

@@ -644,91 +644,91 @@ namespace MultiplayerARPG
         #endregion
 
         #region Sync data changes callback
-        private void OnPlayerIdChange(bool isInitial, string id)
+        private void OnPlayerIdChange(bool isInitial, string oldId, string id)
         {
             if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(CharacterName) && GameInstance.ClientCharacterHandlers != null)
                 GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(this);
         }
 
-        private void OnPlayerCharacterNameChange(bool isInitial, string characterName)
+        private void OnPlayerCharacterNameChange(bool isInitial, string oldCharacterName, string characterName)
         {
             if (!string.IsNullOrEmpty(Id) && !string.IsNullOrEmpty(characterName) && GameInstance.ClientCharacterHandlers != null)
                 GameInstance.ClientCharacterHandlers.SubscribePlayerCharacter(this);
         }
 
-        private void OnDataIdChange(bool isInitial, int dataId)
+        private void OnDataIdChange(bool isInitial, int oldDataId, int dataId)
         {
             IsRecaching = true;
             if (onDataIdChange != null)
                 onDataIdChange.Invoke(dataId);
         }
 
-        private void OnFactionIdChange(bool isInitial, int factionId)
+        private void OnFactionIdChange(bool isInitial, int oldFactionId, int factionId)
         {
             IsRecaching = true;
             if (onFactionIdChange != null)
                 onFactionIdChange.Invoke(factionId);
         }
 
-        private void OnStatPointChange(bool isInitial, float statPoint)
+        private void OnStatPointChange(bool isInitial, float oldStatPoint, float statPoint)
         {
             if (onStatPointChange != null)
                 onStatPointChange.Invoke(statPoint);
         }
 
-        private void OnSkillPointChange(bool isInitial, float skillPoint)
+        private void OnSkillPointChange(bool isInitial, float oldSkillPoint, float skillPoint)
         {
             if (onSkillPointChange != null)
                 onSkillPointChange.Invoke(skillPoint);
         }
 
-        private void OnGoldChange(bool isInitial, int gold)
+        private void OnGoldChange(bool isInitial, int oldGold, int gold)
         {
             if (onGoldChange != null)
                 onGoldChange.Invoke(gold);
         }
 
-        private void OnUserGoldChange(bool isInitial, int gold)
+        private void OnUserGoldChange(bool isInitial, int oldUserGold, int userGold)
         {
             if (onUserGoldChange != null)
-                onUserGoldChange.Invoke(gold);
+                onUserGoldChange.Invoke(userGold);
         }
 
-        private void OnUserCashChange(bool isInitial, int gold)
+        private void OnUserCashChange(bool isInitial, int oldUserCash, int userCash)
         {
             if (onUserCashChange != null)
-                onUserCashChange.Invoke(gold);
+                onUserCashChange.Invoke(userCash);
         }
 
-        private void OnPartyIdChange(bool isInitial, int partyId)
+        private void OnPartyIdChange(bool isInitial, int oldPartyId, int partyId)
         {
             IsRecaching = true;
             if (onPartyIdChange != null)
                 onPartyIdChange.Invoke(partyId);
         }
 
-        private void OnGuildIdChange(bool isInitial, int guildId)
+        private void OnGuildIdChange(bool isInitial, int oldGuildId, int guildId)
         {
             IsRecaching = true;
             if (onGuildIdChange != null)
                 onGuildIdChange.Invoke(guildId);
         }
 
-        private void OnIconDataIdChange(bool isInitial, int iconDataId)
+        private void OnIconDataIdChange(bool isInitial, int oldIconDataId, int iconDataId)
         {
             IsRecaching = true;
             if (onIconDataIdChange != null)
                 onIconDataIdChange.Invoke(iconDataId);
         }
 
-        private void OnFrameDataIdChange(bool isInitial, int frameDataId)
+        private void OnFrameDataIdChange(bool isInitial, int oldFrameDataId, int frameDataId)
         {
             IsRecaching = true;
             if (onFrameDataIdChange != null)
                 onFrameDataIdChange.Invoke(frameDataId);
         }
 
-        private void OnTitleDataIdChange(bool isInitial, int titleDataId)
+        private void OnTitleDataIdChange(bool isInitial, int oldTitleDataId, int titleDataId)
         {
             IsRecaching = true;
             if (onTitleDataIdChange != null)
@@ -736,32 +736,32 @@ namespace MultiplayerARPG
         }
 
 #if !DISABLE_CLASSIC_PK
-        private void OnIsPkOnChange(bool isInitial, bool isPkOn)
+        private void OnIsPkOnChange(bool isInitial, bool oldIsOn, bool isPkOn)
         {
             if (onIsPkOnChange != null)
                 onIsPkOnChange.Invoke(isPkOn);
         }
 
-        private void OnPkPointChange(bool isInitial, int pkPoint)
+        private void OnPkPointChange(bool isInitial, int oldPkPoint, int pkPoint)
         {
             if (onPkPointChange != null)
                 onPkPointChange.Invoke(pkPoint);
         }
 
-        private void OnConsecutivePkKillsChange(bool isInitial, int consecutivePkKills)
+        private void OnConsecutivePkKillsChange(bool isInitial, int oldConsecutivePkKills, int consecutivePkKills)
         {
             if (onConsecutivePkKillsChange != null)
                 onConsecutivePkKillsChange.Invoke(consecutivePkKills);
         }
 #endif
 
-        private void OnReputationChange(bool isInitial, int reputation)
+        private void OnReputationChange(bool isInitial, int oldReputation, int reputation)
         {
             if (onReputationChange != null)
                 onReputationChange.Invoke(reputation);
         }
 
-        private void OnIsWarpingChange(bool isInitial, bool isWarping)
+        private void OnIsWarpingChange(bool isInitial, bool isOldWarping, bool isWarping)
         {
             if (onIsWarpingChange != null)
                 onIsWarpingChange.Invoke(isWarping);

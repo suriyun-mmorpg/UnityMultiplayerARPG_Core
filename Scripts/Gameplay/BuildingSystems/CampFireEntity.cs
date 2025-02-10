@@ -131,7 +131,7 @@ namespace MultiplayerARPG
             isTurnOn.onChange -= OnIsTurnOnChange;
         }
 
-        private void OnIsTurnOnChange(bool isInitial, bool isTurnOn)
+        private void OnIsTurnOnChange(bool isInitial, bool oldIsTurnOn, bool isTurnOn)
         {
             if (isInitial)
             {

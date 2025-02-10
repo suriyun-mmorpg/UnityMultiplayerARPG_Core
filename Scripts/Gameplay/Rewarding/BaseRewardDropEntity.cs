@@ -175,7 +175,7 @@ namespace MultiplayerARPG
                 onPickedUp.Invoke();
         }
 
-        protected virtual void OnAmountChange(bool isInitial, int amount)
+        protected virtual void OnAmountChange(bool isInitial, int oldAmount, int amount)
         {
             // Instantiate model at clients
             if (!IsClient)

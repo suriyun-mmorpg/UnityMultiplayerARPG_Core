@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             StopVending();
         }
 
-        protected void OnDataChange(bool isInitial, VendingData data)
+        protected void OnDataChange(bool isInitial, VendingData oldData, VendingData data)
         {
             if (onVendingDataChange != null)
                 onVendingDataChange.Invoke(data);

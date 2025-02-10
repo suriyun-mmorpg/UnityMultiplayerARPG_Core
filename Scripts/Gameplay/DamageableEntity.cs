@@ -100,8 +100,9 @@ namespace MultiplayerARPG
         /// This will be called when current hp changed
         /// </summary>
         /// <param name="isInitial"></param>
+        /// <param name="oldCurrentHp"></param>
         /// <param name="currentHp"></param>
-        private void OnCurrentHpChange(bool isInitial, int currentHp)
+        private void OnCurrentHpChange(bool isInitial, int oldCurrentHp, int currentHp)
         {
             if (onCurrentHpChange != null)
                 onCurrentHpChange.Invoke(currentHp);

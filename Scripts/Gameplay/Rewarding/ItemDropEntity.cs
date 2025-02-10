@@ -268,7 +268,7 @@ namespace MultiplayerARPG
                 onPickedUp.Invoke();
         }
 
-        protected virtual async void OnItemDropDataChange(bool isInitial, ItemDropData itemDropData)
+        protected virtual async void OnItemDropDataChange(bool isInitial, ItemDropData oldItemDropData, ItemDropData itemDropData)
         {
 #if !UNITY_SERVER
             // Instantiate model at clients
