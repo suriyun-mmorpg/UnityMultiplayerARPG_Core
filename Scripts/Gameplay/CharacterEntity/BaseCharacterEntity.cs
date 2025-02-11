@@ -1173,8 +1173,7 @@ namespace MultiplayerARPG
         #region Character model updating
         public void MarkToUpdateAppearances()
         {
-            if (_countDownToUpdateAppearances > 0)
-                _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
+            _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         }
 
         protected void UpdateAppearances()
