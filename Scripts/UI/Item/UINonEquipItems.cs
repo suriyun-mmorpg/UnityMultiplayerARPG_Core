@@ -21,17 +21,7 @@ namespace MultiplayerARPG
 
         private void OnNonEquipItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
-            switch (operation)
-            {
-                case LiteNetLibSyncListOp.Set:
-                case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, true, true))
-                        UpdateOwningCharacterData();
-                    break;
-                default:
-                    UpdateOwningCharacterData();
-                    break;
-            }
+            UpdateOwningCharacterData();
         }
 
         public void UpdateOwningCharacterData()

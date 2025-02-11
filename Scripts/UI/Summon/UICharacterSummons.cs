@@ -78,21 +78,7 @@ namespace MultiplayerARPG
 
         private void OnSummonsOperation(LiteNetLibSyncListOp operation, int index, CharacterSummon oldItem, CharacterSummon newItem)
         {
-            switch (operation)
-            {
-                case LiteNetLibSyncListOp.Set:
-                case LiteNetLibSyncListOp.Dirty:
-                    if (!string.Equals(oldItem.id, newItem.id) ||
-                        oldItem.type != newItem.type ||
-                        !string.Equals(oldItem.sourceId, newItem.sourceId) ||
-                        oldItem.dataId != newItem.dataId ||
-                        oldItem.objectId != newItem.objectId)
-                        UpdateOwningCharacterData();
-                    break;
-                default:
-                    UpdateOwningCharacterData();
-                    break;
-            }
+            UpdateOwningCharacterData();
         }
 
         public void UpdateOwningCharacterData()

@@ -95,20 +95,7 @@ namespace MultiplayerARPG
 
         protected void OnBuffsOperation(LiteNetLibSyncListOp operation, int index, CharacterBuff oldItem, CharacterBuff newItem)
         {
-            switch (operation)
-            {
-                case LiteNetLibSyncListOp.Set:
-                case LiteNetLibSyncListOp.Dirty:
-                    if (!string.Equals(oldItem.id, newItem.id) ||
-                        oldItem.type != newItem.type ||
-                        oldItem.dataId != newItem.dataId ||
-                        oldItem.level != newItem.level)
-                        UpdateBuffs();
-                    break;
-                default:
-                    UpdateBuffs();
-                    break;
-            }
+            UpdateBuffs();
         }
 
         protected void OnPkPointChange(int pkPoint)

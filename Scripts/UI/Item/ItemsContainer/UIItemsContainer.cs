@@ -39,17 +39,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnItemsOperation(LiteNetLibSyncListOp operation, int index, CharacterItem oldItem, CharacterItem newItem)
         {
-            switch (operation)
-            {
-                case LiteNetLibSyncListOp.Set:
-                case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, true, true))
-                        UpdateData();
-                    break;
-                default:
-                    UpdateData();
-                    break;
-            }
+            UpdateData();
         }
 
         protected override void OnSelect(UICharacterItem ui)

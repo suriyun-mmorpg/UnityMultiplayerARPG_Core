@@ -107,18 +107,7 @@ namespace MultiplayerARPG
 
         private void OnCurrenciesOperation(LiteNetLibSyncListOp operation, int index, CharacterCurrency oldItem, CharacterCurrency newItem)
         {
-            switch (operation)
-            {
-                case LiteNetLibSyncListOp.Set:
-                case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.dataId != newItem.dataId ||
-                        oldItem.amount != newItem.amount)
-                        UpdateOwningCharacterData();
-                    break;
-                default:
-                    UpdateOwningCharacterData();
-                    break;
-            }
+            UpdateOwningCharacterData();
         }
 
         public void UpdateOwningCharacterData()
