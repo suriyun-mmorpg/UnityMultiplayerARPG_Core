@@ -29,9 +29,10 @@ namespace MultiplayerARPG
                 if (_cacheEffects == null)
                 {
                     _cacheEffects = new Dictionary<string, ImpactEffect>();
+                    if (defaultImpactEffect.tag.Tag != null)
+                        _cacheEffects[defaultImpactEffect.tag] = defaultImpactEffect;
                     if (impactEffects != null && impactEffects.Length > 0)
                     {
-                        _cacheEffects[defaultImpactEffect.tag.Tag] = defaultImpactEffect;
                         foreach (ImpactEffect effect in impactEffects)
                         {
                             GameEffect gameEffect = null;
@@ -40,7 +41,10 @@ namespace MultiplayerARPG
 #endif
                             if (gameEffect == null && !effect.addressableEffect.IsDataValid())
                                 continue;
-                            _cacheEffects[effect.tag.Tag] = effect;
+                            if (_cacheEffects.ContainsKey(effect.tag))
+                                continue;
+                            if (effect.tag.Tag != null)
+                                _cacheEffects[effect.tag] = effect;
                         }
                     }
                 }
