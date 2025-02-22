@@ -253,7 +253,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             // Player draw/holster animation
             if (_oldEquipWeapons == null)
                 _oldEquipWeapons = newEquipWeapons;
-            if (Time.unscaledTime - SwitchedTime < 1f || UpdateEquipmentImmediately || !newEquipWeapons.IsDiffer(_oldEquipWeapons.Value, out bool rightIsDiffer, out bool leftIsDiffer))
+            if (Time.unscaledTime - SwitchedTime < 1f || UpdateEquipmentImmediately || !newEquipWeapons.IsDiffer(_oldEquipWeapons.Value, out bool rightIsDiffer, out bool leftIsDiffer, true, true))
             {
                 SetNewEquipWeapons(newEquipWeapons, equipItems, selectableWeaponSets, equipWeaponSet, isWeaponsSheathed);
                 return;
