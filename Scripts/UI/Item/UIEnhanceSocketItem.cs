@@ -207,6 +207,11 @@ namespace MultiplayerARPG
         private void OnUiAppliedSocketEnhancerItemsSelected(UICharacterItem ui)
         {
             UpdateSocketEnhancerItems();
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnSelected.RemoveListener(OnUiAppliedSocketEnhancerItemsSelected);
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnDeselected.RemoveListener(OnUiAppliedSocketEnhancerItemsDeselected);
+            ui.SelectByManager();
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnSelected.AddListener(OnUiAppliedSocketEnhancerItemsSelected);
+            uiAppliedSocketEnhancerItems.CacheSelectionManager.eventOnDeselected.AddListener(OnUiAppliedSocketEnhancerItemsDeselected);
         }
 
         private void OnUiAppliedSocketEnhancerItemsDeselected(UICharacterItem ui)
