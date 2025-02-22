@@ -476,7 +476,7 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, out _, out _, true, false))
+                    if (oldItem.IsDiffer(newItem, out _, out _, true, true))
                     {
                         MarkToUpdateAppearances();
                         IsRecaching = true;
@@ -577,7 +577,7 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, true, false))
+                    if (oldItem.IsDiffer(newItem, true, true))
                     {
                         MarkToUpdateAppearances();
                         IsRecaching = true;
@@ -598,7 +598,7 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, true, false))
+                    if (oldItem.IsDiffer(newItem, true, true))
                         IsRecaching = true;
                     break;
                 default:
