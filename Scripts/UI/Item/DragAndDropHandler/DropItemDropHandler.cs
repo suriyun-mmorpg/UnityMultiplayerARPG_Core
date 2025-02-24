@@ -34,7 +34,6 @@ namespace MultiplayerARPG
                 switch (draggedItemUI.Location)
                 {
                     case UICharacterItemDragHandler.SourceLocation.EquipItems:
-                        break;
                     case UICharacterItemDragHandler.SourceLocation.NonEquipItems:
                         draggedItemUI.UIItem.OnClickDrop();
                         break;

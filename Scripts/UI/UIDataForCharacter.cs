@@ -33,8 +33,8 @@
         protected override void CloneTo(UISelectionEntry<T> target)
         {
             base.CloneTo(target);
-            if (target != null)
-                (target as UIDataForCharacter<T>).IndexOfData = IndexOfData;
+            if (target != null && target is UIDataForCharacter<T> castedTarget)
+                castedTarget.IndexOfData = IndexOfData;
         }
 
         protected override void OnDestroy()

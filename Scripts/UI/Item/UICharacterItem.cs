@@ -251,6 +251,17 @@ namespace MultiplayerARPG
         public string EquipPosition { get; private set; }
         public byte EquipSlotIndex { get; private set; }
 
+        protected override void CloneTo(UISelectionEntry<UICharacterItemData> target)
+        {
+            base.CloneTo(target);
+            if (target != null && target is UICharacterItem castedTarget)
+            {
+                castedTarget.IsSetupAsEquipSlot = IsSetupAsEquipSlot;
+                castedTarget.EquipPosition = EquipPosition;
+                castedTarget.EquipSlotIndex = EquipSlotIndex;
+            }
+        }
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -2043,7 +2054,7 @@ namespace MultiplayerARPG
         public void OnClickDrop()
         {
             // Only unequipped equipment can be dropped
-            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems || GameInstance.PlayingCharacterEntity == null)
+            if (!IsOwningCharacter() || GameInstance.PlayingCharacterEntity == null)
                 return;
 
             switch (GameInstance.Singleton.playerDropItemMode)
@@ -2087,7 +2098,7 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            GameInstance.PlayingCharacterEntity.CallCmdDropItem(IndexOfData, amount);
+            GameInstance.PlayingCharacterEntity.CallCmdDropItem(InventoryType, IndexOfData, EquipSlotIndex, amount);
         }
         #endregion
 

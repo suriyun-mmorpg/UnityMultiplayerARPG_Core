@@ -156,27 +156,95 @@ namespace MultiplayerARPG
         /// <summary>
         /// This will be called at server to order character to drop items
         /// </summary>
+        /// <param name="inventoryType"></param>
         /// <param name="index"></param>
+        /// <param name="equipSlotIndex"></param>
         /// <param name="amount"></param>
         [ServerRpc]
-        protected virtual void CmdDropItem(int index, int amount)
+        protected virtual void CmdDropItem(InventoryType inventoryType, int index, byte equipSlotIndex, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (amount <= 0 || !CanDoActions() || index >= NonEquipItems.Count)
+            if (amount <= 0 || !CanDoActions())
                 return;
 
-            CharacterItem nonEquipItem = NonEquipItems[index];
-            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+            CharacterItem droppingItem;
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    if (index >= NonEquipItems.Count)
+                        return;
+                    droppingItem = NonEquipItems[index].Clone();
+                    break;
+                case InventoryType.EquipItems:
+                    if (index >= EquipItems.Count || !CanUnEquipItem())
+                        return;
+                    droppingItem = EquipItems[index].Clone();
+                    break;
+                case InventoryType.EquipWeaponRight:
+                    if (index >= SelectableWeaponSets.Count || !CanUnEquipItem())
+                        return;
+                    droppingItem = SelectableWeaponSets[equipSlotIndex].rightHand.Clone();
+                    break;
+                case InventoryType.EquipWeaponLeft:
+                    if (index >= SelectableWeaponSets.Count || !CanUnEquipItem())
+                        return;
+                    droppingItem = SelectableWeaponSets[equipSlotIndex].leftHand.Clone();
+                    break;
+                default:
+                    return;
+            }
+            if (droppingItem.IsEmptySlot() || amount > droppingItem.amount)
                 return;
 
-            if (nonEquipItem.GetItem().RestrictDropping)
+            if (droppingItem.GetItem().RestrictDropping)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ITEM_DROPPING_RESTRICTED);
                 return;
             }
 
-            if (!this.DecreaseItemsByIndex(index, amount, false))
-                return;
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    if (!NonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, false))
+                        return;
+                    break;
+                case InventoryType.EquipItems:
+                    if (!EquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, false))
+                        return;
+                    break;
+                case InventoryType.EquipWeaponRight:
+                    if (amount == droppingItem.amount)
+                    {
+                        EquipWeapons equipWeapons = SelectableWeaponSets[index];
+                        equipWeapons.rightHand = CharacterItem.Empty;
+                        SelectableWeaponSets[equipSlotIndex] = equipWeapons;
+                    }
+                    else
+                    {
+                        EquipWeapons equipWeapons = SelectableWeaponSets[index];
+                        CharacterItem equipWeapon = equipWeapons.rightHand;
+                        equipWeapon.amount -= amount;
+                        equipWeapons.rightHand = equipWeapon;
+                        SelectableWeaponSets[equipSlotIndex] = equipWeapons;
+                    }
+                    break;
+                case InventoryType.EquipWeaponLeft:
+                    if (amount == droppingItem.amount)
+                    {
+                        EquipWeapons equipWeapons = SelectableWeaponSets[index];
+                        equipWeapons.leftHand = CharacterItem.Empty;
+                        SelectableWeaponSets[equipSlotIndex] = equipWeapons;
+                    }
+                    else
+                    {
+                        EquipWeapons equipWeapons = SelectableWeaponSets[index];
+                        CharacterItem equipWeapon = equipWeapons.leftHand;
+                        equipWeapon.amount -= amount;
+                        equipWeapons.leftHand = equipWeapon;
+                        SelectableWeaponSets[equipSlotIndex] = equipWeapons;
+                    }
+                    break;
+            }
 
             this.FillEmptySlots();
 
@@ -184,12 +252,11 @@ namespace MultiplayerARPG
             {
                 case PlayerDropItemMode.DropOnGround:
                     // Drop item to the ground
-                    CharacterItem dropData = nonEquipItem.Clone();
-                    dropData.amount = amount;
+                    droppingItem.amount = amount;
                     if (CurrentGameInstance.canPickupItemsWhichDropsByPlayersImmediately)
-                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, dropData, System.Array.Empty<string>()).Forget();
+                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, droppingItem, System.Array.Empty<string>()).Forget();
                     else
-                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, dropData, new string[] { Id }).Forget();
+                        ItemDropEntity.Drop(this, RewardGivenType.PlayerDrop, droppingItem, new string[] { Id }).Forget();
                     break;
             }
 #endif

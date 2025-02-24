@@ -121,6 +121,8 @@ namespace MultiplayerARPG
                 return;
             if (enableDropItemAction && Location == SourceLocation.NonEquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
                 UIItem.OnClickDrop();
+            if (enableDropItemAction && Location == SourceLocation.EquipItems && (!EventSystem.current.IsPointerOverGameObject() || EventSystem.current.currentSelectedGameObject.GetComponent<IMobileInputArea>() != null))
+                UIItem.OnClickDrop();
             if (enableUnequipItemAction && Location == SourceLocation.EquipItems && EventSystem.current.IsPointerOverGameObject())
                 UIItem.OnClickUnEquip();
             if (enableMoveFromStorageAction && Location == SourceLocation.StorageItems)
