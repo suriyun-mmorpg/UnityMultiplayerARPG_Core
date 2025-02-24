@@ -81,6 +81,7 @@ namespace MultiplayerARPG
 
         private static bool RefineItem(IPlayerCharacterData character, CharacterItem refiningItem, int[] enhancerDataIds, System.Action<CharacterItem> onRefine, System.Action onDestroy, out UITextKeys gameMessage)
         {
+            refiningItem = refiningItem.Clone();
             if (refiningItem.IsEmptySlot())
             {
                 // Cannot refine because character item is empty
@@ -174,10 +175,14 @@ namespace MultiplayerARPG
                 // Return items/currencies
                 if (refineLevel.FailReturnings != null && refineLevel.FailReturnings.Length > 0)
                 {
-                    Dictionary<ItemRefineFailReturning, int> randomItems = new Dictionary<ItemRefineFailReturning, int>();
+                    List<WeightedRandomizerItem<ItemRefineFailReturning>> randomItems = new List<WeightedRandomizerItem<ItemRefineFailReturning>>();
                     foreach (ItemRefineFailReturning item in refineLevel.FailReturnings)
                     {
-                        randomItems[item] = item.randomWeight;
+                        randomItems.Add(new WeightedRandomizerItem<ItemRefineFailReturning>()
+                        {
+                            item = item,
+                            weight = item.randomWeight,
+                        });
                     }
                     returning = WeightedRandomizer.From(randomItems).TakeOne();
                     isReturning = true;

@@ -1,27 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 
+public struct WeightedRandomizerItem<T>
+{
+    public T item;
+    public float weight;
+}
+
 /// <summary>
 /// Static class to improve readability
 /// Example:
 /// <code>
 /// var selected = WeightedRandomizer.From(weights).TakeOne();
 /// </code>
-/// 
 /// </summary>
 public static class WeightedRandomizer
 {
-    public static WeightedRandomizer<R> From<R>(Dictionary<R, int> spawnRate)
+    public static WeightedRandomizer<T> From<T>(List<WeightedRandomizerItem<T>> items, float noResultWeight = 0f)
     {
-        return new WeightedRandomizer<R>(spawnRate);
+        return new WeightedRandomizer<T>(items, noResultWeight);
     }
 }
 
 public class WeightedRandomizer<T>
 {
-    public int noResultWeight;
     private static Random _random = new Random();
-    private Dictionary<T, int> _weights;
+    public float NoResultWeight { get; set; }
+    private List<WeightedRandomizerItem<T>> _items;
 
     /// <summary>
     /// Instead of calling this constructor directly,
@@ -33,70 +38,44 @@ public class WeightedRandomizer<T>
     /// </code>
     /// 
     /// </summary>
-    /// <param name="weights"></param>
-    public WeightedRandomizer(Dictionary<T, int> weights)
+    /// <param name="items"></param>
+    /// <param name="noResultWeight"></param>
+    public WeightedRandomizer(List<WeightedRandomizerItem<T>> items, float noResultWeight = 0f)
     {
-        _weights = weights;
+        _items = items;
+        NoResultWeight = noResultWeight;
     }
 
     /// <summary>
     /// Randomizes one item
     /// </summary>
-    /// <param name="spawnRate">An ordered list withe the current spawn rates. The list will be updated so that selected items will have a smaller chance of being repeated.</param>
+    /// <param name="seed"></param>
     /// <returns>The randomized item.</returns>
     public T TakeOne(int seed = 0)
     {
-        if (_weights == null || _weights.Count <= 0)
+        if (_items == null || _items.Count <= 0)
             return default;
 
-        // Sorts the spawn rate list
-        List<KeyValuePair<T, int>> sortedSpawnRate = Sort(_weights);
-
         // Sums all spawn rates
-        int sum = 0;
-        foreach (KeyValuePair<T, int> spawn in _weights)
+        float totalWeight = 0;
+        foreach (WeightedRandomizerItem<T> item in _items)
         {
-            sum += spawn.Value;
+            totalWeight += item.weight;
         }
 
         // Randomizes a number from Zero to Sum
         Random random = _random;
         if (seed != 0)
             random = new Random(seed);
-        int roll = random.Next(0, sum + noResultWeight);
-        if (roll > sum)
-            return default;
 
-        // Finds chosen item based on spawn rate
-        T selected = sortedSpawnRate[sortedSpawnRate.Count - 1].Key;
-
-        foreach (KeyValuePair<T, int> spawn in sortedSpawnRate)
+        float randomValue = (float)(random.NextDouble() * (totalWeight + NoResultWeight));
+        foreach (WeightedRandomizerItem<T> item in _items)
         {
-            if (roll < spawn.Value)
-            {
-                selected = spawn.Key;
-                break;
-            }
-            roll -= spawn.Value;
+            if (randomValue < item.weight)
+                return item.item;
+            randomValue -= item.weight;
         }
 
-        // Returns the selected item
-        return selected;
-    }
-
-    private List<KeyValuePair<T, int>> Sort(Dictionary<T, int> weights)
-    {
-        List<KeyValuePair<T, int>> list = new List<KeyValuePair<T, int>>(weights);
-
-        // Sorts the Spawn Rate List for randomization later
-        list.Sort(
-            delegate (KeyValuePair<T, int> firstPair,
-                     KeyValuePair<T, int> nextPair)
-            {
-                return firstPair.Value.CompareTo(nextPair.Value);
-            }
-         );
-
-        return list;
+        return default; // Fallback if something goes wrong
     }
 }

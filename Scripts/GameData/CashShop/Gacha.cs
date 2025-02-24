@@ -42,19 +42,23 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<ItemRandomByWeight, int> _cacheRandomItems;
-        public Dictionary<ItemRandomByWeight, int> CacheRandomItems
+        private List<WeightedRandomizerItem<ItemRandomByWeight>> _cacheRandomItems;
+        public List<WeightedRandomizerItem<ItemRandomByWeight>> CacheRandomItems
         {
             get
             {
                 if (_cacheRandomItems == null)
                 {
-                    _cacheRandomItems = new Dictionary<ItemRandomByWeight, int>();
+                    _cacheRandomItems = new List<WeightedRandomizerItem<ItemRandomByWeight>>();
                     foreach (ItemRandomByWeight item in randomItems)
                     {
                         if (item.item == null || item.maxAmount <= 0 || item.randomWeight <= 0)
                             continue;
-                        _cacheRandomItems[item] = item.randomWeight;
+                        _cacheRandomItems.Add(new WeightedRandomizerItem<ItemRandomByWeight>()
+                        {
+                            item = item,
+                            weight = item.randomWeight,
+                        });
                     }
                 }
                 return _cacheRandomItems;

@@ -67,12 +67,16 @@ namespace MultiplayerARPG
                     if (harvestEffectiveness.weaponType != null && harvestEffectiveness.damageEffectiveness > 0)
                     {
                         _cacheHarvestEffectivenesses[harvestEffectiveness.weaponType] = harvestEffectiveness;
-                        Dictionary<ItemDropForHarvestable, int> harvestItems = new Dictionary<ItemDropForHarvestable, int>();
+                        List<WeightedRandomizerItem<ItemDropForHarvestable>> harvestItems = new List<WeightedRandomizerItem<ItemDropForHarvestable>>();
                         foreach (ItemDropForHarvestable item in harvestEffectiveness.items)
                         {
                             if (item.item == null || item.amountPerDamage <= 0 || item.randomWeight <= 0)
                                 continue;
-                            harvestItems[item] = item.randomWeight;
+                            harvestItems.Add(new WeightedRandomizerItem<ItemDropForHarvestable>()
+                            {
+                                item = item,
+                                weight = item.randomWeight,
+                            });
                         }
                         _cacheHarvestItems[harvestEffectiveness.weaponType] = WeightedRandomizer.From(harvestItems);
                     }
@@ -87,12 +91,16 @@ namespace MultiplayerARPG
                     if (skillHarvestEffectiveness.skill != null && skillHarvestEffectiveness.damageEffectiveness > 0)
                     {
                         _cacheSkillHarvestEffectivenesses[skillHarvestEffectiveness.skill] = skillHarvestEffectiveness;
-                        Dictionary<ItemDropForHarvestable, int> harvestItems = new Dictionary<ItemDropForHarvestable, int>();
+                        List<WeightedRandomizerItem<ItemDropForHarvestable>> harvestItems = new List<WeightedRandomizerItem<ItemDropForHarvestable>>();
                         foreach (ItemDropForHarvestable item in skillHarvestEffectiveness.items)
                         {
                             if (item.item == null || item.amountPerDamage <= 0 || item.randomWeight <= 0)
                                 continue;
-                            harvestItems[item] = item.randomWeight;
+                            harvestItems.Add(new WeightedRandomizerItem<ItemDropForHarvestable>()
+                            {
+                                item = item,
+                                weight = item.randomWeight,
+                            });
                         }
                         _cacheSkillHarvestItems[skillHarvestEffectiveness.skill] = WeightedRandomizer.From(harvestItems);
                     }

@@ -90,12 +90,16 @@ namespace MultiplayerARPG
             if (quest.randomRewardItems != null &&
                 quest.randomRewardItems.Length > 0)
             {
-                Dictionary<ItemRandomByWeight, int> randomItems = new Dictionary<ItemRandomByWeight, int>();
+                List<WeightedRandomizerItem<ItemRandomByWeight>> randomItems = new List<WeightedRandomizerItem<ItemRandomByWeight>>();
                 foreach (ItemRandomByWeight item in quest.randomRewardItems)
                 {
                     if (item.item == null || item.maxAmount <= 0 || item.randomWeight <= 0)
                         continue;
-                    randomItems[item] = item.randomWeight;
+                    randomItems.Add(new WeightedRandomizerItem<ItemRandomByWeight>()
+                    {
+                        item = item,
+                        weight = item.randomWeight,
+                    });
                 }
                 ItemRandomByWeight randomedItem = WeightedRandomizer.From(randomItems).TakeOne();
                 rewardItems.Add(new ItemAmount()

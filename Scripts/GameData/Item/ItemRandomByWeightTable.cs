@@ -12,21 +12,26 @@ namespace MultiplayerARPG
         [Tooltip("Can set empty item as a chance to not drop any items")]
         [ArrayElementTitle("item")]
         public ItemRandomByWeight[] randomItems = new ItemRandomByWeight[0];
+        public float noDropWeight = 0f;
 
         [System.NonSerialized]
-        private Dictionary<ItemRandomByWeight, int> _cacheRandomItems;
-        public Dictionary<ItemRandomByWeight, int> CacheRandomItems
+        private List<WeightedRandomizerItem<ItemRandomByWeight>> _cacheRandomItems;
+        public List<WeightedRandomizerItem<ItemRandomByWeight>> CacheRandomItems
         {
             get
             {
                 if (_cacheRandomItems == null)
                 {
-                    _cacheRandomItems = new Dictionary<ItemRandomByWeight, int>();
+                    _cacheRandomItems = new List<WeightedRandomizerItem<ItemRandomByWeight>>();
                     foreach (ItemRandomByWeight item in randomItems)
                     {
                         if (item.randomWeight <= 0)
                             continue;
-                        _cacheRandomItems[item] = item.randomWeight;
+                        _cacheRandomItems.Add(new WeightedRandomizerItem<ItemRandomByWeight>()
+                        {
+                            item = item,
+                            weight = item.randomWeight,
+                        });
                     }
                 }
                 return _cacheRandomItems;
@@ -38,19 +43,23 @@ namespace MultiplayerARPG
             ItemRandomByWeight randomedItem;
             if (CacheRandomItems.Count > 1 && excludeItemDataIds != null && excludeItemDataIds.Count > 0)
             {
-                Dictionary<ItemRandomByWeight, int> randomItems = new Dictionary<ItemRandomByWeight, int>();
+                List<WeightedRandomizerItem<ItemRandomByWeight>> randomItems = new List<WeightedRandomizerItem<ItemRandomByWeight>>();
                 foreach (var kv in CacheRandomItems)
                 {
-                    if (!kv.Key.item || excludeItemDataIds.Contains(kv.Key.item.DataId))
+                    if (!kv.item.item || excludeItemDataIds.Contains(kv.item.item.DataId))
                         continue;
-                    randomItems.Add(kv.Key, kv.Value);
+                    randomItems.Add(new WeightedRandomizerItem<ItemRandomByWeight>()
+                    {
+                        item = kv.item,
+                        weight = kv.weight,
+                    });
                 }
-                randomedItem = WeightedRandomizer.From(randomItems).TakeOne(seed);
+                randomedItem = WeightedRandomizer.From(randomItems, noDropWeight).TakeOne(seed);
                 randomItems.Clear();
             }
             else
             {
-                randomedItem = WeightedRandomizer.From(CacheRandomItems).TakeOne(seed);
+                randomedItem = WeightedRandomizer.From(CacheRandomItems, noDropWeight).TakeOne(seed);
             }
             if (randomedItem.item == null)
                 return;
