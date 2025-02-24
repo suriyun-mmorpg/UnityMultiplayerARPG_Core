@@ -10,10 +10,10 @@
         bool IsStorageDialogVisible();
         bool IsDealingDialogVisibleWithDealingState();
         bool IsStartVendingDialogVisible();
-        void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData);
-        void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
-        void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);
-        void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData);
+        void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex);
+        void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex);
+        void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex);
+        void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex);
         void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit);
         void HideStorageDialog(StorageType storageType, string storageOwnerId);
     }

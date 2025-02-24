@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public static partial class CharacterInventoryExtensions
     {
-        public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int[] enhancerDataIds, out UITextKeys gameMessage)
+        public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int[] enhancerDataIds, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             switch (inventoryType)
@@ -16,9 +16,9 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     return character.RefineEquipItem(index, enhancerDataIds, out gameMessage);
                 case InventoryType.EquipWeaponRight:
-                    return character.RefineRightHandItem(enhancerDataIds, out gameMessage);
+                    return character.RefineRightHandItem(equipSlotIndex, enhancerDataIds, out gameMessage);
                 case InventoryType.EquipWeaponLeft:
-                    return character.RefineLeftHandItem(enhancerDataIds, out gameMessage);
+                    return character.RefineLeftHandItem(equipSlotIndex, enhancerDataIds, out gameMessage);
             }
             gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
             return false;
@@ -28,33 +28,33 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool RefineRightHandItem(this IPlayerCharacterData character, int[] enhancerDataIds, out UITextKeys gameMessageType)
+        public static bool RefineRightHandItem(this IPlayerCharacterData character, byte equipSlotIndex, int[] enhancerDataIds, out UITextKeys gameMessageType)
         {
-            return RefineItem(character, character.EquipWeapons.rightHand, enhancerDataIds, (refinedItem) =>
+            return RefineItem(character, character.SelectableWeaponSets[equipSlotIndex].rightHand, enhancerDataIds, (refinedItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.rightHand = refinedItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, () =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.rightHand = CharacterItem.Empty;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessageType);
         }
 
-        public static bool RefineLeftHandItem(this IPlayerCharacterData character, int[] enhancerDataIds, out UITextKeys gameMessageType)
+        public static bool RefineLeftHandItem(this IPlayerCharacterData character, byte equipSlotIndex, int[] enhancerDataIds, out UITextKeys gameMessageType)
         {
-            return RefineItem(character, character.EquipWeapons.leftHand, enhancerDataIds, (refinedItem) =>
+            return RefineItem(character, character.SelectableWeaponSets[equipSlotIndex].leftHand, enhancerDataIds, (refinedItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.leftHand = refinedItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, () =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.leftHand = CharacterItem.Empty;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessageType);
         }
 

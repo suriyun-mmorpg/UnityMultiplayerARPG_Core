@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public static partial class CharacterInventoryExtensions
     {
-        public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int enhancerId, int socketIndex, out UITextKeys gameMessage)
+        public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             switch (inventoryType)
@@ -14,9 +14,9 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     return character.EnhanceSocketEquipItem(index, enhancerId, socketIndex, out gameMessage);
                 case InventoryType.EquipWeaponRight:
-                    return character.EnhanceSocketRightHandItem(enhancerId, socketIndex, out gameMessage);
+                    return character.EnhanceSocketRightHandItem(equipSlotIndex, enhancerId, socketIndex, out gameMessage);
                 case InventoryType.EquipWeaponLeft:
-                    return character.EnhanceSocketLeftHandItem(enhancerId, socketIndex, out gameMessage);
+                    return character.EnhanceSocketLeftHandItem(equipSlotIndex, enhancerId, socketIndex, out gameMessage);
             }
             gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
             return false;
@@ -26,7 +26,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, int socketIndex, out UITextKeys gameMessage)
+        public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int socketIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             bool returnEnhancer = GameInstance.Singleton.enhancerRemoval.ReturnEnhancerItem;
@@ -37,9 +37,9 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     return character.RemoveEnhancerFromEquipItem(index, socketIndex, returnEnhancer, out gameMessage);
                 case InventoryType.EquipWeaponRight:
-                    return character.RemoveEnhancerFromRightHandItem(socketIndex, returnEnhancer, out gameMessage);
+                    return character.RemoveEnhancerFromRightHandItem(equipSlotIndex, socketIndex, returnEnhancer, out gameMessage);
                 case InventoryType.EquipWeaponLeft:
-                    return character.RemoveEnhancerFromLeftHandItem(socketIndex, returnEnhancer, out gameMessage);
+                    return character.RemoveEnhancerFromLeftHandItem(equipSlotIndex, socketIndex, returnEnhancer, out gameMessage);
             }
             gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
             return false;
@@ -49,23 +49,23 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool EnhanceSocketRightHandItem(this IPlayerCharacterData character, int enhancerId, int socketIndex, out UITextKeys gameMessage)
+        public static bool EnhanceSocketRightHandItem(this IPlayerCharacterData character, byte equipSlotIndex, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
-            return EnhanceSocketItem(character, character.EquipWeapons.rightHand, enhancerId, socketIndex, (enhancedSocketItem) =>
+            return EnhanceSocketItem(character, character.SelectableWeaponSets[equipSlotIndex].rightHand, enhancerId, socketIndex, (enhancedSocketItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.rightHand = enhancedSocketItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessage);
         }
 
-        public static bool EnhanceSocketLeftHandItem(this IPlayerCharacterData character, int enhancerId, int socketIndex, out UITextKeys gameMessage)
+        public static bool EnhanceSocketLeftHandItem(this IPlayerCharacterData character, byte equipSlotIndex, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
-            return EnhanceSocketItem(character, character.EquipWeapons.leftHand, enhancerId, socketIndex, (enhancedSocketItem) =>
+            return EnhanceSocketItem(character, character.SelectableWeaponSets[equipSlotIndex].leftHand, enhancerId, socketIndex, (enhancedSocketItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.leftHand = enhancedSocketItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessage);
         }
 
@@ -171,23 +171,23 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool RemoveEnhancerFromRightHandItem(this IPlayerCharacterData character, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
+        public static bool RemoveEnhancerFromRightHandItem(this IPlayerCharacterData character, byte equipSlotIndex, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
         {
-            return RemoveEnhancerFromItem(character, character.EquipWeapons.rightHand, socketIndex, returnEnhancer, (enhancedSocketItem) =>
+            return RemoveEnhancerFromItem(character, character.SelectableWeaponSets[equipSlotIndex].rightHand, socketIndex, returnEnhancer, (enhancedSocketItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.rightHand = enhancedSocketItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessage);
         }
 
-        public static bool RemoveEnhancerFromLeftHandItem(this IPlayerCharacterData character, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
+        public static bool RemoveEnhancerFromLeftHandItem(this IPlayerCharacterData character, byte equipSlotIndex, int socketIndex, bool returnEnhancer, out UITextKeys gameMessage)
         {
-            return RemoveEnhancerFromItem(character, character.EquipWeapons.leftHand, socketIndex, returnEnhancer, (enhancedSocketItem) =>
+            return RemoveEnhancerFromItem(character, character.SelectableWeaponSets[equipSlotIndex].leftHand, socketIndex, returnEnhancer, (enhancedSocketItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.leftHand = enhancedSocketItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessage);
         }
 

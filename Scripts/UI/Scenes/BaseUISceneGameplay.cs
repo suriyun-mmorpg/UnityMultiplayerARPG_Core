@@ -234,10 +234,10 @@ namespace MultiplayerARPG
         public abstract bool IsItemsContainerDialogVisible();
         public abstract bool IsDealingDialogVisibleWithDealingState();
         public abstract bool IsStartVendingDialogVisible();
-        public abstract void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData);
-        public abstract void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData);
-        public abstract void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData);
-        public abstract void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData);
+        public abstract void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex);
+        public abstract void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex);
+        public abstract void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex);
+        public abstract void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex);
         public abstract void ShowStorageDialog(StorageType storageType, string storageOwnerId, uint objectId, int weightLimit, int slotLimit);
         public abstract void HideStorageDialog(StorageType storageType, string storageOwnerId);
         public abstract void ShowItemsContainerDialog(ItemsContainerEntity itemsContainerEntity);

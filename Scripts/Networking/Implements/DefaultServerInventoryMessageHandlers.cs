@@ -287,7 +287,7 @@ namespace MultiplayerARPG
                 return default;
             }
 
-            if (!playerCharacter.EnhanceSocketItem(request.inventoryType, request.index, request.enhancerId, request.socketIndex, out UITextKeys gameMessage))
+            if (!playerCharacter.EnhanceSocketItem(request.inventoryType, request.index, request.equipSlotIndex, request.enhancerId, request.socketIndex, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseEnhanceSocketItemMessage()
                 {
@@ -321,7 +321,7 @@ namespace MultiplayerARPG
                 return default;
             }
 
-            if (!playerCharacter.RefineItem(request.inventoryType, request.index, request.enhancerDataIds, out UITextKeys gameMessage))
+            if (!playerCharacter.RefineItem(request.inventoryType, request.index, request.equipSlotIndex, request.enhancerDataIds, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseRefineItemMessage()
                 {
@@ -355,7 +355,7 @@ namespace MultiplayerARPG
                 return default;
             }
 
-            if (!playerCharacter.RemoveEnhancerFromItem(request.inventoryType, request.index, request.socketIndex, out UITextKeys gameMessage))
+            if (!playerCharacter.RemoveEnhancerFromItem(request.inventoryType, request.index, request.equipSlotIndex, request.socketIndex, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseRemoveEnhancerFromItemMessage()
                 {
@@ -389,7 +389,7 @@ namespace MultiplayerARPG
                 return default;
             }
 
-            if (!playerCharacter.RepairItem(request.inventoryType, request.index, out UITextKeys gameMessage))
+            if (!playerCharacter.RepairItem(request.inventoryType, request.index, request.equipSlotIndex, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseRepairItemMessage()
                 {
@@ -572,10 +572,10 @@ namespace MultiplayerARPG
             }
 
             UITextKeys gameMessage;
-            int ammo = playerCharacter.GetAmmo(request.inventoryType, request.index);
+            int ammo = playerCharacter.GetAmmo(request.inventoryType, request.index, request.equipSlotIndex);
             if (ammo > 0)
             {
-                if (!playerCharacter.RemoveAmmoFromItem(request.inventoryType, request.index, out gameMessage))
+                if (!playerCharacter.RemoveAmmoFromItem(request.inventoryType, request.index, request.equipSlotIndex, out gameMessage))
                 {
                     result.InvokeError(new ResponseChangeAmmoItemMessage()
                     {
@@ -585,7 +585,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!playerCharacter.PutAmmoToItem(request.inventoryType, request.index, request.ammoItemId, out gameMessage))
+            if (!playerCharacter.PutAmmoToItem(request.inventoryType, request.index, request.equipSlotIndex, request.ammoItemId, out gameMessage))
             {
                 result.InvokeError(new ResponseChangeAmmoItemMessage()
                 {
@@ -619,7 +619,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!playerCharacter.RemoveAmmoFromItem(request.inventoryType, request.index, out UITextKeys gameMessage))
+            if (!playerCharacter.RemoveAmmoFromItem(request.inventoryType, request.index, request.equipSlotIndex, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseRemoveAmmoFromItemMessage()
                 {

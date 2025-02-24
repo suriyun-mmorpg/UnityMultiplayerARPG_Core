@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public static partial class CharacterInventoryExtensions
     {
-        public static int GetAmmo(this IPlayerCharacterData character, InventoryType inventoryType, int index)
+        public static int GetAmmo(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex)
         {
             switch (inventoryType)
             {
@@ -14,14 +14,14 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     return GetAmmoEquipItem(character, index);
                 case InventoryType.EquipWeaponRight:
-                    return GetAmmoRightHandItem(character);
+                    return GetAmmoRightHandItem(character, equipSlotIndex);
                 case InventoryType.EquipWeaponLeft:
-                    return GetAmmoLeftHandItem(character);
+                    return GetAmmoLeftHandItem(character, equipSlotIndex);
             }
             return 0;
         }
 
-        public static bool PutAmmoToItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, string ammoItemId, out UITextKeys gameMessage)
+        public static bool PutAmmoToItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, string ammoItemId, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             switch (inventoryType)
@@ -31,9 +31,9 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     return PutAmmoToEquipItem(character, index, ammoItemId, out gameMessage);
                 case InventoryType.EquipWeaponRight:
-                    return PutAmmoToRightHandItem(character, ammoItemId, out gameMessage);
+                    return PutAmmoToRightHandItem(character, equipSlotIndex, ammoItemId, out gameMessage);
                 case InventoryType.EquipWeaponLeft:
-                    return PutAmmoToLeftHandItem(character, ammoItemId, out gameMessage);
+                    return PutAmmoToLeftHandItem(character, equipSlotIndex, ammoItemId, out gameMessage);
             }
             gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
             return false;
@@ -43,7 +43,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool RemoveAmmoFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, out UITextKeys gameMessage)
+        public static bool RemoveAmmoFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             switch (inventoryType)
@@ -53,9 +53,9 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     return RemoveAmmoFromEquipItem(character, index, true, out gameMessage);
                 case InventoryType.EquipWeaponRight:
-                    return RemoveAmmoFromRightHandItem(character, true, out gameMessage);
+                    return RemoveAmmoFromRightHandItem(character, equipSlotIndex, true, out gameMessage);
                 case InventoryType.EquipWeaponLeft:
-                    return RemoveAmmoFromLeftHandItem(character, true, out gameMessage);
+                    return RemoveAmmoFromLeftHandItem(character, equipSlotIndex, true, out gameMessage);
             }
             gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
             return false;
@@ -65,14 +65,14 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static int GetAmmoRightHandItem(IPlayerCharacterData character)
+        public static int GetAmmoRightHandItem(IPlayerCharacterData character, byte equipSlotIndex)
         {
-            return character.EquipWeapons.rightHand.ammo;
+            return character.SelectableWeaponSets[equipSlotIndex].rightHand.ammo;
         }
 
-        public static int GetAmmoLeftHandItem(IPlayerCharacterData character)
+        public static int GetAmmoLeftHandItem(IPlayerCharacterData character, byte equipSlotIndex)
         {
-            return character.EquipWeapons.leftHand.ammo;
+            return character.SelectableWeaponSets[equipSlotIndex].leftHand.ammo;
         }
 
         public static int GetAmmoEquipItem(IPlayerCharacterData character, int index)
@@ -85,23 +85,23 @@ namespace MultiplayerARPG
             return character.NonEquipItems[index].ammo;
         }
 
-        public static bool PutAmmoToRightHandItem(IPlayerCharacterData character, string ammoItemId, out UITextKeys gameMessage)
+        public static bool PutAmmoToRightHandItem(IPlayerCharacterData character, byte equipSlotIndex, string ammoItemId, out UITextKeys gameMessage)
         {
-            return PutAmmoToItem(character, character.EquipWeapons.rightHand, ammoItemId, (weaponItem) =>
+            return PutAmmoToItem(character, character.SelectableWeaponSets[equipSlotIndex].rightHand, ammoItemId, (weaponItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.rightHand = weaponItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessage);
         }
 
-        public static bool PutAmmoToLeftHandItem(IPlayerCharacterData character, string ammoItemId, out UITextKeys gameMessage)
+        public static bool PutAmmoToLeftHandItem(IPlayerCharacterData character, byte equipSlotIndex, string ammoItemId, out UITextKeys gameMessage)
         {
-            return PutAmmoToItem(character, character.EquipWeapons.leftHand, ammoItemId, (weaponItem) =>
+            return PutAmmoToItem(character, character.SelectableWeaponSets[equipSlotIndex].leftHand, ammoItemId, (weaponItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.leftHand = weaponItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessage);
         }
 
@@ -180,23 +180,23 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool RemoveAmmoFromRightHandItem(IPlayerCharacterData character, bool returnAmmo, out UITextKeys gameMessage)
+        public static bool RemoveAmmoFromRightHandItem(IPlayerCharacterData character, byte equipSlotIndex, bool returnAmmo, out UITextKeys gameMessage)
         {
-            return RemoveAmmoFromItem(character, character.EquipWeapons.rightHand, returnAmmo, (weaponSocketItem) =>
+            return RemoveAmmoFromItem(character, character.SelectableWeaponSets[equipSlotIndex].rightHand, returnAmmo, (weaponSocketItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.rightHand = weaponSocketItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessage);
         }
 
-        public static bool RemoveAmmoFromLeftHandItem(IPlayerCharacterData character, bool returnAmmo, out UITextKeys gameMessage)
+        public static bool RemoveAmmoFromLeftHandItem(IPlayerCharacterData character, byte equipSlotIndex, bool returnAmmo, out UITextKeys gameMessage)
         {
-            return RemoveAmmoFromItem(character, character.EquipWeapons.leftHand, returnAmmo, (weaponSocketItem) =>
+            return RemoveAmmoFromItem(character, character.SelectableWeaponSets[equipSlotIndex].leftHand, returnAmmo, (weaponSocketItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.leftHand = weaponSocketItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessage);
         }
 

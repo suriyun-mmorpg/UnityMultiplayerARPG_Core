@@ -88,7 +88,7 @@ namespace MultiplayerARPG
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
-                Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
+                Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1, 0);
                 return;
             }
 
@@ -279,7 +279,7 @@ namespace MultiplayerARPG
         public override void Hide()
         {
             base.Hide();
-            Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
+            Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1, 0);
         }
 
         public void OnClickRefine()
@@ -292,6 +292,7 @@ namespace MultiplayerARPG
             {
                 inventoryType = InventoryType,
                 index = IndexOfData,
+                equipSlotIndex = EquipSlotIndex,
                 enhancerDataIds = _enhancerDataIds.ToArray(),
             }, ResponseRefineItem);
         }

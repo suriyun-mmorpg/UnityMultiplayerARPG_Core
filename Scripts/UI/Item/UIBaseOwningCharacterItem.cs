@@ -7,6 +7,7 @@ namespace MultiplayerARPG
     {
         public InventoryType InventoryType { get { return Data.inventoryType; } }
         public int IndexOfData { get { return Data.indexOfData; } }
+        public byte EquipSlotIndex { get { return Data.equipSlotIndex; } }
         public CharacterItem CharacterItem
         {
             get

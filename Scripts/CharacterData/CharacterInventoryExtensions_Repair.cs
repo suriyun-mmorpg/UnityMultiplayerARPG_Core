@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public static partial class CharacterInventoryExtensions
     {
-        public static bool RepairItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, out UITextKeys gameMessage)
+        public static bool RepairItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             switch (inventoryType)
@@ -14,9 +14,9 @@ namespace MultiplayerARPG
                 case InventoryType.EquipItems:
                     return character.RepairEquipItem(index, out gameMessage);
                 case InventoryType.EquipWeaponRight:
-                    return character.RepairRightHandItem(out gameMessage);
+                    return character.RepairRightHandItem(equipSlotIndex, out gameMessage);
                 case InventoryType.EquipWeaponLeft:
-                    return character.RepairLeftHandItem(out gameMessage);
+                    return character.RepairLeftHandItem(equipSlotIndex, out gameMessage);
             }
             gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
             return false;
@@ -30,9 +30,9 @@ namespace MultiplayerARPG
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             bool success = false;
-            character.RepairRightHandItem(out gameMessage);
+            character.RepairRightHandItem(character.EquipWeaponSet, out gameMessage);
             success = success || gameMessage == UITextKeys.UI_REPAIR_SUCCESS;
-            character.RepairLeftHandItem(out gameMessage);
+            character.RepairLeftHandItem(character.EquipWeaponSet, out gameMessage);
             success = success || gameMessage == UITextKeys.UI_REPAIR_SUCCESS;
             for (int i = 0; i < character.EquipItems.Count; ++i)
             {
@@ -52,23 +52,23 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool RepairRightHandItem(this IPlayerCharacterData character, out UITextKeys gameMessageType)
+        public static bool RepairRightHandItem(this IPlayerCharacterData character, byte equipSlotIndex, out UITextKeys gameMessageType)
         {
-            return RepairItem(character, character.EquipWeapons.rightHand, (repairedItem) =>
+            return RepairItem(character, character.SelectableWeaponSets[equipSlotIndex].rightHand, (repairedItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.rightHand = repairedItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessageType);
         }
 
-        public static bool RepairLeftHandItem(this IPlayerCharacterData character, out UITextKeys gameMessageType)
+        public static bool RepairLeftHandItem(this IPlayerCharacterData character, byte equipSlotIndex, out UITextKeys gameMessageType)
         {
-            return RepairItem(character, character.EquipWeapons.leftHand, (repairedItem) =>
+            return RepairItem(character, character.SelectableWeaponSets[equipSlotIndex].leftHand, (repairedItem) =>
             {
-                EquipWeapons equipWeapon = character.EquipWeapons;
+                EquipWeapons equipWeapon = character.SelectableWeaponSets[equipSlotIndex];
                 equipWeapon.leftHand = repairedItem;
-                character.EquipWeapons = equipWeapon;
+                character.SelectableWeaponSets[equipSlotIndex] = equipWeapon;
             }, out gameMessageType);
         }
 

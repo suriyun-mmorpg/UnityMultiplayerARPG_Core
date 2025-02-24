@@ -142,7 +142,7 @@ namespace MultiplayerARPG
             {
                 // Item's ID is difference to active item ID, so the item may be destroyed
                 // So clear data
-                Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
+                Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1, 0);
                 return;
             }
 
@@ -246,7 +246,7 @@ namespace MultiplayerARPG
         public override void Hide()
         {
             base.Hide();
-            Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
+            Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1, 0);
         }
 
         public void OnClickRemoveEnhancer()
@@ -259,6 +259,7 @@ namespace MultiplayerARPG
             {
                 inventoryType = InventoryType,
                 index = IndexOfData,
+                equipSlotIndex = EquipSlotIndex,
                 socketIndex = SelectedSocketIndex,
             }, ClientInventoryActions.ResponseRemoveEnhancerFromItem);
         }
@@ -273,6 +274,7 @@ namespace MultiplayerARPG
             {
                 inventoryType = InventoryType,
                 index = IndexOfData,
+                equipSlotIndex = EquipSlotIndex,
                 enhancerId = SelectedEnhancerId,
                 socketIndex = SelectedSocketIndex,
             }, ClientInventoryActions.ResponseEnhanceSocketItem);

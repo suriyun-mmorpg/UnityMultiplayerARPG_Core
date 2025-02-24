@@ -505,7 +505,7 @@ namespace MultiplayerARPG
             if (uiRefineItem == null)
                 return;
             // Don't select any item yet, wait player to select the item
-            uiRefineItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
+            uiRefineItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1, 0);
             uiRefineItem.Show();
             AddNpcDialog(uiRefineItem);
         }
@@ -515,7 +515,7 @@ namespace MultiplayerARPG
             if (uiDismantleItem == null)
                 return;
             // Don't select any item yet, wait player to select the item
-            uiDismantleItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
+            uiDismantleItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1, 0);
             uiDismantleItem.Show();
             AddNpcDialog(uiDismantleItem);
         }
@@ -525,7 +525,7 @@ namespace MultiplayerARPG
             if (uiRepairItem == null)
                 return;
             // Don't select any item yet, wait player to select the item
-            uiRepairItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1);
+            uiRepairItem.Data = new UIOwningCharacterItemData(InventoryType.NonEquipItems, -1, 0);
             uiRepairItem.Show();
             AddNpcDialog(uiRepairItem);
         }
@@ -755,35 +755,35 @@ namespace MultiplayerARPG
                 uiStartVending.IsVisible();
         }
 
-        public override void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData)
+        public override void ShowRefineItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex)
         {
             if (uiRefineItem == null)
                 return;
-            uiRefineItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData);
+            uiRefineItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData, equipSlotIndex);
             uiRefineItem.Show();
         }
 
-        public override void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData)
+        public override void ShowDismantleItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex)
         {
             if (uiDismantleItem == null)
                 return;
-            uiDismantleItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData);
+            uiDismantleItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData, equipSlotIndex);
             uiDismantleItem.Show();
         }
 
-        public override void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData)
+        public override void ShowRepairItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex)
         {
             if (uiRepairItem == null)
                 return;
-            uiRepairItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData);
+            uiRepairItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData, equipSlotIndex);
             uiRepairItem.Show();
         }
 
-        public override void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData)
+        public override void ShowEnhanceSocketItemDialog(InventoryType inventoryType, int indexOfData, byte equipSlotIndex)
         {
             if (uiEnhanceSocketItem == null)
                 return;
-            uiEnhanceSocketItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData);
+            uiEnhanceSocketItem.Data = new UIOwningCharacterItemData(inventoryType, indexOfData, equipSlotIndex);
             uiEnhanceSocketItem.Show();
         }
 

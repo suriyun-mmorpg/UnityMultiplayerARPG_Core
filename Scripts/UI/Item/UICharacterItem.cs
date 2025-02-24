@@ -1344,7 +1344,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRefineItem.Show();
-                    uiRefineItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData);
+                    uiRefineItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData, EquipSlotIndex);
                 }
             }
 
@@ -1357,7 +1357,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiDismantleItem.Show();
-                    uiDismantleItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData);
+                    uiDismantleItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData, EquipSlotIndex);
                 }
             }
 
@@ -1370,7 +1370,7 @@ namespace MultiplayerARPG
                 else
                 {
                     uiRepairItem.Show();
-                    uiRepairItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData);
+                    uiRepairItem.Data = new UIOwningCharacterItemData(InventoryType, IndexOfData, EquipSlotIndex);
                 }
             }
 
@@ -2036,6 +2036,7 @@ namespace MultiplayerARPG
             {
                 inventoryType = InventoryType,
                 index = IndexOfData,
+                equipSlotIndex = EquipSlotIndex,
             }, ClientInventoryActions.ResponseRemoveAmmoFromItem);
         }
 
@@ -2289,7 +2290,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                GameInstance.ItemUIVisibilityManager.ShowRefineItemDialog(InventoryType, IndexOfData);
+                GameInstance.ItemUIVisibilityManager.ShowRefineItemDialog(InventoryType, IndexOfData, EquipSlotIndex);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
@@ -2313,6 +2314,7 @@ namespace MultiplayerARPG
                 {
                     inventoryType = InventoryType,
                     index = IndexOfData,
+                    equipSlotIndex = EquipSlotIndex,
                 }, ClientInventoryActions.ResponseRefineItem);
             }
         }
@@ -2331,7 +2333,7 @@ namespace MultiplayerARPG
             if (!GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
                 return;
 
-            GameInstance.ItemUIVisibilityManager.ShowDismantleItemDialog(InventoryType, IndexOfData);
+            GameInstance.ItemUIVisibilityManager.ShowDismantleItemDialog(InventoryType, IndexOfData, EquipSlotIndex);
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
         }
@@ -2385,7 +2387,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                GameInstance.ItemUIVisibilityManager.ShowRepairItemDialog(InventoryType, IndexOfData);
+                GameInstance.ItemUIVisibilityManager.ShowRepairItemDialog(InventoryType, IndexOfData, EquipSlotIndex);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
@@ -2409,6 +2411,7 @@ namespace MultiplayerARPG
                 {
                     inventoryType = InventoryType,
                     index = IndexOfData,
+                    equipSlotIndex = EquipSlotIndex,
                 }, ClientInventoryActions.ResponseRepairItem);
             }
         }
@@ -2426,7 +2429,7 @@ namespace MultiplayerARPG
 
             if (EquipmentItem != null)
             {
-                GameInstance.ItemUIVisibilityManager.ShowEnhanceSocketItemDialog(InventoryType, IndexOfData);
+                GameInstance.ItemUIVisibilityManager.ShowEnhanceSocketItemDialog(InventoryType, IndexOfData, EquipSlotIndex);
                 if (selectionManager != null)
                     selectionManager.DeselectSelectedUI();
             }
