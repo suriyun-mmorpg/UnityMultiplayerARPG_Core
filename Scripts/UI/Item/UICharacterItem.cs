@@ -2123,7 +2123,6 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             if (amount <= 0)
                 return;
-            Debug.LogError(InventoryType + " " + IndexOfData + " " + EquipSlotIndex);
             GameInstance.ClientInventoryHandlers.RequestSellItem(new RequestSellItemMessage()
             {
                 inventoryType = InventoryType,
