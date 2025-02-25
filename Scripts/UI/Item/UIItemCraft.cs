@@ -45,6 +45,16 @@ namespace MultiplayerARPG
             Data = data;
         }
 
+        public override void CloneTo(UISelectionEntry<ItemCraft> target)
+        {
+            base.CloneTo(target);
+            if (target != null && target is UIItemCraft castedTarget)
+            {
+                castedTarget.CrafterType = CrafterType;
+                castedTarget.TargetEntity = TargetEntity;
+            }
+        }
+
         protected override void Update()
         {
             base.Update();

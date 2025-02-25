@@ -107,7 +107,7 @@ namespace MultiplayerARPG
             {
                 uiDialog.selectionManager = CacheSelectionManager;
                 uiDialog.uiCashShop = this;
-                uiDialog.Data = ui.Data;
+                ui.CloneTo(uiDialog);
                 uiDialog.Show();
             }
         }

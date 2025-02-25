@@ -290,7 +290,7 @@ namespace MultiplayerARPG
             if (uiSellItemDialog != null)
             {
                 uiSellItemDialog.selectionManager = CacheSellItemSelectionManager;
-                uiSellItemDialog.Setup(ui.Data, ui.indexOfData);
+                ui.CloneTo(uiSellItemDialog);
                 uiSellItemDialog.Show();
             }
         }

@@ -284,7 +284,7 @@ namespace MultiplayerARPG
             if (uiRewardItemDialog != null)
             {
                 uiRewardItemDialog.selectionManager = CacheRewardItemSelectionManager;
-                uiRewardItemDialog.Setup(ui.Data, Character, ui.IndexOfData);
+                ui.CloneTo(uiRewardItemDialog);
                 uiRewardItemDialog.Show();
             }
         }

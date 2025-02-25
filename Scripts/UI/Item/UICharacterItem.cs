@@ -251,17 +251,6 @@ namespace MultiplayerARPG
         public string EquipPosition { get; private set; }
         public byte EquipSlotIndex { get; private set; }
 
-        public override void CloneTo(UISelectionEntry<UICharacterItemData> target)
-        {
-            base.CloneTo(target);
-            if (target != null && target is UICharacterItem castedTarget)
-            {
-                castedTarget.IsSetupAsEquipSlot = IsSetupAsEquipSlot;
-                castedTarget.EquipPosition = EquipPosition;
-                castedTarget.EquipSlotIndex = EquipSlotIndex;
-            }
-        }
-
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -395,6 +384,17 @@ namespace MultiplayerARPG
             IsSetupAsEquipSlot = true;
             EquipPosition = equipPosition;
             EquipSlotIndex = equipSlotIndex;
+        }
+
+        public override void CloneTo(UISelectionEntry<UICharacterItemData> target)
+        {
+            base.CloneTo(target);
+            if (target != null && target is UICharacterItem castedTarget)
+            {
+                castedTarget.IsSetupAsEquipSlot = IsSetupAsEquipSlot;
+                castedTarget.EquipPosition = EquipPosition;
+                castedTarget.EquipSlotIndex = EquipSlotIndex;
+            }
         }
 
         protected CalculatedItemRandomBonus GetRandomBonus()

@@ -292,7 +292,7 @@ namespace MultiplayerARPG
             if (uiMemberDialog != null)
             {
                 uiMemberDialog.selectionManager = MemberSelectionManager;
-                uiMemberDialog.Data = ui.Data;
+                ui.CloneTo(uiMemberDialog);
                 uiMemberDialog.Show();
             }
             UpdateSelectedMemberSigns(ui);

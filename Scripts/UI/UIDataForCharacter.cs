@@ -25,16 +25,19 @@
             Data = data;
         }
 
-        public bool IsOwningCharacter()
-        {
-            return Character != null && GameInstance.PlayingCharacter != null && Character.Id == GameInstance.PlayingCharacter.Id;
-        }
-
         public override void CloneTo(UISelectionEntry<T> target)
         {
             base.CloneTo(target);
             if (target != null && target is UIDataForCharacter<T> castedTarget)
+            {
+                castedTarget.Character = Character;
                 castedTarget.IndexOfData = IndexOfData;
+            }
+        }
+
+        public bool IsOwningCharacter()
+        {
+            return Character != null && GameInstance.PlayingCharacter != null && Character.Id == GameInstance.PlayingCharacter.Id;
         }
 
         protected override void OnDestroy()

@@ -130,7 +130,7 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.selectionManager = CacheSelectionManager;
-                uiDialog.Setup(ui.Data, GameInstance.PlayingCharacter, ui.IndexOfData);
+                ui.CloneTo(uiDialog);
                 uiDialog.Show();
             }
         }

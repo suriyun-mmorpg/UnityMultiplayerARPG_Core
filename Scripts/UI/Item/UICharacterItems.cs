@@ -106,7 +106,7 @@ namespace MultiplayerARPG
                 CacheSelectionManager.selectionMode == UISelectionMode.Toggle))
             {
                 uiDialog.selectionManager = CacheSelectionManager;
-                uiDialog.Setup(ui.Data, Character, ui.IndexOfData);
+                ui.CloneTo(uiDialog);
                 uiDialog.Show();
             }
         }

@@ -43,7 +43,7 @@ public class UISelectionManagerShowOnSelectEventManager<TData, TUI>
         if (_showingUI != null)
         {
             _showingUI.selectionManager = _selectionManager;
-            _showingUI.Data = ui.Data;
+            ui.CloneTo(_showingUI);
             _showingUI.Show();
         }
     }

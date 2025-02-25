@@ -110,7 +110,7 @@ namespace MultiplayerARPG
             if (uiDialog != null)
             {
                 uiDialog.selectionManager = CacheSelectionManager;
-                uiDialog.Setup(CrafterType, TargetEntity, ui.Data);
+                ui.CloneTo(uiDialog);
                 uiDialog.Show();
             }
         }

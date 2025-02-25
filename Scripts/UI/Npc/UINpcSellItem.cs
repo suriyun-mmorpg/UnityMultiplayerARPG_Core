@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         [Tooltip("If this is `TRUE`, `uiTextSellPrice` will be inactivated when item's sell price is 0")]
         public bool inactiveSellPriceIfZero;
 
-        public int indexOfData { get; protected set; }
+        public int IndexOfData { get; protected set; }
 
         protected override void Awake()
         {
@@ -42,8 +42,17 @@ namespace MultiplayerARPG
 
         public void Setup(NpcSellItem data, int indexOfData)
         {
-            this.indexOfData = indexOfData;
+            IndexOfData = indexOfData;
             Data = data;
+        }
+
+        public override void CloneTo(UISelectionEntry<NpcSellItem> target)
+        {
+            base.CloneTo(target);
+            if (target != null && target is UINpcSellItem castedTarget)
+            {
+                castedTarget.IndexOfData = IndexOfData;
+            }
         }
 
         protected override void UpdateData()
@@ -113,7 +122,7 @@ namespace MultiplayerARPG
 
         private void OnBuyAmountConfirmed(int amount)
         {
-            GameInstance.PlayingCharacterEntity.NpcAction.CallCmdBuyNpcItem(indexOfData, amount);
+            GameInstance.PlayingCharacterEntity.NpcAction.CallCmdBuyNpcItem(IndexOfData, amount);
         }
 
         private void OnBuyAmountChanged(string amountText)

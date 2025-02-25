@@ -392,7 +392,7 @@ namespace MultiplayerARPG
             if (uiRoleDialog != null)
             {
                 uiRoleDialog.selectionManager = RoleSelectionManager;
-                uiRoleDialog.Data = ui.Data;
+                ui.CloneTo(uiRoleDialog);
                 uiRoleDialog.Show();
             }
         }
@@ -412,7 +412,7 @@ namespace MultiplayerARPG
             if (uiSkillDialog != null)
             {
                 uiSkillDialog.selectionManager = SkillSelectionManager;
-                uiSkillDialog.Data = ui.Data;
+                ui.CloneTo(uiSkillDialog);
                 uiSkillDialog.Show();
             }
         }
