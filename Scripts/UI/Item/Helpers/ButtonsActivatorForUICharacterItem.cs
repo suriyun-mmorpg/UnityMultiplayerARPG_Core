@@ -20,34 +20,37 @@ namespace MultiplayerARPG
         public Button buttonDrop;
         public Button buttonPickUpFromContainer;
         public Button buttonAddVendingItem;
-        private UICharacterItem ui;
+        public Button buttonRemoveAmmo;
+        private UICharacterItem _ui;
 
         private void Awake()
         {
-            ui = GetComponent<UICharacterItem>();
-            ui.onSetEquippedData.AddListener(OnSetEquippedData);
-            ui.onSetUnEquippedData.AddListener(OnSetUnEquippedData);
-            ui.onSetUnEquippableData.AddListener(OnSetUnEquippableData);
-            ui.onSetUsableData.AddListener(OnSetUsableData);
-            ui.onSetStorageItemData.AddListener(OnSetStorageItemData);
-            ui.onSetItemsContainerItemData.AddListener(OnSetItemsContainerItemData);
-            ui.onSetUnknowSourceData.AddListener(OnSetUnknowSourceData);
-            ui.onRefineItemDialogAppear.AddListener(OnRefineItemDialogAppear);
-            ui.onRefineItemDialogDisappear.AddListener(OnRefineItemDialogDisappear);
-            ui.onDismantleItemDialogAppear.AddListener(OnDismantleItemDialogAppear);
-            ui.onDismantleItemDialogDisappear.AddListener(OnDismantleItemDialogDisappear);
-            ui.onRepairItemDialogAppear.AddListener(OnRepairItemDialogAppear);
-            ui.onRepairItemDialogDisappear.AddListener(OnRepairItemDialogDisappear);
-            ui.onNpcSellItemDialogAppear.AddListener(OnNpcSellItemDialogAppear);
-            ui.onNpcSellItemDialogDisappear.AddListener(OnNpcSellItemDialogDisappear);
-            ui.onStorageDialogAppear.AddListener(OnStorageDialogAppear);
-            ui.onStorageDialogDisappear.AddListener(OnStorageDialogDisappear);
-            ui.onEnterDealingState.AddListener(OnEnterDealingState);
-            ui.onExitDealingState.AddListener(OnExitDealingState);
-            ui.onStartVendingDialogAppear.AddListener(OnStartVendingDialogAppear);
-            ui.onStartVendingDialogDisappear.AddListener(OnStartVendingDialogDisappear);
+            _ui = GetComponent<UICharacterItem>();
+            _ui.onSetEquippedData.AddListener(OnSetEquippedData);
+            _ui.onSetUnEquippedData.AddListener(OnSetUnEquippedData);
+            _ui.onSetUnEquippableData.AddListener(OnSetUnEquippableData);
+            _ui.onSetUsableData.AddListener(OnSetUsableData);
+            _ui.onSetStorageItemData.AddListener(OnSetStorageItemData);
+            _ui.onSetItemsContainerItemData.AddListener(OnSetItemsContainerItemData);
+            _ui.onSetUnknowSourceData.AddListener(OnSetUnknowSourceData);
+            _ui.onRefineItemDialogAppear.AddListener(OnRefineItemDialogAppear);
+            _ui.onRefineItemDialogDisappear.AddListener(OnRefineItemDialogDisappear);
+            _ui.onDismantleItemDialogAppear.AddListener(OnDismantleItemDialogAppear);
+            _ui.onDismantleItemDialogDisappear.AddListener(OnDismantleItemDialogDisappear);
+            _ui.onRepairItemDialogAppear.AddListener(OnRepairItemDialogAppear);
+            _ui.onRepairItemDialogDisappear.AddListener(OnRepairItemDialogDisappear);
+            _ui.onNpcSellItemDialogAppear.AddListener(OnNpcSellItemDialogAppear);
+            _ui.onNpcSellItemDialogDisappear.AddListener(OnNpcSellItemDialogDisappear);
+            _ui.onStorageDialogAppear.AddListener(OnStorageDialogAppear);
+            _ui.onStorageDialogDisappear.AddListener(OnStorageDialogDisappear);
+            _ui.onEnterDealingState.AddListener(OnEnterDealingState);
+            _ui.onExitDealingState.AddListener(OnExitDealingState);
+            _ui.onStartVendingDialogAppear.AddListener(OnStartVendingDialogAppear);
+            _ui.onStartVendingDialogDisappear.AddListener(OnStartVendingDialogDisappear);
+            _ui.onSetEquipmentWithAmmo.AddListener(OnSetEquipmentWithAmmo);
+            _ui.onSetEquipmentWithoutAmmo.AddListener(OnSetEquipmentWithoutAmmo);
             // Refresh UI data to applies events
-            ui.ForceUpdate();
+            _ui.ForceUpdate();
         }
 
         public void DeactivateAllButtons()
@@ -80,6 +83,8 @@ namespace MultiplayerARPG
                 buttonAddVendingItem.gameObject.SetActive(false);
             if (buttonPickUpFromContainer)
                 buttonPickUpFromContainer.gameObject.SetActive(false);
+            if (buttonRemoveAmmo)
+                buttonRemoveAmmo.gameObject.SetActive(false);
         }
 
         public void OnSetEquippedData()
@@ -92,11 +97,11 @@ namespace MultiplayerARPG
             if (buttonRepair)
                 buttonRepair.gameObject.SetActive(GameInstance.Singleton.canRepairItemByPlayer);
             if (buttonDismantle)
-                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(_ui.CharacterItem));
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
             if (buttonDrop)
-                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDropping);
+                buttonDrop.gameObject.SetActive(!_ui.Item.RestrictDropping);
         }
 
         public void OnSetUnEquippedData()
@@ -107,22 +112,22 @@ namespace MultiplayerARPG
             if (buttonRefine)
                 buttonRefine.gameObject.SetActive(GameInstance.Singleton.canRefineItemByPlayer);
             if (buttonDismantle)
-                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(_ui.CharacterItem));
             if (buttonRepair)
                 buttonRepair.gameObject.SetActive(GameInstance.Singleton.canRepairItemByPlayer);
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
             if (buttonDrop)
-                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDropping);
+                buttonDrop.gameObject.SetActive(!_ui.Item.RestrictDropping);
         }
 
         public void OnSetUnEquippableData()
         {
             DeactivateAllButtons();
             if (buttonDismantle)
-                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(_ui.CharacterItem));
             if (buttonDrop)
-                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDropping);
+                buttonDrop.gameObject.SetActive(!_ui.Item.RestrictDropping);
         }
 
         public void OnSetUsableData()
@@ -131,9 +136,9 @@ namespace MultiplayerARPG
             if (buttonUse)
                 buttonUse.gameObject.SetActive(true);
             if (buttonDismantle)
-                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(_ui.CharacterItem));
             if (buttonDrop)
-                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDropping);
+                buttonDrop.gameObject.SetActive(!_ui.Item.RestrictDropping);
         }
 
         public void OnSetStorageItemData()
@@ -179,7 +184,7 @@ namespace MultiplayerARPG
                 return;
 
             if (buttonDismantle)
-                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.dismantleFilter.Filter(_ui.CharacterItem));
         }
 
         public void OnDismantleItemDialogDisappear()
@@ -211,7 +216,7 @@ namespace MultiplayerARPG
         public void OnNpcSellItemDialogAppear()
         {
             if (buttonSell)
-                buttonSell.gameObject.SetActive(!ui.Item.RestrictSelling);
+                buttonSell.gameObject.SetActive(!_ui.Item.RestrictSelling);
         }
 
         public void OnNpcSellItemDialogDisappear()
@@ -235,7 +240,7 @@ namespace MultiplayerARPG
         public void OnEnterDealingState()
         {
             if (buttonOffer)
-                buttonOffer.gameObject.SetActive(!ui.Item.RestrictDealing);
+                buttonOffer.gameObject.SetActive(!_ui.Item.RestrictDealing);
         }
 
         public void OnExitDealingState()
@@ -254,6 +259,18 @@ namespace MultiplayerARPG
         {
             if (buttonAddVendingItem)
                 buttonAddVendingItem.gameObject.SetActive(false);
+        }
+
+        public void OnSetEquipmentWithAmmo()
+        {
+            if (buttonRemoveAmmo)
+                buttonRemoveAmmo.gameObject.SetActive(true);
+        }
+
+        public void OnSetEquipmentWithoutAmmo()
+        {
+            if (buttonRemoveAmmo)
+                buttonRemoveAmmo.gameObject.SetActive(false);
         }
     }
 }
