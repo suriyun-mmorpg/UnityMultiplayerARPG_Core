@@ -251,7 +251,7 @@ namespace MultiplayerARPG
 
         public void OnClickRemoveEnhancer()
         {
-            if (CharacterItem.IsEmptySlot() || SelectedSocketIndex < 0)
+            if (CharacterItem.IsEmptySlot() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft) || SelectedSocketIndex < 0)
                 return;
             _activated = true;
             _activeItemId = CharacterItem.id;
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
 
         public void OnClickEnhanceSocket()
         {
-            if (CharacterItem.IsEmptySlot() || SelectedEnhancerId == 0)
+            if (CharacterItem.IsEmptySlot() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft) || SelectedEnhancerId == 0)
                 return;
             _activated = true;
             _activeItemId = CharacterItem.id;

@@ -141,13 +141,15 @@ namespace MultiplayerARPG
 
         public void OnClickDismantle()
         {
-            if (InventoryType != InventoryType.NonEquipItems || CharacterItem.IsEmptySlot())
+            if (CharacterItem.IsEmptySlot() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
             _activated = true;
             _activeItemId = CharacterItem.id;
             GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
             {
+                inventoryType = InventoryType,
                 index = IndexOfData,
+                equipSlotIndex = EquipSlotIndex,
                 amount = DismantleAmount,
             }, ClientInventoryActions.ResponseDismantleItem);
         }

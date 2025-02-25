@@ -158,7 +158,7 @@ namespace MultiplayerARPG
 
         public void OnClickRepair()
         {
-            if (CharacterItem.IsEmptySlot())
+            if (CharacterItem.IsEmptySlot() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
             _activated = true;
             _activeItemId = CharacterItem.id;

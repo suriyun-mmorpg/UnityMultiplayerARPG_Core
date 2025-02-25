@@ -167,6 +167,10 @@ namespace MultiplayerARPG
             if (amount <= 0 || !CanDoActions())
                 return;
 
+            bool canUnEquipItem = true;
+            if (!CanUnEquipItem())
+                canUnEquipItem = false;
+
             CharacterItem droppingItem;
             switch (inventoryType)
             {
@@ -176,17 +180,17 @@ namespace MultiplayerARPG
                     droppingItem = NonEquipItems[index].Clone();
                     break;
                 case InventoryType.EquipItems:
-                    if (index >= EquipItems.Count || !CanUnEquipItem())
+                    if (index >= EquipItems.Count || !canUnEquipItem)
                         return;
                     droppingItem = EquipItems[index].Clone();
                     break;
                 case InventoryType.EquipWeaponRight:
-                    if (index >= SelectableWeaponSets.Count || !CanUnEquipItem())
+                    if (index >= SelectableWeaponSets.Count || !canUnEquipItem)
                         return;
                     droppingItem = SelectableWeaponSets[equipSlotIndex].rightHand.Clone();
                     break;
                 case InventoryType.EquipWeaponLeft:
-                    if (index >= SelectableWeaponSets.Count || !CanUnEquipItem())
+                    if (index >= SelectableWeaponSets.Count || !canUnEquipItem)
                         return;
                     droppingItem = SelectableWeaponSets[equipSlotIndex].leftHand.Clone();
                     break;

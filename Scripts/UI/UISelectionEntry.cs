@@ -132,7 +132,7 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
         return Data;
     }
 
-    protected virtual void CloneTo(UISelectionEntry<T> target)
+    public virtual void CloneTo(UISelectionEntry<T> target)
     {
         if (target != null)
             target.Data = Data;

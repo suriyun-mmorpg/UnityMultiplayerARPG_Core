@@ -251,7 +251,7 @@ namespace MultiplayerARPG
         public string EquipPosition { get; private set; }
         public byte EquipSlotIndex { get; private set; }
 
-        protected override void CloneTo(UISelectionEntry<UICharacterItemData> target)
+        public override void CloneTo(UISelectionEntry<UICharacterItemData> target)
         {
             base.CloneTo(target);
             if (target != null && target is UICharacterItem castedTarget)
@@ -1731,8 +1731,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            if (GameInstance.ItemUIVisibilityManager.IsShopDialogVisible() &&
-                InventoryType == InventoryType.NonEquipItems)
+            if (GameInstance.ItemUIVisibilityManager.IsShopDialogVisible())
             {
                 if (isInit || !_isSellItemDialogAppeared)
                 {
@@ -1800,8 +1799,7 @@ namespace MultiplayerARPG
             }
             // Check visible item dialog
             if (GameInstance.ItemUIVisibilityManager.IsDismantleItemDialogVisible() &&
-                GameInstance.Singleton.dismantleFilter.Filter(CharacterItem) &&
-                InventoryType == InventoryType.NonEquipItems)
+                GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
             {
                 if (isInit || !_isDismantleItemDialogAppeared)
                 {
@@ -1902,8 +1900,7 @@ namespace MultiplayerARPG
                 return;
             }
             // Check visible item dialog
-            if (GameInstance.ItemUIVisibilityManager.IsStorageDialogVisible() &&
-                InventoryType == InventoryType.NonEquipItems)
+            if (GameInstance.ItemUIVisibilityManager.IsStorageDialogVisible())
             {
                 if (isInit || !_isStorageDialogAppeared)
                 {
@@ -2011,7 +2008,7 @@ namespace MultiplayerARPG
         public void OnClickUnEquip()
         {
             // Only equipped equipment can be unequipped
-            if (!IsOwningCharacter() || InventoryType == InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (selectionManager != null)
@@ -2029,7 +2026,7 @@ namespace MultiplayerARPG
         public void OnClickRemoveAmmo()
         {
             // Only equipped equipment can be unequipped
-            if (!IsOwningCharacter())
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             GameInstance.ClientInventoryHandlers.RequestRemoveAmmoFromItem(new RequestRemoveAmmoFromItemMessage()
@@ -2042,7 +2039,7 @@ namespace MultiplayerARPG
 
         public void OnClickUse()
         {
-            if (!IsOwningCharacter())
+            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
             if (selectionManager != null)
@@ -2107,7 +2104,7 @@ namespace MultiplayerARPG
         public void OnClickSell()
         {
             // Only unequipped equipment can be sold
-            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (CharacterItem.amount == 1)
@@ -2126,9 +2123,12 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             if (amount <= 0)
                 return;
+            Debug.LogError(InventoryType + " " + IndexOfData + " " + EquipSlotIndex);
             GameInstance.ClientInventoryHandlers.RequestSellItem(new RequestSellItemMessage()
             {
+                inventoryType = InventoryType,
                 index = IndexOfData,
+                equipSlotIndex = EquipSlotIndex,
                 amount = amount,
             }, ClientInventoryActions.ResponseSellItem);
         }
@@ -2285,7 +2285,7 @@ namespace MultiplayerARPG
         public void OnClickSetRefineItem()
         {
             // Only owning character can refine item
-            if (!IsOwningCharacter())
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (EquipmentItem != null)
@@ -2305,7 +2305,7 @@ namespace MultiplayerARPG
                 return;
 
             // Only owning character can refine item
-            if (!IsOwningCharacter())
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (EquipmentItem != null)
@@ -2327,7 +2327,7 @@ namespace MultiplayerARPG
         public void OnClickSetDismantleItem()
         {
             // Only unequipped equipment can be dismantled
-            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (!GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
@@ -2347,7 +2347,7 @@ namespace MultiplayerARPG
                 return;
 
             // Only unequipped equipment can be dismantled
-            if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (!GameInstance.Singleton.dismantleFilter.Filter(CharacterItem))
@@ -2369,7 +2369,9 @@ namespace MultiplayerARPG
                 selectionManager.DeselectSelectedUI();
             GameInstance.ClientInventoryHandlers.RequestDismantleItem(new RequestDismantleItemMessage()
             {
+                inventoryType = InventoryType,
                 index = IndexOfData,
+                equipSlotIndex = EquipSlotIndex,
                 amount = amount,
             }, ClientInventoryActions.ResponseDismantleItem);
         }
@@ -2382,7 +2384,7 @@ namespace MultiplayerARPG
         public void OnClickSetRepairItem()
         {
             // Only owning character can repair item
-            if (!IsOwningCharacter())
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (EquipmentItem != null)
@@ -2402,7 +2404,7 @@ namespace MultiplayerARPG
                 return;
 
             // Only owning character can repair item
-            if (!IsOwningCharacter())
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (EquipmentItem != null)
@@ -2424,7 +2426,7 @@ namespace MultiplayerARPG
         public void OnClickSetEnhanceSocketItem()
         {
             // Only owning character can enhance item
-            if (!IsOwningCharacter())
+            if (!IsOwningCharacter() || (InventoryType != InventoryType.NonEquipItems && InventoryType != InventoryType.EquipItems && InventoryType != InventoryType.EquipWeaponRight && InventoryType != InventoryType.EquipWeaponLeft))
                 return;
 
             if (EquipmentItem != null)

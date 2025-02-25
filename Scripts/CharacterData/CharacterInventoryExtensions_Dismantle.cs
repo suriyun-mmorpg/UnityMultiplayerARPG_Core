@@ -4,7 +4,16 @@ namespace MultiplayerARPG
 {
     public static partial class CharacterInventoryExtensions
     {
-        public static bool VerifyDismantleItem(this IPlayerCharacterData character, int index, int amount, List<CharacterItem> simulatingNonEquipItems, out UITextKeys gameMessage, out ItemAmount dismantleItem, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
+        public static UITextKeys ValidateDismantleItem(CharacterItem targetItem)
+        {
+            if (!GameInstance.Singleton.dismantleFilter.Filter(targetItem))
+            {
+                return UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+            }
+            return UITextKeys.NONE;
+        }
+
+        public static bool VerifyDismantleItem(this IPlayerCharacterData simulateCharacter, InventoryType inventoryType, int index, byte equipSlotIndex, int amount, out UITextKeys gameMessage, out ItemAmount dismantleItem, out int returningGold, out List<ItemAmount> returningItems, out List<CurrencyAmount> returningCurrencies)
         {
             gameMessage = UITextKeys.NONE;
             dismantleItem = new ItemAmount();
@@ -12,74 +21,64 @@ namespace MultiplayerARPG
             returningItems = null;
             returningCurrencies = null;
 
-            if (index < 0 || index >= character.NonEquipItems.Count)
+            if (!DecreaseItem(simulateCharacter, inventoryType, index, equipSlotIndex, amount, out gameMessage, out CharacterItem targetItem, ValidateDismantleItem))
             {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
-                return false;
-            }
-
-            // Found item or not?
-            CharacterItem nonEquipItem = character.NonEquipItems[index];
-            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
-            {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
-                return false;
-            }
-
-            if (!GameInstance.Singleton.dismantleFilter.Filter(nonEquipItem))
-            {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
-                return false;
-            }
-
-            // Simulate data before applies
-            if (!simulatingNonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, false))
-            {
-                gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
                 return false;
             }
 
             // Character can receives all items or not?
-            nonEquipItem.GetDismantleReturnItems(amount, out returningItems, out returningCurrencies);
-            if (simulatingNonEquipItems.IncreasingItemsWillOverwhelming(
+            BaseItem targetItemData = targetItem.GetItem();
+            CharacterDataCache cacheData = simulateCharacter.GetCaches();
+            targetItem.GetDismantleReturnItems(amount, out returningItems, out returningCurrencies);
+            if (simulateCharacter.NonEquipItems.IncreasingItemsWillOverwhelming(
                 returningItems,
                 GameInstance.Singleton.IsLimitInventoryWeight,
-                character.GetCaches().LimitItemWeight,
-                character.GetCaches().TotalItemWeight,
+                cacheData.LimitItemWeight,
+                cacheData.TotalItemWeight,
                 GameInstance.Singleton.IsLimitInventorySlot,
-                character.GetCaches().LimitItemSlot))
+                cacheData.LimitItemSlot))
             {
                 returningItems.Clear();
                 gameMessage = UITextKeys.UI_ERROR_WILL_OVERWHELMING;
                 return false;
             }
-            BaseItem item = nonEquipItem.GetItem();
             dismantleItem = new ItemAmount()
             {
-                item = item,
+                item = targetItemData,
                 amount = amount,
             };
-            simulatingNonEquipItems.IncreaseItems(returningItems);
-            returningGold = item.DismantleReturnGold * amount;
+            simulateCharacter.NonEquipItems.IncreaseItems(returningItems);
+            returningGold = targetItemData.DismantleReturnGold * amount;
             return true;
         }
 
-        public static bool DismantleItem(this IPlayerCharacterData character, int index, int amount, out UITextKeys gameMessage)
+        public static bool DismantleItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int amount, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            PlayerCharacterData simulateCharacter = character.CloneTo(new PlayerCharacterData(), true, true, true, false, true, true, true, false, false, false, false, false, false, false, false);
+            // Proceed dismantle
             ItemAmount dismantleItem;
             int returningGold;
             List<ItemAmount> returningItems;
             List<CurrencyAmount> returningCurrencies;
-            List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
-            if (!character.VerifyDismantleItem(index, amount, simulatingNonEquipItems, out gameMessage, out dismantleItem, out returningGold, out returningItems, out returningCurrencies))
+            if (!VerifyDismantleItem(simulateCharacter, inventoryType, index, equipSlotIndex, amount, out gameMessage, out dismantleItem, out returningGold, out returningItems, out returningCurrencies))
                 return false;
             List<ItemAmount> dismantleItems = new List<ItemAmount>() { dismantleItem };
             List<CharacterItem> increasedItems = new List<CharacterItem>();
             List<CharacterItem> droppedItems = new List<CharacterItem>();
+            // Apply changes
             character.Gold = character.Gold.Increase(returningGold);
-            character.DecreaseItemsByIndex(index, amount, true);
-            character.IncreaseItems(returningItems);
+            character.NonEquipItems = simulateCharacter.NonEquipItems;
+            switch (inventoryType)
+            {
+                case InventoryType.EquipItems:
+                    character.EquipItems = simulateCharacter.EquipItems;
+                    break;
+                case InventoryType.EquipWeaponRight:
+                case InventoryType.EquipWeaponLeft:
+                    character.SelectableWeaponSets = simulateCharacter.SelectableWeaponSets;
+                    break;
+            }
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
             GameInstance.ServerLogHandlers.LogDismantleItems(character, dismantleItems);
@@ -94,14 +93,16 @@ namespace MultiplayerARPG
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             gameMessage = UITextKeys.NONE;
+            PlayerCharacterData simulateCharacter = character.CloneTo(new PlayerCharacterData(), true, true, true, false, true, true, true, false, false, false, false, false, false, false, false);
             List<int> indexes = new List<int>(selectedIndexes);
             indexes.Sort();
+            // Proceed dismantle
             Dictionary<int, int> indexAmountPairs = new Dictionary<int, int>();
-            List<CharacterItem> simulatingNonEquipItems = character.NonEquipItems.Clone();
             List<ItemAmount> dismantleItems = new List<ItemAmount>();
             int returningGold = 0;
             List<ItemAmount> returningItems = new List<ItemAmount>();
             List<CurrencyAmount> returningCurrencies = new List<CurrencyAmount>();
+            // Dismantle all items
             int tempIndex;
             int tempAmount;
             ItemAmount tempDismantleItem;
@@ -116,23 +117,19 @@ namespace MultiplayerARPG
                 if (tempIndex >= character.NonEquipItems.Count)
                     continue;
                 tempAmount = character.NonEquipItems[tempIndex].amount;
-                if (!character.VerifyDismantleItem(tempIndex, tempAmount, simulatingNonEquipItems, out gameMessage, out tempDismantleItem, out tempReturningGold, out tempReturningItems, out tempReturningCurrencies))
+                if (!VerifyDismantleItem(simulateCharacter, InventoryType.NonEquipItems, tempIndex, 0, tempAmount, out gameMessage, out tempDismantleItem, out tempReturningGold, out tempReturningItems, out tempReturningCurrencies))
+                {
                     return false;
+                }
                 dismantleItems.Add(tempDismantleItem);
                 returningGold += tempReturningGold;
                 returningItems.AddRange(tempReturningItems);
                 returningCurrencies.AddRange(tempReturningCurrencies);
                 indexAmountPairs.Add(tempIndex, tempAmount);
             }
+            // Apply changes
             character.Gold = character.Gold.Increase(returningGold);
-            indexes.Clear();
-            indexes.AddRange(indexAmountPairs.Keys);
-            indexes.Sort();
-            for (int i = indexes.Count - 1; i >= 0; --i)
-            {
-                character.DecreaseItemsByIndex(indexes[i], indexAmountPairs[indexes[i]], true);
-            }
-            character.IncreaseItems(returningItems);
+            character.NonEquipItems = simulateCharacter.NonEquipItems;
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
             GameInstance.ServerLogHandlers.LogDismantleItems(character, dismantleItems);

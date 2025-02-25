@@ -932,42 +932,140 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool SellItem(this IPlayerCharacterData character, int index, int amount, out UITextKeys gameMessage)
+        public static bool DecreaseItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int amount, out UITextKeys gameMessage, out CharacterItem targetItem, System.Func<CharacterItem, UITextKeys> validateTargetItem)
         {
+            targetItem = CharacterItem.Empty;
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (index < 0 || index >= character.NonEquipItems.Count)
-            {
-                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+            gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_INDEX;
+            if (amount <= 0)
                 return false;
-            }
 
-            // Found selling item or not?
-            CharacterItem nonEquipItem = character.NonEquipItems[index];
-            if (nonEquipItem.IsEmptySlot() || amount > nonEquipItem.amount)
+            bool canUnEquipItem = true;
+            if (character is BasePlayerCharacterEntity castedCharacter && !castedCharacter.CanUnEquipItem())
+                canUnEquipItem = false;
+
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    if (index >= character.NonEquipItems.Count)
+                        return false;
+                    targetItem = character.NonEquipItems[index].Clone();
+                    break;
+                case InventoryType.EquipItems:
+                    if (index >= character.EquipItems.Count || !canUnEquipItem)
+                        return false;
+                    targetItem = character.EquipItems[index].Clone();
+                    break;
+                case InventoryType.EquipWeaponRight:
+                    if (index >= character.SelectableWeaponSets.Count || !canUnEquipItem)
+                        return false;
+                    targetItem = character.SelectableWeaponSets[equipSlotIndex].rightHand.Clone();
+                    break;
+                case InventoryType.EquipWeaponLeft:
+                    if (index >= character.SelectableWeaponSets.Count || !canUnEquipItem)
+                        return false;
+                    targetItem = character.SelectableWeaponSets[equipSlotIndex].leftHand.Clone();
+                    break;
+                default:
+                    return false;
+            }
+            if (targetItem.IsEmptySlot())
+                return false;
+
+            if (amount > targetItem.amount)
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
                 return false;
             }
 
-            if (nonEquipItem.GetItem().RestrictSelling)
+            gameMessage = validateTargetItem.Invoke(targetItem);
+            if (gameMessage != UITextKeys.NONE)
             {
-                gameMessage = UITextKeys.UI_ERROR_ITEM_SELLING_RESTRICTED;
                 return false;
             }
 
-            // Prepare data for logging
-            nonEquipItem = character.NonEquipItems[index].Clone(false);
+            switch (inventoryType)
+            {
+                case InventoryType.NonEquipItems:
+                    if (!character.NonEquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, false))
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                        return false;
+                    }
+                    break;
+                case InventoryType.EquipItems:
+                    if (!character.EquipItems.DecreaseItemsByIndex(index, amount, GameInstance.Singleton.IsLimitInventorySlot, false))
+                    {
+                        gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS;
+                        return false;
+                    }
+                    break;
+                case InventoryType.EquipWeaponRight:
+                    if (amount == targetItem.amount)
+                    {
+                        EquipWeapons equipWeapons = character.SelectableWeaponSets[index];
+                        equipWeapons.rightHand = CharacterItem.Empty;
+                        character.SelectableWeaponSets[equipSlotIndex] = equipWeapons;
+                    }
+                    else
+                    {
+                        EquipWeapons equipWeapons = character.SelectableWeaponSets[index];
+                        CharacterItem equipWeapon = equipWeapons.rightHand;
+                        equipWeapon.amount -= amount;
+                        equipWeapons.rightHand = equipWeapon;
+                        character.SelectableWeaponSets[equipSlotIndex] = equipWeapons;
+                    }
+                    break;
+                case InventoryType.EquipWeaponLeft:
+                    if (amount == targetItem.amount)
+                    {
+                        EquipWeapons equipWeapons = character.SelectableWeaponSets[index];
+                        equipWeapons.leftHand = CharacterItem.Empty;
+                        character.SelectableWeaponSets[equipSlotIndex] = equipWeapons;
+                    }
+                    else
+                    {
+                        EquipWeapons equipWeapons = character.SelectableWeaponSets[index];
+                        CharacterItem equipWeapon = equipWeapons.leftHand;
+                        equipWeapon.amount -= amount;
+                        equipWeapons.leftHand = equipWeapon;
+                        character.SelectableWeaponSets[equipSlotIndex] = equipWeapons;
+                    }
+                    break;
+            }
 
-            // Remove item from inventory
-            character.DecreaseItemsByIndex(index, amount, true);
             character.FillEmptySlots();
+            return true;
+#else
+            gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
+            return false;
+#endif
+        }
+
+        public static UITextKeys ValidateSellItem(CharacterItem targetItem)
+        {
+            BaseItem targetItemData = targetItem.GetItem();
+            if (targetItemData.RestrictSelling)
+            {
+                return UITextKeys.UI_ERROR_ITEM_SELLING_RESTRICTED;
+            }
+            return UITextKeys.NONE;
+        }
+
+        public static bool SellItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int amount, out UITextKeys gameMessage)
+        {
+#if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!DecreaseItem(character, inventoryType, index, equipSlotIndex, amount, out gameMessage, out CharacterItem targetItem, ValidateSellItem))
+            {
+                return false;
+            }
 
             // Increase currencies
-            BaseItem item = nonEquipItem.GetItem();
-            GameInstance.Singleton.GameplayRule.IncreaseCurrenciesWhenSellItem(character, item, amount);
+            BaseItem targetItemData = targetItem.GetItem();
+            GameInstance.Singleton.GameplayRule.IncreaseCurrenciesWhenSellItem(character, targetItemData, amount);
             gameMessage = UITextKeys.NONE;
 
-            GameInstance.ServerLogHandlers.LogSellNpcItem(character, nonEquipItem, amount);
+            GameInstance.ServerLogHandlers.LogSellNpcItem(character, targetItem, amount);
             return true;
 #else
             gameMessage = UITextKeys.UI_ERROR_SERVICE_NOT_AVAILABLE;
@@ -986,7 +1084,7 @@ namespace MultiplayerARPG
                 tempIndex = indexes[i];
                 if (tempIndex >= character.NonEquipItems.Count)
                     continue;
-                character.SellItem(tempIndex, character.NonEquipItems[tempIndex].amount, out _);
+                character.SellItem(InventoryType.NonEquipItems, tempIndex, 0, character.NonEquipItems[tempIndex].amount, out _);
             }
             gameMessage = UITextKeys.NONE;
             return true;

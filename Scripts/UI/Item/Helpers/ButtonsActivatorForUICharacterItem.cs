@@ -91,8 +91,12 @@ namespace MultiplayerARPG
                 buttonRefine.gameObject.SetActive(GameInstance.Singleton.canRefineItemByPlayer);
             if (buttonRepair)
                 buttonRepair.gameObject.SetActive(GameInstance.Singleton.canRepairItemByPlayer);
+            if (buttonDismantle)
+                buttonDismantle.gameObject.SetActive(GameInstance.Singleton.canDismantleItemByPlayer && GameInstance.Singleton.dismantleFilter.Filter(ui.CharacterItem));
             if (buttonSocketEnhance)
                 buttonSocketEnhance.gameObject.SetActive(true);
+            if (buttonDrop)
+                buttonDrop.gameObject.SetActive(!ui.Item.RestrictDropping);
         }
 
         public void OnSetUnEquippedData()

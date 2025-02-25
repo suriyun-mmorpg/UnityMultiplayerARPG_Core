@@ -219,7 +219,7 @@ namespace MultiplayerARPG
                 return default;
             }
 
-            if (!playerCharacter.DismantleItem(request.index, request.amount, out UITextKeys gameMessage))
+            if (!playerCharacter.DismantleItem(request.inventoryType, request.index, request.equipSlotIndex, request.amount, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseDismantleItemMessage()
                 {
@@ -471,7 +471,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!playerCharacter.SellItem(request.index, request.amount, out UITextKeys gameMessage))
+            if (!playerCharacter.SellItem(request.inventoryType, request.index, request.equipSlotIndex, request.amount, out UITextKeys gameMessage))
             {
                 result.InvokeError(new ResponseSellItemMessage()
                 {
