@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         /// </summary>
         public async UniTask PrepareActionDurations(float[] triggerDurations, float totalDuration, float totalDurationChange, float animSpeedRate, CancellationToken cancellationToken, PrepareActionDurationsResultDelegate resultCallback)
         {
-            float remainsDuration = totalDuration + totalDurationChange;
+            float remainsDuration;
             float setupDelayCounter = 0f;
             // Try setup state data (maybe by animation clip events or state machine behaviours), if it was not set up
             if (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f)
@@ -49,21 +49,18 @@ namespace MultiplayerARPG
                     await UniTask.Yield(cancellationToken);
                     setupDelayCounter += Time.unscaledDeltaTime;
                 } while (setupDelayCounter < STATE_PREPARING_DURATION && (triggerDurations == null || triggerDurations.Length == 0 || totalDuration < 0f));
-                if (setupDelayCounter < STATE_PREPARING_DURATION)
-                {
-                    remainsDuration = totalDuration + totalDurationChange;
-                }
-                else
+                if (setupDelayCounter > STATE_PREPARING_DURATION)
                 {
                     // Can't setup properly, so try to setup manually to make it still workable
-                    remainsDuration = DEFAULT_TOTAL_DURATION + totalDurationChange;
+                    totalDuration = DEFAULT_TOTAL_DURATION;
                     triggerDurations = new float[1]
                     {
                         DEFAULT_TRIGGER_DURATION,
                     };
                 }
             }
-            resultCallback?.Invoke(triggerDurations, totalDuration, remainsDuration, PrepareActionEndTime(remainsDuration, animSpeedRate) + setupDelayCounter);
+            remainsDuration = (totalDuration / animSpeedRate) + totalDurationChange;
+            resultCallback?.Invoke(triggerDurations, totalDuration, remainsDuration, PrepareActionEndTime(remainsDuration, 1f) + setupDelayCounter);
         }
 
         public bool ShouldPrepareActionDurations()
