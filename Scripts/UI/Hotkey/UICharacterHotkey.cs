@@ -1,6 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -23,6 +24,9 @@ namespace MultiplayerARPG
 
         [Header("Options")]
         public bool autoAssignItem;
+
+        [Header("Events")]
+        public UnityEvent onBeingUsed = new UnityEvent();
 
         private IUsableItem _usingItem;
         private BaseSkill _usingSkill;
@@ -409,7 +413,6 @@ namespace MultiplayerARPG
                 // Guild skill this cooling down, can't use it
                 return;
             }
-
             if (HasCustomAimControls())
             {
                 UICharacterHotkeys.SetUsingHotkey(this);
@@ -425,7 +428,10 @@ namespace MultiplayerARPG
             if (IsChanneledAbility())
                 return;
             if (BasePlayerCharacterController.Singleton != null && !Data.IsEmpty())
-                BasePlayerCharacterController.Singleton.UseHotkey(Data.type, Data.relateId, aimPosition);
+            {
+                if (BasePlayerCharacterController.Singleton.UseHotkey(Data.type, Data.relateId, aimPosition))
+                    onBeingUsed.Invoke();
+            }
         }
 
         public void StartChanneledAbility()

@@ -84,11 +84,11 @@ namespace MultiplayerARPG
         [SerializeField]
         protected Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
         [SerializeField]
-        protected Vector3 tpsTargetOffsetWhileSprinting = new Vector3(0.75f, 0.5f, 0f);
-        [SerializeField]
         protected Vector3 tpsTargetOffsetWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
         [SerializeField]
         protected Vector3 tpsTargetOffsetWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
+        [SerializeField]
+        protected Vector3 tpsTargetOffsetWhileSprinting = new Vector3(0.75f, 0.5f, 0f);
         [SerializeField]
         protected float tpsTargetOffsetDamping = 10f;
         [SerializeField]
@@ -802,24 +802,6 @@ namespace MultiplayerARPG
             }
             else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
             {
-                if (Time.unscaledTime - _lastActionTime > sprintDelayAfterActions)
-                {
-                    if (DetectExtraActive("Sprint", sprintActiveMode, isBlockController, ref _toggleSprintOn))
-                    {
-                        _extraMovementState = ExtraMovementState.IsSprinting;
-                        _toggleWalkOn = false;
-                        _toggleCrouchOn = false;
-                        _toggleCrawlOn = false;
-                    }
-                }
-                else if (_extraMovementState == ExtraMovementState.IsSprinting)
-                {
-                    _extraMovementState = ExtraMovementState.None;
-                    _toggleSprintOn = false;
-                    _toggleWalkOn = false;
-                    _toggleCrouchOn = false;
-                    _toggleCrawlOn = false;
-                }
                 if (DetectExtraActive("Walk", walkActiveMode, isBlockController, ref _toggleWalkOn))
                 {
                     _extraMovementState = ExtraMovementState.IsWalking;
@@ -840,6 +822,28 @@ namespace MultiplayerARPG
                     _toggleSprintOn = false;
                     _toggleWalkOn = false;
                     _toggleCrouchOn = false;
+                }
+                // Stand animations
+                if (PlayingCharacterEntity.MovementState.HasDirectionMovement() &&
+                    Time.unscaledTime - _lastActionTime > sprintDelayAfterActions)
+                {
+                    if ((_extraMovementState == ExtraMovementState.None ||
+                        _extraMovementState == ExtraMovementState.IsWalking) &&
+                        DetectExtraActive("Sprint", sprintActiveMode, isBlockController, ref _toggleSprintOn))
+                    {
+                        _extraMovementState = ExtraMovementState.IsSprinting;
+                        _toggleWalkOn = false;
+                        _toggleCrouchOn = false;
+                        _toggleCrawlOn = false;
+                    }
+                }
+                else if (_extraMovementState == ExtraMovementState.IsSprinting)
+                {
+                    _extraMovementState = ExtraMovementState.None;
+                    _toggleSprintOn = false;
+                    _toggleWalkOn = false;
+                    _toggleCrouchOn = false;
+                    _toggleCrawlOn = false;
                 }
                 if (!isBlockController)
                 {
@@ -1155,6 +1159,7 @@ namespace MultiplayerARPG
                     }
 
                     // Hit the wall, stop finding target
+                    _aimTargetPosition = tempHitInfo.point;
                     break;
                 }
 
@@ -1646,15 +1651,16 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition)
+        public override bool UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition)
         {
             ClearQueueUsingSkill();
+            bool beingUsed = false;
             switch (type)
             {
                 case HotkeyType.Skill:
                     if (onBeforeUseSkillHotkey != null)
                         onBeforeUseSkillHotkey.Invoke(relateId, aimPosition);
-                    UseSkill(relateId, aimPosition);
+                    beingUsed = UseSkill(relateId, aimPosition);
                     if (onAfterUseSkillHotkey != null)
                         onAfterUseSkillHotkey.Invoke(relateId, aimPosition);
                     break;
@@ -1662,26 +1668,28 @@ namespace MultiplayerARPG
                     HotkeyEquipWeaponSet = PlayingCharacterEntity.EquipWeaponSet;
                     if (onBeforeUseItemHotkey != null)
                         onBeforeUseItemHotkey.Invoke(relateId, aimPosition);
-                    UseItem(relateId, aimPosition);
+                    beingUsed = UseItem(relateId, aimPosition);
                     if (onAfterUseItemHotkey != null)
                         onAfterUseItemHotkey.Invoke(relateId, aimPosition);
                     break;
                 case HotkeyType.GuildSkill:
-                    UseGuildSkill(relateId);
+                    beingUsed = UseGuildSkill(relateId);
                     break;
             }
+            return beingUsed;
         }
 
-        protected virtual void UseSkill(string id, AimPosition aimPosition)
+        protected virtual bool UseSkill(string id, AimPosition aimPosition)
         {
             int dataId = BaseGameData.MakeDataId(id);
             if (!GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill) || skill == null ||
                 !PlayingCharacterEntity.CachedData.Skills.TryGetValue(skill, out int skillLevel))
-                return;
+                return false;
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
+            return true;
         }
 
-        protected virtual void UseItem(string id, AimPosition aimPosition)
+        protected virtual bool UseItem(string id, AimPosition aimPosition)
         {
             int itemIndex;
             int dataId = BaseGameData.MakeDataId(id);
@@ -1705,16 +1713,16 @@ namespace MultiplayerARPG
                         -1,
                         ClientInventoryActions.ResponseUnEquipArmor,
                         ClientInventoryActions.ResponseUnEquipWeapon);
-                    return;
+                    return true;
                 }
                 item = characterItem.GetItem();
             }
 
             if (itemIndex < 0)
-                return;
+                return false;
 
             if (item == null)
-                return;
+                return false;
 
             if (item.IsEquipment())
             {
@@ -1724,10 +1732,12 @@ namespace MultiplayerARPG
                         HotkeyEquipWeaponSet,
                         ClientInventoryActions.ResponseEquipArmor,
                         ClientInventoryActions.ResponseEquipWeapon);
+                return true;
             }
             else if (item.IsSkill())
             {
                 SetQueueUsingSkill(aimPosition, (item as ISkillItem).SkillData, (item as ISkillItem).SkillLevel, itemIndex);
+                return true;
             }
             else if (item.IsBuilding())
             {
@@ -1743,26 +1753,30 @@ namespace MultiplayerARPG
                     ConfirmBuild();
                 }
                 _mustReleaseFireKey = true;
+                return true;
             }
             else if (item.IsUsable())
             {
-                PlayingCharacterEntity.CallCmdUseItem(itemIndex);
+                return PlayingCharacterEntity.CallCmdUseItem(itemIndex);
             }
+
+            return false;
         }
 
-        protected void UseGuildSkill(string id)
+        protected bool UseGuildSkill(string id)
         {
             if (GameInstance.JoinedGuild == null)
-                return;
+                return false;
             int dataId = BaseGameData.MakeDataId(id);
-            PlayingCharacterEntity.CallCmdUseGuildSkill(dataId);
+            return PlayingCharacterEntity.CallCmdUseGuildSkill(dataId);
         }
 
         public virtual void Attack(ref bool isLeftHand)
         {
             if (PauseFireInputFrames > 0)
                 return;
-            PlayingCharacterEntity.Attack(ref isLeftHand);
+            if (!PlayingCharacterEntity.Attack(ref isLeftHand))
+                ReloadUpdater.InterruptByAttacking(isLeftHand);
         }
 
         public virtual void WeaponCharge(ref bool isLeftHand)

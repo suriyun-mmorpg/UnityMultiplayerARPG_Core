@@ -889,15 +889,16 @@ namespace MultiplayerARPG
                 PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(lookAtDirection), false);
         }
 
-        public override void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition)
+        public override bool UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition)
         {
             ClearQueueUsingSkill();
+            bool beingUsed = false;
             switch (type)
             {
                 case HotkeyType.Skill:
                     if (onBeforeUseSkillHotkey != null)
                         onBeforeUseSkillHotkey.Invoke(relateId, aimPosition);
-                    UseSkill(relateId, aimPosition);
+                    beingUsed = UseSkill(relateId, aimPosition);
                     if (onAfterUseSkillHotkey != null)
                         onAfterUseSkillHotkey.Invoke(relateId, aimPosition);
                     break;
@@ -905,26 +906,28 @@ namespace MultiplayerARPG
                     HotkeyEquipWeaponSet = PlayingCharacterEntity.EquipWeaponSet;
                     if (onBeforeUseItemHotkey != null)
                         onBeforeUseItemHotkey.Invoke(relateId, aimPosition);
-                    UseItem(relateId, aimPosition);
+                    beingUsed = UseItem(relateId, aimPosition);
                     if (onAfterUseItemHotkey != null)
                         onAfterUseItemHotkey.Invoke(relateId, aimPosition);
                     break;
                 case HotkeyType.GuildSkill:
-                    UseGuildSkill(relateId);
+                    beingUsed = UseGuildSkill(relateId);
                     break;
             }
+            return beingUsed;
         }
 
-        protected void UseSkill(string id, AimPosition aimPosition)
+        protected bool UseSkill(string id, AimPosition aimPosition)
         {
             int dataId = BaseGameData.MakeDataId(id);
             if (!GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill) || skill == null ||
                 !PlayingCharacterEntity.CachedData.Skills.TryGetValue(skill, out int skillLevel))
-                return;
+                return false;
             SetQueueUsingSkill(aimPosition, skill, skillLevel);
+            return true;
         }
 
-        protected void UseItem(string id, AimPosition aimPosition)
+        protected bool UseItem(string id, AimPosition aimPosition)
         {
             int itemIndex;
             int dataId = BaseGameData.MakeDataId(id);
@@ -948,16 +951,16 @@ namespace MultiplayerARPG
                         -1,
                         ClientInventoryActions.ResponseUnEquipArmor,
                         ClientInventoryActions.ResponseUnEquipWeapon);
-                    return;
+                    return true;
                 }
                 item = characterItem.GetItem();
             }
 
             if (itemIndex < 0)
-                return;
+                return false;
 
             if (item == null)
-                return;
+                return false;
 
             if (item.IsEquipment())
             {
@@ -967,10 +970,12 @@ namespace MultiplayerARPG
                         HotkeyEquipWeaponSet,
                         ClientInventoryActions.ResponseEquipArmor,
                         ClientInventoryActions.ResponseEquipWeapon);
+                return true;
             }
             else if (item.IsSkill())
             {
                 SetQueueUsingSkill(aimPosition, (item as ISkillItem).SkillData, (item as ISkillItem).SkillLevel, itemIndex);
+                return true;
             }
             else if (item.IsBuilding())
             {
@@ -978,19 +983,22 @@ namespace MultiplayerARPG
                 PlayingCharacterEntity.StopMove();
                 _buildingItemIndex = itemIndex;
                 ShowConstructBuildingDialog();
+                return true;
             }
             else if (item.IsUsable())
             {
-                PlayingCharacterEntity.CallCmdUseItem(itemIndex);
+                return PlayingCharacterEntity.CallCmdUseItem(itemIndex);
             }
+
+            return false;
         }
 
-        protected void UseGuildSkill(string id)
+        protected bool UseGuildSkill(string id)
         {
             if (GameInstance.JoinedGuild == null)
-                return;
+                return false;
             int dataId = BaseGameData.MakeDataId(id);
-            PlayingCharacterEntity.CallCmdUseGuildSkill(dataId);
+            return PlayingCharacterEntity.CallCmdUseGuildSkill(dataId);
         }
     }
 }

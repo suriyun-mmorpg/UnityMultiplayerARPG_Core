@@ -308,7 +308,7 @@ namespace MultiplayerARPG
             _queueUsingSkill = new UsingSkillData(default, null, 0, -1);
         }
 
-        public abstract void UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition);
+        public abstract bool UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition);
 
         public bool CanActivate(IActivatableEntity entity)
         {

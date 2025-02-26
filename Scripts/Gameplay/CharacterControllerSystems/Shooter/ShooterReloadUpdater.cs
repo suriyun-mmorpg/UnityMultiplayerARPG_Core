@@ -7,6 +7,7 @@ namespace MultiplayerARPG
         public ShooterPlayerCharacterController Controller { get; set; }
         public BasePlayerCharacterEntity PlayingCharacterEntity => Controller.PlayingCharacterEntity;
         public bool IsReloading { get; protected set; }
+        public bool? IsAttackingLeftHand { get; protected set; }
         protected int? _reloadedDataIdR = null;
         protected int? _reloadedDataIdL = null;
 
@@ -34,6 +35,11 @@ namespace MultiplayerARPG
             IsReloading = false;
         }
 
+        public virtual void InterruptByAttacking(bool isLeftHand)
+        {
+            IsAttackingLeftHand = isLeftHand;
+        }
+
         protected virtual void Update()
         {
             if (PlayingCharacterEntity.IsDead())
@@ -43,6 +49,13 @@ namespace MultiplayerARPG
             // Wait until animation end
             if (PlayingCharacterEntity.IsPlayingActionAnimation())
                 return;
+            if (IsAttackingLeftHand.HasValue)
+            {
+                bool isLeftHand = IsAttackingLeftHand.Value;
+                PlayingCharacterEntity.Attack(ref isLeftHand);
+                IsAttackingLeftHand = null;
+                return;
+            }
             bool continueReloadingR = false;
             bool continueReloadingL = false;
             // Reload right-hand weapon
