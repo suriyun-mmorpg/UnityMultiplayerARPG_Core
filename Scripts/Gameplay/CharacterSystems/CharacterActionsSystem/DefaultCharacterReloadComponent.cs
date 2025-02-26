@@ -68,6 +68,11 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid ReloadRoutine(bool isLeftHand, int reloadingAmmoDataId, int reloadingAmmoAmount)
         {
+            // Prevent speed hack and also prevent data error
+            // Reload is unlike attacking, I think it won't have someone who want to play reload very fast like attacking
+            if (Time.unscaledTime - LastReloadEndTime < 0f)
+                return;
+
             // Prepare cancellation
             CancellationTokenSource reloadCancellationTokenSource = new CancellationTokenSource();
             _reloadCancellationTokenSources.Add(reloadCancellationTokenSource);
@@ -93,7 +98,7 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (weaponItem.ReloadDuration > 0)
+            if (weaponItem.ReloadDuration > 0f)
                 totalDuration = weaponItem.ReloadDuration;
 
             // Calculate move speed rate while doing action at clients and server
@@ -110,18 +115,6 @@ namespace MultiplayerARPG
                 BaseCharacterModel fpsModel = Entity.FpsModel;
                 bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
-                // Prepare action durations
-                float remainsDuration = totalDuration;
-                LastReloadEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
-                await _manager.PrepareActionDurations(triggerDurations, totalDuration, Entity.CachedData.ReloadDuration, animSpeedRate, reloadCancellationTokenSource.Token,
-                    (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
-                    {
-                        triggerDurations = __triggerDurations;
-                        totalDuration = __totalDuration;
-                        remainsDuration = __remainsDuration;
-                        LastReloadEndTime = __endTime;
-                    });
-
                 // Play animation
                 if (vehicleModelAvailable)
                     vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
@@ -131,6 +124,21 @@ namespace MultiplayerARPG
                         tpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
                     if (fpsModelAvailable)
                         fpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _);
+                }
+
+                // Prepare action durations
+                float remainsDuration = totalDuration;
+                LastReloadEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                if (weaponItem.ReloadDuration <= 0f)
+                {
+                    await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, reloadCancellationTokenSource.Token,
+                        (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
+                        {
+                            triggerDurations = __triggerDurations;
+                            totalDuration = __totalDuration;
+                            remainsDuration = __remainsDuration;
+                            LastReloadEndTime = __endTime;
+                        });
                 }
 
                 // Special effects will plays on clients only
@@ -161,9 +169,9 @@ namespace MultiplayerARPG
                 for (byte triggerIndex = 0; triggerIndex < triggerDurations.Length; ++triggerIndex)
                 {
                     // Wait until triggger before reload ammo
-                    float tempTriggerDuration = triggerDurations[triggerIndex];
+                    float tempTriggerDuration = triggerDurations[triggerIndex] / animSpeedRate;
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -183,7 +191,6 @@ namespace MultiplayerARPG
                         reloaded = true;
                         OnReloadTrigger?.Invoke(triggerIndex);
                         ActionTrigger(reloadingAmmoDataId, reloadingAmmoAmount, triggerIndex, isLeftHand, weapon.id);
-
                     }
 
                     if (remainsDuration <= 0f)
@@ -196,7 +203,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)
@@ -246,7 +253,8 @@ namespace MultiplayerARPG
                     GameInstance.ServerLogHandlers.LogReloadTriggerFail(_playerCharacterEntity, triggerIndex, ActionTriggerFailReasons.NotEnoughResources);
                 return;
             }
-            if (weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
+            IWeaponItem weaponItem = weapon.GetWeaponItem();
+            if (!weaponItem.NoAmmoDataIdChange && weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
             {
                 // If ammo that stored in the weapon is difference
                 // Then it will return ammo in the weapon, and replace amount with the new one
@@ -254,7 +262,7 @@ namespace MultiplayerARPG
                 weapon.ammo = 0;
             }
             Entity.FillEmptySlots();
-            weapon.ammoDataId = reloadingAmmoDataId;
+            weapon.ammoDataId = weaponItem.NoAmmoDataIdChange ? 0 : reloadingAmmoDataId;
             weapon.ammo += reloadingAmmoAmount;
             if (isLeftHand)
             {
@@ -334,7 +342,11 @@ namespace MultiplayerARPG
             }
 
             // Prepare reload data
-            reloadingWeapon.HasAmmoToReload(Entity, out int reloadingAmmoDataId, out int inventoryAmount);
+            if (!reloadingWeapon.HasAmmoToReload(Entity, out int reloadingAmmoDataId, out int inventoryAmount))
+            {
+                // No ammo to reload
+                return;
+            }
 
             int ammoCapacity = reloadingWeaponItem.AmmoCapacity;
             if (!reloadingWeaponItem.NoAmmoCapacityOverriding &&
@@ -347,7 +359,7 @@ namespace MultiplayerARPG
             ammoCapacity += Mathf.CeilToInt(Entity.CachedData.AmmoCapacity);
 
             int reloadingAmmoAmount = 0;
-            if (reloadingWeapon.ammoDataId != reloadingAmmoDataId)
+            if (!reloadingWeaponItem.NoAmmoDataIdChange && reloadingWeapon.ammoDataId != reloadingAmmoDataId)
             {
                 // If ammo that stored in the weapon is difference
                 // Then it will return ammo in the weapon, and replace amount with the new one

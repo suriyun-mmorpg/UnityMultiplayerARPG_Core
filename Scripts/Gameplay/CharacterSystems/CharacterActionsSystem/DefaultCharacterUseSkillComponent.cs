@@ -200,18 +200,6 @@ namespace MultiplayerARPG
                 BaseCharacterModel fpsModel = Entity.FpsModel;
                 bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
-                // Prepare action durations
-                LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate) + CastingSkillDuration;
-                float remainsDuration = totalDuration;
-                await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token,
-                    (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
-                    {
-                        triggerDurations = __triggerDurations;
-                        totalDuration = __totalDuration;
-                        remainsDuration = __remainsDuration;
-                        LastUseSkillEndTime = __endTime + CastingSkillDuration;
-                    });
-
                 // Prepare damage amounts
                 List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, triggerDurations.Length);
 
@@ -245,6 +233,7 @@ namespace MultiplayerARPG
                 // Play cast animation
                 if (CastingSkillDuration > 0f)
                 {
+                    LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionEndTime(CastingSkillDuration, 1f);
                     if (vehicleModelAvailable)
                         vehicleModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _skipMovementValidation, out _shouldUseRootMotion);
                     if (!overridePassengerActionAnimations)
@@ -294,6 +283,18 @@ namespace MultiplayerARPG
                         fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
                 }
 
+                // Prepare action durations
+                float remainsDuration = totalDuration;
+                LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token,
+                    (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
+                    {
+                        triggerDurations = __triggerDurations;
+                        totalDuration = __totalDuration;
+                        remainsDuration = __remainsDuration;
+                        LastUseSkillEndTime = __endTime + CastingSkillDuration;
+                    });
+
                 // Use skill starts
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillStart(_playerCharacterEntity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon, skill, skillLevel);
@@ -302,9 +303,9 @@ namespace MultiplayerARPG
                 for (byte triggerIndex = 0; triggerIndex < triggerDurations.Length; ++triggerIndex)
                 {
                     // Play special effects after trigger duration
-                    float tempTriggerDuration = triggerDurations[triggerIndex];
+                    float tempTriggerDuration = triggerDurations[triggerIndex] / animSpeedRate;
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient && (AnimActionType == AnimActionType.AttackRightHand || AnimActionType == AnimActionType.AttackLeftHand))
@@ -371,7 +372,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)

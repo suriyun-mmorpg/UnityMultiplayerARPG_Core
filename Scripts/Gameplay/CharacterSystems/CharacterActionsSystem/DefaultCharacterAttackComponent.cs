@@ -165,6 +165,33 @@ namespace MultiplayerARPG
                 BaseCharacterModel fpsModel = Entity.FpsModel;
                 bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
+                // Play animation
+                if (weaponItem.DoRecoilingAsAttackAnimation)
+                {
+                    if (vehicleModelAvailable)
+                        vehicleModel.CacheAttackRecoiler?.PlayRecoiling();
+                    if (!overridePassengerActionAnimations)
+                    {
+                        if (tpsModelAvailable)
+                            tpsModel.CacheAttackRecoiler?.PlayRecoiling();
+                        if (fpsModelAvailable)
+                            fpsModel.CacheAttackRecoiler?.PlayRecoiling();
+                    }
+                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                }
+                else
+                {
+                    if (vehicleModelAvailable)
+                        vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                    if (!overridePassengerActionAnimations)
+                    {
+                        if (tpsModelAvailable)
+                            tpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                        if (fpsModelAvailable)
+                            fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                    }
+                }
+
                 // Prepare action durations
                 float remainsDuration = totalDuration;
                 if (weaponItem.RateOfFire > 0)
@@ -199,33 +226,6 @@ namespace MultiplayerARPG
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
                     HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
 
-                // Play animation
-                if (weaponItem.DoRecoilingAsAttackAnimation)
-                {
-                    if (vehicleModelAvailable)
-                        vehicleModel.CacheAttackRecoiler?.PlayRecoiling();
-                    if (!overridePassengerActionAnimations)
-                    {
-                        if (tpsModelAvailable)
-                            tpsModel.CacheAttackRecoiler?.PlayRecoiling();
-                        if (fpsModelAvailable)
-                            fpsModel.CacheAttackRecoiler?.PlayRecoiling();
-                    }
-                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
-                }
-                else
-                {
-                    if (vehicleModelAvailable)
-                        vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
-                    if (!overridePassengerActionAnimations)
-                    {
-                        if (tpsModelAvailable)
-                            tpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
-                        if (fpsModelAvailable)
-                            fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
-                    }
-                }
-
                 // Attack starts
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogAttackStart(_playerCharacterEntity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, isLeftHand, weapon);
@@ -234,25 +234,18 @@ namespace MultiplayerARPG
                 for (byte triggerIndex = 0; triggerIndex < triggerDurations.Length; ++triggerIndex)
                 {
                     // Wait until triggger before play special effects
-                    float tempTriggerDuration = triggerDurations[triggerIndex];
+                    float tempTriggerDuration = triggerDurations[triggerIndex] / animSpeedRate;
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(tempTriggerDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
                     {
                         // Play weapon launch special effects
-                        if (!overridePassengerActionAnimations)
-                        {
-                            if (tpsModelAvailable)
-                                tpsModel.PlayEquippedWeaponLaunch(isLeftHand);
-                            if (fpsModelAvailable)
-                                fpsModel.PlayEquippedWeaponLaunch(isLeftHand);
-                        }
-                        else if (vehicleModelAvailable)
-                        {
-                            vehicleModel.PlayEquippedWeaponLaunch(isLeftHand);
-                        }
+                        if (tpsModelAvailable)
+                            tpsModel.PlayEquippedWeaponLaunch(isLeftHand);
+                        if (fpsModelAvailable)
+                            fpsModel.PlayEquippedWeaponLaunch(isLeftHand);
                         // Play launch sfx
                         AudioClipWithVolumeSettings launchClip = weaponItem.LaunchClip;
                         if (entityCaches.TryGetWeaponAbility(isLeftHand, LaunchSfxWeaponAbility.KEY, out BaseWeaponAbility ability) && ability is LaunchSfxWeaponAbility launchSfxAbility)
@@ -337,7 +330,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration / animSpeedRate * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
+                    await UniTask.Delay((int)(remainsDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, attackCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)
