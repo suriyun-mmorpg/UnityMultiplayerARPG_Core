@@ -77,11 +77,10 @@ namespace MultiplayerARPG
             get { return useItemCooldown; }
         }
 
-        public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
+        public bool UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
             if (!characterEntity.CanUseItem())
-                return;
-            characterEntity.FillEmptySlots();
+                return false;
             // Clear all summoned pets
             bool doNotSummonNewOne = false;
             CharacterSummon tempSummon;
@@ -96,11 +95,12 @@ namespace MultiplayerARPG
                     doNotSummonNewOne = true;
             }
             if (doNotSummonNewOne)
-                return;
+                return true;
             // Summon new pet
             CharacterSummon newSummon = CharacterSummon.Create(SummonType.PetItem, characterItem.id, DataId);
             newSummon.Summon(characterEntity, characterItem.level, 0f, characterItem.exp);
             characterEntity.Summons.Add(newSummon);
+            return true;
         }
 
         public bool HasCustomAimControls()

@@ -62,12 +62,37 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
+        public bool UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
             BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-            if (playerCharacterEntity == null || !characterEntity.CanUseItem() || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
-            GameInstance.ServerCharacterHandlers.Respawn(0, playerCharacterEntity);
+            if (playerCharacterEntity == null)
+                return false;
+            if (!characterEntity.CanUseItem() || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
+                return false;
+            characterEntity.FillEmptySlots();
+            WarpPortalType respawnPortalType = WarpPortalType.Default;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
+            string respawnMapName = playerCharacterEntity.RespawnMapName;
+            Vector3 respawnPosition = playerCharacterEntity.RespawnPosition;
+#else
+            string respawnMapName = playerCharacterEntity.CurrentMapName;
+            Vector3 respawnPosition = playerCharacterEntity.CurrentPosition;
+#endif
+            bool respawnOverrideRotation = false;
+            Vector3 respawnRotation = Vector3.zero;
+            BaseMapInfo mapInfo = BaseGameNetworkManager.CurrentMapInfo;
+            if (BaseGameNetworkManager.CurrentMapInfo != null)
+                BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacterEntity, out respawnPortalType, out respawnMapName, out respawnPosition, out respawnOverrideRotation, out respawnRotation);
+            switch (respawnPortalType)
+            {
+                case WarpPortalType.Default:
+                    BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacterEntity, respawnMapName, respawnPosition, respawnOverrideRotation, respawnRotation);
+                    break;
+                case WarpPortalType.EnterInstance:
+                    BaseGameNetworkManager.Singleton.WarpCharacterToInstance(playerCharacterEntity, respawnMapName, respawnPosition, respawnOverrideRotation, respawnRotation);
+                    break;
+            }
+            return true;
         }
     }
 }

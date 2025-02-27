@@ -26,7 +26,9 @@ namespace MultiplayerARPG
             this.AddOrUpdateSkillUsage(SkillUsageType.UsableItem, nonEquipItems[itemIndex].dataId, 1);
 
             // Use item
-            usableItem.UseItem(this, itemIndex, nonEquipItems[itemIndex]);
+            if (!usableItem.UseItem(this, itemIndex, nonEquipItems[itemIndex]))
+                return;
+
             // Do something with buffs when use item
             SkillAndBuffComponent.OnUseItem();
 #endif
@@ -53,15 +55,20 @@ namespace MultiplayerARPG
             }
 
             // Validate new character name
-            UITextKeys detectNameExistance = await GameInstance.ServerUserHandlers.DetectCharacterNameExistance(newCharacterName);
-            if (detectNameExistance != UITextKeys.NONE)
+            UITextKeys validateCharacterName = await GameInstance.ServerUserHandlers.ValidateCharacterName(newCharacterName);
+            if (validateCharacterName != UITextKeys.NONE)
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, detectNameExistance);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, validateCharacterName);
                 return;
             }
 
             // Use item
-            usableItem.UseItem(this, itemIndex, nonEquipItems[itemIndex]);
+            if (!usableItem.UseItem(this, itemIndex, nonEquipItems[itemIndex]))
+                return;
+
+            // Name changed
+            CharacterName = newCharacterName;
+            GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_CHARACTER_NAME_CHANGE_SUCCESS);
 #endif
         }
     }

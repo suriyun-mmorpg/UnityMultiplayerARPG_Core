@@ -59,12 +59,13 @@ namespace MultiplayerARPG
             get { return useItemCooldown; }
         }
 
-        public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
+        public bool UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
             if (!characterEntity.CanUseItem() || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
+                return false;
             characterEntity.FillEmptySlots();
             characterEntity.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, characterEntity.GetInfo(), CharacterItem.Empty);
+            return true;
         }
 
         public bool HasCustomAimControls()

@@ -66,22 +66,24 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
+        public bool UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
             BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-            if (playerCharacterEntity == null || !characterEntity.CanUseItem())
-                return;
+            if (playerCharacterEntity == null)
+                return false;
+            if (!characterEntity.CanUseItem())
+                return false;
             SafeArea[] safeAreas = FindObjectsOfType<SafeArea>();
             SafeArea randomedSafeArea = safeAreas.GetRandomObjectInArray(out _);
             if (!randomedSafeArea)
-                return;
+                return false;
             Vector3? foundPosition = null;
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension2D:
                     Collider2D collider2d = randomedSafeArea.GetComponent<Collider2D>();
                     if (!collider2d)
-                        return;
+                        return false;
                     Vector3 extents2d = collider2d.bounds.extents.GetXY();
                     float radius2d = Mathf.Max(extents2d.x, extents2d.y);
                     Vector3 randomedInsideCircle = Random.insideUnitCircle * radius2d;
@@ -90,7 +92,7 @@ namespace MultiplayerARPG
                 default:
                     Collider collider = randomedSafeArea.GetComponent<Collider>();
                     if (!collider)
-                        return;
+                        return false;
                     Vector3 extents = collider.bounds.extents.GetXZ();
                     float radius = Mathf.Max(extents.x, extents.z);
                     Vector3 randomedInsideSphere = Random.insideUnitSphere * radius;
@@ -100,10 +102,12 @@ namespace MultiplayerARPG
                     break;
             }
             if (!foundPosition.HasValue)
-                return;
+                return false;
             if (!characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
+                return false;
+            characterEntity.FillEmptySlots();
             BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacterEntity, string.Empty, foundPosition.Value, false, characterEntity.EntityTransform.eulerAngles);
+            return true;
         }
     }
 }

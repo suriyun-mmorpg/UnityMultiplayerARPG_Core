@@ -78,15 +78,19 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
+        public bool UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
             BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-            if (playerCharacterEntity == null || !characterEntity.CanUseItem() || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
+            if (playerCharacterEntity == null)
+                return false;
+            if (!characterEntity.CanUseItem() || !characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
+                return false;
+            characterEntity.FillEmptySlots();
             if (warpToMapInfo == null)
                 BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, playerCharacterEntity, string.Empty, warpToPosition, warpOverrideRotation, warpToRotation);
             else
                 BaseGameNetworkManager.Singleton.WarpCharacter(warpPortalType, playerCharacterEntity, warpToMapInfo.Id, warpToPosition, warpOverrideRotation, warpToRotation);
+            return true;
         }
     }
 }

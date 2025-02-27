@@ -65,19 +65,22 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
+        public bool UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
             BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-            if (playerCharacterEntity == null || !characterEntity.CanUseItem())
-                return;
+            if (playerCharacterEntity == null)
+                return false;
+            if (!characterEntity.CanUseItem())
+                return false;
             if (characterEntity.IncreasingItemsWillOverwhelming(rewardingItems))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacterEntity.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
-                return;
+                return false;
             }
             if (!characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
+                return false;
             playerCharacterEntity.IncreaseItems(rewardingItems);
+            return true;
         }
     }
 }

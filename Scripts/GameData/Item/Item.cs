@@ -1020,47 +1020,41 @@ namespace MultiplayerARPG
             return this;
         }
 
-        public void UseItem(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
+        public bool UseItem(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
         {
             switch (itemType)
             {
                 case LegacyItemType.Potion:
-                    UseItemPotion(character, itemIndex, characterItem);
-                    break;
+                    return UseItemPotion(character, itemIndex, characterItem);
                 case LegacyItemType.Pet:
-                    UseItemPet(character, itemIndex, characterItem);
-                    break;
+                    return UseItemPet(character, itemIndex, characterItem);
                 case LegacyItemType.Mount:
-                    UseItemMount(character, characterItem);
-                    break;
+                    return UseItemMount(character, characterItem);
                 case LegacyItemType.AttributeIncrease:
-                    UseItemAttributeIncrease(character as BasePlayerCharacterEntity, itemIndex);
-                    break;
+                    return UseItemAttributeIncrease(character as BasePlayerCharacterEntity, itemIndex);
                 case LegacyItemType.AttributeReset:
-                    UseItemAttributeReset(character as BasePlayerCharacterEntity, itemIndex);
-                    break;
+                    return UseItemAttributeReset(character as BasePlayerCharacterEntity, itemIndex);
                 case LegacyItemType.SkillLearn:
-                    UseItemSkillLearn(character as BasePlayerCharacterEntity, itemIndex);
-                    break;
+                    return UseItemSkillLearn(character as BasePlayerCharacterEntity, itemIndex);
                 case LegacyItemType.SkillReset:
-                    UseItemSkillReset(character as BasePlayerCharacterEntity, itemIndex);
-                    break;
+                    return UseItemSkillReset(character as BasePlayerCharacterEntity, itemIndex);
             }
+            return true;
         }
 
-        protected void UseItemPotion(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
+        protected bool UseItemPotion(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
         {
             if (!character.CanUseItem() || !character.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
+                return false;
             character.FillEmptySlots();
             character.ApplyBuff(DataId, BuffType.PotionBuff, characterItem.level, character.GetInfo(), CharacterItem.Empty);
+            return true;
         }
 
-        protected void UseItemPet(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
+        protected bool UseItemPet(BaseCharacterEntity character, int itemIndex, CharacterItem characterItem)
         {
             if (!character.CanUseItem())
-                return;
-            character.FillEmptySlots();
+                return false;
             // Clear all summoned pets
             bool doNotSummonNewOne = false;
             CharacterSummon tempSummon;
@@ -1075,54 +1069,66 @@ namespace MultiplayerARPG
                     doNotSummonNewOne = true;
             }
             if (doNotSummonNewOne)
-                return;
+                return true;
             // Summon new pet
             CharacterSummon newSummon = CharacterSummon.Create(SummonType.PetItem, characterItem.id, DataId);
             newSummon.Summon(character, characterItem.level, 0f, characterItem.exp);
             character.Summons.Add(newSummon);
+            return true;
         }
 
-        protected void UseItemMount(BaseCharacterEntity character, CharacterItem characterItem)
+        protected bool UseItemMount(BaseCharacterEntity character, CharacterItem characterItem)
         {
             if (!character.CanUseItem())
-                return;
+                return false;
             character.SpawnMount(MountType.MountItem, characterItem.id, MountDuration.GetAmount(characterItem.level));
+            return true;
         }
 
-        protected void UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)
+        protected bool UseItemAttributeIncrease(BasePlayerCharacterEntity character, int itemIndex)
         {
             if (!character.CanUseItem() || attributeAmount.attribute == null)
-                return;
+                return false;
 
             UITextKeys gameMessage;
             if (!character.AddAttribute(out gameMessage, attributeAmount.attribute.DataId, (int)attributeAmount.amount, itemIndex))
+            {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(character.ConnectionId, gameMessage);
+                return false;
+            }
+
+            return true;
         }
 
-        protected void UseItemAttributeReset(BasePlayerCharacterEntity character, int itemIndex)
+        protected bool UseItemAttributeReset(BasePlayerCharacterEntity character, int itemIndex)
         {
             if (!character.CanUseItem())
-                return;
+                return false;
 
-            character.ResetAttributes(itemIndex);
+            return character.ResetAttributes(itemIndex);
         }
 
-        protected void UseItemSkillLearn(BasePlayerCharacterEntity character, int itemIndex)
+        protected bool UseItemSkillLearn(BasePlayerCharacterEntity character, int itemIndex)
         {
             if (!character.CanUseItem() || SkillData == null)
-                return;
+                return false;
 
             UITextKeys gameMessage;
             if (!character.AddSkill(out gameMessage, SkillData.DataId, SkillLevel, itemIndex))
+            {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(character.ConnectionId, gameMessage);
+                return false;
+            }
+
+            return true;
         }
 
-        protected void UseItemSkillReset(BasePlayerCharacterEntity character, int itemIndex)
+        protected bool UseItemSkillReset(BasePlayerCharacterEntity character, int itemIndex)
         {
             if (!character.CanUseItem())
-                return;
+                return false;
 
-            character.ResetSkills(itemIndex);
+            return character.ResetSkills(itemIndex);
         }
 
         public bool HasCustomAimControls()

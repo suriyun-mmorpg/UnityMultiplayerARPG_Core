@@ -6,7 +6,7 @@
         /// Cooldown duration before it is able to use again
         /// </summary>
         float UseItemCooldown { get; }
-        void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem);
+        bool UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem);
 
     }
 }

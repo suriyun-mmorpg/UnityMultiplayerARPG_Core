@@ -68,13 +68,15 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
+        public bool UseItem(BaseCharacterEntity characterEntity, int itemIndex, CharacterItem characterItem)
         {
             BasePlayerCharacterEntity playerCharacterEntity = characterEntity as BasePlayerCharacterEntity;
-            if (playerCharacterEntity == null || !characterEntity.CanUseItem())
-                return;
+            if (playerCharacterEntity == null)
+                return false;
+            if (!characterEntity.CanUseItem())
+                return false;
             if (rewardingItemsTable == null)
-                return;
+                return false;
             int seed = characterItem.id.GenerateHashId();
             List<ItemAmount> rewardingItems = new List<ItemAmount>();
             for (int i = 0; i < maxDropAmount; ++i)
@@ -95,12 +97,14 @@ namespace MultiplayerARPG
             }
             if (characterEntity.IncreasingItemsWillOverwhelming(rewardingItems))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(playerCharacterEntity.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
-                return;
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(characterEntity.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
+                return false;
             }
             if (!characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
-                return;
-            playerCharacterEntity.IncreaseItems(rewardingItems);
+                return false;
+            characterEntity.IncreaseItems(rewardingItems);
+            characterEntity.FillEmptySlots();
+            return true;
         }
     }
 }
