@@ -154,7 +154,7 @@ namespace MultiplayerARPG
             playerCharacter.UserCash = playerCharacter.UserCash.Increase(cash);
         }
 
-        public virtual UniTask<UITextKeys> DetectCharacterNameExistance(string characterName)
+        public virtual UniTask<UITextKeys> ValidateCharacterName(string characterName)
         {
             return new UniTask<UITextKeys>(UITextKeys.NONE);
         }

@@ -161,6 +161,6 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="characterName"></param>
         /// <returns></returns>
-        UniTask<UITextKeys> DetectCharacterNameExistance(string characterName);
+        UniTask<UITextKeys> ValidateCharacterName(string characterName);
     }
 }
