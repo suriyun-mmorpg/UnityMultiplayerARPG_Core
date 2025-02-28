@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
@@ -335,11 +336,7 @@ namespace MultiplayerARPG
                         // Set default ammo amount
                         if (weaponItem.AmmoItemIds.Count > 0)
                         {
-                            using (var iterator = weaponItem.AmmoItemIds.GetEnumerator())
-                            {
-                                iterator.MoveNext();
-                                newItem.ammoDataId = iterator.Current;
-                            }
+                            newItem.ammoDataId = weaponItem.AmmoItemIds.First();
                             if (GameInstance.Items.TryGetValue(newItem.ammoDataId, out BaseItem ammoItem))
                             {
                                 if (!weaponItem.NoAmmoCapacityOverriding && ammoItem.OverrideAmmoCapacity > 0)

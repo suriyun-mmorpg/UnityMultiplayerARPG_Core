@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -167,8 +168,8 @@ namespace MultiplayerARPG
                 ammo = Mathf.Min(ammoItem.amount, weaponItemData.AmmoCapacity);
 
             // Update weapon item, before make changes to other items
-            if (weaponItemData.NoAmmoDataIdChange)
-                ammoItemDataId = 0;
+            if (weaponItemData.NoAmmoDataIdChange && weaponItemData.AmmoItemIds.Count > 0)
+                ammoItemDataId = weaponItemData.AmmoItemIds.First();
             weaponItem.ammoDataId = ammoItemDataId;
             weaponItem.ammo = ammo;
             onPutAmmo.Invoke(weaponItem);

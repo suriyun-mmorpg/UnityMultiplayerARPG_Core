@@ -2,6 +2,7 @@
 using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using UnityEngine;
 
@@ -253,8 +254,8 @@ namespace MultiplayerARPG
                     GameInstance.ServerLogHandlers.LogReloadTriggerFail(_playerCharacterEntity, triggerIndex, ActionTriggerFailReasons.NotEnoughResources);
                 return;
             }
-            IWeaponItem weaponItem = weapon.GetWeaponItem();
-            if (!weaponItem.NoAmmoDataIdChange && weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
+            IWeaponItem weaponItemData = weapon.GetWeaponItem();
+            if (!weaponItemData.NoAmmoDataIdChange && weapon.ammo > 0 && weapon.ammoDataId != reloadingAmmoDataId)
             {
                 // If ammo that stored in the weapon is difference
                 // Then it will return ammo in the weapon, and replace amount with the new one
@@ -262,7 +263,9 @@ namespace MultiplayerARPG
                 weapon.ammo = 0;
             }
             Entity.FillEmptySlots();
-            weapon.ammoDataId = weaponItem.NoAmmoDataIdChange ? 0 : reloadingAmmoDataId;
+            if (weaponItemData.NoAmmoDataIdChange && weaponItemData.AmmoItemIds.Count > 0)
+                reloadingAmmoDataId = weaponItemData.AmmoItemIds.First();
+            weapon.ammoDataId = reloadingAmmoDataId;
             weapon.ammo += reloadingAmmoAmount;
             if (isLeftHand)
             {
