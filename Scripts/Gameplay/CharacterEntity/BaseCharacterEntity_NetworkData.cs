@@ -254,23 +254,26 @@ namespace MultiplayerARPG
             exp.deliveryMethod = DeliveryMethod.ReliableOrdered;
             exp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
 
-            isImmune.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            isImmune.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            isImmune.deliveryMethod = DeliveryMethod.Sequenced;
+            isImmune.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
 
-            currentHp.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            currentHp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentHp.deliveryMethod = DeliveryMethod.Sequenced;
+            currentHp.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
 
-            currentMp.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            currentMp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentMp.deliveryMethod = DeliveryMethod.Sequenced;
+            currentMp.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
 
-            currentFood.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            currentFood.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentStamina.deliveryMethod = DeliveryMethod.Sequenced;
+            currentStamina.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
 
-            currentWater.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            currentWater.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentFood.deliveryMethod = DeliveryMethod.Sequenced;
+            currentFood.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
 
-            equipWeaponSet.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            equipWeaponSet.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currentWater.deliveryMethod = DeliveryMethod.Sequenced;
+            currentWater.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
+
+            equipWeaponSet.deliveryMethod = DeliveryMethod.Sequenced;
+            equipWeaponSet.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
 
             isWeaponsSheathed.deliveryMethod = DeliveryMethod.ReliableOrdered;
             isWeaponsSheathed.clientDeliveryMethod = DeliveryMethod.ReliableOrdered;
