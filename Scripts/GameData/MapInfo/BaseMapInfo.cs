@@ -156,8 +156,8 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Category("Minimap Settings")]
         [PreviewSprite(50)]
-        [AddressableAssetConversion(nameof(addressableMinimapSprite))]
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableMinimapSprite))]
         private Sprite minimapSprite;
 #endif
         public Sprite MinimapSprite
@@ -199,8 +199,8 @@ namespace MultiplayerARPG
 
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [PreviewSprite(50)]
-        [AddressableAssetConversion(nameof(addressableMinimapSprite2))]
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableMinimapSprite2))]
         private Sprite minimapSprite2;
 #endif
         public Sprite MinimapSprite2

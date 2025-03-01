@@ -81,8 +81,8 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || !UNITY_SERVER
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [PreviewSprite(50)]
-        [AddressableAssetConversion(nameof(addressableIcon))]
         [SerializeField]
+        [AddressableAssetConversion(nameof(addressableIcon))]
         protected Sprite icon;
 #endif
         public Sprite Icon

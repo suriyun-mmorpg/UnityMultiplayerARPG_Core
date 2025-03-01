@@ -97,6 +97,7 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+        [SerializeField]
         [AddressableAssetConversion(nameof(addressableFpsModelPrefab))]
         protected BaseCharacterModel fpsModelPrefab;
 #endif
