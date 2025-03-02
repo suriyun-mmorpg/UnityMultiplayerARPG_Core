@@ -1,4 +1,5 @@
-﻿using System.Collections;
+﻿using Insthync.AudioManager;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
