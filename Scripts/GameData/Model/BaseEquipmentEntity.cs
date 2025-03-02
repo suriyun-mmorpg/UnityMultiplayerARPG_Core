@@ -15,6 +15,7 @@ namespace MultiplayerARPG
     {
         public BaseCharacterModel CharacterModel { get; set; }
         public ModelHiddingUpdater ModelHiddingUpdater { get; protected set; }
+        public string EquipSocket { get; set; }
         public string EquipPosition { get; set; }
 
         private CharacterItem _item;
@@ -95,11 +96,12 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void Setup(BaseCharacterModel characterModel, string equipPosition, CharacterItem item)
+        public virtual void Setup(BaseCharacterModel characterModel, string equipSocket, string equipPosition, CharacterItem item)
         {
             CharacterModel = characterModel;
             if (CharacterModel != null)
                 CharacterModel.onVisibleStateChange += SetVisibleState;
+            EquipSocket = equipSocket;
             EquipPosition = equipPosition;
             Item = item;
             onSetup.Invoke();

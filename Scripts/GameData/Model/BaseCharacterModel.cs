@@ -570,7 +570,7 @@ namespace MultiplayerARPG
             // Destroy unequipped item models, and show default models
             foreach (string unequippingSocket in unequippingSockets)
             {
-                ClearEquippedModel(unequippingSocket);
+                ClearEquippedModel(unequippingSocket, true);
 
                 if (!CacheEquipmentModelContainers.TryGetValue(unequippingSocket, out tempContainer))
                     continue;
@@ -583,10 +583,12 @@ namespace MultiplayerARPG
 
             foreach (string equipSocket in showingModels.Keys)
             {
-                ClearEquippedModel(equipSocket);
+                ClearEquippedModel(equipSocket, false);
 
                 if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out tempContainer))
+                {
                     continue;
+                }
 
                 tempEquipmentModel = showingModels[equipSocket];
                 tempEquipmentObject = null;
@@ -618,7 +620,9 @@ namespace MultiplayerARPG
                     }
 
                     if (!modelActivated)
+                    {
                         continue;
+                    }
                 }
                 else
                 {
@@ -657,7 +661,7 @@ namespace MultiplayerARPG
                     tempEquipmentEntity = tempEquipmentObject.GetComponent<BaseEquipmentEntity>();
                     if (tempEquipmentEntity != null)
                     {
-                        tempEquipmentEntity.Setup(this, tempEquipmentModel.equipPosition, tempEquipmentModel.item);
+                        tempEquipmentEntity.Setup(this, equipSocket, tempEquipmentModel.equipPosition, tempEquipmentModel.item);
 #if UNITY_EDITOR
                         GameObject editorAsset = null;
                         if (tempEquipmentModel.AddressableMeshPrefab.IsDataValid())
@@ -679,13 +683,13 @@ namespace MultiplayerARPG
             EquippedModels = storingModels;
         }
 
-        private void ClearEquippedModel(string equipSocket)
+        private void ClearEquippedModel(string equipSocket, bool clearCacheEquipmentEntity)
         {
             if (EquippedModels.TryGetValue(equipSocket, out EquipmentModel equipmentModel))
             {
-                if (GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipmentModel.equipPosition))
+                if (GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipmentModel.equipPosition) && clearCacheEquipmentEntity)
                     CacheRightHandEquipmentEntity = null;
-                if (GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipmentModel.equipPosition))
+                if (GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipmentModel.equipPosition) && clearCacheEquipmentEntity)
                     CacheLeftHandEquipmentEntity = null;
             }
 
