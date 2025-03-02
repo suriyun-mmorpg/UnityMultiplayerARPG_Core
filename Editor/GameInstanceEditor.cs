@@ -1,4 +1,5 @@
-﻿using UnityEditor;
+﻿using Insthync.UnityEditorUtils.Editor;
+using UnityEditor;
 
 namespace MultiplayerARPG
 {
