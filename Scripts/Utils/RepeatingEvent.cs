@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     public class RepeatingEvent : MonoBehaviour
     {

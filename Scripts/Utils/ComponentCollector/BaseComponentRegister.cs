@@ -1,25 +1,28 @@
 ﻿using UnityEngine;
 
-public class BaseComponentRegister<T> : MonoBehaviour where T : Component
+namespace MultiplayerARPG
 {
-    T[] _components;
-
-    private void Awake()
+    public class BaseComponentRegister<T> : MonoBehaviour where T : Component
     {
-        _components = GetComponents<T>();
-        foreach (T component in _components)
+        T[] _components;
+
+        private void Awake()
         {
-            ComponentCollector.Add(component);
+            _components = GetComponents<T>();
+            foreach (T component in _components)
+            {
+                ComponentCollector.Add(component);
+            }
         }
-    }
 
-    private void OnDestroy()
-    {
-        if (_components == null)
-            return;
-        foreach (T component in _components)
+        private void OnDestroy()
         {
-            ComponentCollector.Remove(component);
+            if (_components == null)
+                return;
+            foreach (T component in _components)
+            {
+                ComponentCollector.Remove(component);
+            }
         }
     }
 }

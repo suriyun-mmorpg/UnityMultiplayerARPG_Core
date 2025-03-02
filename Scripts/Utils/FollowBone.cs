@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     [DefaultExecutionOrder(int.MaxValue)]
     public class FollowBone : MonoBehaviour

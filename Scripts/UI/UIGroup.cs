@@ -1,28 +1,31 @@
-﻿public class UIGroup : UIBase
+﻿namespace MultiplayerARPG
 {
-    public UIBase[] subSet;
-
-    protected override void OnDestroy()
+    public class UIGroup : UIBase
     {
-        base.OnDestroy();
-        subSet.Nulling();
-    }
+        public UIBase[] subSet;
 
-    public override void Show()
-    {
-        foreach (UIBase entry in subSet)
+        protected override void OnDestroy()
         {
-            entry.Show();
+            base.OnDestroy();
+            subSet.Nulling();
         }
-        base.Show();
-    }
 
-    public override void Hide()
-    {
-        foreach (UIBase entry in subSet)
+        public override void Show()
         {
-            entry.Hide();
+            foreach (UIBase entry in subSet)
+            {
+                entry.Show();
+            }
+            base.Show();
         }
-        base.Hide();
+
+        public override void Hide()
+        {
+            foreach (UIBase entry in subSet)
+            {
+                entry.Hide();
+            }
+            base.Hide();
+        }
     }
 }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     public class FollowTransformZPosition : MonoBehaviour
     {

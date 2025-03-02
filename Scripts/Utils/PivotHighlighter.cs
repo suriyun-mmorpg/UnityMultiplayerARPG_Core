@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     public class PivotHighlighter : MonoBehaviour
     {

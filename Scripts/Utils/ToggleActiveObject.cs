@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEditor;
 #endif
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     public class ToggleActiveObject : MonoBehaviour
     {

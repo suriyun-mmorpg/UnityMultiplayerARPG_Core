@@ -1,22 +1,25 @@
 using UnityEngine;
 
-[RequireComponent(typeof(UIBase))]
-public class UIStackEntry : MonoBehaviour
+namespace MultiplayerARPG
 {
-    private UIBase _ui;
-
-    private void Awake()
+    [RequireComponent(typeof(UIBase))]
+    public class UIStackEntry : MonoBehaviour
     {
-        _ui = GetComponent<UIBase>();
-    }
+        private UIBase _ui;
 
-    private void OnEnable()
-    {
-        UIStackManager.Add(this);
-    }
+        private void Awake()
+        {
+            _ui = GetComponent<UIBase>();
+        }
 
-    public void Hide()
-    {
-        _ui.Hide();
+        private void OnEnable()
+        {
+            UIStackManager.Add(this);
+        }
+
+        public void Hide()
+        {
+            _ui.Hide();
+        }
     }
 }

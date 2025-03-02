@@ -1,7 +1,7 @@
 using LiteNetLibManager;
 using UnityEngine;
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     public class SimpleNetworkingSpawn : MonoBehaviour
     {

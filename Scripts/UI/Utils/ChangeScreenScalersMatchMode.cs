@@ -2,7 +2,7 @@ using Insthync.UnityEditorUtils;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     public class ChangeScreenScalersMatchMode : MonoBehaviour
     {

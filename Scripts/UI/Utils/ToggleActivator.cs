@@ -1,34 +1,37 @@
 ﻿using UnityEngine;
 using UnityEngine.UI;
 
-[ExecuteInEditMode]
-public class ToggleActivator : MonoBehaviour
+namespace MultiplayerARPG
 {
-    public Toggle toggle;
-    [Tooltip("These objects will be activated while toggle is the On, otherwise it will deactivated")]
-    public GameObject[] turnOnObjects;
-    [Tooltip("These objects will be activated while toggle is the off, otherwise it will deactivated")]
-    public GameObject[] turnOffObjects;
-
-    private void OnEnable()
+    [ExecuteInEditMode]
+    public class ToggleActivator : MonoBehaviour
     {
-        toggle.onValueChanged.AddListener(OnToggle);
-    }
+        public Toggle toggle;
+        [Tooltip("These objects will be activated while toggle is the On, otherwise it will deactivated")]
+        public GameObject[] turnOnObjects;
+        [Tooltip("These objects will be activated while toggle is the off, otherwise it will deactivated")]
+        public GameObject[] turnOffObjects;
 
-    private void OnDisable()
-    {
-        toggle.onValueChanged.RemoveListener(OnToggle);
-    }
-
-    private void OnToggle(bool isOn)
-    {
-        foreach (GameObject obj in turnOnObjects)
+        private void OnEnable()
         {
-            obj.SetActive(isOn);
+            toggle.onValueChanged.AddListener(OnToggle);
         }
-        foreach (GameObject obj in turnOffObjects)
+
+        private void OnDisable()
         {
-            obj.SetActive(!isOn);
+            toggle.onValueChanged.RemoveListener(OnToggle);
+        }
+
+        private void OnToggle(bool isOn)
+        {
+            foreach (GameObject obj in turnOnObjects)
+            {
+                obj.SetActive(isOn);
+            }
+            foreach (GameObject obj in turnOffObjects)
+            {
+                obj.SetActive(!isOn);
+            }
         }
     }
 }

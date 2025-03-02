@@ -1,9 +1,7 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     public class SimpleNextPreviousTextManager : MonoBehaviour
     {

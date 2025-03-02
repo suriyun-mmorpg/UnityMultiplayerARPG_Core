@@ -2,7 +2,7 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     [DefaultExecutionOrder(1001)]
     public class OnDisableEvent : MonoBehaviour

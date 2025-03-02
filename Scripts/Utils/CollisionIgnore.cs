@@ -1,7 +1,7 @@
 ﻿using Insthync.UnityEditorUtils;
 using UnityEngine;
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     public class CollisionIgnore : MonoBehaviour
     {

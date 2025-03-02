@@ -1,24 +1,27 @@
 using UnityEngine;
 
-public class UIVisibleFollowShownUIs : MonoBehaviour
+namespace MultiplayerARPG
 {
-    public UIBase[] conditionUIs;
-    public UIBase[] showingUIs;
-
-    private void Update()
+    public class UIVisibleFollowShownUIs : MonoBehaviour
     {
-        bool show = false;
-        for (int i = 0; i < conditionUIs.Length; ++i)
+        public UIBase[] conditionUIs;
+        public UIBase[] showingUIs;
+
+        private void Update()
         {
-            if (conditionUIs[i].IsVisible())
+            bool show = false;
+            for (int i = 0; i < conditionUIs.Length; ++i)
             {
-                show = true;
-                break;
+                if (conditionUIs[i].IsVisible())
+                {
+                    show = true;
+                    break;
+                }
             }
-        }
-        for (int i = 0; i < showingUIs.Length; ++i)
-        {
-            showingUIs[i].SetVisible(show);
+            for (int i = 0; i < showingUIs.Length; ++i)
+            {
+                showingUIs[i].SetVisible(show);
+            }
         }
     }
 }

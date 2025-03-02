@@ -3,7 +3,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     [System.Serializable]
     public class SetupByAspectRatioActivatingSetting : SetupByAspectRatioSetting

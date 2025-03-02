@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace UtilsComponents
+namespace MultiplayerARPG
 {
     [DefaultExecutionOrder(1000)]
     public class OnEnableEvent : MonoBehaviour

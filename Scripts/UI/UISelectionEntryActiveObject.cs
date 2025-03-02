@@ -3,80 +3,83 @@
 using UnityEditor;
 #endif
 
-public class UISelectionEntryActiveObject : MonoBehaviour
+namespace MultiplayerARPG
 {
-    [System.Serializable]
-    public struct Setting
+    public class UISelectionEntryActiveObject : MonoBehaviour
     {
-        public GameObject defaultObject;
-        public GameObject selectedObject;
-    }
-
-    public Setting[] settings;
-    private IUISelectionEntry _entry;
-    private bool _dirtySelected;
-
-    private void Awake()
-    {
-        _entry = GetComponent<IUISelectionEntry>();
-    }
-
-    private void OnEnable()
-    {
-        _dirtySelected = false;
-        foreach (Setting setting in settings)
+        [System.Serializable]
+        public struct Setting
         {
-            setting.defaultObject.SetActive(true);
-            setting.selectedObject.SetActive(false);
+            public GameObject defaultObject;
+            public GameObject selectedObject;
         }
-    }
 
-    private void Update()
-    {
-        if (_entry == null)
-            return;
+        public Setting[] settings;
+        private IUISelectionEntry _entry;
+        private bool _dirtySelected;
 
-        if (_dirtySelected != _entry.IsSelected)
+        private void Awake()
         {
-            _dirtySelected = _entry.IsSelected;
+            _entry = GetComponent<IUISelectionEntry>();
+        }
+
+        private void OnEnable()
+        {
+            _dirtySelected = false;
             foreach (Setting setting in settings)
             {
-                setting.defaultObject.SetActive(!_dirtySelected);
-                setting.selectedObject.SetActive(_dirtySelected);
+                setting.defaultObject.SetActive(true);
+                setting.selectedObject.SetActive(false);
             }
         }
-    }
 
-    [ContextMenu("Set Active Default Object")]
-    public void SetActiveDefaultObject()
-    {
-#if UNITY_EDITOR
-        for (int i = 0; i < settings.Length; ++i)
+        private void Update()
         {
-            Setting setting = settings[i];
-            setting.defaultObject.SetActive(true);
-            setting.selectedObject.SetActive(false);
-            settings[i] = setting;
+            if (_entry == null)
+                return;
+
+            if (_dirtySelected != _entry.IsSelected)
+            {
+                _dirtySelected = _entry.IsSelected;
+                foreach (Setting setting in settings)
+                {
+                    setting.defaultObject.SetActive(!_dirtySelected);
+                    setting.selectedObject.SetActive(_dirtySelected);
+                }
+            }
         }
-        EditorUtility.SetDirty(this);
-#endif
-    }
 
-
-    [ContextMenu("Swap Default Object and Selected Object")]
-    public void SwapDefaultObjectAndSelectedObject()
-    {
-#if UNITY_EDITOR
-        for (int i = 0; i < settings.Length; ++i)
+        [ContextMenu("Set Active Default Object")]
+        public void SetActiveDefaultObject()
         {
-            Setting setting = settings[i];
-            GameObject defaultObject = setting.defaultObject;
-            GameObject selectedObject = setting.selectedObject;
-            setting.defaultObject = selectedObject;
-            setting.selectedObject = defaultObject;
-            settings[i] = setting;
-        }
-        EditorUtility.SetDirty(this);
+#if UNITY_EDITOR
+            for (int i = 0; i < settings.Length; ++i)
+            {
+                Setting setting = settings[i];
+                setting.defaultObject.SetActive(true);
+                setting.selectedObject.SetActive(false);
+                settings[i] = setting;
+            }
+            EditorUtility.SetDirty(this);
 #endif
+        }
+
+
+        [ContextMenu("Swap Default Object and Selected Object")]
+        public void SwapDefaultObjectAndSelectedObject()
+        {
+#if UNITY_EDITOR
+            for (int i = 0; i < settings.Length; ++i)
+            {
+                Setting setting = settings[i];
+                GameObject defaultObject = setting.defaultObject;
+                GameObject selectedObject = setting.selectedObject;
+                setting.defaultObject = selectedObject;
+                setting.selectedObject = defaultObject;
+                settings[i] = setting;
+            }
+            EditorUtility.SetDirty(this);
+#endif
+        }
     }
 }
