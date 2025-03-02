@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Insthync.SerializationSurrogates;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 
 namespace MultiplayerARPG
