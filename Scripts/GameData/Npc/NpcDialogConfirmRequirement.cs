@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using Insthync.UnityEditorUtils;
+
+namespace MultiplayerARPG
 {
     [System.Serializable]
     public struct NpcDialogConfirmRequirement

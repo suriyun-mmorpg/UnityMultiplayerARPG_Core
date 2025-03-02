@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Insthync.UnityEditorUtils;
+using UnityEngine;
 using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 
