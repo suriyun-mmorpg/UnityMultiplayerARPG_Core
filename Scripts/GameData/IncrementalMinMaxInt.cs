@@ -1,55 +1,58 @@
 ﻿using UnityEngine;
 
-[System.Serializable]
-public struct IncrementalMinMaxInt
+namespace MultiplayerARPG
 {
-    [Tooltip("Amount at level 1")]
-    public MinMaxInt baseAmount;
-    [Tooltip("Increase amount when level > 1 (it will be decreasing when level < 0)")]
-    public MinMaxFloat amountIncreaseEachLevel;
-    [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
-    public IncrementalMinMaxIntByLevel[] amountIncreaseEachLevelByLevels;
-
-    public MinMaxInt GetAmount(int level)
+    [System.Serializable]
+    public struct IncrementalMinMaxInt
     {
-        MinMaxFloat result = new MinMaxFloat()
+        [Tooltip("Amount at level 1")]
+        public MinMaxInt baseAmount;
+        [Tooltip("Increase amount when level > 1 (it will be decreasing when level < 0)")]
+        public MinMaxFloat amountIncreaseEachLevel;
+        [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
+        public IncrementalMinMaxIntByLevel[] amountIncreaseEachLevelByLevels;
+
+        public MinMaxInt GetAmount(int level)
         {
-            min = baseAmount.min,
-            max = baseAmount.max,
-        };
-        if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
-        {
-            result += amountIncreaseEachLevel * (level - (level > 0 ? 1 : 0));
+            MinMaxFloat result = new MinMaxFloat()
+            {
+                min = baseAmount.min,
+                max = baseAmount.max,
+            };
+            if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
+            {
+                result += amountIncreaseEachLevel * (level - (level > 0 ? 1 : 0));
+                return new MinMaxInt()
+                {
+                    min = (int)result.min,
+                    max = (int)result.max,
+                };
+            }
+            int countLevel = 2;
+            int indexOfIncremental = 0;
+            int firstMinLevel = amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
+            while (countLevel <= level)
+            {
+                if (countLevel < firstMinLevel)
+                    result += amountIncreaseEachLevel;
+                else
+                    result += amountIncreaseEachLevelByLevels[indexOfIncremental].amountIncreaseEachLevel;
+                countLevel++;
+                if (indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length && countLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
+                    indexOfIncremental++;
+            }
             return new MinMaxInt()
             {
                 min = (int)result.min,
                 max = (int)result.max,
             };
         }
-        int countLevel = 2;
-        int indexOfIncremental = 0;
-        int firstMinLevel = amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
-        while (countLevel <= level)
-        {
-            if (countLevel < firstMinLevel)
-                result += amountIncreaseEachLevel;
-            else
-                result += amountIncreaseEachLevelByLevels[indexOfIncremental].amountIncreaseEachLevel;
-            countLevel++;
-            if (indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length && countLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
-                indexOfIncremental++;
-        }
-        return new MinMaxInt()
-        {
-            min = (int)result.min,
-            max = (int)result.max,
-        };
     }
-}
 
-[System.Serializable]
-public struct IncrementalMinMaxIntByLevel
-{
-    public int minLevel;
-    public MinMaxFloat amountIncreaseEachLevel;
+    [System.Serializable]
+    public struct IncrementalMinMaxIntByLevel
+    {
+        public int minLevel;
+        public MinMaxFloat amountIncreaseEachLevel;
+    }
 }
