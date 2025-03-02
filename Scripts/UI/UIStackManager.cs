@@ -1,3 +1,4 @@
+using Insthync.CameraAndInput;
 using System.Collections.Generic;
 using UnityEngine;
 

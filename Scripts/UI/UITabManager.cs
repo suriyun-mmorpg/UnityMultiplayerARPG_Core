@@ -1,3 +1,4 @@
+using Insthync.CameraAndInput;
 using UnityEngine;
 using UnityEngine.UI;
 

@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Insthync.CameraAndInput;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Insthync.CameraAndInput;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
