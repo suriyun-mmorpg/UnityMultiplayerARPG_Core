@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using Insthync.UnityRestClient;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -24,7 +25,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool ShowUnhandledResponseMessageDialog(this UnityRestClient.RestClient.IResult result)
+        public static bool ShowUnhandledResponseMessageDialog(this RestClient.IResult result)
         {
             if (result.IsNetworkError)
             {
