@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Insthync.DevExtension;
+using UnityEngine;
 
 public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
 {

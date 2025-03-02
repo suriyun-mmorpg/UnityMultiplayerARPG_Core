@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using Insthync.CameraAndInput;
+using Insthync.DevExtension;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;

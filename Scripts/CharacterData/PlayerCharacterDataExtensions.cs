@@ -1,4 +1,5 @@
 ﻿using Insthync.AddressableAssetTools;
+using Insthync.DevExtension;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.IO;

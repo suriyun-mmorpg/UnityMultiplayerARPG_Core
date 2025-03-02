@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Insthync.DevExtension;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
