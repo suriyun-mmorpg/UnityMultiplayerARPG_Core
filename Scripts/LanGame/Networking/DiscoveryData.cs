@@ -1,10 +1,7 @@
-﻿namespace MultiplayerARPG
+﻿[System.Serializable]
+public struct DiscoveryData
 {
-    [System.Serializable]
-    public struct DiscoveryData
-    {
-        public string id;
-        public string characterName;
-        public int level;
-    }
+    public string id;
+    public string characterName;
+    public int level;
 }

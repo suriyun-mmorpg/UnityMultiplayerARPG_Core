@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     public class RTCameraCapturer : MonoBehaviour
     {

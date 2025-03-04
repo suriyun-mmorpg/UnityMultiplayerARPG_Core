@@ -4,7 +4,7 @@ using UnityEngine.UI;
 using UnityEditor;
 #endif
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     public class ToggleGraphicColor : MonoBehaviour
     {

@@ -1,41 +1,38 @@
 ﻿using UnityEngine;
 
-namespace MultiplayerARPG
+[RequireComponent(typeof(UIFollowWorldPosition))]
+[DefaultExecutionOrder(0)]
+public class UIFollowWorldObject : MonoBehaviour
 {
-    [RequireComponent(typeof(UIFollowWorldPosition))]
-    [DefaultExecutionOrder(0)]
-    public class UIFollowWorldObject : MonoBehaviour
+    [SerializeField]
+    private Transform targetObject;
+    public Transform TargetObject
     {
-        [SerializeField]
-        private Transform targetObject;
-        public Transform TargetObject
+        get { return targetObject; }
+        set
         {
-            get { return targetObject; }
-            set
-            {
-                targetObject = value;
-                CachePositionFollower.SetTargetPosition(targetObject.position);
-            }
+            targetObject = value;
+            CachePositionFollower.SetTargetPosition(targetObject.position);
         }
+    }
 
-        public UIFollowWorldPosition CachePositionFollower { get; private set; }
+    public UIFollowWorldPosition CachePositionFollower { get; private set; }
 
-        private void OnEnable()
-        {
-            CachePositionFollower = GetComponent<UIFollowWorldPosition>();
-        }
+    private void OnEnable()
+    {
+        CachePositionFollower = GetComponent<UIFollowWorldPosition>();
+    }
 
-        private void Update()
-        {
-            UpdatePosition();
-        }
+    private void Update()
+    {
+        UpdatePosition();
+    }
 
-        public void UpdatePosition()
-        {
-            if (TargetObject == null)
-                return;
+    public void UpdatePosition()
+    {
+        if (TargetObject == null)
+            return;
 
-            CachePositionFollower.targetPosition = TargetObject.position;
-        }
+        CachePositionFollower.targetPosition = TargetObject.position;
     }
 }

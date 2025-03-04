@@ -1,80 +1,77 @@
 using UnityEngine;
 
-namespace MultiplayerARPG
+public class KeepInScreenBounds : MonoBehaviour
 {
-    public class KeepInScreenBounds : MonoBehaviour
+    private RectTransform _rectTransform;
+    private Canvas _canvas;
+    private Vector2 _defaultAnchoredPosition;
+
+    void Start()
     {
-        private RectTransform _rectTransform;
-        private Canvas _canvas;
-        private Vector2 _defaultAnchoredPosition;
+        _rectTransform = GetComponent<RectTransform>();
+        _canvas = GetComponentInParent<Canvas>();
 
-        void Start()
+        if (_rectTransform == null || _canvas == null)
         {
-            _rectTransform = GetComponent<RectTransform>();
-            _canvas = GetComponentInParent<Canvas>();
-
-            if (_rectTransform == null || _canvas == null)
-            {
-                Debug.LogError("RectTransform or Canvas is missing!");
-                enabled = false;
-                return;
-            }
-
-            _defaultAnchoredPosition = _rectTransform.anchoredPosition;
+            Debug.LogError("RectTransform or Canvas is missing!");
+            enabled = false;
+            return;
         }
 
-        void Update()
+        _defaultAnchoredPosition = _rectTransform.anchoredPosition;
+    }
+
+    void Update()
+    {
+        KeepRectTransformInBounds();
+    }
+
+    private void KeepRectTransformInBounds()
+    {
+        // Get the corners of the RectTransform in world space
+        Vector3[] corners = new Vector3[4];
+        _rectTransform.GetWorldCorners(corners);
+
+        // Get the canvas rect
+        RectTransform canvasRectTransform = _canvas.GetComponent<RectTransform>();
+        Vector3[] canvasCorners = new Vector3[4];
+        canvasRectTransform.GetWorldCorners(canvasCorners);
+
+        // Calculate new position
+        Vector3 newPosition = _rectTransform.position;
+        bool isOutOfBounds = false;
+
+        if (corners[0].x < canvasCorners[0].x)
         {
-            KeepRectTransformInBounds();
+            newPosition.x += canvasCorners[0].x - corners[0].x;
+            isOutOfBounds = true;
+        }
+        if (corners[2].x > canvasCorners[2].x)
+        {
+            newPosition.x -= corners[2].x - canvasCorners[2].x;
+            isOutOfBounds = true;
         }
 
-        private void KeepRectTransformInBounds()
+        if (corners[0].y < canvasCorners[0].y)
         {
-            // Get the corners of the RectTransform in world space
-            Vector3[] corners = new Vector3[4];
-            _rectTransform.GetWorldCorners(corners);
+            newPosition.y += canvasCorners[0].y - corners[0].y;
+            isOutOfBounds = true;
+        }
+        if (corners[1].y > canvasCorners[1].y)
+        {
+            newPosition.y -= corners[1].y - canvasCorners[1].y;
+            isOutOfBounds = true;
+        }
 
-            // Get the canvas rect
-            RectTransform canvasRectTransform = _canvas.GetComponent<RectTransform>();
-            Vector3[] canvasCorners = new Vector3[4];
-            canvasRectTransform.GetWorldCorners(canvasCorners);
-
-            // Calculate new position
-            Vector3 newPosition = _rectTransform.position;
-            bool isOutOfBounds = false;
-
-            if (corners[0].x < canvasCorners[0].x)
-            {
-                newPosition.x += canvasCorners[0].x - corners[0].x;
-                isOutOfBounds = true;
-            }
-            if (corners[2].x > canvasCorners[2].x)
-            {
-                newPosition.x -= corners[2].x - canvasCorners[2].x;
-                isOutOfBounds = true;
-            }
-
-            if (corners[0].y < canvasCorners[0].y)
-            {
-                newPosition.y += canvasCorners[0].y - corners[0].y;
-                isOutOfBounds = true;
-            }
-            if (corners[1].y > canvasCorners[1].y)
-            {
-                newPosition.y -= corners[1].y - canvasCorners[1].y;
-                isOutOfBounds = true;
-            }
-
-            // If out of bounds, adjust the position
-            if (isOutOfBounds)
-            {
-                _rectTransform.position = newPosition;
-            }
-            else
-            {
-                // If not out of bounds, reset to default anchored position
-                _rectTransform.anchoredPosition = _defaultAnchoredPosition;
-            }
+        // If out of bounds, adjust the position
+        if (isOutOfBounds)
+        {
+            _rectTransform.position = newPosition;
+        }
+        else
+        {
+            // If not out of bounds, reset to default anchored position
+            _rectTransform.anchoredPosition = _defaultAnchoredPosition;
         }
     }
 }

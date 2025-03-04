@@ -1,34 +1,31 @@
 ﻿using UnityEngine;
 
-namespace MultiplayerARPG
+public class UIToggleGroup : MonoBehaviour
 {
-    public class UIToggleGroup : MonoBehaviour
+    public UIBase[] uis;
+
+    private void OnEnable()
     {
-        public UIBase[] uis;
-
-        private void OnEnable()
+        foreach (UIBase ui in uis)
         {
-            foreach (UIBase ui in uis)
-            {
-                ui.onShowWithObject.AddListener(OnShow);
-            }
+            ui.onShowWithObject.AddListener(OnShow);
         }
+    }
 
-        private void OnDisable()
+    private void OnDisable()
+    {
+        foreach (UIBase ui in uis)
         {
-            foreach (UIBase ui in uis)
-            {
-                ui.onShowWithObject.RemoveListener(OnShow);
-            }
+            ui.onShowWithObject.RemoveListener(OnShow);
         }
+    }
 
-        private void OnShow(UIBase showUI)
+    private void OnShow(UIBase showUI)
+    {
+        foreach (UIBase ui in uis)
         {
-            foreach (UIBase ui in uis)
-            {
-                if (ui == showUI) continue;
-                ui.Hide();
-            }
+            if (ui == showUI) continue;
+            ui.Hide();
         }
     }
 }

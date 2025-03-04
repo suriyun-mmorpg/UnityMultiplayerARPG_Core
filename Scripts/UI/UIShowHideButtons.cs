@@ -1,30 +1,27 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace MultiplayerARPG
+public class UIShowHideButtons : MonoBehaviour
 {
-    public class UIShowHideButtons : MonoBehaviour
+    public UIBase ui;
+    public Button btnShow;
+    public Button btnHide;
+
+    void Awake()
     {
-        public UIBase ui;
-        public Button btnShow;
-        public Button btnHide;
+        if (ui != null && btnShow != null)
+            btnShow.onClick.AddListener(ui.Show);
 
-        void Awake()
-        {
-            if (ui != null && btnShow != null)
-                btnShow.onClick.AddListener(ui.Show);
+        if (ui != null && btnHide != null)
+            btnHide.onClick.AddListener(ui.Hide);
+    }
 
-            if (ui != null && btnHide != null)
-                btnHide.onClick.AddListener(ui.Hide);
-        }
+    void OnDestroy()
+    {
+        if (ui != null && btnShow != null)
+            btnShow.onClick.RemoveListener(ui.Show);
 
-        void OnDestroy()
-        {
-            if (ui != null && btnShow != null)
-                btnShow.onClick.RemoveListener(ui.Show);
-
-            if (ui != null && btnHide != null)
-                btnHide.onClick.RemoveListener(ui.Hide);
-        }
+        if (ui != null && btnHide != null)
+            btnHide.onClick.RemoveListener(ui.Hide);
     }
 }

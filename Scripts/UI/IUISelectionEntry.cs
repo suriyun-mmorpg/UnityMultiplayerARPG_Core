@@ -1,10 +1,7 @@
-﻿namespace MultiplayerARPG
+﻿public interface IUISelectionEntry
 {
-    public interface IUISelectionEntry
-    {
-        bool IsSelected { get; }
-        void ForceUpdate();
-        void SetData(object data);
-        object GetData();
-    }
+    bool IsSelected { get; }
+    void ForceUpdate();
+    void SetData(object data);
+    object GetData();
 }

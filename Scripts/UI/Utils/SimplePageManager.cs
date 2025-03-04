@@ -1,6 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using System.Collections.Generic;
+using UnityEngine;
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     public class SimplePageManager : MonoBehaviour
     {

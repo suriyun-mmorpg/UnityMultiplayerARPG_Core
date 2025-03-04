@@ -5,7 +5,7 @@ using UnityEngine.UI;
 using UnityEditor;
 #endif
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     [System.Serializable]
     public class SetupByAspectRatioCanvasScalerSetting : SetupByAspectRatioSetting

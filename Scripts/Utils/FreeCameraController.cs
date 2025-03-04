@@ -1,7 +1,7 @@
 using Insthync.CameraAndInput;
 using UnityEngine;
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     public class FreeCameraController : MonoBehaviour
     {

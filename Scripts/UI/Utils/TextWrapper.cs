@@ -2,80 +2,77 @@
 using UnityEngine.UI;
 using TMPro;
 
-namespace MultiplayerARPG
+public class TextWrapper : MonoBehaviour
 {
-    public class TextWrapper : MonoBehaviour
+    public Text unityText;
+    public TextMeshProUGUI textMeshText;
+    private string _textValue = null;
+    public virtual string text
     {
-        public Text unityText;
-        public TextMeshProUGUI textMeshText;
-        private string _textValue = null;
-        public virtual string text
+        get
         {
-            get
-            {
-                if (unityText != null) return unityText.text;
-                if (textMeshText != null) return textMeshText.text;
-                return _textValue;
-            }
-
-            set
-            {
-                _textValue = value;
-                if (unityText != null) unityText.text = value;
-                if (textMeshText != null) textMeshText.text = value;
-            }
+            if (unityText != null) return unityText.text;
+            if (textMeshText != null) return textMeshText.text;
+            return _textValue;
         }
 
-        public virtual Color color
+        set
         {
-            get
-            {
-                if (unityText != null) return unityText.color;
-                if (textMeshText != null) return textMeshText.color;
-                return Color.clear;
-            }
+            _textValue = value;
+            if (unityText != null) unityText.text = value;
+            if (textMeshText != null) textMeshText.text = value;
+        }
+    }
 
-            set
-            {
-                if (unityText != null) unityText.color = value;
-                if (textMeshText != null) textMeshText.color = value;
-            }
+    public virtual Color color
+    {
+        get
+        {
+            if (unityText != null) return unityText.color;
+            if (textMeshText != null) return textMeshText.color;
+            return Color.clear;
         }
 
-        private void Awake()
+        set
         {
-            if (unityText == null) unityText = GetComponent<Text>();
-            if (textMeshText == null) textMeshText = GetComponent<TextMeshProUGUI>();
-            if (_textValue != null)
-                text = _textValue;
+            if (unityText != null) unityText.color = value;
+            if (textMeshText != null) textMeshText.color = value;
         }
+    }
 
-        private void OnDestroy()
-        {
-            unityText = null;
-            textMeshText = null;
-            _textValue = null;
-        }
+    private void Awake()
+    {
+        if (unityText == null) unityText = GetComponent<Text>();
+        if (textMeshText == null) textMeshText = GetComponent<TextMeshProUGUI>();
+        if (_textValue != null)
+            text = _textValue;
+    }
 
-        public void SetGameObjectActive(bool isActive)
-        {
-            if (unityText != null)
-                unityText.gameObject.SetActive(isActive);
-            if (textMeshText != null)
-                textMeshText.gameObject.SetActive(isActive);
-            gameObject.SetActive(isActive);
-        }
+    private void OnDestroy()
+    {
+        unityText = null;
+        textMeshText = null;
+        _textValue = null;
+    }
 
-        [ContextMenu("Set Attached Text Component To Field")]
-        public void SetAttachedTextComponentToField()
-        {
-            unityText = GetComponent<Text>();
-        }
+    public void SetGameObjectActive(bool isActive)
+    {
+        if (unityText != null)
+            unityText.gameObject.SetActive(isActive);
+        if (textMeshText != null)
+            textMeshText.gameObject.SetActive(isActive);
+        gameObject.SetActive(isActive);
+    }
 
-        [ContextMenu("Set Attached Text Mesh Text Component To Field")]
-        public void SetAttachedTextMeshTextComponentToField()
-        {
-            textMeshText = GetComponent<TextMeshProUGUI>();
-        }
+    [ContextMenu("Set Attached Text Component To Field")]
+    public void SetAttachedTextComponentToField()
+    {
+        unityText = GetComponent<Text>();
+    }
+
+    [ContextMenu("Set Attached Text Mesh Text Component To Field")]
+    public void SetAttachedTextMeshTextComponentToField()
+    {
+        textMeshText = GetComponent<TextMeshProUGUI>();
     }
 }

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     public class RaycastButton3D : MonoBehaviour
     {

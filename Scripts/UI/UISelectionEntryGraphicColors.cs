@@ -4,80 +4,77 @@ using UnityEngine.UI;
 using UnityEditor;
 #endif
 
-namespace MultiplayerARPG
+public class UISelectionEntryGraphicColors : MonoBehaviour
 {
-    public class UISelectionEntryGraphicColors : MonoBehaviour
+    [System.Serializable]
+    public struct Setting
     {
-        [System.Serializable]
-        public struct Setting
+        public Graphic graphic;
+        public Color defaultColor;
+        public Color selectedColor;
+    }
+
+    public Setting[] settings;
+    private IUISelectionEntry _entry;
+    private bool _dirtySelected;
+
+    private void Awake()
+    {
+        _entry = GetComponent<IUISelectionEntry>();
+    }
+
+    private void OnEnable()
+    {
+        _dirtySelected = false;
+        foreach (Setting setting in settings)
         {
-            public Graphic graphic;
-            public Color defaultColor;
-            public Color selectedColor;
+            setting.graphic.color = setting.defaultColor;
         }
+    }
 
-        public Setting[] settings;
-        private IUISelectionEntry _entry;
-        private bool _dirtySelected;
+    private void Update()
+    {
+        if (_entry == null)
+            return;
 
-        private void Awake()
+        if (_dirtySelected != _entry.IsSelected)
         {
-            _entry = GetComponent<IUISelectionEntry>();
-        }
-
-        private void OnEnable()
-        {
-            _dirtySelected = false;
+            _dirtySelected = _entry.IsSelected;
             foreach (Setting setting in settings)
             {
-                setting.graphic.color = setting.defaultColor;
+                setting.graphic.color = _dirtySelected ? setting.selectedColor : setting.defaultColor;
             }
         }
+    }
 
-        private void Update()
-        {
-            if (_entry == null)
-                return;
-
-            if (_dirtySelected != _entry.IsSelected)
-            {
-                _dirtySelected = _entry.IsSelected;
-                foreach (Setting setting in settings)
-                {
-                    setting.graphic.color = _dirtySelected ? setting.selectedColor : setting.defaultColor;
-                }
-            }
-        }
-
-        [ContextMenu("Set default color by graphic's color")]
-        public void SetDefaultColorByGraphic()
-        {
+    [ContextMenu("Set default color by graphic's color")]
+    public void SetDefaultColorByGraphic()
+    {
 #if UNITY_EDITOR
-            for (int i = 0; i < settings.Length; ++i)
-            {
-                Setting setting = settings[i];
-                setting.defaultColor = setting.graphic.color;
-                settings[i] = setting;
-            }
-            EditorUtility.SetDirty(this);
-#endif
-        }
-
-        [ContextMenu("Swap default color and selected color")]
-        public void SwapDefaultColorAndSelectedColor()
+        for (int i = 0; i < settings.Length; ++i)
         {
-#if UNITY_EDITOR
-            for (int i = 0; i < settings.Length; ++i)
-            {
-                Setting setting = settings[i];
-                Color defaultColor = setting.defaultColor;
-                Color selectedColor = setting.selectedColor;
-                setting.defaultColor = selectedColor;
-                setting.selectedColor = defaultColor;
-                settings[i] = setting;
-            }
-            EditorUtility.SetDirty(this);
-#endif
+            Setting setting = settings[i];
+            setting.defaultColor = setting.graphic.color;
+            settings[i] = setting;
         }
+        EditorUtility.SetDirty(this);
+#endif
+    }
+
+    [ContextMenu("Swap default color and selected color")]
+    public void SwapDefaultColorAndSelectedColor()
+    {
+#if UNITY_EDITOR
+        for (int i = 0; i < settings.Length; ++i)
+        {
+            Setting setting = settings[i];
+            Color defaultColor = setting.defaultColor;
+            Color selectedColor = setting.selectedColor;
+            setting.defaultColor = selectedColor;
+            setting.selectedColor = defaultColor;
+            settings[i] = setting;
+        }
+        EditorUtility.SetDirty(this);
+#endif
     }
 }

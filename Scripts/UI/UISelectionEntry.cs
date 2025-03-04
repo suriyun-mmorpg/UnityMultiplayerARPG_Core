@@ -1,147 +1,144 @@
 ﻿using Insthync.DevExtension;
 using UnityEngine;
 
-namespace MultiplayerARPG
+public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
 {
-    public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
+    [Header("UI Selection Elements")]
+    public GameObject objectSelected;
+    protected T _data;
+    public T Data
     {
-        [Header("UI Selection Elements")]
-        public GameObject objectSelected;
-        protected T _data;
-        public T Data
+        get { return _data; }
+        set
         {
-            get { return _data; }
-            set
-            {
-                _data = value;
-                ForceUpdate();
-            }
+            _data = value;
+            ForceUpdate();
         }
-        [Tooltip("UIs set here will be cloned by this UI")]
-        public UISelectionEntry<T>[] clones = new UISelectionEntry<T>[0];
-        public UISelectionManager selectionManager;
-        public float updateUIRepeatRate = 0.5f;
-        protected float _updateCountDown;
-        private bool _isSelected;
-        public bool IsSelected
+    }
+    [Tooltip("UIs set here will be cloned by this UI")]
+    public UISelectionEntry<T>[] clones = new UISelectionEntry<T>[0];
+    public UISelectionManager selectionManager;
+    public float updateUIRepeatRate = 0.5f;
+    protected float _updateCountDown;
+    private bool _isSelected;
+    public bool IsSelected
+    {
+        get { return _isSelected; }
+        protected set
         {
-            get { return _isSelected; }
-            protected set
-            {
-                _isSelected = value;
-                if (objectSelected != null)
-                    objectSelected.SetActive(value);
-            }
+            _isSelected = value;
+            if (objectSelected != null)
+                objectSelected.SetActive(value);
         }
+    }
 
-        public System.Action onUpdateUI;
-        public System.Action<T> onUpdateData;
+    public System.Action onUpdateUI;
+    public System.Action<T> onUpdateData;
 
-        protected override void Awake()
+    protected override void Awake()
+    {
+        base.Awake();
+        IsSelected = false;
+        _updateCountDown = 0f;
+    }
+
+    protected override void OnDestroy()
+    {
+        base.OnDestroy();
+        objectSelected = null;
+        clones.Nulling();
+        selectionManager = null;
+        onUpdateUI = null;
+        onUpdateData = null;
+    }
+
+    protected virtual void OnEnable()
+    {
+        UpdateUI();
+    }
+
+    protected virtual void OnDisable()
+    {
+        _updateCountDown = 0f;
+    }
+
+    protected virtual void Update()
+    {
+        _updateCountDown -= Time.deltaTime;
+        if (_updateCountDown <= 0f)
         {
-            base.Awake();
-            IsSelected = false;
-            _updateCountDown = 0f;
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            objectSelected = null;
-            clones.Nulling();
-            selectionManager = null;
-            onUpdateUI = null;
-            onUpdateData = null;
-        }
-
-        protected virtual void OnEnable()
-        {
+            _updateCountDown = updateUIRepeatRate;
             UpdateUI();
+            if (onUpdateUI != null)
+                onUpdateUI.Invoke();
+            this.InvokeInstanceDevExtMethods("UpdateUI");
         }
+    }
 
-        protected virtual void OnDisable()
+    public void ForceUpdate()
+    {
+        UpdateData();
+        UpdateUI();
+        for (int i = 0; i < clones.Length; ++i)
         {
-            _updateCountDown = 0f;
+            CloneTo(clones[i]);
         }
+        if (onUpdateData != null)
+            onUpdateData.Invoke(Data);
+        this.InvokeInstanceDevExtMethods("UpdateData");
+    }
 
-        protected virtual void Update()
+    public void OnClickSelect()
+    {
+        if (selectionManager != null)
         {
-            _updateCountDown -= Time.deltaTime;
-            if (_updateCountDown <= 0f)
-            {
-                _updateCountDown = updateUIRepeatRate;
-                UpdateUI();
-                if (onUpdateUI != null)
-                    onUpdateUI.Invoke();
-                this.InvokeInstanceDevExtMethods("UpdateUI");
-            }
-        }
-
-        public void ForceUpdate()
-        {
-            UpdateData();
-            UpdateUI();
-            for (int i = 0; i < clones.Length; ++i)
-            {
-                CloneTo(clones[i]);
-            }
-            if (onUpdateData != null)
-                onUpdateData.Invoke(Data);
-            this.InvokeInstanceDevExtMethods("UpdateData");
-        }
-
-        public void OnClickSelect()
-        {
-            if (selectionManager != null)
-            {
-                UISelectionMode selectionMode = selectionManager.selectionMode;
-                if (selectionMode != UISelectionMode.Toggle && IsSelected)
-                    selectionManager.Deselect(this);
-                else if (!IsSelected)
-                    selectionManager.Select(this);
-            }
-        }
-
-        public void SelectByManager()
-        {
-            if (selectionManager != null)
+            UISelectionMode selectionMode = selectionManager.selectionMode;
+            if (selectionMode != UISelectionMode.Toggle && IsSelected)
+                selectionManager.Deselect(this);
+            else if (!IsSelected)
                 selectionManager.Select(this);
         }
-
-        public void DeselectByManager()
-        {
-            if (selectionManager != null)
-                selectionManager.Deselect(this);
-        }
-
-        public void Select()
-        {
-            IsSelected = true;
-        }
-
-        public void Deselect()
-        {
-            IsSelected = false;
-        }
-
-        public void SetData(object data)
-        {
-            if (data is T)
-                Data = (T)data;
-        }
-
-        public object GetData()
-        {
-            return Data;
-        }
-
-        public virtual void CloneTo(UISelectionEntry<T> target)
-        {
-            if (target != null)
-                target.Data = Data;
-        }
-
-        protected virtual void UpdateUI() { }
-        protected abstract void UpdateData();
     }
+
+    public void SelectByManager()
+    {
+        if (selectionManager != null)
+            selectionManager.Select(this);
+    }
+
+    public void DeselectByManager()
+    {
+        if (selectionManager != null)
+            selectionManager.Deselect(this);
+    }
+
+    public void Select()
+    {
+        IsSelected = true;
+    }
+
+    public void Deselect()
+    {
+        IsSelected = false;
+    }
+
+    public void SetData(object data)
+    {
+        if (data is T)
+            Data = (T)data;
+    }
+
+    public object GetData()
+    {
+        return Data;
+    }
+
+    public virtual void CloneTo(UISelectionEntry<T> target)
+    {
+        if (target != null)
+            target.Data = Data;
+    }
+
+    protected virtual void UpdateUI() { }
+    protected abstract void UpdateData();
 }

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     public class SetupByAspectRatioSetting : System.IComparable
     {

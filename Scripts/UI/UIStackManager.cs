@@ -2,43 +2,40 @@ using Insthync.CameraAndInput;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MultiplayerARPG
+public class UIStackManager : MonoBehaviour
 {
-    public class UIStackManager : MonoBehaviour
+    public string closeButtonName = "CloseUI";
+    private static Stack<UIStackEntry> s_entries = new Stack<UIStackEntry>();
+
+    private void Awake()
     {
-        public string closeButtonName = "CloseUI";
-        private static Stack<UIStackEntry> s_entries = new Stack<UIStackEntry>();
+        Clear();
+    }
 
-        private void Awake()
+    private void Update()
+    {
+        if (InputManager.GetButtonDown(closeButtonName))
         {
-            Clear();
-        }
-
-        private void Update()
-        {
-            if (InputManager.GetButtonDown(closeButtonName))
+            UIStackEntry entry;
+            while (s_entries.Count > 0)
             {
-                UIStackEntry entry;
-                while (s_entries.Count > 0)
+                entry = s_entries.Pop();
+                if (entry != null)
                 {
-                    entry = s_entries.Pop();
-                    if (entry != null)
-                    {
-                        entry.Hide();
-                        break;
-                    }
+                    entry.Hide();
+                    break;
                 }
             }
         }
+    }
 
-        public void Clear()
-        {
-            s_entries.Clear();
-        }
+    public void Clear()
+    {
+        s_entries.Clear();
+    }
 
-        public static void Add(UIStackEntry entry)
-        {
-            s_entries.Push(entry);
-        }
+    public static void Add(UIStackEntry entry)
+    {
+        s_entries.Push(entry);
     }
 }

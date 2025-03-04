@@ -1,7 +1,7 @@
 using UnityEngine;
 using MultiplayerARPG;
 
-namespace MultiplayerARPG
+namespace UtilsComponents
 {
     public class DeactivateIfServerStarted : MonoBehaviour
     {
