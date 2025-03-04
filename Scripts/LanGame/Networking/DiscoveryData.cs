@@ -1,7 +1,10 @@
-﻿[System.Serializable]
-public struct DiscoveryData
+﻿namespace MultiplayerARPG
 {
-    public string id;
-    public string characterName;
-    public int level;
+    [System.Serializable]
+    public struct DiscoveryData
+    {
+        public string id;
+        public string characterName;
+        public int level;
+    }
 }
