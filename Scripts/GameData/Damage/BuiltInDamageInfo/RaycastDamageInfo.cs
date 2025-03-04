@@ -107,7 +107,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;
             bool isServer = attacker.IsServer;
@@ -146,26 +146,24 @@ namespace MultiplayerARPG
             {
                 // Only server entities (such as monsters) and clients will launch raycast damage
                 // clients do it for game effects playing, server do it to apply damage
-                return;
+                return default;
             }
 
-            ProjectileEffect loadedProjectileEffect = await AddressableProjectEffect
-                .GetOrLoadAssetAsyncOrUsePrefab(ProjectileEffect);
-
-            bool isPlayImpactEffects = isClient && impactEffects != null;
             float projectileDistance = missileDistance;
+#if !UNITY_SERVER
+            bool isPlayImpactEffects = isClient && impactEffects != null;
             List<ImpactEffectPlayingData> impactEffectsData = new List<ImpactEffectPlayingData>();
+#endif
             int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
             int tempHitCount = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, layerMask, QueryTriggerInteraction.Collide, true);
             if (tempHitCount <= 0)
             {
+#if !UNITY_SERVER
                 // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                if (isClient && loadedProjectileEffect)
-                {
-                    PoolSystem.GetInstance(loadedProjectileEffect, damagePosition, damageRotation)
-                        .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
-                }
-                return;
+                if (isClient)
+                    PlayProjectileEffect(damagePosition, damageRotation, projectileDistance, impactEffectsData);
+#endif
+                return default;
             }
 
             HashSet<uint> hitObjects = new HashSet<uint>();
@@ -197,6 +195,7 @@ namespace MultiplayerARPG
                         continue;
                     }
 
+#if !UNITY_SERVER
                     // Hit wall... so play impact effects and update piercing
                     // Prepare data to instantiate impact effects
                     if (isPlayImpactEffects)
@@ -209,6 +208,7 @@ namespace MultiplayerARPG
                             normal = tempHitNormal,
                         });
                     }
+#endif
 
                     // Update pierce trough entities count
                     if (pierceThroughEntities <= 0)
@@ -249,10 +249,11 @@ namespace MultiplayerARPG
                     attacker.CallCmdPerformHitRegValidation(hitRegData);
                 }
 
+#if !UNITY_SERVER
                 // Prepare data to instantiate impact effects
                 if (isPlayImpactEffects)
                 {
-                    tempTag = tempDamageableHitBox.EntityGameObject.tag;
+                    tempTag = tempGameObject.tag;
                     impactEffectsData.Add(new ImpactEffectPlayingData()
                     {
                         tag = tempTag,
@@ -260,6 +261,7 @@ namespace MultiplayerARPG
                         normal = tempHitNormal,
                     });
                 }
+#endif
 
                 // Update pierce trough entities count
                 if (pierceThroughEntities <= 0)
@@ -270,13 +272,26 @@ namespace MultiplayerARPG
                 }
                 --pierceThroughEntities;
             }
-
+#if !UNITY_SERVER
             // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-            if (isClient && loadedProjectileEffect)
-            {
-                PoolSystem.GetInstance(loadedProjectileEffect, damagePosition, damageRotation)
-                    .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
-            }
+            if (isClient)
+                PlayProjectileEffect(damagePosition, damageRotation, projectileDistance, impactEffectsData);
+#endif
+            return default;
         }
+
+#if !UNITY_SERVER
+        private async void PlayProjectileEffect(Vector3 damagePosition, Quaternion damageRotation, float projectileDistance, List<ImpactEffectPlayingData> impactEffectsData)
+        {
+            ProjectileEffect loadedProjectileEffect = await AddressableProjectEffect
+                .GetOrLoadAssetAsync<ProjectileEffect>();
+
+            if (loadedProjectileEffect == null)
+                return;
+
+            PoolSystem.GetInstance(loadedProjectileEffect, damagePosition, damageRotation)
+                .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
+        }
+#endif
     }
 }

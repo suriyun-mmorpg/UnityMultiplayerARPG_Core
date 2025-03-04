@@ -98,7 +98,9 @@ namespace MultiplayerARPG
                 return default;
 
             HashSet<uint> hitObjects = new HashSet<uint>();
+#if !UNITY_SERVER
             bool isPlayImpactEffects = isClient && impactEffects != null;
+#endif
             DamageableHitBox tempDamageableHitBox;
             GameObject tempGameObject;
             string tempTag;
@@ -163,13 +165,14 @@ namespace MultiplayerARPG
                     hitRegData.HitOrigin = tempDamageableHitBox.CacheTransform.position;
                     attacker.CallCmdPerformHitRegValidation(hitRegData);
                 }
-
+#if !UNITY_SERVER
                 // Instantiate impact effects
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageableHitBox.EntityGameObject.tag;
                     PlayMeleeImpactEffect(attacker, tempTag, tempDamageableHitBox, damagePositionWithOffsets);
                 }
+#endif
             }
 
             if (hitOnlySelectedTarget && tempDamageTakenTarget != null)
@@ -188,18 +191,20 @@ namespace MultiplayerARPG
                     hitRegData.HitOrigin = tempDamageTakenTarget.CacheTransform.position;
                     attacker.CallCmdPerformHitRegValidation(hitRegData);
                 }
-
+#if !UNITY_SERVER
                 // Instantiate impact effects
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageTakenTarget.EntityGameObject.tag;
                     PlayMeleeImpactEffect(attacker, tempTag, tempDamageTakenTarget, damagePositionWithOffsets);
                 }
+#endif
             }
 
             return default;
         }
 
+#if !UNITY_SERVER
         private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, DamageableHitBox hitBox, Vector3 damagePosition)
         {
             if (impactEffects == null)
@@ -211,5 +216,6 @@ namespace MultiplayerARPG
             Quaternion rotation = Quaternion.LookRotation(Vector3.up, dir);
             impactEffects.PlayEffect(tag, position, rotation);
         }
+#endif
     }
 }
