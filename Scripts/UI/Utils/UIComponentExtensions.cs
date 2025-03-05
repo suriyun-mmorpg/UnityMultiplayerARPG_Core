@@ -16,6 +16,8 @@ namespace MultiplayerARPG
             Sprite sprite = null;
             if (gameData)
                 sprite = await gameData.GetIcon();
+            if (!image)
+                return;
             image.SetImageSprite(sprite, deactivateIfNoContent, placeHolders);
 #endif
         }
@@ -33,6 +35,8 @@ namespace MultiplayerARPG
                 if (texture == null)
                     texture = defaultTexture;
             }
+            if (!rawImage)
+                return;
             rawImage.gameObject.SetActive(!deactivateIfNoContent || texture != null);
             rawImage.texture = texture;
 #endif
@@ -49,6 +53,8 @@ namespace MultiplayerARPG
             Sprite sprite = null;
             if (npcDialog)
                 sprite = await npcDialog.GetIcon();
+            if (!image)
+                return;
             image.SetImageSprite(sprite, deactivateIfNoContent, placeHolders);
 #endif
         }
@@ -78,8 +84,10 @@ namespace MultiplayerARPG
                 return;
             source.Stop();
             AudioClip clip = await npcDialog.GetVoice();
+            if (!source)
+                return;
             source.clip = clip;
-            if (clip != null && uiRoot.enabled)
+            if (clip != null && uiRoot && uiRoot.enabled)
                 source.Play();
 #endif
         }
