@@ -47,6 +47,8 @@ namespace MultiplayerARPG
         protected int _countDownToUpdateAmmoSim = FRAMES_BEFORE_UPDATE_AMMO_SIM;
         public void MarkToUpdateAmmoSim()
         {
+            if (_countDownToUpdateAmmoSim > 0)
+                return;
             _countDownToUpdateAmmoSim = FRAMES_BEFORE_UPDATE_AMMO_SIM;
         }
 

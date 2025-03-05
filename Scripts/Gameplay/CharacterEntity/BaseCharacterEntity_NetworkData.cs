@@ -476,9 +476,23 @@ namespace MultiplayerARPG
         #region Net functions operation callback
         private void OnSelectableWeaponSetsOperation(LiteNetLibSyncListOp operation, int index, EquipWeapons oldItem, EquipWeapons newItem)
         {
-            MarkToUpdateAppearances();
-            IsRecaching = true;
-            MarkToUpdateAmmoSim();
+            switch (operation)
+            {
+                case LiteNetLibSyncListOp.Set:
+                case LiteNetLibSyncListOp.Dirty:
+                    if (oldItem.IsDiffer(newItem, out _, out _, true, true))
+                    {
+                        MarkToUpdateAppearances();
+                        MarkToUpdateAmmoSim();
+                        IsRecaching = true;
+                    }
+                    break;
+                default:
+                    MarkToUpdateAppearances();
+                    MarkToUpdateAmmoSim();
+                    IsRecaching = true;
+                    break;
+            }
             if (onSelectableWeaponSetsOperation != null)
                 onSelectableWeaponSetsOperation.Invoke(operation, index, oldItem, newItem);
         }
