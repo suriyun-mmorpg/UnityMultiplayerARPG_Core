@@ -284,7 +284,7 @@ namespace MultiplayerARPG
         private async void PlayProjectileEffect(Vector3 damagePosition, Quaternion damageRotation, float projectileDistance, List<ImpactEffectPlayingData> impactEffectsData)
         {
             ProjectileEffect loadedProjectileEffect = await AddressableProjectEffect
-                .GetOrLoadAssetAsync<ProjectileEffect>();
+                .GetOrLoadAssetAsyncOrUsePrefab(ProjectileEffect);
 
             if (loadedProjectileEffect == null)
                 return;
