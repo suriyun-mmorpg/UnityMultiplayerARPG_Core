@@ -1099,13 +1099,6 @@ namespace MultiplayerARPG
                     _tempPressWeaponAbility = !isBlockController && GetSecondaryAttackButtonDown();
                 }
 
-                // TODO: Improve this, this is a codes which will force players to not attack in safe area
-                if (PlayingCharacterEntity.IsInSafeArea)
-                {
-                    _tempPressAttackRight = false;
-                    _tempPressAttackLeft = false;
-                }
-
                 attacking = _tempPressAttackRight || _tempPressAttackLeft;
                 if (attacking && !PlayingCharacterEntity.IsAttacking && !PlayingCharacterEntity.IsUsingSkill)
                 {
