@@ -57,10 +57,14 @@ namespace MultiplayerARPG
             if (!EquipWeapons.rightHand.IsEmptySlot() &&
                 EquipWeapons.rightHand.GetWeaponItem() != null)
                 RightWeaponAmmoSim = EquipWeapons.rightHand.ammo;
+            else
+                RightWeaponAmmoSim = 0;
 
             if (!EquipWeapons.leftHand.IsEmptySlot() &&
                 EquipWeapons.leftHand.GetWeaponItem() != null)
                 LeftWeaponAmmoSim = EquipWeapons.leftHand.ammo;
+            else
+                LeftWeaponAmmoSim = 0;
         }
     }
 }
