@@ -480,7 +480,7 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, out _, out _, true, true))
+                    if (oldItem.IsDiffer(newItem, out _, out _, true, true, true, true))
                     {
                         MarkToUpdateAppearances();
                         MarkToUpdateAmmoSim();
@@ -490,6 +490,12 @@ namespace MultiplayerARPG
                         oldItem.leftHand.ammo != newItem.leftHand.ammo)
                     {
                         MarkToUpdateAmmoSim();
+                        IsRecaching = true;
+                    }
+                    else if (!Mathf.Approximately(oldItem.rightHand.durability, newItem.rightHand.durability) ||
+                        !Mathf.Approximately(oldItem.leftHand.durability, newItem.leftHand.durability))
+                    {
+                        IsRecaching = true;
                     }
                     break;
                 default:
@@ -587,9 +593,13 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, true, true))
+                    if (oldItem.IsDiffer(newItem, true, true, true, true))
                     {
                         MarkToUpdateAppearances();
+                        IsRecaching = true;
+                    }
+                    else if (!Mathf.Approximately(oldItem.durability, newItem.durability))
+                    {
                         IsRecaching = true;
                     }
                     break;
@@ -608,7 +618,7 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, true, true))
+                    if (oldItem.IsDiffer(newItem, true, true, true, true))
                         IsRecaching = true;
                     break;
                 default:

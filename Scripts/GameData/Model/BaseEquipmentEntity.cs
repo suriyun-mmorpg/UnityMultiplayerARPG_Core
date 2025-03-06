@@ -24,11 +24,15 @@ namespace MultiplayerARPG
             get { return _item; }
             set
             {
-                if (_item.IsDiffer(value, true))
+                if (_item.IsDiffer(value, true, true, true, true))
                 {
                     _item = value;
                     OnItemChanged(_item);
                     onItemChanged.Invoke(_item);
+                }
+                else
+                {
+                    _item = value;
                 }
             }
         }

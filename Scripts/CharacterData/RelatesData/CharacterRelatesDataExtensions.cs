@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -59,11 +60,25 @@ namespace MultiplayerARPG
             return data.Equals(CharacterSummon.Empty);
         }
 
-        public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData, bool checkLevel = false, bool checkSockets = false)
+        public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData,
+            bool checkLevel = false,
+            bool checkSockets = false,
+            bool checkRandomSeed = false,
+            bool checkAmmoDataId = false,
+            bool checkAmmoAmount = false,
+            bool checkDurability = false)
         {
             if (checkLevel && data.level != anotherData.level)
                 return true;
             if (checkSockets && IsDifferSockets(data, anotherData))
+                return true;
+            if (checkRandomSeed && data.randomSeed != anotherData.randomSeed)
+                return true;
+            if (checkAmmoDataId && data.ammoDataId != anotherData.ammoDataId)
+                return true;
+            if (checkAmmoAmount && data.ammo != anotherData.ammo)
+                return true;
+            if (checkDurability && !Mathf.Approximately(data.durability, anotherData.durability))
                 return true;
             return !string.Equals(data.id, anotherData.id) || data.dataId != anotherData.dataId;
         }
@@ -88,10 +103,17 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData, out bool rightIsDiffer, out bool leftIsDiffer, bool checkLevel = false, bool checkSockets = false)
+        public static bool IsDiffer(this EquipWeapons data, EquipWeapons anotherData,
+            out bool rightIsDiffer, out bool leftIsDiffer,
+            bool checkLevel = false,
+            bool checkSockets = false,
+            bool checkRandomSeed = false,
+            bool checkAmmoDataId = false,
+            bool checkAmmoAmount = false,
+            bool checkDurability = false)
         {
-            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand, checkLevel, checkSockets);
-            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand, checkLevel, checkSockets);
+            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand, checkLevel, checkSockets, checkRandomSeed, checkAmmoDataId, checkAmmoAmount, checkDurability);
+            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand, checkLevel, checkSockets, checkRandomSeed, checkAmmoDataId, checkAmmoAmount, checkDurability);
             return rightIsDiffer || leftIsDiffer;
         }
 
