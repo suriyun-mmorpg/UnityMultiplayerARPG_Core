@@ -485,6 +485,10 @@ namespace MultiplayerARPG
                         MarkToUpdateAppearances();
                         MarkToUpdateAmmoSim();
                         IsRecaching = true;
+                    } else if (oldItem.rightHand.ammo != newItem.rightHand.ammo ||
+                        oldItem.leftHand.ammo != newItem.leftHand.ammo)
+                    {
+                        MarkToUpdateAmmoSim();
                     }
                     break;
                 default:
