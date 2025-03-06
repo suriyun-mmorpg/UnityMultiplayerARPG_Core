@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             bool continueReloadingR = false;
             bool continueReloadingL = false;
             // Reload right-hand weapon
-            if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull() &&
+            if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull(PlayingCharacterEntity) &&
                 PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity, out int reloadingAmmoDataIdR, out int ammoAmountR) &&
                 (!_reloadedDataIdR.HasValue || _reloadedDataIdR.Value == reloadingAmmoDataIdR))
             {
@@ -67,7 +67,7 @@ namespace MultiplayerARPG
                 continueReloadingR = ProceedReloading(false, PlayingCharacterEntity.EquipWeapons.GetRightHandWeaponItem(), ammoAmountR);
             }
             // Reload left-hand weapon
-            if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull() &&
+            if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull(PlayingCharacterEntity) &&
                 PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity, out int reloadingAmmoDataIdL, out int ammoAmountL) &&
                 (!_reloadedDataIdL.HasValue || _reloadedDataIdL.Value == reloadingAmmoDataIdL))
             {

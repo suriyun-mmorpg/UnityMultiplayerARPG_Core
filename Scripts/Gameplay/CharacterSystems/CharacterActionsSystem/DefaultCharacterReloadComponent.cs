@@ -338,7 +338,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (reloadingWeapon.IsAmmoFull())
+            if (reloadingWeapon.IsAmmoFull(Entity))
             {
                 // Full, don't reload
                 return;

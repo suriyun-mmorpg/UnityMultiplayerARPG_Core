@@ -133,12 +133,12 @@ namespace MultiplayerARPG
             return ammo <= 0;
         }
 
-        public bool IsAmmoFull()
+        public bool IsAmmoFull(ICharacterData characterData)
         {
             IWeaponItem item = GetWeaponItem();
             if (item == null || item.AmmoCapacity <= 0)
                 return true;
-            return ammo >= GetAmmoCapacity();
+            return ammo >= GetAmmoCapacity(characterData);
         }
 
         public bool IsRewardingItem()
@@ -208,7 +208,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public int GetAmmoCapacity()
+        public int GetAmmoCapacity(ICharacterData characterData)
         {
             IWeaponItem item = GetWeaponItem();
             if (item == null)
@@ -217,9 +217,9 @@ namespace MultiplayerARPG
                 GameInstance.Items.TryGetValue(ammoDataId, out BaseItem prevAmmoItem) &&
                 prevAmmoItem.OverrideAmmoCapacity > 0)
             {
-                return prevAmmoItem.OverrideAmmoCapacity;
+                return prevAmmoItem.OverrideAmmoCapacity + (int)characterData.GetCaches().AmmoCapacity;
             }
-            return item.AmmoCapacity;
+            return item.AmmoCapacity + (int)characterData.GetCaches().AmmoCapacity;
         }
 
         public void Lock(float duration)
