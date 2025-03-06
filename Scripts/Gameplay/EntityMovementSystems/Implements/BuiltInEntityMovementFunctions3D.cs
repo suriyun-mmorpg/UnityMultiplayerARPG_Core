@@ -152,6 +152,11 @@ namespace MultiplayerARPG
         private float _accumulateDiffHorMoveDist = 0f;
         private float _accumulateDiffVerMoveDist = 0f;
         private float _lastServerHorSpdBeforeAirborne;
+        private bool _isServerWaitingTeleportConfirm;
+
+        // Client confirm codes
+        private bool _isClientConfirmingTeleport;
+        private bool _isStarted;
 
         public BuiltInEntityMovementFunctions3D(BaseGameEntity entity, Animator animator, IBuiltInEntityMovement3D entityMovement)
         {
@@ -165,6 +170,8 @@ namespace MultiplayerARPG
 
         public void EntityStart()
         {
+            _isClientConfirmingTeleport = true;
+            _isStarted = true;
             _yAngle = CacheTransform.eulerAngles.y;
             _verticalVelocity = 0;
             _lastTeleportFrame = Time.frameCount;
@@ -959,6 +966,8 @@ namespace MultiplayerARPG
         public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
+            if (!_isStarted)
+                return false;
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
@@ -980,9 +989,15 @@ namespace MultiplayerARPG
                 {
                     MovementState &= ~MovementState.IsDash;
                 }
+                if (_isClientConfirmingTeleport)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsTeleport;
+                }
                 Entity.ClientWriteSyncTransform3D(writer);
                 _sendingJump = false;
                 _sendingDash = false;
+                _isClientConfirmingTeleport = false;
                 return true;
             }
             if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
@@ -1006,6 +1021,11 @@ namespace MultiplayerARPG
                 {
                     _currentInput = Entity.ClearInputDash(_currentInput);
                 }
+                if (_isClientConfirmingTeleport)
+                {
+                    shouldSendReliably = true;
+                    _currentInput.MovementState |= MovementState.IsTeleport;
+                }
                 if (Entity.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
                 {
                     if (!_currentInput.IsKeyMovement)
@@ -1021,6 +1041,7 @@ namespace MultiplayerARPG
                     Entity.ClientWriteMovementInput3D(writer, inputState, _currentInput);
                     _sendingJump = false;
                     _sendingDash = false;
+                    _isClientConfirmingTeleport = false;
                     _oldInput = _currentInput;
                     _currentInput = null;
                     return true;
@@ -1032,6 +1053,8 @@ namespace MultiplayerARPG
         public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
+            if (!_isStarted)
+                return false;
             // Sync transform from server to all clients (include owner client)
             if (_sendingJump)
             {
@@ -1153,6 +1176,16 @@ namespace MultiplayerARPG
                 return;
             }
             reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
+            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
+            {
+                // Teleport confirming from client
+                _isServerWaitingTeleportConfirm = false;
+            }
+            if (_isServerWaitingTeleportConfirm)
+            {
+                // Waiting for teleport confirming
+                return;
+            }
             if (!Entity.CanMove())
             {
                 // It can't move, so don't move
@@ -1223,6 +1256,16 @@ namespace MultiplayerARPG
                 return;
             }
             reader.ServerReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            if (movementState.Has(MovementState.IsTeleport))
+            {
+                // Teleport confirming from client
+                _isServerWaitingTeleportConfirm = false;
+            }
+            if (_isServerWaitingTeleportConfirm)
+            {
+                // Waiting for teleport confirming
+                return;
+            }
             if (_acceptedPositionTimestamp > peerTimestamp)
             {
                 // Invalid timestamp
@@ -1253,56 +1296,28 @@ namespace MultiplayerARPG
             // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
             float clientHorMoveDist = Vector3.Distance(oldPos.GetXZ(), newPos.GetXZ());
             float clientVerMoveDist = Mathf.Abs(newPos.y - oldPos.y);
-            bool skipValidation = UseRootMotion();
-            if (Entity.SkipMovementValidation)
-                skipValidation = true;
             // Increase accumulate data to detect hacking
             float horMoveDistDiff = clientHorMoveDist > horMoveableDist ? (clientHorMoveDist - horMoveableDist) : 0f;
             float verMoveDistDiff = clientVerMoveDist > verMoveableDist ? (clientVerMoveDist - verMoveableDist) : 0f;
             _accumulateDeltaTime += unityDeltaTime;
             _accumulateDiffHorMoveDist += horMoveDistDiff;
             _accumulateDiffVerMoveDist += verMoveDistDiff;
-            float horMoveDiffTime = horMoveDistDiff / horMoveSpd;
-            float verMoveDiffTime = verMoveDistDiff / verMoveSpd;
+            // TODO: Speed hack detection
             if (!IsClient)
             {
-                // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
-                if (skipValidation || horMoveDiffTime < 0.1f)
-                {
-                    // Allow to move to the position
-                    _acceptedPosition = newPos;
-                    CacheTransform.position = newPos;
-                    CurrentGameManager.ShouldPhysicSyncTransforms = true;
-                    // Update character rotation
-                    RemoteTurnSimulation(true, yAngle, unityDeltaTime);
-                }
-                else
-                {
-                    // Client moves too fast, adjust it
-                    newPos = GetMoveablePosition(oldPos, newPos, falling, clientHorMoveDist, horMoveableDist, clientVerMoveDist, verMoveableDist);
-                    // And also adjust client's position
-                    Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
-                }
+                // Allow to move to the position
+                _acceptedPosition = newPos;
+                CacheTransform.position = newPos;
+                CurrentGameManager.ShouldPhysicSyncTransforms = true;
+                // Update character rotation
+                RemoteTurnSimulation(true, yAngle, unityDeltaTime);
             }
             else
             {
                 // It's both server and client, simulate movement
                 if (Vector3.Distance(position, oldPos) > s_minDistanceToSimulateMovement)
                 {
-                    if (skipValidation || horMoveDiffTime < 0.1f)
-                    {
-                        // Jumped position
-                        if (falling && CacheTransform.position.y < newPos.y)
-                            CacheTransform.position = new Vector3(CacheTransform.position.x, newPos.y, CacheTransform.position.z);
-                        _acceptedPosition = newPos;
-                    }
-                    else
-                    {
-                        // Client moves too fast, adjust it
-                        newPos = GetMoveablePosition(oldPos, newPos, falling, clientHorMoveDist, horMoveableDist, clientVerMoveDist, verMoveableDist);
-                        // And also adjust client's position
-                        Teleport(newPos, Quaternion.Euler(0f, yAngle, 0f), true);
-                    }
+                    _acceptedPosition = newPos;
                     _simulatingKeyMovement = true;
                     SetMovePaths(position, false);
                 }
@@ -1336,6 +1351,10 @@ namespace MultiplayerARPG
             CacheTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             TurnImmediately(yAngle);
+            if (IsServer && !IsOwnedByServer)
+                _isServerWaitingTeleportConfirm = true;
+            if (!IsServer && IsOwnerClient)
+                _isClientConfirmingTeleport = true;
             _lastTeleportFrame = Time.frameCount;
             _previousPosition = CacheTransform.position;
         }
