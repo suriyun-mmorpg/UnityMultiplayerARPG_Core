@@ -4,10 +4,19 @@ namespace MultiplayerARPG
 {
     public class ShooterReloadUpdater : MonoBehaviour
     {
+        public enum EInterruptByAttackingState
+        {
+            None,
+            ConfirmingToAttackR,
+            ConfirmingToAttackL,
+            AttackingR,
+            AttackingL,
+        }
         public ShooterPlayerCharacterController Controller { get; set; }
         public BasePlayerCharacterEntity PlayingCharacterEntity => Controller.PlayingCharacterEntity;
         public bool IsReloading { get; protected set; }
-        public bool? IsAttackingLeftHand { get; protected set; }
+        public EInterruptByAttackingState InterruptByAttackingState { get; protected set; } = EInterruptByAttackingState.None;
+
         protected int? _reloadedDataIdR = null;
         protected int? _reloadedDataIdL = null;
 
@@ -37,7 +46,10 @@ namespace MultiplayerARPG
 
         public virtual void InterruptByAttacking(bool isLeftHand)
         {
-            IsAttackingLeftHand = isLeftHand;
+            if (isLeftHand)
+                InterruptByAttackingState = EInterruptByAttackingState.ConfirmingToAttackL;
+            else
+                InterruptByAttackingState = EInterruptByAttackingState.ConfirmingToAttackR;
         }
 
         protected virtual void Update()
@@ -49,12 +61,19 @@ namespace MultiplayerARPG
             // Wait until animation end
             if (PlayingCharacterEntity.IsPlayingActionAnimation())
                 return;
-            if (IsAttackingLeftHand.HasValue)
+            bool isAttackLeftHand;
+            switch (InterruptByAttackingState)
             {
-                bool isLeftHand = IsAttackingLeftHand.Value;
-                PlayingCharacterEntity.Attack(ref isLeftHand);
-                IsAttackingLeftHand = null;
-                return;
+                case EInterruptByAttackingState.AttackingR:
+                    InterruptByAttackingState = EInterruptByAttackingState.None;
+                    isAttackLeftHand = false;
+                    PlayingCharacterEntity.Attack(ref isAttackLeftHand);
+                    return;
+                case EInterruptByAttackingState.AttackingL:
+                    InterruptByAttackingState = EInterruptByAttackingState.None;
+                    isAttackLeftHand = true;
+                    PlayingCharacterEntity.Attack(ref isAttackLeftHand);
+                    return;
             }
             bool continueReloadingR = false;
             bool continueReloadingL = false;
@@ -75,7 +94,24 @@ namespace MultiplayerARPG
                 continueReloadingL = ProceedReloading(true, PlayingCharacterEntity.EquipWeapons.GetLeftHandWeaponItem(), ammoAmountL);
             }
             if (!continueReloadingR && !continueReloadingL)
+            {
+                // Not continue reloading
                 IsReloading = false;
+                InterruptByAttackingState = EInterruptByAttackingState.None;
+            }
+            else
+            {
+                // Continue reloading, let's check if it is being interrupted by attacking inputs or not, if interrupted then attack later
+                switch (InterruptByAttackingState)
+                {
+                    case EInterruptByAttackingState.ConfirmingToAttackR:
+                        InterruptByAttackingState = EInterruptByAttackingState.AttackingR;
+                        break;
+                    case EInterruptByAttackingState.ConfirmingToAttackL:
+                        InterruptByAttackingState = EInterruptByAttackingState.AttackingL;
+                        break;
+                }
+            }
         }
 
         /// <summary>
