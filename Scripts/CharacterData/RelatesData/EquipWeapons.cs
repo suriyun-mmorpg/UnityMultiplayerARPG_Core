@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class SyncFieldEquipWeapons : LiteNetLibSyncField<EquipWeapons>
     {
-        protected override bool IsValueChanged(EquipWeapons newValue)
+        protected override bool IsValueChanged(EquipWeapons oldValue, EquipWeapons newValue)
         {
             return true;
         }
