@@ -4,19 +4,12 @@ namespace MultiplayerARPG
 {
     public class ShooterReloadUpdater : MonoBehaviour
     {
-        public enum EInterruptByAttackingState
-        {
-            None,
-            ConfirmingToAttackR,
-            ConfirmingToAttackL,
-            AttackingR,
-            AttackingL,
-        }
         public ShooterPlayerCharacterController Controller { get; set; }
         public BasePlayerCharacterEntity PlayingCharacterEntity => Controller.PlayingCharacterEntity;
         public bool IsReloading { get; protected set; }
-        public EInterruptByAttackingState InterruptByAttackingState { get; protected set; } = EInterruptByAttackingState.None;
-
+        public bool? IsAttackingLeftHand { get; protected set; }
+        [SerializeField]
+        protected bool _continueReloadingAfterAttack = false;
         protected int? _reloadedDataIdR = null;
         protected int? _reloadedDataIdL = null;
 
@@ -46,10 +39,7 @@ namespace MultiplayerARPG
 
         public virtual void InterruptByAttacking(bool isLeftHand)
         {
-            if (isLeftHand)
-                InterruptByAttackingState = EInterruptByAttackingState.ConfirmingToAttackL;
-            else
-                InterruptByAttackingState = EInterruptByAttackingState.ConfirmingToAttackR;
+            IsAttackingLeftHand = isLeftHand;
         }
 
         protected virtual void Update()
@@ -61,61 +51,65 @@ namespace MultiplayerARPG
             // Wait until animation end
             if (PlayingCharacterEntity.IsPlayingActionAnimation())
                 return;
-            bool isAttackLeftHand;
-            switch (InterruptByAttackingState)
-            {
-                case EInterruptByAttackingState.AttackingR:
-                    InterruptByAttackingState = EInterruptByAttackingState.None;
-                    isAttackLeftHand = false;
-                    PlayingCharacterEntity.Attack(ref isAttackLeftHand);
-                    return;
-                case EInterruptByAttackingState.AttackingL:
-                    InterruptByAttackingState = EInterruptByAttackingState.None;
-                    isAttackLeftHand = true;
-                    PlayingCharacterEntity.Attack(ref isAttackLeftHand);
-                    return;
-            }
             bool continueReloadingR = false;
             bool continueReloadingL = false;
+            IWeaponItem weaponItem;
+            int ammoDataId;
+            int ammoAmount;
             // Reload right-hand weapon
             if (!PlayingCharacterEntity.EquipWeapons.rightHand.IsAmmoFull(PlayingCharacterEntity) &&
-                PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity, out int reloadingAmmoDataIdR, out int ammoAmountR) &&
-                (!_reloadedDataIdR.HasValue || _reloadedDataIdR.Value == reloadingAmmoDataIdR))
+                PlayingCharacterEntity.EquipWeapons.rightHand.HasAmmoToReload(PlayingCharacterEntity, out ammoDataId, out ammoAmount) &&
+                (!_reloadedDataIdR.HasValue || _reloadedDataIdR.Value == ammoDataId))
             {
-                _reloadedDataIdR = reloadingAmmoDataIdR;
-                continueReloadingR = ProceedReloading(false, PlayingCharacterEntity.EquipWeapons.GetRightHandWeaponItem(), ammoAmountR);
+                _reloadedDataIdR = ammoDataId;
+                weaponItem = PlayingCharacterEntity.EquipWeapons.GetRightHandWeaponItem();
+                continueReloadingR = ShouldContinueReloading(weaponItem, ammoAmount);
+                if (continueReloadingR && ProceedAttacking())
+                {
+                    IsReloading = _continueReloadingAfterAttack;
+                    return;
+                }
+                continueReloadingR = ProceedReloading(false, weaponItem, ammoAmount) && continueReloadingR;
             }
             // Reload left-hand weapon
             if (!PlayingCharacterEntity.EquipWeapons.leftHand.IsAmmoFull(PlayingCharacterEntity) &&
-                PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity, out int reloadingAmmoDataIdL, out int ammoAmountL) &&
-                (!_reloadedDataIdL.HasValue || _reloadedDataIdL.Value == reloadingAmmoDataIdL))
+                PlayingCharacterEntity.EquipWeapons.leftHand.HasAmmoToReload(PlayingCharacterEntity, out ammoDataId, out ammoAmount) &&
+                (!_reloadedDataIdL.HasValue || _reloadedDataIdL.Value == ammoDataId))
             {
-                _reloadedDataIdL = reloadingAmmoDataIdL;
-                continueReloadingL = ProceedReloading(true, PlayingCharacterEntity.EquipWeapons.GetLeftHandWeaponItem(), ammoAmountL);
+                _reloadedDataIdL = ammoDataId;
+                weaponItem = PlayingCharacterEntity.EquipWeapons.GetLeftHandWeaponItem();
+                continueReloadingL = ShouldContinueReloading(weaponItem, ammoAmount);
+                if (continueReloadingL && ProceedAttacking())
+                {
+                    IsReloading = _continueReloadingAfterAttack;
+                    return;
+                }
+                continueReloadingL = ProceedReloading(true, weaponItem, ammoAmount) && continueReloadingL;
             }
             if (!continueReloadingR && !continueReloadingL)
             {
                 // Not continue reloading
                 IsReloading = false;
-                InterruptByAttackingState = EInterruptByAttackingState.None;
             }
-            else
-            {
-                // Continue reloading, let's check if it is being interrupted by attacking inputs or not, if interrupted then attack later
-                switch (InterruptByAttackingState)
-                {
-                    case EInterruptByAttackingState.ConfirmingToAttackR:
-                        InterruptByAttackingState = EInterruptByAttackingState.AttackingR;
-                        break;
-                    case EInterruptByAttackingState.ConfirmingToAttackL:
-                        InterruptByAttackingState = EInterruptByAttackingState.AttackingL;
-                        break;
-                }
-            }
+            IsAttackingLeftHand = null;
         }
 
         /// <summary>
-        /// Return `TRUE` if it should continue
+        /// Return `TRUE` if attack proceeded
+        /// </summary>
+        /// <returns></returns>
+        private bool ProceedAttacking()
+        {
+            if (!IsAttackingLeftHand.HasValue)
+                return false;
+            bool isLeftHand = IsAttackingLeftHand.Value;
+            PlayingCharacterEntity.Attack(ref isLeftHand);
+            IsAttackingLeftHand = null;
+            return true;
+        }
+
+        /// <summary>
+        /// Return `TRUE` if reload proceeded
         /// </summary>
         /// <param name="isLeftHand"></param>
         /// <param name="weaponItem"></param>
@@ -124,8 +118,11 @@ namespace MultiplayerARPG
         {
             if (weaponItem == null)
                 return false;
-            if (!PlayingCharacterEntity.Reload(isLeftHand))
-                return false;
+            return PlayingCharacterEntity.Reload(isLeftHand);
+        }
+
+        private bool ShouldContinueReloading(IWeaponItem weaponItem, int ammoAmount)
+        {
             return weaponItem.MaxAmmoEachReload > 0 && ammoAmount - weaponItem.MaxAmmoEachReload >= 0;
         }
     }
