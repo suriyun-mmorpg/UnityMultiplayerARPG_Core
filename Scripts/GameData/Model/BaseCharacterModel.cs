@@ -572,7 +572,7 @@ namespace MultiplayerARPG
             // Destroy unequipped item models, and show default models
             foreach (string unequippingSocket in unequippingSockets)
             {
-                ClearEquippedModel(unequippingSocket, true);
+                ClearEquippedModel(unequippingSocket);
 
                 if (!CacheEquipmentModelContainers.TryGetValue(unequippingSocket, out tempContainer))
                     continue;
@@ -583,14 +583,14 @@ namespace MultiplayerARPG
                 tempContainer.SetActiveDefaultModelGroup(true);
             }
 
+            bool shouldClearLeftHandCache = true;
+            bool shouldClearRightHandCache = true;
             foreach (string equipSocket in showingModels.Keys)
             {
-                ClearEquippedModel(equipSocket, false);
+                ClearEquippedModel(equipSocket, shouldClearLeftHandCache, shouldClearRightHandCache);
 
                 if (!CacheEquipmentModelContainers.TryGetValue(equipSocket, out tempContainer))
-                {
                     continue;
-                }
 
                 tempEquipmentModel = showingModels[equipSocket];
                 tempEquipmentObject = null;
@@ -674,9 +674,15 @@ namespace MultiplayerARPG
 #endif
                     }
                     if (CacheRightHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(tempEquipmentModel.equipPosition))
+                    {
                         CacheRightHandEquipmentEntity = tempEquipmentEntity;
+                        shouldClearRightHandCache = false;
+                    }
                     if (CacheLeftHandEquipmentEntity == null && GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(tempEquipmentModel.equipPosition))
+                    {
                         CacheLeftHandEquipmentEntity = tempEquipmentEntity;
+                        shouldClearLeftHandCache = false;
+                    }
                 }
 
                 tempEquipmentModel.InvokeOnInstantiated(tempEquipmentObject, tempEquipmentEntity, tempEquipmentObjectGroup, tempContainer);
@@ -685,13 +691,13 @@ namespace MultiplayerARPG
             EquippedModels = storingModels;
         }
 
-        private void ClearEquippedModel(string equipSocket, bool clearCacheEquipmentEntity)
+        private void ClearEquippedModel(string equipSocket, bool clearLeftHandCache = true, bool clearRightHandCache = true)
         {
             if (EquippedModels.TryGetValue(equipSocket, out EquipmentModel equipmentModel))
             {
-                if (GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipmentModel.equipPosition) && clearCacheEquipmentEntity)
+                if (GameDataConst.EQUIP_POSITION_RIGHT_HAND.Equals(equipmentModel.equipPosition) && clearRightHandCache)
                     CacheRightHandEquipmentEntity = null;
-                if (GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipmentModel.equipPosition) && clearCacheEquipmentEntity)
+                if (GameDataConst.EQUIP_POSITION_LEFT_HAND.Equals(equipmentModel.equipPosition) && clearLeftHandCache)
                     CacheLeftHandEquipmentEntity = null;
             }
 
