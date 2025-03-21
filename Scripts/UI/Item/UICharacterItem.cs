@@ -1,4 +1,4 @@
-﻿using Cysharp.Text;
+using Cysharp.Text;
 using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
 using System.Linq;
@@ -715,7 +715,7 @@ namespace MultiplayerARPG
         protected override async void UpdateData()
         {
             if (changeObjectNameByData)
-                name = $"(UICharacterSkill){(Item == null ? string.Empty : Item.Id)}";
+                name = $"(UICharacterItem){(Item == null ? string.Empty : Item.Id)}";
 
             bool isEmpty = Item == null;
 
