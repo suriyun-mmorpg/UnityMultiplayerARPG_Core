@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     public interface IMinimapCameraController
     {
         GameObject gameObject { get; }
+        bool enabled { get; }
         Camera Camera { get; }
         Transform CameraTransform { get; }
         Transform FollowingEntityTransform { get; set; }
