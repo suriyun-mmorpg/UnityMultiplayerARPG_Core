@@ -19,6 +19,7 @@ namespace MultiplayerARPG
             {
                 Debug.LogWarning("`minimapCameraPrefab` is empty, `DefaultMinimapCameraController` component is disabling.");
                 enabled = false;
+                return;
             }
             CameraControls = Instantiate(minimapCameraPrefab);
         }
