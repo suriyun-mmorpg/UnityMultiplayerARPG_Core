@@ -23,8 +23,11 @@ namespace MultiplayerARPG
             SceneManager.sceneLoaded -= SceneManager_sceneLoaded;
         }
 
-        private static async void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadMode)
+        private static async void SceneManager_sceneLoaded(Scene scene, LoadSceneMode loadSceneMode)
         {
+            if (loadSceneMode != LoadSceneMode.Single)
+                return;
+
             await UniTask.SwitchToMainThread();
             CurrentEventSystem = FindObjectOfType<EventSystem>();
             // Create a new event system
