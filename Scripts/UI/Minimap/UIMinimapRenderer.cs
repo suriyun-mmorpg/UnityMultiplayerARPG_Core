@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
@@ -8,8 +9,10 @@ namespace MultiplayerARPG
     {
         private struct MarkerData
         {
-            public BaseCharacterEntity Character { get; set; }
+            public bool IsRequiredEntity { get; set; }
+            public BaseGameEntity Entity { get; set; }
             public RectTransform Marker { get; set; }
+            public RectTransform Prefab { get; set; }
             public Vector3 MarkerRotateOffsets { get; set; }
         }
         public enum MinimapMode
@@ -47,20 +50,32 @@ namespace MultiplayerARPG
         public RectTransform neutralMarkerPrefab;
         public Vector3 neutralRotateOffsets = Vector3.zero;
         public RectTransform nonPlayingCharacterMarkerContainer;
-        public float allyMarkerDistance = 10000f;
+        public float allyMarkerDistance = 10_000f;
         public float enemyOrNeutralMarkerDistance = 5f;
         public float updateMarkerDuration = 1f;
         [Tooltip("Image's anchor min, max and pivot must be 0.5")]
         public Image imageMinimap;
         public ScrollRect scrollRectMinimap;
+
         [Header("Testing")]
         public bool isTestMode;
         public BaseMapInfo testingMapInfo;
         public Transform testingPlayingCharacterTransform;
 
+        // Events
+        public Action onInstantiateEntitiesMarkersStart;
+        public Action<uint> onInstantiateGuildMemberMarker;
+        public Action<uint> onInstantiatePartyMemberMarker;
+        public Action<uint> onInstantiateAllyMemberMarker;
+        public Action<uint> onInstantiateEnemyMarker;
+        public Action<uint> onInstantiateNeutralMarker;
+        public Action onInstantiateEntitiesMarkersFinish;
+
         private float _updateMarkerCountdown;
         private BaseMapInfo _currentMapInfo;
         private List<MarkerData> _markers = new List<MarkerData>();
+        private Dictionary<int, Queue<RectTransform>> _markersPool = new Dictionary<int, Queue<RectTransform>>();
+        public float CurrentSizeRate { get; private set; }
 
         public void SetModeToDefault()
         {
@@ -189,22 +204,24 @@ namespace MultiplayerARPG
         {
             for (int i = _markers.Count - 1; i >= 0; --i)
             {
-                if (_markers[i].Character == null)
+                if (_markers[i].IsRequiredEntity && !_markers[i].Entity)
                 {
-                    Destroy(_markers[i].Marker.gameObject);
-                    _markers.RemoveAt(i);
+                    PutMarkerBack(_markers[i].Prefab, _markers[i].Marker);
                     continue;
                 }
 
-                SetMarkerPositionAndRotation(_markers[i].Marker, _markers[i].Character.EntityTransform, sizeRate, _markers[i].MarkerRotateOffsets);
+                SetMarkerPositionAndRotation(_markers[i].Marker, _markers[i].Entity.EntityTransform, sizeRate, _markers[i].MarkerRotateOffsets);
             }
         }
 
         private void InstantiateEntitiesMarkers(float sizeRate)
         {
+            if (onInstantiateEntitiesMarkersStart != null)
+                onInstantiateEntitiesMarkersStart.Invoke();
+
             for (int i = _markers.Count - 1; i >= 0; --i)
             {
-                Destroy(_markers[i].Marker.gameObject);
+                PutMarkerBack(_markers[i].Prefab, _markers[i].Marker);
             }
             _markers.Clear();
 
@@ -225,16 +242,19 @@ namespace MultiplayerARPG
                     {
                         markerPrefab = guildMemberMarkerPrefab;
                         markerRotateOffsets = guildMemberRotateOffsets;
+                        onInstantiateGuildMemberMarker.Invoke(entry.ObjectId);
                     }
                     else if (partyMemberMarkerPrefab != null && entityInfo.PartyId > 0 && entityInfo.PartyId == GameInstance.PlayingCharacterEntity.PartyId)
                     {
                         markerPrefab = partyMemberMarkerPrefab;
                         markerRotateOffsets = partyMemberRotateOffsets;
+                        onInstantiatePartyMemberMarker.Invoke(entry.ObjectId);
                     }
                     else if (allyMemberMarkerPrefab != null)
                     {
                         markerPrefab = allyMemberMarkerPrefab;
                         markerRotateOffsets = allyMemberRotateOffsets;
+                        onInstantiateAllyMemberMarker.Invoke(entry.ObjectId);
                     }
                     if (markerPrefab != null)
                     {
@@ -250,11 +270,13 @@ namespace MultiplayerARPG
                     {
                         markerPrefab = enemyMarkerPrefab;
                         markerRotateOffsets = enemyRotateOffsets;
+                        onInstantiateEnemyMarker.Invoke(entry.ObjectId);
                     }
                     else if (neutralMarkerPrefab != null)
                     {
                         markerPrefab = neutralMarkerPrefab;
                         markerRotateOffsets = neutralRotateOffsets;
+                        onInstantiateNeutralMarker.Invoke(entry.ObjectId);
                     }
                     if (markerPrefab != null)
                     {
@@ -262,20 +284,60 @@ namespace MultiplayerARPG
                     }
                 }
             }
+
+            if (onInstantiateEntitiesMarkersFinish != null)
+                onInstantiateEntitiesMarkersFinish.Invoke();
         }
 
         private void InstantiateEntityMarker(BaseCharacterEntity character, Vector3 markerRotateOffsets, float sizeRate, RectTransform prefab)
         {
-            RectTransform newMarker = Instantiate(prefab);
-            newMarker.SetParent(nonPlayingCharacterMarkerContainer);
+            RectTransform newMarker = InstantiateOrGetMarkerFromPool(prefab, nonPlayingCharacterMarkerContainer);
+            if (newMarker == null)
+                return;
             newMarker.transform.localScale = Vector3.one;
             SetMarkerPositionAndRotation(newMarker, character.EntityTransform, sizeRate, markerRotateOffsets);
             _markers.Add(new MarkerData()
             {
-                Character = character,
+                IsRequiredEntity = true,
+                Entity = character,
                 Marker = newMarker,
+                Prefab = prefab,
                 MarkerRotateOffsets = markerRotateOffsets,
             });
+        }
+
+        public RectTransform InstantiateOrGetMarkerFromPool(RectTransform prefab, RectTransform container)
+        {
+            if (prefab == null)
+                return null;
+            int prefabInstanceID = prefab.GetInstanceID();
+            if (!_markersPool.TryGetValue(prefabInstanceID, out Queue<RectTransform> instances))
+            {
+                instances = new Queue<RectTransform>();
+                _markersPool[prefabInstanceID] = instances;
+            }
+            RectTransform instance;
+            if (instances.Count > 0)
+            {
+                instance = instances.Dequeue();
+                instance.gameObject.SetActive(true);
+                return instance;
+            }
+            // Instantiate a new one
+            instance = Instantiate(prefab, container);
+            instance.gameObject.SetActive(true);
+            return instance;
+        }
+
+        public void PutMarkerBack(RectTransform prefab, RectTransform instance)
+        {
+            if (prefab == null)
+                return;
+            int prefabInstanceID = prefab.GetInstanceID();
+            if (!_markersPool.TryGetValue(prefabInstanceID, out Queue<RectTransform> instances))
+                return;
+            instances.Enqueue(instance);
+            instance.gameObject.SetActive(false);
         }
 
         private void SetMarkerPositionAndRotation(RectTransform markerTransform, Transform entityTransform, float sizeRate, Vector3 markerRotateOffsets)
