@@ -178,9 +178,9 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyDecreaseStaminaDecreationRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_DECREASE_STAMINA_DECREATION_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
-        public UILocaleKeySetting formatKeyBuyItemPriceRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUY_ITEM_PRICE_RATE);
+        public UILocaleKeySetting formatKeyBuyItemPriceRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BUY_ITEM_PRICE_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
-        public UILocaleKeySetting formatKeySellItemPriceRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_ITEM_PRICE_RATE);
+        public UILocaleKeySetting formatKeySellItemPriceRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_ITEM_PRICE_RATE_RATE);
 
         [Header("UI Elements")]
         public TextWrapper uiTextStats;
