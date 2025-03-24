@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     public interface IShooterWeaponController
     {
         ShooterControllerViewMode ViewMode { get; set; }
+        ShooterControllerViewMode ActiveViewMode { get; }
         float CameraZoomDistance { get; }
         Vector3 CameraTargetOffset { get; }
         float CameraFov { get; }
