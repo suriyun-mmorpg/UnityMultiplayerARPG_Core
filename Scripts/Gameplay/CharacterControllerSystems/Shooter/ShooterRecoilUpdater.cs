@@ -43,7 +43,7 @@ namespace MultiplayerARPG
             float recoilYaw;
             float recoilRoll;
 
-            float weaponRecoil = weaponItem.Recoil;
+            float weaponRecoil = Controller.IsZoomAimming && weaponItem.RecoilWhileAiming > 0f ? weaponItem.RecoilWhileAiming : weaponItem.Recoil;
             float recoilWithModifier = weaponRecoil + PlayingCharacterEntity.GetCaches().RecoilModifier;
             if (PlayingCharacterEntity.MovementState.Has(MovementState.Forward) ||
                 PlayingCharacterEntity.MovementState.Has(MovementState.Backward) ||

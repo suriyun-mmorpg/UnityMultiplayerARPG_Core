@@ -51,6 +51,10 @@ namespace MultiplayerARPG
         /// </summary>
         public HashSet<string> HitObjects { get; } = new HashSet<string>();
         /// <summary>
+        /// Aiming while attacking?
+        /// </summary>
+        public bool IsAiming { get; set; }
+        /// <summary>
         /// Set any validator data here
         /// </summary>
         public object ValidatorData { get; set; }

@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         {
             public int SimulateSeed;
             public bool IsLeftHand;
+            public bool IsAiming;
         }
 
         protected readonly List<CancellationTokenSource> _attackCancellationTokenSources = new List<CancellationTokenSource>();
@@ -90,6 +91,7 @@ namespace MultiplayerARPG
             CharacterDataCache entityCaches = Entity.GetCaches();
             int simulateSeed = GetSimulateSeed(peerTimestamp);
             bool isLeftHand = simulateState.IsLeftHand;
+            bool isAiming = simulateState.IsAiming;
             if (simulateState.SimulateSeed == 0)
                 simulateState.SimulateSeed = simulateSeed;
             else
@@ -292,7 +294,7 @@ namespace MultiplayerARPG
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
-                            ApplyAttack(entityCaches, isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
+                            ApplyAttack(entityCaches, isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition, isAiming);
                         }
                         else if (IsOwnerClient)
                         {
@@ -306,7 +308,7 @@ namespace MultiplayerARPG
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
-                            ApplyAttack(entityCaches, isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
+                            ApplyAttack(entityCaches, isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition, isAiming);
                         }
                     }
 
@@ -376,7 +378,7 @@ namespace MultiplayerARPG
                 return;
             }
             RPC(RpcSimulateActionTrigger, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
-            ApplyAttack(Entity.GetCaches(), validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
+            ApplyAttack(Entity.GetCaches(), validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition, validateData.IsAiming);
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogAttackTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
         }
@@ -391,10 +393,10 @@ namespace MultiplayerARPG
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
             if (validateData == null)
                 return;
-            ApplyAttack(Entity.GetCaches(), validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
+            ApplyAttack(Entity.GetCaches(), validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition, validateData.IsAiming);
         }
 
-        protected virtual async void ApplyAttack(CharacterDataCache entityCaches, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition)
+        protected virtual async void ApplyAttack(CharacterDataCache entityCaches, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition, bool isAiming)
         {
             if (triggerIndex >= damageAmounts.Count)
             {
@@ -409,7 +411,7 @@ namespace MultiplayerARPG
             {
                 // For monsters, their weapon can be null so have to avoid null exception
                 fireSpreadAmount = weaponItem.FireSpreadAmount;
-                fireSpreadRange = weaponItem.FireSpreadRange;
+                fireSpreadRange = isAiming ? weaponItem.FireSpreadRangeWhileAiming : weaponItem.FireSpreadRange;
             }
 
             fireSpreadAmount += (byte)Mathf.CeilToInt(entityCaches.FireSpread);
@@ -445,47 +447,53 @@ namespace MultiplayerARPG
 
         public virtual void Attack(bool isLeftHand)
         {
+            bool isAiming = false;
             long timestamp = Manager.ServerTimestamp;
+            if (IsOwnerClient && _entityIsPlayer && BasePlayerCharacterController.Singleton is IShooterWeaponController shooterWeaponController)
+            {
+                isAiming = shooterWeaponController.IsZoomAimming;
+            }
             if (!IsServer && IsOwnerClient)
             {
-                ProceedAttack(timestamp, isLeftHand);
-                RPC(CmdAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, isLeftHand);
+                ProceedAttack(timestamp, isLeftHand, isAiming);
+                RPC(CmdAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, isLeftHand, isAiming);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                PreceedCmdAttack(timestamp, isLeftHand);
+                PreceedCmdAttack(timestamp, isLeftHand, isAiming);
             }
         }
 
         [ServerRpc]
-        protected void CmdAttack(long peerTimestamp, bool isLeftHand)
+        protected void CmdAttack(long peerTimestamp, bool isLeftHand, bool isAiming)
         {
-            PreceedCmdAttack(peerTimestamp, isLeftHand);
+            PreceedCmdAttack(peerTimestamp, isLeftHand, isAiming);
         }
 
-        protected void PreceedCmdAttack(long peerTimestamp, bool isLeftHand)
+        protected void PreceedCmdAttack(long peerTimestamp, bool isLeftHand, bool isAiming)
         {
-            ProceedAttack(peerTimestamp, isLeftHand);
-            RPC(RpcAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, isLeftHand);
+            ProceedAttack(peerTimestamp, isLeftHand, isAiming);
+            RPC(RpcAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, isLeftHand, isAiming);
         }
 
         [AllRpc]
-        protected void RpcAttack(long peerTimestamp, bool isLeftHand)
+        protected void RpcAttack(long peerTimestamp, bool isLeftHand, bool isAiming)
         {
             if (IsServer || IsOwnerClient)
             {
                 // Don't play attacking animation again
                 return;
             }
-            ProceedAttack(peerTimestamp, isLeftHand);
+            ProceedAttack(peerTimestamp, isLeftHand, isAiming);
         }
 
-        protected void ProceedAttack(long peerTimestamp, bool isLeftHand)
+        protected void ProceedAttack(long peerTimestamp, bool isLeftHand, bool isAiming)
         {
             AttackState simulateState = new AttackState()
             {
                 SimulateSeed = GetSimulateSeed(peerTimestamp),
                 IsLeftHand = isLeftHand,
+                IsAiming = isAiming,
             };
             AttackRoutine(peerTimestamp, simulateState).Forget();
         }

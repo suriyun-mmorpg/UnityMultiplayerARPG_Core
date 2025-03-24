@@ -116,6 +116,10 @@ namespace MultiplayerARPG
         /// </summary>
         Vector2 FireSpreadRange { get; }
         /// <summary>
+        /// Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}, while aiming
+        /// </summary>
+        Vector2 FireSpreadRangeWhileAiming { get; }
+        /// <summary>
         /// Amount of bullets that will be launched when fire once, will be used for shotgun items
         /// </summary>
         byte FireSpreadAmount { get; }
@@ -123,6 +127,10 @@ namespace MultiplayerARPG
         /// Recoiling
         /// </summary>
         float Recoil { get; }
+        /// <summary>
+        /// Recoiling, while aiming
+        /// </summary>
+        float RecoilWhileAiming { get; }
         /// <summary>
         /// Minimum charge duration to attack
         /// </summary>

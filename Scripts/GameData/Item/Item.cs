@@ -137,9 +137,11 @@ namespace MultiplayerARPG
         public int maxAmmoEachReload;
         [FormerlySerializedAs("fireStagger")]
         public Vector2 fireSpreadRange;
+        public Vector2 fireSpreadRangeWhileAiming;
         [FormerlySerializedAs("fireSpread")]
         public byte fireSpreadAmount;
         public float recoil = 1f;
+        public float recoilWhileAiming = 1;
         public float chargeDuration;
         public bool destroyImmediatelyAfterFired;
 
@@ -678,6 +680,11 @@ namespace MultiplayerARPG
             get { return fireSpreadRange; }
         }
 
+        public Vector2 FireSpreadRangeWhileAiming
+        {
+            get { return fireSpreadRangeWhileAiming; }
+        }
+
         public byte FireSpreadAmount
         {
             get { return fireSpreadAmount; }
@@ -686,6 +693,11 @@ namespace MultiplayerARPG
         public float Recoil
         {
             get { return recoil; }
+        }
+
+        public float RecoilWhileAiming
+        {
+            get { return recoilWhileAiming; }
         }
 
         public float ChargeDuration

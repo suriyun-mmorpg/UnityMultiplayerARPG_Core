@@ -365,6 +365,14 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}, while aiming")]
+        private Vector2 fireSpreadRangeWhileAiming = Vector2.zero;
+        public Vector2 FireSpreadRangeWhileAiming
+        {
+            get { return fireSpreadRangeWhileAiming; }
+        }
+
+        [SerializeField]
         [FormerlySerializedAs("fireSpread")]
         [Tooltip("Amount of bullets that will be launched when fire once, will be used for shotgun items")]
         private byte fireSpreadAmount = 0;
@@ -378,6 +386,13 @@ namespace MultiplayerARPG
         public float Recoil
         {
             get { return recoil; }
+        }
+
+        [SerializeField]
+        private float recoilWhileAiming = 1;
+        public float RecoilWhileAiming
+        {
+            get { return recoilWhileAiming; }
         }
 
         [SerializeField]
