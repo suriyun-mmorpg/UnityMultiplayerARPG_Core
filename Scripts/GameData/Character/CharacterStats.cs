@@ -39,6 +39,7 @@ namespace MultiplayerARPG
         public float gravityRate;
         public float protectedSlotLimit;
         public float ammoCapacity;
+        public float recoilModifier;
         public float recoilRate;
         public float rateOfFire;
         public float reloadDuration;
@@ -83,6 +84,7 @@ namespace MultiplayerARPG
             a.gravityRate = a.gravityRate + b.gravityRate;
             a.protectedSlotLimit = a.protectedSlotLimit + b.protectedSlotLimit;
             a.ammoCapacity = a.ammoCapacity + b.ammoCapacity;
+            a.recoilModifier = a.recoilModifier + b.recoilModifier;
             a.recoilRate = a.recoilRate + b.recoilRate;
             a.rateOfFire = a.rateOfFire + b.rateOfFire;
             a.reloadDuration = a.reloadDuration + b.reloadDuration;
@@ -93,8 +95,57 @@ namespace MultiplayerARPG
             a.decreaseStaminaDecreation = a.decreaseStaminaDecreation + b.decreaseStaminaDecreation;
             a.buyItemPriceRate = a.buyItemPriceRate + b.buyItemPriceRate;
             a.sellItemPriceRate = a.sellItemPriceRate + b.sellItemPriceRate;
-            if (GameExtensionInstance.onAddCharacterStats != null)
-                GameExtensionInstance.onAddCharacterStats(ref a, b);
+            if (GameExtensionInstance.onIncreaseCharacterStats != null)
+                GameExtensionInstance.onIncreaseCharacterStats(ref a, b);
+            return a;
+        }
+
+        public static CharacterStats operator -(CharacterStats a, CharacterStats b)
+        {
+            a.hp = a.hp - b.hp;
+            a.hpRecovery = a.hpRecovery - b.hpRecovery;
+            a.hpLeechRate = a.hpLeechRate - b.hpLeechRate;
+            a.mp = a.mp - b.mp;
+            a.mpRecovery = a.mpRecovery - b.mpRecovery;
+            a.mpLeechRate = a.mpLeechRate - b.mpLeechRate;
+            a.stamina = a.stamina - b.stamina;
+            a.staminaRecovery = a.staminaRecovery - b.staminaRecovery;
+            a.staminaLeechRate = a.staminaLeechRate - b.staminaLeechRate;
+            a.food = a.food - b.food;
+            a.water = a.water - b.water;
+            a.accuracy = a.accuracy - b.accuracy;
+            a.evasion = a.evasion - b.evasion;
+            a.criRate = a.criRate - b.criRate;
+            a.criDmgRate = a.criDmgRate - b.criDmgRate;
+            a.blockRate = a.blockRate - b.blockRate;
+            a.blockDmgRate = a.blockDmgRate - b.blockDmgRate;
+            a.moveSpeed = a.moveSpeed - b.moveSpeed;
+            a.atkSpeed = a.atkSpeed - b.atkSpeed;
+            a.weightLimit = a.weightLimit - b.weightLimit;
+            a.slotLimit = a.slotLimit - b.slotLimit;
+            a.goldRate = a.goldRate - b.goldRate;
+            a.expRate = a.expRate - b.expRate;
+            a.itemDropRate = a.itemDropRate - b.itemDropRate;
+            a.jumpHeight = a.jumpHeight - b.jumpHeight;
+            a.headDamageAbsorbs = a.headDamageAbsorbs - b.headDamageAbsorbs;
+            a.bodyDamageAbsorbs = a.bodyDamageAbsorbs - b.bodyDamageAbsorbs;
+            a.fallDamageAbsorbs = a.fallDamageAbsorbs - b.fallDamageAbsorbs;
+            a.gravityRate = a.gravityRate - b.gravityRate;
+            a.protectedSlotLimit = a.protectedSlotLimit - b.protectedSlotLimit;
+            a.ammoCapacity = a.ammoCapacity - b.ammoCapacity;
+            a.recoilModifier = a.recoilModifier - b.recoilModifier;
+            a.recoilRate = a.recoilRate - b.recoilRate;
+            a.rateOfFire = a.rateOfFire - b.rateOfFire;
+            a.reloadDuration = a.reloadDuration - b.reloadDuration;
+            a.fireSpreadRangeRate = a.fireSpreadRangeRate - b.fireSpreadRangeRate;
+            a.fireSpread = a.fireSpread - b.fireSpread;
+            a.decreaseFoodDecreation = a.decreaseFoodDecreation - b.decreaseFoodDecreation;
+            a.decreaseWaterDecreation = a.decreaseWaterDecreation - b.decreaseWaterDecreation;
+            a.decreaseStaminaDecreation = a.decreaseStaminaDecreation - b.decreaseStaminaDecreation;
+            a.buyItemPriceRate = a.buyItemPriceRate - b.buyItemPriceRate;
+            a.sellItemPriceRate = a.sellItemPriceRate - b.sellItemPriceRate;
+            if (GameExtensionInstance.onDecreaseCharacterStats != null)
+                GameExtensionInstance.onDecreaseCharacterStats(ref a, b);
             return a;
         }
 
@@ -131,6 +182,7 @@ namespace MultiplayerARPG
             a.gravityRate = a.gravityRate * multiplier;
             a.protectedSlotLimit = a.protectedSlotLimit * multiplier;
             a.ammoCapacity = a.ammoCapacity * multiplier;
+            a.recoilModifier = a.recoilModifier * multiplier;
             a.recoilRate = a.recoilRate * multiplier;
             a.rateOfFire = a.rateOfFire * multiplier;
             a.reloadDuration = a.reloadDuration * multiplier;
@@ -179,6 +231,7 @@ namespace MultiplayerARPG
             a.gravityRate = a.gravityRate * b.gravityRate;
             a.protectedSlotLimit = a.protectedSlotLimit * b.protectedSlotLimit;
             a.ammoCapacity = a.ammoCapacity * b.ammoCapacity;
+            a.recoilModifier = a.recoilModifier * b.recoilModifier;
             a.recoilRate = a.recoilRate * b.recoilRate;
             a.rateOfFire = a.rateOfFire * b.rateOfFire;
             a.reloadDuration = a.reloadDuration * b.reloadDuration;

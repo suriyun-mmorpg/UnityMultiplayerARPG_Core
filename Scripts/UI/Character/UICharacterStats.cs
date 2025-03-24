@@ -77,6 +77,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyProtectedSlotLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_PROTECTED_SLOT_LIMIT);
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyAmmoCapacityStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AMMO_CAPACITY);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyRecoilModifierStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_MODIFIER);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyRecoilRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_RATE);
         [Tooltip("Format => {0} = {Amount}")]
@@ -162,6 +164,8 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyAmmoCapacityRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AMMO_CAPACITY_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyRecoilModifierRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_MODIFIER_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyRecoilRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyRateOfFireRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RATE_OF_FIRE_RATE);
@@ -215,6 +219,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextGravityRate;
         public TextWrapper uiTextProtectedSlotLimit;
         public TextWrapper uiTextAmmoCapacity;
+        public TextWrapper uiTextRecoilModifier;
         public TextWrapper uiTextRecoilRate;
         public TextWrapper uiTextRateOfFire;
         public TextWrapper uiTextReloadDuration;
@@ -279,6 +284,7 @@ namespace MultiplayerARPG
             uiTextGravityRate = null;
             uiTextProtectedSlotLimit = null;
             uiTextAmmoCapacity = null;
+            uiTextRecoilModifier = null;
             uiTextRecoilRate = null;
             uiTextRateOfFire = null;
             uiTextReloadDuration = null;
@@ -369,6 +375,7 @@ namespace MultiplayerARPG
                         gravityRateStatsFormat = formatKeyGravityRateRateStats,
                         protectedSlotLimitFormat = formatKeyProtectedSlotLimitRateStats,
                         ammoCapacityFormat = formatKeyAmmoCapacityRateStats,
+                        recoilModifierFormat = formatKeyRecoilModifierRateStats,
                         recoilRateFormat = formatKeyRecoilRateRateStats,
                         rateOfFireFormat = formatKeyRateOfFireRateStats,
                         reloadDurationFormat = formatKeyReloadDurationRateStats,
@@ -410,6 +417,7 @@ namespace MultiplayerARPG
                         uiTextGravityRate = uiTextGravityRate,
                         uiTextProtectedSlotLimit = uiTextProtectedSlotLimit,
                         uiTextAmmoCapacity = uiTextAmmoCapacity,
+                        uiTextRecoilModifier = uiTextRecoilModifier,
                         uiTextRecoilRate = uiTextRecoilRate,
                         uiTextRateOfFire = uiTextRateOfFire,
                         uiTextReloadDuration = uiTextReloadDuration,
@@ -463,6 +471,7 @@ namespace MultiplayerARPG
                         gravityRateStatsFormat = formatKeyGravityRateStats,
                         protectedSlotLimitFormat = formatKeyProtectedSlotLimitStats,
                         ammoCapacityFormat = formatKeyAmmoCapacityStats,
+                        recoilModifierFormat = formatKeyRecoilModifierStats,
                         recoilRateFormat = formatKeyRecoilRateStats,
                         rateOfFireFormat = formatKeyRateOfFireStats,
                         reloadDurationFormat = formatKeyReloadDurationStats,
@@ -504,6 +513,7 @@ namespace MultiplayerARPG
                         uiTextGravityRate = uiTextGravityRate,
                         uiTextProtectedSlotLimit = uiTextProtectedSlotLimit,
                         uiTextAmmoCapacity = uiTextAmmoCapacity,
+                        uiTextRecoilModifier = uiTextRecoilModifier,
                         uiTextRecoilRate = uiTextRecoilRate,
                         uiTextRateOfFire = uiTextRateOfFire,
                         uiTextReloadDuration = uiTextReloadDuration,

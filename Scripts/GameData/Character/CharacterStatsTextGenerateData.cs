@@ -42,6 +42,7 @@ namespace MultiplayerARPG
         public string gravityRateStatsFormat;
         public string protectedSlotLimitFormat;
         public string ammoCapacityFormat;
+        public string recoilModifierFormat;
         public string recoilRateFormat;
         public string rateOfFireFormat;
         public string reloadDurationFormat;
@@ -83,6 +84,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextGravityRate;
         public TextWrapper uiTextProtectedSlotLimit;
         public TextWrapper uiTextAmmoCapacity;
+        public TextWrapper uiTextRecoilModifier;
         public TextWrapper uiTextRecoilRate;
         public TextWrapper uiTextRateOfFire;
         public TextWrapper uiTextReloadDuration;
@@ -192,6 +194,9 @@ namespace MultiplayerARPG
 
             // Ammo Capacity
             GetSingleStatsText(statsStringBuilder, false, LanguageManager.GetText(ammoCapacityFormat), data.ammoCapacity, uiTextAmmoCapacity, bonusIncreaseColor, bonusDecreaseColor);
+
+            // Recoil Modifier
+            GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(recoilModifierFormat), data.recoilModifier, uiTextRecoilModifier, bonusIncreaseColor, bonusDecreaseColor);
 
             // Recoil Rate
             GetSingleStatsText(statsStringBuilder, true, LanguageManager.GetText(recoilRateFormat), data.recoilRate, uiTextRecoilRate, bonusIncreaseColor, bonusDecreaseColor);

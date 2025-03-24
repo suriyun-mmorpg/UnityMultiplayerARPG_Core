@@ -43,6 +43,8 @@ namespace MultiplayerARPG
             float recoilYaw;
             float recoilRoll;
 
+            float weaponRecoil = weaponItem.Recoil;
+            float recoilWithModifier = weaponRecoil + PlayingCharacterEntity.GetCaches().RecoilModifier;
             if (PlayingCharacterEntity.MovementState.Has(MovementState.Forward) ||
                 PlayingCharacterEntity.MovementState.Has(MovementState.Backward) ||
                 PlayingCharacterEntity.MovementState.Has(MovementState.Left) ||
@@ -50,37 +52,42 @@ namespace MultiplayerARPG
             {
                 if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
                 {
-                    recoilPitch = recoilYaw = recoilRoll = weaponItem.Recoil * recoilRateWhileSwimming;
+                    recoilPitch = recoilYaw = recoilRoll = recoilWithModifier * recoilRateWhileSwimming;
                 }
                 else if (PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsSprinting)
                 {
-                    recoilPitch = recoilYaw = recoilRoll = weaponItem.Recoil * recoilRateWhileSprinting;
+                    recoilPitch = recoilYaw = recoilRoll = recoilWithModifier * recoilRateWhileSprinting;
                 }
                 else if (PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsWalking)
                 {
-                    recoilPitch = recoilYaw = recoilRoll = weaponItem.Recoil * recoilRateWhileWalking;
+                    recoilPitch = recoilYaw = recoilRoll = recoilWithModifier * recoilRateWhileWalking;
                 }
                 else
                 {
-                    recoilPitch = recoilYaw = recoilRoll = weaponItem.Recoil * recoilRateWhileMoving;
+                    recoilPitch = recoilYaw = recoilRoll = recoilWithModifier * recoilRateWhileMoving;
                 }
             }
             else if (PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
             {
-                recoilPitch = recoilYaw = recoilRoll = weaponItem.Recoil * recoilRateWhileCrouching;
+                recoilPitch = recoilYaw = recoilRoll = recoilWithModifier * recoilRateWhileCrouching;
             }
             else if (PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
             {
-                recoilPitch = recoilYaw = recoilRoll = weaponItem.Recoil * recoilRateWhileCrawling;
+                recoilPitch = recoilYaw = recoilRoll = recoilWithModifier * recoilRateWhileCrawling;
             }
             else
             {
-                recoilPitch = recoilYaw = recoilRoll = weaponItem.Recoil;
+                recoilPitch = recoilYaw = recoilRoll = recoilWithModifier;
             }
 
-            recoilPitch *= recoilPitchScale * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
-            recoilYaw *= recoilYawScale * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
-            recoilRoll *= recoilRollScale * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
+            recoilPitch += weaponRecoil * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
+            recoilPitch *= recoilPitchScale;
+
+            recoilYaw += weaponRecoil * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
+            recoilYaw *= recoilYawScale;
+
+            recoilRoll += weaponRecoil * (1f + PlayingCharacterEntity.GetCaches().RecoilRate);
+            recoilRoll *= recoilRollScale;
 
             if (recoilPitch > 0f || recoilYaw > 0f || recoilRoll > 0f)
             {

@@ -47,6 +47,7 @@ namespace MultiplayerARPG
         public float GravityRate => _stats.gravityRate;
         public float ProtectedSlotLimit => _stats.protectedSlotLimit;
         public float AmmoCapacity => _stats.ammoCapacity;
+        public float RecoilModifier => _stats.recoilModifier;
         public float RecoilRate => _stats.recoilRate;
         public float RateOfFire => _stats.rateOfFire;
         public float ReloadDuration => _stats.reloadDuration;

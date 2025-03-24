@@ -69,6 +69,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyProtectedSlotLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_PROTECTED_SLOT_LIMIT);
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyAmmoCapacityStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AMMO_CAPACITY);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyRecoilModifierStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_MODIFIER);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyRecoilRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_RATE);
         [Tooltip("Format => {0} = {Amount}")]
@@ -153,6 +155,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyProtectedSlotLimitRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_PROTECTED_SLOT_LIMIT_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyAmmoCapacityRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_AMMO_CAPACITY_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeyRecoilModifierRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_MODIFIER_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyRecoilRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_RECOIL_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
@@ -267,6 +271,7 @@ namespace MultiplayerARPG
                     gravityRateStatsFormat = formatKeyGravityRateRateStats,
                     protectedSlotLimitFormat = formatKeyProtectedSlotLimitRateStats,
                     ammoCapacityFormat = formatKeyAmmoCapacityRateStats,
+                    recoilModifierFormat = formatKeyRecoilModifierRateStats,
                     recoilRateFormat = formatKeyRecoilRateRateStats,
                     rateOfFireFormat = formatKeyRateOfFireRateStats,
                     reloadDurationFormat = formatKeyReloadDurationRateStats,
@@ -318,6 +323,7 @@ namespace MultiplayerARPG
                     gravityRateStatsFormat = formatKeyGravityRateStats,
                     protectedSlotLimitFormat = formatKeyProtectedSlotLimitStats,
                     ammoCapacityFormat = formatKeyAmmoCapacityStats,
+                    recoilModifierFormat = formatKeyRecoilModifierStats,
                     recoilRateFormat = formatKeyRecoilRateStats,
                     rateOfFireFormat = formatKeyRateOfFireStats,
                     reloadDurationFormat = formatKeyReloadDurationStats,
