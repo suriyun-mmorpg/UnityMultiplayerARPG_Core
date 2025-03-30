@@ -144,7 +144,7 @@ namespace MultiplayerARPG
             get
             {
                 if (IsSceneObject)
-                    return ObjectId.ToString();
+                    return Identity.SceneObjectId;
                 else
                     return id;
             }
