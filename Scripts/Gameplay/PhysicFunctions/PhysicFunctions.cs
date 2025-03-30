@@ -38,6 +38,7 @@ namespace MultiplayerARPG
 
         public bool SingleRaycast(Vector3 origin, Vector3 direction, out PhysicRaycastResult result, float distance, int layerMask, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
+            Physics.SyncTransforms();
             result = new PhysicRaycastResult();
             NativeArray<RaycastCommand> tempCommands = new NativeArray<RaycastCommand>(1, Allocator.TempJob);
             QueryParameters queryParameters = new QueryParameters(layerMask, hitMultipleFaces, hitTriggers, hitBackfaces);
@@ -69,6 +70,7 @@ namespace MultiplayerARPG
         public int Raycast<TSorter>(Vector3 origin, Vector3 direction, float distance, int layerMask, TSorter sorter, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
             where TSorter : IComparer<RaycastHit>
         {
+            Physics.SyncTransforms();
             NativeArray<RaycastCommand> tempCommands = new NativeArray<RaycastCommand>(1, Allocator.TempJob);
             QueryParameters queryParameters = new QueryParameters(layerMask, hitMultipleFaces, hitTriggers, hitBackfaces);
             tempCommands[0] = new RaycastCommand(origin, direction, queryParameters, distance);
@@ -103,6 +105,7 @@ namespace MultiplayerARPG
 
         public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
+            Physics.SyncTransforms();
             NativeArray<OverlapSphereCommand> tempCommands = new NativeArray<OverlapSphereCommand>(1, Allocator.TempJob);
             QueryParameters queryParameters = new QueryParameters(layerMask, hitMultipleFaces, hitTriggers, hitBackfaces);
             tempCommands[0] = new OverlapSphereCommand(position, radius, queryParameters);
