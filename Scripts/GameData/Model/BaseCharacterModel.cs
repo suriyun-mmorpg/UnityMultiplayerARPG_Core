@@ -207,12 +207,6 @@ namespace MultiplayerARPG
                     Id = Entity.Identity.HashAssetId + id;
                 }
             }
-            this.InvokeInstanceDevExtMethods("Awake");
-        }
-
-        protected virtual void OnDestroy()
-        {
-            this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 
         internal override void InitCacheData()
