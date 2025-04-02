@@ -103,6 +103,14 @@ namespace MultiplayerARPG
         /// Enable force hide
         /// </summary>
         public const string Invisible = "/invisible";
+        /// <summary>
+        /// Close the servers
+        /// </summary>
+        public const string CloseServers = "/close_servers";
+        /// <summary>
+        /// Close the server by channel ID
+        /// </summary>
+        public const string CloseServer = "/close_server";
 
         public const string HelpResponse = "/level {level} = Set character's level to {level} value.\n" +
             "/statpoint {amount} = Set character's stat point to {amount} value.\n" +
@@ -126,7 +134,9 @@ namespace MultiplayerARPG
             "/unban {name} = Unban character's account which its name is {name}.\n" +
             "/kick {name} = Kick character which its name is {name}.\n" +
             "/visible = Show user character to other players.\n" +
-            "/invisible = Hide user character from other players.\n";
+            "/invisible = Hide user character from other players.\n" +
+            "/close_servers = Close the servers.\n" +
+            "/close_server {channel_id} = Close the server by channel ID.\n";
 #endif
 
         public virtual bool IsDataLengthValid(string command, int dataLength)
@@ -182,6 +192,10 @@ namespace MultiplayerARPG
                 return true;
             if (command.ToLower().Equals(Invisible.ToLower()))
                 return true;
+            if (command.ToLower().Equals(CloseServers.ToLower()))
+                return true;
+            if (command.ToLower().Equals(CloseServer.ToLower()) && dataLength == 2)
+                return true;
 #endif
             return false;
         }
@@ -217,7 +231,9 @@ namespace MultiplayerARPG
                 command.ToLower().Equals(Unban.ToLower()) ||
                 command.ToLower().Equals(Kick.ToLower()) ||
                 command.ToLower().Equals(Visible.ToLower()) ||
-                command.ToLower().Equals(Invisible.ToLower()))
+                command.ToLower().Equals(Invisible.ToLower()) ||
+                command.ToLower().Equals(CloseServers.ToLower()) ||
+                command.ToLower().Equals(CloseServer.ToLower()))
             {
                 return true;
             }
@@ -628,6 +644,29 @@ namespace MultiplayerARPG
                     if (senderCharacter != null)
                         senderCharacter.ForceHide = true;
                     response = "Your character is hidden from other players";
+                }
+                if (commandKey.ToLower().Equals(CloseServers.ToLower()))
+                {
+                    var players = BaseGameNetworkManager.Singleton.GetPlayers();
+                    foreach (var player in players)
+                    {
+                        BaseGameNetworkManager.Singleton.KickClient(player.ConnectionId, UITextKeys.UI_ERROR_SERVER_CLOSE);
+                    }
+                    BaseGameNetworkManager.Singleton.IsTemporarilyClose = true;
+                    response = "Server closing";
+                }
+                if (commandKey.ToLower().Equals(CloseServer.ToLower()))
+                {
+                    if (string.Equals(data[1].ToLower(), BaseGameNetworkManager.Singleton.ChannelId.ToLower()))
+                    {
+                        var players = BaseGameNetworkManager.Singleton.GetPlayers();
+                        foreach (var player in players)
+                        {
+                            BaseGameNetworkManager.Singleton.KickClient(player.ConnectionId, UITextKeys.UI_ERROR_SERVER_CLOSE);
+                        }
+                        BaseGameNetworkManager.Singleton.IsTemporarilyClose = true;
+                        response = "Server closing";
+                    }
                 }
             }
 #endif

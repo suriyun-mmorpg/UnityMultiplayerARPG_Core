@@ -30,6 +30,7 @@ namespace MultiplayerARPG
         public IHitRegistrationManager HitRegistrationManager { get; protected set; }
         public BaseGameNetworkManagerComponent[] ManagerComponents { get; private set; }
 
+        public bool IsTemporarilyClose { get; set; } = false;
         public string ChannelId { get; set; } = string.Empty;
         public string ChannelTitle { get; set; } = string.Empty;
         public string ChannelDescription { get; set; } = string.Empty;
@@ -353,6 +354,11 @@ namespace MultiplayerARPG
 
         public override void OnPeerConnected(long connectionId)
         {
+            if (IsTemporarilyClose)
+            {
+                KickClient(connectionId, UITextKeys.UI_ERROR_SERVER_CLOSE);
+                return;
+            }
             this.InvokeInstanceDevExtMethods("OnPeerConnected", connectionId);
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
