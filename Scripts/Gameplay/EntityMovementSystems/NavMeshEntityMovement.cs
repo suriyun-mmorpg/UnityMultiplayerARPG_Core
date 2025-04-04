@@ -97,7 +97,7 @@ namespace MultiplayerARPG
                 rigidBody.isKinematic = true;
             }
             // Setup
-            _yAngle = _targetYAngle = CacheTransform.eulerAngles.y;
+            _yAngle = _targetYAngle = EntityTransform.eulerAngles.y;
             _lookRotationApplied = true;
             StopMoveFunction();
         }
@@ -197,7 +197,7 @@ namespace MultiplayerARPG
 
         public Quaternion GetLookRotation()
         {
-            return Quaternion.Euler(0f, CacheTransform.eulerAngles.y, 0f);
+            return Quaternion.Euler(0f, EntityTransform.eulerAngles.y, 0f);
         }
 
         public void SetSmoothTurnSpeed(float turnDuration)
@@ -296,7 +296,7 @@ namespace MultiplayerARPG
             if (_acceptedDash || _isDashing)
             {
                 _sendingDash = true;
-                dashingForceApplier.Apply(CacheTransform.forward);
+                dashingForceApplier.Apply(EntityTransform.forward);
                 dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
                 // Can have only one replace movement force applier, so remove stored ones
                 _movementForceAppliers.RemoveReplaceMovementForces();
@@ -364,7 +364,7 @@ namespace MultiplayerARPG
                 if (_inputDirection.sqrMagnitude > 0f)
                 {
                     _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
-                    _currentInput = Entity.SetInputPosition(_currentInput, CacheTransform.position);
+                    _currentInput = Entity.SetInputPosition(_currentInput, EntityTransform.position);
                 }
                 else if (_moveByDestination)
                 {
@@ -391,7 +391,7 @@ namespace MultiplayerARPG
             if (replaceMovementForceApplierMode == ApplyMovementForceMode.Dash)
                 MovementState |= MovementState.IsDash;
 
-            _currentInput = Entity.SetInputYAngle(_currentInput, CacheTransform.eulerAngles.y);
+            _currentInput = Entity.SetInputYAngle(_currentInput, EntityTransform.eulerAngles.y);
         }
 
         public void UpdateRotation(float deltaTime)
@@ -422,7 +422,7 @@ namespace MultiplayerARPG
 
         private void RotateY()
         {
-            CacheTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);
+            EntityTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);
         }
 
         private void SetMovePaths(Vector3 position)
@@ -571,12 +571,12 @@ namespace MultiplayerARPG
                 // Prepare time
                 long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
                 float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
-                if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
+                if (Vector3.Distance(position, EntityTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
                     if (movementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
-                        CacheTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                        EntityTransform.eulerAngles = new Vector3(0, yAngle, 0);
                         CacheNavMeshAgent.Warp(position);
                     }
                 }
@@ -694,7 +694,7 @@ namespace MultiplayerARPG
             MovementState = movementState;
             ExtraMovementState = extraMovementState;
             // Prepare data for validation
-            Vector3 oldPos = _acceptedPosition.HasValue ? _acceptedPosition.Value : CacheTransform.position;
+            Vector3 oldPos = _acceptedPosition.HasValue ? _acceptedPosition.Value : EntityTransform.position;
             Vector3 newPos = position;
             // Calculate moveable distance
             float moveSpd = Entity.GetMoveSpeed(movementState, extraMovementState);
@@ -712,7 +712,7 @@ namespace MultiplayerARPG
             {
                 // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
                 _acceptedPosition = newPos;
-                CacheTransform.position = newPos;
+                EntityTransform.position = newPos;
                 CurrentGameManager.ShouldPhysicSyncTransforms = true;
                 // Update character rotation
                 RemoteTurnSimulation(yAngle, unityDeltaTime);
@@ -720,7 +720,7 @@ namespace MultiplayerARPG
             else
             {
                 // It's both server and client, simulate movement
-                if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
+                if (Vector3.Distance(position, EntityTransform.position) > s_minDistanceToSimulateMovement)
                 {
                     _acceptedPosition = newPos;
                     SetMovePaths(position);

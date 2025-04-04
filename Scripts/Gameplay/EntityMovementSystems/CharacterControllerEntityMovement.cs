@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
-        public float stickGroundForce = 9.6f;
+        public float groundSnapDistance = 2f;
         [Tooltip("Delay before character change from grounded state to airborne")]
         public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
@@ -131,7 +131,6 @@ namespace MultiplayerARPG
                 backwardMoveSpeedRate = backwardMoveSpeedRate,
                 gravity = gravity,
                 maxFallVelocity = maxFallVelocity,
-                stickGroundForce = stickGroundForce,
                 airborneDelay = airborneDelay,
                 doNotChangeVelocityWhileAirborne = doNotChangeVelocityWhileAirborne,
                 landedPauseMovementDuration = landedPauseMovementDuration,
@@ -204,7 +203,6 @@ namespace MultiplayerARPG
             Functions.backwardMoveSpeedRate = backwardMoveSpeedRate;
             Functions.gravity = gravity;
             Functions.maxFallVelocity = maxFallVelocity;
-            Functions.stickGroundForce = stickGroundForce;
             Functions.airborneDelay = airborneDelay;
             Functions.doNotChangeVelocityWhileAirborne = doNotChangeVelocityWhileAirborne;
             Functions.landedPauseMovementDuration = landedPauseMovementDuration;
@@ -246,7 +244,7 @@ namespace MultiplayerARPG
 
         private Vector3 GetGroundCheckCenter()
         {
-            return new Vector3(CacheTransform.position.x, CacheTransform.position.y - groundCheckOffsets, CacheTransform.position.z);
+            return new Vector3(EntityTransform.position.x, EntityTransform.position.y - groundCheckOffsets, EntityTransform.position.z);
         }
 
 #if UNITY_EDITOR
@@ -271,7 +269,7 @@ namespace MultiplayerARPG
 
         public void RotateY(float yAngle)
         {
-            CacheTransform.eulerAngles = new Vector3(0f, yAngle, 0f);
+            EntityTransform.eulerAngles = new Vector3(0f, yAngle, 0f);
         }
 
         public void OnJumpForceApplied(float verticalVelocity)
@@ -357,6 +355,15 @@ namespace MultiplayerARPG
         public void ClearAllForces()
         {
             Functions.ClearAllForces();
+        }
+
+        public Vector3 GetSnapToGroundMotion(Vector3 motion, Vector3 platformMotion, Vector3 forceMotion)
+        {
+            if (Functions.IsGrounded && Physics.Raycast(EntityTransform.position, Vector3.down, out RaycastHit hit, groundSnapDistance))
+            {
+                return Vector3.down * (hit.distance - CacheCharacterController.skinWidth);
+            }
+            return Vector3.zero;
         }
     }
 }

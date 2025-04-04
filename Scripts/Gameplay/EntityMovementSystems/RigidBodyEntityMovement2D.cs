@@ -270,7 +270,7 @@ namespace MultiplayerARPG
             Vector2 tempTargetPosition;
             Vector2 tempPredictPosition;
 
-            tempCurrentPosition = CacheTransform.position;
+            tempCurrentPosition = EntityTransform.position;
             tempMoveVelocity = Vector3.zero;
             _moveDirection = Vector2.zero;
             tempTargetDistance = 0f;
@@ -556,13 +556,13 @@ namespace MultiplayerARPG
             }
             else if (_acceptedPositionTimestamp <= peerTimestamp)
             {
-                if (Vector2.Distance(position, CacheTransform.position) >= snapThreshold)
+                if (Vector2.Distance(position, EntityTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
                     if (movementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
                         Direction2D = direction2D;
-                        CacheTransform.position = position;
+                        EntityTransform.position = position;
                         CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
                     }
                     MovementState = movementState;
@@ -572,7 +572,7 @@ namespace MultiplayerARPG
                 {
                     Direction2D = direction2D;
                     _simulatingKeyMovement = true;
-                    if (Vector2.Distance(position, CacheTransform.position.GetXY()) > s_minDistanceToSimulateMovement)
+                    if (Vector2.Distance(position, EntityTransform.position.GetXY()) > s_minDistanceToSimulateMovement)
                         SetMovePaths(position, false);
                     else
                         NavPaths = null;
@@ -679,7 +679,7 @@ namespace MultiplayerARPG
             MovementState = movementState;
             ExtraMovementState = extraMovementState;
             // Prepare data for validation
-            Vector3 oldPos = _acceptedPosition.HasValue ? _acceptedPosition.Value : CacheTransform.position;
+            Vector3 oldPos = _acceptedPosition.HasValue ? _acceptedPosition.Value : EntityTransform.position;
             Vector3 newPos = position;
             // Calculate moveable distance
             float moveSpd = Entity.GetMoveSpeed(movementState, extraMovementState);
@@ -697,13 +697,13 @@ namespace MultiplayerARPG
             {
                 // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
                 _acceptedPosition = newPos;
-                CacheTransform.position = newPos;
+                EntityTransform.position = newPos;
                 CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
             }
             else
             {
                 // It's both server and client, simulate movement
-                if (Vector3.Distance(position, CacheTransform.position) > s_minDistanceToSimulateMovement)
+                if (Vector3.Distance(position, EntityTransform.position) > s_minDistanceToSimulateMovement)
                 {
                     _acceptedPosition = newPos;
                     SetMovePaths(position, false);
@@ -727,7 +727,7 @@ namespace MultiplayerARPG
         {
             if (!stillMoveAfterTeleport)
                 NavPaths = null;
-            CacheTransform.position = position;
+            EntityTransform.position = position;
             CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;

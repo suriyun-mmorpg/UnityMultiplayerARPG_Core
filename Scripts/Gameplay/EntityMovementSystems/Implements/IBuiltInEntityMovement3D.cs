@@ -9,5 +9,6 @@ namespace MultiplayerARPG
         void RotateY(float yAngle);
         void OnJumpForceApplied(float verticalVelocity);
         Bounds GetMovementBounds();
+        Vector3 GetSnapToGroundMotion(Vector3 motion, Vector3 platformMotion, Vector3 forceMotion);
     }
 }
