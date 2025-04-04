@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         /// Add some distant to avoid character falling under ground
         /// </summary>
         private const float ABOVE_GROUND_OFFSETS = 0.25f;
+        private const float GROUNDED_FRAMES_TO_STICK = 3;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
         private static readonly int s_forceGroundedFramesAfterTeleport = 3;
         private static readonly float s_minDistanceToSimulateMovement = 0.01f;
@@ -110,6 +111,7 @@ namespace MultiplayerARPG
         private Vector3 _previousPosition;
         private Vector3 _previousMovement;
         private bool _isGrounded = true;
+        private int _groundedFrames = 0;
         private bool _isAirborne = false;
         private bool _isUnderWater = false;
         private bool _isClimbing = false;
@@ -390,9 +392,15 @@ namespace MultiplayerARPG
 
             // Update airborne elasped
             if (_isGrounded)
+            {
                 _airborneElapsed = 0f;
+                _groundedFrames++;
+            }
             else
+            {
                 _airborneElapsed += deltaTime;
+                _groundedFrames = 0;
+            }
 
             // Underwater state, movement state must be setup here to make it able to calculate move speed properly
             if (_isClimbing)
@@ -798,7 +806,7 @@ namespace MultiplayerARPG
                     _previousPlatformPosition = _groundedTransform.position;
                 }
             }
-            Vector3 stickGroundMotion = (_isGrounded && !_isUnderWater && platformMotion.y <= 0f) ? (Vector3.down * stickGroundForce) : Vector3.zero;
+            Vector3 stickGroundMotion = (_groundedFrames >= GROUNDED_FRAMES_TO_STICK && !_isUnderWater && platformMotion.y <= 0f) ? (Vector3.down * stickGroundForce) : Vector3.zero;
             _previousMovement = (tempMoveVelocity + platformMotion + stickGroundMotion + forceMotion) * deltaTime;
             if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent &&
                 LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder &&
