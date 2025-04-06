@@ -443,7 +443,7 @@ namespace MultiplayerARPG
             WarpCharacter(playerCharacterEntity, mapName, position, overrideRotation, rotation);
         }
 
-        protected override bool IsInstanceMap()
+        public override bool IsInstanceMap()
         {
             return false;
         }
