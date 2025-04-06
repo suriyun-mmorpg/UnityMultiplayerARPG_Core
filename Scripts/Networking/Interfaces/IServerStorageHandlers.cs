@@ -102,5 +102,13 @@ namespace MultiplayerARPG
         /// <param name="storageType"></param>
         /// <param name="storageOwnerId"></param>
         void NotifyStorageItemsUpdated(StorageType storageType, string storageOwnerId);
+
+        /// <summary>
+        /// Return `TRUE` if it is going to proceed storage saving
+        /// </summary>
+        /// <param name="storageType"></param>
+        /// <param name="storageOwnerId"></param>
+        /// <returns></returns>
+        bool WillProceedStorageSaving(StorageType storageType, string storageOwnerId);
     }
 }

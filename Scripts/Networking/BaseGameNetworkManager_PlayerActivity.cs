@@ -119,6 +119,6 @@ namespace MultiplayerARPG
         /// Check if this game network manager is for instance map or not
         /// </summary>
         /// <returns></returns>
-        protected abstract bool IsInstanceMap();
+        public abstract bool IsInstanceMap();
     }
 }

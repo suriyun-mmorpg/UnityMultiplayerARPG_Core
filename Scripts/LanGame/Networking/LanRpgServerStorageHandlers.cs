@@ -268,5 +268,12 @@ namespace MultiplayerARPG
         {
             return storageItems;
         }
+
+        public bool WillProceedStorageSaving(StorageType storageType, string storageOwnerId)
+        {
+            if (storageType == StorageType.Building && BaseGameNetworkManager.Singleton.IsInstanceMap())
+                return false;
+            return true;
+        }
     }
 }
