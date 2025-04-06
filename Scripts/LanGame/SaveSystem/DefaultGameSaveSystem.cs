@@ -36,38 +36,33 @@ namespace MultiplayerARPG
             if (hostPlayerCharacterData != null && !string.IsNullOrEmpty(hostPlayerCharacterData.Id))
             {
                 // Load and Spawn buildings
+                BuildingEntity tempBuildingEntity;
                 BuildingEntity[] inSceneBuildings = FindObjectsByType<BuildingEntity>(FindObjectsSortMode.None);
-                Dictionary<string, BuildingEntity> inSceneBuildingDicts = new Dictionary<string, BuildingEntity>();
+                Dictionary<string, BuildingEntity> initializingBuildingDicts = new Dictionary<string, BuildingEntity>();
                 for (int i = 0; i < inSceneBuildings.Length; ++i)
                 {
-                    inSceneBuildingDicts.Add(inSceneBuildings[i].Id, inSceneBuildings[i]);
+                    tempBuildingEntity = inSceneBuildings[i];
+                    initializingBuildingDicts.Add(tempBuildingEntity.Id, tempBuildingEntity);
                 }
                 worldSaveData.LoadPersistentData(hostPlayerCharacterData.Id, BaseGameNetworkManager.CurrentMapInfo.Id);
                 foreach (BuildingSaveData building in worldSaveData.buildings)
                 {
-                    if (building.IsSceneObject && inSceneBuildingDicts.TryGetValue(building.Id, out BuildingEntity inSceneBuilding))
+                    if (building.IsSceneObject && initializingBuildingDicts.TryGetValue(building.Id, out BuildingEntity inSceneBuilding))
                     {
                         if (building.CurrentHp <= 0)
                         {
+                            initializingBuildingDicts.Remove(building.Id);
                             inSceneBuilding.NetworkDestroy();
-                            GameInstance.ServerBuildingHandlers.AddBuilding(building.Id, building);
-                            inSceneBuildingDicts.Remove(building.Id);
                             continue;
                         }
+                        initializingBuildingDicts.Remove(building.Id);
                         inSceneBuilding.CurrentHp = building.CurrentHp;
                         GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
-                        inSceneBuildingDicts.Remove(building.Id);
                     }
                     else
                     {
                         await BaseGameNetworkManager.Singleton.CreateBuildingEntity(building, true);
                     }
-                }
-                // Setup building
-                foreach (BuildingEntity inSceneBuilding in inSceneBuildingDicts.Values)
-                {
-                    inSceneBuilding.InitSceneObject();
-                    GameInstance.ServerBuildingHandlers.AddBuilding(inSceneBuilding.Id, inSceneBuilding);
                 }
                 // Load storage data
                 worldStorageSaveData.LoadPersistentData($"{hostPlayerCharacterData.Id}_world");
@@ -78,6 +73,12 @@ namespace MultiplayerARPG
                     if (!storageItems.ContainsKey(storageId))
                         storageItems[storageId] = new List<CharacterItem>();
                     storageItems[storageId].Add(storageItem.characterItem);
+                }
+                // Setup building
+                foreach (BuildingEntity initializingBuilding in initializingBuildingDicts.Values)
+                {
+                    initializingBuilding.InitSceneObject();
+                    GameInstance.ServerBuildingHandlers.AddBuilding(initializingBuilding.Id, initializingBuilding);
                 }
             }
             isReadyToSave = true;
