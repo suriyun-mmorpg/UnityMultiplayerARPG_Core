@@ -36,7 +36,8 @@ namespace MultiplayerARPG
         public string ChannelDescription { get; set; } = string.Empty;
         public string ChannelTag { get; set; } = string.Empty;
         public string ChannelPassword { get; set; } = string.Empty;
-        public static BaseMapInfo CurrentMapInfo { get; protected set; }
+        public BaseMapInfo MapInfo { get; protected set; } = null;
+        public static BaseMapInfo CurrentMapInfo => Singleton.MapInfo;
         public bool ShouldPhysicSyncTransforms { get; set; }
         public bool ShouldPhysicSyncTransforms2D { get; set; }
 
@@ -238,7 +239,7 @@ namespace MultiplayerARPG
             CleanHandlers();
             // Other components
             HitRegistrationManager.ClearData();
-            CurrentMapInfo = null;
+            MapInfo = null;
             _isServerReadyToInstantiateObjects = false;
             _isClientReadyToInstantiateObjects = false;
             _isServerReadyToInstantiatePlayers = false;
@@ -501,19 +502,19 @@ namespace MultiplayerARPG
                 return;
             UpdateMapInfoMessage message = messageHandler.ReadMessage<UpdateMapInfoMessage>();
             SetMapInfo(message.mapName);
-            if (CurrentMapInfo == null)
+            if (MapInfo == null)
             {
                 Logging.LogError(LogTag, $"Cannot find map info: {message.mapName}, it will create new map info to use, it can affect players' experience.");
-                CurrentMapInfo = ScriptableObject.CreateInstance<MapInfo>();
-                CurrentMapInfo.Id = message.mapName;
+                MapInfo = ScriptableObject.CreateInstance<MapInfo>();
+                MapInfo.Id = message.mapName;
                 return;
             }
-            if (!CurrentMapInfo.GetType().FullName.Equals(message.className))
+            if (!MapInfo.GetType().FullName.Equals(message.className))
             {
-                Logging.LogError(LogTag, $"Invalid map info expect: {message.className}, found {CurrentMapInfo.GetType().FullName}, it can affect players' experience.");
+                Logging.LogError(LogTag, $"Invalid map info expect: {message.className}, found {MapInfo.GetType().FullName}, it can affect players' experience.");
                 return;
             }
-            CurrentMapInfo.Deserialize(messageHandler.Reader);
+            MapInfo.Deserialize(messageHandler.Reader);
             this.InvokeInstanceDevExtMethods("ReadMapInfoExtra", messageHandler.Reader);
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -830,7 +831,7 @@ namespace MultiplayerARPG
                 Logging.Log(LogTag, "Spawning warp portals");
             if (GameInstance.MapWarpPortals.Count > 0)
             {
-                if (GameInstance.MapWarpPortals.TryGetValue(CurrentMapInfo.Id, out List<WarpPortal> mapWarpPortals))
+                if (GameInstance.MapWarpPortals.TryGetValue(MapInfo.Id, out List<WarpPortal> mapWarpPortals))
                 {
                     WarpPortal warpPortal;
                     WarpPortalEntity warpPortalPrefab;
@@ -883,7 +884,7 @@ namespace MultiplayerARPG
                 Logging.Log(LogTag, "Spawning NPCs");
             if (GameInstance.MapNpcs.Count > 0)
             {
-                if (GameInstance.MapNpcs.TryGetValue(CurrentMapInfo.Id, out List<Npc> mapNpcs))
+                if (GameInstance.MapNpcs.TryGetValue(MapInfo.Id, out List<Npc> mapNpcs))
                 {
                     Npc npc;
                     NpcEntity npcPrefab;
@@ -948,7 +949,7 @@ namespace MultiplayerARPG
             {
                 if (LogInfo)
                     Logging.Log(LogTag, "Spawning server character");
-                Instantiate(GameInstance.Singleton.serverCharacterPrefab, CurrentMapInfo.StartPosition, Quaternion.identity);
+                Instantiate(GameInstance.Singleton.serverCharacterPrefab, MapInfo.StartPosition, Quaternion.identity);
             }
             await UniTask.NextFrame();
             // Entities were spawned
@@ -1108,7 +1109,7 @@ namespace MultiplayerARPG
         {
             if (!GameInstance.MapInfos.TryGetValue(mapName, out BaseMapInfo mapInfo))
             {
-                CurrentMapInfo = null;
+                MapInfo = null;
                 return;
             }
             SetMapInfo(mapInfo);
@@ -1118,7 +1119,7 @@ namespace MultiplayerARPG
         {
             if (mapInfo == null)
                 return;
-            CurrentMapInfo = mapInfo;
+            MapInfo = mapInfo;
             SendMapInfo();
         }
 
@@ -1134,15 +1135,15 @@ namespace MultiplayerARPG
 
         public void SendMapInfo(long connectionId)
         {
-            if (!IsServer || CurrentMapInfo == null)
+            if (!IsServer || MapInfo == null)
                 return;
             ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, new UpdateMapInfoMessage()
             {
-                mapName = CurrentMapInfo.Id,
-                className = CurrentMapInfo.GetType().FullName,
+                mapName = MapInfo.Id,
+                className = MapInfo.GetType().FullName,
             }, (writer) =>
             {
-                CurrentMapInfo.Serialize(writer);
+                MapInfo.Serialize(writer);
                 this.InvokeInstanceDevExtMethods("WriteMapInfoExtra", writer);
                 foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
                 {
