@@ -91,6 +91,9 @@ namespace MultiplayerARPG
                     CloseAllStorages(connectionId);
                     continue;
                 }
+                Vector3 currentPosition = playerCharacter.CurrentPosition;
+                if (playerCharacter is BasePlayerCharacterEntity entity)
+                    currentPosition = entity.EntityTransform.position;
                 if (userUsingStorages.TryGetValue(connectionId, out List<UserUsingStorageData> oneUserUsingStorages))
                 {
                     // Looking for far entities and close the storage
@@ -204,7 +207,10 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (Vector3.Distance(playerCharacter.CurrentPosition, storageEntity.EntityTransform.position) > storageEntity.GetActivatableDistance())
+            Vector3 currentPosition = playerCharacter.CurrentPosition;
+            if (playerCharacter is BasePlayerCharacterEntity entity)
+                currentPosition = entity.EntityTransform.position;
+            if (Vector3.Distance(currentPosition, storageEntity.EntityTransform.position) > storageEntity.GetActivatableDistance())
             {
                 uiTextKeys = UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR;
                 return false;
