@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Profiling;
 using UnityEngine.UI;
+using Cysharp.Text;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -144,7 +146,7 @@ namespace MultiplayerARPG
             get
             {
                 if (IsSceneObject)
-                    return Identity.SceneObjectId;
+                    return ZString.Concat(CurrentGameManager.ChannelId, '_', CurrentGameManager.MapInfo.Id, '_', Identity.SceneObjectId);
                 else
                     return id;
             }
