@@ -82,8 +82,8 @@ namespace MultiplayerARPG
             bool respawnOverrideRotation = false;
             Vector3 respawnRotation = Vector3.zero;
             BaseMapInfo mapInfo = BaseGameNetworkManager.CurrentMapInfo;
-            if (BaseGameNetworkManager.CurrentMapInfo != null)
-                BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacterEntity, out respawnPortalType, out respawnMapName, out respawnPosition, out respawnOverrideRotation, out respawnRotation);
+            if (mapInfo != null)
+                mapInfo.GetRespawnPoint(playerCharacterEntity, out respawnPortalType, out respawnMapName, out respawnPosition, out respawnOverrideRotation, out respawnRotation);
             switch (respawnPortalType)
             {
                 case WarpPortalType.Default:
