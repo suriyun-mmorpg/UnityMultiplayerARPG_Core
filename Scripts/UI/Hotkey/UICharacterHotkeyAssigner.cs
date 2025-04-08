@@ -257,25 +257,25 @@ namespace MultiplayerARPG
 
         protected void OnSelectCharacterSkill(UICharacterSkill ui)
         {
-            GameInstance.PlayingCharacterEntity.AssignSkillHotkey(uiCharacterHotkey.hotkeyId, ui.CharacterSkill);
+            GameInstance.PlayingCharacterEntity.AssignSkillHotkey(uiCharacterHotkey.HotkeyId, ui.CharacterSkill);
             Hide();
         }
 
         protected void OnSelectCharacterItem(UICharacterItem ui)
         {
-            GameInstance.PlayingCharacterEntity.AssignItemHotkey(uiCharacterHotkey.hotkeyId, ui.CharacterItem);
+            GameInstance.PlayingCharacterEntity.AssignItemHotkey(uiCharacterHotkey.HotkeyId, ui.CharacterItem);
             Hide();
         }
 
         protected void OnSelectGuildSkill(UIGuildSkill ui)
         {
-            GameInstance.PlayingCharacterEntity.AssignGuildSkillHotkey(uiCharacterHotkey.hotkeyId, ui.GuildSkill);
+            GameInstance.PlayingCharacterEntity.AssignGuildSkillHotkey(uiCharacterHotkey.HotkeyId, ui.GuildSkill);
             Hide();
         }
 
         public void OnClickUnAssign()
         {
-            GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.hotkeyId);
+            GameInstance.PlayingCharacterEntity.UnAssignHotkey(uiCharacterHotkey.HotkeyId);
             Hide();
         }
     }

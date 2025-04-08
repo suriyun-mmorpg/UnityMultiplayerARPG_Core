@@ -10,8 +10,8 @@ namespace MultiplayerARPG
     [DefaultExecutionOrder(DefaultExecutionOrders.UI_CHARACTER_HOTKEY)]
     public partial class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
     {
-        public int indexOfData { get; protected set; }
-        public string hotkeyId { get { return Data.hotkeyId; } }
+        public int IndexOfData { get; protected set; }
+        public string HotkeyId { get { return Data.hotkeyId; } }
         public UICharacterHotkeys UICharacterHotkeys { get; private set; }
 
         [FormerlySerializedAs("uiAssigner")]
@@ -79,7 +79,7 @@ namespace MultiplayerARPG
                 {
                     if (!CanAssignCharacterItem(nonEquipItem))
                         continue;
-                    GameInstance.PlayingCharacterEntity.AssignItemHotkey(hotkeyId, nonEquipItem);
+                    GameInstance.PlayingCharacterEntity.AssignItemHotkey(HotkeyId, nonEquipItem);
                     break;
                 }
             }
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             UICharacterHotkeys = uiCharacterHotkeys;
             if (this.uiCharacterHotkeyAssigner == null)
                 this.uiCharacterHotkeyAssigner = uiCharacterHotkeyAssigner;
-            this.indexOfData = indexOfData;
+            this.IndexOfData = indexOfData;
             Data = data;
         }
 

@@ -131,7 +131,7 @@ namespace MultiplayerARPG
             if (enablePickupFromContainerAction && Location == SourceLocation.ItemsContainer)
                 UIItem.OnClickPickUpFromContainer();
             if (enableUnassignHotkeyAction && Location == SourceLocation.Hotkey)
-                GameInstance.PlayingCharacterEntity.UnAssignHotkey(UIHotkey.hotkeyId);
+                GameInstance.PlayingCharacterEntity.UnAssignHotkey(UIHotkey.HotkeyId);
             if (enableBuyVendingItem && Location == SourceLocation.Vending)
                 UIItem.OnClickBuyVendingItem();
         }
