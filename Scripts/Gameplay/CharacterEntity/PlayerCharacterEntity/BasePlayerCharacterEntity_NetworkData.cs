@@ -791,7 +791,6 @@ namespace MultiplayerARPG
 #endif
 
 #if !DISABLE_CUSTOM_CHARACTER_DATA
-
         private void OnServerBoolsOperation(NotifiableListAction action, int index, CharacterDataBoolean oldItem, CharacterDataBoolean newItem)
         {
             if (onServerBoolsOperation != null)
