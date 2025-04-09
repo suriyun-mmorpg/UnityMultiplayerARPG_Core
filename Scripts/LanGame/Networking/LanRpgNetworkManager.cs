@@ -155,7 +155,7 @@ namespace MultiplayerARPG
 
         public void Save(System.Action<IPlayerCharacterData> onBeforeSaveCharacter = null, bool saveWorld = true, bool saveStorage = true)
         {
-            using (s_SaveDataProfilerMarker.Auto())
+            using (s_SaveProfilerMarker.Auto())
             {
                 BasePlayerCharacterEntity playingCharacter = GameInstance.PlayingCharacterEntity;
                 if (playingCharacter != null)

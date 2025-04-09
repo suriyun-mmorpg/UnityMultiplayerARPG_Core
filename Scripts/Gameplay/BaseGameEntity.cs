@@ -20,6 +20,10 @@ namespace MultiplayerARPG
         protected static readonly ProfilerMarker s_ComponentsUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - ComponentsUpdate");
         protected static readonly ProfilerMarker s_EntityUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - EntityUpdate");
         protected static readonly ProfilerMarker s_OnUpdateInvokeProfilerMarker = new ProfilerMarker("BaseGameEntity - OnUpdateInvoke");
+        protected static readonly ProfilerMarker s_ComponentsLateUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - ComponentsLateUpdate");
+        protected static readonly ProfilerMarker s_ComponentsChangedStateUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - ComponentsChangedStateUpdate");
+        protected static readonly ProfilerMarker s_EntityLateUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - EntityLateUpdate");
+        protected static readonly ProfilerMarker s_OnLateUpdateInvokeProfilerMarker = new ProfilerMarker("BaseGameEntity - OnLateUpdateInvoke");
 
         public int HashAssetId
         {
@@ -338,20 +342,23 @@ namespace MultiplayerARPG
 
         internal void DoUpdate()
         {
-            Profiler.BeginSample("EntityComponents - Update");
-            for (int i = 0; i < EntityComponents.Length; ++i)
+            using (s_ComponentsUpdateProfilerMarker.Auto())
             {
-                if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
-                    EntityComponents[i].EntityUpdate();
+                for (int i = 0; i < EntityComponents.Length; ++i)
+                {
+                    if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
+                        EntityComponents[i].EntityUpdate();
+                }
             }
-            Profiler.EndSample();
-            Profiler.BeginSample("BaseGameEntity - EntityUpdate");
-            EntityUpdate();
-            Profiler.EndSample();
-            Profiler.BeginSample("BaseGameEntity - OnUpdateInvoke");
-            if (onUpdate != null)
-                onUpdate.Invoke();
-            Profiler.EndSample();
+            using (s_EntityUpdateProfilerMarker.Auto())
+            {
+                EntityUpdate();
+            }
+            using (s_OnUpdateInvokeProfilerMarker.Auto())
+            {
+                if (onUpdate != null)
+                    onUpdate.Invoke();
+            }
         }
 
         protected virtual void EntityUpdate()
@@ -385,28 +392,32 @@ namespace MultiplayerARPG
         internal void DoLateUpdate()
         {
             bool isUpdateEntityComponents = IsUpdateEntityComponents;
-            Profiler.BeginSample("EntityComponents - LateUpdate");
-            for (int i = 0; i < EntityComponents.Length; ++i)
+            using (s_ComponentsLateUpdateProfilerMarker.Auto())
             {
-                if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
-                    EntityComponents[i].EntityLateUpdate();
+                for (int i = 0; i < EntityComponents.Length; ++i)
+                {
+                    if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
+                        EntityComponents[i].EntityLateUpdate();
+                }
             }
-            Profiler.EndSample();
-            Profiler.BeginSample("BaseGameEntity - OnUpdateEntityComponentsChanged");
-            if (!_wasUpdateEntityComponents.HasValue || _wasUpdateEntityComponents.Value != isUpdateEntityComponents)
+            using (s_ComponentsChangedStateUpdateProfilerMarker.Auto())
             {
-                _wasUpdateEntityComponents = isUpdateEntityComponents;
-                if (onIsUpdateEntityComponentsChanged != null)
-                    onIsUpdateEntityComponentsChanged.Invoke(isUpdateEntityComponents);
+                if (!_wasUpdateEntityComponents.HasValue || _wasUpdateEntityComponents.Value != isUpdateEntityComponents)
+                {
+                    _wasUpdateEntityComponents = isUpdateEntityComponents;
+                    if (onIsUpdateEntityComponentsChanged != null)
+                        onIsUpdateEntityComponentsChanged.Invoke(isUpdateEntityComponents);
+                }
             }
-            Profiler.EndSample();
-            Profiler.BeginSample("BaseGameEntity - EntityLateUpdate");
-            EntityLateUpdate();
-            Profiler.EndSample();
-            Profiler.BeginSample("BaseGameEntity - OnLateUpdateInvoke");
-            if (onLateUpdate != null)
-                onLateUpdate.Invoke();
-            Profiler.EndSample();
+            using (s_EntityLateUpdateProfilerMarker.Auto())
+            {
+                EntityLateUpdate();
+            }
+            using (s_OnLateUpdateInvokeProfilerMarker.Auto())
+            {
+                if (onLateUpdate != null)
+                    onLateUpdate.Invoke();
+            }
         }
 
         protected virtual void EntityLateUpdate()
