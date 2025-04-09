@@ -638,45 +638,50 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public bool Attack(ref bool isLeftHand)
+        public bool Attack(ref WeaponHandlingState weaponHandlingState)
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             if (ValidateAttack(ref isLeftHand, out CharacterItem characterItem))
             {
+                if (!isLeftHand)
+                    weaponHandlingState &= ~WeaponHandlingState.IsLeftHand;
                 if (characterItem.GetWeaponItem().FireType == FireType.FireOnRelease && !WillDoActionWhenStopCharging)
                 {
                     StopCharge();
                     return false;
                 }
                 StopCharge();
-                AttackComponent.Attack(isLeftHand);
+                AttackComponent.Attack(weaponHandlingState);
                 return true;
             }
             return false;
         }
 
-        public bool UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public bool UseSkill(int dataId, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             if (ValidateUseSkill(dataId, isLeftHand, targetObjectId))
             {
                 StopCharge();
-                UseSkillComponent.UseSkill(dataId, isLeftHand, targetObjectId, aimPosition);
+                UseSkillComponent.UseSkill(dataId, weaponHandlingState, targetObjectId, aimPosition);
                 return true;
             }
             return false;
         }
 
-        public bool UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public bool UseSkillItem(int itemIndex, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
             if (!IsOwnerClientOrOwnedByServer)
                 return false;
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             if (ValidateUseSkillItem(itemIndex, isLeftHand, targetObjectId))
             {
                 StopCharge();
-                UseSkillComponent.UseSkillItem(itemIndex, isLeftHand, targetObjectId, aimPosition);
+                UseSkillComponent.UseSkillItem(itemIndex, weaponHandlingState, targetObjectId, aimPosition);
                 return true;
             }
             return false;

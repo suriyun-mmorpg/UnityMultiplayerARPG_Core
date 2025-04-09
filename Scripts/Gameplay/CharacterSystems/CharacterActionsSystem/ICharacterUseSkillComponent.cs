@@ -14,11 +14,17 @@
         bool IsUseRootMotionWhileUsingSkill { get; }
         float MoveSpeedRateWhileUsingSkill { get; }
         MovementRestriction MovementRestrictionWhileUsingSkill { get; }
+        System.Action OnCastSkillStart { get; set; }
+        System.Action OnCastSkillEnd { get; set; }
+        System.Action OnUseSkillStart { get; set; }
+        System.Action<int> OnUseSkillTrigger { get; set; }
+        System.Action OnUseSkillEnd { get; set; }
+        System.Action OnSkillInterupted { get; set; }
 
         void InterruptCastingSkill();
         void CancelSkill();
         void ClearUseSkillStates();
-        void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition);
-        void UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition);
+        void UseSkill(int dataId, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition);
+        void UseSkillItem(int itemIndex, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition);
     }
 }

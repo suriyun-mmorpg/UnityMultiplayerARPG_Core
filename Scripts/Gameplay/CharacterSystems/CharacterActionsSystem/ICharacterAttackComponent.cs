@@ -8,9 +8,13 @@
         bool IsUseRootMotionWhileAttacking { get; }
         float MoveSpeedRateWhileAttacking { get; }
         MovementRestriction MovementRestrictionWhileAttacking { get; }
+        System.Action OnAttackStart { get; set; }
+        System.Action<int> OnAttackTrigger { get; set; }
+        System.Action OnAttackEnd { get; set; }
+        System.Action OnAttackInterupted { get; set; }
 
         void CancelAttack();
         void ClearAttackStates();
-        void Attack(bool isLeftHand);
+        void Attack(WeaponHandlingState weaponHandlingState);
     }
 }

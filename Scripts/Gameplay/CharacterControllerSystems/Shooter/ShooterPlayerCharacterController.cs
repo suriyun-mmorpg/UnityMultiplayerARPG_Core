@@ -1769,8 +1769,12 @@ namespace MultiplayerARPG
         {
             if (PauseFireInputFrames > 0)
                 return;
-            if (!PlayingCharacterEntity.Attack(ref isLeftHand))
-                ReloadUpdater.InterruptByAttacking(isLeftHand);
+            WeaponHandlingState weaponHandlingState = GetWeaponHandlingState(isLeftHand);
+            if (!PlayingCharacterEntity.Attack(ref weaponHandlingState))
+            {
+                ReloadUpdater.InterruptByAttacking(weaponHandlingState);
+                isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
+            }
         }
 
         public virtual void WeaponCharge(ref bool isLeftHand)
@@ -1871,11 +1875,11 @@ namespace MultiplayerARPG
             {
                 if (_queueUsingSkill.itemIndex >= 0)
                 {
-                    PlayingCharacterEntity.UseSkillItem(_queueUsingSkill.itemIndex, isLeftHand, SelectedGameEntityObjectId, _queueUsingSkill.aimPosition);
+                    PlayingCharacterEntity.UseSkillItem(_queueUsingSkill.itemIndex, GetWeaponHandlingState(isLeftHand), SelectedGameEntityObjectId, _queueUsingSkill.aimPosition);
                 }
                 else
                 {
-                    PlayingCharacterEntity.UseSkill(_queueUsingSkill.skill.DataId, isLeftHand, SelectedGameEntityObjectId, _queueUsingSkill.aimPosition);
+                    PlayingCharacterEntity.UseSkill(_queueUsingSkill.skill.DataId, GetWeaponHandlingState(isLeftHand), SelectedGameEntityObjectId, _queueUsingSkill.aimPosition);
                 }
             }
             ClearQueueUsingSkill();
@@ -1968,6 +1972,20 @@ namespace MultiplayerARPG
         {
             base.ConfirmBuild();
             PauseFireInputFrames = PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD;
+        }
+
+        public WeaponHandlingState GetWeaponHandlingState(bool isLeftHand)
+        {
+            WeaponHandlingState weaponHandlingState = WeaponHandlingState.None;
+            if (isLeftHand)
+                weaponHandlingState |= WeaponHandlingState.IsLeftHand;
+            if (IsZoomAimming)
+                weaponHandlingState |= WeaponHandlingState.IsAiming;
+            if (ActiveViewMode == ShooterControllerViewMode.Fps)
+                weaponHandlingState |= WeaponHandlingState.IsFpsView;
+            if (ActiveViewMode == ShooterControllerViewMode.Shoulder)
+                weaponHandlingState |= WeaponHandlingState.IsShoulderView;
+            return weaponHandlingState;
         }
     }
 }

@@ -116,6 +116,14 @@ namespace MultiplayerARPG
         /// </summary>
         Vector2 FireSpreadRange { get; }
         /// <summary>
+        /// Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}, while in FPS view mode
+        /// </summary>
+        Vector2 FireSpreadRangeWhileFpsViewMode { get; }
+        /// <summary>
+        /// Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}, while in shoulder view mode
+        /// </summary>
+        Vector2 FireSpreadRangeWhileShoulderViewMode { get; }
+        /// <summary>
         /// Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}, while aiming
         /// </summary>
         Vector2 FireSpreadRangeWhileAiming { get; }
@@ -127,6 +135,14 @@ namespace MultiplayerARPG
         /// Recoiling
         /// </summary>
         float Recoil { get; }
+        /// <summary>
+        /// Recoiling, while in FPS view mode
+        /// </summary>
+        float RecoilWhileFpsViewMode { get; }
+        /// <summary>
+        /// Recoiling, while in shoulder view mode
+        /// </summary>
+        float RecoilWhileShoulderViewMode { get; }
         /// <summary>
         /// Recoiling, while aiming
         /// </summary>

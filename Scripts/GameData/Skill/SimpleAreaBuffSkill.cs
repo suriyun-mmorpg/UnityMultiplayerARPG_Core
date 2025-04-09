@@ -45,7 +45,7 @@ namespace MultiplayerARPG
         protected override void ApplySkillImplement(
             BaseCharacterEntity skillUser,
             int skillLevel,
-            bool isLeftHand,
+            WeaponHandlingState weaponHandlingState,
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,

@@ -314,7 +314,7 @@ namespace MultiplayerARPG
                 if (_queueSkill != null && Entity.IndexOfSkillUsage(SkillUsageType.Skill, _queueSkill.DataId) < 0)
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
-                    Entity.UseSkill(_queueSkill.DataId, false, 0, new AimPosition()
+                    Entity.UseSkill(_queueSkill.DataId, WeaponHandlingState.None, 0, new AimPosition()
                     {
                         type = AimPositionType.Position,
                         position = _queueSkill.GetDefaultAttackAimPosition(Entity, _queueSkillLevel, _isLeftHandAttacking, targetEnemy),
@@ -323,7 +323,11 @@ namespace MultiplayerARPG
                 else
                 {
                     // Attack when no queue skill
-                    Entity.Attack(ref _isLeftHandAttacking);
+                    WeaponHandlingState weaponHandlingState = WeaponHandlingState.None;
+                    if (_isLeftHandAttacking)
+                        weaponHandlingState |= WeaponHandlingState.IsLeftHand;
+                    if (Entity.Attack(ref weaponHandlingState))
+                        _isLeftHandAttacking = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
                 }
 
                 ClearActionState();

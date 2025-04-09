@@ -137,11 +137,15 @@ namespace MultiplayerARPG
         public int maxAmmoEachReload;
         [FormerlySerializedAs("fireStagger")]
         public Vector2 fireSpreadRange;
-        public Vector2 fireSpreadRangeWhileAiming;
+        public Vector2 fireSpreadRangeWhileFpsViewMode = Vector2.one * float.MinValue;
+        public Vector2 fireSpreadRangeWhileShoulderViewMode = Vector2.one * float.MinValue;
+        public Vector2 fireSpreadRangeWhileAiming = Vector2.one * float.MinValue;
         [FormerlySerializedAs("fireSpread")]
         public byte fireSpreadAmount;
         public float recoil = 1f;
-        public float recoilWhileAiming = 1;
+        public float recoilWhileFpsViewMode = float.MinValue;
+        public float recoilWhileShoulderViewMode = float.MinValue;
+        public float recoilWhileAiming = float.MinValue;
         public float chargeDuration;
         public bool destroyImmediatelyAfterFired;
 
@@ -680,6 +684,16 @@ namespace MultiplayerARPG
             get { return fireSpreadRange; }
         }
 
+        public Vector2 FireSpreadRangeWhileFpsViewMode
+        {
+            get { return fireSpreadRangeWhileFpsViewMode; }
+        }
+
+        public Vector2 FireSpreadRangeWhileShoulderViewMode
+        {
+            get { return fireSpreadRangeWhileShoulderViewMode; }
+        }
+
         public Vector2 FireSpreadRangeWhileAiming
         {
             get { return fireSpreadRangeWhileAiming; }
@@ -693,6 +707,16 @@ namespace MultiplayerARPG
         public float Recoil
         {
             get { return recoil; }
+        }
+
+        public float RecoilWhileFpsViewMode
+        {
+            get { return recoilWhileFpsViewMode; }
+        }
+
+        public float RecoilWhileShoulderViewMode
+        {
+            get { return recoilWhileShoulderViewMode; }
         }
 
         public float RecoilWhileAiming

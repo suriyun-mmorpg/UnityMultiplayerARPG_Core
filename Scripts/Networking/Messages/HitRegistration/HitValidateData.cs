@@ -25,9 +25,9 @@ namespace MultiplayerARPG
         /// </summary>
         public List<Dictionary<DamageElement, MinMaxFloat>> DamageAmounts { get; set; }
         /// <summary>
-        /// Attack by left-hand weapon?
+        /// Attack by left-hand weapon?, while aimming?, while in FPS view mode?
         /// </summary>
-        public bool IsLeftHand { get; set; }
+        public WeaponHandlingState WeaponHandlingState { get; set; }
         /// <summary>
         /// Weapon which being used for attacking
         /// </summary>
@@ -50,10 +50,6 @@ namespace MultiplayerARPG
         /// If object were hit it might not allow to being hitted again (up to implementation)
         /// </summary>
         public HashSet<string> HitObjects { get; } = new HashSet<string>();
-        /// <summary>
-        /// Aiming while attacking?
-        /// </summary>
-        public bool IsAiming { get; set; }
         /// <summary>
         /// Set any validator data here
         /// </summary>

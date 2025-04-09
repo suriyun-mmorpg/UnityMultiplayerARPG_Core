@@ -48,9 +48,9 @@ namespace MultiplayerARPG
             if (s_validatingHits.TryGetValue(id, out HitValidateData hitValidateData))
                 return hitValidateData;
             return null;
-        }    
+        }
 
-        public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, bool isLeftHand, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, WeaponHandlingState weaponHandlingState, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             string id = HitRegistrationUtils.MakeValidateId(attacker.ObjectId, simulateSeed);
             bool appending = false;
@@ -65,7 +65,7 @@ namespace MultiplayerARPG
             hitValidateData.FireSpread = fireSpread;
             hitValidateData.DamageInfo = damageInfo;
             hitValidateData.DamageAmounts = damageAmounts;
-            hitValidateData.IsLeftHand = isLeftHand;
+            hitValidateData.WeaponHandlingState = weaponHandlingState;
             hitValidateData.Weapon = weapon;
             hitValidateData.Skill = skill;
             hitValidateData.SkillLevel = skillLevel;

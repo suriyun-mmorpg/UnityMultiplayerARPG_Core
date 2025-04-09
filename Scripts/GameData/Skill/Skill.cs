@@ -101,7 +101,7 @@ namespace MultiplayerARPG
         protected override async void ApplySkillImplement(
             BaseCharacterEntity skillUser,
             int skillLevel,
-            bool isLeftHand,
+            WeaponHandlingState weaponHandlingState,
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,
@@ -117,6 +117,7 @@ namespace MultiplayerARPG
             ApplySkillBuff(skillUser, skillLevel, weapon, targetObjectId);
 
             // Apply attack skill
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             if (IsAttack && TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
             {
                 // Launch damage entity to apply damage to other characters

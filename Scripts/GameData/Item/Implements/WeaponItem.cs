@@ -365,6 +365,22 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
+        [Tooltip("Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}, while in FPS view mode")]
+        private Vector2 fireSpreadRangeWhileFpsViewMode = Vector2.one * float.MinValue;
+        public Vector2 FireSpreadRangeWhileFpsViewMode
+        {
+            get { return fireSpreadRangeWhileFpsViewMode; }
+        }
+
+        [SerializeField]
+        [Tooltip("Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}, while in shoulder view mode")]
+        private Vector2 fireSpreadRangeWhileShoulderViewMode = Vector2.one * float.MinValue;
+        public Vector2 FireSpreadRangeWhileShoulderViewMode
+        {
+            get { return fireSpreadRangeWhileShoulderViewMode; }
+        }
+
+        [SerializeField]
         [Tooltip("Random spread from aiming position, then when shoot actual shot position will be {aim position} + {randomed spread}, while aiming")]
         private Vector2 fireSpreadRangeWhileAiming = Vector2.zero;
         public Vector2 FireSpreadRangeWhileAiming
@@ -386,6 +402,20 @@ namespace MultiplayerARPG
         public float Recoil
         {
             get { return recoil; }
+        }
+
+        [SerializeField]
+        private float recoilWhileFpsViewMode = float.MinValue;
+        public float RecoilWhileFpsViewMode
+        {
+            get { return recoilWhileFpsViewMode; }
+        }
+
+        [SerializeField]
+        private float recoilWhileShoulderViewMode = float.MinValue;
+        public float RecoilWhileShoulderViewMode
+        {
+            get { return recoilWhileShoulderViewMode; }
         }
 
         [SerializeField]

@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         public ShooterPlayerCharacterController Controller { get; set; }
         public BasePlayerCharacterEntity PlayingCharacterEntity => Controller.PlayingCharacterEntity;
         public bool IsReloading { get; protected set; }
-        public bool? IsAttackingLeftHand { get; protected set; }
+        public WeaponHandlingState? AttackingWeaponHandlingState { get; protected set; }
         [SerializeField]
         protected bool _continueReloadingAfterAttack = false;
         protected int? _reloadedDataIdR = null;
@@ -37,9 +37,9 @@ namespace MultiplayerARPG
             IsReloading = false;
         }
 
-        public virtual void InterruptByAttacking(bool isLeftHand)
+        public virtual void InterruptByAttacking(WeaponHandlingState weaponHandlingState)
         {
-            IsAttackingLeftHand = isLeftHand;
+            AttackingWeaponHandlingState = weaponHandlingState;
         }
 
         protected virtual void Update()
@@ -91,7 +91,7 @@ namespace MultiplayerARPG
                 // Not continue reloading
                 IsReloading = false;
             }
-            IsAttackingLeftHand = null;
+            AttackingWeaponHandlingState = null;
         }
 
         /// <summary>
@@ -100,11 +100,11 @@ namespace MultiplayerARPG
         /// <returns></returns>
         private bool ProceedAttacking()
         {
-            if (!IsAttackingLeftHand.HasValue)
+            if (!AttackingWeaponHandlingState.HasValue)
                 return false;
-            bool isLeftHand = IsAttackingLeftHand.Value;
-            PlayingCharacterEntity.Attack(ref isLeftHand);
-            IsAttackingLeftHand = null;
+            WeaponHandlingState weaponHandlingState = AttackingWeaponHandlingState.Value;
+            PlayingCharacterEntity.Attack(ref weaponHandlingState);
+            AttackingWeaponHandlingState = null;
             return true;
         }
 

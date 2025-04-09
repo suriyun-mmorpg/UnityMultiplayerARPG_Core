@@ -19,7 +19,7 @@ namespace MultiplayerARPG
             public int? ItemDataId;
             public BaseSkill Skill;
             public int SkillLevel;
-            public bool IsLeftHand;
+            public WeaponHandlingState WeaponHandlingState;
             public uint TargetObjectId;
             public AimPosition AimPosition;
         }
@@ -120,7 +120,8 @@ namespace MultiplayerARPG
         protected virtual async UniTaskVoid UseSkillRoutine(long peerTimestamp, UseSkillState simulateState)
         {
             int simulateSeed = GetSimulateSeed(peerTimestamp);
-            bool isLeftHand = simulateState.IsLeftHand;
+            WeaponHandlingState weaponHandlingState = simulateState.WeaponHandlingState;
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             BaseSkill skill = simulateState.Skill;
             int skillLevel = simulateState.SkillLevel;
             uint targetObjectId = simulateState.TargetObjectId;
@@ -205,7 +206,7 @@ namespace MultiplayerARPG
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, 0, damageInfo, damageAmounts, isLeftHand, weapon, skill, skillLevel);
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, 0, damageInfo, damageAmounts, weaponHandlingState, weapon, skill, skillLevel);
 
                 // Play special effect
                 if (IsClient)
@@ -344,7 +345,7 @@ namespace MultiplayerARPG
                             targetObjectId = targetObjectId,
                             aimPosition = aimPosition,
                         });
-                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
+                        ApplySkillUsing(skill, skillLevel, weaponHandlingState, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
                     }
                     else if (IsOwnerClient)
                     {
@@ -355,7 +356,7 @@ namespace MultiplayerARPG
                             targetObjectId = targetObjectId,
                             aimPosition = aimPosition,
                         });
-                        ApplySkillUsing(skill, skillLevel, isLeftHand, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
+                        ApplySkillUsing(skill, skillLevel, weaponHandlingState, weapon, simulateSeed, triggerIndex, damageAmounts, targetObjectId, aimPosition);
                     }
 
                     if (remainsDuration <= 0f)
@@ -418,7 +419,7 @@ namespace MultiplayerARPG
                 return;
             }
             RPC(RpcSimulateActionTrigger, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
-            ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageAmounts, data.targetObjectId, data.aimPosition);
+            ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.WeaponHandlingState, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageAmounts, data.targetObjectId, data.aimPosition);
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogUseSkillTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
         }
@@ -433,10 +434,10 @@ namespace MultiplayerARPG
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
             if (validateData == null || validateData.Skill == null)
                 return;
-            ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageAmounts, data.targetObjectId, data.aimPosition);
+            ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.WeaponHandlingState, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageAmounts, data.targetObjectId, data.aimPosition);
         }
 
-        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, WeaponHandlingState weaponHandlingState, CharacterItem weapon, int simulateSeed, byte triggerIndex, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, uint targetObjectId, AimPosition aimPosition)
         {
             if (triggerIndex >= damageAmounts.Count)
             {
@@ -447,7 +448,7 @@ namespace MultiplayerARPG
             skill.ApplySkill(
                 Entity,
                 skillLevel,
-                isLeftHand,
+                weaponHandlingState,
                 weapon,
                 simulateSeed,
                 triggerIndex,
@@ -456,8 +457,9 @@ namespace MultiplayerARPG
                 aimPosition);
         }
 
-        public virtual void UseSkill(int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public virtual void UseSkill(int dataId, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             long timestamp = Manager.ServerTimestamp;
             if (!IsServer && IsOwnerClient)
             {
@@ -466,31 +468,31 @@ namespace MultiplayerARPG
                     ClientGenericActions.ClientReceiveGameMessage(gameMessage);
                     return;
                 }
-                ProceedUseSkill(timestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-                RPC(CmdUseSkill, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, dataId, isLeftHand, targetObjectId, aimPosition);
+                ProceedUseSkill(timestamp, skill, skillLevel, weaponHandlingState, targetObjectId, aimPosition);
+                RPC(CmdUseSkill, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, dataId, weaponHandlingState, targetObjectId, aimPosition);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                ProceedCmdUseSkill(timestamp, dataId, isLeftHand, targetObjectId, aimPosition);
+                ProceedCmdUseSkill(timestamp, dataId, weaponHandlingState, targetObjectId, aimPosition);
             }
         }
 
         [ServerRpc]
-        protected void CmdUseSkill(long peerTimestamp, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void CmdUseSkill(long peerTimestamp, int dataId, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
-            ProceedCmdUseSkill(peerTimestamp, dataId, isLeftHand, targetObjectId, aimPosition);
+            ProceedCmdUseSkill(peerTimestamp, dataId, weaponHandlingState, targetObjectId, aimPosition);
         }
 
-        protected void ProceedCmdUseSkill(long peerTimestamp, int dataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedCmdUseSkill(long peerTimestamp, int dataId, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
-            if (!Entity.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out int skillLevel, out _))
+            if (!Entity.ValidateSkillToUse(dataId, weaponHandlingState.Has(WeaponHandlingState.IsLeftHand), targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                 return;
-            ProceedUseSkill(peerTimestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-            RPC(RpcUseSkill, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, dataId, skillLevel, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkill(peerTimestamp, skill, skillLevel, weaponHandlingState, targetObjectId, aimPosition);
+            RPC(RpcUseSkill, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, dataId, skillLevel, weaponHandlingState, targetObjectId, aimPosition);
         }
 
         [AllRpc]
-        protected void RpcUseSkill(long peerTimestamp, int dataId, int skillLevel, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void RpcUseSkill(long peerTimestamp, int dataId, int skillLevel, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
             if (IsServer || IsOwnerClient)
             {
@@ -499,25 +501,26 @@ namespace MultiplayerARPG
             }
             if (!GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill))
                 return;
-            ProceedUseSkill(peerTimestamp, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkill(peerTimestamp, skill, skillLevel, weaponHandlingState, targetObjectId, aimPosition);
         }
 
-        protected void ProceedUseSkill(long peerTimestamp, BaseSkill skill, int skillLevel, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedUseSkill(long peerTimestamp, BaseSkill skill, int skillLevel, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
             UseSkillState simulateState = new UseSkillState()
             {
                 SimulateSeed = GetSimulateSeed(peerTimestamp),
                 Skill = skill,
                 SkillLevel = skillLevel,
-                IsLeftHand = isLeftHand,
+                WeaponHandlingState = weaponHandlingState,
                 TargetObjectId = targetObjectId,
                 AimPosition = aimPosition,
             };
             UseSkillRoutine(peerTimestamp, simulateState).Forget();
         }
 
-        public virtual void UseSkillItem(int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        public virtual void UseSkillItem(int itemIndex, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             long timestamp = Manager.ServerTimestamp;
             if (!IsServer && IsOwnerClient)
             {
@@ -527,31 +530,31 @@ namespace MultiplayerARPG
                     return;
                 }
                 Entity.LastUseItemTime = Time.unscaledTime;
-                ProceedUseSkillItem(timestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-                RPC(CmdUseSkillItem, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
+                ProceedUseSkillItem(timestamp, skillItem, skill, skillLevel, weaponHandlingState, targetObjectId, aimPosition);
+                RPC(CmdUseSkillItem, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, itemIndex, weaponHandlingState, targetObjectId, aimPosition);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                ProceedCmdUseSkillItem(timestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
+                ProceedCmdUseSkillItem(timestamp, itemIndex, weaponHandlingState, targetObjectId, aimPosition);
             }
         }
 
         [ServerRpc]
-        protected void CmdUseSkillItem(long peerTimestamp, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void CmdUseSkillItem(long peerTimestamp, int itemIndex, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
-            ProceedCmdUseSkillItem(peerTimestamp, itemIndex, isLeftHand, targetObjectId, aimPosition);
+            ProceedCmdUseSkillItem(peerTimestamp, itemIndex, weaponHandlingState, targetObjectId, aimPosition);
         }
 
-        protected void ProceedCmdUseSkillItem(long peerTimestamp, int itemIndex, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedCmdUseSkillItem(long peerTimestamp, int itemIndex, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
-            if (!Entity.ValidateSkillItemToUse(itemIndex, isLeftHand, targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
+            if (!Entity.ValidateSkillItemToUse(itemIndex, weaponHandlingState.Has(WeaponHandlingState.IsLeftHand), targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
-            ProceedUseSkillItem(peerTimestamp, skillItem, skill, skillLevel, isLeftHand, targetObjectId, aimPosition);
-            RPC(RpcUseSkillItem, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, skillItem.DataId, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkillItem(peerTimestamp, skillItem, skill, skillLevel, weaponHandlingState, targetObjectId, aimPosition);
+            RPC(RpcUseSkillItem, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, skillItem.DataId, weaponHandlingState, targetObjectId, aimPosition);
         }
 
         [AllRpc]
-        protected void RpcUseSkillItem(long peerTimestamp, int itemDataId, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void RpcUseSkillItem(long peerTimestamp, int itemDataId, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
             if (IsServer || IsOwnerClient)
             {
@@ -560,10 +563,10 @@ namespace MultiplayerARPG
             }
             if (!GameInstance.Items.TryGetValue(itemDataId, out BaseItem item) || !(item is ISkillItem skillItem))
                 return;
-            ProceedUseSkillItem(peerTimestamp, skillItem, skillItem.SkillData, skillItem.SkillLevel, isLeftHand, targetObjectId, aimPosition);
+            ProceedUseSkillItem(peerTimestamp, skillItem, skillItem.SkillData, skillItem.SkillLevel, weaponHandlingState, targetObjectId, aimPosition);
         }
 
-        protected void ProceedUseSkillItem(long peerTimestamp, ISkillItem skillItem, BaseSkill skill, int skillLevel, bool isLeftHand, uint targetObjectId, AimPosition aimPosition)
+        protected void ProceedUseSkillItem(long peerTimestamp, ISkillItem skillItem, BaseSkill skill, int skillLevel, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
             UseSkillState simulateState = new UseSkillState()
             {
@@ -571,7 +574,7 @@ namespace MultiplayerARPG
                 ItemDataId = skillItem.DataId,
                 Skill = skill,
                 SkillLevel = skillLevel,
-                IsLeftHand = isLeftHand,
+                WeaponHandlingState = weaponHandlingState,
                 TargetObjectId = targetObjectId,
                 AimPosition = aimPosition,
             };

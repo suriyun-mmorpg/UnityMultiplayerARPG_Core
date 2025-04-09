@@ -661,7 +661,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="skillUser"></param>
         /// <param name="skillLevel"></param>
-        /// <param name="isLeftHand"></param>
+        /// <param name="weaponHandlingState"></param>
         /// <param name="weapon"></param>
         /// <param name="simulateSeed"></param>
         /// <param name="triggerIndex"></param>
@@ -672,7 +672,7 @@ namespace MultiplayerARPG
         public void ApplySkill(
             BaseCharacterEntity skillUser,
             int skillLevel,
-            bool isLeftHand,
+            WeaponHandlingState weaponHandlingState,
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,
@@ -680,7 +680,9 @@ namespace MultiplayerARPG
             uint targetObjectId,
             AimPosition aimPosition)
         {
-            if (skillUser == null || skillUser.IsDead() || skillLevel <= 0)
+
+            skillLevel = skillUser is BaseMonsterCharacterEntity ? 1 : skillLevel;
+            if (skillUser == null || skillUser.IsDead() || (skillUser is not BaseMonsterCharacterEntity && skillLevel <= 0))
                 return;
             ApplySkillItemCraft(skillUser);
             ApplySkillSummon(skillUser, skillLevel);
@@ -688,7 +690,7 @@ namespace MultiplayerARPG
             ApplySkillImplement(
                 skillUser,
                 skillLevel,
-                isLeftHand,
+                weaponHandlingState,
                 weapon,
                 simulateSeed,
                 triggerIndex,
@@ -769,7 +771,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="skillUser"></param>
         /// <param name="skillLevel"></param>
-        /// <param name="isLeftHand"></param>
+        /// <param name="weaponHandlingState"></param>
         /// <param name="weapon"></param>
         /// <param name="simulateSeed"></param>
         /// <param name="triggerIndex"></param>
@@ -781,7 +783,7 @@ namespace MultiplayerARPG
         protected abstract void ApplySkillImplement(
             BaseCharacterEntity skillUser,
             int skillLevel,
-            bool isLeftHand,
+            WeaponHandlingState weaponHandlingState,
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,

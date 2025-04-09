@@ -15,8 +15,7 @@ namespace MultiplayerARPG
         protected struct AttackState
         {
             public int SimulateSeed;
-            public bool IsLeftHand;
-            public bool IsAiming;
+            public WeaponHandlingState WeaponHandlingState;
         }
 
         protected readonly List<CancellationTokenSource> _attackCancellationTokenSources = new List<CancellationTokenSource>();
@@ -90,8 +89,8 @@ namespace MultiplayerARPG
         {
             CharacterDataCache entityCaches = Entity.GetCaches();
             int simulateSeed = GetSimulateSeed(peerTimestamp);
-            bool isLeftHand = simulateState.IsLeftHand;
-            bool isAiming = simulateState.IsAiming;
+            WeaponHandlingState weaponHandlingState = simulateState.WeaponHandlingState;
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             if (simulateState.SimulateSeed == 0)
                 simulateState.SimulateSeed = simulateSeed;
             else
@@ -226,7 +225,7 @@ namespace MultiplayerARPG
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, damageInfo, damageAmounts, isLeftHand, weapon, null, 0);
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, damageInfo, damageAmounts, weaponHandlingState, weapon, null, 0);
 
                 // Attack starts
                 if (_entityIsPlayer && IsServer)
@@ -294,7 +293,7 @@ namespace MultiplayerARPG
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
-                            ApplyAttack(entityCaches, isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition, isAiming);
+                            ApplyAttack(entityCaches, weaponHandlingState, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                         }
                         else if (IsOwnerClient)
                         {
@@ -308,7 +307,7 @@ namespace MultiplayerARPG
                                 triggerIndex = triggerIndex,
                                 aimPosition = aimPosition,
                             });
-                            ApplyAttack(entityCaches, isLeftHand, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition, isAiming);
+                            ApplyAttack(entityCaches, weaponHandlingState, weapon, simulateSeed, triggerIndex, damageInfo, damageAmounts, aimPosition);
                         }
                     }
 
@@ -378,7 +377,7 @@ namespace MultiplayerARPG
                 return;
             }
             RPC(RpcSimulateActionTrigger, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, data);
-            ApplyAttack(Entity.GetCaches(), validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition, validateData.IsAiming);
+            ApplyAttack(Entity.GetCaches(), validateData.WeaponHandlingState, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
             if (_entityIsPlayer && IsServer)
                 GameInstance.ServerLogHandlers.LogAttackTrigger(_playerCharacterEntity, data.simulateSeed, data.triggerIndex);
         }
@@ -393,10 +392,10 @@ namespace MultiplayerARPG
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
             if (validateData == null)
                 return;
-            ApplyAttack(Entity.GetCaches(), validateData.IsLeftHand, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition, validateData.IsAiming);
+            ApplyAttack(Entity.GetCaches(), validateData.WeaponHandlingState, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
         }
 
-        protected virtual async void ApplyAttack(CharacterDataCache entityCaches, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition, bool isAiming)
+        protected virtual async void ApplyAttack(CharacterDataCache entityCaches, WeaponHandlingState weaponHandlingState, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition)
         {
             if (triggerIndex >= damageAmounts.Count)
             {
@@ -404,6 +403,7 @@ namespace MultiplayerARPG
                 return;
             }
 
+            bool isLeftHand = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             byte fireSpreadAmount = 0;
             Vector3 fireSpreadRange = Vector3.zero;
             IWeaponItem weaponItem = weapon.GetWeaponItem();
@@ -411,7 +411,19 @@ namespace MultiplayerARPG
             {
                 // For monsters, their weapon can be null so have to avoid null exception
                 fireSpreadAmount = weaponItem.FireSpreadAmount;
-                fireSpreadRange = isAiming ? weaponItem.FireSpreadRangeWhileAiming : weaponItem.FireSpreadRange;
+                fireSpreadRange = weaponItem.FireSpreadRange;
+                if (weaponHandlingState.Has(WeaponHandlingState.IsAiming) && weaponItem.FireSpreadRangeWhileAiming.x > float.MinValue)
+                {
+                    fireSpreadRange = weaponItem.FireSpreadRangeWhileAiming;
+                }
+                else if (weaponHandlingState.Has(WeaponHandlingState.IsShoulderView) && weaponItem.FireSpreadRangeWhileShoulderViewMode.x > float.MinValue)
+                {
+                    fireSpreadRange = weaponItem.FireSpreadRangeWhileShoulderViewMode;
+                }
+                else if (weaponHandlingState.Has(WeaponHandlingState.IsFpsView) && weaponItem.FireSpreadRangeWhileFpsViewMode.x > float.MinValue)
+                {
+                    fireSpreadRange = weaponItem.FireSpreadRangeWhileFpsViewMode;
+                }
             }
 
             fireSpreadAmount += (byte)Mathf.CeilToInt(entityCaches.FireSpread);
@@ -445,55 +457,49 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void Attack(bool isLeftHand)
+        public virtual void Attack(WeaponHandlingState weaponHandlingState)
         {
-            bool isAiming = false;
             long timestamp = Manager.ServerTimestamp;
-            if (IsOwnerClient && _entityIsPlayer && BasePlayerCharacterController.Singleton is IShooterWeaponController shooterWeaponController)
-            {
-                isAiming = shooterWeaponController.IsZoomAimming;
-            }
             if (!IsServer && IsOwnerClient)
             {
-                ProceedAttack(timestamp, isLeftHand, isAiming);
-                RPC(CmdAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, isLeftHand, isAiming);
+                ProceedAttack(timestamp, weaponHandlingState);
+                RPC(CmdAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, weaponHandlingState);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
-                PreceedCmdAttack(timestamp, isLeftHand, isAiming);
+                PreceedCmdAttack(timestamp, weaponHandlingState);
             }
         }
 
         [ServerRpc]
-        protected void CmdAttack(long peerTimestamp, bool isLeftHand, bool isAiming)
+        protected void CmdAttack(long peerTimestamp, WeaponHandlingState weaponHandlingState)
         {
-            PreceedCmdAttack(peerTimestamp, isLeftHand, isAiming);
+            PreceedCmdAttack(peerTimestamp, weaponHandlingState);
         }
 
-        protected void PreceedCmdAttack(long peerTimestamp, bool isLeftHand, bool isAiming)
+        protected void PreceedCmdAttack(long peerTimestamp, WeaponHandlingState weaponHandlingState)
         {
-            ProceedAttack(peerTimestamp, isLeftHand, isAiming);
-            RPC(RpcAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, isLeftHand, isAiming);
+            ProceedAttack(peerTimestamp, weaponHandlingState);
+            RPC(RpcAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, weaponHandlingState);
         }
 
         [AllRpc]
-        protected void RpcAttack(long peerTimestamp, bool isLeftHand, bool isAiming)
+        protected void RpcAttack(long peerTimestamp, WeaponHandlingState weaponHandlingState)
         {
             if (IsServer || IsOwnerClient)
             {
                 // Don't play attacking animation again
                 return;
             }
-            ProceedAttack(peerTimestamp, isLeftHand, isAiming);
+            ProceedAttack(peerTimestamp, weaponHandlingState);
         }
 
-        protected void ProceedAttack(long peerTimestamp, bool isLeftHand, bool isAiming)
+        protected void ProceedAttack(long peerTimestamp, WeaponHandlingState weaponHandlingState)
         {
             AttackState simulateState = new AttackState()
             {
                 SimulateSeed = GetSimulateSeed(peerTimestamp),
-                IsLeftHand = isLeftHand,
-                IsAiming = isAiming,
+                WeaponHandlingState = weaponHandlingState,
             };
             AttackRoutine(peerTimestamp, simulateState).Forget();
         }
