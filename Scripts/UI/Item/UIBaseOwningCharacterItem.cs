@@ -23,9 +23,9 @@ namespace MultiplayerARPG
                             return GameInstance.PlayingCharacter.EquipItems[IndexOfData];
                         break;
                     case InventoryType.EquipWeaponRight:
-                        return GameInstance.PlayingCharacter.EquipWeapons.rightHand;
+                        return GameInstance.PlayingCharacter.SelectableWeaponSets[EquipSlotIndex].rightHand;
                     case InventoryType.EquipWeaponLeft:
-                        return GameInstance.PlayingCharacter.EquipWeapons.leftHand;
+                        return GameInstance.PlayingCharacter.SelectableWeaponSets[EquipSlotIndex].leftHand;
                 }
                 return CharacterItem.Empty;
             }
