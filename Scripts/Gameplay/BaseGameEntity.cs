@@ -3,8 +3,8 @@ using Insthync.UnityEditorUtils;
 using LiteNetLib;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
+using Unity.Profiling;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -17,6 +17,9 @@ namespace MultiplayerARPG
         public const byte ACTION_DATA_CHANNEL = 3;
         protected static readonly NetDataWriter s_EntityStateMessageWriter = new NetDataWriter();
         protected static readonly NetDataWriter s_EntityStateDataWriter = new NetDataWriter();
+        protected static readonly ProfilerMarker s_ComponentsUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - ComponentsUpdate");
+        protected static readonly ProfilerMarker s_EntityUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - EntityUpdate");
+        protected static readonly ProfilerMarker s_OnUpdateInvokeProfilerMarker = new ProfilerMarker("BaseGameEntity - OnUpdateInvoke");
 
         public int HashAssetId
         {

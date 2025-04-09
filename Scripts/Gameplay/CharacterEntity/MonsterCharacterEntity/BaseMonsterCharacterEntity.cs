@@ -3,8 +3,8 @@ using Insthync.UnityEditorUtils;
 using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -12,6 +12,7 @@ namespace MultiplayerARPG
     public abstract partial class BaseMonsterCharacterEntity : BaseCharacterEntity
     {
         public const float TELEPORT_TO_SUMMONER_DELAY = 5f;
+        protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("BaseMonsterCharacterEntity - Update");
 
         public readonly Dictionary<BaseCharacterEntity, ReceivedDamageRecord> receivedDamageRecords = new Dictionary<BaseCharacterEntity, ReceivedDamageRecord>();
 
@@ -193,30 +194,31 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            Profiler.BeginSample("BaseMonsterCharacterEntity - Update");
-            if (IsServer)
+            using (s_UpdateProfilerMarker.Auto())
             {
-                if (IsSummoned)
+                if (IsServer)
                 {
-                    if (!Summoner || Summoner.IsDead())
+                    if (IsSummoned)
                     {
-                        // Summoner disappear so destroy it
-                        UnSummon();
-                    }
-                    else
-                    {
-                        float currentTime = Time.unscaledTime;
-                        if (Vector3.Distance(EntityTransform.position, Summoner.EntityTransform.position) > CurrentGameInstance.maxFollowSummonerDistance &&
-                            currentTime - _lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
+                        if (!Summoner || Summoner.IsDead())
                         {
-                            // Teleport to summoner if too far from summoner
-                            Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner), false);
-                            _lastTeleportToSummonerTime = currentTime;
+                            // Summoner disappear so destroy it
+                            UnSummon();
+                        }
+                        else
+                        {
+                            float currentTime = Time.unscaledTime;
+                            if (Vector3.Distance(EntityTransform.position, Summoner.EntityTransform.position) > CurrentGameInstance.maxFollowSummonerDistance &&
+                                currentTime - _lastTeleportToSummonerTime > TELEPORT_TO_SUMMONER_DELAY)
+                            {
+                                // Teleport to summoner if too far from summoner
+                                Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner), false);
+                                _lastTeleportToSummonerTime = currentTime;
+                            }
                         }
                     }
                 }
             }
-            Profiler.EndSample();
         }
 
         public override void SendServerState(long writeTimestamp)

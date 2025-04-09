@@ -1,12 +1,14 @@
 ﻿using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     public partial class MonsterActivityComponent : BaseMonsterActivityComponent
     {
+        protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("MonsterActivityComponent - Update");
+
         [SerializeField]
         protected float turnSmoothSpeed = 10f;
         [Tooltip("Min random delay for next wander")]
@@ -137,65 +139,66 @@ namespace MultiplayerARPG
                 return;
             }
 
-            Profiler.BeginSample("MonsterActivityComponent - Update");
-            Entity.SetSmoothTurnSpeed(turnSmoothSpeed);
-
-            Vector3 currentPosition = Entity.MovementTransform.position;
-            if (Entity.Summoner != null)
+            using (s_UpdateProfilerMarker.Auto())
             {
-                if (!UpdateAttackEnemy(deltaTime, currentPosition))
-                {
-                    UpdateEnemyFindingActivity(deltaTime);
+                Entity.SetSmoothTurnSpeed(turnSmoothSpeed);
 
-                    if (Vector3.Distance(currentPosition, Entity.Summoner.EntityTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
-                        FollowSummoner();
-                    else
-                        UpdateWanderDestinationRandomingActivity(deltaTime);
-                }
-            }
-            else
-            {
-                float distFromSpawnPoint = Vector3.Distance(Entity.SpawnPosition, currentPosition);
-                if (!_reachedSpawnPoint)
+                Vector3 currentPosition = Entity.MovementTransform.position;
+                if (Entity.Summoner != null)
                 {
-                    if (distFromSpawnPoint <= Mathf.Max(1f, randomWanderDistance))
+                    if (!UpdateAttackEnemy(deltaTime, currentPosition))
                     {
-                        _reachedSpawnPoint = true;
-                        _followEnemyElasped = 0f;
-                        Entity.SetTargetEntity(null);
-                        ClearActionState();
+                        UpdateEnemyFindingActivity(deltaTime);
+
+                        if (Vector3.Distance(currentPosition, Entity.Summoner.EntityTransform.position) > CurrentGameInstance.minFollowSummonerDistance)
+                            FollowSummoner();
+                        else
+                            UpdateWanderDestinationRandomingActivity(deltaTime);
                     }
-                    return;
                 }
-
-                if (Entity.IsInSafeArea)
+                else
                 {
-                    UpdateMoveBackToSpawnPointActivity(deltaTime);
-                    return;
-                }
+                    float distFromSpawnPoint = Vector3.Distance(Entity.SpawnPosition, currentPosition);
+                    if (!_reachedSpawnPoint)
+                    {
+                        if (distFromSpawnPoint <= Mathf.Max(1f, randomWanderDistance))
+                        {
+                            _reachedSpawnPoint = true;
+                            _followEnemyElasped = 0f;
+                            Entity.SetTargetEntity(null);
+                            ClearActionState();
+                        }
+                        return;
+                    }
 
-                if (maxDistanceFromSpawnPoint > 0f && distFromSpawnPoint >= maxDistanceFromSpawnPoint)
-                {
-                    UpdateMoveBackToSpawnPointActivity(deltaTime);
-                    return;
-                }
+                    if (Entity.IsInSafeArea)
+                    {
+                        UpdateMoveBackToSpawnPointActivity(deltaTime);
+                        return;
+                    }
 
-                if (followTargetDuration > 0f && _followEnemyElasped >= followTargetDuration)
-                {
-                    UpdateMoveBackToSpawnPointActivity(deltaTime);
-                    return;
-                }
+                    if (maxDistanceFromSpawnPoint > 0f && distFromSpawnPoint >= maxDistanceFromSpawnPoint)
+                    {
+                        UpdateMoveBackToSpawnPointActivity(deltaTime);
+                        return;
+                    }
 
-                if (!UpdateAttackEnemy(deltaTime, currentPosition))
-                {
-                    // No enemy, try find it
-                    _enemyExisted = false;
-                    UpdateEnemyFindingActivity(deltaTime);
-                    // Random movement (if no enemy existed)
-                    UpdateWanderDestinationRandomingActivity(deltaTime);
+                    if (followTargetDuration > 0f && _followEnemyElasped >= followTargetDuration)
+                    {
+                        UpdateMoveBackToSpawnPointActivity(deltaTime);
+                        return;
+                    }
+
+                    if (!UpdateAttackEnemy(deltaTime, currentPosition))
+                    {
+                        // No enemy, try find it
+                        _enemyExisted = false;
+                        UpdateEnemyFindingActivity(deltaTime);
+                        // Random movement (if no enemy existed)
+                        UpdateWanderDestinationRandomingActivity(deltaTime);
+                    }
                 }
             }
-            Profiler.EndSample();
         }
 
         protected virtual void UpdateEnemyFindingActivity(float deltaTime)

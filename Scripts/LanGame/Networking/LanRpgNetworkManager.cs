@@ -7,6 +7,7 @@ using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using Newtonsoft.Json;
+using Unity.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -24,6 +25,8 @@ namespace MultiplayerARPG
             Everyone,
             HostOnly,
         }
+
+        protected static readonly ProfilerMarker s_SaveProfilerMarker = new ProfilerMarker("LanRpgNetworkManager - Save");
 
         [Header("Lan RPG")]
         public float autoSaveDuration = 2f;
@@ -152,26 +155,27 @@ namespace MultiplayerARPG
 
         public void Save(System.Action<IPlayerCharacterData> onBeforeSaveCharacter = null, bool saveWorld = true, bool saveStorage = true)
         {
-            Profiler.BeginSample("LanRpgNetworkManager - Save Data");
-            BasePlayerCharacterEntity playingCharacter = GameInstance.PlayingCharacterEntity;
-            if (playingCharacter != null)
+            using (s_SaveDataProfilerMarker.Auto())
             {
-                selectedCharacter = playingCharacter.CloneTo(selectedCharacter);
-                if (onBeforeSaveCharacter != null)
-                    onBeforeSaveCharacter.Invoke(selectedCharacter);
-                SaveSystem.SaveCharacter(selectedCharacter);
-                SaveSystem.SaveSummonBuffs(selectedCharacter, new List<CharacterSummon>(selectedCharacter.Summons));
-                if (IsServer)
+                BasePlayerCharacterEntity playingCharacter = GameInstance.PlayingCharacterEntity;
+                if (playingCharacter != null)
                 {
-                    if (saveWorld)
-                        SaveSystem.SaveWorld(selectedCharacter, ServerBuildingHandlers.GetBuildings());
+                    selectedCharacter = playingCharacter.CloneTo(selectedCharacter);
+                    if (onBeforeSaveCharacter != null)
+                        onBeforeSaveCharacter.Invoke(selectedCharacter);
+                    SaveSystem.SaveCharacter(selectedCharacter);
+                    SaveSystem.SaveSummonBuffs(selectedCharacter, new List<CharacterSummon>(selectedCharacter.Summons));
+                    if (IsServer)
+                    {
+                        if (saveWorld)
+                            SaveSystem.SaveWorld(selectedCharacter, ServerBuildingHandlers.GetBuildings());
+                        if (saveStorage)
+                            SaveSystem.SaveStorage(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
+                    }
                     if (saveStorage)
-                        SaveSystem.SaveStorage(selectedCharacter, ServerStorageHandlers.GetAllStorageItems());
+                        SaveSystem.SavePlayerStorage(selectedCharacter, selectedCharacterStorageItems);
                 }
-                if (saveStorage)
-                    SaveSystem.SavePlayerStorage(selectedCharacter, selectedCharacterStorageItems);
             }
-            Profiler.EndSample();
         }
 
         protected override void Update()

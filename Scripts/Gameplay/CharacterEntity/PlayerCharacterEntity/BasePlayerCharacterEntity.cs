@@ -1,6 +1,6 @@
 ﻿using Insthync.UnityEditorUtils;
+using Unity.Profiling;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -11,6 +11,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData, IActivatableEntity
     {
+        protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("BasePlayerCharacterEntity - Update");
 
         [Category("Character Settings")]
         [Tooltip("This is list which used as choice of character classes when create character")]
@@ -179,14 +180,15 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            Profiler.BeginSample("BasePlayerCharacterEntity - Update");
-            if (this.IsDead())
+            using (s_UpdateProfilerMarker.Auto())
             {
-                StopMove();
-                SetTargetEntity(null);
-                return;
+                if (this.IsDead())
+                {
+                    StopMove();
+                    SetTargetEntity(null);
+                    return;
+                }
             }
-            Profiler.EndSample();
         }
 
         public virtual float GetActivatableDistance()

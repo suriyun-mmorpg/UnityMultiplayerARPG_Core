@@ -1,7 +1,6 @@
 ﻿using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -96,7 +95,6 @@ namespace MultiplayerARPG
                 return;
             }
 
-            Profiler.BeginSample("UIBaseGameEntity - Update UI");
             BasePlayerCharacterEntity tempPlayingCharacter = GameInstance.PlayingCharacterEntity;
             if (tempPlayingCharacter == Data)
             {
@@ -121,7 +119,6 @@ namespace MultiplayerARPG
                         break;
                 }
             }
-            Profiler.EndSample();
         }
 
         protected override void UpdateData()

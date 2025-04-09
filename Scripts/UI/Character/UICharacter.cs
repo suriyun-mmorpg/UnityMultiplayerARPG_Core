@@ -3,7 +3,6 @@ using System.Linq;
 using Cysharp.Text;
 using LiteNetLibManager;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -228,8 +227,6 @@ namespace MultiplayerARPG
         protected override void Update()
         {
             base.Update();
-
-            Profiler.BeginSample("UICharacter - Update UI (Immediately)");
             CharacterDataCache cache = Data.GetCaches();
             // Hp
             int currentHp = 0;
@@ -285,14 +282,10 @@ namespace MultiplayerARPG
             }
             if (uiGageWater != null)
                 uiGageWater.Update(currentWater, maxWater);
-
-            Profiler.EndSample();
         }
 
         protected override void UpdateUI()
         {
-            Profiler.BeginSample("UICharacter - Update UI");
-
             if (uiTextId != null)
             {
                 uiTextId.text = ZString.Format(
@@ -385,8 +378,6 @@ namespace MultiplayerARPG
                     uiFaction.SetDataByDataId(playerCharacter.FactionId);
                 uiFaction.SetVisible(playerCharacter != null);
             }
-
-            Profiler.EndSample();
         }
 
         protected override void UpdateData()

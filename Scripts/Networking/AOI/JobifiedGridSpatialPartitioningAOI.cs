@@ -1,13 +1,15 @@
 using Insthync.SpatialPartitioningSystems;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
-using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
     public class JobifiedGridSpatialPartitioningAOI : BaseInterestManager
     {
+        protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("JobifiedGridSpatialPartitioningAOI - Update");
+
         public float cellSize = 64f;
         public int maxObjects = 10000;
         [Tooltip("Update every ? seconds")]
@@ -99,47 +101,48 @@ namespace MultiplayerARPG
                 return;
             _updateCountDown = updateInterval;
 
-            Profiler.BeginSample("JobifiedGridSpatialPartitioningAOI - Update");
-            _spatialObjects.Clear();
-            foreach (LiteNetLibIdentity spawnedObject in Manager.Assets.GetSpawnedObjects())
+            using (s_UpdateProfilerMarker.Auto())
             {
-                if (spawnedObject == null)
-                    continue;
-                _spatialObjects.Add(new SpatialObject()
+                _spatialObjects.Clear();
+                foreach (LiteNetLibIdentity spawnedObject in Manager.Assets.GetSpawnedObjects())
                 {
-                    objectId = spawnedObject.ObjectId,
-                    position = spawnedObject.transform.position,
-                    radius = GetVisibleRange(spawnedObject),
-                });
-            }
-            _system.UpdateGrid(_spatialObjects);
-
-            HashSet<uint> subscribings = new HashSet<uint>();
-            foreach (LiteNetLibPlayer player in Manager.GetPlayers())
-            {
-                if (!player.IsReady)
-                {
-                    // Don't subscribe if player not ready
-                    continue;
-                }
-                foreach (LiteNetLibIdentity playerObject in player.GetSpawnedObjects())
-                {
-                    // Update subscribing list, it will unsubscribe objects which is not in this list
-                    subscribings.Clear();
-                    var resultSpatialObjects = _system.QueryRadius(playerObject.transform.position, 0f);
-                    LiteNetLibIdentity contactedObject;
-                    for (int i = 0; i < resultSpatialObjects.Length; ++i)
+                    if (spawnedObject == null)
+                        continue;
+                    _spatialObjects.Add(new SpatialObject()
                     {
-                        uint contactedObjectId = resultSpatialObjects[i].objectId;
-                        if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out contactedObject) &&
-                            ShouldSubscribe(playerObject, contactedObject, false))
-                            subscribings.Add(contactedObjectId);
+                        objectId = spawnedObject.ObjectId,
+                        position = spawnedObject.transform.position,
+                        radius = GetVisibleRange(spawnedObject),
+                    });
+                }
+                _system.UpdateGrid(_spatialObjects);
+
+                HashSet<uint> subscribings = new HashSet<uint>();
+                foreach (LiteNetLibPlayer player in Manager.GetPlayers())
+                {
+                    if (!player.IsReady)
+                    {
+                        // Don't subscribe if player not ready
+                        continue;
                     }
-                    resultSpatialObjects.Dispose();
-                    playerObject.UpdateSubscribings(subscribings);
+                    foreach (LiteNetLibIdentity playerObject in player.GetSpawnedObjects())
+                    {
+                        // Update subscribing list, it will unsubscribe objects which is not in this list
+                        subscribings.Clear();
+                        var resultSpatialObjects = _system.QueryRadius(playerObject.transform.position, 0f);
+                        LiteNetLibIdentity contactedObject;
+                        for (int i = 0; i < resultSpatialObjects.Length; ++i)
+                        {
+                            uint contactedObjectId = resultSpatialObjects[i].objectId;
+                            if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out contactedObject) &&
+                                ShouldSubscribe(playerObject, contactedObject, false))
+                                subscribings.Add(contactedObjectId);
+                        }
+                        resultSpatialObjects.Dispose();
+                        playerObject.UpdateSubscribings(subscribings);
+                    }
                 }
             }
-            Profiler.EndSample();
         }
     }
 }

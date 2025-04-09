@@ -3,14 +3,16 @@ using Insthync.UnityEditorUtils;
 using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
     public abstract partial class DamageableEntity : BaseGameEntity, IDamageableEntity
     {
+        protected static readonly ProfilerMarker s_UpdateHitboxesTransformHistoryProfilerMarker = new ProfilerMarker("DamageableEntity - UpdateHitboxesTransformHistory");
+
         [Category("Relative GameObjects/Transforms")]
         [Tooltip("This is transform where combat texts will be instantiates from")]
         [SerializeField]
@@ -175,12 +177,13 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            Profiler.BeginSample("BaseCharacterEntity - AddHitBoxesTransformHistory");
-            if (CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
-                AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
-            else if (CurrentGameManager.LagCompensationManager.IsDisabled)
-                ClearHitBoxesTransformHistory();
-            Profiler.EndSample();
+            using (s_UpdateHitboxesTransformHistoryProfilerMarker.Auto())
+            {
+                if (CurrentGameManager.LagCompensationManager.ShouldStoreHitBoxesTransformHistory)
+                    AddHitBoxesTransformHistory(CurrentGameManager.ServerTimestamp);
+                else if (CurrentGameManager.LagCompensationManager.IsDisabled)
+                    ClearHitBoxesTransformHistory();
+            }
         }
 
         public void AddHitBoxesTransformHistory(long time)

@@ -39,11 +39,9 @@ namespace MultiplayerARPG
                 return;
             IsRecaching = false;
 
-            Profiler.BeginSample("BaseCharacterEntity - MakeCaches");
             // Make caches with cache manager
             this.MarkToMakeCaches();
             CachedData = this.GetCaches();
-            Profiler.EndSample();
 
             // Invoke recached event
             if (onRecached != null)

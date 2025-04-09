@@ -1,9 +1,9 @@
 ﻿using System.Collections.Generic;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.AI;
-using UnityEngine.Profiling;
 
 namespace MultiplayerARPG
 {
@@ -13,6 +13,7 @@ namespace MultiplayerARPG
         protected static readonly float s_minMagnitudeToDetermineMoving = 0.01f;
         protected static readonly float s_minDistanceToSimulateMovement = 0.01f;
         protected static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
+        protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("NavMeshEntityMovement - Update");
 
         [Header("Movement Settings")]
         public ObstacleAvoidanceType obstacleAvoidanceWhileMoving = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
@@ -276,13 +277,14 @@ namespace MultiplayerARPG
 
         public override void EntityUpdate()
         {
-            Profiler.BeginSample("NavMeshEntityMovement - Update");
-            float deltaTime = Time.deltaTime;
-            UpdateMovement(deltaTime);
-            UpdateRotation(deltaTime);
-            _isDashing = false;
-            _acceptedDash = false;
-            Profiler.EndSample();
+            using (s_UpdateProfilerMarker.Auto())
+            {
+                float deltaTime = Time.deltaTime;
+                UpdateMovement(deltaTime);
+                UpdateRotation(deltaTime);
+                _isDashing = false;
+                _acceptedDash = false;
+            }
         }
 
         public void UpdateMovement(float deltaTime)

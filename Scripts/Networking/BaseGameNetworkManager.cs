@@ -1,15 +1,15 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using Insthync.DevExtension;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using UnityEngine.Rendering;
-using UnityEngine.SceneManagement;
-using Cysharp.Threading.Tasks;
 using System.Collections.Generic;
 using System.Net.Sockets;
+using Unity.Profiling;
 using UnityEngine;
-using UnityEngine.Profiling;
+using UnityEngine.Rendering;
+using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
 {
@@ -22,6 +22,8 @@ namespace MultiplayerARPG
         public const float INSTANTIATES_OBJECTS_DELAY = 0.5f;
 
         protected static readonly NetDataWriter s_Writer = new NetDataWriter();
+        protected static readonly ProfilerMarker s_SendServerStateProfilerMarker = new ProfilerMarker("BaseGameNetworkManager - SendServerState");
+        protected static readonly ProfilerMarker s_SendClientStateProfilerMarker = new ProfilerMarker("BaseGameNetworkManager - SendClientState");
 
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
@@ -181,15 +183,16 @@ namespace MultiplayerARPG
         protected override void OnServerUpdate(LogicUpdater updater)
         {
             base.OnServerUpdate(updater);
-            Profiler.BeginSample("BaseGameNetworkManager - SendServerState");
-            long timestamp = ServerTimestamp;
-            foreach (BaseGameEntity entity in _setOfGameEntity)
+            using (s_SendServerStateProfilerMarker.Auto())
             {
-                if (!entity.enabled)
-                    continue;
-                entity.SendServerState(timestamp);
+                long timestamp = ServerTimestamp;
+                foreach (BaseGameEntity entity in _setOfGameEntity)
+                {
+                    if (!entity.enabled)
+                        continue;
+                    entity.SendServerState(timestamp);
+                }
             }
-            Profiler.EndSample();
         }
 
         protected override void OnClientUpdate(LogicUpdater updater)
@@ -197,16 +200,17 @@ namespace MultiplayerARPG
             base.OnClientUpdate(updater);
             if (IsServer)
                 return;
-            Profiler.BeginSample("BaseGameNetworkManager - SendClientState");
-            long timestamp = ServerTimestamp;
-            foreach (BaseGameEntity entity in _setOfGameEntity)
+            using (s_SendClientStateProfilerMarker.Auto())
             {
-                if (!entity.enabled)
-                    continue;
-                if (entity.IsOwnerClient)
-                    entity.SendClientState(timestamp);
+                long timestamp = ServerTimestamp;
+                foreach (BaseGameEntity entity in _setOfGameEntity)
+                {
+                    if (!entity.enabled)
+                        continue;
+                    if (entity.IsOwnerClient)
+                        entity.SendClientState(timestamp);
+                }
             }
-            Profiler.EndSample();
         }
 
         public void RegisterGameEntity(BaseGameEntity gameEntity)

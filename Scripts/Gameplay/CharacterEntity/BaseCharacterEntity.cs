@@ -5,7 +5,6 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Profiling;
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -274,7 +273,6 @@ namespace MultiplayerARPG
             float deltaTime = Time.unscaledDeltaTime;
 
             UpdateHitboxesTransformHistory();
-            Profiler.BeginSample("BaseCharacterEntity - ApplyFallDamage");
             if (IsServer && CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 bool isGrounded = MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsClimbing);
@@ -292,10 +290,8 @@ namespace MultiplayerARPG
                     _lastGroundedPosition = EntityTransform.position;
                 }
             }
-            Profiler.EndSample();
 
             bool tempEnableMovement = PassengingVehicleEntity.IsNull();
-            Profiler.BeginSample("BaseCharacterEntity - UnderDeadYChecking");
             if (RespawnGroundedCheckCountDown > 0f)
             {
                 // Character won't receive fall damage
@@ -315,7 +311,6 @@ namespace MultiplayerARPG
                     }
                 }
             }
-            Profiler.EndSample();
 
             if (RespawnInvincibleCountDown > 0f)
             {
@@ -331,7 +326,6 @@ namespace MultiplayerARPG
                 tempEnableMovement = false;
             }
 
-            Profiler.BeginSample("BaseCharacterEntity - MovementEnablingUpdate");
             // Enable movement or not
             if (!Movement.IsNull())
             {
@@ -343,7 +337,6 @@ namespace MultiplayerARPG
                     Movement.Enabled = tempEnableMovement;
                 }
             }
-            Profiler.EndSample();
 
             UpdateModelManager(deltaTime);
             UpdateCharacterModel(deltaTime);
@@ -987,9 +980,7 @@ namespace MultiplayerARPG
             where T : DamageableEntity
         {
             List<T> result = new List<T>();
-            Profiler.BeginSample("Character Entity Components - Find Entities");
             int tempOverlapSize = FindPhysicFunctions.OverlapObjects(origin, distance, overlapMask);
-            Profiler.EndSample();
             if (tempOverlapSize == 0)
                 return result;
             IDamageableEntity tempBaseEntity;
@@ -1030,9 +1021,7 @@ namespace MultiplayerARPG
         public T FindNearestEntity<T>(Vector3 origin, float distance, bool findForAliveOnly, bool findForAlly, bool findForEnemy, bool findForNeutral, int overlapMask, bool findInFov = false, float fov = 0)
             where T : DamageableEntity
         {
-            Profiler.BeginSample("Character Entity Components - Find Nearest Characters");
             int tempOverlapSize = FindPhysicFunctions.OverlapObjects(origin, distance, overlapMask);
-            Profiler.EndSample();
             if (tempOverlapSize == 0)
                 return null;
             float tempDistance;
@@ -1186,16 +1175,13 @@ namespace MultiplayerARPG
 
         protected void UpdateAppearances()
         {
-            Profiler.BeginSample("BaseCharacterEntity - UpdateAppearances");
             CharacterModel.SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
             if (IsOwnerClient && FpsModel != null)
                 FpsModel.SetEquipItems(EquipItems, SelectableWeaponSets, EquipWeaponSet, IsWeaponsSheathed);
-            Profiler.EndSample();
         }
 
         protected void UpdateModelManager(float deltaTime)
         {
-            Profiler.BeginSample("BaseCharacterEntity - UpdateModelManager");
             // Update character model handler based on passenging vehicle
             ModelManager.UpdatePassengingVehicle(PassengingVehicleType, PassengingVehicleSeatIndex);
             // Set character model hide state
@@ -1207,12 +1193,10 @@ namespace MultiplayerARPG
             if (!isHide && PassengingVehicleSeat != null && PassengingVehicleSeat.hidePassenger)
                 isHide = true;
             ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, isHide);
-            Profiler.EndSample();
         }
 
         protected void UpdateCharacterModel(float deltaTime)
         {
-            Profiler.BeginSample("BaseCharacterEntity - UpdateCharacterModel");
             // Update model animations
             if (IsClient || GameInstance.Singleton.updateAnimationAtServer)
             {
@@ -1225,12 +1209,10 @@ namespace MultiplayerARPG
                 // Update animation
                 CharacterModel.UpdateAnimation(deltaTime);
             }
-            Profiler.EndSample();
         }
 
         protected void UpdateFpsModel(float deltaTime)
         {
-            Profiler.BeginSample("BaseCharacterEntity - UpdateFpsModel");
             // Update FPS model
             if (IsOwnerClient && FpsModel != null && FpsModel.gameObject.activeSelf)
             {
@@ -1243,7 +1225,6 @@ namespace MultiplayerARPG
                 // Update animation
                 FpsModel.UpdateAnimation(deltaTime);
             }
-            Profiler.EndSample();
         }
         #endregion
 

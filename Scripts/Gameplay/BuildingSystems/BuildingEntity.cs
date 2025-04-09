@@ -1,12 +1,12 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.Profiling;
 using UnityEngine.UI;
-using Cysharp.Text;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -17,6 +17,7 @@ namespace MultiplayerARPG
     public partial class BuildingEntity : DamageableEntity, IBuildingSaveData, IActivatableEntity, IHoldActivatableEntity
     {
         public const float BUILD_DISTANCE_BUFFER = 0.1f;
+        protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("BuildingEntity - Update");
 
         [Category(5, "Building Settings")]
         [SerializeField]
@@ -306,19 +307,20 @@ namespace MultiplayerARPG
         protected override void EntityUpdate()
         {
             base.EntityUpdate();
-            Profiler.BeginSample("BuildingEntity - Update");
-            if (IsServer && lifeTime > 0f)
+            using (s_UpdateProfilerMarker.Auto())
             {
-                // Reduce remains life time
-                RemainsLifeTime -= Time.deltaTime;
-                if (RemainsLifeTime < 0)
+                if (IsServer && lifeTime > 0f)
                 {
-                    // Destroy building
-                    RemainsLifeTime = 0f;
-                    Destroy();
+                    // Reduce remains life time
+                    RemainsLifeTime -= Time.deltaTime;
+                    if (RemainsLifeTime < 0)
+                    {
+                        // Destroy building
+                        RemainsLifeTime = 0f;
+                        Destroy();
+                    }
                 }
             }
-            Profiler.EndSample();
         }
 
         protected override void EntityLateUpdate()
