@@ -1,7 +1,11 @@
+using Unity.Profiling;
+
 namespace MultiplayerARPG
 {
     public class CharacterBuffCacheManager : BaseCacheManager<CharacterBuff, CharacterBuffCacheData>
     {
+        protected static ProfilerMarker s_profilerMarker = new ProfilerMarker("CharacterBuffCacheManager");
+        public override ProfilerMarker ProfilerMarker => s_profilerMarker;
         public BaseSkill GetSkill(in CharacterBuff data)
         {
             return GetOrMakeCache(data.id, in data)?.GetSkill();

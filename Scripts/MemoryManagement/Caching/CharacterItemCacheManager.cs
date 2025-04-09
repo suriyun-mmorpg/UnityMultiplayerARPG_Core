@@ -1,7 +1,12 @@
+using Unity.Profiling;
+
 namespace MultiplayerARPG
 {
     public class CharacterItemCacheManager : BaseCacheManager<CharacterItem, CharacterItemCacheData>
     {
+        protected static ProfilerMarker s_profilerMarker = new ProfilerMarker("CharacterItemCacheManager");
+        public override ProfilerMarker ProfilerMarker => s_profilerMarker;
+
         public BaseItem GetItem(in CharacterItem data)
         {
             return GetOrMakeCache(data.id, in data)?.GetItem();

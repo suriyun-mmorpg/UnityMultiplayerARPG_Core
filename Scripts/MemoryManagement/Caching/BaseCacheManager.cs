@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -8,21 +9,24 @@ namespace MultiplayerARPG
     {
         public float cacheLifeTime = 30f;
 
+        public abstract ProfilerMarker ProfilerMarker { get; }
         protected Dictionary<string, TCache> _caches = new Dictionary<string, TCache>();
 
         public void OnUpdate()
         {
             if (_caches.Count <= 0)
                 return;
-
-            float time = Time.unscaledTime;
-            List<string> keys = new List<string>(_caches.Keys);
-            foreach (string key in keys)
+            using (ProfilerMarker.Auto())
             {
-                if (time - _caches[key].TouchedTime < cacheLifeTime)
-                    continue;
-                _caches[key].Clear();
-                _caches.Remove(key);
+                float time = Time.unscaledTime;
+                List<string> keys = new List<string>(_caches.Keys);
+                foreach (string key in keys)
+                {
+                    if (time - _caches[key].TouchedTime < cacheLifeTime)
+                        continue;
+                    _caches[key].Clear();
+                    _caches.Remove(key);
+                }
             }
         }
 

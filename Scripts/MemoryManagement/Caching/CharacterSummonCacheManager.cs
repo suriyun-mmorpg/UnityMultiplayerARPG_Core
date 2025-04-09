@@ -1,7 +1,12 @@
+using Unity.Profiling;
+
 namespace MultiplayerARPG
 {
     public class CharacterSummonCacheManager : BaseCacheManager<CharacterSummon, CharacterSummonCacheData>
     {
+        protected static ProfilerMarker s_profilerMarker = new ProfilerMarker("CharacterSummonCacheManager");
+        public override ProfilerMarker ProfilerMarker => s_profilerMarker;
+
         public BaseMonsterCharacterEntity GetEntity(in CharacterSummon data)
         {
             return GetOrMakeCache(data.id, in data)?.CacheEntity;

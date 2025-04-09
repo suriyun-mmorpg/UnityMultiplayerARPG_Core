@@ -1,10 +1,13 @@
 ﻿using System.Collections.Generic;
+using Unity.Profiling;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class CharacterDataCache
     {
+        private static ProfilerMarker s_profilerMarker = new ProfilerMarker("CharacterDataCache - GetCaches");
+
         public bool IsRecaching { get; private set; }
         private CharacterStats _stats;
         public CharacterStats Stats => _stats;
@@ -225,261 +228,264 @@ namespace MultiplayerARPG
 
         public CharacterDataCache GetCaches(ICharacterData characterData)
         {
-            // Don't make cache if not needed
-            if (!IsRecaching)
+            using (s_profilerMarker.Auto())
+            {
+                // Don't make cache if not needed
+                if (!IsRecaching)
+                    return this;
+
+                IsRecaching = false;
+                Attributes.Clear();
+                Resistances.Clear();
+                Armors.Clear();
+                RightHandDamages.Clear();
+                LeftHandDamages.Clear();
+                IncreaseDamages.Clear();
+                IncreaseDamagesRate.Clear();
+                Skills.Clear();
+                StatusEffectResistances.Clear();
+                EquipmentSets.Clear();
+                RightHandWeaponAbilities.Clear();
+                RightHandWeaponAbilityIndexes.Clear();
+                LeftHandWeaponAbilities.Clear();
+                LeftHandWeaponAbilityIndexes.Clear();
+
+                int oldBattlePoints = BattlePoints;
+
+                CalculatedBuff tempCalculatedBuff;
+                bool isOverrideDamageInfo = false;
+                DamageInfo overrideDamageInfo = null;
+                bool isOverrideSkills = false;
+                for (int i = characterData.Buffs.Count - 1; i >= 0; --i)
+                {
+                    tempCalculatedBuff = characterData.Buffs[i].GetBuff();
+                    if (!isOverrideDamageInfo && tempCalculatedBuff.IsOverrideDamageInfo())
+                    {
+                        isOverrideDamageInfo = true;
+                        overrideDamageInfo = tempCalculatedBuff.GetOverrideDamageInfo();
+                    }
+                    if (!isOverrideSkills && tempCalculatedBuff.IsOverrideSkills())
+                    {
+                        isOverrideSkills = true;
+                        Skills = null;
+                        Skills = new Dictionary<BaseSkill, int>(tempCalculatedBuff.GetOverrideSkills());
+                    }
+                    if (isOverrideDamageInfo && isOverrideSkills)
+                        break;
+                }
+
+                characterData.GetAllStats(true, true, true,
+                    SetStats,
+                    SetAttributes,
+                    SetResistances,
+                    SetArmors,
+                    SetRightHandDamages,
+                    SetRightHandWeaponDamage,
+                    SetLeftHandDamages,
+                    SetLeftHandWeaponDamage,
+                    isOverrideSkills ? null : SetSkills,
+                    SetStatusEffectResistances,
+                    SetEquipmentSets,
+                    onGetIncreasingDamages: SetIncreaseDamages,
+                    onGetIncreasingDamagesRate: SetIncreaseDamagesRate);
+
+                if (characterData.GetDatabase() != null)
+                    BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;
+
+                TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData, _stats);
+                TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData, _stats);
+                LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, _stats);
+                LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, _stats);
+
+                IsOverweight = (GameInstance.Singleton.IsLimitInventorySlot && TotalItemSlot > LimitItemSlot) || (GameInstance.Singleton.IsLimitInventoryWeight && TotalItemWeight > LimitItemWeight);
+                DisallowMove = false;
+                DisallowSprint = false;
+                DisallowWalk = false;
+                DisallowJump = false;
+                DisallowDash = false;
+                DisallowCrouch = false;
+                DisallowCrawl = false;
+                DisallowAttack = false;
+                DisallowUseSkill = false;
+                DisallowUseItem = false;
+                FreezeAnimation = false;
+                IsHide = false;
+                IsRevealsHide = false;
+                IsBlind = false;
+                MuteFootstepSound = false;
+                HavingChanceToRemoveBuffWhenAttack = false;
+                HavingChanceToRemoveBuffWhenAttacked = false;
+                HavingChanceToRemoveBuffWhenUseSkill = false;
+                HavingChanceToRemoveBuffWhenUseItem = false;
+                HavingChanceToRemoveBuffWhenPickupItem = false;
+
+                bool allAilmentsWereApplied = false;
+                if (characterData is BasePlayerCharacterEntity playerCharacterEntity)
+                {
+                    if (!allAilmentsWereApplied && playerCharacterEntity.PassengingVehicleEntity != null)
+                    {
+                        UpdateAppliedAilments(playerCharacterEntity.PassengingVehicleEntity.GetBuff());
+                        allAilmentsWereApplied = AllAilmentsWereApplied();
+                    }
+                }
+
+                if (!allAilmentsWereApplied)
+                {
+                    foreach (CharacterBuff characterBuff in characterData.Buffs)
+                    {
+                        UpdateAppliedAilments(characterBuff.GetBuff());
+                        allAilmentsWereApplied = AllAilmentsWereApplied();
+                        if (allAilmentsWereApplied)
+                            break;
+                    }
+                }
+
+                if (!allAilmentsWereApplied)
+                {
+                    foreach (CharacterSummon characterBuff in characterData.Summons)
+                    {
+                        UpdateAppliedAilments(characterBuff.GetBuff());
+                        allAilmentsWereApplied = AllAilmentsWereApplied();
+                        if (allAilmentsWereApplied)
+                            break;
+                    }
+                }
+
+                float tempTotalBattlePoint = 0f;
+
+                foreach (Attribute tempAttribute in Attributes.Keys)
+                {
+                    if (tempAttribute == null)
+                        continue;
+                    float amount = Attributes[tempAttribute];
+                    tempTotalBattlePoint += tempAttribute.BattlePointScore * amount;
+                }
+
+                foreach (BaseSkill tempSkill in Skills.Keys)
+                {
+                    if (tempSkill == null)
+                        continue;
+                    int skillLevel = Skills[tempSkill];
+                    tempTotalBattlePoint += tempSkill.battlePointScore * skillLevel;
+                    // Apply ailments by passive buff only
+                    if (!allAilmentsWereApplied && tempSkill.IsPassive && tempSkill.TryGetBuff(out Buff tempBuff))
+                    {
+                        UpdateAppliedAilments(new CalculatedBuff(tempBuff, skillLevel));
+                        allAilmentsWereApplied = AllAilmentsWereApplied();
+                    }
+                }
+
+                foreach (DamageElement tempDamageElement in Resistances.Keys)
+                {
+                    if (tempDamageElement == null)
+                        continue;
+                    float amount = Resistances[tempDamageElement];
+                    tempTotalBattlePoint += tempDamageElement.ResistanceBattlePointScore * amount;
+                }
+
+                foreach (DamageElement tempDamageElement in Armors.Keys)
+                {
+                    if (tempDamageElement == null)
+                        continue;
+                    float amount = Armors[tempDamageElement];
+                    tempTotalBattlePoint += tempDamageElement.ArmorBattlePointScore * amount;
+                }
+
+                foreach (DamageElement tempDamageElement in RightHandDamages.Keys)
+                {
+                    if (tempDamageElement == null)
+                        continue;
+                    MinMaxFloat amount = RightHandDamages[tempDamageElement];
+                    tempTotalBattlePoint += tempDamageElement.DamageBattlePointScore * (amount.min + amount.max) * 0.5f;
+                }
+
+                foreach (DamageElement tempDamageElement in LeftHandDamages.Keys)
+                {
+                    if (tempDamageElement == null)
+                        continue;
+                    MinMaxFloat amount = LeftHandDamages[tempDamageElement];
+                    tempTotalBattlePoint += tempDamageElement.DamageBattlePointScore * (amount.min + amount.max) * 0.5f;
+                }
+
+                if (characterData.EquipWeapons.NotEmptyRightHandSlot())
+                {
+                    tempTotalBattlePoint += characterData.EquipWeapons.rightHand.GetWeaponDamageBattlePoints();
+                }
+
+                if (characterData.EquipWeapons.NotEmptyLeftHandSlot())
+                {
+                    tempTotalBattlePoint += characterData.EquipWeapons.leftHand.GetWeaponDamageBattlePoints();
+                }
+
+                tempTotalBattlePoint += GameInstance.Singleton.GameplayRule.GetBattlePointFromCharacterStats(Stats);
+                BattlePoints = Mathf.CeilToInt(tempTotalBattlePoint);
+
+                if (characterData == GameInstance.PlayingCharacter)
+                {
+                    int battlePointChange = BattlePoints - oldBattlePoints;
+                    if (battlePointChange != 0)
+                        ClientGenericActions.NotifyBattlePointsChanged(battlePointChange);
+                }
+
+                RightHandDamageInfo = null;
+                IsRightHandItemAvailable = false;
+                LeftHandDamageInfo = null;
+                IsLeftHandItemAvailable = false;
+
+                IWeaponItem rightWeaponItem = characterData.EquipWeapons.GetRightHandWeaponItem();
+                if (rightWeaponItem != null)
+                {
+                    IsRightHandItemAvailable = true;
+                    RightHandItem = characterData.EquipWeapons.rightHand;
+                    if (isOverrideDamageInfo)
+                        RightHandDamageInfo = overrideDamageInfo;
+                    else
+                        RightHandDamageInfo = rightWeaponItem.WeaponType.DamageInfo;
+                    if (rightWeaponItem.WeaponAbilities != null && rightWeaponItem.WeaponAbilities.Length > 0)
+                        RightHandWeaponAbilities.AddRange(rightWeaponItem.WeaponAbilities);
+                    AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandWeaponAbilityIndexes, RightHandItem.sockets);
+                }
+
+                IWeaponItem leftWeaponItem = characterData.EquipWeapons.GetLeftHandWeaponItem();
+                if (leftWeaponItem != null)
+                {
+                    IsLeftHandItemAvailable = true;
+                    LeftHandItem = characterData.EquipWeapons.leftHand;
+                    if (isOverrideDamageInfo)
+                        LeftHandDamageInfo = overrideDamageInfo;
+                    else
+                        LeftHandDamageInfo = leftWeaponItem.WeaponType.DamageInfo;
+                    if (leftWeaponItem.WeaponAbilities != null && leftWeaponItem.WeaponAbilities.Length > 0)
+                        LeftHandWeaponAbilities.AddRange(leftWeaponItem.WeaponAbilities);
+                    AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandWeaponAbilityIndexes, LeftHandItem.sockets);
+                }
+
+                if (!IsLeftHandItemAvailable && !IsRightHandItemAvailable)
+                {
+                    if (characterData is BaseMonsterCharacterEntity monsterCharacterEntity)
+                    {
+                        // Monster has its own damage info set to game database
+                        IsRightHandItemAvailable = true;
+                        RightHandItem = CharacterItem.CreateMonsterWeapon();
+                        if (isOverrideDamageInfo)
+                            RightHandDamageInfo = overrideDamageInfo;
+                        else
+                            RightHandDamageInfo = monsterCharacterEntity.CharacterDatabase.DamageInfo;
+                    }
+                    else
+                    {
+                        // No equipped weapon?, use default one
+                        IsRightHandItemAvailable = true;
+                        RightHandItem = CharacterItem.CreateDefaultWeapon();
+                        if (isOverrideDamageInfo)
+                            RightHandDamageInfo = overrideDamageInfo;
+                        else
+                            RightHandDamageInfo = RightHandItem.GetWeaponItem().WeaponType.DamageInfo;
+                    }
+                }
+
                 return this;
-
-            IsRecaching = false;
-            Attributes.Clear();
-            Resistances.Clear();
-            Armors.Clear();
-            RightHandDamages.Clear();
-            LeftHandDamages.Clear();
-            IncreaseDamages.Clear();
-            IncreaseDamagesRate.Clear();
-            Skills.Clear();
-            StatusEffectResistances.Clear();
-            EquipmentSets.Clear();
-            RightHandWeaponAbilities.Clear();
-            RightHandWeaponAbilityIndexes.Clear();
-            LeftHandWeaponAbilities.Clear();
-            LeftHandWeaponAbilityIndexes.Clear();
-
-            int oldBattlePoints = BattlePoints;
-
-            CalculatedBuff tempCalculatedBuff;
-            bool isOverrideDamageInfo = false;
-            DamageInfo overrideDamageInfo = null;
-            bool isOverrideSkills = false;
-            for (int i = characterData.Buffs.Count - 1; i >= 0; --i)
-            {
-                tempCalculatedBuff = characterData.Buffs[i].GetBuff();
-                if (!isOverrideDamageInfo && tempCalculatedBuff.IsOverrideDamageInfo())
-                {
-                    isOverrideDamageInfo = true;
-                    overrideDamageInfo = tempCalculatedBuff.GetOverrideDamageInfo();
-                }
-                if (!isOverrideSkills && tempCalculatedBuff.IsOverrideSkills())
-                {
-                    isOverrideSkills = true;
-                    Skills = null;
-                    Skills = new Dictionary<BaseSkill, int>(tempCalculatedBuff.GetOverrideSkills());
-                }
-                if (isOverrideDamageInfo && isOverrideSkills)
-                    break;
             }
-
-            characterData.GetAllStats(true, true, true,
-                SetStats,
-                SetAttributes,
-                SetResistances,
-                SetArmors,
-                SetRightHandDamages,
-                SetRightHandWeaponDamage,
-                SetLeftHandDamages,
-                SetLeftHandWeaponDamage,
-                isOverrideSkills ? null : SetSkills,
-                SetStatusEffectResistances,
-                SetEquipmentSets,
-                onGetIncreasingDamages: SetIncreaseDamages,
-                onGetIncreasingDamagesRate: SetIncreaseDamagesRate);
-
-            if (characterData.GetDatabase() != null)
-                BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;
-
-            TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData, _stats);
-            TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData, _stats);
-            LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, _stats);
-            LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, _stats);
-
-            IsOverweight = (GameInstance.Singleton.IsLimitInventorySlot && TotalItemSlot > LimitItemSlot) || (GameInstance.Singleton.IsLimitInventoryWeight && TotalItemWeight > LimitItemWeight);
-            DisallowMove = false;
-            DisallowSprint = false;
-            DisallowWalk = false;
-            DisallowJump = false;
-            DisallowDash = false;
-            DisallowCrouch = false;
-            DisallowCrawl = false;
-            DisallowAttack = false;
-            DisallowUseSkill = false;
-            DisallowUseItem = false;
-            FreezeAnimation = false;
-            IsHide = false;
-            IsRevealsHide = false;
-            IsBlind = false;
-            MuteFootstepSound = false;
-            HavingChanceToRemoveBuffWhenAttack = false;
-            HavingChanceToRemoveBuffWhenAttacked = false;
-            HavingChanceToRemoveBuffWhenUseSkill = false;
-            HavingChanceToRemoveBuffWhenUseItem = false;
-            HavingChanceToRemoveBuffWhenPickupItem = false;
-
-            bool allAilmentsWereApplied = false;
-            if (characterData is BasePlayerCharacterEntity playerCharacterEntity)
-            {
-                if (!allAilmentsWereApplied && playerCharacterEntity.PassengingVehicleEntity != null)
-                {
-                    UpdateAppliedAilments(playerCharacterEntity.PassengingVehicleEntity.GetBuff());
-                    allAilmentsWereApplied = AllAilmentsWereApplied();
-                }
-            }
-
-            if (!allAilmentsWereApplied)
-            {
-                foreach (CharacterBuff characterBuff in characterData.Buffs)
-                {
-                    UpdateAppliedAilments(characterBuff.GetBuff());
-                    allAilmentsWereApplied = AllAilmentsWereApplied();
-                    if (allAilmentsWereApplied)
-                        break;
-                }
-            }
-
-            if (!allAilmentsWereApplied)
-            {
-                foreach (CharacterSummon characterBuff in characterData.Summons)
-                {
-                    UpdateAppliedAilments(characterBuff.GetBuff());
-                    allAilmentsWereApplied = AllAilmentsWereApplied();
-                    if (allAilmentsWereApplied)
-                        break;
-                }
-            }
-
-            float tempTotalBattlePoint = 0f;
-
-            foreach (Attribute tempAttribute in Attributes.Keys)
-            {
-                if (tempAttribute == null)
-                    continue;
-                float amount = Attributes[tempAttribute];
-                tempTotalBattlePoint += tempAttribute.BattlePointScore * amount;
-            }
-
-            foreach (BaseSkill tempSkill in Skills.Keys)
-            {
-                if (tempSkill == null)
-                    continue;
-                int skillLevel = Skills[tempSkill];
-                tempTotalBattlePoint += tempSkill.battlePointScore * skillLevel;
-                // Apply ailments by passive buff only
-                if (!allAilmentsWereApplied && tempSkill.IsPassive && tempSkill.TryGetBuff(out Buff tempBuff))
-                {
-                    UpdateAppliedAilments(new CalculatedBuff(tempBuff, skillLevel));
-                    allAilmentsWereApplied = AllAilmentsWereApplied();
-                }
-            }
-
-            foreach (DamageElement tempDamageElement in Resistances.Keys)
-            {
-                if (tempDamageElement == null)
-                    continue;
-                float amount = Resistances[tempDamageElement];
-                tempTotalBattlePoint += tempDamageElement.ResistanceBattlePointScore * amount;
-            }
-
-            foreach (DamageElement tempDamageElement in Armors.Keys)
-            {
-                if (tempDamageElement == null)
-                    continue;
-                float amount = Armors[tempDamageElement];
-                tempTotalBattlePoint += tempDamageElement.ArmorBattlePointScore * amount;
-            }
-
-            foreach (DamageElement tempDamageElement in RightHandDamages.Keys)
-            {
-                if (tempDamageElement == null)
-                    continue;
-                MinMaxFloat amount = RightHandDamages[tempDamageElement];
-                tempTotalBattlePoint += tempDamageElement.DamageBattlePointScore * (amount.min + amount.max) * 0.5f;
-            }
-
-            foreach (DamageElement tempDamageElement in LeftHandDamages.Keys)
-            {
-                if (tempDamageElement == null)
-                    continue;
-                MinMaxFloat amount = LeftHandDamages[tempDamageElement];
-                tempTotalBattlePoint += tempDamageElement.DamageBattlePointScore * (amount.min + amount.max) * 0.5f;
-            }
-
-            if (characterData.EquipWeapons.NotEmptyRightHandSlot())
-            {
-                tempTotalBattlePoint += characterData.EquipWeapons.rightHand.GetWeaponDamageBattlePoints();
-            }
-
-            if (characterData.EquipWeapons.NotEmptyLeftHandSlot())
-            {
-                tempTotalBattlePoint += characterData.EquipWeapons.leftHand.GetWeaponDamageBattlePoints();
-            }
-
-            tempTotalBattlePoint += GameInstance.Singleton.GameplayRule.GetBattlePointFromCharacterStats(Stats);
-            BattlePoints = Mathf.CeilToInt(tempTotalBattlePoint);
-
-            if (characterData == GameInstance.PlayingCharacter)
-            {
-                int battlePointChange = BattlePoints - oldBattlePoints;
-                if (battlePointChange != 0)
-                    ClientGenericActions.NotifyBattlePointsChanged(battlePointChange);
-            }
-
-            RightHandDamageInfo = null;
-            IsRightHandItemAvailable = false;
-            LeftHandDamageInfo = null;
-            IsLeftHandItemAvailable = false;
-
-            IWeaponItem rightWeaponItem = characterData.EquipWeapons.GetRightHandWeaponItem();
-            if (rightWeaponItem != null)
-            {
-                IsRightHandItemAvailable = true;
-                RightHandItem = characterData.EquipWeapons.rightHand;
-                if (isOverrideDamageInfo)
-                    RightHandDamageInfo = overrideDamageInfo;
-                else
-                    RightHandDamageInfo = rightWeaponItem.WeaponType.DamageInfo;
-                if (rightWeaponItem.WeaponAbilities != null && rightWeaponItem.WeaponAbilities.Length > 0)
-                    RightHandWeaponAbilities.AddRange(rightWeaponItem.WeaponAbilities);
-                AddOrReplaceWeaponAbilities(RightHandWeaponAbilities, RightHandWeaponAbilityIndexes, RightHandItem.sockets);
-            }
-
-            IWeaponItem leftWeaponItem = characterData.EquipWeapons.GetLeftHandWeaponItem();
-            if (leftWeaponItem != null)
-            {
-                IsLeftHandItemAvailable = true;
-                LeftHandItem = characterData.EquipWeapons.leftHand;
-                if (isOverrideDamageInfo)
-                    LeftHandDamageInfo = overrideDamageInfo;
-                else
-                    LeftHandDamageInfo = leftWeaponItem.WeaponType.DamageInfo;
-                if (leftWeaponItem.WeaponAbilities != null && leftWeaponItem.WeaponAbilities.Length > 0)
-                    LeftHandWeaponAbilities.AddRange(leftWeaponItem.WeaponAbilities);
-                AddOrReplaceWeaponAbilities(LeftHandWeaponAbilities, LeftHandWeaponAbilityIndexes, LeftHandItem.sockets);
-            }
-
-            if (!IsLeftHandItemAvailable && !IsRightHandItemAvailable)
-            {
-                if (characterData is BaseMonsterCharacterEntity monsterCharacterEntity)
-                {
-                    // Monster has its own damage info set to game database
-                    IsRightHandItemAvailable = true;
-                    RightHandItem = CharacterItem.CreateMonsterWeapon();
-                    if (isOverrideDamageInfo)
-                        RightHandDamageInfo = overrideDamageInfo;
-                    else
-                        RightHandDamageInfo = monsterCharacterEntity.CharacterDatabase.DamageInfo;
-                }
-                else
-                {
-                    // No equipped weapon?, use default one
-                    IsRightHandItemAvailable = true;
-                    RightHandItem = CharacterItem.CreateDefaultWeapon();
-                    if (isOverrideDamageInfo)
-                        RightHandDamageInfo = overrideDamageInfo;
-                    else
-                        RightHandDamageInfo = RightHandItem.GetWeaponItem().WeaponType.DamageInfo;
-                }
-            }
-
-            return this;
         }
 
         private static void AddOrReplaceWeaponAbilities(List<BaseWeaponAbility> weaponAbilities, Dictionary<string, int> weaponAbilityIndexes, List<int> sockets)
