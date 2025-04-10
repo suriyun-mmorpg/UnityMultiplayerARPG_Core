@@ -1,6 +1,4 @@
-﻿using UnityEngine.Profiling;
-
-namespace MultiplayerARPG
+﻿namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
