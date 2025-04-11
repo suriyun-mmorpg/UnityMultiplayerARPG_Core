@@ -436,7 +436,7 @@ namespace MultiplayerARPG
                     // Enter or exit
                     Vector3 tempPosition;
                     if (LadderComponent.EnterOrExitDuration > 0f)
-                        tempPosition = Vector3.Lerp(LadderComponent.EnterOrExitFromPosition, LadderComponent.EnterOrExitToPosition, currentTime - LadderComponent.EnterOrExitTime / LadderComponent.EnterOrExitDuration);
+                        tempPosition = Vector3.Lerp(LadderComponent.EnterOrExitFromPosition, LadderComponent.EnterOrExitToPosition, (currentTime - LadderComponent.EnterOrExitTime) / LadderComponent.EnterOrExitDuration);
                     else
                         tempPosition = LadderComponent.EnterOrExitToPosition;
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, tempPosition, deltaTime);
@@ -838,6 +838,8 @@ namespace MultiplayerARPG
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
                 if (IsUnderWater)
                     _tempMovementState |= MovementState.IsUnderWater;
+                if (IsClimbing)
+                    _tempMovementState |= MovementState.IsClimbing;
                 if (IsGrounded || _airborneElapsed < airborneDelay || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
                     _tempMovementState |= MovementState.IsGrounded;
                 if (_isJumping)

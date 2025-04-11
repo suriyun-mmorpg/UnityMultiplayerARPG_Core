@@ -810,7 +810,9 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
 
             // Falling
-            if (!stateUpdateData.MovementState.Has(MovementState.IsUnderWater) && !stateUpdateData.MovementState.Has(MovementState.IsGrounded))
+            if (!stateUpdateData.MovementState.Has(MovementState.IsUnderWater) &&
+                !stateUpdateData.MovementState.Has(MovementState.IsClimbing) &&
+                !stateUpdateData.MovementState.Has(MovementState.IsGrounded))
             {
                 TryGetStateInfoId(stateInfos, weaponTypeId, CLIP_FALL, out string foundStateInfoId);
                 return foundStateInfoId;
