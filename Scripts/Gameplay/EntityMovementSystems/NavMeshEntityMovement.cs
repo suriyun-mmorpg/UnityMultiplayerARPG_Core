@@ -378,6 +378,7 @@ namespace MultiplayerARPG
             {
                 // Disable obstacle avoidance because it won't predict movement, it is just moving to destination without obstacle avoidance
                 CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+                // Keep moving or should stop
                 if (CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
                 {
                     MovementState = _acceptedMovementStateBeforeStopped;
@@ -386,7 +387,6 @@ namespace MultiplayerARPG
                 else
                 {
                     MovementState = MovementState.IsGrounded;
-                    ExtraMovementState = ExtraMovementState.None;
                 }
             }
 
