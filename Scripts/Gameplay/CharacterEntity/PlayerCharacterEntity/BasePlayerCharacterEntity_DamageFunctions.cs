@@ -45,10 +45,10 @@ namespace MultiplayerARPG
             bool attackerIsPlayer = attackPlayer != null;
 
             // Find punishment type
-            if (Dueling.DuelingStarted)
+            if (DuelingComponent != null && DuelingComponent.DuelingStarted)
             {
                 deadPunishmentType = DeadPunishmentType.Duel;
-                Dueling.EndDueling(this);
+                DuelingComponent.EndDueling(this);
             }
             else if (CurrentMapInfo.EnablePkRules && attackerIsPlayer)
             {
@@ -84,7 +84,7 @@ namespace MultiplayerARPG
                 Gold = 0;
 
             // Clear data
-            NpcAction.ClearNpcDialogData();
+            NpcActionComponent.ClearNpcDialogData();
 
             // Drop items
             KilledDropItems(lastAttacker, deadPunishmentType, decreaseItems);

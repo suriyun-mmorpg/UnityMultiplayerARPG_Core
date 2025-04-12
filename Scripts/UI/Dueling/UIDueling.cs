@@ -59,14 +59,14 @@ namespace MultiplayerARPG
                 uiTimerDuelingTime.gameObject.SetActive(false);
             _dirtyCountDown = -1;
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.Dueling.onEndDueling += EndDueling;
+            GameInstance.PlayingCharacterEntity.DuelingComponent.onEndDueling += EndDueling;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.Dueling.onEndDueling -= EndDueling;
+            GameInstance.PlayingCharacterEntity.DuelingComponent.onEndDueling -= EndDueling;
         }
 
         protected override void Update()

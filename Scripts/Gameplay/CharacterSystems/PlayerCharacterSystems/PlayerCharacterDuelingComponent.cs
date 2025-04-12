@@ -125,10 +125,10 @@ namespace MultiplayerARPG
             {
                 if (DuelingStartingOrStarted && !DuelingTimeout && DuelingCharacterObjectId > 0 && _duelingCharacter == null && Manager.TryGetEntityByObjectId(DuelingCharacterObjectId, out _duelingCharacter))
                 {
-                    _duelingCharacter.Dueling.DuelingCharacter = Entity;
-                    _duelingCharacter.Dueling.DuelingStartTime = DuelingStartTime;
-                    _duelingCharacter.Dueling._countDownDuration = _countDownDuration;
-                    _duelingCharacter.Dueling._duelDuration = _duelDuration;
+                    _duelingCharacter.DuelingComponent.DuelingCharacter = Entity;
+                    _duelingCharacter.DuelingComponent.DuelingStartTime = DuelingStartTime;
+                    _duelingCharacter.DuelingComponent._countDownDuration = _countDownDuration;
+                    _duelingCharacter.DuelingComponent._duelDuration = _duelDuration;
                 }
             }
         }
@@ -147,8 +147,8 @@ namespace MultiplayerARPG
                 return;
             }
             // Set dueling state/data for co player character entity
-            DuelingCharacter.Dueling.ClearDuelingData();
-            DuelingCharacter.Dueling.DuelingCharacter = null;
+            DuelingCharacter.DuelingComponent.ClearDuelingData();
+            DuelingCharacter.DuelingComponent.DuelingCharacter = null;
             // Set dueling state/data for player character entity
             ClearDuelingData();
             DuelingCharacter = null;
@@ -179,7 +179,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 return;
             }
-            if (targetCharacterEntity.Dueling.DuelingCharacter != null)
+            if (targetCharacterEntity.DuelingComponent.DuelingCharacter != null)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_DUELING);
                 return;
@@ -195,9 +195,9 @@ namespace MultiplayerARPG
                 return;
             }
             DuelingCharacter = targetCharacterEntity;
-            targetCharacterEntity.Dueling.DuelingCharacter = Entity;
+            targetCharacterEntity.DuelingComponent.DuelingCharacter = Entity;
             // Send receive dueling request to player
-            DuelingCharacter.Dueling.CallOwnerReceiveDuelingRequest(ObjectId);
+            DuelingCharacter.DuelingComponent.CallOwnerReceiveDuelingRequest(ObjectId);
 #endif
         }
 
@@ -248,9 +248,9 @@ namespace MultiplayerARPG
             float countDownDuration = CurrentGameInstance.duelingCountDownDuration;
             float duelDuration = CurrentGameInstance.duelingDuration;
             // Set dueling state/data for co player character entity
-            DuelingCharacter.Dueling.ClearDuelingData();
-            DuelingCharacter.Dueling.StartDueling(countDownDuration, duelDuration);
-            DuelingCharacter.Dueling.CallOwnerAcceptedDuelingRequest(ObjectId, countDownDuration, duelDuration);
+            DuelingCharacter.DuelingComponent.ClearDuelingData();
+            DuelingCharacter.DuelingComponent.StartDueling(countDownDuration, duelDuration);
+            DuelingCharacter.DuelingComponent.CallOwnerAcceptedDuelingRequest(ObjectId, countDownDuration, duelDuration);
             // Set dueling state/data for player character entity
             ClearDuelingData();
             StartDueling(countDownDuration, duelDuration);
@@ -291,9 +291,9 @@ namespace MultiplayerARPG
             {
                 // Already setup in accept request function, so don't setup again
                 DuelingCharacter = playerCharacterEntity;
-                DuelingCharacter.Dueling.DuelingCharacter = Entity;
-                DuelingCharacter.Dueling.ClearDuelingData();
-                DuelingCharacter.Dueling.StartDueling(countDownDuration, duelDuration);
+                DuelingCharacter.DuelingComponent.DuelingCharacter = Entity;
+                DuelingCharacter.DuelingComponent.ClearDuelingData();
+                DuelingCharacter.DuelingComponent.StartDueling(countDownDuration, duelDuration);
                 ClearDuelingData();
                 StartDueling(countDownDuration, duelDuration);
             }
@@ -349,7 +349,7 @@ namespace MultiplayerARPG
         {
             uint loserObjectId = loser != null ? loser.ObjectId : 0;
             if (DuelingCharacter != null)
-                DuelingCharacter.Dueling.CallOwnerEndDueling(loserObjectId);
+                DuelingCharacter.DuelingComponent.CallOwnerEndDueling(loserObjectId);
             CallOwnerEndDueling(loserObjectId);
             StopDueling();
         }

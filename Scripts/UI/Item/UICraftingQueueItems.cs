@@ -96,13 +96,13 @@ namespace MultiplayerARPG
         public void RegisterSourceEvents()
         {
             if (Source == null && GameInstance.PlayingCharacterEntity != null)
-                Source = GameInstance.PlayingCharacterEntity.Crafting;
+                Source = GameInstance.PlayingCharacterEntity.CraftingComponent;
             if (Source != null)
             {
                 if (Source.PublicQueue)
                     CraftingQueueItems = Source.QueueItems;
                 else
-                    CraftingQueueItems = GameInstance.PlayingCharacterEntity.Crafting.QueueItems;
+                    CraftingQueueItems = GameInstance.PlayingCharacterEntity.CraftingComponent.QueueItems;
                 CraftingQueueItems.onOperation += OnCraftingQueueItemsOperation;
             }
         }

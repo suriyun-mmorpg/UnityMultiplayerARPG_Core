@@ -122,7 +122,7 @@ namespace MultiplayerARPG
 
         private void OnBuyAmountConfirmed(int amount)
         {
-            GameInstance.PlayingCharacterEntity.NpcAction.CallCmdBuyNpcItem(IndexOfData, amount);
+            GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdBuyNpcItem(IndexOfData, amount);
         }
 
         private void OnBuyAmountChanged(string amountText)

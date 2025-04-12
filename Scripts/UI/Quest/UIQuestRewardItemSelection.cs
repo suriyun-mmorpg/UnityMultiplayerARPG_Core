@@ -27,7 +27,7 @@
         {
             if (CacheSelectionManager.SelectedUI == null)
                 return;
-            GameInstance.PlayingCharacterEntity.NpcAction.CallCmdSelectQuestRewardItem((byte)CacheSelectionManager.SelectedUI.IndexOfData);
+            GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdSelectQuestRewardItem((byte)CacheSelectionManager.SelectedUI.IndexOfData);
             Hide();
         }
     }

@@ -75,10 +75,10 @@ namespace MultiplayerARPG
             _itemListEventSetupManager.OnDisable();
             if (_entity != null)
             {
-                _entity.Vending.onVendingDataChange -= Vending_onVendingDataChange;
-                _entity.Vending.onUpdateItems -= Vending_onUpdateItems;
+                _entity.VendingComponent.onVendingDataChange -= Vending_onVendingDataChange;
+                _entity.VendingComponent.onUpdateItems -= Vending_onUpdateItems;
             }
-            GameInstance.PlayingCharacterEntity.Vending.CallCmdUnsubscribe();
+            GameInstance.PlayingCharacterEntity.VendingComponent.CallCmdUnsubscribe();
 
             foreach (GameObject obj in ownerObjects)
             {
@@ -120,24 +120,24 @@ namespace MultiplayerARPG
         {
             if (_entity != null)
             {
-                _entity.Vending.onVendingDataChange -= Vending_onVendingDataChange;
-                _entity.Vending.onUpdateItems -= Vending_onUpdateItems;
+                _entity.VendingComponent.onVendingDataChange -= Vending_onVendingDataChange;
+                _entity.VendingComponent.onUpdateItems -= Vending_onUpdateItems;
             }
             _entity = Data;
             if (_entity == null)
                 return;
-            _entity.Vending.onVendingDataChange += Vending_onVendingDataChange;
-            _entity.Vending.onUpdateItems += Vending_onUpdateItems;
+            _entity.VendingComponent.onVendingDataChange += Vending_onVendingDataChange;
+            _entity.VendingComponent.onUpdateItems += Vending_onUpdateItems;
 
             if (textTitle != null)
             {
                 textTitle.text = ZString.Format(
                     LanguageManager.GetText(formatKeyTitle),
-                    Data == null ? LanguageManager.GetUnknowTitle() : Data.Vending.Data.title);
+                    Data == null ? LanguageManager.GetUnknowTitle() : Data.VendingComponent.Data.title);
             }
             ItemSelectionManager.Clear();
             ItemList.HideAll();
-            GameInstance.PlayingCharacterEntity.Vending.CallCmdSubscribe(Data.ObjectId);
+            GameInstance.PlayingCharacterEntity.VendingComponent.CallCmdSubscribe(Data.ObjectId);
 
             foreach (GameObject obj in ownerObjects)
             {
@@ -157,7 +157,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_STOP_VENDING_DESCRIPTION.ToString()),
                 false, true, true, false, onClickYes: () =>
                 {
-                    GameInstance.PlayingCharacterEntity.Vending.CallCmdStopVending();
+                    GameInstance.PlayingCharacterEntity.VendingComponent.CallCmdStopVending();
                     Hide();
                 });
         }

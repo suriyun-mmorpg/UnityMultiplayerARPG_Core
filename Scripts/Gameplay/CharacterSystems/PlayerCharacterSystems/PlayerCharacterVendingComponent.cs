@@ -156,10 +156,10 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
                 return;
-            if (!playerCharacterEntity.Vending.Data.isStarted)
+            if (!playerCharacterEntity.VendingComponent.Data.isStarted)
                 return;
             CmdUnsubscribe();
-            _store = playerCharacterEntity.Vending;
+            _store = playerCharacterEntity.VendingComponent;
             _store.AddCustomer(this);
 #endif
         }

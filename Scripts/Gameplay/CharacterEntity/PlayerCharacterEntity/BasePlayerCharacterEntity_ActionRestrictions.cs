@@ -6,17 +6,17 @@ namespace MultiplayerARPG
 
         public bool IsDealing
         {
-            get { return Dealing.DealingState != DealingState.None; }
+            get { return DealingComponent != null && DealingComponent.DealingState != DealingState.None; }
         }
 
         public bool IsVendingStarted
         {
-            get { return Vending.Data.isStarted; }
+            get { return VendingComponent != null && VendingComponent.Data.isStarted; }
         }
 
         public override bool CanDoActions()
         {
-            return base.CanDoActions() && Dealing.DealingState == DealingState.None && !Vending.Data.isStarted && !IsWarping;
+            return base.CanDoActions() && !IsDealing && !IsVendingStarted && !IsWarping;
         }
 
         public override bool CanEquipItem()

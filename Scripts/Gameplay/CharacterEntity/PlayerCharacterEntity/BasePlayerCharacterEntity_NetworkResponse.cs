@@ -98,7 +98,7 @@ namespace MultiplayerARPG
             UITextKeys errorMessage;
             if (sourceObjectId == ObjectId)
             {
-                if (!Crafting.AppendCraftingQueueItem(this, dataId, amount, out errorMessage))
+                if (!CraftingComponent.AppendCraftingQueueItem(this, dataId, amount, out errorMessage))
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
             }
             else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
@@ -113,7 +113,7 @@ namespace MultiplayerARPG
         {
             if (sourceObjectId == ObjectId)
             {
-                Crafting.ChangeCraftingQueueItem(this, indexOfData, amount);
+                CraftingComponent.ChangeCraftingQueueItem(this, indexOfData, amount);
             }
             else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
             {
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
         {
             if (sourceObjectId == ObjectId)
             {
-                Crafting.CancelCraftingQueueItem(this, indexOfData);
+                CraftingComponent.CancelCraftingQueueItem(this, indexOfData);
             }
             else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
             {

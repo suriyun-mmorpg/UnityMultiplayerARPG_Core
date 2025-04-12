@@ -11,13 +11,14 @@ namespace MultiplayerARPG
             controllerPrefab = null;
 #endif
             addressableControllerPrefab = null;
-            Building = null;
-            Crafting = null;
-            Dealing = null;
-            Dueling = null;
-            Vending = null;
-            NpcAction = null;
-            Pk = null;
+            ItemLockAndExpireComponent = null;
+            NpcActionComponent = null;
+            BuildingComponent = null;
+            CraftingComponent = null;
+            DealingComponent = null;
+            DuelingComponent = null;
+            VendingComponent = null;
+            PkComponent = null;
             // Events
             onDataIdChange = null;
             onFactionIdChange = null;

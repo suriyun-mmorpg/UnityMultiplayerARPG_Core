@@ -63,7 +63,7 @@ namespace MultiplayerARPG
 
         public void OnClickBuy()
         {
-            GameInstance.PlayingCharacterEntity.Vending.CallCmdBuyItem(IndexOfData);
+            GameInstance.PlayingCharacterEntity.VendingComponent.CallCmdBuyItem(IndexOfData);
         }
 
         public void OnClickCancel()

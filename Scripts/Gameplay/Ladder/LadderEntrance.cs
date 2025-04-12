@@ -60,8 +60,7 @@ namespace MultiplayerARPG
 
         private void OnTrigger(Collider other)
         {
-            if (!other.transform.root.TryGetComponent(out BaseCharacterEntity characterEntity) ||
-                !characterEntity.LadderComponent)
+            if (!other.transform.root.TryGetComponent(out BaseCharacterEntity characterEntity) || characterEntity.LadderComponent == null)
             {
                 return;
             }

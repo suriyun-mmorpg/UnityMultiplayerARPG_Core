@@ -24,13 +24,13 @@
 
         public void OnClickAccept()
         {
-            GameInstance.PlayingCharacterEntity.Dueling.CallCmdAcceptDuelingRequest();
+            GameInstance.PlayingCharacterEntity.DuelingComponent.CallCmdAcceptDuelingRequest();
             Hide();
         }
 
         public void OnClickDecline()
         {
-            GameInstance.PlayingCharacterEntity.Dueling.CallCmdDeclineDuelingRequest();
+            GameInstance.PlayingCharacterEntity.DuelingComponent.CallCmdDeclineDuelingRequest();
             Hide();
         }
     }

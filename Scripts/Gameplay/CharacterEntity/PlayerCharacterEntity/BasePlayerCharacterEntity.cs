@@ -5,9 +5,7 @@ using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [RequireComponent(typeof(PlayerCharacterBuildingComponent))]
-    [RequireComponent(typeof(PlayerCharacterCraftingComponent))]
-    [RequireComponent(typeof(PlayerCharacterDealingComponent))]
+    [RequireComponent(typeof(PlayerCharacterItemLockAndExpireComponent))]
     [RequireComponent(typeof(PlayerCharacterNpcActionComponent))]
     public abstract partial class BasePlayerCharacterEntity : BaseCharacterEntity, IPlayerCharacterData, IActivatableEntity
     {
@@ -68,37 +66,42 @@ namespace MultiplayerARPG
             set { addressableControllerPrefab = value; }
         }
 
-        public PlayerCharacterBuildingComponent Building
+        public PlayerCharacterItemLockAndExpireComponent ItemLockAndExpireComponent
         {
             get; private set;
         }
 
-        public PlayerCharacterCraftingComponent Crafting
+        public PlayerCharacterNpcActionComponent NpcActionComponent
         {
             get; private set;
         }
 
-        public PlayerCharacterDealingComponent Dealing
+        public PlayerCharacterBuildingComponent BuildingComponent
         {
             get; private set;
         }
 
-        public PlayerCharacterDuelingComponent Dueling
+        public PlayerCharacterCraftingComponent CraftingComponent
         {
             get; private set;
         }
 
-        public PlayerCharacterVendingComponent Vending
+        public PlayerCharacterDealingComponent DealingComponent
         {
             get; private set;
         }
 
-        public PlayerCharacterNpcActionComponent NpcAction
+        public PlayerCharacterDuelingComponent DuelingComponent
         {
             get; private set;
         }
 
-        public PlayerCharacterPkComponent Pk
+        public PlayerCharacterVendingComponent VendingComponent
+        {
+            get; private set;
+        }
+
+        public PlayerCharacterPkComponent PkComponent
         {
             get; private set;
         }
@@ -166,15 +169,16 @@ namespace MultiplayerARPG
 
         public override void InitialRequiredComponents()
         {
+            CurrentGameInstance.EntitySetting.InitialPlayerCharacterEntityComponents(this);
             base.InitialRequiredComponents();
-            Building = gameObject.GetOrAddComponent<PlayerCharacterBuildingComponent>();
-            Crafting = gameObject.GetOrAddComponent<PlayerCharacterCraftingComponent>();
-            Dealing = gameObject.GetOrAddComponent<PlayerCharacterDealingComponent>();
-            Dueling = gameObject.GetOrAddComponent<PlayerCharacterDuelingComponent>();
-            Vending = gameObject.GetOrAddComponent<PlayerCharacterVendingComponent>();
-            NpcAction = gameObject.GetOrAddComponent<PlayerCharacterNpcActionComponent>();
-            Pk = gameObject.GetOrAddComponent<PlayerCharacterPkComponent>();
-            gameObject.GetOrAddComponent<PlayerCharacterItemLockAndExpireComponent>();
+            ItemLockAndExpireComponent = gameObject.GetComponent<PlayerCharacterItemLockAndExpireComponent>();
+            NpcActionComponent = gameObject.GetComponent<PlayerCharacterNpcActionComponent>();
+            BuildingComponent = gameObject.GetComponent<PlayerCharacterBuildingComponent>();
+            CraftingComponent = gameObject.GetComponent<PlayerCharacterCraftingComponent>();
+            DealingComponent = gameObject.GetComponent<PlayerCharacterDealingComponent>();
+            DuelingComponent = gameObject.GetComponent<PlayerCharacterDuelingComponent>();
+            VendingComponent = gameObject.GetComponent<PlayerCharacterVendingComponent>();
+            PkComponent = gameObject.GetComponent<PlayerCharacterPkComponent>();
         }
 
         protected override void EntityUpdate()

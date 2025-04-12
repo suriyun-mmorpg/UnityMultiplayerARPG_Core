@@ -94,6 +94,12 @@ namespace MultiplayerARPG
             _isDestroyed = false;
         }
 
+        public override void InitialRequiredComponents()
+        {
+            CurrentGameInstance.EntitySetting.InitialVehicleEntityComponents(this);
+            base.InitialRequiredComponents();
+        }
+
         public virtual void InitStats()
         {
             if (!IsServer)

@@ -133,7 +133,7 @@ namespace MultiplayerARPG
             if (GameInstance.PlayingCharacterEntity != null && CraftingItem != null)
             {
                 if (CrafterType == CrafterType.Workbench && TargetEntity)
-                    GameInstance.PlayingCharacterEntity.Building.CallCmdCraftItemByWorkbench(TargetEntity.ObjectId, CraftingItem.DataId);
+                    GameInstance.PlayingCharacterEntity.BuildingComponent.CallCmdCraftItemByWorkbench(TargetEntity.ObjectId, CraftingItem.DataId);
             }
         }
     }

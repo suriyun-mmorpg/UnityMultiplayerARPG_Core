@@ -71,19 +71,19 @@ namespace MultiplayerARPG
             if (targetEntity.Type == EntityTypes.Player && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer))
             {
                 // Cannot attack duelers because they're invulnerable to other
-                if (duelersCanAttackEachOtherOnly && targetPlayer.Dueling.DuelingStartingOrStarted && targetPlayer.Dueling.DuelingCharacterObjectId != playerCharacter.ObjectId)
+                if (duelersCanAttackEachOtherOnly && targetPlayer.DuelingComponent != null && targetPlayer.DuelingComponent.DuelingStartingOrStarted && targetPlayer.DuelingComponent.DuelingCharacterObjectId != playerCharacter.ObjectId)
                     return true;
 
                 // Cannot attack other because dueler invulnerable to other
-                if (duelersCanAttackEachOtherOnly && playerCharacter.Dueling.DuelingStartingOrStarted && playerCharacter.Dueling.DuelingCharacterObjectId != targetPlayer.ObjectId)
+                if (duelersCanAttackEachOtherOnly && playerCharacter.DuelingComponent != null && playerCharacter.DuelingComponent.DuelingStartingOrStarted && playerCharacter.DuelingComponent.DuelingCharacterObjectId != targetPlayer.ObjectId)
                     return true;
 
                 // Cannot attack another dueler because dueling not started yet
-                if (playerCharacter.Dueling.DuelingStarting && playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId)
+                if (playerCharacter.DuelingComponent != null && playerCharacter.DuelingComponent.DuelingStarting && playerCharacter.DuelingComponent.DuelingCharacterObjectId == targetEntity.ObjectId)
                     return true;
 
                 // Can attack another dueler because dueling started
-                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId)
+                if (playerCharacter.DuelingComponent != null && playerCharacter.DuelingComponent.DuelingStarted && playerCharacter.DuelingComponent.DuelingCharacterObjectId == targetEntity.ObjectId)
                     return false;
 
                 // Cannot attack party member
@@ -142,7 +142,7 @@ namespace MultiplayerARPG
             if (targetEntity.Type == EntityTypes.Player && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer))
             {
                 // Cannot attack duelers
-                if (duelersCanAttackEachOtherOnly && targetPlayer.Dueling.DuelingStartingOrStarted && targetPlayer.Dueling.DuelingCharacterObjectId > 0)
+                if (duelersCanAttackEachOtherOnly && targetPlayer.DuelingComponent != null && targetPlayer.DuelingComponent.DuelingStartingOrStarted && targetPlayer.DuelingComponent.DuelingCharacterObjectId > 0)
                     return true;
 
                 // If it has faction set, then check the faction between two characters
@@ -179,19 +179,19 @@ namespace MultiplayerARPG
             if (targetEntity.Type == EntityTypes.Player && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer))
             {
                 // Cannot attack duelers because they're invulnerable to other
-                if (duelersCanAttackEachOtherOnly && targetPlayer.Dueling.DuelingStartingOrStarted && targetPlayer.Dueling.DuelingCharacterObjectId != playerCharacter.ObjectId)
+                if (duelersCanAttackEachOtherOnly && targetPlayer.DuelingComponent != null && targetPlayer.DuelingComponent.DuelingStartingOrStarted && targetPlayer.DuelingComponent.DuelingCharacterObjectId != playerCharacter.ObjectId)
                     return false;
 
                 // Cannot attack other because dueler invulnerable to other
-                if (duelersCanAttackEachOtherOnly && playerCharacter.Dueling.DuelingStartingOrStarted && playerCharacter.Dueling.DuelingCharacterObjectId != targetPlayer.ObjectId)
+                if (duelersCanAttackEachOtherOnly && playerCharacter.DuelingComponent != null && playerCharacter.DuelingComponent.DuelingStartingOrStarted && playerCharacter.DuelingComponent.DuelingCharacterObjectId != targetPlayer.ObjectId)
                     return false;
 
                 // Cannot attack another dueler because dueling not started yet
-                if (playerCharacter.Dueling.DuelingStarting && playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId)
+                if (playerCharacter.DuelingComponent != null && playerCharacter.DuelingComponent.DuelingStarting && playerCharacter.DuelingComponent.DuelingCharacterObjectId == targetEntity.ObjectId)
                     return false;
 
                 // Can attack another dueler because dueling started
-                if (playerCharacter.Dueling.DuelingStarted && playerCharacter.Dueling.DuelingCharacterObjectId == targetEntity.ObjectId)
+                if (playerCharacter.DuelingComponent != null && playerCharacter.DuelingComponent.DuelingStarted && playerCharacter.DuelingComponent.DuelingCharacterObjectId == targetEntity.ObjectId)
                     return true;
 
                 // Cannot attack party member
@@ -250,7 +250,7 @@ namespace MultiplayerARPG
             if (targetEntity.Type == EntityTypes.Player && targetEntity.TryGetEntity(out BasePlayerCharacterEntity targetPlayer))
             {
                 // Cannot attack duelers
-                if (duelersCanAttackEachOtherOnly && targetPlayer.Dueling.DuelingStartingOrStarted && targetPlayer.Dueling.DuelingCharacterObjectId > 0)
+                if (duelersCanAttackEachOtherOnly && targetPlayer.DuelingComponent != null && targetPlayer.DuelingComponent.DuelingStartingOrStarted && targetPlayer.DuelingComponent.DuelingCharacterObjectId > 0)
                     return false;
 
                 // If it has faction set, then check the faction between two characters

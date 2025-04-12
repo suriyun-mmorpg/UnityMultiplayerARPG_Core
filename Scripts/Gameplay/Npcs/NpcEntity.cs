@@ -333,7 +333,7 @@ namespace MultiplayerARPG
 
         public virtual void OnActivate()
         {
-            GameInstance.PlayingCharacterEntity.NpcAction.CallCmdNpcActivate(ObjectId);
+            GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdNpcActivate(ObjectId);
         }
     }
 }

@@ -96,7 +96,7 @@ namespace MultiplayerARPG
             if (craftingHandler.ObjectId != crafter.ObjectId && !craftingHandler.PublicQueue)
             {
                 // Not public, so it will be updated by player's source
-                return crafter.Crafting.AppendCraftingQueueItem(craftingHandler, crafter, dataId, amount, out errorMessage);
+                return crafter.CraftingComponent.AppendCraftingQueueItem(craftingHandler, crafter, dataId, amount, out errorMessage);
             }
             errorMessage = UITextKeys.NONE;
             if (!craftingHandler.CanCraft)
@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             if (source.ObjectId != crafter.ObjectId && !source.PublicQueue)
             {
                 // Not public, so it will be updated by player's source
-                crafter.Crafting.ChangeCraftingQueueItem(crafter, index, amount);
+                crafter.CraftingComponent.ChangeCraftingQueueItem(crafter, index, amount);
                 return;
             }
             if (!source.CanCraft)
@@ -148,7 +148,7 @@ namespace MultiplayerARPG
             if (source.ObjectId != crafter.ObjectId && !source.PublicQueue)
             {
                 // Not public, so it will be updated by player's source
-                crafter.Crafting.CancelCraftingQueueItem(crafter, index);
+                crafter.CraftingComponent.CancelCraftingQueueItem(crafter, index);
                 return;
             }
             if (!source.CanCraft)

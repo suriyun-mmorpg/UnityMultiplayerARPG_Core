@@ -87,6 +87,12 @@ namespace MultiplayerARPG
             isStaticHitBoxes = true;
         }
 
+        public override void InitialRequiredComponents()
+        {
+            CurrentGameInstance.EntitySetting.InitialHarvestableEntityComponents(this);
+            base.InitialRequiredComponents();
+        }
+
         public virtual void InitStats()
         {
             _isDestroyed = false;

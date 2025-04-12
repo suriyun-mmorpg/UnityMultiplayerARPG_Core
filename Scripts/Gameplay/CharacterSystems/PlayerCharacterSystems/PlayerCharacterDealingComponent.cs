@@ -16,7 +16,7 @@ namespace MultiplayerARPG
                 _dealingState = value;
                 CallOwnerUpdateDealingState(value);
                 if (DealingCharacter != null)
-                    DealingCharacter.Dealing.CallOwnerUpdateAnotherDealingState(value);
+                    DealingCharacter.DealingComponent.CallOwnerUpdateAnotherDealingState(value);
             }
         }
 
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
                 _dealingGold = value;
                 CallOwnerUpdateDealingGold(value);
                 if (DealingCharacter != null)
-                    DealingCharacter.Dealing.CallOwnerUpdateAnotherDealingGold(value);
+                    DealingCharacter.DealingComponent.CallOwnerUpdateAnotherDealingGold(value);
             }
         }
 
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
                 _dealingItems = value;
                 CallOwnerUpdateDealingItems(value);
                 if (DealingCharacter != null)
-                    DealingCharacter.Dealing.CallOwnerUpdateAnotherDealingItems(value);
+                    DealingCharacter.DealingComponent.CallOwnerUpdateAnotherDealingItems(value);
             }
         }
 
@@ -196,8 +196,8 @@ namespace MultiplayerARPG
                 return;
             }
             // Set dealing state/data for co player character entity
-            DealingCharacter.Dealing.ClearDealingData();
-            DealingCharacter.Dealing.DealingCharacter = null;
+            DealingCharacter.DealingComponent.ClearDealingData();
+            DealingCharacter.DealingComponent.DealingCharacter = null;
             // Set dealing state/data for player character entity
             ClearDealingData();
             DealingCharacter = null;
@@ -228,7 +228,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 return;
             }
-            if (targetCharacterEntity.Dealing.DealingCharacter != null)
+            if (targetCharacterEntity.DealingComponent.DealingCharacter != null)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_DEALING);
                 return;
@@ -239,9 +239,9 @@ namespace MultiplayerARPG
                 return;
             }
             DealingCharacter = targetCharacterEntity;
-            targetCharacterEntity.Dealing.DealingCharacter = Entity;
+            targetCharacterEntity.DealingComponent.DealingCharacter = Entity;
             // Send receive dealing request to player
-            DealingCharacter.Dealing.CallOwnerReceiveDealingRequest(ObjectId);
+            DealingCharacter.DealingComponent.CallOwnerReceiveDealingRequest(ObjectId);
 #endif
         }
 
@@ -284,9 +284,9 @@ namespace MultiplayerARPG
                 return;
             }
             // Set dealing state/data for co player character entity
-            DealingCharacter.Dealing.ClearDealingData();
-            DealingCharacter.Dealing.DealingState = DealingState.Dealing;
-            DealingCharacter.Dealing.CallOwnerAcceptedDealingRequest(ObjectId);
+            DealingCharacter.DealingComponent.ClearDealingData();
+            DealingCharacter.DealingComponent.DealingState = DealingState.Dealing;
+            DealingCharacter.DealingComponent.CallOwnerAcceptedDealingRequest(ObjectId);
             // Set dealing state/data for player character entity
             ClearDealingData();
             DealingState = DealingState.Dealing;
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
             {
                 // Already setup in accept request function, so don't setup again
                 DealingCharacter = playerCharacterEntity;
-                DealingCharacter.Dealing.DealingCharacter = Entity;
+                DealingCharacter.DealingComponent.DealingCharacter = Entity;
             }
             if (onStartDealing != null)
                 onStartDealing.Invoke(playerCharacterEntity);
@@ -444,7 +444,7 @@ namespace MultiplayerARPG
         protected void CmdConfirmDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (DealingState != DealingState.LockDealing || !(DealingCharacter.Dealing.DealingState == DealingState.LockDealing || DealingCharacter.Dealing.DealingState == DealingState.ConfirmDealing))
+            if (DealingState != DealingState.LockDealing || !(DealingCharacter.DealingComponent.DealingState == DealingState.LockDealing || DealingCharacter.DealingComponent.DealingState == DealingState.ConfirmDealing))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DEALING_STATE);
                 return;
@@ -455,9 +455,9 @@ namespace MultiplayerARPG
                 return;
             }
             DealingState = DealingState.ConfirmDealing;
-            if (DealingState == DealingState.ConfirmDealing && DealingCharacter.Dealing.DealingState == DealingState.ConfirmDealing)
+            if (DealingState == DealingState.ConfirmDealing && DealingCharacter.DealingComponent.DealingState == DealingState.ConfirmDealing)
             {
-                if (!HaveEnoughGold() || !DealingCharacter.Dealing.HaveEnoughGold())
+                if (!HaveEnoughGold() || !DealingCharacter.DealingComponent.HaveEnoughGold())
                 {
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
@@ -467,7 +467,7 @@ namespace MultiplayerARPG
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_ANOTHER_CHARACTER_WILL_OVERWHELMING);
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 }
-                else if (DealingCharacter.Dealing.ExchangingDealingItemsWillOverwhelming())
+                else if (DealingCharacter.DealingComponent.ExchangingDealingItemsWillOverwhelming())
                 {
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_ANOTHER_CHARACTER_WILL_OVERWHELMING);
@@ -475,7 +475,7 @@ namespace MultiplayerARPG
                 else
                 {
                     ExchangeDealingItemsAndGold();
-                    DealingCharacter.Dealing.ExchangeDealingItemsAndGold();
+                    DealingCharacter.DealingComponent.ExchangeDealingItemsAndGold();
                 }
                 StopDealing();
             }
@@ -492,7 +492,7 @@ namespace MultiplayerARPG
         protected void CmdCancelDealing()
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (DealingCharacter != null && DealingCharacter.Dealing.DealingState != DealingState.None)
+            if (DealingCharacter != null && DealingCharacter.DealingComponent.DealingState != DealingState.None)
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(DealingCharacter.ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);
             if (DealingState != DealingState.None)
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_DEALING_CANCELED);

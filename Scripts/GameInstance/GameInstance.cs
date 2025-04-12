@@ -264,6 +264,8 @@ namespace MultiplayerARPG
         [Tooltip("You should add game data to game database and set the game database to this. If you leave this empty, it will load game data from `Resources` folders")]
         [SerializeField]
         private BaseGameDatabase gameDatabase = null;
+        [SerializeField]
+        private BaseEntitySetting entitySetting = null;
         [Tooltip("You can add NPCs to NPC database or may add NPCs into the scene directly, so you can leave this empty if you are going to add NPCs into the scene directly only")]
         [SerializeField]
         private NpcDatabase npcDatabase = null;
@@ -546,6 +548,11 @@ namespace MultiplayerARPG
         public BaseGameDatabase GameDatabase
         {
             get { return gameDatabase; }
+        }
+
+        public BaseEntitySetting EntitySetting
+        {
+            get { return entitySetting; }
         }
 
         public SocialSystemSetting SocialSystemSetting
@@ -1077,6 +1084,10 @@ namespace MultiplayerARPG
             // Setup game database if not existed
             if (gameDatabase == null)
                 gameDatabase = ScriptableObject.CreateInstance<ResourcesFolderGameDatabase>();
+
+            // Setup entity setting if not existed
+            if (entitySetting == null)
+                entitySetting = ScriptableObject.CreateInstance<DefaultEntitySetting>();
 
             // Setup social system setting if not existed
             if (socialSystemSetting == null)

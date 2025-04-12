@@ -28,6 +28,10 @@ namespace MultiplayerARPG
         public const string IMPACT_EFFECTS_FILE = "Impact Effects";
         public const string IMPACT_EFFECTS_MENU = "Create GameDatabase/Impact Effects";
         public const int IMPACT_EFFECTS_ORDER = -6995;
+
+        public const string DEFAULT_ENTITY_SETTING_FILE = "Default Entity Setting";
+        public const string DEFAULT_ENTITY_SETTING_MENU = "Create Entity Setting/Default Entity Setting";
+        public const int DEFAULT_ENTITY_SETTING_ORDER = -6994;
         #endregion
 
         #region Game Data

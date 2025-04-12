@@ -417,7 +417,7 @@ namespace MultiplayerARPG
 
         public override void SetActivePlayerCharacter(BasePlayerCharacterEntity playerCharacter)
         {
-            if (showVendingUiOnActivate && playerCharacter.Vending.Data.isStarted)
+            if (showVendingUiOnActivate && playerCharacter.VendingComponent.Data.isStarted)
             {
                 ShowVending(playerCharacter);
                 return;
@@ -499,8 +499,8 @@ namespace MultiplayerARPG
                     _openedNpcDialogs[i].Hide();
                 _openedNpcDialogs.RemoveAt(i);
             }
-            if (GameInstance.PlayingCharacterEntity.NpcAction.CurrentNpcDialog != null)
-                GameInstance.PlayingCharacterEntity.NpcAction.CallCmdHideNpcDialog();
+            if (GameInstance.PlayingCharacterEntity.NpcActionComponent.CurrentNpcDialog != null)
+                GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdHideNpcDialog();
         }
 
         public void OnShowNpcRefineItem()
@@ -899,15 +899,24 @@ namespace MultiplayerARPG
         {
             if (playerCharacter != null)
             {
-                playerCharacter.NpcAction.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
-                playerCharacter.NpcAction.onShowNpcDialog += ShowNpcDialog;
-                playerCharacter.NpcAction.onShowNpcRefineItem += OnShowNpcRefineItem;
-                playerCharacter.NpcAction.onShowNpcDismantleItem += OnShowNpcDismantleItem;
-                playerCharacter.NpcAction.onShowNpcRepairItem += OnShowNpcRepairItem;
-                playerCharacter.Dealing.onRequestDealing += OnShowDealingRequest;
-                playerCharacter.Dealing.onStartDealing += OnShowDealing;
-                playerCharacter.Dueling.onRequestDueling += OnShowDuelingRequest;
-                playerCharacter.Dueling.onStartDueling += OnShowDueling;
+                if (playerCharacter.NpcActionComponent != null)
+                {
+                    playerCharacter.NpcActionComponent.onShowQuestRewardItemSelection += ShowQuestRewardItemSelection;
+                    playerCharacter.NpcActionComponent.onShowNpcDialog += ShowNpcDialog;
+                    playerCharacter.NpcActionComponent.onShowNpcRefineItem += OnShowNpcRefineItem;
+                    playerCharacter.NpcActionComponent.onShowNpcDismantleItem += OnShowNpcDismantleItem;
+                    playerCharacter.NpcActionComponent.onShowNpcRepairItem += OnShowNpcRepairItem;
+                }
+                if (playerCharacter.DealingComponent != null)
+                {
+                    playerCharacter.DealingComponent.onRequestDealing += OnShowDealingRequest;
+                    playerCharacter.DealingComponent.onStartDealing += OnShowDealing;
+                }
+                if (playerCharacter.DuelingComponent != null)
+                {
+                    playerCharacter.DuelingComponent.onRequestDueling += OnShowDuelingRequest;
+                    playerCharacter.DuelingComponent.onStartDueling += OnShowDueling;
+                }
                 playerCharacter.onIsWarpingChange += OnIsWarpingChange;
                 playerCharacter.onDead.AddListener(OnCharacterDead);
                 playerCharacter.onRespawn.AddListener(OnCharacterRespawn);
@@ -920,15 +929,24 @@ namespace MultiplayerARPG
         {
             if (playerCharacter != null)
             {
-                playerCharacter.NpcAction.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
-                playerCharacter.NpcAction.onShowNpcDialog -= ShowNpcDialog;
-                playerCharacter.NpcAction.onShowNpcRefineItem -= OnShowNpcRefineItem;
-                playerCharacter.NpcAction.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
-                playerCharacter.NpcAction.onShowNpcRepairItem -= OnShowNpcRepairItem;
-                playerCharacter.Dealing.onRequestDealing -= OnShowDealingRequest;
-                playerCharacter.Dealing.onStartDealing -= OnShowDealing;
-                playerCharacter.Dueling.onRequestDueling -= OnShowDuelingRequest;
-                playerCharacter.Dueling.onStartDueling -= OnShowDueling;
+                if (playerCharacter.NpcActionComponent != null)
+                {
+                    playerCharacter.NpcActionComponent.onShowQuestRewardItemSelection -= ShowQuestRewardItemSelection;
+                    playerCharacter.NpcActionComponent.onShowNpcDialog -= ShowNpcDialog;
+                    playerCharacter.NpcActionComponent.onShowNpcRefineItem -= OnShowNpcRefineItem;
+                    playerCharacter.NpcActionComponent.onShowNpcDismantleItem -= OnShowNpcDismantleItem;
+                    playerCharacter.NpcActionComponent.onShowNpcRepairItem -= OnShowNpcRepairItem;
+                }
+                if (playerCharacter.DealingComponent != null)
+                {
+                    playerCharacter.DealingComponent.onRequestDealing -= OnShowDealingRequest;
+                    playerCharacter.DealingComponent.onStartDealing -= OnShowDealing;
+                }
+                if (playerCharacter.DuelingComponent != null)
+                {
+                    playerCharacter.DuelingComponent.onRequestDueling -= OnShowDuelingRequest;
+                    playerCharacter.DuelingComponent.onStartDueling -= OnShowDueling;
+                }
                 playerCharacter.onIsWarpingChange -= OnIsWarpingChange;
                 playerCharacter.onDead.RemoveListener(OnCharacterDead);
                 playerCharacter.onRespawn.RemoveListener(OnCharacterRespawn);
@@ -939,7 +957,7 @@ namespace MultiplayerARPG
 
         public override void ShowVending(BasePlayerCharacterEntity playerCharacter)
         {
-            if (!playerCharacter.Vending.Data.isStarted)
+            if (!playerCharacter.VendingComponent.Data.isStarted)
                 return;
             uiVending.Data = playerCharacter;
             uiVending.Show();

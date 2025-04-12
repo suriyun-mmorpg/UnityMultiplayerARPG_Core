@@ -268,6 +268,12 @@ namespace MultiplayerARPG
             MigrateBuildingType();
         }
 
+        public override void InitialRequiredComponents()
+        {
+            CurrentGameInstance.EntitySetting.InitialBuildingEntityComponents(this);
+            base.InitialRequiredComponents();
+        }
+
 #if UNITY_EDITOR
         protected override void OnValidate()
         {

@@ -893,7 +893,7 @@ namespace MultiplayerARPG
                         _movementState |= GameplayUtils.GetMovementStateByDirection(_moveDirection, MovementTransform.forward);
                         break;
                 }
-                if (PlayingCharacterEntity.LadderComponent && PlayingCharacterEntity.LadderComponent.ClimbingLadder)
+                if (PlayingCharacterEntity.LadderComponent != null && PlayingCharacterEntity.LadderComponent.ClimbingLadder)
                 {
                     _movementState = GameplayUtils.GetMovementStateByDirection(_moveDirection, PlayingCharacterEntity.LadderComponent.ClimbingLadder);
                 }

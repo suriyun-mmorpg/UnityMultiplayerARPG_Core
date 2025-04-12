@@ -191,6 +191,12 @@ namespace MultiplayerARPG
             gameObject.layer = CurrentGameInstance.monsterLayer;
         }
 
+        public override void InitialRequiredComponents()
+        {
+            CurrentGameInstance.EntitySetting.InitialMonsterCharacterEntityComponents(this);
+            base.InitialRequiredComponents();
+        }
+
         protected override void EntityUpdate()
         {
             base.EntityUpdate();

@@ -69,17 +69,17 @@ namespace MultiplayerARPG
                 foreach (GameObject obj in dealObjects)
                 {
                     if (obj != null)
-                        obj.SetActive(true);
+                        obj.SetActive(entity.DealingComponent != null);
                 }
                 foreach (GameObject obj in duelObjects)
                 {
                     if (obj != null)
-                        obj.SetActive(true);
+                        obj.SetActive(entity.DuelingComponent != null);
                 }
                 foreach (GameObject obj in vendingObjects)
                 {
                     if (obj != null)
-                        obj.SetActive(entity.Vending.Data.isStarted);
+                        obj.SetActive(entity.IsVendingStarted);
                 }
             }
             else
@@ -114,14 +114,14 @@ namespace MultiplayerARPG
         public void OnClickSendDealingRequest()
         {
             if (Data is BasePlayerCharacterEntity entity)
-                GameInstance.PlayingCharacterEntity.Dealing.CallCmdSendDealingRequest(entity.ObjectId);
+                GameInstance.PlayingCharacterEntity.DealingComponent.CallCmdSendDealingRequest(entity.ObjectId);
             Hide();
         }
 
         public void OnClickSendDuelingRequest()
         {
             if (Data is BasePlayerCharacterEntity entity)
-                GameInstance.PlayingCharacterEntity.Dueling.CallCmdSendDuelingRequest(entity.ObjectId);
+                GameInstance.PlayingCharacterEntity.DuelingComponent.CallCmdSendDuelingRequest(entity.ObjectId);
             Hide();
         }
 

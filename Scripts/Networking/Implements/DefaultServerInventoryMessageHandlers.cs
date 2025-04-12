@@ -464,7 +464,7 @@ namespace MultiplayerARPG
                     result.InvokeError(new ResponseSellItemMessage());
                     return default;
                 }
-                if (!playerCharacterEntity.NpcAction.AccessingNpcShopDialog(out _))
+                if (!playerCharacterEntity.NpcActionComponent.AccessingNpcShopDialog(out _))
                 {
                     result.InvokeError(new ResponseSellItemMessage());
                     return default;
@@ -506,7 +506,7 @@ namespace MultiplayerARPG
                     result.InvokeError(new ResponseSellItemsMessage());
                     return default;
                 }
-                if (!playerCharacterEntity.NpcAction.AccessingNpcShopDialog(out _))
+                if (!playerCharacterEntity.NpcActionComponent.AccessingNpcShopDialog(out _))
                 {
                     result.InvokeError(new ResponseSellItemsMessage());
                     return default;

@@ -8,21 +8,33 @@ namespace MultiplayerARPG
         public TextWrapper textTitle;
 
         private BasePlayerCharacterEntity _entity;
+        private bool _isStarted = false;
+
+        private void Start()
+        {
+            _isStarted = true;
+            _entity = GetComponentInParent<BasePlayerCharacterEntity>();
+            if (_entity == null || _entity.VendingComponent == null)
+                return;
+            _entity.VendingComponent.onVendingDataChange += UpdateUI;
+            UpdateUI(_entity.VendingComponent.Data);
+        }
 
         private void OnEnable()
         {
-            _entity = GetComponentInParent<BasePlayerCharacterEntity>();
-            if (_entity == null)
+            if (!_isStarted)
                 return;
-            _entity.Vending.onVendingDataChange += UpdateUI;
-            UpdateUI(_entity.Vending.Data);
+            if (_entity == null || _entity.VendingComponent == null)
+                return;
+            _entity.VendingComponent.onVendingDataChange += UpdateUI;
+            UpdateUI(_entity.VendingComponent.Data);
         }
 
         private void OnDisable()
         {
-            if (_entity == null)
+            if (_entity == null || _entity.VendingComponent == null)
                 return;
-            _entity.Vending.onVendingDataChange -= UpdateUI;
+            _entity.VendingComponent.onVendingDataChange -= UpdateUI;
         }
 
         public void UpdateUI(VendingData data)

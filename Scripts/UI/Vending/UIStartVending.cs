@@ -67,7 +67,7 @@ namespace MultiplayerARPG
 
         public override void Show()
         {
-            if (GameInstance.PlayingCharacterEntity.Vending.Data.isStarted)
+            if (GameInstance.PlayingCharacterEntity.VendingComponent.Data.isStarted)
             {
                 BaseUISceneGameplay.Singleton.ShowVending(GameInstance.PlayingCharacterEntity);
                 if (IsVisible())
@@ -182,7 +182,7 @@ namespace MultiplayerARPG
                 LanguageManager.GetText(UITextKeys.UI_START_VENDING_DESCRIPTION.ToString()),
                 false, true, true, false, onClickYes: () =>
                 {
-                    GameInstance.PlayingCharacterEntity.Vending.CallCmdStartVending(inputTitle.text, _items);
+                    GameInstance.PlayingCharacterEntity.VendingComponent.CallCmdStartVending(inputTitle.text, _items);
                     Hide();
                 });
         }
