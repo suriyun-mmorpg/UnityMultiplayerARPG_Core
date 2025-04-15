@@ -1,10 +1,6 @@
-using Insthync.AddressableAssetTools;
-using System.Collections.Generic;
-using System.Reflection;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
 using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
@@ -100,115 +96,6 @@ namespace MultiplayerARPG
             foreach (Transform child in gameObject.transform)
             {
                 UnpackPrefabInstances(child.gameObject);
-            }
-        }
-
-        public static readonly HashSet<string> findUnconvertibleAssemblies = new HashSet<string>() { "Assembly-CSharp" };
-        [MenuItem(EditorMenuConsts.FIND_UNCONVERTIBLE_OBJECTS_MENU, false, EditorMenuConsts.FIND_UNCONVERTIBLE_OBJECTS_ORDER)]
-        public static void FindUnconvertibleObjects()
-        {
-            foreach (string assemblyName in findUnconvertibleAssemblies)
-            {
-                LogUnconvertibleTypesFromAssembly(assemblyName);
-            }
-        }
-
-        static void LogUnconvertibleTypesFromAssembly(string name)
-        {
-            Debug.Log("--- Log Start ---");
-            HashSet<object> loggedTypes = new HashSet<object>();
-            try
-            {
-                // Get project assembly
-                Assembly asm = Assembly.Load(new AssemblyName(name));
-
-                // Filter out all that unconvertible
-                foreach (System.Type type in asm.GetTypes())
-                {
-                    if (!type.IsSubclassOf(typeof(BaseGameData)))
-                        continue;
-                    if (type.HasAttribute<NotPatchableAttribute>())
-                        continue;
-                    LogUnconvertibleFields(loggedTypes, type.FullName, type);
-                }
-            }
-            catch (System.Exception ex)
-            {
-                Debug.LogException(ex);
-            }
-            Debug.Log("--- Log End ---");
-        }
-
-        static void LogUnconvertibleFields(HashSet<object> loggedTypes, string treeLog, System.Type objectType)
-        {
-            if (loggedTypes.Contains(objectType))
-                return;
-            loggedTypes.Add(objectType);
-            List<FieldInfo> fields = new List<FieldInfo>(objectType.GetFields(BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance));
-            for (int i = fields.Count - 1; i >= 0; --i)
-            {
-                bool isRemoving = false;
-                if (!fields[i].IsPublic && !fields[i].HasAttribute<SerializeField>())
-                {
-                    isRemoving = true;
-                }
-                if (fields[i].HasAttribute<System.NonSerializedAttribute>())
-                {
-                    isRemoving = true;
-                }
-                if (fields[i].HasAttribute<AddressableAssetConversionAttribute>() || fields[i].HasAttribute<NotPatchableAttribute>())
-                {
-                    isRemoving = true;
-                }
-                if (isRemoving)
-                {
-                    fields.RemoveAt(i);
-                }
-            }
-            foreach (FieldInfo field in fields)
-            {
-                System.Type fieldType = field.FieldType;
-                if (fieldType.IsListOrArray(out System.Type elementType))
-                {
-                    string nodeName = $"{field.Name}({elementType.FullName})";
-                    if (elementType.IsSubclassOf(typeof(System.Delegate)))
-                    {
-                        continue;
-                    }
-                    if (elementType.IsSubclassOf(typeof(AssetReference)))
-                    {
-                        continue;
-                    }
-                    if (elementType.IsSubclassOf(typeof(Object)) && !elementType.IsSubclassOf(typeof(ScriptableObject)))
-                    {
-                        Debug.Log($"{treeLog} -> {nodeName} is object which is not convertible");
-                        continue;
-                    }
-                    LogUnconvertibleFields(loggedTypes, $"{treeLog} -> {nodeName}", elementType);
-                }
-                else if (fieldType.IsClass)
-                {
-                    string nodeName = $"{field.Name}({fieldType.FullName})";
-                    if (fieldType.IsSubclassOf(typeof(System.Delegate)))
-                    {
-                        continue;
-                    }
-                    if (fieldType.IsSubclassOf(typeof(AssetReference)))
-                    {
-                        continue;
-                    }
-                    if (fieldType.IsSubclassOf(typeof(Object)) && !fieldType.IsSubclassOf(typeof(ScriptableObject)))
-                    {
-                        Debug.Log($"{treeLog} -> {nodeName} is object which is not convertible");
-                        continue;
-                    }
-                    LogUnconvertibleFields(loggedTypes, $"{treeLog} -> {nodeName}", fieldType);
-                }
-                else if (fieldType.IsValueType && !fieldType.IsPrimitive && !fieldType.IsEnum)
-                {
-                    string nodeName = $"{field.Name}({fieldType.FullName})";
-                    LogUnconvertibleFields(loggedTypes, $"{treeLog} -> {nodeName}", fieldType);
-                }
             }
         }
     }
