@@ -87,6 +87,8 @@ namespace MultiplayerARPG
         public UnityEvent onUnableToUse = new UnityEvent();
         public UnityEvent onMaxedLevel = new UnityEvent();
         public UnityEvent onNotMaxedLevel = new UnityEvent();
+        public UnityEvent onClickAimToUseSkill = new UnityEvent();
+        public UnityEvent onClickUseSkill = new UnityEvent();
 
         [Header("Options")]
         public UICharacterSkill uiNextLevelSkill;
@@ -607,11 +609,22 @@ namespace MultiplayerARPG
             if (!IsOwningCharacter())
                 return;
 
+            if (Skill == null || !Skill.IsActive)
+                return;
+
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            // Controlling by hotkey controller
+            if (Skill.HasCustomAimControls())
+            {
+                // Controlling by hotkey controller
+                UICharacterHotkeys.SetupHotkeyForAimming(HotkeyType.Skill, Skill.Id);
+                onClickAimToUseSkill.Invoke();
+                return;
+            }
+
             UICharacterHotkeys.SetupHotkeyForAimming(HotkeyType.Skill, Skill.Id);
+            onClickUseSkill.Invoke();
         }
     }
 }

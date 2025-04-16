@@ -218,6 +218,8 @@ namespace MultiplayerARPG
         public UnityEvent onStartVendingDialogDisappear = new UnityEvent();
         public UnityEvent onSetEquipmentWithAmmo = new UnityEvent();
         public UnityEvent onSetEquipmentWithoutAmmo = new UnityEvent();
+        public UnityEvent onClickAimToUseItem = new UnityEvent();
+        public UnityEvent onClickUseItem = new UnityEvent();
 
         [Header("Options")]
         public UICharacterItemDragHandler uiDragging;
@@ -2042,10 +2044,22 @@ namespace MultiplayerARPG
             if (!IsOwningCharacter() || InventoryType != InventoryType.NonEquipItems)
                 return;
 
+            if (UsableItem == null)
+                return;
+
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
 
-            GameInstance.PlayingCharacterEntity.CallCmdUseItem(IndexOfData);
+            if (UsableItem.HasCustomAimControls())
+            {
+                // Controlling by hotkey controller
+                UICharacterHotkeys.SetupHotkeyForAimming(HotkeyType.Item, Item.Id);
+                onClickAimToUseItem.Invoke();
+                return;
+            }
+
+            UICharacterHotkeys.SetupHotkeyForAimming(HotkeyType.Item, Item.Id);
+            onClickUseItem.Invoke();
         }
 
         #region Drop Item Functions
