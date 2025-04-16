@@ -158,6 +158,7 @@ namespace MultiplayerARPG
             UpdateData();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onRecached += UpdateData;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
             GameInstance.PlayingCharacterEntity.onHotkeysOperation += PlayingCharacterEntity_onHotkeysOperation;
         }
 
@@ -165,7 +166,13 @@ namespace MultiplayerARPG
         {
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onRecached -= UpdateData;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
             GameInstance.PlayingCharacterEntity.onHotkeysOperation -= PlayingCharacterEntity_onHotkeysOperation;
+        }
+
+        private void PlayingCharacterEntity_onNonEquipItemsOperation(LiteNetLibSyncListOp op, int itemIndex, CharacterItem oldItem, CharacterItem newItem)
+        {
+            UpdateData();
         }
 
         private void PlayingCharacterEntity_onHotkeysOperation(LiteNetLibSyncListOp operation, int index, CharacterHotkey oldItem, CharacterHotkey newItem)
