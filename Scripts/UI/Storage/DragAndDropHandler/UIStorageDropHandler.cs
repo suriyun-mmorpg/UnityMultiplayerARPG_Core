@@ -24,7 +24,7 @@ namespace MultiplayerARPG
             if (!RectTransformUtility.RectangleContainsScreenPoint(DropRect, eventData.position))
                 return;
             // Validate dragging UI
-            UIDragHandler dragHandler = eventData.pointerDrag.GetComponent<UIDragHandler>();
+            UIDragHandler dragHandler = UIDragHandler.Get(eventData);
             if (dragHandler == null || !dragHandler.CanDrop)
                 return;
             // Set UI drop state

@@ -1,4 +1,5 @@
-﻿using Insthync.CameraAndInput;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.CameraAndInput;
 using UnityEngine;
 using UnityEngine.EventSystems;
 
@@ -60,12 +61,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Start()
-        {
-            base.Start();
-            rootTransform = CacheUI.CacheRoot.transform;
-        }
-
         public void SetupForEquipItems(UICharacterItem uiCharacterItem)
         {
             Location = SourceLocation.EquipItems;
@@ -108,14 +103,9 @@ namespace MultiplayerARPG
             UIItem = uiCharacterItem;
         }
 
-        public override void OnEndDrag(PointerEventData eventData)
+        public override void OnEndDrag()
         {
-            if (IsScrolling)
-            {
-                base.OnEndDrag(eventData);
-                return;
-            }
-            base.OnEndDrag(eventData);
+            base.OnEndDrag();
             if (IsDropped || !CanDrag)
                 return;
             if (requireDropArea)
@@ -134,6 +124,11 @@ namespace MultiplayerARPG
                 GameInstance.PlayingCharacterEntity.UnAssignHotkey(UIHotkey.HotkeyId);
             if (enableBuyVendingItem && Location == SourceLocation.Vending)
                 UIItem.OnClickBuyVendingItem();
+        }
+
+        public override UniTask<Sprite> LoadIcon()
+        {
+            return CacheUI.Item.GetIcon();
         }
     }
 }

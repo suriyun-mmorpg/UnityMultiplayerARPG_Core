@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using UnityEngine.EventSystems;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -45,12 +45,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void Start()
-        {
-            base.Start();
-            rootTransform = CacheUI.CacheRoot.transform;
-        }
-
         public void SetupForSkills(UICharacterSkill uiCharacterSkill)
         {
             Location = SourceLocation.Skills;
@@ -63,20 +57,20 @@ namespace MultiplayerARPG
             UIHotkey = uiCharacterHotkey;
         }
 
-        public override void OnEndDrag(PointerEventData eventData)
+        public override void OnEndDrag()
         {
-            if (IsScrolling)
-            {
-                base.OnEndDrag(eventData);
-                return;
-            }
-            base.OnEndDrag(eventData);
+            base.OnEndDrag();
             if (IsDropped || !CanDrag)
                 return;
             if (requireDropArea)
                 return;
             if (enableUnassignHotkeyAction && Location == SourceLocation.Hotkey)
                 GameInstance.PlayingCharacterEntity.UnAssignHotkey(UIHotkey.HotkeyId);
+        }
+
+        public override UniTask<Sprite> LoadIcon()
+        {
+            return CacheUI.Skill.GetIcon();
         }
     }
 }

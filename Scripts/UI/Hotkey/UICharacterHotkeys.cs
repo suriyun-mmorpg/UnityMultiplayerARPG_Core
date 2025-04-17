@@ -157,32 +157,20 @@ namespace MultiplayerARPG
         {
             UpdateData();
             if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onRecached += UpdateData;
             GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onSkillsOperation += PlayingCharacterEntity_onSkillsOperation;
-            GameInstance.PlayingCharacterEntity.onGuildSkillsOperation += PlayingCharacterEntity_onGuildSkillsOperation;
             GameInstance.PlayingCharacterEntity.onHotkeysOperation += PlayingCharacterEntity_onHotkeysOperation;
         }
 
         protected virtual void OnDisable()
         {
             if (!GameInstance.PlayingCharacterEntity) return;
+            GameInstance.PlayingCharacterEntity.onRecached -= UpdateData;
             GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
-            GameInstance.PlayingCharacterEntity.onSkillsOperation -= PlayingCharacterEntity_onSkillsOperation;
-            GameInstance.PlayingCharacterEntity.onGuildSkillsOperation -= PlayingCharacterEntity_onGuildSkillsOperation;
             GameInstance.PlayingCharacterEntity.onHotkeysOperation -= PlayingCharacterEntity_onHotkeysOperation;
         }
 
         private void PlayingCharacterEntity_onNonEquipItemsOperation(LiteNetLibSyncListOp op, int itemIndex, CharacterItem oldItem, CharacterItem newItem)
-        {
-            UpdateData();
-        }
-
-        private void PlayingCharacterEntity_onSkillsOperation(LiteNetLibSyncListOp op, int itemIndex, CharacterSkill oldItem, CharacterSkill newItem)
-        {
-            UpdateData();
-        }
-
-        private void PlayingCharacterEntity_onGuildSkillsOperation(LiteNetLibSyncListOp op, int itemIndex, CharacterSkill oldItem, CharacterSkill newItem)
         {
             UpdateData();
         }
