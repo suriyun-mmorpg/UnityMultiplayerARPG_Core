@@ -1,6 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -10,14 +11,15 @@ namespace MultiplayerARPG
         public GameObject listEmptyObject;
         public UIPlayerFrame uiPrefab;
         public Transform uiContainer;
-        public UIPlayerFrame[] selectedFrames;
+        public UIPlayerFrame[] selectedFrames = new UIPlayerFrame[0];
         public GameObject[] selectedSignObjects = new GameObject[0];
         public GameObject[] notSelectedSignObjects = new GameObject[0];
+        public Button uiButtonConfirm;
 
         [Header("Options")]
         public bool updateSelectedFrameOnSelect;
 
-        private List<int> _availableFrameIds = new List<int>();
+        private Dictionary<int, UnlockableContent> _availableFrameIds = new Dictionary<int, UnlockableContent>();
         private List<PlayerFrame> _list = new List<PlayerFrame>();
 
         private UIList _cacheList;
@@ -85,14 +87,14 @@ namespace MultiplayerARPG
             for (int i = 0; i < response.contents.Length; ++i)
             {
                 if (response.contents[i].unlocked)
-                    _availableFrameIds.Add(response.contents[i].dataId);
+                    _availableFrameIds.Add(response.contents[i].dataId, response.contents[i]);
             }
             _list.Clear();
             List<PlayerFrame> availableFrames = new List<PlayerFrame>();
             List<PlayerFrame> unavailableFrames = new List<PlayerFrame>();
             foreach (PlayerFrame frame in GameInstance.PlayerFrames.Values)
             {
-                if (_availableFrameIds.Contains(frame.DataId))
+                if (_availableFrameIds.ContainsKey(frame.DataId))
                     availableFrames.Add(frame);
                 else
                     unavailableFrames.Add(frame);
@@ -107,6 +109,11 @@ namespace MultiplayerARPG
             UpdateSelectedFrames();
             if (updateSelectedFrameOnSelect)
                 UpdateSelectedFrame();
+
+            if (uiButtonConfirm != null)
+            {
+                uiButtonConfirm.interactable = _availableFrameIds.ContainsKey(ui.Data.DataId);
+            }
         }
 
         public void UpdateData()
@@ -138,10 +145,10 @@ namespace MultiplayerARPG
             {
                 tempUI = ui.GetComponent<UIPlayerFrame>();
                 tempUI.Data = data;
-                tempUI.SetIsLocked(_availableFrameIds.Contains(data.DataId));
+                tempUI.SetIsLocked(!_availableFrameIds.ContainsKey(data.DataId));
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if ((selectedDataId == 0 && _availableFrameIds.Contains(data.DataId)) || selectedDataId == data.DataId)
+                if ((selectedDataId == 0 && _availableFrameIds.ContainsKey(data.DataId)) || selectedDataId == data.DataId)
                 {
                     selectedDataId = data.DataId;
                     selectedUI = tempUI;
@@ -188,6 +195,7 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedFrame(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetFrameMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            _selectedDataId = response.dataId;
             UpdateSelectedFrames();
         }
     }

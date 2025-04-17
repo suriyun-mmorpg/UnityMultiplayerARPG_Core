@@ -1,6 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -10,14 +11,15 @@ namespace MultiplayerARPG
         public GameObject listEmptyObject;
         public UIPlayerTitle uiPrefab;
         public Transform uiContainer;
-        public UIPlayerTitle[] selectedTitles;
+        public UIPlayerTitle[] selectedTitles = new UIPlayerTitle[0];
         public GameObject[] selectedSignObjects = new GameObject[0];
         public GameObject[] notSelectedSignObjects = new GameObject[0];
+        public Button uiButtonConfirm;
 
         [Header("Options")]
         public bool updateSelectedTitleOnSelect;
 
-        private List<int> _availableTitleIds = new List<int>();
+        private Dictionary<int, UnlockableContent> _availableTitleIds = new Dictionary<int, UnlockableContent>();
         private List<PlayerTitle> _list = new List<PlayerTitle>();
 
         private UIList _cacheList;
@@ -74,7 +76,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientUserContentHandlers.RequestAvailableContents(new RequestAvailableContentsMessage()
             {
-                type = UnlockableContentType.Frame,
+                type = UnlockableContentType.Title,
             }, ResponseAvailableContents);
         }
 
@@ -85,14 +87,14 @@ namespace MultiplayerARPG
             for (int i = 0; i < response.contents.Length; ++i)
             {
                 if (response.contents[i].unlocked)
-                    _availableTitleIds.Add(response.contents[i].dataId);
+                    _availableTitleIds.Add(response.contents[i].dataId, response.contents[i]);
             }
             _list.Clear();
             List<PlayerTitle> availableTitles = new List<PlayerTitle>();
             List<PlayerTitle> unavailableTitles = new List<PlayerTitle>();
             foreach (PlayerTitle title in GameInstance.PlayerTitles.Values)
             {
-                if (_availableTitleIds.Contains(title.DataId))
+                if (_availableTitleIds.ContainsKey(title.DataId))
                     availableTitles.Add(title);
                 else
                     unavailableTitles.Add(title);
@@ -107,6 +109,11 @@ namespace MultiplayerARPG
             UpdateSelectedTitles();
             if (updateSelectedTitleOnSelect)
                 UpdateSelectedTitle();
+
+            if (uiButtonConfirm != null)
+            {
+                uiButtonConfirm.interactable = _availableTitleIds.ContainsKey(ui.Data.DataId);
+            }
         }
 
         public void UpdateData()
@@ -138,10 +145,10 @@ namespace MultiplayerARPG
             {
                 tempUI = ui.GetComponent<UIPlayerTitle>();
                 tempUI.Data = data;
-                tempUI.SetIsLocked(_availableTitleIds.Contains(data.DataId));
+                tempUI.SetIsLocked(!_availableTitleIds.ContainsKey(data.DataId));
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if ((selectedDataId == 0 && _availableTitleIds.Contains(data.DataId)) || selectedDataId == data.DataId)
+                if ((selectedDataId == 0 && _availableTitleIds.ContainsKey(data.DataId)) || selectedDataId == data.DataId)
                 {
                     selectedDataId = data.DataId;
                     selectedUI = tempUI;
@@ -188,6 +195,7 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedTitle(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetTitleMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            _selectedDataId = response.dataId;
             UpdateSelectedTitles();
         }
     }

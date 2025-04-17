@@ -1,6 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MultiplayerARPG
 {
@@ -13,11 +14,12 @@ namespace MultiplayerARPG
         public UIPlayerIcon[] selectedIcons = new UIPlayerIcon[0];
         public GameObject[] selectedSignObjects = new GameObject[0];
         public GameObject[] notSelectedSignObjects = new GameObject[0];
+        public Button uiButtonConfirm;
 
         [Header("Options")]
         public bool updateSelectedIconOnSelect;
 
-        private List<int> _availableIconIds = new List<int>();
+        private Dictionary<int, UnlockableContent> _availableIconIds = new Dictionary<int, UnlockableContent>();
         private List<PlayerIcon> _list = new List<PlayerIcon>();
 
         private UIList _cacheList;
@@ -85,14 +87,14 @@ namespace MultiplayerARPG
             for (int i = 0; i < response.contents.Length; ++i)
             {
                 if (response.contents[i].unlocked)
-                    _availableIconIds.Add(response.contents[i].dataId);
+                    _availableIconIds.Add(response.contents[i].dataId, response.contents[i]);
             }
             _list.Clear();
             List<PlayerIcon> availableIcons = new List<PlayerIcon>();
             List<PlayerIcon> unavailableIcons = new List<PlayerIcon>();
             foreach (PlayerIcon icon in GameInstance.PlayerIcons.Values)
             {
-                if (_availableIconIds.Contains(icon.DataId))
+                if (_availableIconIds.ContainsKey(icon.DataId))
                     availableIcons.Add(icon);
                 else
                     unavailableIcons.Add(icon);
@@ -107,6 +109,11 @@ namespace MultiplayerARPG
             UpdateSelectedIcons();
             if (updateSelectedIconOnSelect)
                 UpdateSelectedIcon();
+
+            if (uiButtonConfirm != null)
+            {
+                uiButtonConfirm.interactable = _availableIconIds.ContainsKey(ui.Data.DataId);
+            }
         }
 
         public void UpdateData()
@@ -138,10 +145,10 @@ namespace MultiplayerARPG
             {
                 tempUI = ui.GetComponent<UIPlayerIcon>();
                 tempUI.Data = data;
-                tempUI.SetIsLocked(_availableIconIds.Contains(data.DataId));
+                tempUI.SetIsLocked(!_availableIconIds.ContainsKey(data.DataId));
                 tempUI.Show();
                 CacheSelectionManager.Add(tempUI);
-                if ((selectedDataId == 0 && _availableIconIds.Contains(data.DataId)) || selectedDataId == data.DataId)
+                if ((selectedDataId == 0 && _availableIconIds.ContainsKey(data.DataId)) || selectedDataId == data.DataId)
                 {
                     selectedDataId = data.DataId;
                     selectedUI = tempUI;
@@ -188,6 +195,7 @@ namespace MultiplayerARPG
         protected virtual void ResponseSelectedIcon(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSetIconMessage response)
         {
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
+            _selectedDataId = response.dataId;
             UpdateSelectedIcons();
         }
     }
