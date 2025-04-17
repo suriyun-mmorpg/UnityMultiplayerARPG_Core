@@ -74,7 +74,7 @@ namespace MultiplayerARPG
         {
             GameInstance.ClientUserContentHandlers.RequestAvailableContents(new RequestAvailableContentsMessage()
             {
-                type = UnlockableContentType.Frame,
+                type = UnlockableContentType.Icon,
             }, ResponseAvailableContents);
         }
 
