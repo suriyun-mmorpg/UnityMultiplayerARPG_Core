@@ -25,6 +25,7 @@ namespace MultiplayerARPG
         protected Vector3 _previousPointClickPosition = Vector3.positiveInfinity;
         protected bool _didActionOnTarget;
         protected bool _isBlockControllerLastFrame = false;
+        protected bool _isWASDAttackInputLastFrame = false;
 
         public int FindClickObjects(out Vector3 worldPosition2D)
         {
@@ -244,7 +245,7 @@ namespace MultiplayerARPG
                 _isMouseDragOrHoldOrOverUI = true;
             }
             // Will set move target when pointer isn't point on an UIs 
-            if (!_isPointerOverUI && (_getMouse || _getMouseUp))
+            if (!_isPointerOverUI && !_isWASDAttackInputLastFrame && (_getMouse || _getMouseUp))
             {
                 // Clear target
                 ClearTarget(true);
@@ -411,6 +412,7 @@ namespace MultiplayerARPG
 
         public virtual void UpdateWASDInput()
         {
+            _isWASDAttackInputLastFrame = false;
             if (controllerMode == PlayerCharacterControllerMode.PointClick)
                 return;
 
@@ -437,7 +439,10 @@ namespace MultiplayerARPG
 
             // Attack when player pressed attack button
             if (InputManager.GetButton("Attack"))
+            {
                 UpdateWASDAttack();
+                _isWASDAttackInputLastFrame = true;
+            }
 
             // Set movement state to be forward only when it is having moving direction
             MovementState movementState = MovementState.None;
