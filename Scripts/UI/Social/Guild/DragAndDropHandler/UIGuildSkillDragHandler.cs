@@ -70,7 +70,11 @@ namespace MultiplayerARPG
 
         public override UniTask<Sprite> LoadIcon()
         {
+#if UNITY_EDITOR || !UNITY_SERVER
             return CacheUI.GuildSkill.GetIcon();
+#else
+            return new UniTask<Sprite>(null);
+#endif
         }
     }
 }
