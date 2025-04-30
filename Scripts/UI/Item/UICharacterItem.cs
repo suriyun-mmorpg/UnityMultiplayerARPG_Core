@@ -396,6 +396,8 @@ namespace MultiplayerARPG
                 castedTarget.IsSetupAsEquipSlot = IsSetupAsEquipSlot;
                 castedTarget.EquipPosition = EquipPosition;
                 castedTarget.EquipSlotIndex = EquipSlotIndex;
+                castedTarget.StorageType = StorageType;
+                castedTarget.StorageOwnerId = StorageOwnerId;
             }
         }
 
