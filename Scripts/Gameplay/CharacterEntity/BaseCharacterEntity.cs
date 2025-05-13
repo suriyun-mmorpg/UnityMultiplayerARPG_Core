@@ -454,6 +454,10 @@ namespace MultiplayerARPG
         #region Target Entity Getter/Setter
         public void SetTargetEntity(BaseGameEntity entity)
         {
+            if (!IsOwnerClientOrOwnedByServer)
+            {
+                return;
+            }
             if (entity == null)
             {
                 targetEntityId.Value = 0;
