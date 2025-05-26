@@ -91,30 +91,43 @@ namespace MultiplayerARPG
 
         public virtual bool GetRandomPosition(out Vector3 randomedPosition)
         {
-            randomedPosition = transform.position;
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension2D:
                     if (randomedPosition2Ds != null && randomedPosition2Ds.Count > 0)
                     {
-                        randomedPosition += randomedPosition2Ds[_indexOfRandomPosition];
+                        randomedPosition = randomedPosition2Ds[_indexOfRandomPosition];
+                        randomedPosition += transform.position;
                         _indexOfRandomPosition++;
                         if (_indexOfRandomPosition >= randomedPosition2Ds.Count)
                             _indexOfRandomPosition = 0;
                         return true;
                     }
-                    return GetRandomedPosition2D(randomizer, out randomedPosition);
+                    if (GetRandomedPosition2D(randomizer, out randomedPosition))
+                    {
+                        randomedPosition += transform.position;
+                        return true;
+                    }
+                    break;
                 default:
                     if (randomedPosition3Ds != null && randomedPosition3Ds.Count > 0)
                     {
-                        randomedPosition += randomedPosition3Ds[_indexOfRandomPosition];
+                        randomedPosition = randomedPosition3Ds[_indexOfRandomPosition];
+                        randomedPosition += transform.position;
                         _indexOfRandomPosition++;
                         if (_indexOfRandomPosition >= randomedPosition3Ds.Count)
                             _indexOfRandomPosition = 0;
                         return true;
                     }
-                    return GetRandomedPosition3D(randomizer, out randomedPosition, stillUseRandomedPositionIfGroundNotFound);
+                    if (GetRandomedPosition3D(randomizer, out randomedPosition, stillUseRandomedPositionIfGroundNotFound))
+                    {
+                        randomedPosition += transform.position;
+                        return true;
+                    }
+                    break;
             }
+            randomedPosition = transform.position;
+            return false;
         }
 
         public virtual Quaternion GetRandomRotation()
