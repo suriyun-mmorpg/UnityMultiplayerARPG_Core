@@ -1,5 +1,8 @@
-﻿using UnityEngine;
+﻿using Insthync.UnityEditorUtils;
+using UnityEngine;
 using UnityEngine.AI;
+using System.Collections.Generic;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -20,60 +23,98 @@ namespace MultiplayerARPG
 
     public class GameArea : MonoBehaviour
     {
+        protected static System.Random randomizer = new System.Random();
         protected static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[10];
-        public float groundDetectionOffsets = 100f;
+#if UNITY_EDITOR
+        [Header("Generic")]
         public Color gizmosColor = Color.magenta;
+        public Color positionGizmosColor = Color.cyan;
+        public float positionGizmosRadius = 0.1f;
+        public DimensionType gizmosDimentionType = DimensionType.Dimension3D;
+#endif
+        public LayerMask groundLayerMask = -1;
         public GameAreaType type;
         [Header("Radius Area")]
         public float randomRadius = 5f;
         [Header("Square Area")]
         public float squareSizeX = 10f;
         public float squareSizeZ = 10f;
+        public bool enableRotation = true;
         public GameAreaGroundFindingType groundFindingType = GameAreaGroundFindingType.NavMesh;
+        public float groundDetectionOffsets = 100f;
         public float findGroundUpOffsetsRate = 1f;
         public bool stillUseRandomedPositionIfGroundNotFound = false;
+        public int randomPositionAmount = 20;
+        public int randomPositionSeed = 123456;
+        public float randomSpacing = 0.5f;
+        public List<Vector3> randomedPosition3Ds = new List<Vector3>();
+        public List<Vector3> randomedPosition2Ds = new List<Vector3>();
+        public bool excludeFromAllAreaBaking = false;
+#if UNITY_EDITOR
+        [InspectorButton(nameof(BakeRandomPositions), "Bake Random Positions")]
+        public bool btnBakeRandomPositions;
+        [InspectorButton(nameof(BakeAllRandomPositions), "Bake Random Positions (All Areas)")]
+        public bool btnBakeAllRandomPositions;
+#endif
 
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
 
         protected IPhysicFunctions _physicFunctions;
+        protected int _indexOfRandomPosition = 0;
+
+        public List<Vector3> GetWorldRandomPositions()
+        {
+            List<Vector3> result = new List<Vector3>();
+            switch (GameInstance.Singleton.DimensionType)
+            {
+                case DimensionType.Dimension2D:
+                    foreach (Vector3 position in randomedPosition2Ds)
+                    {
+                        if (enableRotation)
+                            result.Add(transform.TransformPoint(position));
+                        else
+                            result.Add(transform.position + position);
+                    }
+                    break;
+                default:
+                    foreach (Vector3 position in randomedPosition3Ds)
+                    {
+                        if (enableRotation)
+                            result.Add(transform.TransformPoint(position));
+                        else
+                            result.Add(transform.position + position);
+                    }
+                    break;
+            }
+            return result;
+        }
 
         public virtual bool GetRandomPosition(out Vector3 randomedPosition)
         {
-            Vector3 randomingPosition = transform.position;
-            randomedPosition = randomingPosition;
-
+            randomedPosition = transform.position;
             switch (GameInstance.Singleton.DimensionType)
             {
-                case DimensionType.Dimension3D:
-                    switch (type)
-                    {
-                        case GameAreaType.Radius:
-                            randomingPosition += new Vector3(Random.Range(-1f, 1f) * randomRadius, 0f, Random.Range(-1f, 1f) * randomRadius);
-                            break;
-                        case GameAreaType.Square:
-                            randomingPosition += new Vector3(Random.Range(-0.5f, 0.5f) * squareSizeX, 0f, Random.Range(-0.5f, 0.5f) * squareSizeZ);
-                            break;
-                    }
-                    if (FindGroundedPosition(randomingPosition, groundDetectionOffsets, out randomedPosition))
-                        return true;
-                    if (!stillUseRandomedPositionIfGroundNotFound)
-                        return false;
-                    randomedPosition = randomingPosition;
-                    return true;
                 case DimensionType.Dimension2D:
-                    switch (type)
+                    if (randomedPosition2Ds != null && randomedPosition2Ds.Count > 0)
                     {
-                        case GameAreaType.Radius:
-                            randomingPosition += new Vector3(Random.Range(-1f, 1f) * randomRadius, Random.Range(-1f, 1f) * randomRadius);
-                            break;
-                        case GameAreaType.Square:
-                            randomingPosition += new Vector3(Random.Range(-0.5f, 0.5f) * squareSizeX, Random.Range(-0.5f, 0.5f) * squareSizeZ);
-                            break;
+                        randomedPosition += randomedPosition2Ds[_indexOfRandomPosition];
+                        _indexOfRandomPosition++;
+                        if (_indexOfRandomPosition >= randomedPosition2Ds.Count)
+                            _indexOfRandomPosition = 0;
+                        return true;
                     }
-                    randomedPosition = randomingPosition;
-                    return true;
+                    return GetRandomedPosition2D(randomizer, out randomedPosition);
+                default:
+                    if (randomedPosition3Ds != null && randomedPosition3Ds.Count > 0)
+                    {
+                        randomedPosition += randomedPosition3Ds[_indexOfRandomPosition];
+                        _indexOfRandomPosition++;
+                        if (_indexOfRandomPosition >= randomedPosition3Ds.Count)
+                            _indexOfRandomPosition = 0;
+                        return true;
+                    }
+                    return GetRandomedPosition3D(randomizer, out randomedPosition, stillUseRandomedPositionIfGroundNotFound);
             }
-            return false;
         }
 
         public virtual Quaternion GetRandomRotation()
@@ -86,6 +127,10 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         protected virtual void OnDrawGizmos()
         {
+            if (enableRotation)
+                Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+            else
+                Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.identity, Vector3.one);
             Color handleCol = Handles.color;
             Color gizmosCol = Gizmos.color;
             Handles.color = gizmosColor;
@@ -97,19 +142,170 @@ namespace MultiplayerARPG
                     Vector3 upDestination = Vector3.up * findGroundUpOffsetsRate * groundDetectionOffsets;
                     Handles.DrawWireDisc(transform.position + upOrigin, Vector3.up, randomRadius);
                     Handles.DrawWireDisc(transform.position + upDestination, Vector3.up, randomRadius);
-                    Gizmos.DrawLine(transform.position + (Vector3.left * randomRadius) + upOrigin, transform.position + (Vector3.left * randomRadius) + upDestination);
-                    Gizmos.DrawLine(transform.position + (Vector3.right * randomRadius) + upOrigin, transform.position + (Vector3.right * randomRadius) + upDestination);
-                    Gizmos.DrawLine(transform.position + (Vector3.forward * randomRadius) + upOrigin, transform.position + (Vector3.forward * randomRadius) + upDestination);
-                    Gizmos.DrawLine(transform.position + (Vector3.back * randomRadius) + upOrigin, transform.position + (Vector3.back * randomRadius) + upDestination);
+                    Gizmos.DrawLine((Vector3.left * randomRadius) + upOrigin, (Vector3.left * randomRadius) + upDestination);
+                    Gizmos.DrawLine((Vector3.right * randomRadius) + upOrigin, (Vector3.right * randomRadius) + upDestination);
+                    Gizmos.DrawLine((Vector3.forward * randomRadius) + upOrigin, (Vector3.forward * randomRadius) + upDestination);
+                    Gizmos.DrawLine((Vector3.back * randomRadius) + upOrigin, (Vector3.back * randomRadius) + upDestination);
                     break;
                 case GameAreaType.Square:
-                    Gizmos.DrawWireCube(transform.position + (Vector3.up * findGroundUpOffsetsRate * groundDetectionOffsets * 0.5f), new Vector3(squareSizeX, groundDetectionOffsets, squareSizeZ));
+                    Gizmos.DrawWireCube(Vector3.up * findGroundUpOffsetsRate * groundDetectionOffsets * 0.5f, new Vector3(squareSizeX, groundDetectionOffsets, squareSizeZ));
                     break;
             }
             Handles.color = handleCol;
             Gizmos.color = gizmosCol;
         }
+
+        protected virtual void OnDrawGizmosSelected()
+        {
+            if (enableRotation)
+                Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
+            else
+                Gizmos.matrix = Matrix4x4.TRS(transform.position, Quaternion.identity, Vector3.one);
+            Color gizmosCol = Gizmos.color;
+            Gizmos.color = positionGizmosColor;
+            switch (gizmosDimentionType)
+            {
+                case DimensionType.Dimension3D:
+                    for (int i = 0; i < randomedPosition3Ds.Count; ++i)
+                    {
+                        Gizmos.DrawWireSphere(randomedPosition3Ds[i], positionGizmosRadius);
+                    }
+                    break;
+                case DimensionType.Dimension2D:
+                    for (int i = 0; i < randomedPosition2Ds.Count; ++i)
+                    {
+                        Gizmos.DrawWireSphere(randomedPosition2Ds[i], positionGizmosRadius);
+                    }
+                    break;
+            }
+            Gizmos.color = gizmosCol;
+        }
 #endif
+
+        public bool IsRandomingPositionEligible(List<Vector3> randomedPositions, Vector3 randomedPosition, float spacing)
+        {
+            if (spacing <= 0f)
+                return true;
+            for (int i = 0; i < randomedPositions.Count; ++i)
+            {
+                if (Vector3.Distance(randomedPositions[i], randomedPosition) < spacing)
+                    return false;
+            }
+            return true;
+        }
+
+#if UNITY_EDITOR
+        [ContextMenu("Bake Random Positions")]
+        public void BakeRandomPositions()
+        {
+            System.Random random = new System.Random(randomPositionSeed);
+            int i;
+            Vector3 randomingPosition;
+            randomedPosition3Ds.Clear();
+            i = 0;
+            int failedCount = 0;
+            while (i < randomPositionAmount)
+            {
+                if (GetRandomedPosition3D(random, out randomingPosition, stillUseRandomedPositionIfGroundNotFound) && IsRandomingPositionEligible(randomedPosition3Ds, randomingPosition, randomSpacing))
+                {
+                    randomedPosition3Ds.Add(randomingPosition);
+                    ++i;
+                    continue;
+                }
+                ++failedCount;
+                if (failedCount > 100)
+                {
+                    Debug.LogError("Unable to find grounded position (3D)", gameObject);
+                    break;
+                }
+            }
+            randomedPosition2Ds.Clear();
+            i = 0;
+            while (i < randomPositionAmount)
+            {
+                if (GetRandomedPosition2D(random, out randomingPosition) && IsRandomingPositionEligible(randomedPosition2Ds, randomingPosition, randomSpacing))
+                {
+                    randomedPosition2Ds.Add(randomingPosition);
+                    ++i;
+                    continue;
+                }
+                ++failedCount;
+                if (failedCount > 100)
+                {
+                    Debug.LogError("Unable to find grounded position (2D)", gameObject);
+                    break;
+                }
+            }
+            EditorUtility.SetDirty(this);
+        }
+
+        [ContextMenu("Bake Random Positions (All Areas)")]
+        public void BakeAllRandomPositions()
+        {
+            GameArea[] areas = FindObjectsOfType<GameArea>();
+            for (int i = 0; i < areas.Length; ++i)
+            {
+                if (areas[i].excludeFromAllAreaBaking)
+                    continue;
+                areas[i].BakeRandomPositions();
+            }
+        }
+#endif
+
+        public bool GetRandomedPosition3D(System.Random random, out Vector3 randomedPosition, bool stillUseRandomedPositionIfGroundNotFound = false)
+        {
+            Vector3 randomingPosition = Vector3.zero;
+            switch (type)
+            {
+                case GameAreaType.Radius:
+                    var preState = Random.state;
+                    Random.InitState(random.Next());
+                    Vector2 circle = Random.insideUnitCircle * randomRadius;
+                    randomingPosition += new Vector3(circle.x, 0f, circle.y);
+                    Random.state = preState;
+                    break;
+                case GameAreaType.Square:
+                    randomingPosition += new Vector3(random.RandomFloat(-0.5f, 0.5f) * squareSizeX, 0f, random.RandomFloat(-0.5f, 0.5f) * squareSizeZ);
+                    break;
+            }
+            if (FindGroundedPosition(enableRotation ? transform.TransformPoint(randomingPosition) : (randomingPosition + transform.position), groundDetectionOffsets, out randomedPosition))
+            {
+                if (enableRotation)
+                    randomedPosition = transform.InverseTransformPoint(randomedPosition);
+                else
+                    randomedPosition -= transform.position.GetXZ();
+                return true;
+            }
+            if (!stillUseRandomedPositionIfGroundNotFound)
+                return false;
+            randomedPosition = randomingPosition;
+            return true;
+        }
+
+        public bool GetRandomedPosition2D(System.Random random, out Vector3 randomedPosition)
+        {
+            Vector3 randomingPosition = Vector3.zero;
+            switch (type)
+            {
+                case GameAreaType.Radius:
+                    var preState = Random.state;
+                    Random.InitState(random.Next());
+                    Vector2 circle = Random.insideUnitCircle * randomRadius;
+                    randomingPosition += new Vector3(circle.x, circle.y, 0f);
+                    Random.state = preState;
+                    break;
+                case GameAreaType.Square:
+                    randomingPosition += new Vector3(random.RandomFloat(-0.5f, 0.5f) * squareSizeX, random.RandomFloat(-0.5f, 0.5f) * squareSizeZ, 0f);
+                    break;
+            }
+            randomedPosition = randomingPosition;
+            return true;
+        }
+
+        public bool FindGroundedPosition(Vector3 fromPosition, out Vector3 result)
+        {
+            return FindGroundedPosition(groundFindingType, GroundLayerMask, fromPosition, groundDetectionOffsets, out result, null, findGroundUpOffsetsRate);
+        }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
@@ -133,6 +329,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual int GroundLayerMask { get { return -1; } }
+        public virtual int GroundLayerMask { get { return groundLayerMask; } }
     }
 }
