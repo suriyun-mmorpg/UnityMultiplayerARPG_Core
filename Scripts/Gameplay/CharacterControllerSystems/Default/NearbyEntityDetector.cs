@@ -16,6 +16,7 @@ namespace MultiplayerARPG
         public bool findMonsterToAttack;
         public bool findNpc;
         public bool findItemDrop;
+        public bool findRewardDrop;
         public bool findBuilding;
         public bool findOnlyAliveBuildings;
         public bool findOnlyActivatableBuildings;
@@ -30,6 +31,7 @@ namespace MultiplayerARPG
         public readonly List<BaseMonsterCharacterEntity> monsters = new List<BaseMonsterCharacterEntity>();
         public readonly List<NpcEntity> npcs = new List<NpcEntity>();
         public readonly List<ItemDropEntity> itemDrops = new List<ItemDropEntity>();
+        public readonly List<BaseRewardDropEntity> rewardDrops = new List<BaseRewardDropEntity>();
         public readonly List<BuildingEntity> buildings = new List<BuildingEntity>();
         public readonly List<VehicleEntity> vehicles = new List<VehicleEntity>();
         public readonly List<WarpPortalEntity> warpPortals = new List<WarpPortalEntity>();
@@ -63,6 +65,8 @@ namespace MultiplayerARPG
             npcs?.Clear();
             itemDrops.Nulling();
             itemDrops?.Clear();
+            rewardDrops.Nulling();
+            rewardDrops?.Clear();
             buildings.Nulling();
             buildings?.Clear();
             vehicles.Nulling();
@@ -121,6 +125,7 @@ namespace MultiplayerARPG
             RemoveInactiveAndSortNearestEntity(monsters);
             RemoveInactiveAndSortNearestEntity(npcs);
             RemoveInactiveAndSortNearestEntity(itemDrops);
+            RemoveInactiveAndSortNearestEntity(rewardDrops);
             RemoveInactiveAndSortNearestEntity(buildings);
             RemoveInactiveAndSortNearestEntity(vehicles);
             RemoveInactiveAndSortNearestEntity(warpPortals);
@@ -140,6 +145,7 @@ namespace MultiplayerARPG
         {
             if (_excludeColliders.Contains(other))
                 return;
+
             if (!AddEntity(other.gameObject))
             {
                 _excludeColliders.Add(other);
@@ -184,6 +190,7 @@ namespace MultiplayerARPG
             BaseMonsterCharacterEntity monster;
             NpcEntity npc;
             ItemDropEntity itemDrop;
+            BaseRewardDropEntity rewardDrop;
             BuildingEntity building;
             VehicleEntity vehicle;
             WarpPortalEntity warpPortal;
@@ -191,7 +198,7 @@ namespace MultiplayerARPG
             IActivatableEntity activatableEntity;
             IHoldActivatableEntity holdActivatableEntity;
             IPickupActivatableEntity pickupActivatableEntity;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatableEntity, out holdActivatableEntity, out pickupActivatableEntity, true);
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out rewardDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatableEntity, out holdActivatableEntity, out pickupActivatableEntity, true);
 
             bool foundSomething = false;
             if (player != null)
@@ -220,6 +227,12 @@ namespace MultiplayerARPG
             {
                 if (!itemDrops.Contains(itemDrop))
                     itemDrops.Add(itemDrop);
+                foundSomething = true;
+            }
+            if (rewardDrop != null)
+            {
+                if (!rewardDrops.Contains(rewardDrop))
+                    rewardDrops.Add(rewardDrop);
                 foundSomething = true;
             }
             if (building != null)
@@ -273,6 +286,7 @@ namespace MultiplayerARPG
             BaseMonsterCharacterEntity monster;
             NpcEntity npc;
             ItemDropEntity itemDrop;
+            BaseRewardDropEntity rewardDrop;
             BuildingEntity building;
             VehicleEntity vehicle;
             WarpPortalEntity warpPortal;
@@ -280,7 +294,7 @@ namespace MultiplayerARPG
             IActivatableEntity activatableEntity;
             IHoldActivatableEntity holdActivatableEntity;
             IPickupActivatableEntity pickupActivatableEntity;
-            FindEntity(other, out player, out monster, out npc, out itemDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatableEntity, out holdActivatableEntity, out pickupActivatableEntity, false);
+            FindEntity(other, out player, out monster, out npc, out itemDrop, out rewardDrop, out building, out vehicle, out warpPortal, out itemsContainer, out activatableEntity, out holdActivatableEntity, out pickupActivatableEntity, false);
 
             bool removeSomething = false;
             if (player != null)
@@ -291,6 +305,8 @@ namespace MultiplayerARPG
                 removeSomething = removeSomething || npcs.Remove(npc);
             if (itemDrop != null)
                 removeSomething = removeSomething || itemDrops.Remove(itemDrop);
+            if (rewardDrop != null)
+                removeSomething = removeSomething || rewardDrops.Remove(rewardDrop);
             if (building != null)
                 removeSomething = removeSomething || buildings.Remove(building);
             if (vehicle != null)
@@ -313,6 +329,7 @@ namespace MultiplayerARPG
             out BaseMonsterCharacterEntity monster,
             out NpcEntity npc,
             out ItemDropEntity itemDrop,
+            out BaseRewardDropEntity rewardDrop,
             out BuildingEntity building,
             out VehicleEntity vehicle,
             out WarpPortalEntity warpPortal,
@@ -326,6 +343,7 @@ namespace MultiplayerARPG
             monster = null;
             npc = null;
             itemDrop = null;
+            rewardDrop = null;
             building = null;
             vehicle = null;
             warpPortal = null;
@@ -368,6 +386,9 @@ namespace MultiplayerARPG
 
                 if (findItemDrop)
                     itemDrop = gameEntity.Entity as ItemDropEntity;
+
+                if (findRewardDrop)
+                    rewardDrop = gameEntity.Entity as BaseRewardDropEntity;
 
                 if (findBuilding)
                 {

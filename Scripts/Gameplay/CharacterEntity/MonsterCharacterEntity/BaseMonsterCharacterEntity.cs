@@ -161,6 +161,7 @@ namespace MultiplayerARPG
         protected bool _isDestroyed;
         protected readonly HashSet<string> _looters = new HashSet<string>();
         protected readonly List<CharacterItem> _droppingItems = new List<CharacterItem>();
+        protected Reward _killedReward;
         protected float _lastTeleportToSummonerTime = 0f;
         protected int _beforeDamageReceivedHp;
 
@@ -384,19 +385,19 @@ namespace MultiplayerARPG
             if (IsSummoned)
                 return;
 
-            Reward reward = CurrentGameplayRule.MakeMonsterReward(CharacterDatabase, Level);
+            _killedReward = CurrentGameplayRule.MakeMonsterReward(CharacterDatabase, Level);
             // Giving gold and exp to players
-            GivingRewardToKillers(FindLastAttackerPlayer(lastAttacker), reward, out float itemDropRate);
+            GivingRewardToKillers(FindLastAttackerPlayer(lastAttacker), _killedReward, out float itemDropRate);
             receivedDamageRecords.Clear();
             // Clear dropping items, it will fills in `OnRandomDropItem` function
             _droppingItems.Clear();
             // Drop items
             CharacterDatabase.RandomItems(OnRandomDropItem, itemDropRate);
-
+            int i;
             switch (CurrentGameInstance.monsterDeadDropItemMode)
             {
                 case RewardingItemMode.DropOnGround:
-                    for (int i = 0; i < _droppingItems.Count; ++i)
+                    for (i = 0; i < _droppingItems.Count; ++i)
                     {
                         ItemDropEntity.Drop(this, RewardGivenType.KillMonster, _droppingItems[i], _looters).Forget();
                     }
@@ -414,7 +415,7 @@ namespace MultiplayerARPG
                     List<string> shufflingLooters = new List<string>(_looters);
                     shufflingLooters.Shuffle();
                     int looterIndex = 0;
-                    for (int i = 0; i < _droppingItems.Count; ++i)
+                    for (i = 0; i < _droppingItems.Count; ++i)
                     {
                         if (looterIndex >= shufflingLooters.Count)
                         {
@@ -447,25 +448,28 @@ namespace MultiplayerARPG
                     break;
             }
 
-            if (!reward.NoExp() && CurrentGameInstance.monsterExpRewardingMode == RewardingMode.DropOnGround)
+            if (!_killedReward.NoExp() && CurrentGameInstance.monsterExpRewardingMode == RewardingMode.DropOnGround)
             {
-                ExpDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.exp, _looters).Forget();
+                ExpDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, _killedReward.exp, _looters).Forget();
             }
 
-            if (!reward.NoGold() && CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.DropOnGround)
+            if (!_killedReward.NoGold() && CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.DropOnGround)
             {
-                GoldDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, reward.gold, _looters).Forget();
+                GoldDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, _killedReward.gold, _looters).Forget();
             }
 
-            if (!reward.NoCurrencies() && CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.DropOnGround)
+            if (!_killedReward.NoCurrencies() && CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.DropOnGround)
             {
-                foreach (CurrencyAmount currencyAmount in reward.currencies)
+                foreach (CurrencyAmount currencyAmount in _killedReward.currencies)
                 {
                     if (currencyAmount.currency == null || currencyAmount.amount <= 0)
                         continue;
                     CurrencyDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, currencyAmount.currency, currencyAmount.amount, _looters).Forget();
                 }
             }
+
+            _killedReward.Dispose();
+            _killedReward = null;
 
             if (!IsSummoned)
             {
@@ -718,6 +722,28 @@ namespace MultiplayerARPG
 
         private void OnRandomDropItem(BaseItem item, int level, int amount)
         {
+            if (GameInstance.Singleton.IsExpDropRepresentItem(item))
+            {
+                _killedReward.exp += amount;
+                return;
+            }
+            if (GameInstance.Singleton.IsGoldDropRepresentItem(item))
+            {
+                _killedReward.gold += amount;
+                return;
+            }
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            if (GameInstance.Singleton.IsCurrencyDropRepresentItem(item, out Currency currency))
+            {
+                _killedReward.currencies.Add(new CurrencyAmount()
+                {
+                    currency = currency,
+                    amount = amount,
+                });
+                return;
+            }
+#endif
+
             int maxStack = item.MaxStack;
             while (amount > 0)
             {

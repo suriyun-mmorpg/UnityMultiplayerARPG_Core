@@ -11,6 +11,7 @@ namespace MultiplayerARPG
     {
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
+        public static readonly Dictionary<int, BaseItem> CurrencyDropRepresentItems = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, Dictionary<int, BaseItem>> ItemsByAmmoType = new Dictionary<int, Dictionary<int, BaseItem>>();
         public static readonly Dictionary<int, ItemCraftFormula> ItemCraftFormulas = new Dictionary<int, ItemCraftFormula>();

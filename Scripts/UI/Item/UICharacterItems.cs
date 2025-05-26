@@ -55,7 +55,7 @@ namespace MultiplayerARPG
         public virtual ICharacterData Character { get; protected set; }
         public List<CharacterItem> LoadedList { get; private set; } = new List<CharacterItem>();
 
-        private UISelectionMode dirtySelectionMode;
+        private UISelectionMode _dirtySelectionMode;
 
         protected override void OnDestroy()
         {
@@ -187,6 +187,8 @@ namespace MultiplayerARPG
                 filteredList = overrideGetFilteredListFunction(LoadedList, filterCategories, filterItemTypes, filterSocketEnhancerTypes, doNotShowEmptySlots);
             else
                 filteredList = UICharacterItemsUtils.GetFilteredList(LoadedList, filterCategories, filterItemTypes, filterSocketEnhancerTypes, doNotShowEmptySlots);
+            OnListFiltered(filteredList);
+
             if (Character == null || filteredList.Count == 0)
             {
                 CacheSelectionManager.DeselectSelectedUI();
@@ -201,19 +203,23 @@ namespace MultiplayerARPG
             if (listEmptyObject != null)
                 listEmptyObject.SetActive(false);
 
+            InventoryType itemInventoryType;
             UICharacterItem selectedUI = null;
             UICharacterItem tempUI;
             CacheList.Generate(filteredList, (index, data, ui) =>
             {
+                itemInventoryType = inventoryType;
+                if (data.Key < 0)
+                    itemInventoryType = InventoryType.Unknow;
                 tempUI = ui.GetComponent<UICharacterItem>();
-                tempUI.Setup(new UICharacterItemData(data.Value, inventoryType), Character, data.Key);
+                tempUI.Setup(new UICharacterItemData(data.Value, itemInventoryType), Character, data.Key);
                 tempUI.Show();
                 if (onGenerateEntry != null)
                     onGenerateEntry.Invoke(data.Key, data.Value, index, tempUI);
                 UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
                 {
-                    switch (inventoryType)
+                    switch (itemInventoryType)
                     {
                         case InventoryType.NonEquipItems:
                             dragHandler.SetupForNonEquipItems(tempUI);
@@ -257,12 +263,17 @@ namespace MultiplayerARPG
             }
         }
 
+        protected virtual void OnListFiltered(List<KeyValuePair<int, CharacterItem>> filteredList)
+        {
+
+        }
+
         protected virtual void Update()
         {
-            if (CacheSelectionManager.selectionMode != dirtySelectionMode)
+            if (CacheSelectionManager.selectionMode != _dirtySelectionMode)
             {
                 CacheSelectionManager.DeselectAll();
-                dirtySelectionMode = CacheSelectionManager.selectionMode;
+                _dirtySelectionMode = CacheSelectionManager.selectionMode;
                 if (uiDialog != null)
                 {
                     uiDialog.onHide.RemoveListener(OnDialogHide);

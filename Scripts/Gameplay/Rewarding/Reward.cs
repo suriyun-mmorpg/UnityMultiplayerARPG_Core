@@ -1,11 +1,20 @@
-﻿namespace MultiplayerARPG
+﻿using System.Collections.Generic;
+
+namespace MultiplayerARPG
 {
     [System.Serializable]
-    public partial struct Reward
+    public partial class Reward : System.IDisposable
     {
         public int exp;
         public int gold;
-        public CurrencyAmount[] currencies;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+        public List<CurrencyAmount> currencies;
+#endif
+
+        ~Reward()
+        {
+            Dispose();
+        }
 
         public bool NoExp()
         {
@@ -19,12 +28,24 @@
 
         public bool NoCurrencies()
         {
-            return currencies == null || currencies.Length == 0;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            return currencies == null || currencies.Count == 0;
+#else
+            return true;
+#endif
         }
 
         public bool NoRewards()
         {
             return NoExp() && NoGold() && NoCurrencies();
+        }
+
+        public void Dispose()
+        {
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            currencies?.Clear();
+            currencies = null;
+#endif
         }
     }
 }

@@ -160,8 +160,13 @@ namespace MultiplayerARPG
             RewardExp(reward.exp, 1f, RewardGivenType.Quest, 1, 1);
             // Add gold
             RewardGold(reward.gold, 1f, RewardGivenType.Quest, 1, 1);
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             // Add currency
             RewardCurrencies(reward.currencies, 1f, RewardGivenType.Quest, 1, 1);
+#endif
+            // Rewards given
+            reward.Dispose();
+            reward = null;
             // Add stat points
             checked
             {

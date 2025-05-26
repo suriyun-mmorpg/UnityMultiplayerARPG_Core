@@ -523,7 +523,9 @@ namespace MultiplayerARPG
             result.exp = monster.RandomExp(level);
             if (Random.value > monster.ChanceToNotDropGold(level))
                 result.gold = monster.RandomGold(level);
-            result.currencies = monster.RandomCurrencies();
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            result.currencies = new List<CurrencyAmount>(monster.RandomCurrencies());
+#endif
             return result;
         }
 
@@ -532,7 +534,9 @@ namespace MultiplayerARPG
             Reward result = new Reward();
             result.exp = quest.rewardExp;
             result.gold = quest.rewardGold;
-            result.currencies = quest.rewardCurrencies;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            result.currencies = new List<CurrencyAmount>(quest.rewardCurrencies);
+#endif
             return result;
         }
 

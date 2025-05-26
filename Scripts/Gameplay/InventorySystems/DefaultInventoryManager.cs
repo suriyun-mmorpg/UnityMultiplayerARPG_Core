@@ -133,9 +133,13 @@ namespace MultiplayerARPG
         public override bool IncreaseItems(IList<CharacterItem> itemList, CharacterItem increasingItem)
         {
             // If item not valid
-            if (increasingItem.IsEmptySlot()) return false;
+            if (increasingItem.IsEmptySlot())
+                return false;
 
             BaseItem itemData = increasingItem.GetItem();
+            if (GameInstance.Singleton.IsRepresentItem(itemData))
+                return false;
+
             int amount = increasingItem.amount;
 
             int maxStack = itemData.MaxStack;

@@ -35,6 +35,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public override BaseItem RepresentItem
+        {
+            get
+            {
+                if (GameInstance.CurrencyDropRepresentItems.TryGetValue(CurrencyDataId, out BaseItem item))
+                    return item;
+                return null;
+            }
+        }
+
         [Category("Relative GameObjects/Transforms")]
         public List<CurrencyAppearanceSetting> currencyAppearanceSettings = new List<CurrencyAppearanceSetting>();
 

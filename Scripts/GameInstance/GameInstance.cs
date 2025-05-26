@@ -144,6 +144,12 @@ namespace MultiplayerARPG
         private NetworkSetting networkSetting = null;
 
         [Header("Gameplay Objects")]
+        [SerializeField]
+        private BaseItem expDropRepresentItem;
+        [SerializeField]
+        private BaseItem goldDropRepresentItem;
+        [SerializeField]
+        private CurrencyItemPair[] currencyDropRepresentItems = new CurrencyItemPair[0];
 #if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
         public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
@@ -591,6 +597,16 @@ namespace MultiplayerARPG
         public ExpTable ExpTable
         {
             get { return expTable; }
+        }
+
+        public BaseItem ExpDropRepresentItem
+        {
+            get { return expDropRepresentItem; }
+        }
+
+        public BaseItem GoldDropRepresentItem
+        {
+            get { return goldDropRepresentItem; }
         }
 
         public ItemDropEntity ItemDropEntityPrefab
@@ -1129,6 +1145,7 @@ namespace MultiplayerARPG
         {
             Attributes.Clear();
             Currencies.Clear();
+            CurrencyDropRepresentItems.Clear();
             Items.Clear();
             ItemsByAmmoType.Clear();
             ItemCraftFormulas.Clear();
@@ -1225,11 +1242,38 @@ namespace MultiplayerARPG
                 }
             }
 
-            // Add required default game data
-            AddItems(new BaseItem[] {
+            List<Currency> representCurrencies = new List<Currency>();
+            List<BaseItem> representItems = new List<BaseItem>()
+            {
                 DefaultWeaponItem as BaseItem,
-                MonsterWeaponItem as BaseItem
-            });
+                MonsterWeaponItem as BaseItem,
+            };
+
+            if (ExpDropRepresentItem != null)
+            {
+                ExpDropRepresentItem.MaxStack = int.MaxValue;
+                representItems.Add(ExpDropRepresentItem);
+            }
+
+            if (GoldDropRepresentItem != null)
+            {
+                GoldDropRepresentItem.MaxStack = int.MaxValue;
+                representItems.Add(GoldDropRepresentItem);
+            }
+
+            foreach (CurrencyItemPair currencyItemPair in currencyDropRepresentItems)
+            {
+                if (currencyItemPair.currency == null || currencyItemPair.item == null)
+                    continue;
+                representCurrencies.Add(currencyItemPair.currency);
+                representItems.Add(currencyItemPair.item);
+                currencyItemPair.item.MaxStack = int.MaxValue;
+                CurrencyDropRepresentItems[currencyItemPair.currency.DataId] = currencyItemPair.item;
+            }
+
+            // Add required represent game data
+            AddCurrencies(representCurrencies);
+            AddItems(representItems);
             MigrateLevelUpEffect();
 
             if (newCharacterSetting != null && newCharacterSetting.startItems != null)
@@ -1262,6 +1306,47 @@ namespace MultiplayerARPG
                 OnGameDataLoadedEvent.Invoke();
             if (Application.isPlaying && !DoNotLoadHomeScene)
                 LoadHomeScene();
+        }
+
+        public bool IsRepresentItem(BaseItem item)
+        {
+            return
+                IsExpDropRepresentItem(item) ||
+                IsGoldDropRepresentItem(item) ||
+                IsCurrencyDropRepresentItem(item, out _);
+        }
+
+        public bool IsExpDropRepresentItem(BaseItem item)
+        {
+            if (expDropRepresentItem != null && expDropRepresentItem == item)
+                return true;
+            return false;
+        }
+
+        public bool IsGoldDropRepresentItem(BaseItem item)
+        {
+            if (goldDropRepresentItem != null && goldDropRepresentItem == item)
+                return true;
+            return false;
+        }
+
+        public bool IsCurrencyDropRepresentItem(BaseItem item, out Currency currency)
+        {
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            if (currencyDropRepresentItems != null && currencyDropRepresentItems.Length > 0)
+            {
+                for (int i = 0; i < currencyDropRepresentItems.Length; ++i)
+                {
+                    if (currencyDropRepresentItems[i].item != null && currencyDropRepresentItems[i].item == item)
+                    {
+                        currency = currencyDropRepresentItems[i].currency;
+                        return true;
+                    }
+                }
+            }
+#endif
+            currency = null;
+            return false;
         }
 
         public List<string> GetGameMapIds()

@@ -128,5 +128,17 @@ namespace MultiplayerARPG
             RPC(CmdChangeQuestTracking, questDataId, isTracking);
             return true;
         }
+
+        public bool CallCmdDropGold(int gold)
+        {
+            if (gold < 0)
+                return false;
+
+            if (gold > Gold)
+                return false;
+
+            RPC(CmdDropGold, gold);
+            return true;
+        }
     }
 }

@@ -5,6 +5,14 @@ namespace MultiplayerARPG
 {
     public partial class GoldDropEntity : BaseRewardDropEntity, IPickupActivatableEntity
     {
+        public override BaseItem RepresentItem
+        {
+            get
+            {
+                return GameInstance.Singleton.GoldDropRepresentItem;
+            }
+        }
+
         public static async UniTask<GoldDropEntity> Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters)
         {
             GoldDropEntity entity = null;

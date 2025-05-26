@@ -498,6 +498,27 @@ namespace MultiplayerARPG
             return result;
         }
 
+        public static Dictionary<int, int> GetCurrenciesByDataId(this IPlayerCharacterData data)
+        {
+            if (data == null)
+                return new Dictionary<int, int>();
+            Dictionary<int, int> result = new Dictionary<int, int>();
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            foreach (CharacterCurrency characterCurrency in data.Currencies)
+            {
+                Currency key = characterCurrency.GetCurrency();
+                int value = characterCurrency.amount;
+                if (key == null)
+                    continue;
+                if (!result.ContainsKey(key.DataId))
+                    result[key.DataId] = value;
+                else
+                    result[key.DataId] += value;
+            }
+#endif
+            return result;
+        }
+
         public static void IncreaseCurrencies(this IPlayerCharacterData character, Dictionary<Currency, int> currencyAmounts, float multiplier = 1)
         {
             if (currencyAmounts == null)

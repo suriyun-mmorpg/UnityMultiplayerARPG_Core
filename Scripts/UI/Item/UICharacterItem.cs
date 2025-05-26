@@ -50,6 +50,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyTitleWithRefineLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_TITLE_WITH_REFINE_LEVEL);
         [Tooltip("Format => {0} = {Sell Price}")]
         public UILocaleKeySetting formatKeySellPrice = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SELL_PRICE);
+        [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeyAmount = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
         [Tooltip("Format => {0} = {Amount}, {1} = {Max Stack}")]
         public UILocaleKeySetting formatKeyStack = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ITEM_STACK);
         [Tooltip("Format => {0} = {Total item amount}")]
@@ -893,12 +895,21 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    stackString = ZString.Format(
-                        LanguageManager.GetText(formatKeyStack),
-                        CharacterItem.amount.ToString("N0"),
-                        Item.MaxStack.ToString("N0"));
+                    if (CharacterItem.amount > Item.MaxStack || Item.MaxStack == int.MaxValue)
+                    {
+                        stackString = ZString.Format(
+                            LanguageManager.GetText(formatKeyAmount),
+                            CharacterItem.amount.ToString("N0"));
+                    }
+                    else
+                    {
+                        stackString = ZString.Format(
+                            LanguageManager.GetText(formatKeyStack),
+                            CharacterItem.amount.ToString("N0"),
+                            Item.MaxStack.ToString("N0"));
+                    }
                 }
-                uiTextStack.SetGameObjectActive(!CharacterItem.IsEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && Item.MaxStack > 1)));
+                uiTextStack.SetGameObjectActive(!CharacterItem.IsEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && (CharacterItem.amount > Item.MaxStack || Item.MaxStack > 1))));
                 uiTextStack.text = stackString;
             }
 

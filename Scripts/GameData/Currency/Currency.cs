@@ -39,4 +39,11 @@ namespace MultiplayerARPG
             return Random.Range(min, max);
         }
     }
+
+    [System.Serializable]
+    public struct CurrencyItemPair
+    {
+        public Currency currency;
+        public BaseItem item;
+    }
 }

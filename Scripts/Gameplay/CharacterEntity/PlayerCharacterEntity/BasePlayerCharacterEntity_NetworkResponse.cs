@@ -1,4 +1,6 @@
 ﻿using LiteNetLibManager;
+using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -132,6 +134,22 @@ namespace MultiplayerARPG
             {
                 source.CancelCraftingQueueItem(this, indexOfData);
             }
+        }
+
+        [ServerRpc]
+        protected void CmdDropGold(int gold)
+        {
+            if (gold < 0)
+                return;
+
+            if (gold > Gold)
+                return;
+
+            if (CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.DropOnGround)
+                GoldDropEntity.Drop(this, 1f, RewardGivenType.PlayerDrop, Level, Level, Gold, new List<string>()).Forget();
+
+            Gold -= gold;
+
         }
     }
 }

@@ -73,6 +73,11 @@ namespace MultiplayerARPG
         [SerializeField]
         private PlayerItemDropMode playerDeadDropsNonEquipItems = PlayerItemDropMode.None;
         public virtual PlayerItemDropMode PlayerDeadDropsNonEquipItems { get { return playerDeadDropsNonEquipItems; } }
+
+        [Tooltip("When character dead, it will drop gold or not?")]
+        [SerializeField]
+        private PlayerItemDropMode playerDeadDropsGold = PlayerItemDropMode.None;
+        public virtual PlayerItemDropMode PlayerDeadDropsGold { get { return playerDeadDropsGold; } }
         #endregion
 
         #region Item Drop Rules

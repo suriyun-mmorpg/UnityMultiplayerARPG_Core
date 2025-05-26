@@ -61,6 +61,8 @@ namespace MultiplayerARPG
 
         public Vector3 SpawnPosition { get; protected set; }
 
+        public abstract BaseItem RepresentItem { get; }
+
         public float DestroyDelay
         {
             get { return destroyDelay; }

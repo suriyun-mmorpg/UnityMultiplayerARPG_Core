@@ -15,6 +15,7 @@ namespace MultiplayerARPG
             ItemDropEntityDetector = tempGameObject.AddComponent<NearbyEntityDetector>();
             ItemDropEntityDetector.detectingRadius = GameInstance.Singleton.pickUpItemDistance;
             ItemDropEntityDetector.findItemDrop = true;
+            ItemDropEntityDetector.findRewardDrop = true;
             ItemDropEntityDetector.onUpdateList += OnUpdate;
             if (uiList != null)
             {
@@ -52,6 +53,16 @@ namespace MultiplayerARPG
                 tempCharacterItem.id = tempEntryId;
                 droppedItems.Add(tempCharacterItem);
             }
+            foreach (BaseRewardDropEntity entity in ItemDropEntityDetector.rewardDrops)
+            {
+                if (entity.RepresentItem == null)
+                    continue;
+                tempEntryId = entity.ObjectId.ToString();
+                tempCharacterItem = CharacterItem.Create(entity.RepresentItem, 1, entity.Amount);
+                tempCharacterItem.id = tempEntryId;
+                droppedItems.Add(tempCharacterItem);
+            }
+
             // Update list
             if (uiList != null)
             {

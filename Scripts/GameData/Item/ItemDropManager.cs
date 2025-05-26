@@ -126,11 +126,13 @@ namespace MultiplayerARPG
             _uncertainDropItems.Shuffle();
             for (i = 0; i < _uncertainDropItems.Count && randomDropCount < maxDropItems; ++i)
             {
-                if (Random.value > _uncertainDropItems[i].dropRate * rate)
+                BaseItem dropItem = _uncertainDropItems[i].item;
+                float dropRate = _uncertainDropItems[i].dropRate * rate;
+                if (Random.value > dropRate)
                     continue;
-                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_uncertainDropItems[i].item))
+                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(dropItem))
                     continue;
-                onRandomItem.Invoke(_uncertainDropItems[i].item, _uncertainDropItems[i].GetRandomedLevel(), _uncertainDropItems[i].GetRandomedAmount());
+                onRandomItem.Invoke(dropItem, _uncertainDropItems[i].GetRandomedLevel(), _uncertainDropItems[i].GetRandomedAmount());
                 ++randomDropCount;
             }
             // Reached max drop items?
