@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         public ItemRandomByWeightTable weightTable;
         public float respawnPickedupDelay = 10f;
         public float droppedItemDestroyDelay = 300f;
+        public RewardGivenType rewardGivenType = RewardGivenType.KillMonster;
 
         protected float _respawnPendingEntitiesTimer = 0f;
         protected readonly List<CharacterItem> _pending = new List<CharacterItem>();
@@ -59,7 +60,6 @@ namespace MultiplayerARPG
                 return;
             }
             await UniTask.Delay(Mathf.RoundToInt(delay * 1000));
-            ItemDropEntity newEntity = null;
             if (GetRandomPosition(out Vector3 dropPosition))
             {
                 Quaternion dropRotation = Quaternion.identity;
@@ -67,21 +67,56 @@ namespace MultiplayerARPG
                 {
                     dropRotation = Quaternion.Euler(Vector3.up * Random.Range(0, 360));
                 }
-                ItemDropEntity loadedPrefab = await CurrentGameInstance.GetLoadedItemDropEntityPrefab();
-                if (loadedPrefab != null)
-                    newEntity = ItemDropEntity.Drop(loadedPrefab, dropPosition, dropRotation, RewardGivenType.None, item, System.Array.Empty<string>(), -1);
-            }
-            if (newEntity == null)
-            {
-                AddPending(item);
+
+                BaseItem itemData = item.GetItem();
+                if (GameInstance.Singleton.IsExpDropRepresentItem(itemData))
+                {
+                    ExpDropEntity prefab = await CurrentGameInstance.GetLoadedExpDropEntityPrefab();
+                    if (prefab != null)
+                    {
+                        ExpDropEntity newEntity = BaseRewardDropEntity.Drop(prefab, dropPosition, dropRotation, 1f, rewardGivenType, 1, 1, item.amount, System.Array.Empty<string>(), -1);
+                        newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
+                        newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                    }
+                }
+                else if (GameInstance.Singleton.IsGoldDropRepresentItem(itemData))
+                {
+                    GoldDropEntity prefab = await CurrentGameInstance.GetLoadedGoldDropEntityPrefab();
+                    if (prefab != null)
+                    {
+                        GoldDropEntity newEntity = BaseRewardDropEntity.Drop(prefab, dropPosition, dropRotation, 1f, rewardGivenType, 1, 1, item.amount, System.Array.Empty<string>(), -1);
+                        newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
+                        newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                    }
+                }
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+                else if (GameInstance.Singleton.IsCurrencyDropRepresentItem(itemData, out Currency currency))
+                {
+                    CurrencyDropEntity prefab = await CurrentGameInstance.GetLoadedCurrencyDropEntityPrefab();
+                    if (prefab != null)
+                    {
+                        CurrencyDropEntity newEntity = BaseRewardDropEntity.Drop(prefab, dropPosition, dropRotation, 1f, rewardGivenType, 1, 1, item.amount, System.Array.Empty<string>(), -1);
+                        newEntity.Currency = currency;
+                        newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
+                        newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                    }
+                }
+#endif
+                else
+                {
+                    ItemDropEntity prefab = await CurrentGameInstance.GetLoadedItemDropEntityPrefab();
+                    if (prefab != null)
+                    {
+                        ItemDropEntity newEntity = ItemDropEntity.Drop(prefab, dropPosition, dropRotation, rewardGivenType, item, System.Array.Empty<string>(), -1);
+                        newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
+                        newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                    }
+                }
             }
             else
             {
-                // TODO: fix this later
-                //if (droppedItemDestroyDelay >= 0)
-                //    newEntity.NetworkDestroy(droppedItemDestroyDelay);
-                newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
-                newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                // Unable to spawn?, add to pending list
+                AddPending(item);
             }
         }
 

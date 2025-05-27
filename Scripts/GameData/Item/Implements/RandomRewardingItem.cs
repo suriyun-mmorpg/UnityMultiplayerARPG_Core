@@ -79,6 +79,11 @@ namespace MultiplayerARPG
             if (rewardingItemsTable == null)
                 return false;
             int seed = characterItem.id.GenerateHashId();
+            int rewardingExp = 0;
+            int rewardingGold = 0;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            List<CurrencyAmount> rewardingCurrencies = new List<CurrencyAmount>();
+#endif
             List<ItemAmount> rewardingItems = new List<ItemAmount>();
             for (int i = 0; i < maxDropAmount; ++i)
             {
@@ -88,12 +93,33 @@ namespace MultiplayerARPG
                 }
                 rewardingItemsTable.RandomItem((item, level, amount) =>
                 {
-                    rewardingItems.Add(new ItemAmount()
+                    if (GameInstance.Singleton.IsExpDropRepresentItem(item))
                     {
-                        item = item,
-                        level = level,
-                        amount = amount,
-                    });
+                        rewardingExp += amount;
+                    }
+                    else if (GameInstance.Singleton.IsGoldDropRepresentItem(item))
+                    {
+                        rewardingGold += amount;
+                    }
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+                    else if (GameInstance.Singleton.IsCurrencyDropRepresentItem(item, out Currency currency))
+                    {
+                        rewardingCurrencies.Add(new CurrencyAmount()
+                        {
+                            currency = currency,
+                            amount = amount,
+                        });
+                    }
+#endif
+                    else
+                    {
+                        rewardingItems.Add(new ItemAmount()
+                        {
+                            item = item,
+                            level = level,
+                            amount = amount,
+                        });
+                    }
                 }, seed);
             }
             if (characterEntity.IncreasingItemsWillOverwhelming(rewardingItems))
@@ -103,6 +129,12 @@ namespace MultiplayerARPG
             }
             if (!characterEntity.DecreaseItemsByIndex(itemIndex, 1, false))
                 return false;
+
+            characterEntity.RewardExp(rewardingExp, 1f, RewardGivenType.None, 1, 1);
+            characterEntity.RewardGold(rewardingGold, 1f, RewardGivenType.None, 1, 1);
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            characterEntity.RewardCurrencies(rewardingCurrencies, 1f, RewardGivenType.None, 1, 1);
+#endif
             characterEntity.IncreaseItems(rewardingItems);
             characterEntity.FillEmptySlots();
             return true;
