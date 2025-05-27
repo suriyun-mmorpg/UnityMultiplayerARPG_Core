@@ -7,9 +7,12 @@ namespace MultiplayerARPG
     public partial class UINonEquipItems : UICharacterItems
     {
         [Header("Represent Items")]
-        public bool showRepresentExp;
-        public bool showRepresentGold;
-        public bool showRepresentCurrencies;
+        public bool showRepresentExp = false;
+        public bool showRepresentExpWhileZero = true;
+        public bool showRepresentGold = false;
+        public bool showRepresentGoldWhileZero = true;
+        public bool showRepresentCurrencies = false;
+        public bool showRepresentCurrenciesWhileZero = true;
 
         protected IPlayerCharacterData _updatedPlayerCharacterData = null;
 
@@ -62,21 +65,23 @@ namespace MultiplayerARPG
                 Dictionary<int, int> currencies = _updatedPlayerCharacterData.GetCurrenciesByDataId();
                 foreach (KeyValuePair<int, BaseItem> kv in GameInstance.CurrencyDropRepresentItems)
                 {
-                    int amount = 0;
-                    if (!currencies.TryGetValue(kv.Key, out amount))
-                        continue;
-                    filteredList.Insert(0, new KeyValuePair<int, CharacterItem>(-1, CharacterItem.Create(kv.Value, amount: amount)));
+                    if (!currencies.TryGetValue(kv.Key, out int amount))
+                        amount = 0;
+                    if (amount > 0 || showRepresentCurrenciesWhileZero)
+                        filteredList.Insert(0, new KeyValuePair<int, CharacterItem>(-1, CharacterItem.Create(kv.Value, amount: amount)));
                 }
             }
 
             if (showRepresentGold)
             {
-                filteredList.Insert(0, new KeyValuePair<int, CharacterItem>(-1, CharacterItem.Create(GameInstance.Singleton.GoldDropRepresentItem, amount: _updatedPlayerCharacterData.Gold)));
+                if (_updatedPlayerCharacterData.Gold > 0 || showRepresentGoldWhileZero)
+                    filteredList.Insert(0, new KeyValuePair<int, CharacterItem>(-1, CharacterItem.Create(GameInstance.Singleton.GoldDropRepresentItem, amount: _updatedPlayerCharacterData.Gold)));
             }
 
             if (showRepresentExp)
             {
-                filteredList.Insert(0, new KeyValuePair<int, CharacterItem>(-1, CharacterItem.Create(GameInstance.Singleton.ExpDropRepresentItem, amount: _updatedPlayerCharacterData.Exp)));
+                if (_updatedPlayerCharacterData.Exp > 0 || showRepresentExpWhileZero)
+                    filteredList.Insert(0, new KeyValuePair<int, CharacterItem>(-1, CharacterItem.Create(GameInstance.Singleton.ExpDropRepresentItem, amount: _updatedPlayerCharacterData.Exp)));
             }
         }
 
