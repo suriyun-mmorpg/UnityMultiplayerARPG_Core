@@ -387,11 +387,12 @@ namespace MultiplayerARPG
         public abstract bool GetEntityNameColor(BaseGameEntity entity, out Color color);
 
         /// <summary>
-        /// Get dealing tax in-case that your game need it
+        /// Get dealing fee in-case that your game need it
         /// </summary>
         /// <param name="dealingItems"></param>
+        /// <param name="gold"></param>
         /// <returns></returns>
-        public abstract int GetDealingTax(DealingCharacterItems dealingItems);
+        public abstract int GetDealingFee(List<CharacterItem> dealingItems, int gold);
 
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {

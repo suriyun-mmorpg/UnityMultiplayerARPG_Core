@@ -2,6 +2,7 @@
 using Cysharp.Text;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -12,8 +13,9 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyDealingGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
         [Tooltip("Format => {0} = {Gold Amount}")]
         public UILocaleKeySetting formatKeyAnotherDealingGold = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_GOLD);
-        [Tooltip("Format => {0} = {Tax Amount}")]
-        public UILocaleKeySetting formatKeyTax = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_TAX);
+        [Tooltip("Format => {0} = {Fee Amount}")]
+        [FormerlySerializedAs("formatKeyTax")]
+        public UILocaleKeySetting formatKeyFee = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_FEE);
 
         [Header("UI Elements")]
         public UICharacterItem uiDealingItemPrefab;
@@ -25,8 +27,9 @@ namespace MultiplayerARPG
         public UICharacter uiAnotherCharacter;
         public TextWrapper uiTextAnotherDealingGold;
         public Transform uiAnotherDealingItemsContainer;
-        [Header("Tax UIs")]
-        public TextWrapper uiTextTax;
+        [Header("Fee UIs")]
+        [FormerlySerializedAs("uiTextTax")]
+        public TextWrapper uiTextFee;
 
         [Header("UI Events")]
         public UnityEvent onStateChangeToDealing = new UnityEvent();
@@ -41,7 +44,9 @@ namespace MultiplayerARPG
         public DealingState AnotherDealingState { get; private set; }
         public int DealingGold { get; private set; }
         public int AnotherDealingGold { get; private set; }
-        public int Tax { get; private set; }
+        public List<CharacterItem> DealingItems { get; private set; } = new List<CharacterItem>();
+        public List<CharacterItem> AnotherDealingItems { get; private set; } = new List<CharacterItem>();
+        public int Fee { get; private set; }
 
         private UIList _cacheDealingItemsList;
         public UIList CacheDealingItemsList
@@ -91,6 +96,8 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
+            DealingItems.Clear();
+            AnotherDealingItems.Clear();
             uiDealingItemPrefab = null;
             uiItemDialog = null;
             uiTextDealingGold = null;
@@ -98,7 +105,7 @@ namespace MultiplayerARPG
             uiAnotherCharacter = null;
             uiTextAnotherDealingGold = null;
             uiAnotherDealingItemsContainer = null;
-            uiTextTax = null;
+            uiTextFee = null;
             onStateChangeToDealing?.RemoveAllListeners();
             onStateChangeToDealing = null;
             onStateChangeToLock?.RemoveAllListeners();
@@ -207,13 +214,17 @@ namespace MultiplayerARPG
                 uiAnotherCharacter.Data = anotherCharacter;
             }
 
+            DealingGold = 0;
+            AnotherDealingGold = 0;
+            DealingItems.Clear();
+            AnotherDealingItems.Clear();
             DealingState = DealingState.None;
             AnotherDealingState = DealingState.None;
             UpdateDealingState(DealingState.Dealing);
             UpdateAnotherDealingState(DealingState.Dealing);
             UpdateDealingGold(0);
             UpdateAnotherDealingGold(0);
-            UpdateTax(0);
+            UpdateFee(0);
             CacheDealingItemsList.HideAll();
             CacheAnotherDealingItemsList.HideAll();
             CacheItemSelectionManager.DeselectSelectedUI();
@@ -288,6 +299,7 @@ namespace MultiplayerARPG
                     gold.ToString("N0"));
             }
             DealingGold = gold;
+            UpdateFee(DealingItems, DealingGold);
         }
 
         public void UpdateAnotherDealingGold(int gold)
@@ -301,29 +313,38 @@ namespace MultiplayerARPG
             AnotherDealingGold = gold;
         }
 
-        public void UpdateTax(int tax)
+        public void UpdateFee(int fee)
         {
-            if (uiTextTax != null)
+            if (uiTextFee != null)
             {
-                uiTextTax.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyTax),
-                    tax.ToString("N0"));
+                uiTextFee.text = ZString.Format(
+                    LanguageManager.GetText(formatKeyFee),
+                    fee.ToString("N0"));
             }
-            Tax = tax;
+            Fee = fee;
+        }
+
+        public void UpdateFee(List<CharacterItem> dealingItems, int gold)
+        {
+            UpdateFee(GameInstance.Singleton.GameplayRule.GetDealingFee(dealingItems, gold));
         }
 
         public void UpdateDealingItems(DealingCharacterItems dealingItems)
         {
-            SetupItemList(CacheDealingItemsList, dealingItems, _tempDealingItemUIs);
-            UpdateTax(GameInstance.Singleton.GameplayRule.GetDealingTax(dealingItems));
+            DealingItems.Clear();
+            DealingItems.AddRange(dealingItems);
+            SetupItemList(CacheDealingItemsList, DealingItems, _tempDealingItemUIs);
+            UpdateFee(DealingItems, DealingGold);
         }
 
         public void UpdateAnotherDealingItems(DealingCharacterItems dealingItems)
         {
-            SetupItemList(CacheAnotherDealingItemsList, dealingItems, _tempAnotherDealingItemUIs);
+            AnotherDealingItems.Clear();
+            AnotherDealingItems.AddRange(dealingItems);
+            SetupItemList(CacheAnotherDealingItemsList, AnotherDealingItems, _tempAnotherDealingItemUIs);
         }
 
-        private void SetupItemList(UIList list, DealingCharacterItems dealingItems, List<UICharacterItem> uiList)
+        private void SetupItemList(UIList list, List<CharacterItem> dealingItems, List<UICharacterItem> uiList)
         {
             CacheItemSelectionManager.DeselectSelectedUI();
             uiList.Clear();
