@@ -458,6 +458,7 @@ namespace MultiplayerARPG
                 GoldDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, _killedReward.gold, _looters).Forget();
             }
 
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             if (!_killedReward.NoCurrencies() && CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.DropOnGround)
             {
                 foreach (CurrencyAmount currencyAmount in _killedReward.currencies)
@@ -467,6 +468,7 @@ namespace MultiplayerARPG
                     CurrencyDropEntity.Drop(this, 1f, RewardGivenType.KillMonster, Level, Level, currencyAmount.currency, currencyAmount.amount, _looters).Forget();
                 }
             }
+#endif
 
             _killedReward.Dispose();
             _killedReward = null;
@@ -582,11 +584,13 @@ namespace MultiplayerARPG
                         tempPlayerCharacterEntity.RewardGold(reward.gold, rewardRate, RewardGivenType.KillMonster, Level, Level);
                     }
 
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
                     if (CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.Immediately && !givenRewardCurrencies)
                     {
                         // Will give reward when it was not given
                         tempPlayerCharacterEntity.RewardCurrencies(reward.currencies, rewardRate, RewardGivenType.KillMonster, Level, Level);
                     }
+#endif
                 }
             }
         }
@@ -691,8 +695,10 @@ namespace MultiplayerARPG
                     RewardGivenType rewardGivenType = playerCharacterEntity.ObjectId == nearbyPartyMember.ObjectId ? RewardGivenType.KillMonster : RewardGivenType.PartyShare;
                     if (CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.Immediately)
                         nearbyPartyMember.RewardGold(reward.gold, multiplier, rewardGivenType, Level, Level);
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
                     if (CurrentGameInstance.monsterCurrencyRewardingMode == RewardingMode.Immediately)
                         nearbyPartyMember.RewardCurrencies(reward.currencies, multiplier, rewardGivenType, Level, Level);
+#endif
                 }
             }
 
