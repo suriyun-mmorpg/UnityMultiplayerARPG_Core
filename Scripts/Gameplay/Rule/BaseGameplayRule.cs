@@ -408,6 +408,20 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public abstract int GetUserBankWithdrawFee(int gold);
 
+        /// <summary>
+        /// Get guild's bank deposit fee
+        /// </summary>
+        /// <param name="gold"></param>
+        /// <returns></returns>
+        public abstract int GetGuildBankDepositFee(int gold);
+
+        /// <summary>
+        /// Get guild's bank withdraw fee
+        /// </summary>
+        /// <param name="gold"></param>
+        /// <returns></returns>
+        public abstract int GetGuildBankWithdrawFee(int gold);
+
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
             float rate = 1f + character.GetCaches().BuyItemPriceRate;

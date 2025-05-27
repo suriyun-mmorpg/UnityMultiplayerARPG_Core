@@ -1165,6 +1165,16 @@ namespace MultiplayerARPG
             return 0;
         }
 
+        public override int GetGuildBankDepositFee(int gold)
+        {
+            return 0;
+        }
+
+        public override int GetGuildBankWithdrawFee(int gold)
+        {
+            return 0;
+        }
+
         private bool TryGetPkData(BasePlayerCharacterEntity player, out PkData data)
         {
             data = default;

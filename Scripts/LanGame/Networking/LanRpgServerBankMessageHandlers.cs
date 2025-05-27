@@ -32,7 +32,8 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            if (playerCharacter.Gold - request.gold < 0)
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetGuildBankDepositFee(request.gold) + request.gold;
+            if (playerCharacter.Gold < requiredGold)
             {
                 result.InvokeError(new ResponseDepositGuildGoldMessage()
                 {
@@ -40,7 +41,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            playerCharacter.Gold -= request.gold;
+            playerCharacter.Gold -= requiredGold;
             guild.gold += request.gold;
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
@@ -74,7 +75,8 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            if (playerCharacter.Gold - request.gold < 0)
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetUserBankDepositFee(request.gold) + request.gold;
+            if (playerCharacter.Gold < requiredGold)
             {
                 result.InvokeError(new ResponseDepositUserGoldMessage()
                 {
@@ -82,7 +84,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            playerCharacter.Gold -= request.gold;
+            playerCharacter.Gold -= requiredGold;
             playerCharacter.UserGold = playerCharacter.UserGold.Increase(request.gold);
             return default;
         }
@@ -113,7 +115,8 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            if (guild.gold - request.gold < 0)
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetGuildBankWithdrawFee(request.gold) + request.gold;
+            if (guild.gold < requiredGold)
             {
                 result.InvokeError(new ResponseWithdrawGuildGoldMessage()
                 {
@@ -121,7 +124,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            guild.gold -= request.gold;
+            guild.gold -= requiredGold;
             playerCharacter.Gold = playerCharacter.Gold.Increase(request.gold);
             GameInstance.ServerGuildHandlers.SetGuild(playerCharacter.GuildId, guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildGoldToMembers(guild);
@@ -155,7 +158,8 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            if (playerCharacter.UserGold - request.gold < 0)
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetUserBankWithdrawFee(request.gold) + request.gold;
+            if (playerCharacter.UserGold < request.gold)
             {
                 result.InvokeError(new ResponseWithdrawUserGoldMessage()
                 {
@@ -163,7 +167,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            playerCharacter.UserGold -= request.gold;
+            playerCharacter.UserGold -= requiredGold;
             playerCharacter.Gold = playerCharacter.Gold.Increase(request.gold);
             result.InvokeSuccess(new ResponseWithdrawUserGoldMessage());
             return default;
