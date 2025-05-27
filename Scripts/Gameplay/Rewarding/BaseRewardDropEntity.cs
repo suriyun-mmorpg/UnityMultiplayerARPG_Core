@@ -263,7 +263,8 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public static BaseRewardDropEntity Drop(BaseRewardDropEntity prefab, BaseGameEntity dropper, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters, float appearDuration)
+        public static T Drop<T>(T prefab, BaseGameEntity dropper, float multiplier, RewardGivenType rewardGivenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters, float appearDuration)
+            where T : BaseRewardDropEntity
         {
             Vector3 dropPosition = dropper.EntityTransform.position;
             Quaternion dropRotation = Quaternion.identity;
@@ -283,7 +284,8 @@ namespace MultiplayerARPG
             return Drop(prefab, dropPosition, dropRotation, multiplier, rewardGivenType, giverLevel, sourceLevel, amount, looters, appearDuration);
         }
 
-        public static BaseRewardDropEntity Drop(BaseRewardDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters, float appearDuration)
+        public static T Drop<T>(T prefab, Vector3 dropPosition, Quaternion dropRotation, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, int amount, IEnumerable<string> looters, float appearDuration)
+            where T : BaseRewardDropEntity
         {
             if (prefab == null)
                 return null;
@@ -291,7 +293,7 @@ namespace MultiplayerARPG
             LiteNetLibIdentity spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                 prefab.Identity.HashAssetId,
                 dropPosition, dropRotation);
-            BaseRewardDropEntity entity = spawnObj.GetComponent<BaseRewardDropEntity>();
+            T entity = spawnObj.GetComponent<T>();
             entity.Multiplier = multiplier;
             entity.GivenType = givenType;
             entity.GiverLevel = giverLevel;

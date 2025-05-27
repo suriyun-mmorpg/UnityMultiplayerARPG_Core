@@ -118,13 +118,18 @@ namespace MultiplayerARPG
             }
         }
 
-        public static async UniTask<CurrencyDropEntity> Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, Currency currency, int amount, IEnumerable<string> looters)
+        public static UniTask<CurrencyDropEntity> Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, Currency currency, int amount, IEnumerable<string> looters)
+        {
+            return Drop(dropper, multiplier, givenType, giverLevel, sourceLevel, currency, amount, looters, GameInstance.Singleton.itemAppearDuration);
+        }
+
+        public static async UniTask<CurrencyDropEntity> Drop(BaseGameEntity dropper, float multiplier, RewardGivenType givenType, int giverLevel, int sourceLevel, Currency currency, int amount, IEnumerable<string> looters, float appearDuration)
         {
             CurrencyDropEntity entity = null;
             CurrencyDropEntity loadedPrefab = await GameInstance.Singleton.GetLoadedCurrencyDropEntityPrefab();
             if (loadedPrefab != null)
             {
-                entity = Drop(loadedPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration) as CurrencyDropEntity;
+                entity = Drop(loadedPrefab, dropper, multiplier, givenType, giverLevel, sourceLevel, amount, looters, GameInstance.Singleton.itemAppearDuration);
             }
             if (entity != null)
             {
