@@ -399,14 +399,14 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="gold"></param>
         /// <returns></returns>
-        public abstract int GetUserBankDepositFee(int gold);
+        public abstract int GetPlayerBankDepositFee(int gold);
 
         /// <summary>
         /// Get user's bank withdraw fee
         /// </summary>
         /// <param name="gold"></param>
         /// <returns></returns>
-        public abstract int GetUserBankWithdrawFee(int gold);
+        public abstract int GetPlayerBankWithdrawFee(int gold);
 
         /// <summary>
         /// Get guild's bank deposit fee

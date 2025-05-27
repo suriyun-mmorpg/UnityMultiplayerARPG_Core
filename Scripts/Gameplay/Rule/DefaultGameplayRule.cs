@@ -1155,12 +1155,12 @@ namespace MultiplayerARPG
             return Mathf.CeilToInt(totalFee);
         }
 
-        public override int GetUserBankDepositFee(int gold)
+        public override int GetPlayerBankDepositFee(int gold)
         {
             return 0;
         }
 
-        public override int GetUserBankWithdrawFee(int gold)
+        public override int GetPlayerBankWithdrawFee(int gold)
         {
             return 0;
         }

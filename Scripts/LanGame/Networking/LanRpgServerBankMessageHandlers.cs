@@ -75,7 +75,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            int requiredGold = GameInstance.Singleton.GameplayRule.GetUserBankDepositFee(request.gold) + request.gold;
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetPlayerBankDepositFee(request.gold) + request.gold;
             if (playerCharacter.Gold < requiredGold)
             {
                 result.InvokeError(new ResponseDepositUserGoldMessage()
@@ -158,7 +158,7 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            int requiredGold = GameInstance.Singleton.GameplayRule.GetUserBankWithdrawFee(request.gold) + request.gold;
+            int requiredGold = GameInstance.Singleton.GameplayRule.GetPlayerBankWithdrawFee(request.gold) + request.gold;
             if (playerCharacter.UserGold < request.gold)
             {
                 result.InvokeError(new ResponseWithdrawUserGoldMessage()
