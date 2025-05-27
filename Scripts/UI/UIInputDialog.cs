@@ -384,4 +384,9 @@ public class UIInputDialog : UIBase
     {
         uiInputField.text += text;
     }
+
+    public void DeleteLastCharacter()
+    {
+        uiInputField.text = uiInputField.text.Substring(0, uiInputField.text.Length - 1);
+    }
 }
