@@ -146,10 +146,9 @@ namespace MultiplayerARPG
                 return;
 
             if (CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.DropOnGround)
-                GoldDropEntity.Drop(this, 1f, RewardGivenType.PlayerDrop, Level, Level, Gold, new List<string>()).Forget();
+                GoldDropEntity.Drop(this, 1f, RewardGivenType.PlayerDrop, Level, Level, gold, System.Array.Empty<string>()).Forget();
 
             Gold -= gold;
-
         }
     }
 }
