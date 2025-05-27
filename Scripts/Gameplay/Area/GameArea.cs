@@ -64,8 +64,13 @@ namespace MultiplayerARPG
 
         public List<Vector3> GetWorldRandomPositions()
         {
+            return GetWorldRandomPositions(GameInstance.Singleton.DimensionType);
+        }
+
+        public List<Vector3> GetWorldRandomPositions(DimensionType type)
+        {
             List<Vector3> result = new List<Vector3>();
-            switch (GameInstance.Singleton.DimensionType)
+            switch (type)
             {
                 case DimensionType.Dimension2D:
                     foreach (Vector3 position in randomedPosition2Ds)
