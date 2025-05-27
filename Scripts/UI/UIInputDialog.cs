@@ -274,6 +274,10 @@ public class UIInputDialog : UIBase
 
     public void OnClickConfirm()
     {
+        if (!IsVisible())
+            return;
+        if (hideOnConfirm)
+            Hide();
         switch (ContentType)
         {
             case InputField.ContentType.IntegerNumber:
@@ -292,8 +296,6 @@ public class UIInputDialog : UIBase
                     _onConfirmText.Invoke(text);
                 break;
         }
-        if (hideOnConfirm)
-            Hide();
     }
 
     public void SetToMinAmount()
