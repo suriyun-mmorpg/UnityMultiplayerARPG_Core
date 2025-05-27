@@ -122,7 +122,7 @@ namespace MultiplayerARPG
             bool playerDeadDropsEquipWeapons = false;
             bool playerDeadDropsEquipItems = false;
             bool playerDeadDropsNonEquipItems = false;
-            bool playerDeadDropGold = false;
+            bool playerDeadDropsGold = false;
 
             switch (CurrentMapInfo.PlayerDeadDropsEquipWeapons)
             {
@@ -157,10 +157,10 @@ namespace MultiplayerARPG
             switch (CurrentMapInfo.PlayerDeadDropsGold)
             {
                 case PlayerItemDropMode.AlwaysDrop:
-                    playerDeadDropGold = true;
+                    playerDeadDropsGold = true;
                     break;
                 case PlayerItemDropMode.PkPunishmentDrop:
-                    playerDeadDropGold = deadPunishmentType == DeadPunishmentType.PK;
+                    playerDeadDropsGold = deadPunishmentType == DeadPunishmentType.PK;
                     break;
             }
 
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (playerDeadDropGold)
+            if (playerDeadDropsGold)
             {
                 if (Gold > 0 && CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.DropOnGround)
                     GoldDropEntity.Drop(this, 1f, RewardGivenType.PlayerDead, Level, Level, Gold, looters).Forget();
