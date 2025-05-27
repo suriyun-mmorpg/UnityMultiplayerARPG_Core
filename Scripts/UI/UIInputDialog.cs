@@ -7,6 +7,7 @@ public class UIInputDialog : UIBase
     public TextWrapper uiTextDescription;
     public InputFieldWrapper uiInputField;
     public Button buttonConfirm;
+    public bool hideOnConfirm = true;
     private System.Action<string> _onConfirmText;
     private System.Action<int> _onConfirmInteger;
     private System.Action<float> _onConfirmDecimal;
@@ -159,6 +160,19 @@ public class UIInputDialog : UIBase
         int defaultAmount = 0,
         string placeHolder = "")
     {
+        Title = title;
+        Description = description;
+        PlaceHolderText = placeHolder;
+        SetupForIntegerInput(onConfirmInteger, minAmount, maxAmount, defaultAmount);
+        Show();
+    }
+
+    public void SetupForIntegerInput(
+        System.Action<int> onConfirmInteger,
+        int? minAmount = null,
+        int? maxAmount = null,
+        int defaultAmount = 0)
+    {
         if (!minAmount.HasValue)
             minAmount = int.MinValue;
         if (!maxAmount.HasValue)
@@ -168,9 +182,6 @@ public class UIInputDialog : UIBase
         _intMinAmount = minAmount;
         _intMaxAmount = maxAmount;
 
-        Title = title;
-        Description = description;
-        PlaceHolderText = placeHolder;
         if (uiInputField != null)
         {
             if (minAmount.Value > maxAmount.Value)
@@ -178,29 +189,26 @@ public class UIInputDialog : UIBase
                 minAmount = null;
                 Debug.LogWarning("min amount is more than max amount");
             }
-            uiInputField.onValueChanged.RemoveListener(ValidateIntAmount);
-            uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
-            uiInputField.onValueChanged.AddListener(ValidateIntAmount);
+            uiInputField.onValueChanged.RemoveListener(ValidateIntegerAmount);
+            uiInputField.onValueChanged.RemoveListener(ValidateDecimalAmount);
+            uiInputField.onValueChanged.AddListener(ValidateIntegerAmount);
         }
         InputFieldText = defaultAmount.ToString();
         ContentType = InputField.ContentType.IntegerNumber;
         CharacterLimit = 0;
         _onConfirmInteger = onConfirmInteger;
-        Show();
     }
 
-    protected void ValidateIntAmount(string result)
+    protected void ValidateIntegerAmount(string result)
     {
         int amount = _intDefaultAmount;
         if (int.TryParse(result, out amount))
         {
-            uiInputField.onValueChanged.RemoveListener(ValidateIntAmount);
-            uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
             if (_intMinAmount.HasValue && amount < _intMinAmount.Value)
-                InputFieldText = _intMinAmount.Value.ToString();
+                amount = _intMinAmount.Value;
             if (_intMaxAmount.HasValue && amount > _intMaxAmount.Value)
-                InputFieldText = _intMaxAmount.Value.ToString();
-            uiInputField.onValueChanged.AddListener(ValidateIntAmount);
+                amount = _intMaxAmount.Value;
+            uiInputField.SetTextWithoutNotify(amount.ToString());
         }
     }
 
@@ -212,6 +220,19 @@ public class UIInputDialog : UIBase
         float defaultAmount = 0f,
         string placeHolder = "")
     {
+        Title = title;
+        Description = description;
+        PlaceHolderText = placeHolder;
+        SetupForDecimalInput(onConfirmDecimal, minAmount, maxAmount, defaultAmount);
+        Show();
+    }
+
+    public void SetupForDecimalInput(
+        System.Action<float> onConfirmDecimal,
+        float? minAmount = null,
+        float? maxAmount = null,
+        float defaultAmount = 0f)
+    {
         if (!minAmount.HasValue)
             minAmount = float.MinValue;
         if (!maxAmount.HasValue)
@@ -220,9 +241,7 @@ public class UIInputDialog : UIBase
         _floatDefaultAmount = defaultAmount;
         _floatMinAmount = minAmount;
         _floatMaxAmount = maxAmount;
-        Title = title;
-        Description = description;
-        PlaceHolderText = placeHolder;
+
         if (uiInputField != null)
         {
             if (minAmount.Value > maxAmount.Value)
@@ -230,29 +249,26 @@ public class UIInputDialog : UIBase
                 minAmount = null;
                 Debug.LogWarning("min amount is more than max amount");
             }
-            uiInputField.onValueChanged.RemoveListener(ValidateIntAmount);
-            uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
-            uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
+            uiInputField.onValueChanged.RemoveListener(ValidateIntegerAmount);
+            uiInputField.onValueChanged.RemoveListener(ValidateDecimalAmount);
+            uiInputField.onValueChanged.AddListener(ValidateDecimalAmount);
         }
         InputFieldText = defaultAmount.ToString();
         ContentType = InputField.ContentType.DecimalNumber;
         CharacterLimit = 0;
         _onConfirmDecimal = onConfirmDecimal;
-        Show();
     }
 
-    protected void ValidateFloatAmount(string result)
+    protected void ValidateDecimalAmount(string result)
     {
         float amount = _floatDefaultAmount;
         if (float.TryParse(result, out amount))
         {
-            uiInputField.onValueChanged.RemoveListener(ValidateIntAmount);
-            uiInputField.onValueChanged.RemoveListener(ValidateFloatAmount);
             if (_floatMinAmount.HasValue && amount < _floatMinAmount.Value)
-                InputFieldText = _floatMinAmount.Value.ToString();
+                amount = _floatMinAmount.Value;
             if (_floatMaxAmount.HasValue && amount > _floatMaxAmount.Value)
-                InputFieldText = _floatMaxAmount.Value.ToString();
-            uiInputField.onValueChanged.AddListener(ValidateFloatAmount);
+                amount = _floatMaxAmount.Value;
+            uiInputField.SetTextWithoutNotify(amount.ToString());
         }
     }
 
@@ -276,6 +292,96 @@ public class UIInputDialog : UIBase
                     _onConfirmText.Invoke(text);
                 break;
         }
-        Hide();
+        if (hideOnConfirm)
+            Hide();
+    }
+
+    public void SetToMinAmount()
+    {
+        switch (ContentType)
+        {
+            case InputField.ContentType.IntegerNumber:
+                if (_intMinAmount.HasValue)
+                    InputFieldText = _intMinAmount.Value.ToString();
+                break;
+            case InputField.ContentType.DecimalNumber:
+                if (_floatMinAmount.HasValue)
+                    InputFieldText = _floatMinAmount.Value.ToString();
+                break;
+        }
+    }
+
+    public void SetToMaxAmount()
+    {
+        switch (ContentType)
+        {
+            case InputField.ContentType.IntegerNumber:
+                if (_intMaxAmount.HasValue)
+                    InputFieldText = _intMaxAmount.Value.ToString();
+                break;
+            case InputField.ContentType.DecimalNumber:
+                if (_floatMaxAmount.HasValue)
+                    InputFieldText = _floatMaxAmount.Value.ToString();
+                break;
+        }
+    }
+
+    public void ChangeAmount(int step)
+    {
+        switch (ContentType)
+        {
+            case InputField.ContentType.IntegerNumber:
+                if (!int.TryParse(InputFieldText, out int amount))
+                    amount = 0;
+                amount -= step;
+                if (_intMinAmount.HasValue && amount < _intMinAmount.Value)
+                    amount = _intMinAmount.Value;
+                if (_intMaxAmount.HasValue && amount > _intMaxAmount.Value)
+                    amount = _intMaxAmount.Value;
+                uiInputField.SetTextWithoutNotify(amount.ToString());
+                break;
+            case InputField.ContentType.DecimalNumber:
+                if (!float.TryParse(InputFieldText, out float amountDecimal))
+                    amountDecimal = 0f;
+                amountDecimal -= step;
+                if (_floatMinAmount.HasValue && amountDecimal < _floatMinAmount.Value)
+                    amountDecimal = _floatMinAmount.Value;
+                if (_floatMaxAmount.HasValue && amountDecimal > _floatMaxAmount.Value)
+                    amountDecimal = _floatMaxAmount.Value;
+                uiInputField.SetTextWithoutNotify(amountDecimal.ToString());
+                break;
+        }
+    }
+
+    public void ChangeAmountDecimal(float step)
+    {
+        switch (ContentType)
+        {
+            case InputField.ContentType.IntegerNumber:
+                if (!int.TryParse(InputFieldText, out int amount))
+                    amount = 0;
+                amount -= (int)step;
+                if (_intMinAmount.HasValue && amount < _intMinAmount.Value)
+                    amount = _intMinAmount.Value;
+                if (_intMaxAmount.HasValue && amount > _intMaxAmount.Value)
+                    amount = _intMaxAmount.Value;
+                uiInputField.SetTextWithoutNotify(amount.ToString());
+                break;
+            case InputField.ContentType.DecimalNumber:
+                if (!float.TryParse(InputFieldText, out float amountDecimal))
+                    amountDecimal = 0f;
+                amountDecimal -= step;
+                if (_floatMinAmount.HasValue && amountDecimal < _floatMinAmount.Value)
+                    amountDecimal = _floatMinAmount.Value;
+                if (_floatMaxAmount.HasValue && amountDecimal > _floatMaxAmount.Value)
+                    amountDecimal = _floatMaxAmount.Value;
+                uiInputField.SetTextWithoutNotify(amountDecimal.ToString());
+                break;
+        }
+    }
+
+    public void AppendText(string text)
+    {
+        uiInputField.text += text;
     }
 }

@@ -9,6 +9,16 @@
             return GameInstance.JoinedGuild.gold;
         }
 
+        public override int GetDepositFee(int amount)
+        {
+            return GameInstance.Singleton.GameplayRule.GetGuildBankDepositFee(amount);
+        }
+
+        public override int GetWithdrawFee(int amount)
+        {
+            return GameInstance.Singleton.GameplayRule.GetGuildBankWithdrawFee(amount);
+        }
+
         public override void OnDepositConfirm(int amount)
         {
             GameInstance.ClientBankHandlers.RequestDepositGuildGold(new RequestDepositGuildGoldMessage()
