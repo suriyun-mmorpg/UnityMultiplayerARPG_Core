@@ -108,7 +108,7 @@ namespace MultiplayerARPG
 
         public int GetRequiredGold()
         {
-            return GameInstance.Singleton.GameplayRule.GetDealingTax(DealingItems) + DealingGold;
+            return GameInstance.Singleton.GameplayRule.GetDealingFee(DealingItems, DealingGold) + DealingGold;
         }
 
         public bool HaveEnoughGold()

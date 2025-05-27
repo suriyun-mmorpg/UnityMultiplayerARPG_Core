@@ -1143,16 +1143,26 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override int GetDealingTax(DealingCharacterItems dealingCharacterItems)
+        public override int GetDealingFee(List<CharacterItem> dealingItems, int gold)
         {
-            float totalTax = 0f;
-            foreach (CharacterItem item in dealingCharacterItems)
+            float totalFee = 0f;
+            foreach (CharacterItem item in dealingItems)
             {
                 BaseItem itemData = item.GetItem();
                 float rate = (calculateTaxByStackedItems ? 1f : ((float)item.amount / (float)itemData.MaxStack)) * taxByItemPriceRate;
-                totalTax += (float)itemData.SellPrice * rate;
+                totalFee += (float)itemData.SellPrice * rate;
             }
-            return Mathf.CeilToInt(totalTax);
+            return Mathf.CeilToInt(totalFee);
+        }
+
+        public override int GetUserBankDepositFee(int gold)
+        {
+            return 0;
+        }
+
+        public override int GetUserBankWithdrawFee(int gold)
+        {
+            return 0;
         }
 
         private bool TryGetPkData(BasePlayerCharacterEntity player, out PkData data)
