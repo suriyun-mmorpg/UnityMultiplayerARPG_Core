@@ -337,13 +337,18 @@ namespace MultiplayerARPG
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
         }
 
-        public static async UniTask<ItemDropEntity> Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
+        public static UniTask<ItemDropEntity> Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
+        {
+            return Drop(dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+        }
+
+        public static async UniTask<ItemDropEntity> Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters, float appearDuration)
         {
             ItemDropEntity entity = null;
             ItemDropEntity loadedPrefab = await GameInstance.Singleton.GetLoadedItemDropEntityPrefab();
             if (loadedPrefab != null)
             {
-                entity = Drop(loadedPrefab, dropper, givenType, dropData, looters, GameInstance.Singleton.itemAppearDuration);
+                entity = Drop(loadedPrefab, dropper, givenType, dropData, looters, appearDuration);
             }
             return entity;
         }
