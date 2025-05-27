@@ -18,8 +18,11 @@ namespace MultiplayerARPG
         public int minLevel = 1;
         [Min(1)]
         public int maxLevel = 1;
+        [FormerlySerializedAs("amount")]
         [Min(1)]
-        public int amount = 1;
+        public int minAmount = 1;
+        [Min(1)]
+        public int maxAmount = 1;
         public float destroyRespawnDelay = 0f;
         public float respawnPendingEntitiesDelay = 5f;
 
@@ -143,6 +146,7 @@ namespace MultiplayerARPG
             AddressablePrefab addressablePrefab = this.addressablePrefab;
             if (prefab != null || addressablePrefab.IsDataValid())
             {
+                int amount = Random.Range(minAmount, maxAmount);
                 for (int i = 0; i < amount; ++i)
                 {
                     Spawn(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), 0, destroyRespawnDelay);
@@ -207,7 +211,7 @@ namespace MultiplayerARPG
             GameSpawnArea<T>[] areas = FindObjectsOfType<GameSpawnArea<T>>();
             foreach (GameSpawnArea<T> area in areas)
             {
-                count += area.amount;
+                count += area.minAmount;
                 List<SpawnPrefabData> spawningPrefabs = new List<SpawnPrefabData>(area.spawningPrefabs);
                 foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
                 {

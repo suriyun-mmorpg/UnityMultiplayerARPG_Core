@@ -1,19 +1,36 @@
 using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     public class ItemDropByWeightTableSpawnArea : GameSpawnArea
     {
         public ItemRandomByWeightTable weightTable;
-        public float respawnPickedupDelay = 10f;
+        [FormerlySerializedAs("respawnPickedupDelay")]
+        public float respawnPickedupDelayMin = 10f;
+        public float respawnPickedupDelayMax = 10f;
         public float droppedItemDestroyDelay = 300f;
         public RewardGivenType rewardGivenType = RewardGivenType.KillMonster;
 
         protected float _respawnPendingEntitiesTimer = 0f;
         protected readonly List<CharacterItem> _pending = new List<CharacterItem>();
+        private CancellationTokenSource _cancellationSource;
+
+        protected override void Awake()
+        {
+            base.Awake();
+            _cancellationSource = new CancellationTokenSource();
+        }
+
+        private void OnDestroy()
+        {
+            _cancellationSource?.Cancel();
+            _cancellationSource = null;
+        }
 
         protected virtual void LateUpdate()
         {
@@ -37,6 +54,7 @@ namespace MultiplayerARPG
 
         public override void SpawnAll()
         {
+            int amount = Random.Range(minAmount, maxAmount);
             for (int i = 0; i < amount; ++i)
             {
                 if (weightTable == null)
@@ -59,7 +77,14 @@ namespace MultiplayerARPG
             {
                 return;
             }
-            await UniTask.Delay(Mathf.RoundToInt(delay * 1000));
+            try
+            {
+                await UniTask.Delay(Mathf.RoundToInt(delay * 1000), cancellationToken: _cancellationSource.Token);
+            }
+            catch
+            {
+                return;
+            }
             if (GetRandomPosition(out Vector3 dropPosition))
             {
                 Quaternion dropRotation = Quaternion.identity;
@@ -129,7 +154,9 @@ namespace MultiplayerARPG
         {
             weightTable.RandomItem((item, level, amount) =>
             {
-                Spawn(CharacterItem.Create(item, level, amount), respawnPickedupDelay);
+                Spawn(
+                    CharacterItem.Create(item, level, amount),
+                    Random.Range(respawnPickedupDelayMin, respawnPickedupDelayMax));
             });
         }
     }
