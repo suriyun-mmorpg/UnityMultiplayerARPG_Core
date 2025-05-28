@@ -18,30 +18,39 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            if (uiDepositInput != null)
-            {
+            ResetDepositUIs();
+            ResetWithdrawUIs();
+            ResetFeeUIs();
+        }
+
+        public void ResetDepositUIs()
+        {
+            if (uiDepositInput == null)
                 uiDepositInput.SetupForIntegerInput(OnDepositConfirm, 0, null, 0);
-                if (uiDepositInput.uiInputField != null)
-                {
-                    uiDepositInput.uiInputField.onValueChanged.RemoveListener(OnDepositValueChangedProceeding);
-                    uiDepositInput.uiInputField.onValueChanged.AddListener(OnDepositValueChangedProceeding);
-                }
-            }
-
-            if (uiWithdrawInput != null)
+            if (uiDepositInput.uiInputField != null)
             {
-                uiWithdrawInput.SetupForIntegerInput(OnWithdrawConfirm, 0, null, 0);
-                if (uiWithdrawInput.uiInputField != null)
-                {
-                    uiWithdrawInput.uiInputField.onValueChanged.RemoveListener(OnWithdrawValueChangedProceeding);
-                    uiWithdrawInput.uiInputField.onValueChanged.AddListener(OnWithdrawValueChangedProceeding);
-                }
+                uiDepositInput.uiInputField.onValueChanged.RemoveListener(OnDepositValueChangedProceeding);
+                uiDepositInput.uiInputField.onValueChanged.AddListener(OnDepositValueChangedProceeding);
             }
+        }
 
-            if (uiTextFee != null)
+        public void ResetWithdrawUIs()
+        {
+            if (uiWithdrawInput == null)
+                return;
+            uiWithdrawInput.SetupForIntegerInput(OnWithdrawConfirm, 0, null, 0);
+            if (uiWithdrawInput.uiInputField != null)
             {
-                uiTextFee.text = ZString.Format(LanguageManager.GetText(formatKeyFee), "0");
+                uiWithdrawInput.uiInputField.onValueChanged.RemoveListener(OnWithdrawValueChangedProceeding);
+                uiWithdrawInput.uiInputField.onValueChanged.AddListener(OnWithdrawValueChangedProceeding);
             }
+        }
+
+        public void ResetFeeUIs()
+        {
+            if (uiTextFee == null)
+                return;
+            uiTextFee.text = ZString.Format(LanguageManager.GetText(formatKeyFee), "0");
         }
 
         protected override void OnDestroy()
@@ -65,8 +74,10 @@ namespace MultiplayerARPG
 
         public void OnClickDeposit()
         {
+            ResetFeeUIs();
             if (uiDepositInput != null)
             {
+                ResetDepositUIs();
                 uiDepositInput.Show();
             }
             else
@@ -79,8 +90,10 @@ namespace MultiplayerARPG
 
         public void OnClickWithdraw()
         {
+            ResetFeeUIs();
             if (uiWithdrawInput != null)
             {
+                ResetWithdrawUIs();
                 uiWithdrawInput.Show();
             }
             else

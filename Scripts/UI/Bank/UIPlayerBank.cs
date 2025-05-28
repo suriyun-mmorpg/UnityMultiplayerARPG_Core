@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using LiteNetLibManager;
+
+namespace MultiplayerARPG
 {
     public class UIPlayerBank : UIBaseBank
     {
@@ -24,7 +26,16 @@
             GameInstance.ClientBankHandlers.RequestDepositUserGold(new RequestDepositUserGoldMessage()
             {
                 gold = amount,
-            }, ClientBankActions.ResponseDepositUserGold);
+            }, ResponseDepositUserGold);
+        }
+
+        public void ResponseDepositUserGold(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDepositUserGoldMessage response)
+        {
+            ClientBankActions.ResponseDepositUserGold(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
+                return;
+            ResetDepositUIs();
+            ResetFeeUIs();
         }
 
         public override void OnWithdrawConfirm(int amount)
@@ -32,7 +43,16 @@
             GameInstance.ClientBankHandlers.RequestWithdrawUserGold(new RequestWithdrawUserGoldMessage()
             {
                 gold = amount,
-            }, ClientBankActions.ResponseWithdrawUserGold);
+            }, ResponseWithdrawUserGold);
+        }
+
+        public void ResponseWithdrawUserGold(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseWithdrawUserGoldMessage response)
+        {
+            ClientBankActions.ResponseWithdrawUserGold(requestHandler, responseCode, response);
+            if (responseCode.ShowUnhandledResponseMessageDialog(response.message))
+                return;
+            ResetWithdrawUIs();
+            ResetFeeUIs();
         }
     }
 }
