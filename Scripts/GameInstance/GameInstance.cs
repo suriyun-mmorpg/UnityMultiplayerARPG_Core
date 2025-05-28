@@ -139,15 +139,15 @@ namespace MultiplayerARPG
         [SerializeField]
         private BaseGMCommands gmCommands = null;
         [SerializeField]
-        private BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager;
+        private BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager = null;
         [SerializeField]
         private NetworkSetting networkSetting = null;
 
         [Header("Gameplay Objects")]
         [SerializeField]
-        private BaseItem expDropRepresentItem;
+        private BaseItem expDropRepresentItem = null;
         [SerializeField]
-        private BaseItem goldDropRepresentItem;
+        private BaseItem goldDropRepresentItem = null;
         [SerializeField]
         private CurrencyItemPair[] currencyDropRepresentItems = new CurrencyItemPair[0];
 #if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
@@ -336,7 +336,8 @@ namespace MultiplayerARPG
         };
         [Tooltip("Layers which will be ignored when raycasting")]
         [FormerlySerializedAs("nonTargetingLayers")]
-        public UnityLayer[] ignoreRaycastLayers = new UnityLayer[] {
+        public UnityLayer[] ignoreRaycastLayers = new UnityLayer[]
+        {
             new UnityLayer(11)
         };
 
