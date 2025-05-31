@@ -110,14 +110,33 @@ namespace MultiplayerARPG
                         continue;
                     _spatialObjects.Add(new SpatialObject()
                     {
+                        objectType = SpatialObjectTypes.NetworkedObject,
                         objectId = spawnedObject.ObjectId,
                         position = spawnedObject.transform.position,
+                        shape = SpatialObjectShape.Sphere,
                         radius = GetVisibleRange(spawnedObject),
+                    });
+                }
+                foreach (ISpatialObjectComponent component in SpatialObjectContainer.GetValues())
+                {
+                    component.ClearSubscribers();
+                    if (!component.SpatialObjectEnabled)
+                        continue;
+                    _spatialObjects.Add(new SpatialObject()
+                    {
+                        objectType = SpatialObjectTypes.NonNetworkedObject,
+                        objectId = component.SpatialObjectId,
+                        position = component.SpatialObjectPosition,
+                        shape = component.SpatialObjectShape,
+                        radius = component.SpatialObjectRadius,
+                        extents = component.SpatialObjectExtents,
                     });
                 }
                 _system.UpdateGrid(_spatialObjects);
 
-                HashSet<uint> subscribings = new HashSet<uint>();
+                HashSet<uint> subscribingNetworkedObjects = new HashSet<uint>();
+                LiteNetLibIdentity contactedObject;
+                ISpatialObjectComponent spatialObjectComponent;
                 foreach (LiteNetLibPlayer player in Manager.GetPlayers())
                 {
                     if (!player.IsReady)
@@ -128,18 +147,27 @@ namespace MultiplayerARPG
                     foreach (LiteNetLibIdentity playerObject in player.GetSpawnedObjects())
                     {
                         // Update subscribing list, it will unsubscribe objects which is not in this list
-                        subscribings.Clear();
-                        var resultSpatialObjects = _system.QueryRadius(playerObject.transform.position, 0f);
-                        LiteNetLibIdentity contactedObject;
+                        subscribingNetworkedObjects.Clear();
+                        var resultSpatialObjects = _system.QuerySphere(playerObject.transform.position, 0f);
                         for (int i = 0; i < resultSpatialObjects.Length; ++i)
                         {
+                            byte contactedObjectType = resultSpatialObjects[i].objectType;
                             uint contactedObjectId = resultSpatialObjects[i].objectId;
-                            if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out contactedObject) &&
-                                ShouldSubscribe(playerObject, contactedObject, false))
-                                subscribings.Add(contactedObjectId);
+                            switch (contactedObjectType)
+                            {
+                                case SpatialObjectTypes.NetworkedObject:
+                                    if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out contactedObject) &&
+                                        ShouldSubscribe(playerObject, contactedObject, false))
+                                        subscribingNetworkedObjects.Add(contactedObjectId);
+                                    break;
+                                default:
+                                    if (SpatialObjectContainer.TryGet(contactedObjectId, out spatialObjectComponent))
+                                        spatialObjectComponent.AddSubscriber(playerObject.ObjectId);
+                                    break;
+                            }
                         }
                         resultSpatialObjects.Dispose();
-                        playerObject.UpdateSubscribings(subscribings);
+                        playerObject.UpdateSubscribings(subscribingNetworkedObjects);
                     }
                 }
             }
