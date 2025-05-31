@@ -101,6 +101,9 @@ namespace MultiplayerARPG
             doNotDestroyOnSceneChanges = true;
             LagCompensationManager = gameObject.GetOrAddComponent<ILagCompensationManager, DefaultLagCompensationManager>();
             HitRegistrationManager = gameObject.GetOrAddComponent<IHitRegistrationManager, DefaultHitRegistrationManager>();
+            _defaultInterestManager = GetComponent<BaseInterestManager>();
+            if (_defaultInterestManager == null)
+                _defaultInterestManager = gameObject.AddComponent<JobifiedGridSpatialPartitioningAOI>();
             ManagerComponents = GetComponents<BaseGameNetworkManagerComponent>();
             // Force change physic auto sync transforms mode to manual
             Physics.autoSyncTransforms = useUnityAutoPhysicSyncTransform;
@@ -939,7 +942,7 @@ namespace MultiplayerARPG
             List<GameSpawnArea> gameSpawnAreas = GenericUtils.GetComponentsFromAllLoadedScenes<GameSpawnArea>(false);
             for (i = 0; i < gameSpawnAreas.Count; ++i)
             {
-                gameSpawnAreas[i].SpawnAll();
+                gameSpawnAreas[i].SpawnFirstTime();
                 await UniTask.NextFrame();
                 progress = 0.5f + ((float)i / (float)gameSpawnAreas.Count * 0.5f);
                 onSpawnEntitiesProgress.Invoke(sceneName, false, true, progress);
@@ -1188,7 +1191,7 @@ namespace MultiplayerARPG
                 message = message,
                 sendByServer = true,
             });
-            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(s_Writer.Data)));
+            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(s_Writer.Data, 0, s_Writer.Length)));
         }
 
         public void ServerSendLocalMessage(string sender, string message)
@@ -1203,7 +1206,7 @@ namespace MultiplayerARPG
                 message = message,
                 sendByServer = true,
             });
-            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(s_Writer.Data)));
+            HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(s_Writer.Data, 0, s_Writer.Length)));
         }
 
         public void KickClient(long connectionId, UITextKeys message)
@@ -1212,7 +1215,7 @@ namespace MultiplayerARPG
                 return;
             s_Writer.Reset();
             s_Writer.PutPackedUShort((ushort)message);
-            KickClient(connectionId, s_Writer.Data);
+            KickClient(connectionId, s_Writer.CopyData());
         }
 
         public virtual async UniTask<AsyncResponseData<EmptyMessage>> SendClientSafeDisconnect()

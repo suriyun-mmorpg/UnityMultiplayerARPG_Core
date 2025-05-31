@@ -9,6 +9,7 @@ namespace MultiplayerARPG
 {
     public class ItemDropByWeightTableSpawnArea : GameSpawnArea
     {
+        [Header("Drop settings")]
         public ItemRandomByWeightTable weightTable;
         [FormerlySerializedAs("respawnPickedupDelay")]
         public float respawnPickedupDelayMin = 10f;
@@ -17,8 +18,8 @@ namespace MultiplayerARPG
         public RewardGivenType rewardGivenType = RewardGivenType.KillMonster;
 
         protected float _respawnPendingEntitiesTimer = 0f;
-        protected readonly List<CharacterItem> _pending = new List<CharacterItem>();
-        private CancellationTokenSource _cancellationSource;
+        protected List<CharacterItem> _pending = new List<CharacterItem>();
+        protected CancellationTokenSource _cancellationSource;
 
         protected override void Awake()
         {
@@ -26,14 +27,23 @@ namespace MultiplayerARPG
             _cancellationSource = new CancellationTokenSource();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            weightTable = null;
             _cancellationSource?.Cancel();
             _cancellationSource = null;
+            _pending?.Clear();
+            _pending = null;
         }
 
-        protected virtual void LateUpdate()
+        protected override void LateUpdate()
         {
+            if (!BaseGameNetworkManager.Singleton.IsServer)
+                return;
+
+            base.LateUpdate();
+
             if (_pending.Count > 0)
             {
                 _respawnPendingEntitiesTimer += Time.deltaTime;
@@ -54,7 +64,7 @@ namespace MultiplayerARPG
 
         public override void SpawnAll()
         {
-            int amount = Random.Range(minAmount, maxAmount);
+            int amount = GetRandomedSpawnAmount();
             for (int i = 0; i < amount; ++i)
             {
                 if (weightTable == null)
@@ -102,6 +112,7 @@ namespace MultiplayerARPG
                         ExpDropEntity newEntity = BaseRewardDropEntity.Drop(prefab, dropPosition, dropRotation, 1f, rewardGivenType, 1, 1, item.amount, System.Array.Empty<string>(), -1);
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                        _subscribeHandler.AddEntity(newEntity);
                     }
                 }
                 else if (GameInstance.Singleton.IsGoldDropRepresentItem(itemData))
@@ -112,6 +123,7 @@ namespace MultiplayerARPG
                         GoldDropEntity newEntity = BaseRewardDropEntity.Drop(prefab, dropPosition, dropRotation, 1f, rewardGivenType, 1, 1, item.amount, System.Array.Empty<string>(), -1);
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                        _subscribeHandler.AddEntity(newEntity);
                     }
                 }
 #if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
@@ -124,6 +136,7 @@ namespace MultiplayerARPG
                         newEntity.Currency = currency;
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                        _subscribeHandler.AddEntity(newEntity);
                     }
                 }
 #endif
@@ -135,6 +148,7 @@ namespace MultiplayerARPG
                         ItemDropEntity newEntity = ItemDropEntity.Drop(prefab, dropPosition, dropRotation, rewardGivenType, item, System.Array.Empty<string>(), -1);
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
+                        _subscribeHandler.AddEntity(newEntity);
                     }
                 }
             }

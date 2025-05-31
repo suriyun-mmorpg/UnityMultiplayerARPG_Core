@@ -12,6 +12,12 @@ namespace MultiplayerARPG
 {
     public abstract class GameSpawnArea : GameArea
     {
+        public enum SpawnType
+        {
+            Default,
+            SpawnIfPlayerNearby,
+        }
+
         [Header("Spawning Data")]
         [FormerlySerializedAs("level")]
         [Min(1)]
@@ -25,10 +31,48 @@ namespace MultiplayerARPG
         public int maxAmount = 1;
         public float destroyRespawnDelay = 0f;
         public float respawnPendingEntitiesDelay = 5f;
+        public SpawnType spawnType = SpawnType.Default;
+        [Tooltip("If `spawnType` is `SpawnIfPlayerNearby`, and there is no players nearby this spawn area, it will destroy all spawned objects within `noPlayerNearbyDestroyDelay`")]
+        public float noPlayerNearbyDestroyDelay = 30f;
+
+        protected GameSpawnAreaSubscribeHandler _subscribeHandler;
 
         protected virtual void Awake()
         {
+            _subscribeHandler = new GameSpawnAreaSubscribeHandler(this);
+            SpatialObjectContainer.Add(_subscribeHandler);
             gameObject.layer = PhysicLayers.IgnoreRaycast;
+        }
+
+        protected virtual void OnDestroy()
+        {
+            SpatialObjectContainer.Remove(_subscribeHandler);
+            _subscribeHandler?.Clean();
+            _subscribeHandler = null;
+        }
+
+        protected virtual void LateUpdate()
+        {
+            if (!BaseGameNetworkManager.Singleton.IsServer)
+                return;
+
+            _subscribeHandler.SpatialObjectEnabled = spawnType == SpawnType.SpawnIfPlayerNearby;
+            if (_subscribeHandler.SpatialObjectEnabled)
+                _subscribeHandler.Update(Time.deltaTime, noPlayerNearbyDestroyDelay);
+        }
+
+        public int GetRandomedSpawnAmount()
+        {
+            if (maxAmount < minAmount)
+                return minAmount;
+            return Random.Range(minAmount, maxAmount);
+        }
+
+        public void SpawnFirstTime()
+        {
+            if (spawnType == SpawnType.SpawnIfPlayerNearby)
+                return;
+            SpawnAll();
         }
 
         public abstract void SpawnAll();
@@ -75,10 +119,24 @@ namespace MultiplayerARPG
         public List<SpawnPrefabData> spawningPrefabs = new List<SpawnPrefabData>();
 
         protected float _respawnPendingEntitiesTimer = 0f;
-        protected readonly List<SpawnPrefabData> _pending = new List<SpawnPrefabData>();
+        protected List<SpawnPrefabData> _pending = new List<SpawnPrefabData>();
 
-        protected virtual void LateUpdate()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+            spawningPrefabs?.Clear();
+            spawningPrefabs = null;
+            _pending?.Clear();
+            _pending = null;
+        }
+
+        protected override void LateUpdate()
+        {
+            if (!BaseGameNetworkManager.Singleton.IsServer)
+                return;
+
+            base.LateUpdate();
+
             if (_pending.Count > 0)
             {
                 _respawnPendingEntitiesTimer += Time.deltaTime;
@@ -146,7 +204,7 @@ namespace MultiplayerARPG
             AddressablePrefab addressablePrefab = this.addressablePrefab;
             if (prefab != null || addressablePrefab.IsDataValid())
             {
-                int amount = Random.Range(minAmount, maxAmount);
+                int amount = GetRandomedSpawnAmount();
                 for (int i = 0; i < amount; ++i)
                 {
                     Spawn(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), 0, destroyRespawnDelay);
@@ -195,6 +253,11 @@ namespace MultiplayerARPG
                     amount = 1,
                     destroyRespawnDelay = destroyRespawnDelay,
                 });
+            }
+            else
+            {
+                // Store to entities collection, so the spawner can manage them later
+                _subscribeHandler.AddEntity(newEntity);
             }
         }
 
