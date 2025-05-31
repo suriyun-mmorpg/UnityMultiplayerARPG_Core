@@ -38,7 +38,7 @@ namespace MultiplayerARPG
                 switch (GameSpawnArea.type)
                 {
                     case GameAreaType.Radius:
-                        return GameSpawnArea.randomRadius;
+                        return GameSpawnArea.randomRadius + GameSpawnArea.additionalRangeToFindNearbyPlayers;
                 }
                 return 0f;
             }
@@ -51,12 +51,14 @@ namespace MultiplayerARPG
                 switch (GameSpawnArea.type)
                 {
                     case GameAreaType.Square:
+                        float extentX = (GameSpawnArea.squareSizeX + GameSpawnArea.additionalRangeToFindNearbyPlayers) * 0.5f;
+                        float extentZ = (GameSpawnArea.squareSizeZ + GameSpawnArea.additionalRangeToFindNearbyPlayers) * 0.5f;
                         switch (GameInstance.Singleton.DimensionType)
                         {
                             case DimensionType.Dimension2D:
-                                return new float3(GameSpawnArea.squareSizeX * 0.5f, GameSpawnArea.squareSizeZ * 0.5f, 0f);
+                                return new float3(extentX, extentZ, 0f);
                             default:
-                                return new float3(GameSpawnArea.squareSizeX * 0.5f, 0f, GameSpawnArea.squareSizeZ * 0.5f);
+                                return new float3(extentX, 0f, extentZ);
                         }
                 }
                 return new float3(0f, 0f, 0f);
