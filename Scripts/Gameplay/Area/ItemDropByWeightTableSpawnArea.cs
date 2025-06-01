@@ -95,6 +95,10 @@ namespace MultiplayerARPG
             {
                 return;
             }
+            if (!AbleToSpawn())
+            {
+                return;
+            }
             if (GetRandomPosition(out Vector3 dropPosition))
             {
                 Quaternion dropRotation = Quaternion.identity;
@@ -166,6 +170,10 @@ namespace MultiplayerARPG
 
         protected virtual void NewEntity_onNetworkDestroy(byte reasons)
         {
+            if (!AbleToSpawn())
+            {
+                return;
+            }
             weightTable.RandomItem((item, level, amount) =>
             {
                 Spawn(

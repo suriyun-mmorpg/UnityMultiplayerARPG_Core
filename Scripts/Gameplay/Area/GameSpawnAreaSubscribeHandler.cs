@@ -66,6 +66,7 @@ namespace MultiplayerARPG
         }
 
         public GameSpawnArea GameSpawnArea { get; private set; }
+        public SpawnState CurrentSpawnState => _spawnState;
 
         private readonly HashSet<GameSpawnAreaEntityHandler> _entityHandlers = new HashSet<GameSpawnAreaEntityHandler>();
         private readonly HashSet<uint> _subscribers = new HashSet<uint>();
@@ -95,9 +96,10 @@ namespace MultiplayerARPG
 
         public void AddEntity(LiteNetLibBehaviour entity)
         {
-            if (entity == null || entity.TryGetComponent(out GameSpawnAreaEntityHandler entityHandler))
+            if (entity == null)
                 return;
-            entityHandler = entity.gameObject.AddComponent<GameSpawnAreaEntityHandler>();
+            if (!entity.TryGetComponent(out GameSpawnAreaEntityHandler entityHandler))
+                entityHandler = entity.gameObject.AddComponent<GameSpawnAreaEntityHandler>();
             entityHandler.Handler = this;
             entityHandler.Entity = entity;
             _entityHandlers.Add(entityHandler);
@@ -135,6 +137,7 @@ namespace MultiplayerARPG
             if (_timer >= unspawnDelayInSeconds)
             {
                 _timer = 0f;
+                _spawnState = SpawnState.Despawned;
                 foreach (GameSpawnAreaEntityHandler entityHandler in _entityHandlers)
                 {
                     if (entityHandler.Entity == null)
@@ -143,7 +146,6 @@ namespace MultiplayerARPG
                     entityHandler.Entity.NetworkDestroy();
                 }
                 _entityHandlers.Clear();
-                _spawnState = SpawnState.Despawned;
             }
         }
 
@@ -151,8 +153,8 @@ namespace MultiplayerARPG
         {
             if (_subscribers.Count <= 0)
                 return;
-            GameSpawnArea.SpawnAll();
             _spawnState = SpawnState.Spawned;
+            GameSpawnArea.SpawnAll();
         }
     }
 }

@@ -76,6 +76,16 @@ namespace MultiplayerARPG
             SpawnAll();
         }
 
+        public bool AbleToSpawn()
+        {
+            if (spawnType == SpawnType.SpawnIfPlayerNearby && _subscribeHandler.CurrentSpawnState == GameSpawnAreaSubscribeHandler.SpawnState.Despawned)
+            {
+                // Unable to spawn yet
+                return false;
+            }
+            return true;
+        }
+
         public abstract void SpawnAll();
     }
 
@@ -241,6 +251,10 @@ namespace MultiplayerARPG
         IEnumerator SpawnRoutine(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay)
         {
             yield return new WaitForSecondsRealtime(delay);
+            if (!AbleToSpawn())
+            {
+                yield break;
+            }
             T newEntity = SpawnInternal(prefab, addressablePrefab, level, destroyRespawnDelay);
             if (newEntity == null)
             {
