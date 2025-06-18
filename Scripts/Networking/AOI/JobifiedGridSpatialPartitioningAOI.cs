@@ -47,7 +47,7 @@ namespace MultiplayerARPG
 
         private void OnLoadSceneFinish(string sceneName, bool isAdditive, bool isOnline, float progress)
         {
-            if (!IsServer || isAdditive || !isOnline)
+            if (!IsServer || !isOnline)
             {
                 _system = null;
                 return;
@@ -63,24 +63,18 @@ namespace MultiplayerARPG
                 return;
             }
             _system = null;
-            Bounds? bounds = null;
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension3D:
                     var collider3Ds = GenericUtils.GetComponentsFromAllLoadedScenes<Collider>(true);
                     if (collider3Ds.Count > 0)
                     {
-                        bounds = collider3Ds[0].bounds;
+                        _bounds = collider3Ds[0].bounds;
                         for (int i = 1; i < collider3Ds.Count; ++i)
                         {
-                            bounds.Value.Encapsulate(collider3Ds[i].bounds);
+                            _bounds.Encapsulate(collider3Ds[i].bounds);
                         }
-                    }
-                    if (bounds.HasValue)
-                    {
-                        Bounds adjustedBounds = bounds.Value;
-                        adjustedBounds.extents += bufferedCells * cellSize * 2;
-                        _bounds = adjustedBounds;
+                        _bounds.extents += bufferedCells * cellSize * 2;
                         _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects, false, true, false);
                     }
                     break;
@@ -88,17 +82,12 @@ namespace MultiplayerARPG
                     var collider2Ds = GenericUtils.GetComponentsFromAllLoadedScenes<Collider2D>(true);
                     if (collider2Ds.Count > 0)
                     {
-                        bounds = collider2Ds[0].bounds;
+                        _bounds = collider2Ds[0].bounds;
                         for (int i = 0; i < collider2Ds.Count; ++i)
                         {
-                            bounds.Value.Encapsulate(collider2Ds[i].bounds);
+                            _bounds.Encapsulate(collider2Ds[i].bounds);
                         }
-                    }
-                    if (bounds.HasValue)
-                    {
-                        Bounds adjustedBounds = bounds.Value;
-                        adjustedBounds.extents += bufferedCells * cellSize * 2;
-                        _bounds = adjustedBounds;
+                        _bounds.extents += bufferedCells * cellSize * 2;
                         _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects, false, false, true);
                     }
                     break;
