@@ -1,6 +1,7 @@
 using Insthync.SpatialPartitioningSystems;
 using LiteNetLibManager;
 using System.Collections.Generic;
+using Unity.Collections;
 using Unity.Profiling;
 using UnityEngine;
 
@@ -14,12 +15,14 @@ namespace MultiplayerARPG
         public int maxObjects = 10000;
         [Tooltip("Update every ? seconds")]
         public float updateInterval = 1.0f;
+        public Vector3 bufferedCells = Vector3.one;
         public Color boundsGizmosColor = Color.green;
 
         private JobifiedGridSpatialPartitioningSystem _system;
         private float _updateCountDown;
         private Bounds _bounds;
         private List<SpatialObject> _spatialObjects = new List<SpatialObject>();
+        private Dictionary<uint, HashSet<uint>> _playerSubscribings = new Dictionary<uint, HashSet<uint>>();
 
         private void OnDrawGizmosSelected()
         {
@@ -60,32 +63,43 @@ namespace MultiplayerARPG
                 return;
             }
             _system = null;
+            Bounds? bounds = null;
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension3D:
                     var collider3Ds = GenericUtils.GetComponentsFromAllLoadedScenes<Collider>(true);
                     if (collider3Ds.Count > 0)
                     {
-                        Bounds bounds = collider3Ds[0].bounds;
+                        bounds = collider3Ds[0].bounds;
                         for (int i = 1; i < collider3Ds.Count; ++i)
                         {
-                            bounds.Encapsulate(collider3Ds[i].bounds);
+                            bounds.Value.Encapsulate(collider3Ds[i].bounds);
                         }
-                        _bounds = bounds;
-                        _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects);
+                    }
+                    if (bounds.HasValue)
+                    {
+                        Bounds adjustedBounds = bounds.Value;
+                        adjustedBounds.extents += bufferedCells * cellSize * 2;
+                        _bounds = adjustedBounds;
+                        _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects, false, true, false);
                     }
                     break;
                 case DimensionType.Dimension2D:
                     var collider2Ds = GenericUtils.GetComponentsFromAllLoadedScenes<Collider2D>(true);
                     if (collider2Ds.Count > 0)
                     {
-                        Bounds bounds = collider2Ds[0].bounds;
+                        bounds = collider2Ds[0].bounds;
                         for (int i = 0; i < collider2Ds.Count; ++i)
                         {
-                            bounds.Encapsulate(collider2Ds[i].bounds);
+                            bounds.Value.Encapsulate(collider2Ds[i].bounds);
                         }
-                        _bounds = bounds;
-                        _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects);
+                    }
+                    if (bounds.HasValue)
+                    {
+                        Bounds adjustedBounds = bounds.Value;
+                        adjustedBounds.extents += bufferedCells * cellSize * 2;
+                        _bounds = adjustedBounds;
+                        _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects, false, false, true);
                     }
                     break;
             }
@@ -104,39 +118,6 @@ namespace MultiplayerARPG
             using (s_UpdateProfilerMarker.Auto())
             {
                 _spatialObjects.Clear();
-                foreach (LiteNetLibIdentity spawnedObject in Manager.Assets.GetSpawnedObjects())
-                {
-                    if (spawnedObject == null)
-                        continue;
-                    _spatialObjects.Add(new SpatialObject()
-                    {
-                        objectType = SpatialObjectTypes.NetworkedObject,
-                        objectId = spawnedObject.ObjectId,
-                        position = spawnedObject.transform.position,
-                        shape = SpatialObjectShape.Sphere,
-                        radius = GetVisibleRange(spawnedObject),
-                    });
-                }
-                foreach (ISpatialObjectComponent component in SpatialObjectContainer.GetValues())
-                {
-                    component.ClearSubscribers();
-                    if (!component.SpatialObjectEnabled)
-                        continue;
-                    _spatialObjects.Add(new SpatialObject()
-                    {
-                        objectType = SpatialObjectTypes.NonNetworkedObject,
-                        objectId = component.SpatialObjectId,
-                        position = component.SpatialObjectPosition,
-                        shape = component.SpatialObjectShape,
-                        radius = component.SpatialObjectRadius,
-                        extents = component.SpatialObjectExtents,
-                    });
-                }
-                _system.UpdateGrid(_spatialObjects);
-
-                HashSet<uint> subscribingNetworkedObjects = new HashSet<uint>();
-                LiteNetLibIdentity contactedObject;
-                ISpatialObjectComponent spatialObjectComponent;
                 foreach (LiteNetLibPlayer player in Manager.GetPlayers())
                 {
                     if (!player.IsReady)
@@ -146,28 +127,81 @@ namespace MultiplayerARPG
                     }
                     foreach (LiteNetLibIdentity playerObject in player.GetSpawnedObjects())
                     {
-                        // Update subscribing list, it will unsubscribe objects which is not in this list
-                        subscribingNetworkedObjects.Clear();
-                        var resultSpatialObjects = _system.QuerySphere(playerObject.transform.position, 0f);
-                        for (int i = 0; i < resultSpatialObjects.Length; ++i)
+                        _spatialObjects.Add(new SpatialObject()
                         {
-                            byte contactedObjectType = resultSpatialObjects[i].objectType;
-                            uint contactedObjectId = resultSpatialObjects[i].objectId;
-                            switch (contactedObjectType)
-                            {
-                                case SpatialObjectTypes.NetworkedObject:
-                                    if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out contactedObject) &&
-                                        ShouldSubscribe(playerObject, contactedObject, false))
-                                        subscribingNetworkedObjects.Add(contactedObjectId);
-                                    break;
-                                default:
-                                    if (SpatialObjectContainer.TryGet(contactedObjectId, out spatialObjectComponent))
-                                        spatialObjectComponent.AddSubscriber(playerObject.ObjectId);
-                                    break;
-                            }
+                            objectId = playerObject.ObjectId,
+                            position = playerObject.transform.position,
+                        });
+                    }
+                }
+                _system.UpdateGrid(_spatialObjects);
+
+                NativeList<SpatialObject> queryResult;
+                HashSet<uint> subscribings;
+                LiteNetLibIdentity foundPlayerObject;
+                foreach (LiteNetLibIdentity spawnedObject in Manager.Assets.GetSpawnedObjects())
+                {
+                    if (spawnedObject == null)
+                        continue;
+                    queryResult = _system.QuerySphere(spawnedObject.transform.position, GetVisibleRange(spawnedObject));
+                    for (int i = 0; i < queryResult.Length; ++i)
+                    {
+                        uint contactedObjectId = queryResult[i].objectId;
+                        if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out foundPlayerObject) &&
+                            ShouldSubscribe(foundPlayerObject, spawnedObject, false))
+                        {
+                            if (!_playerSubscribings.TryGetValue(contactedObjectId, out subscribings))
+                                subscribings = new HashSet<uint>();
+                            subscribings.Add(spawnedObject.ObjectId);
+                            _playerSubscribings[contactedObjectId] = subscribings;
                         }
-                        resultSpatialObjects.Dispose();
-                        playerObject.UpdateSubscribings(subscribingNetworkedObjects);
+                    }
+                    queryResult.Dispose();
+                }
+
+                foreach (ISpatialObjectComponent component in SpatialObjectContainer.GetValues())
+                {
+                    if (component == null)
+                        continue;
+                    component.ClearSubscribers();
+                    if (!component.SpatialObjectEnabled)
+                        continue;
+                    switch (component.SpatialObjectShape)
+                    {
+                        case SpatialObjectShape.Box:
+                            queryResult = _system.QueryBox(component.SpatialObjectPosition, component.SpatialObjectExtents);
+                            break;
+                        default:
+                            queryResult = _system.QuerySphere(component.SpatialObjectPosition, component.SpatialObjectRadius);
+                            break;
+                    }
+                    for (int i = 0; i < queryResult.Length; ++i)
+                    {
+                        uint contactedObjectId = queryResult[i].objectId;
+                        if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out foundPlayerObject))
+                            component.AddSubscriber(foundPlayerObject.ObjectId);
+                    }
+                    queryResult.Dispose();
+                }
+
+                foreach (LiteNetLibPlayer player in Manager.GetPlayers())
+                {
+                    if (!player.IsReady)
+                    {
+                        // Don't subscribe if player not ready
+                        continue;
+                    }
+                    foreach (LiteNetLibIdentity playerObject in player.GetSpawnedObjects())
+                    {
+                        if (_playerSubscribings.TryGetValue(playerObject.ObjectId, out subscribings))
+                        {
+                            playerObject.UpdateSubscribings(subscribings);
+                            _playerSubscribings.Clear();
+                        }
+                        else
+                        {
+                            playerObject.ClearSubscribings();
+                        }
                     }
                 }
             }
