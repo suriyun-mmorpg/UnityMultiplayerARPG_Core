@@ -57,8 +57,7 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            isOpen.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            isOpen.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            isOpen.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
         }
 
         protected override void EntityOnDestroy()

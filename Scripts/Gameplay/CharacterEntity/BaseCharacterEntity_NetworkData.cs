@@ -246,52 +246,23 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            id.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            id.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-
-            level.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            level.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-
-            exp.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            exp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-
-            isImmune.deliveryMethod = DeliveryMethod.Sequenced;
-            isImmune.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
-
-            currentHp.deliveryMethod = DeliveryMethod.Sequenced;
-            currentHp.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
-
-            currentMp.deliveryMethod = DeliveryMethod.Sequenced;
-            currentMp.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
-
-            currentStamina.deliveryMethod = DeliveryMethod.Sequenced;
-            currentStamina.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
-
-            currentFood.deliveryMethod = DeliveryMethod.Sequenced;
-            currentFood.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
-
-            currentWater.deliveryMethod = DeliveryMethod.Sequenced;
-            currentWater.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
-
-            equipWeaponSet.deliveryMethod = DeliveryMethod.Sequenced;
-            equipWeaponSet.syncBehaviour = LiteNetLibSyncField.SyncBehaviour.AlwaysSync;
-
-            isWeaponsSheathed.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            isWeaponsSheathed.clientDeliveryMethod = DeliveryMethod.ReliableOrdered;
-            isWeaponsSheathed.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
-
-            pitch.deliveryMethod = DeliveryMethod.Sequenced;
-            pitch.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-
-            aimPosition.deliveryMethod = DeliveryMethod.Sequenced;
-            aimPosition.syncMode = LiteNetLibSyncField.SyncMode.ClientMulticast;
-
-            targetEntityId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            targetEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-
-            mount.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            mount.syncMode = LiteNetLibSyncField.SyncMode.ServerToOwnerClient;
-
+            // Sync fields
+            id.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            level.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            exp.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            isImmune.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            currentHp.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            currentMp.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            currentStamina.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            currentFood.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            currentWater.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            equipWeaponSet.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            isWeaponsSheathed.syncMode = LiteNetLibSyncFieldMode.ClientMulticast;
+            pitch.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            aimPosition.syncMode = LiteNetLibSyncFieldMode.ClientMulticast;
+            targetEntityId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            mount.syncMode = LiteNetLibSyncFieldMode.ServerToOwnerClient;
+            // Sync lists
             selectableWeaponSets.forOwnerOnly = false;
             attributes.forOwnerOnly = false;
             skills.forOwnerOnly = false;

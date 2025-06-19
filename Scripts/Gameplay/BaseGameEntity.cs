@@ -511,10 +511,8 @@ namespace MultiplayerARPG
         {
             if (onSetupNetElements != null)
                 onSetupNetElements.Invoke();
-            syncMetaDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            syncMetaDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            syncTitle.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            syncTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            syncMetaDataId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            syncTitle.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
         }
 
         public override void OnNetworkDestroy(byte reasons)

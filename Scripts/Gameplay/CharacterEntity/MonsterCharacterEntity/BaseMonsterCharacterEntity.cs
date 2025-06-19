@@ -273,10 +273,8 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            summonerObjectId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            summonerObjectId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            summonType.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            summonType.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            summonerObjectId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            summonType.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
         }
 
         public override void OnSetup()
