@@ -492,12 +492,12 @@ namespace MultiplayerARPG
 #endif
             guildSkills.onOperation -= OnGuildSkillsOperation;
 
+            if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
+                Destroy(BasePlayerCharacterController.Singleton.gameObject);
+
             // Unsubscribe this entity
             if (GameInstance.ClientCharacterHandlers != null)
                 GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(this);
-
-            if (IsOwnerClient && BasePlayerCharacterController.Singleton != null)
-                Destroy(BasePlayerCharacterController.Singleton.gameObject);
         }
 
         protected override async void EntityOnSetOwnerClient()
