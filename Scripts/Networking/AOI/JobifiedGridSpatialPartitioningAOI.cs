@@ -185,7 +185,7 @@ namespace MultiplayerARPG
                         if (_playerSubscribings.TryGetValue(playerObject.ObjectId, out subscribings))
                         {
                             playerObject.UpdateSubscribings(subscribings);
-                            _playerSubscribings.Clear();
+                            subscribings.Clear();
                         }
                         else
                         {
