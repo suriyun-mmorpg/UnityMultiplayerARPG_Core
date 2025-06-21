@@ -21,7 +21,8 @@ namespace MultiplayerARPG
         float GetSmoothTurnSpeed();
         void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport);
         bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result);
-        void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration);
+        void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration);
+        EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId);
         void ClearAllForces();
     }
 }

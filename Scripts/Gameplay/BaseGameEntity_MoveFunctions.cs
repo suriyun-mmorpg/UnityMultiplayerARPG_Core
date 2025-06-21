@@ -318,12 +318,17 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
         {
             if (!IsServer)
                 return;
             if (!ActiveMovement.IsNull())
-                ActiveMovement.ApplyForce(direction, mode, force, deceleration, duration);
+                ActiveMovement.ApplyForce(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration);
+        }
+
+        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
+        {
+            return ActiveMovement.FindForceByActionKey(sourceType, sourceDataId);
         }
 
         public void ClearAllForces()

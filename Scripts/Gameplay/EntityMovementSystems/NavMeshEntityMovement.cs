@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public MovementSecure movementSecure = MovementSecure.NotSecure;
 
         [Header("Dashing")]
-        public EntityMovementForceApplier dashingForceApplier;
+        public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
 
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
@@ -44,6 +44,7 @@ namespace MultiplayerARPG
 
         // Move simulate codes
         protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
+        protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
 
         // Client state codes
         protected EntityMovementInput _oldInput;
@@ -84,6 +85,8 @@ namespace MultiplayerARPG
         {
             // Prepare nav mesh agent component
             CacheNavMeshAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
+            _forceUpdateListeners = gameObject.GetComponents<IEntityMovementForceUpdateListener>();
+
             // Disable unused component
             LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
             if (disablingComp != null)
@@ -100,7 +103,6 @@ namespace MultiplayerARPG
             // Setup
             _yAngle = _targetYAngle = EntityTransform.eulerAngles.y;
             _lookRotationApplied = true;
-            StopMoveFunction();
         }
 
         public override void EntityStart()
@@ -239,7 +241,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
         {
             if (!IsServer)
                 return;
@@ -249,7 +251,12 @@ namespace MultiplayerARPG
                 _movementForceAppliers.RemoveReplaceMovementForces();
             }
             _movementForceAppliers.Add(new EntityMovementForceApplier()
-                .Apply(direction, mode, force, deceleration, duration));
+                .Apply(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration));
+        }
+
+        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
+        {
+            return _movementForceAppliers.FindBySource(sourceType, sourceDataId);
         }
 
         public void ClearAllForces()
@@ -298,17 +305,18 @@ namespace MultiplayerARPG
             if (_acceptedDash || _isDashing)
             {
                 _sendingDash = true;
-                dashingForceApplier.Apply(EntityTransform.forward);
-                dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
                 // Can have only one replace movement force applier, so remove stored ones
                 _movementForceAppliers.RemoveReplaceMovementForces();
-                _movementForceAppliers.Add(dashingForceApplier);
+                _movementForceAppliers.Add(new EntityMovementForceApplier().Apply(
+                    ApplyMovementForceMode.Dash, EntityTransform.forward, ApplyMovementForceSourceType.None, 0, 0, dashingForceApplier));
             }
 
             // Apply Forces
+            _forceUpdateListeners.OnPreUpdateForces(_movementForceAppliers);
             _movementForceAppliers.UpdateForces(deltaTime,
                 Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
                 out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
+            _forceUpdateListeners.OnPostUpdateForces(_movementForceAppliers);
 
             // Replace player's movement by this
             if (replaceMovementForceApplier != null)
@@ -378,7 +386,6 @@ namespace MultiplayerARPG
             {
                 // Disable obstacle avoidance because it won't predict movement, it is just moving to destination without obstacle avoidance
                 CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-                // Keep moving or should stop
                 if (CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
                 {
                     MovementState = _acceptedMovementStateBeforeStopped;
@@ -387,6 +394,7 @@ namespace MultiplayerARPG
                 else
                 {
                     MovementState = MovementState.IsGrounded;
+                    ExtraMovementState = ExtraMovementState.None;
                 }
             }
 
@@ -709,7 +717,6 @@ namespace MultiplayerARPG
             float moveDistDiff = clientMoveDist > moveableDist ? (clientMoveDist - moveableDist) : 0f;
             _accumulateDeltaTime += unityDeltaTime;
             _accumulateDiffMoveDist += moveDistDiff;
-            // TODO: Speed hack detection
             if (!IsClient)
             {
                 // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
