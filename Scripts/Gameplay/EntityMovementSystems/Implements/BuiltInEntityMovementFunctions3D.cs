@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
+        public float groundedVerticalVelocity = 0f;
         [Tooltip("Delay before character change from grounded state to airborne")]
         public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
@@ -54,6 +55,7 @@ namespace MultiplayerARPG
         public bool useRootMotionForFall;
         public bool useRootMotionUnderWater;
         public bool useRootMotionClimbing;
+        public float rootMotionGroundedVerticalVelocity = 0f;
 
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
@@ -601,13 +603,13 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    _verticalVelocity = -2f;
+                    _verticalVelocity = -rootMotionGroundedVerticalVelocity;
                 }
             }
             else
             {
                 // Not falling set verical velocity to 0
-                _verticalVelocity = -2f;
+                _verticalVelocity = -groundedVerticalVelocity;
             }
 
             // Jumping 
