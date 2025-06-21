@@ -43,7 +43,7 @@ namespace MultiplayerARPG
         public Color groundCheckGizmosColor = Color.blue;
 
         [Header("Dashing")]
-        public EntityMovementForceApplier dashingForceApplier = new EntityMovementForceApplier();
+        public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
 
         [Header("Root Motion Settings")]
         [FormerlySerializedAs("useRootMotionWhileNotMoving")]
@@ -347,9 +347,14 @@ namespace MultiplayerARPG
             return Functions.FindGroundedPosition(fromPosition, findDistance, out result);
         }
 
-        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
         {
-            Functions.ApplyForce(direction, mode, force, deceleration, duration);
+            Functions.ApplyForce(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration);
+        }
+
+        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
+        {
+            return Functions.FindForceByActionKey(sourceType, sourceDataId);
         }
 
         public void ClearAllForces()
@@ -359,7 +364,7 @@ namespace MultiplayerARPG
 
         public Vector3 GetSnapToGroundMotion(Vector3 motion, Vector3 platformMotion, Vector3 forceMotion)
         {
-            if (Functions.IsGrounded && Physics.Raycast(EntityTransform.position, Vector3.down, out RaycastHit hit, groundSnapDistance))
+            if (!Functions.IsUnderWater && Functions.IsGrounded && Physics.Raycast(EntityTransform.position, Vector3.down, out RaycastHit hit, groundSnapDistance) && hit.transform.gameObject.layer != PhysicLayers.Water)
             {
                 return Vector3.down * (hit.distance - CacheCharacterController.skinWidth);
             }

@@ -44,7 +44,7 @@ namespace MultiplayerARPG
         public bool autoSwimToSurface;
 
         [Header("Dashing")]
-        public EntityMovementForceApplier dashingForceApplier;
+        public EntityMovementForceApplierData dashingForceApplier;
 
         [Header("Root Motion Settings")]
         public bool alwaysUseRootMotion;
@@ -108,6 +108,7 @@ namespace MultiplayerARPG
         private float _verticalVelocity;
         private Vector3 _velocityBeforeAirborne;
         private Collider _waterCollider;
+        private byte _underWaterFrameCount;
         private Transform _groundedTransform;
         private Vector3 _previousPlatformPosition;
         private Vector3 _previousPosition;
@@ -121,6 +122,7 @@ namespace MultiplayerARPG
         private float _pauseMovementCountDown;
         private Vector3 _moveDirection;
         private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
+        protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
 
         // Jump simulate codes
         private float _airborneElapsed;
@@ -163,6 +165,7 @@ namespace MultiplayerARPG
             LadderComponent = entity.GetComponent<CharacterLadderComponent>();
             Animator = animator;
             EntityMovement = entityMovement;
+            _forceUpdateListeners = entity.GetComponents<IEntityMovementForceUpdateListener>();
             _yAngle = _targetYAngle = CacheTransform.eulerAngles.y;
             _lookRotationApplied = true;
         }
@@ -325,7 +328,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
         {
             if (!IsServer)
                 return;
@@ -335,7 +338,12 @@ namespace MultiplayerARPG
                 _movementForceAppliers.RemoveReplaceMovementForces();
             }
             _movementForceAppliers.Add(new EntityMovementForceApplier()
-                .Apply(direction, mode, force, deceleration, duration));
+                .Apply(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration));
+        }
+
+        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
+        {
+            return _movementForceAppliers.FindBySource(sourceType, sourceDataId);
         }
 
         public void ClearAllForces()
@@ -369,7 +377,18 @@ namespace MultiplayerARPG
                 // Not in water
                 return false;
             }
-            return Entity.EntityTransform.position.y < TargetWaterSurfaceY(waterCollider) + 0.01f;
+            bool isUnderWater = Entity.EntityTransform.position.y < TargetWaterSurfaceY(waterCollider) + 0.01f;
+            if (isUnderWater)
+            {
+                if (_underWaterFrameCount < 3)
+                    _underWaterFrameCount++;
+                return _underWaterFrameCount >= 3;
+            }
+            else
+            {
+                _underWaterFrameCount = 0;
+                return false;
+            }
         }
 
         public float TargetWaterSurfaceY(Collider waterCollider)
@@ -436,7 +455,7 @@ namespace MultiplayerARPG
                     // Enter or exit
                     Vector3 tempPosition;
                     if (LadderComponent.EnterOrExitDuration > 0f)
-                        tempPosition = Vector3.Lerp(LadderComponent.EnterOrExitFromPosition, LadderComponent.EnterOrExitToPosition, (currentTime - LadderComponent.EnterOrExitTime) / LadderComponent.EnterOrExitDuration);
+                        tempPosition = Vector3.Lerp(LadderComponent.EnterOrExitFromPosition, LadderComponent.EnterOrExitToPosition, currentTime - LadderComponent.EnterOrExitTime / LadderComponent.EnterOrExitDuration);
                     else
                         tempPosition = LadderComponent.EnterOrExitToPosition;
                     tempMoveVelocity = GetVelocityForMovePosition(tempCurrentPosition, tempPosition, deltaTime);
@@ -637,17 +656,18 @@ namespace MultiplayerARPG
             if (_acceptedDash || (_pauseMovementCountDown <= 0f && IsGrounded && _isDashing))
             {
                 _sendingDash = true;
-                dashingForceApplier.Apply(CacheTransform.forward);
-                dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
                 // Can have only one replace movement force applier, so remove stored ones
                 _movementForceAppliers.RemoveReplaceMovementForces();
-                _movementForceAppliers.Add(dashingForceApplier);
+                _movementForceAppliers.Add(new EntityMovementForceApplier().Apply(
+                    ApplyMovementForceMode.Dash, CacheTransform.forward, ApplyMovementForceSourceType.None, 0, 0, dashingForceApplier));
             }
 
             // Apply Forces
+            _forceUpdateListeners.OnPreUpdateForces(_movementForceAppliers);
             _movementForceAppliers.UpdateForces(deltaTime,
                 Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
                 out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
+            _forceUpdateListeners.OnPostUpdateForces(_movementForceAppliers);
 
             // Replace player's movement by this
             if (replaceMovementForceApplier != null)
@@ -838,8 +858,6 @@ namespace MultiplayerARPG
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
                 if (IsUnderWater)
                     _tempMovementState |= MovementState.IsUnderWater;
-                if (IsClimbing)
-                    _tempMovementState |= MovementState.IsClimbing;
                 if (IsGrounded || _airborneElapsed < airborneDelay || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
                     _tempMovementState |= MovementState.IsGrounded;
                 if (_isJumping)

@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         public MovementSecure movementSecure = MovementSecure.NotSecure;
 
         [Header("Dashing")]
-        public EntityMovementForceApplier dashingForceApplier;
+        public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
 
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
@@ -48,6 +48,7 @@ namespace MultiplayerARPG
         // Move simulate codes
         protected Vector2 _moveDirection;
         protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
+        protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
 
         // Teleport codes
         protected bool _isTeleporting;
@@ -74,12 +75,12 @@ namespace MultiplayerARPG
 
         // Client confirm codes
         protected bool _isClientConfirmingTeleport;
-        protected bool _isStarted;
 
         public override void EntityAwake()
         {
             // Prepare rigidbody component
             CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
+            _forceUpdateListeners = gameObject.GetComponents<IEntityMovementForceUpdateListener>();
             // Disable unused component
             LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
             if (disablingComp != null)
@@ -95,7 +96,6 @@ namespace MultiplayerARPG
         public override void EntityStart()
         {
             _isClientConfirmingTeleport = true;
-            _isStarted = true;
         }
 
         public override void ComponentOnEnable()
@@ -213,7 +213,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ApplyForce(Vector3 direction, ApplyMovementForceMode mode, float force, float deceleration, float duration)
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
         {
             if (!IsServer)
                 return;
@@ -223,7 +223,12 @@ namespace MultiplayerARPG
                 _movementForceAppliers.RemoveReplaceMovementForces();
             }
             _movementForceAppliers.Add(new EntityMovementForceApplier()
-                .Apply(direction, mode, force, deceleration, duration));
+                .Apply(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration));
+        }
+
+        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
+        {
+            return _movementForceAppliers.FindBySource(sourceType, sourceDataId);
         }
 
         public void ClearAllForces()
@@ -334,17 +339,18 @@ namespace MultiplayerARPG
             if (_acceptedDash || _isDashing)
             {
                 _sendingDash = true;
-                dashingForceApplier.Apply(Direction2D);
-                dashingForceApplier.Mode = ApplyMovementForceMode.Dash;
                 // Can have only one replace movement force applier, so remove stored ones
                 _movementForceAppliers.RemoveReplaceMovementForces();
-                _movementForceAppliers.Add(dashingForceApplier);
+                _movementForceAppliers.Add(new EntityMovementForceApplier().Apply(
+                    ApplyMovementForceMode.Dash, Direction2D, ApplyMovementForceSourceType.None, 0, 0, dashingForceApplier));
             }
 
             // Apply Forces
+            _forceUpdateListeners.OnPreUpdateForces(_movementForceAppliers);
             _movementForceAppliers.UpdateForces(Time.deltaTime,
                 Entity.GetMoveSpeed(MovementState.Forward, ExtraMovementState.None),
                 out Vector3 forceMotion, out EntityMovementForceApplier replaceMovementForceApplier);
+            _forceUpdateListeners.OnPostUpdateForces(_movementForceAppliers);
 
             // Replace player's movement by this
             if (replaceMovementForceApplier != null)
@@ -433,8 +439,6 @@ namespace MultiplayerARPG
         public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
-            if (!_isStarted)
-                return false;
             if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
                 // Sync transform from owner client to server (except it's both owner client and server)
@@ -495,8 +499,6 @@ namespace MultiplayerARPG
         public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
             shouldSendReliably = false;
-            if (!_isStarted)
-                return false;
             if (_sendingDash)
             {
                 shouldSendReliably = true;
@@ -692,20 +694,42 @@ namespace MultiplayerARPG
             float moveDistDiff = clientMoveDist > moveableDist ? (clientMoveDist - moveableDist) : 0f;
             _accumulateDeltaTime += unityDeltaTime;
             _accumulateDiffMoveDist += moveDistDiff;
-            // TODO: Speed hack detection
+            float moveDiffTime = moveDistDiff / moveSpd;
             if (!IsClient)
             {
-                // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
-                _acceptedPosition = newPos;
-                EntityTransform.position = newPos;
-                CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
+                // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
+                if (moveDiffTime < 0.1f)
+                {
+                    // Allow to move to the position
+                    _acceptedPosition = newPos;
+                    EntityTransform.position = newPos;
+                    CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
+                }
+                else
+                {
+                    // Client moves too fast, adjust it
+                    newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
+                    // And also adjust client's position
+                    Teleport(newPos, Quaternion.identity, true);
+                }
             }
             else
             {
                 // It's both server and client, simulate movement
                 if (Vector3.Distance(position, EntityTransform.position) > s_minDistanceToSimulateMovement)
                 {
-                    _acceptedPosition = newPos;
+                    if (moveDiffTime < 0.1f)
+                    {
+                        // Allow to move to the position
+                        _acceptedPosition = newPos;
+                    }
+                    else
+                    {
+                        // Client moves too fast, adjust it
+                        newPos = GetMoveablePosition(oldPos, newPos, clientMoveDist, moveableDist);
+                        // And also adjust client's position
+                        Teleport(newPos, Quaternion.identity, true);
+                    }
                     SetMovePaths(position, false);
                 }
             }

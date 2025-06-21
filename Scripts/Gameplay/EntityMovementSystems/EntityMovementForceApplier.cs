@@ -4,33 +4,40 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [System.Serializable]
     public class EntityMovementForceApplier : INetSerializable
     {
-        [SerializeField]
-        private ApplyMovementForceMode mode;
-        [SerializeField]
-        [Tooltip("Speed when apply then current speed will be decreased by deceleration * delta time")]
-        private float speed = 20f;
-        [SerializeField]
-        [Tooltip("Current speed will be decreased by this value * delta time, you can set this to 0 to make speed not decrease (but you should set duration more than 0)")]
-        private float deceleration = 20f;
-        [SerializeField]
-        [Tooltip("If duration <= 0, then it is no duration, it will stop applying when current speed <= 0")]
-        private float duration = 0f;
-
-        public Vector3 Direction { get; set; }
         public ApplyMovementForceMode Mode { get; set; }
+        public Vector3 Direction { get; set; }
+        public ApplyMovementForceSourceType SourceType { get; set; }
+        public int SourceDataId { get; set; }
+        public int SourceLevel { get; set; }
         public float CurrentSpeed { get; set; }
         public float Deceleration { get; set; }
         public float Duration { get; set; }
         public float Elasped { get; set; }
         public Vector3 Velocity { get => Direction * CurrentSpeed; }
 
-        public EntityMovementForceApplier Apply(Vector3 direction)
+        public EntityMovementForceApplier Apply(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, EntityMovementForceApplierData data)
         {
-            Direction = direction;
             Mode = mode;
+            Direction = direction;
+            SourceType = sourceType;
+            SourceDataId = sourceDataId;
+            SourceLevel = sourceLevel;
+            CurrentSpeed = data.speed;
+            Deceleration = data.deceleration;
+            Duration = data.duration;
+            Elasped = 0f;
+            return this;
+        }
+
+        public EntityMovementForceApplier Apply(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float speed, float deceleration, float duration)
+        {
+            Mode = mode;
+            Direction = direction;
+            SourceType = sourceType;
+            SourceDataId = sourceDataId;
+            SourceLevel = sourceLevel;
             CurrentSpeed = speed;
             Deceleration = deceleration;
             Duration = duration;
@@ -38,32 +45,36 @@ namespace MultiplayerARPG
             return this;
         }
 
-        public EntityMovementForceApplier Apply(Vector3 direction, ApplyMovementForceMode mode, float speed, float deceleration, float duration)
-        {
-            Apply(direction);
-            Mode = mode;
-            CurrentSpeed = speed;
-            Deceleration = deceleration;
-            Duration = duration;
-            return this;
-        }
-
         public void Deserialize(NetDataReader reader)
         {
             Mode = (ApplyMovementForceMode)reader.GetByte();
             Direction = reader.GetVector3();
-            CurrentSpeed = reader.GetFloat();
-            Deceleration = reader.GetFloat();
-            Elasped = reader.GetFloat();
+            SourceType = (ApplyMovementForceSourceType)reader.GetByte();
+            if (SourceType != ApplyMovementForceSourceType.None)
+            {
+                SourceDataId = reader.GetPackedInt();
+                SourceLevel = reader.GetPackedInt();
+            }
+            CurrentSpeed = Mathf.HalfToFloat(reader.GetPackedUShort());
+            Deceleration = Mathf.HalfToFloat(reader.GetPackedUShort());
+            Duration = Mathf.HalfToFloat(reader.GetPackedUShort());
+            Elasped = Mathf.HalfToFloat(reader.GetPackedUShort());
         }
 
         public void Serialize(NetDataWriter writer)
         {
             writer.Put((byte)Mode);
             writer.PutVector3(Direction);
-            writer.Put(CurrentSpeed);
-            writer.Put(Deceleration);
-            writer.Put(Elasped);
+            writer.Put((byte)SourceType);
+            if (SourceType != ApplyMovementForceSourceType.None)
+            {
+                writer.PutPackedInt(SourceDataId);
+                writer.PutPackedInt(SourceLevel);
+            }
+            writer.PutPackedUShort(Mathf.FloatToHalf(CurrentSpeed));
+            writer.PutPackedUShort(Mathf.FloatToHalf(Deceleration));
+            writer.PutPackedUShort(Mathf.FloatToHalf(Duration));
+            writer.PutPackedUShort(Mathf.FloatToHalf(Elasped));
         }
 
         public bool Update(float deltaTime)
@@ -79,8 +90,19 @@ namespace MultiplayerARPG
             }
             return CurrentSpeed > 0f;
         }
-    }
 
+        public BaseGameData GetSourceData()
+        {
+            switch (SourceType)
+            {
+                case ApplyMovementForceSourceType.Skill:
+                    if (GameInstance.Skills.TryGetValue(SourceDataId, out BaseSkill skill))
+                        return skill;
+                    return null;
+            }
+            return null;
+        }
+    }
 
     public static class EntityMovementForceApplierExtensions
     {
@@ -109,6 +131,17 @@ namespace MultiplayerARPG
                 else
                     replaceMovementForceApplier = forceAppliers[i];
             }
+        }
+
+        public static EntityMovementForceApplier FindBySource(this IList<EntityMovementForceApplier> forceAppliers, ApplyMovementForceSourceType sourceType, int sourceDataId)
+        {
+            for (int i = 0; i < forceAppliers.Count; ++i)
+            {
+                if (forceAppliers[i].SourceType == sourceType &&
+                    forceAppliers[i].SourceDataId == sourceDataId)
+                    return forceAppliers[i];
+            }
+            return null;
         }
     }
 }
