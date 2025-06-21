@@ -71,8 +71,8 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            _dropperTitle.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            _dropperEntityId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            _dropperTitle.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            _dropperEntityId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             _items.forOwnerOnly = false;
         }
 

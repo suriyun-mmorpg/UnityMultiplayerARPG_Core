@@ -122,12 +122,9 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            level.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            level.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            isImmune.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            isImmune.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            currentHp.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            currentHp.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            level.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            isImmune.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            currentHp.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             passengerIds.forOwnerOnly = false;
         }
 

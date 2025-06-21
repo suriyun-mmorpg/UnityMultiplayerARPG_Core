@@ -63,8 +63,7 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            currencyDataId.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            currencyDataId.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            currencyDataId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             if (currencyAppearanceSettings != null && currencyAppearanceSettings.Count > 0)
             {
                 foreach (CurrencyAppearanceSetting setting in currencyAppearanceSettings)

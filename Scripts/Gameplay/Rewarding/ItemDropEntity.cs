@@ -229,8 +229,7 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            itemDropData.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            itemDropData.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            itemDropData.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
         }
 
         public virtual void SetSpawnArea(GameSpawnArea<ItemDropEntity> spawnArea, ItemDropEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)

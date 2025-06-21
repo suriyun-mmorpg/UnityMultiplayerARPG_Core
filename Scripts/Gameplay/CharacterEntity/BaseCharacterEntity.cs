@@ -464,7 +464,6 @@ namespace MultiplayerARPG
                 return;
             }
             targetEntityId.Value = entity.ObjectId;
-            targetEntityId.UpdateImmediately();
         }
 
         public BaseGameEntity GetTargetEntity()

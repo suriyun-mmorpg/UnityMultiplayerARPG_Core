@@ -120,10 +120,8 @@ namespace MultiplayerARPG
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
-            isTurnOn.deliveryMethod = DeliveryMethod.ReliableOrdered;
-            isTurnOn.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
-            turnOnElapsed.deliveryMethod = DeliveryMethod.Sequenced;
-            turnOnElapsed.syncMode = LiteNetLibSyncField.SyncMode.ServerToClients;
+            isTurnOn.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            turnOnElapsed.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
         }
 
         protected override void EntityOnDestroy()
