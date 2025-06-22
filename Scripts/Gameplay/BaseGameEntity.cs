@@ -265,10 +265,22 @@ namespace MultiplayerARPG
             EntityStart();
             if (onStart != null)
                 onStart.Invoke();
+        }
+        protected virtual void EntityStart() { }
+
+        public override void OnStartServer()
+        {
+            base.OnStartServer();
             if (BaseGameNetworkManager.Singleton != null)
                 BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
         }
-        protected virtual void EntityStart() { }
+
+        public override void OnStartClient()
+        {
+            base.OnStartClient();
+            if (!IsServer && BaseGameNetworkManager.Singleton != null)
+                BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
+        }
 
         private void OnDestroy()
         {
