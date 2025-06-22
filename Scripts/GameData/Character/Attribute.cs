@@ -1,4 +1,5 @@
 ﻿using Insthync.UnityEditorUtils;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -84,6 +85,39 @@ namespace MultiplayerARPG
             }
 
             return true;
+        }
+
+        public virtual CharacterStats GetStatsByLevel(float level)
+        {
+            return StatsIncreaseEachLevel * level;
+        }
+
+        public virtual Dictionary<DamageElement, float> GetIncreaseResistancesByLevel(float level)
+        {
+            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+            result = GameDataHelpers.CombineResistances(IncreaseResistances, result, Mathf.CeilToInt(level), 1f);
+            return result;
+        }
+
+        public virtual Dictionary<DamageElement, float> GetIncreaseArmorsByLevel(float level)
+        {
+            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+            result = GameDataHelpers.CombineArmors(IncreaseArmors, result, Mathf.CeilToInt(level), 1f);
+            return result;
+        }
+
+        public virtual Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesByLevel(float level)
+        {
+            Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
+            result = GameDataHelpers.CombineDamages(IncreaseDamages, result, Mathf.CeilToInt(level), 1f);
+            return result;
+        }
+
+        public virtual Dictionary<StatusEffect, float> GetIncreaseArmorsByLevel(float level)
+        {
+            Dictionary<StatusEffect, float> result = new Dictionary<StatusEffect, float>();
+            result = GameDataHelpers.CombineStatusEffectResistances(attribute.IncreaseStatusEffectResistances, result, Mathf.CeilToInt(amount), 1f);
+            return result;
         }
     }
 
