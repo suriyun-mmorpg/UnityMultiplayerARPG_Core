@@ -48,7 +48,7 @@ namespace MultiplayerARPG
 
         public bool ShouldRemove()
         {
-            return buffRemainsDuration <= 0f;
+            return GetBuff().GetDuration() >= 0f && buffRemainsDuration <= 0f;
         }
 
         public void Apply(EntityInfo buffApplier, CharacterItem buffApplierWeapon)
@@ -59,6 +59,8 @@ namespace MultiplayerARPG
 
         public void Update(float deltaTime)
         {
+            if (GetBuff().GetDuration() < 0f)
+                return;
             buffRemainsDuration -= deltaTime;
         }
     }
