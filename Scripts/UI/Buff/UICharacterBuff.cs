@@ -59,7 +59,7 @@ namespace MultiplayerARPG
             }
 
             // Update UIs
-            float buffDuration = CharacterBuff.GetBuff().GetDuration();
+            float buffDuration = CharacterBuff.GetBuff().GetBuff().noDuration ? 0f : CharacterBuff.GetBuff().GetDuration();
 
             if (uiTextDuration != null)
             {
@@ -70,7 +70,7 @@ namespace MultiplayerARPG
 
             if (uiTextRemainsDuration != null)
             {
-                uiTextRemainsDuration.SetGameObjectActive(_buffRemainsDuration > 0);
+                uiTextRemainsDuration.SetGameObjectActive(_buffRemainsDuration > 0f);
                 uiTextRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyBuffRemainsDuration),
                     _buffRemainsDuration.ToString("N0"));
@@ -78,7 +78,7 @@ namespace MultiplayerARPG
 
             if (imageDurationGage != null)
             {
-                imageDurationGage.fillAmount = buffDuration <= 0 ? 0 : _buffRemainsDuration / buffDuration;
+                imageDurationGage.fillAmount = buffDuration <= 0f ? 0f : _buffRemainsDuration / buffDuration;
                 imageDurationGage.gameObject.SetActive(imageDurationGage.fillAmount > 0f);
             }
         }
@@ -89,14 +89,14 @@ namespace MultiplayerARPG
 
             // Update remains duration
             if (_buffRemainsDuration <= 0f)
-                _buffRemainsDuration = CharacterBuff.buffRemainsDuration;
+                _buffRemainsDuration = CharacterBuff.GetBuff().GetBuff().noDuration ? 0f : CharacterBuff.buffRemainsDuration;
         }
 
         protected override void UpdateData()
         {
             // Update remains duration
             if (Mathf.Abs(CharacterBuff.buffRemainsDuration - _buffRemainsDuration) > 1)
-                _buffRemainsDuration = CharacterBuff.buffRemainsDuration;
+                _buffRemainsDuration = CharacterBuff.GetBuff().GetBuff().noDuration ? 0f : CharacterBuff.buffRemainsDuration;
 
             BaseGameData tempGameData = null;
             switch (Data.type)

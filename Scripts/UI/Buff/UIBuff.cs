@@ -158,8 +158,8 @@ namespace MultiplayerARPG
         {
             if (uiTextDuration != null)
             {
-                float value = Buff.GetDuration(Level);
-                bool activated = value != 0;
+                float value = Buff.noDuration ? 0f : Buff.GetDuration(Level);
+                bool activated = value != 0f;
                 uiTextDuration.SetGameObjectActive(activated);
                 if (activated)
                 {
