@@ -1041,8 +1041,7 @@ namespace MultiplayerARPG
             bool success = ServerUserHandlers.RemovePlayerCharacter(connectionId, out string characterId, out string userId);
             if (success)
             {
-                if (ServerUserHandlers.TryGetPlayerCharacter(connectionId, out IPlayerCharacterData playerCharacter))
-                    ServerLogHandlers.LogExitGame(characterId, userId);
+                ServerLogHandlers.LogExitGame(characterId, userId);
                 onUnregisterCharacter?.Invoke(connectionId, characterId, userId);
             }
         }
