@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             {
                 if (_itemSelectionManager == null)
                     _itemSelectionManager = gameObject.GetOrAddComponent<UIVendingItemSelectionManager>();
-                _itemSelectionManager.selectionMode = UISelectionMode.Toggle;
+                _itemSelectionManager.selectionMode = UISelectionMode.SelectSingle;
                 return _itemSelectionManager;
             }
         }
@@ -111,8 +111,7 @@ namespace MultiplayerARPG
             {
                 UIVendingItem uiComp = ui.GetComponent<UIVendingItem>();
                 uiComp.Setup(data, Data, index);
-                if (index == 0)
-                    uiComp.SelectByManager();
+                ItemSelectionManager.Add(uiComp);
             });
         }
 
