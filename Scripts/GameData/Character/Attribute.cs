@@ -113,10 +113,10 @@ namespace MultiplayerARPG
             return result;
         }
 
-        public virtual Dictionary<StatusEffect, float> GetIncreaseArmorsByLevel(float level)
+        public virtual Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistancesByLevel(float level)
         {
             Dictionary<StatusEffect, float> result = new Dictionary<StatusEffect, float>();
-            result = GameDataHelpers.CombineStatusEffectResistances(attribute.IncreaseStatusEffectResistances, result, Mathf.CeilToInt(amount), 1f);
+            result = GameDataHelpers.CombineStatusEffectResistances(IncreaseStatusEffectResistances, result, Mathf.CeilToInt(level), 1f);
             return result;
         }
     }
