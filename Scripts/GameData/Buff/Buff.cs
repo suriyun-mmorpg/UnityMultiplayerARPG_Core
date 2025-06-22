@@ -61,6 +61,8 @@ namespace MultiplayerARPG
         [Header("Settings for Active Skills only")]
         [Tooltip("If duration less than or equals to 0, buff stats won't applied only recovery will be applied. This won't be applied to monster's summoner.")]
         public IncrementalFloat duration = new IncrementalFloat();
+        [Tooltip("If this is `TRUE`, it won't use `duration` and buff won't be removed by duration")]
+        public bool noDuration = false;
         [Tooltip("Recover character's current HP. This won't be applied to monster's summoner.")]
         public IncrementalInt recoveryHp = new IncrementalInt();
         [Tooltip("Recover character's current MP. This won't be applied to monster's summoner.")]
