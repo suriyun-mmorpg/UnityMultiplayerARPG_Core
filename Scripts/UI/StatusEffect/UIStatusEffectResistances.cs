@@ -86,8 +86,6 @@ namespace MultiplayerARPG
                     uiComp.Data = new UIStatusEffectResistanceData(data.Key, data.Value);
                     uiComp.Show();
                     CacheSelectionManager.Add(uiComp);
-                    if (index == 0)
-                        uiComp.SelectByManager();
                 });
             }
 
