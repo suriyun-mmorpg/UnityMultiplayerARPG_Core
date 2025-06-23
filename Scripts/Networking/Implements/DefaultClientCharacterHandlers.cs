@@ -43,8 +43,10 @@ namespace MultiplayerARPG
         {
             if (playerCharacter == null)
                 return;
-            SubscribedPlayerCharactersById.Remove(playerCharacter.Id);
-            SubscribedPlayerCharactersByName.Remove(playerCharacter.CharacterName);
+            if (!string.IsNullOrWhiteSpace(playerCharacter.Id))
+                SubscribedPlayerCharactersById.Remove(playerCharacter.Id);
+            if (!string.IsNullOrWhiteSpace(playerCharacter.CharacterName))
+                SubscribedPlayerCharactersByName.Remove(playerCharacter.CharacterName);
         }
 
         public bool TryGetSubscribedPlayerCharacterById(string characterId, out IPlayerCharacterData playerCharacter)
