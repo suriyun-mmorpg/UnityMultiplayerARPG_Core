@@ -152,7 +152,7 @@ namespace MultiplayerARPG
             OnApplyBuff(newBuff);
             Buffs.Add(newBuff);
 
-            if (calculatedBuff.GetDuration() <= 0f)
+            if (!calculatedBuff.NoDuration() && calculatedBuff.GetDuration() <= 0f)
             {
                 CharacterRecoveryData recoveryData = new CharacterRecoveryData(this);
                 recoveryData.SetupByBuff(newBuff, calculatedBuff);

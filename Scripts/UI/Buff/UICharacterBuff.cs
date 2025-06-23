@@ -9,8 +9,8 @@ namespace MultiplayerARPG
         public CharacterBuff CharacterBuff { get { return Data; } }
         public CalculatedBuff CalculatedBuff { get { return CharacterBuff.GetBuff(); } }
         public float Duration { get { return CalculatedBuff == null ? 0 : CalculatedBuff.GetDuration(); } }
+        public bool NoDuration { get { return CalculatedBuff == null ? false : CalculatedBuff.NoDuration(); } }
         public Buff Buff { get { return CalculatedBuff == null ? null : CalculatedBuff.GetBuff(); } }
-        public bool NoDuration { get { return Buff == null ? false : Buff.noDuration; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]

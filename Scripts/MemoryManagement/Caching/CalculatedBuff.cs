@@ -151,7 +151,13 @@ namespace MultiplayerARPG
 
         public float GetDuration()
         {
-            return _cacheDuration;
+            // Intend to fix duration to 1 if no duration
+            return NoDuration() ? 1f : _cacheDuration;
+        }
+
+        public bool NoDuration()
+        {
+            return _buff.noDuration;
         }
 
         public int GetRecoveryHp()
