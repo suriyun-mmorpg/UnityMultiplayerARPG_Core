@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         protected float _updateTimeOfDayCountDown;
         protected float _serverSceneLoadedTime;
         protected float _clientSceneLoadedTime;
-        protected HashSet<BaseGameEntity> _setOfGameEntity = new HashSet<BaseGameEntity>();
+        protected List<BaseGameEntity> _setOfGameEntity = new List<BaseGameEntity>();
 
         // Instantiate object allowing status
         /// <summary>
@@ -161,8 +161,14 @@ namespace MultiplayerARPG
             {
                 // Update day-night time on both client and server. It will sync from server some time to make sure that clients time of day won't very difference
                 CurrentGameInstance.DayNightTimeUpdater.UpdateTimeOfDay(tempDeltaTime);
-                foreach (BaseGameEntity entity in _setOfGameEntity)
+                for (int i = _setOfGameEntity.Count - 1; i >= 0; --i)
                 {
+                    BaseGameEntity entity = _setOfGameEntity[i];
+                    if (entity == null)
+                    {
+                        _setOfGameEntity.RemoveAt(i);
+                        continue;
+                    }
                     if (!entity.enabled)
                         continue;
                     entity.DoUpdate();
@@ -174,8 +180,14 @@ namespace MultiplayerARPG
         {
             if (IsNetworkActive)
             {
-                foreach (BaseGameEntity entity in _setOfGameEntity)
+                for (int i = _setOfGameEntity.Count - 1; i >= 0; --i)
                 {
+                    BaseGameEntity entity = _setOfGameEntity[i];
+                    if (entity == null)
+                    {
+                        _setOfGameEntity.RemoveAt(i);
+                        continue;
+                    }
                     if (!entity.enabled)
                         continue;
                     entity.DoLateUpdate();
@@ -189,8 +201,14 @@ namespace MultiplayerARPG
             using (s_SendServerStateProfilerMarker.Auto())
             {
                 long timestamp = ServerTimestamp;
-                foreach (BaseGameEntity entity in _setOfGameEntity)
+                for (int i = _setOfGameEntity.Count - 1; i >= 0; --i)
                 {
+                    BaseGameEntity entity = _setOfGameEntity[i];
+                    if (entity == null)
+                    {
+                        _setOfGameEntity.RemoveAt(i);
+                        continue;
+                    }
                     if (!entity.enabled)
                         continue;
                     entity.SendServerState(timestamp);
@@ -206,18 +224,27 @@ namespace MultiplayerARPG
             using (s_SendClientStateProfilerMarker.Auto())
             {
                 long timestamp = ServerTimestamp;
-                foreach (BaseGameEntity entity in _setOfGameEntity)
+                for (int i = _setOfGameEntity.Count - 1; i >= 0; --i)
                 {
+                    BaseGameEntity entity = _setOfGameEntity[i];
+                    if (entity == null)
+                    {
+                        _setOfGameEntity.RemoveAt(i);
+                        continue;
+                    }
                     if (!entity.enabled)
                         continue;
-                    if (entity.IsOwnerClient)
-                        entity.SendClientState(timestamp);
+                    if (!entity.IsOwnerClient)
+                        continue;
+                    entity.SendClientState(timestamp);
                 }
             }
         }
 
         public void RegisterGameEntity(BaseGameEntity gameEntity)
         {
+            if (_setOfGameEntity.Contains(gameEntity))
+                return;
             _setOfGameEntity.Add(gameEntity);
         }
 
