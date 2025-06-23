@@ -7,6 +7,10 @@ namespace MultiplayerARPG
     public partial class UICharacterBuff : UIDataForCharacter<CharacterBuff>
     {
         public CharacterBuff CharacterBuff { get { return Data; } }
+        public CalculatedBuff CalculatedBuff { get { return CharacterBuff.GetBuff(); } }
+        public float Duration { get { return CalculatedBuff == null ? 0 : CalculatedBuff.GetDuration(); } }
+        public Buff Buff { get { return CalculatedBuff == null ? null : CalculatedBuff.GetBuff(); } }
+        public bool NoDuration { get { return Buff == null ? false : Buff.noDuration; } }
 
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Title}")]
@@ -59,7 +63,7 @@ namespace MultiplayerARPG
             }
 
             // Update UIs
-            float buffDuration = CharacterBuff.GetBuff().GetBuff().noDuration ? 0f : CharacterBuff.GetBuff().GetDuration();
+            float buffDuration = NoDuration ? 0f : Duration;
 
             if (uiTextDuration != null)
             {
@@ -89,14 +93,14 @@ namespace MultiplayerARPG
 
             // Update remains duration
             if (_buffRemainsDuration <= 0f)
-                _buffRemainsDuration = CharacterBuff.GetBuff().GetBuff().noDuration ? 0f : CharacterBuff.buffRemainsDuration;
+                _buffRemainsDuration = NoDuration ? 0f : CharacterBuff.buffRemainsDuration;
         }
 
         protected override void UpdateData()
         {
             // Update remains duration
             if (Mathf.Abs(CharacterBuff.buffRemainsDuration - _buffRemainsDuration) > 1)
-                _buffRemainsDuration = CharacterBuff.GetBuff().GetBuff().noDuration ? 0f : CharacterBuff.buffRemainsDuration;
+                _buffRemainsDuration = NoDuration ? 0f : CharacterBuff.buffRemainsDuration;
 
             BaseGameData tempGameData = null;
             switch (Data.type)
