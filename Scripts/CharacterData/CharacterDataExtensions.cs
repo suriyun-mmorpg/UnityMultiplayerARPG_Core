@@ -561,7 +561,7 @@ namespace MultiplayerARPG
         {
             increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             decreaseItems = new Dictionary<CharacterItem, int>();
-            if (ammoType == null || amount <= 0)
+            if (ammoType == null || amount < 0)
                 return false;
             Dictionary<int, Dictionary<DamageElement, MinMaxFloat>> calculatingDamageAmounts = new Dictionary<int, Dictionary<DamageElement, MinMaxFloat>>();
             List<int> decreasingItemIndexes = new List<int>();
