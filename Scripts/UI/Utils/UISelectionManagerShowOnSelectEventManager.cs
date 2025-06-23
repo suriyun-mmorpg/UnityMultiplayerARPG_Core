@@ -23,7 +23,10 @@ public class UISelectionManagerShowOnSelectEventManager<TData, TUI>
             _selectionManager.eventOnDeselect.AddListener(OnDeselect);
         }
         if (_showingUI != null)
+        {
+            _showingUI.onHide.RemoveListener(OnHide);
             _showingUI.onHide.AddListener(OnHide);
+        }
     }
 
     /// <summary>
