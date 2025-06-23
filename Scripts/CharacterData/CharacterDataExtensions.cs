@@ -557,10 +557,9 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Functions
-        public static bool DecreaseAmmos(this IList<CharacterItem> nonEquipItems, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
+        public static bool DecreaseAmmos(this IList<CharacterItem> nonEquipItems, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, Dictionary<CharacterItem, int> decreaseItems)
         {
             increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-            decreaseItems = new Dictionary<CharacterItem, int>();
             if (ammoType == null || amount < 0)
                 return false;
             Dictionary<int, Dictionary<DamageElement, MinMaxFloat>> calculatingDamageAmounts = new Dictionary<int, Dictionary<DamageElement, MinMaxFloat>>();
@@ -605,37 +604,23 @@ namespace MultiplayerARPG
 
             for (i = decreasingItemIndexes.Count - 1; i >= 0; --i)
             {
-                decreaseItems.Add(nonEquipItems[decreasingItemIndexes[i]], decreasingItemAmounts[i]);
+                if (decreaseItems != null)
+                    decreaseItems.Add(nonEquipItems[decreasingItemIndexes[i]], decreasingItemAmounts[i]);
                 DecreaseItemsByIndex(nonEquipItems, decreasingItemIndexes[i], decreasingItemAmounts[i], GameInstance.Singleton.IsLimitInventorySlot, true);
             }
 
             return true;
         }
 
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, out Dictionary<CharacterItem, int> decreaseItems)
-        {
-            if (data.CurrentHp <= 0)
-            {
-                increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-                decreaseItems = new Dictionary<CharacterItem, int>();
-                return false;
-            }
-            return data.NonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts, out decreaseItems);
-        }
-
-        public static bool DecreaseAmmos(this IList<CharacterItem> nonEquipItems, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
-        {
-            return DecreaseAmmos(nonEquipItems, ammoType, amount, out increaseDamageAmounts, out _);
-        }
-
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool applyChanges = true)
         {
             if (data.CurrentHp <= 0)
             {
                 increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
                 return false;
             }
-            return data.NonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts);
+            IList<CharacterItem> nonEquipItems = applyChanges ? data.NonEquipItems : new List<CharacterItem>(data.NonEquipItems);
+            return nonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts, null);
         }
 
         public static bool DecreaseAmmos(ref EquipWeapons equipWeapons, IList<CharacterItem> nonEquipItems, bool isLimitSlot, int slotLimit, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
@@ -669,7 +654,7 @@ namespace MultiplayerARPG
             else if (weaponItem.AmmoCapacity <= 0 && hasAmmoType)
             {
                 // Ammo capacity is 0 so reduce ammo from inventory
-                if (nonEquipItems.DecreaseAmmos(weaponItem.WeaponType.AmmoType, amount, out increaseDamages))
+                if (nonEquipItems.DecreaseAmmos(weaponItem.WeaponType.AmmoType, amount, out increaseDamages, null))
                 {
                     nonEquipItems.FillEmptySlots(isLimitSlot, slotLimit);
                     return true;

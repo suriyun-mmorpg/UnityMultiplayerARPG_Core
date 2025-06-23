@@ -653,7 +653,28 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts,
             int triggerCount)
         {
-            return skillUser.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, triggerCount, requireAmmoAmount, true);
+            List<Dictionary<DamageElement, MinMaxFloat>> result;
+            switch (requireAmmoType)
+            {
+                case RequireAmmoType.BasedOnWeapon:
+                    return skillUser.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, triggerCount, requireAmmoAmount, true);
+                case RequireAmmoType.BasedOnSkill:
+                    result = new List<Dictionary<DamageElement, MinMaxFloat>>();
+                    Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamageAmounts;
+                    for (int i = 0; i < triggerCount; ++i)
+                    {
+                        if (!DecreaseAmmos(skillUser, isLeftHand, out tempIncreaseDamageAmounts, false))
+                            break;
+                        result.Add(GameDataHelpers.CombineDamages(new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts), tempIncreaseDamageAmounts));
+                    }
+                    return result;
+            }
+            result = new List<Dictionary<DamageElement, MinMaxFloat>>();
+            for (int i = 0; i < triggerCount; ++i)
+            {
+                result.Add(baseDamageAmounts);
+            }
+            return result;
         }
 
         /// <summary>
@@ -1119,7 +1140,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        protected bool DecreaseAmmos(BaseCharacterEntity character, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+        protected bool DecreaseAmmos(BaseCharacterEntity character, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool applyChanges = true)
         {
             increaseDamageAmounts = null;
             AmmoType ammoType;
@@ -1127,7 +1148,7 @@ namespace MultiplayerARPG
             switch (requireAmmoType)
             {
                 case RequireAmmoType.BasedOnWeapon:
-                    return character.DecreaseAmmos(isLeftHand, requireAmmoAmount, out increaseDamageAmounts, false);
+                    return character.DecreaseAmmos(isLeftHand, requireAmmoAmount, out increaseDamageAmounts, false, applyChanges);
                 case RequireAmmoType.BasedOnSkill:
                     if (HasEnoughAmmos(character, isLeftHand, out ammoType, out amount))
                     {
@@ -1136,7 +1157,7 @@ namespace MultiplayerARPG
                             // No required ammos, don't decrease ammos
                             return true;
                         }
-                        if (character.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts))
+                        if (character.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts, applyChanges))
                         {
                             character.FillEmptySlots();
                             return true;
