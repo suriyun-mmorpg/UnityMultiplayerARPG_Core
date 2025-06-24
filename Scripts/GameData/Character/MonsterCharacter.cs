@@ -569,54 +569,12 @@ namespace MultiplayerARPG
                 amountIncreaseEachLevel.moveSpeed = adjustedValue;
                 Debug.LogWarning($"Invalid moveSpeed stats's increase each level setting for {this} adjusted to {adjustedValue}");
             }
-            // atkSpeed
-            if (AdjustFloatValue(baseAmount.atkSpeed, amountIncreaseEachLevel.atkSpeed, out adjustedValue, 0.01f))
+            // sprintSpeed
+            if (AdjustFloatValue(baseAmount.sprintSpeed, amountIncreaseEachLevel.sprintSpeed, out adjustedValue, 0.01f))
             {
                 hasChanges = true;
-                amountIncreaseEachLevel.atkSpeed = adjustedValue;
-                Debug.LogWarning($"Invalid atkSpeed stats's increase each level setting for {this} adjusted to {adjustedValue}");
-            }
-            // weightLimit
-            if (AdjustFloatValue(baseAmount.weightLimit, amountIncreaseEachLevel.weightLimit, out adjustedValue, 0f))
-            {
-                hasChanges = true;
-                amountIncreaseEachLevel.weightLimit = adjustedValue;
-                Debug.LogWarning($"Invalid weightLimit stats's increase each level setting for {this} adjusted to {adjustedValue}");
-            }
-            // slotLimit
-            if (AdjustFloatValue(baseAmount.slotLimit, amountIncreaseEachLevel.slotLimit, out adjustedValue, 0f))
-            {
-                hasChanges = true;
-                amountIncreaseEachLevel.slotLimit = adjustedValue;
-                Debug.LogWarning($"Invalid slotLimit stats's increase each level setting for {this} adjusted to {adjustedValue}");
-            }
-            // goldRate
-            if (AdjustFloatValue(baseAmount.goldRate, amountIncreaseEachLevel.goldRate, out adjustedValue, 0f))
-            {
-                hasChanges = true;
-                amountIncreaseEachLevel.goldRate = adjustedValue;
-                Debug.LogWarning($"Invalid goldRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
-            }
-            // expRate
-            if (AdjustFloatValue(baseAmount.expRate, amountIncreaseEachLevel.expRate, out adjustedValue, 0f))
-            {
-                hasChanges = true;
-                amountIncreaseEachLevel.expRate = adjustedValue;
-                Debug.LogWarning($"Invalid expRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
-            }
-            // itemDropRate
-            if (AdjustFloatValue(baseAmount.itemDropRate, amountIncreaseEachLevel.itemDropRate, out adjustedValue, 0f))
-            {
-                hasChanges = true;
-                amountIncreaseEachLevel.itemDropRate = adjustedValue;
-                Debug.LogWarning($"Invalid itemDropRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
-            }
-            // moveSpeed
-            if (AdjustFloatValue(baseAmount.moveSpeed, amountIncreaseEachLevel.moveSpeed, out adjustedValue, 0f))
-            {
-                hasChanges = true;
-                amountIncreaseEachLevel.moveSpeed = adjustedValue;
-                Debug.LogWarning($"Invalid moveSpeed stats's increase each level setting for {this} adjusted to {adjustedValue}");
+                amountIncreaseEachLevel.sprintSpeed = adjustedValue;
+                Debug.LogWarning($"Invalid sprintSpeed stats's increase each level setting for {this} adjusted to {adjustedValue}");
             }
             // atkSpeed
             if (AdjustFloatValue(baseAmount.atkSpeed, amountIncreaseEachLevel.atkSpeed, out adjustedValue, 0.01f))
@@ -694,6 +652,97 @@ namespace MultiplayerARPG
                 hasChanges = true;
                 amountIncreaseEachLevel.gravityRate = adjustedValue;
                 Debug.LogWarning($"Invalid gravityRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // protectedSlotLimit
+            if (AdjustFloatValue(baseAmount.protectedSlotLimit, amountIncreaseEachLevel.protectedSlotLimit, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.protectedSlotLimit = adjustedValue;
+                Debug.LogWarning($"Invalid protectedSlotLimit stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // ammoCapacity
+            if (AdjustFloatValue(baseAmount.ammoCapacity, amountIncreaseEachLevel.ammoCapacity, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.ammoCapacity = adjustedValue;
+                Debug.LogWarning($"Invalid ammoCapacity stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // recoilModifier
+            if (AdjustFloatValue(baseAmount.recoilModifier, amountIncreaseEachLevel.recoilModifier, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.recoilModifier = adjustedValue;
+                Debug.LogWarning($"Invalid recoilModifier stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // recoilRate
+            if (AdjustFloatValue(baseAmount.recoilRate, amountIncreaseEachLevel.recoilRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.recoilRate = adjustedValue;
+                Debug.LogWarning($"Invalid recoilRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // rateOfFire
+            if (AdjustFloatValue(baseAmount.rateOfFire, amountIncreaseEachLevel.rateOfFire, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.rateOfFire = adjustedValue;
+                Debug.LogWarning($"Invalid rateOfFire stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // reloadDuration
+            if (AdjustFloatValue(baseAmount.reloadDuration, amountIncreaseEachLevel.reloadDuration, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.reloadDuration = adjustedValue;
+                Debug.LogWarning($"Invalid reloadDuration stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // fireSpreadRangeRate
+            if (AdjustFloatValue(baseAmount.fireSpreadRangeRate, amountIncreaseEachLevel.fireSpreadRangeRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.fireSpreadRangeRate = adjustedValue;
+                Debug.LogWarning($"Invalid fireSpreadRangeRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // fireSpread
+            if (AdjustFloatValue(baseAmount.fireSpread, amountIncreaseEachLevel.fireSpread, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.fireSpread = adjustedValue;
+                Debug.LogWarning($"Invalid fireSpread stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // decreaseFoodDecreation
+            if (AdjustFloatValue(baseAmount.decreaseFoodDecreation, amountIncreaseEachLevel.decreaseFoodDecreation, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.decreaseFoodDecreation = adjustedValue;
+                Debug.LogWarning($"Invalid decreaseFoodDecreation stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // decreaseWaterDecreation
+            if (AdjustFloatValue(baseAmount.decreaseWaterDecreation, amountIncreaseEachLevel.decreaseWaterDecreation, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.decreaseWaterDecreation = adjustedValue;
+                Debug.LogWarning($"Invalid decreaseWaterDecreation stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // decreaseStaminaDecreation
+            if (AdjustFloatValue(baseAmount.decreaseStaminaDecreation, amountIncreaseEachLevel.decreaseStaminaDecreation, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.decreaseStaminaDecreation = adjustedValue;
+                Debug.LogWarning($"Invalid decreaseStaminaDecreation stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // buyItemPriceRate
+            if (AdjustFloatValue(baseAmount.buyItemPriceRate, amountIncreaseEachLevel.buyItemPriceRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.buyItemPriceRate = adjustedValue;
+                Debug.LogWarning($"Invalid buyItemPriceRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
+            }
+            // sellItemPriceRate
+            if (AdjustFloatValue(baseAmount.sellItemPriceRate, amountIncreaseEachLevel.sellItemPriceRate, out adjustedValue, 0f))
+            {
+                hasChanges = true;
+                amountIncreaseEachLevel.sellItemPriceRate = adjustedValue;
+                Debug.LogWarning($"Invalid sellItemPriceRate stats's increase each level setting for {this} adjusted to {adjustedValue}");
             }
             if (hasChanges)
             {
