@@ -161,37 +161,6 @@ namespace MultiplayerARPG
             {
                 // Update day-night time on both client and server. It will sync from server some time to make sure that clients time of day won't very difference
                 CurrentGameInstance.DayNightTimeUpdater.UpdateTimeOfDay(tempDeltaTime);
-                for (int i = _setOfGameEntity.Count - 1; i >= 0; --i)
-                {
-                    BaseGameEntity entity = _setOfGameEntity[i];
-                    if (entity == null)
-                    {
-                        _setOfGameEntity.RemoveAt(i);
-                        continue;
-                    }
-                    if (!entity.enabled)
-                        continue;
-                    entity.DoUpdate();
-                }
-            }
-        }
-
-        protected virtual void LateUpdate()
-        {
-            if (IsNetworkActive)
-            {
-                for (int i = _setOfGameEntity.Count - 1; i >= 0; --i)
-                {
-                    BaseGameEntity entity = _setOfGameEntity[i];
-                    if (entity == null)
-                    {
-                        _setOfGameEntity.RemoveAt(i);
-                        continue;
-                    }
-                    if (!entity.enabled)
-                        continue;
-                    entity.DoLateUpdate();
-                }
             }
         }
 

@@ -352,7 +352,7 @@ namespace MultiplayerARPG
             }
         }
 
-        internal void DoUpdate()
+        internal void Update()
         {
             using (s_ComponentsUpdateProfilerMarker.Auto())
             {
@@ -401,7 +401,7 @@ namespace MultiplayerARPG
             }
         }
 
-        internal void DoLateUpdate()
+        internal void LateUpdate()
         {
             bool isUpdateEntityComponents = IsUpdateEntityComponents;
             using (s_ComponentsLateUpdateProfilerMarker.Auto())
