@@ -56,8 +56,8 @@ namespace MultiplayerARPG
 
         public void Clear()
         {
-            _cacheIncreaseStats.Reset();
-            _cacheIncreaseStatsRate.Reset();
+            _cacheIncreaseStats = new CharacterStats();
+            _cacheIncreaseStatsRate = new CharacterStats();
             _cacheIncreaseAttributes.Clear();
             _cacheIncreaseAttributesRate.Clear();
             _cacheIncreaseResistances.Clear();
