@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         public float blockRate;
         public float blockDmgRate;
         public float moveSpeed;
+        public float sprintSpeed;
         public float atkSpeed;
         public float weightLimit;
         public float slotLimit;
@@ -51,6 +52,105 @@ namespace MultiplayerARPG
         public float buyItemPriceRate;
         public float sellItemPriceRate;
 
+        public CharacterStats()
+        {
+            Reset();
+        }
+
+        public void Reset()
+        {
+            hp = 0f;
+            hpRecovery = 0f;
+            hpLeechRate = 0f;
+            mp = 0f;
+            mpRecovery = 0f;
+            mpLeechRate = 0f;
+            stamina = 0f;
+            staminaRecovery = 0f;
+            staminaLeechRate = 0f;
+            food = 0f;
+            water = 0f;
+            accuracy = 0f;
+            evasion = 0f;
+            criRate = 0f;
+            criDmgRate = 0f;
+            blockRate = 0f;
+            blockDmgRate = 0f;
+            moveSpeed = 0f;
+            sprintSpeed = 0f;
+            atkSpeed = 0f;
+            weightLimit = 0f;
+            slotLimit = 0f;
+            goldRate = 0f;
+            expRate = 0f;
+            itemDropRate = 0f;
+            jumpHeight = 0f;
+            headDamageAbsorbs = 0f;
+            bodyDamageAbsorbs = 0f;
+            fallDamageAbsorbs = 0f;
+            gravityRate = 0f;
+            protectedSlotLimit = 0f;
+            ammoCapacity = 0f;
+            recoilModifier = 0f;
+            recoilRate = 0f;
+            rateOfFire = 0f;
+            reloadDuration = 0f;
+            fireSpreadRangeRate = 0f;
+            fireSpread = 0f;
+            decreaseFoodDecreation = 0f;
+            decreaseWaterDecreation = 0f;
+            decreaseStaminaDecreation = 0f;
+            buyItemPriceRate = 0f;
+            sellItemPriceRate = 0f;
+        }
+
+        public CharacterStats(CharacterStats other)
+        {
+            hp = other.hp;
+            hpRecovery = other.hpRecovery;
+            hpLeechRate = other.hpLeechRate;
+            mp = other.mp;
+            mpRecovery = other.mpRecovery;
+            mpLeechRate = other.mpLeechRate;
+            stamina = other.stamina;
+            staminaRecovery = other.staminaRecovery;
+            staminaLeechRate = other.staminaLeechRate;
+            food = other.food;
+            water = other.water;
+            accuracy = other.accuracy;
+            evasion = other.evasion;
+            criRate = other.criRate;
+            criDmgRate = other.criDmgRate;
+            blockRate = other.blockRate;
+            blockDmgRate = other.blockDmgRate;
+            moveSpeed = other.moveSpeed;
+            sprintSpeed = other.sprintSpeed;
+            atkSpeed = other.atkSpeed;
+            weightLimit = other.weightLimit;
+            slotLimit = other.slotLimit;
+            goldRate = other.goldRate;
+            expRate = other.expRate;
+            itemDropRate = other.itemDropRate;
+            jumpHeight = other.jumpHeight;
+            headDamageAbsorbs = other.headDamageAbsorbs;
+            bodyDamageAbsorbs = other.bodyDamageAbsorbs;
+            fallDamageAbsorbs = other.fallDamageAbsorbs;
+            gravityRate = other.gravityRate;
+            protectedSlotLimit = other.protectedSlotLimit;
+            ammoCapacity = other.ammoCapacity;
+            recoilModifier = other.recoilModifier;
+            recoilRate = other.recoilRate;
+            rateOfFire = other.rateOfFire;
+            reloadDuration = other.reloadDuration;
+            fireSpreadRangeRate = other.fireSpreadRangeRate;
+            fireSpread = other.fireSpread;
+            decreaseFoodDecreation = other.decreaseFoodDecreation;
+            decreaseWaterDecreation = other.decreaseWaterDecreation;
+            decreaseStaminaDecreation = other.decreaseStaminaDecreation;
+            buyItemPriceRate = other.buyItemPriceRate;
+            sellItemPriceRate = other.sellItemPriceRate;
+        }
+
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
         {
             a.hp = a.hp + b.hp;
@@ -71,6 +171,7 @@ namespace MultiplayerARPG
             a.blockRate = a.blockRate + b.blockRate;
             a.blockDmgRate = a.blockDmgRate + b.blockDmgRate;
             a.moveSpeed = a.moveSpeed + b.moveSpeed;
+            a.sprintSpeed = a.sprintSpeed + b.sprintSpeed;
             a.atkSpeed = a.atkSpeed + b.atkSpeed;
             a.weightLimit = a.weightLimit + b.weightLimit;
             a.slotLimit = a.slotLimit + b.slotLimit;
@@ -120,6 +221,7 @@ namespace MultiplayerARPG
             a.blockRate = a.blockRate - b.blockRate;
             a.blockDmgRate = a.blockDmgRate - b.blockDmgRate;
             a.moveSpeed = a.moveSpeed - b.moveSpeed;
+            a.sprintSpeed = a.sprintSpeed - b.sprintSpeed;
             a.atkSpeed = a.atkSpeed - b.atkSpeed;
             a.weightLimit = a.weightLimit - b.weightLimit;
             a.slotLimit = a.slotLimit - b.slotLimit;
@@ -169,6 +271,7 @@ namespace MultiplayerARPG
             a.blockRate = a.blockRate * multiplier;
             a.blockDmgRate = a.blockDmgRate * multiplier;
             a.moveSpeed = a.moveSpeed * multiplier;
+            a.sprintSpeed = a.sprintSpeed * multiplier;
             a.atkSpeed = a.atkSpeed * multiplier;
             a.weightLimit = a.weightLimit * multiplier;
             a.slotLimit = a.slotLimit * multiplier;
@@ -218,6 +321,7 @@ namespace MultiplayerARPG
             a.blockRate = a.blockRate * b.blockRate;
             a.blockDmgRate = a.blockDmgRate * b.blockDmgRate;
             a.moveSpeed = a.moveSpeed * b.moveSpeed;
+            a.sprintSpeed = a.sprintSpeed * b.sprintSpeed;
             a.atkSpeed = a.atkSpeed * b.atkSpeed;
             a.weightLimit = a.weightLimit * b.weightLimit;
             a.slotLimit = a.slotLimit * b.slotLimit;
@@ -262,7 +366,7 @@ namespace MultiplayerARPG
         {
             if (statsIncreaseEachLevelByLevels == null || statsIncreaseEachLevelByLevels.Length == 0)
                 return baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0)));
-            CharacterStats result = baseStats;
+            CharacterStats result = new CharacterStats(baseStats);
             int countLevel = 2;
             int indexOfIncremental = 0;
             int firstMinLevel = statsIncreaseEachLevelByLevels[indexOfIncremental].minLevel;

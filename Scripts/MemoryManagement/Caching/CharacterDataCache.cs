@@ -40,6 +40,7 @@ namespace MultiplayerARPG
         public int MaxWater => (int)_stats.water;
         public float AtkSpeed => _stats.atkSpeed;
         public float MoveSpeed => _stats.moveSpeed;
+        public float SprintSpeed => _stats.sprintSpeed;
         public float GoldRate => _stats.goldRate;
         public float ExpRate => _stats.expRate;
         public float ItemDropRate => _stats.itemDropRate;
@@ -62,6 +63,7 @@ namespace MultiplayerARPG
         public float BuyItemPriceRate => _stats.buyItemPriceRate;
         public float SellItemPriceRate => _stats.sellItemPriceRate;
         public float BaseMoveSpeed { get; private set; }
+        public float BaseSprintSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
         public int TotalItemSlot { get; private set; }
         public float LimitItemWeight { get; private set; }
@@ -291,6 +293,9 @@ namespace MultiplayerARPG
 
                 if (characterData.GetDatabase() != null)
                     BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;
+
+                if (characterData.GetDatabase() != null)
+                    BaseSprintSpeed = characterData.GetDatabase().Stats.baseStats.sprintSpeed;
 
                 TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData, _stats);
                 TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData, _stats);

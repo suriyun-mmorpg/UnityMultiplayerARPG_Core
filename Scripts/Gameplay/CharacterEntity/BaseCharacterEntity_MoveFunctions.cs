@@ -56,23 +56,23 @@ namespace MultiplayerARPG
 
             if (movementState.Has(MovementState.IsUnderWater))
             {
-                moveSpeed *= CurrentGameplayRule.GetSwimMoveSpeedRate(this);
+                moveSpeed = CurrentGameplayRule.GetSwimMoveSpeed(this, CachedData.Stats);
             }
             else
             {
                 switch (extraMovementState)
                 {
                     case ExtraMovementState.IsSprinting:
-                        moveSpeed *= CurrentGameplayRule.GetSprintMoveSpeedRate(this);
+                        moveSpeed = CurrentGameplayRule.GetSprintMoveSpeed(this, CachedData.Stats);
                         break;
                     case ExtraMovementState.IsWalking:
-                        moveSpeed *= CurrentGameplayRule.GetWalkMoveSpeedRate(this);
+                        moveSpeed = CurrentGameplayRule.GetWalkMoveSpeed(this, CachedData.Stats);
                         break;
                     case ExtraMovementState.IsCrouching:
-                        moveSpeed *= CurrentGameplayRule.GetCrouchMoveSpeedRate(this);
+                        moveSpeed = CurrentGameplayRule.GetCrouchMoveSpeed(this, CachedData.Stats);
                         break;
                     case ExtraMovementState.IsCrawling:
-                        moveSpeed *= CurrentGameplayRule.GetCrawlMoveSpeedRate(this);
+                        moveSpeed = CurrentGameplayRule.GetCrawlMoveSpeed(this, CachedData.Stats);
                         break;
                 }
             }

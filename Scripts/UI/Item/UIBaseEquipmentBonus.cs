@@ -44,6 +44,8 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyMoveSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MOVE_SPEED);
         [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeySprintSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SPRINT_SPEED);
+        [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyAtkSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ATTACK_SPEED);
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyWeightLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_WEIGHT);
@@ -129,6 +131,8 @@ namespace MultiplayerARPG
         public UILocaleKeySetting formatKeyBlockDmgRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_BLOCK_DAMAGE_RATE_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyMoveSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MOVE_SPEED_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeySprintSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SPRINT_SPEED_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyAtkSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ATTACK_SPEED_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
@@ -258,6 +262,7 @@ namespace MultiplayerARPG
                     blockRateStatsFormat = formatKeyBlockRateRateStats,
                     blockDmgRateStatsFormat = formatKeyBlockDmgRateRateStats,
                     moveSpeedStatsFormat = formatKeyMoveSpeedRateStats,
+                    sprintSpeedStatsFormat = formatKeySprintSpeedRateStats,
                     atkSpeedStatsFormat = formatKeyAtkSpeedRateStats,
                     weightLimitStatsFormat = formatKeyWeightLimitRateStats,
                     slotLimitStatsFormat = formatKeySlotLimitRateStats,
@@ -310,6 +315,7 @@ namespace MultiplayerARPG
                     blockRateStatsFormat = formatKeyBlockRateStats,
                     blockDmgRateStatsFormat = formatKeyBlockDmgRateStats,
                     moveSpeedStatsFormat = formatKeyMoveSpeedStats,
+                    sprintSpeedStatsFormat = formatKeySprintSpeedStats,
                     atkSpeedStatsFormat = formatKeyAtkSpeedStats,
                     weightLimitStatsFormat = formatKeyWeightLimitStats,
                     slotLimitStatsFormat = formatKeySlotLimitStats,

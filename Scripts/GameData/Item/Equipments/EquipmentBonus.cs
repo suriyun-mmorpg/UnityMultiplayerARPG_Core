@@ -5,8 +5,8 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class EquipmentBonus
     {
-        public CharacterStats stats = default;
-        public CharacterStats statsRate = default;
+        public CharacterStats stats = new CharacterStats();
+        public CharacterStats statsRate = new CharacterStats();
         [ArrayElementTitle("attribute")]
         public AttributeAmount[] attributes = new AttributeAmount[0];
         [ArrayElementTitle("attribute")]

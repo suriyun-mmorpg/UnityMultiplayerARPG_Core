@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        private CharacterStats statsIncreaseEachLevel;
+        private CharacterStats statsIncreaseEachLevel = new CharacterStats();
         public CharacterStats StatsIncreaseEachLevel
         {
             get { return statsIncreaseEachLevel; }

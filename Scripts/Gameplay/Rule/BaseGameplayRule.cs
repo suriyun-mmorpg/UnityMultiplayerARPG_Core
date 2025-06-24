@@ -159,36 +159,41 @@ namespace MultiplayerARPG
         /// Result from this function will be used to calculate character's move speed while character is sprinting
         /// </summary>
         /// <param name="gameEntity"></param>
+        /// <param name="stats"></param>
         /// <returns></returns>
-        public abstract float GetSprintMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetSprintMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats);
 
         /// <summary>
         /// Result from this function will be used to calculate character's move speed while character is walking
         /// </summary>
         /// <param name="gameEntity"></param>
+        /// <param name="stats"></param>
         /// <returns></returns>
-        public abstract float GetWalkMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetWalkMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats);
 
         /// <summary>
         /// Result from this function will be used to calculate character's move speed while character is crouching
         /// </summary>
         /// <param name="gameEntity"></param>
+        /// <param name="stats"></param>
         /// <returns></returns>
-        public abstract float GetCrouchMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetCrouchMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats);
 
         /// <summary>
         /// Result from this function will be used to calculate character's move speed while character is crawling
         /// </summary>
         /// <param name="gameEntity"></param>
+        /// <param name="stats"></param>
         /// <returns></returns>
-        public abstract float GetCrawlMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetCrawlMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats);
 
         /// <summary>
         /// Result from this function will be used to calculate character's move speed while character is swimming
         /// </summary>
         /// <param name="gameEntity"></param>
+        /// <param name="stats"></param>
         /// <returns></returns>
-        public abstract float GetSwimMoveSpeedRate(BaseGameEntity gameEntity);
+        public abstract float GetSwimMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats);
 
         /// <summary>
         /// This function will be called to find character's total weight from carrying items (use it to store as caches later)

@@ -11,8 +11,8 @@ namespace MultiplayerARPG
         private int _level;
         private int _randomSeed;
         private byte _version;
-        private CharacterStats _cacheIncreaseStats = CharacterStats.Empty;
-        private CharacterStats _cacheIncreaseStatsRate = CharacterStats.Empty;
+        private CharacterStats _cacheIncreaseStats = new CharacterStats();
+        private CharacterStats _cacheIncreaseStatsRate = new CharacterStats();
         private Dictionary<Attribute, float> _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
         private Dictionary<Attribute, float> _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
         private Dictionary<DamageElement, float> _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
@@ -57,8 +57,8 @@ namespace MultiplayerARPG
 
         public void Clear()
         {
-            _cacheIncreaseStats = CharacterStats.Empty;
-            _cacheIncreaseStatsRate = CharacterStats.Empty;
+            _cacheIncreaseStats.Reset();
+            _cacheIncreaseStatsRate.Reset();
             _cacheIncreaseAttributes.Clear();
             _cacheIncreaseAttributesRate.Clear();
             _cacheIncreaseResistances.Clear();

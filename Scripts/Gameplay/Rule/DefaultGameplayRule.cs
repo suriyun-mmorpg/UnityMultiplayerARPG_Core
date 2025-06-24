@@ -25,18 +25,23 @@ namespace MultiplayerARPG
         public float moveSpeedRateWhileOverweight = 0.05f;
         [FormerlySerializedAs("moveSpeedRateWhileSprint")]
         public float moveSpeedRateWhileSprinting = 1.5f;
+        public float moveSpeedIncrementWhileSprinting = 0f;
 
         [Header("Walk")]
         public float moveSpeedRateWhileWalking = 0.5f;
+        public float moveSpeedIncrementWhileWalking = 0f;
 
         [Header("Crouch")]
         public float moveSpeedRateWhileCrouching = 0.35f;
+        public float moveSpeedIncrementWhileCrouching = 0f;
 
         [Header("Crawl")]
         public float moveSpeedRateWhileCrawling = 0.15f;
+        public float moveSpeedIncrementWhileCrawling = 0f;
 
         [Header("Swim")]
         public float moveSpeedRateWhileSwimming = 0.5f;
+        public float moveSpeedIncrementWhileSwimming = 0f;
 
         [Header("Hp/Mp/Food/Water")]
         public int hungryWhenFoodLowerThan = 40;
@@ -397,34 +402,34 @@ namespace MultiplayerARPG
             return moveSpeedRateWhileOverweight;
         }
 
-        public override float GetSprintMoveSpeedRate(BaseGameEntity gameEntity)
+        public override float GetSprintMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats)
         {
             // For some gameplay rule, move speed rate may difference for specific entiy type.
-            return moveSpeedRateWhileSprinting;
+            return (stats.moveSpeed * moveSpeedRateWhileSprinting) + moveSpeedIncrementWhileSprinting + stats.sprintSpeed;
         }
 
-        public override float GetWalkMoveSpeedRate(BaseGameEntity gameEntity)
+        public override float GetWalkMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats)
         {
             // For some gameplay rule, move speed rate may difference for specific entiy type.
-            return moveSpeedRateWhileWalking;
+            return (stats.moveSpeed * moveSpeedRateWhileWalking) + moveSpeedIncrementWhileWalking;
         }
 
-        public override float GetCrouchMoveSpeedRate(BaseGameEntity gameEntity)
+        public override float GetCrouchMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats)
         {
             // For some gameplay rule, move speed rate may difference for specific entiy type.
-            return moveSpeedRateWhileCrouching;
+            return (stats.moveSpeed * moveSpeedRateWhileCrouching) + moveSpeedIncrementWhileCrouching;
         }
 
-        public override float GetCrawlMoveSpeedRate(BaseGameEntity gameEntity)
+        public override float GetCrawlMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats)
         {
             // For some gameplay rule, move speed rate may difference for specific entiy type.
-            return moveSpeedRateWhileCrawling;
+            return (stats.moveSpeed * moveSpeedRateWhileCrawling) + moveSpeedIncrementWhileCrawling;
         }
 
-        public override float GetSwimMoveSpeedRate(BaseGameEntity gameEntity)
+        public override float GetSwimMoveSpeed(BaseGameEntity gameEntity, CharacterStats stats)
         {
             // For some gameplay rule, move speed rate may difference for specific entiy type.
-            return moveSpeedRateWhileSwimming;
+            return (stats.moveSpeed * moveSpeedRateWhileSwimming) + moveSpeedIncrementWhileSwimming;
         }
 
         public override float GetLimitWeight(ICharacterData character, CharacterStats stats)

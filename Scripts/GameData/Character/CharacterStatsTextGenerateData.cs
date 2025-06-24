@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public string blockRateStatsFormat;
         public string blockDmgRateStatsFormat;
         public string moveSpeedStatsFormat;
+        public string sprintSpeedStatsFormat;
         public string atkSpeedStatsFormat;
         public string weightLimitStatsFormat;
         public string slotLimitStatsFormat;
@@ -71,6 +72,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextBlockRate;
         public TextWrapper uiTextBlockDmgRate;
         public TextWrapper uiTextMoveSpeed;
+        public TextWrapper uiTextSprintSpeed;
         public TextWrapper uiTextAtkSpeed;
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
@@ -155,6 +157,9 @@ namespace MultiplayerARPG
 
             // Move Speed
             GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(moveSpeedStatsFormat), data.moveSpeed, uiTextMoveSpeed, bonusIncreaseColor, bonusDecreaseColor);
+
+            // Sprint Speed
+            GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(sprintSpeedStatsFormat), data.sprintSpeed, uiTextSprintSpeed, bonusIncreaseColor, bonusDecreaseColor);
 
             // Attack Speed
             GetSingleStatsText(statsStringBuilder, isRate || false, LanguageManager.GetText(atkSpeedStatsFormat), data.atkSpeed, uiTextAtkSpeed, bonusIncreaseColor, bonusDecreaseColor);

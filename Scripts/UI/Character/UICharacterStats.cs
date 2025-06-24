@@ -52,6 +52,8 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyMoveSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MOVE_SPEED);
         [Tooltip("Format => {0} = {Amount}")]
+        public UILocaleKeySetting formatKeySprintSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SPRINT_SPEED);
+        [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyAtkSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ATTACK_SPEED);
         [Tooltip("Format => {0} = {Amount}")]
         public UILocaleKeySetting formatKeyWeightLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_WEIGHT);
@@ -138,6 +140,8 @@ namespace MultiplayerARPG
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyMoveSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_MOVE_SPEED_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
+        public UILocaleKeySetting formatKeySprintSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SPRINT_SPEED_RATE);
+        [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyAtkSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_ATTACK_SPEED_RATE);
         [Tooltip("Format => {0} = {Amount * 100}")]
         public UILocaleKeySetting formatKeyWeightLimitRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_WEIGHT_RATE);
@@ -206,6 +210,7 @@ namespace MultiplayerARPG
         public TextWrapper uiTextBlockRate;
         public TextWrapper uiTextBlockDmgRate;
         public TextWrapper uiTextMoveSpeed;
+        public TextWrapper uiTextSprintSpeed;
         public TextWrapper uiTextAtkSpeed;
         public TextWrapper uiTextWeightLimit;
         public TextWrapper uiTextSlotLimit;
@@ -271,6 +276,7 @@ namespace MultiplayerARPG
             uiTextBlockRate = null;
             uiTextBlockDmgRate = null;
             uiTextMoveSpeed = null;
+            uiTextSprintSpeed = null;
             uiTextAtkSpeed = null;
             uiTextWeightLimit = null;
             uiTextSlotLimit = null;
@@ -362,6 +368,7 @@ namespace MultiplayerARPG
                         blockRateStatsFormat = formatKeyBlockRateRateStats,
                         blockDmgRateStatsFormat = formatKeyBlockDmgRateRateStats,
                         moveSpeedStatsFormat = formatKeyMoveSpeedRateStats,
+                        sprintSpeedStatsFormat = formatKeySprintSpeedRateStats,
                         atkSpeedStatsFormat = formatKeyAtkSpeedRateStats,
                         weightLimitStatsFormat = formatKeyWeightLimitRateStats,
                         slotLimitStatsFormat = formatKeySlotLimitRateStats,
@@ -404,6 +411,7 @@ namespace MultiplayerARPG
                         uiTextBlockRate = uiTextBlockRate,
                         uiTextBlockDmgRate = uiTextBlockDmgRate,
                         uiTextMoveSpeed = uiTextMoveSpeed,
+                        uiTextSprintSpeed = uiTextSprintSpeed,
                         uiTextAtkSpeed = uiTextAtkSpeed,
                         uiTextWeightLimit = uiTextWeightLimit,
                         uiTextSlotLimit = uiTextSlotLimit,
@@ -458,6 +466,7 @@ namespace MultiplayerARPG
                         blockRateStatsFormat = formatKeyBlockRateStats,
                         blockDmgRateStatsFormat = formatKeyBlockDmgRateStats,
                         moveSpeedStatsFormat = formatKeyMoveSpeedStats,
+                        sprintSpeedStatsFormat = formatKeySprintSpeedStats,
                         atkSpeedStatsFormat = formatKeyAtkSpeedStats,
                         weightLimitStatsFormat = formatKeyWeightLimitStats,
                         slotLimitStatsFormat = formatKeySlotLimitStats,
@@ -500,6 +509,7 @@ namespace MultiplayerARPG
                         uiTextBlockRate = uiTextBlockRate,
                         uiTextBlockDmgRate = uiTextBlockDmgRate,
                         uiTextMoveSpeed = uiTextMoveSpeed,
+                        uiTextSprintSpeed = uiTextSprintSpeed,
                         uiTextAtkSpeed = uiTextAtkSpeed,
                         uiTextWeightLimit = uiTextWeightLimit,
                         uiTextSlotLimit = uiTextSlotLimit,
@@ -560,6 +570,7 @@ namespace MultiplayerARPG
             formatKeyBlockRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
             formatKeyBlockDmgRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
             formatKeyMoveSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
+            formatKeySprintSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
             formatKeyAtkSpeedStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
             formatKeyWeightLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
             formatKeySlotLimitStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE);
@@ -602,6 +613,7 @@ namespace MultiplayerARPG
             formatKeyBlockRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
             formatKeyBlockDmgRateRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
             formatKeyMoveSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
+            formatKeySprintSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
             formatKeyAtkSpeedRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
             formatKeyWeightLimitRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
             formatKeySlotLimitRateStats = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_SIMPLE_PERCENTAGE);
