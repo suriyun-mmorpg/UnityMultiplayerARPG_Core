@@ -62,18 +62,20 @@ namespace MultiplayerARPG
                     {
                         foreach (ItemDropTable itemDropTable in itemDropTables)
                         {
-                            if (itemDropTable != null &&
-                                itemDropTable.randomItems != null &&
-                                itemDropTable.randomItems.Length > 0)
+                            if (itemDropTable == null ||
+                                itemDropTable.randomItems == null ||
+                                itemDropTable.randomItems.Length <= 0)
                             {
-                                for (i = 0; i < itemDropTable.randomItems.Length; ++i)
-                                {
-                                    if (itemDropTable.randomItems[i].item == null ||
-                                        itemDropTable.randomItems[i].maxAmount <= 0 ||
-                                        itemDropTable.randomItems[i].dropRate <= 0)
-                                        continue;
-                                    _cacheRandomItems.Add(itemDropTable.randomItems[i]);
-                                }
+                                continue;
+                            }
+
+                            for (i = 0; i < itemDropTable.randomItems.Length; ++i)
+                            {
+                                if (itemDropTable.randomItems[i].item == null ||
+                                    itemDropTable.randomItems[i].maxAmount <= 0 ||
+                                    itemDropTable.randomItems[i].dropRate <= 0)
+                                    continue;
+                                _cacheRandomItems.Add(itemDropTable.randomItems[i]);
                             }
                         }
                     }
@@ -99,6 +101,8 @@ namespace MultiplayerARPG
             {
                 foreach (ItemRandomByWeightTable entry in itemRandomByWeightTables)
                 {
+                    if (entry == null)
+                        continue;
                     GameInstance.AddItems(entry.randomItems);
                 }
             }
