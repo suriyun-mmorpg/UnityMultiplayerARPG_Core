@@ -19,7 +19,7 @@ namespace MultiplayerARPG
         {
             if (!GetRandomPosition(out Vector3 spawnPosition))
             {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                 Logging.LogWarning(ToString(), $"Cannot spawn item drop, it cannot find grounded position, pending item drop amount {_pending.Count}");
 #endif
                 return null;

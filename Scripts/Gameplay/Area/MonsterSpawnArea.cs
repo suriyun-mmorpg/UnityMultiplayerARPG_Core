@@ -62,7 +62,7 @@ namespace MultiplayerARPG
         {
             if (!GetRandomPosition(out Vector3 spawnPosition))
             {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                 Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
 #endif
                 return null;
@@ -106,7 +106,7 @@ namespace MultiplayerARPG
             {
                 // Destroy the entity (because it can't find ground position)
                 BaseGameNetworkManager.Singleton.Assets.DestroyObjectInstance(spawnObj);
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                 Logging.LogWarning(ToString(), $"Cannot spawn monster, it cannot find grounded position, pending monster amount {_pending.Count}");
 #endif
                 return null;

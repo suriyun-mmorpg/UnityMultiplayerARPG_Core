@@ -163,7 +163,7 @@ namespace MultiplayerARPG
                         prefab = pendingEntry.prefab;
 #endif
                         addressablePrefab = pendingEntry.addressablePrefab;
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                         Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {prefab?.name ?? "None"}, Addressable: {addressablePrefab?.RuntimeKey ?? "None"}, Amount: {pendingEntry.amount}.");
 #endif
                         for (int i = 0; i < pendingEntry.amount; ++i)
@@ -206,6 +206,9 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR
+        [ContextMenu("Spawn All")]
+#endif
         public override void SpawnAll()
         {
             T prefab = null;

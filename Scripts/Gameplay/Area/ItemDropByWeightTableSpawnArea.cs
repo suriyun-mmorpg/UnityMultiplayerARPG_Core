@@ -52,7 +52,7 @@ namespace MultiplayerARPG
                     _respawnPendingEntitiesTimer = 0f;
                     foreach (CharacterItem pendingEntry in _pending)
                     {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                         Logging.LogWarning(ToString(), $"Spawning pending items, Item: {pendingEntry.dataId}, Amount: {pendingEntry.amount}.");
 #endif
                         Spawn(pendingEntry, 0);
@@ -62,6 +62,9 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR
+        [ContextMenu("Spawn All")]
+#endif
         public override void SpawnAll()
         {
             int amount = GetRandomedSpawnAmount();
@@ -69,7 +72,7 @@ namespace MultiplayerARPG
             {
                 if (weightTable == null)
                 {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                     Logging.LogWarning(ToString(), $"Unable to spawn item, table is empty.");
 #endif
                     continue;
@@ -114,6 +117,11 @@ namespace MultiplayerARPG
                     if (prefab != null)
                     {
                         ExpDropEntity newEntity = BaseRewardDropEntity.Drop(prefab, dropPosition, dropRotation, 1f, rewardGivenType, 1, 1, item.amount, System.Array.Empty<string>(), -1);
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
+                        newEntity.name = $"ExpDropEntity_{name}_{item.dataId}_{item.amount}";
+#else
+                        newEntity.name = string.Empty;
+#endif
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity);
@@ -125,6 +133,11 @@ namespace MultiplayerARPG
                     if (prefab != null)
                     {
                         GoldDropEntity newEntity = BaseRewardDropEntity.Drop(prefab, dropPosition, dropRotation, 1f, rewardGivenType, 1, 1, item.amount, System.Array.Empty<string>(), -1);
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
+                        newEntity.name = $"GoldDropEntity_{name}_{item.dataId}_{item.amount}";
+#else
+                        newEntity.name = string.Empty;
+#endif
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity);
@@ -137,6 +150,11 @@ namespace MultiplayerARPG
                     if (prefab != null)
                     {
                         CurrencyDropEntity newEntity = BaseRewardDropEntity.Drop(prefab, dropPosition, dropRotation, 1f, rewardGivenType, 1, 1, item.amount, System.Array.Empty<string>(), -1);
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
+                        newEntity.name = $"CurrencyDropEntity_{name}_{item.dataId}_{item.amount}";
+#else
+                        newEntity.name = string.Empty;
+#endif
                         newEntity.Currency = currency;
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
@@ -150,6 +168,11 @@ namespace MultiplayerARPG
                     if (prefab != null)
                     {
                         ItemDropEntity newEntity = ItemDropEntity.Drop(prefab, dropPosition, dropRotation, rewardGivenType, item, System.Array.Empty<string>(), -1);
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
+                        newEntity.name = $"ItemDropEntity_{name}_{item.dataId}_{item.amount}";
+#else
+                        newEntity.name = string.Empty;
+#endif
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity);

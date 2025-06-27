@@ -61,7 +61,7 @@ namespace MultiplayerARPG
         {
             if (!GetRandomPosition(out Vector3 spawnPosition))
             {
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                 Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it cannot find grounded position, pending harvestable amount {_pending.Count}");
 #endif
                 return null;
@@ -105,7 +105,7 @@ namespace MultiplayerARPG
             {
                 // Destroy the entity (because it is hitting something)
                 BaseGameNetworkManager.Singleton.Assets.DestroyObjectInstance(spawnObj);
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                 Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is hitting something nearby, pending monster amount {_pending.Count}");
 #endif
                 return null;
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
                         overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                     {
                         // Don't spawn because it will hitting other entities
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                         Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
 #endif
                         return true;
@@ -155,7 +155,7 @@ namespace MultiplayerARPG
                         overlap.gameObject.layer == CurrentGameInstance.harvestableLayer)
                     {
                         // Don't spawn because it will hitting other entities
-#if UNITY_EDITOR || DEVELOPMENT_BUILD
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
                         Logging.LogWarning(ToString(), $"Cannot spawn harvestable, it is collided to another entities, pending harvestable amount {_pending.Count}");
 #endif
                         return true;
