@@ -8,11 +8,6 @@ namespace MultiplayerARPG
 {
     public partial class BuiltInEntityMovementFunctions3D
     {
-        /// <summary>
-        /// Add some distant to avoid character falling under ground
-        /// </summary>
-        private const float ABOVE_GROUND_OFFSETS = 0.25f;
-        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[4];
         private static readonly int s_forceGroundedFramesAfterTeleport = 3;
         private static readonly float s_minDistanceToSimulateMovement = 0.01f;
         private static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
@@ -317,17 +312,6 @@ namespace MultiplayerARPG
             _isTeleporting = true;
             _stillMoveAfterTeleport = stillMoveAfterTeleport;
             OnTeleport(position, rotation.eulerAngles.y, stillMoveAfterTeleport);
-        }
-
-        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
-        {
-            if (PhysicUtils.FindGroundedPosition(fromPosition, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, CacheTransform))
-            {
-                result = result + Vector3.up * ABOVE_GROUND_OFFSETS;
-                return true;
-            }
-            result = fromPosition + Vector3.up * ABOVE_GROUND_OFFSETS;
-            return false;
         }
 
         public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
@@ -890,7 +874,7 @@ namespace MultiplayerARPG
             {
                 Vector3 tempTargetPosition = Vector3.up * TargetWaterSurfaceY(_waterCollider);
                 if (Mathf.Abs(CacheTransform.position.y - tempTargetPosition.y) < 0.05f)
-                    CacheTransform.position = new Vector3(CacheTransform.position.x, tempTargetPosition.y, CacheTransform.position.z);
+                    EntityMovement.SetPosition(new Vector3(CacheTransform.position.x, tempTargetPosition.y, CacheTransform.position.z));
             }
         }
 
@@ -1157,7 +1141,7 @@ namespace MultiplayerARPG
                     // Snap character to the position if character is too far from the position
                     if (movementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
                     {
-                        CacheTransform.position = position;
+                        EntityMovement.SetPosition(position);
                         CurrentGameManager.ShouldPhysicSyncTransforms = true;
                         RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                     }
@@ -1332,7 +1316,7 @@ namespace MultiplayerARPG
             {
                 // Allow to move to the position
                 _acceptedPosition = newPos;
-                CacheTransform.position = newPos;
+                EntityMovement.SetPosition(newPos);
                 CurrentGameManager.ShouldPhysicSyncTransforms = true;
                 // Update character rotation
                 RemoteTurnSimulation(true, yAngle, unityDeltaTime);
@@ -1373,7 +1357,7 @@ namespace MultiplayerARPG
                 NavPaths = null;
             _airborneElapsed = 0;
             _verticalVelocity = 0;
-            CacheTransform.position = position;
+            EntityMovement.SetPosition(position);
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             TurnImmediately(yAngle);
             if (IsServer && !IsOwnedByServer)

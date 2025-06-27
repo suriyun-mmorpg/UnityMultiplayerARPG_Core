@@ -9,6 +9,12 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterController))]
     public partial class CharacterControllerEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IBuiltInEntityMovement3D
     {
+        /// <summary>
+        /// Add some distant to avoid character falling under ground
+        /// </summary>
+        private const float ABOVE_GROUND_OFFSETS = 0.25f;
+        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[8];
+
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
@@ -242,6 +248,11 @@ namespace MultiplayerARPG
             return Physics.CheckSphere(GetGroundCheckCenter(), groundCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
         }
 
+        public void SetPosition(Vector3 position)
+        {
+            EntityTransform.position = position;
+        }
+
         private Vector3 GetGroundCheckCenter()
         {
             return new Vector3(EntityTransform.position.x, EntityTransform.position.y - groundCheckOffsets, EntityTransform.position.z);
@@ -344,7 +355,13 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            return Functions.FindGroundedPosition(fromPosition, findDistance, out result);
+            if (PhysicUtils.FindGroundedPositionWithCapsule(fromPosition, EntityTransform.rotation, CacheCharacterController.center, CacheCharacterController.radius, CacheCharacterController.height, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, EntityTransform))
+            {
+                result = result + Vector3.up * ABOVE_GROUND_OFFSETS;
+                return true;
+            }
+            result = fromPosition + Vector3.up * ABOVE_GROUND_OFFSETS;
+            return false;
         }
 
         public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)

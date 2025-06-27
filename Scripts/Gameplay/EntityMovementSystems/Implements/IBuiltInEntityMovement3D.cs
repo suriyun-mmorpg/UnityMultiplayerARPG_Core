@@ -5,6 +5,7 @@ namespace MultiplayerARPG
     public partial interface IBuiltInEntityMovement3D
     {
         bool GroundCheck();
+        void SetPosition(Vector3 position);
         void Move(Vector3 motion);
         void RotateY(float yAngle);
         void OnJumpForceApplied(float verticalVelocity);
