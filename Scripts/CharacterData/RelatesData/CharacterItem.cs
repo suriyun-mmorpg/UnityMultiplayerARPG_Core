@@ -112,7 +112,7 @@ namespace MultiplayerARPG
 
         public bool IsFull()
         {
-            return amount == GetMaxStack();
+            return amount >= GetMaxStack();
         }
 
         public bool IsBroken()
