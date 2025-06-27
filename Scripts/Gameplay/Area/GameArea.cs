@@ -1,5 +1,4 @@
-﻿using Insthync.UnityEditorUtils;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.AI;
 using System.Collections.Generic;
 
@@ -55,6 +54,10 @@ namespace MultiplayerARPG
         public bool btnBakeRandomPositions;
         [InspectorButton(nameof(BakeAllRandomPositions), "Bake Random Positions (All Areas)")]
         public bool btnBakeAllRandomPositions;
+        [Header("Test tools")]
+        public GameObject testSpawnPrefab;
+        [InspectorButton(nameof(TestSpawn), "Test Spawn")]
+        public bool btnTestSpawn;
 #endif
 
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
@@ -75,19 +78,13 @@ namespace MultiplayerARPG
                 case DimensionType.Dimension2D:
                     foreach (Vector3 position in randomedPosition2Ds)
                     {
-                        if (enableRotation)
-                            result.Add(transform.TransformPoint(position));
-                        else
-                            result.Add(transform.position + position);
+                        result.Add(LocalToWorldPosition(position));
                     }
                     break;
                 default:
                     foreach (Vector3 position in randomedPosition3Ds)
                     {
-                        if (enableRotation)
-                            result.Add(transform.TransformPoint(position));
-                        else
-                            result.Add(transform.position + position);
+                        result.Add(LocalToWorldPosition(position));
                     }
                     break;
             }
@@ -101,8 +98,7 @@ namespace MultiplayerARPG
                 case DimensionType.Dimension2D:
                     if (randomedPosition2Ds != null && randomedPosition2Ds.Count > 0)
                     {
-                        randomedPosition = randomedPosition2Ds[_indexOfRandomPosition];
-                        randomedPosition += transform.position;
+                        randomedPosition = GetRandomPosition2D(_indexOfRandomPosition);
                         _indexOfRandomPosition++;
                         if (_indexOfRandomPosition >= randomedPosition2Ds.Count)
                             _indexOfRandomPosition = 0;
@@ -110,15 +106,14 @@ namespace MultiplayerARPG
                     }
                     if (GetRandomedPosition2D(randomizer, out randomedPosition))
                     {
-                        randomedPosition += transform.position;
+                        randomedPosition = LocalToWorldPosition(randomedPosition);
                         return true;
                     }
                     break;
                 default:
                     if (randomedPosition3Ds != null && randomedPosition3Ds.Count > 0)
                     {
-                        randomedPosition = randomedPosition3Ds[_indexOfRandomPosition];
-                        randomedPosition += transform.position;
+                        randomedPosition = GetRandomPosition3D(_indexOfRandomPosition);
                         _indexOfRandomPosition++;
                         if (_indexOfRandomPosition >= randomedPosition3Ds.Count)
                             _indexOfRandomPosition = 0;
@@ -126,13 +121,31 @@ namespace MultiplayerARPG
                     }
                     if (GetRandomedPosition3D(randomizer, out randomedPosition, stillUseRandomedPositionIfGroundNotFound))
                     {
-                        randomedPosition += transform.position;
+                        randomedPosition = LocalToWorldPosition(randomedPosition);
                         return true;
                     }
                     break;
             }
             randomedPosition = transform.position;
             return false;
+        }
+
+        public Vector3 GetRandomPosition2D(int index)
+        {
+            return LocalToWorldPosition(randomedPosition2Ds[index]);
+        }
+
+        public Vector3 GetRandomPosition3D(int index)
+        {
+            return LocalToWorldPosition(randomedPosition3Ds[index]);
+        }
+
+        public Vector3 LocalToWorldPosition(Vector3 localPosition)
+        {
+            if (enableRotation)
+                return transform.TransformPoint(localPosition);
+            else
+                return transform.position + localPosition;
         }
 
         public virtual Quaternion GetRandomRotation()
@@ -266,6 +279,23 @@ namespace MultiplayerARPG
                 if (areas[i].excludeFromAllAreaBaking)
                     continue;
                 areas[i].BakeRandomPositions();
+            }
+        }
+
+        [ContextMenu("Test Spawn")]
+        public void TestSpawn()
+        {
+            if (testSpawnPrefab == null)
+                return;
+
+            for (int i = 0; i < randomedPosition2Ds.Count; ++i)
+            {
+                Instantiate(testSpawnPrefab, GetRandomPosition2D(i), Quaternion.identity);
+            }
+
+            for (int i = 0; i < randomedPosition3Ds.Count; ++i)
+            {
+                Instantiate(testSpawnPrefab, GetRandomPosition3D(i), Quaternion.identity);
             }
         }
 #endif
