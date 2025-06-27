@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
+    public partial class PlayerCharacterSerializationSurrogate : ISerializationSurrogate
     {
         public void GetObjectData(
             object obj,
