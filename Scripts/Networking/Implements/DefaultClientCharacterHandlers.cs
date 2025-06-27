@@ -35,17 +35,19 @@ namespace MultiplayerARPG
         {
             if (playerCharacter == null)
                 return;
-            SubscribedPlayerCharactersById[playerCharacter.Id] = playerCharacter;
-            SubscribedPlayerCharactersByName[playerCharacter.CharacterName] = playerCharacter;
+            if (!string.IsNullOrEmpty(playerCharacter.Id))
+                SubscribedPlayerCharactersById[playerCharacter.Id] = playerCharacter;
+            if (!string.IsNullOrEmpty(playerCharacter.CharacterName))
+                SubscribedPlayerCharactersByName[playerCharacter.CharacterName] = playerCharacter;
         }
 
         public void UnsubscribePlayerCharacter(IPlayerCharacterData playerCharacter)
         {
             if (playerCharacter == null)
                 return;
-            if (!string.IsNullOrWhiteSpace(playerCharacter.Id))
+            if (!string.IsNullOrEmpty(playerCharacter.Id))
                 SubscribedPlayerCharactersById.Remove(playerCharacter.Id);
-            if (!string.IsNullOrWhiteSpace(playerCharacter.CharacterName))
+            if (!string.IsNullOrEmpty(playerCharacter.CharacterName))
                 SubscribedPlayerCharactersByName.Remove(playerCharacter.CharacterName);
         }
 
