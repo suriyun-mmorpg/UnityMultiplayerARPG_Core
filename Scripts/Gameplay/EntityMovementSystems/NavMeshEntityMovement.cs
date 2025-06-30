@@ -800,5 +800,25 @@ namespace MultiplayerARPG
                 _remoteTargetYAngle = null;
             }
         }
+
+        public bool AllowToJump()
+        {
+            return false;
+        }
+
+        public bool AllowToDash()
+        {
+            return true;
+        }
+
+        public bool AllowToCrouch()
+        {
+            return true;
+        }
+
+        public bool AllowToCrawl()
+        {
+            return true;
+        }
     }
 }

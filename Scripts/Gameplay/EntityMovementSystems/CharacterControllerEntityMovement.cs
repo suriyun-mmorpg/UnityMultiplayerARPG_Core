@@ -27,9 +27,8 @@ namespace MultiplayerARPG
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
+        public float groundedVerticalVelocity = -2f;
         public float groundSnapDistance = 2f;
-        [Tooltip("Delay before character change from grounded state to airborne")]
-        public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
 
         [Header("Pausing")]
@@ -42,11 +41,24 @@ namespace MultiplayerARPG
         public float underWaterThreshold = 0.75f;
         public bool autoSwimToSurface;
 
-        [Header("Ground checking")]
+        [Header("Ground Checking")]
         public float groundCheckOffsets = 0.14f;
         public float groundCheckRadius = 0.28f;
-        public float forceUngroundAfterJumpDuration = 0.1f;
         public Color groundCheckGizmosColor = Color.blue;
+
+        [Header("Airborne Checking")]
+        public float airborneCheckOffsets = 0.14f;
+        public float airborneCheckRadius = 0.28f;
+        public Color airborneCheckGizmosColor = Color.cyan;
+        public float forceUngroundAfterJumpDuration = 0.1f;
+
+        [Header("Crawl Checking")]
+        public float crawlCheckOffsets = -0.14f;
+        [Min(0)]
+        public int crawlCheckRaycasts = 0;
+        [Min(0f)]
+        public float crawlCheckRadius = 1f;
+        public Color crawlCheckGizmosColor = Color.yellow;
 
         [Header("Dashing")]
         public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
@@ -59,6 +71,8 @@ namespace MultiplayerARPG
         public bool useRootMotionForJump;
         public bool useRootMotionForFall;
         public bool useRootMotionUnderWater;
+        public bool useRootMotionClimbing;
+        public float rootMotionGroundedVerticalVelocity = -2f;
 
         [Header("Networking Settings")]
         public float snapThreshold = 5.0f;
@@ -104,6 +118,9 @@ namespace MultiplayerARPG
         public bool HasNavPaths { get { return Functions.HasNavPaths; } }
 
         protected float _forceUngroundCountdown = 0f;
+        protected int _allowToJumpOrDashCheckFrame = 0;
+        protected bool _isAllowToJumpOrDash = true;
+        protected float[] _crawlRaycastDegrees;
 
         public override void EntityAwake()
         {
@@ -137,23 +154,43 @@ namespace MultiplayerARPG
                 backwardMoveSpeedRate = backwardMoveSpeedRate,
                 gravity = gravity,
                 maxFallVelocity = maxFallVelocity,
-                airborneDelay = airborneDelay,
+                groundedVerticalVelocity = groundedVerticalVelocity,
                 doNotChangeVelocityWhileAirborne = doNotChangeVelocityWhileAirborne,
                 landedPauseMovementDuration = landedPauseMovementDuration,
                 beforeCrawlingPauseMovementDuration = beforeCrawlingPauseMovementDuration,
                 afterCrawlingPauseMovementDuration = afterCrawlingPauseMovementDuration,
                 underWaterThreshold = underWaterThreshold,
                 autoSwimToSurface = autoSwimToSurface,
-                alwaysUseRootMotion = alwaysUseRootMotion,
                 dashingForceApplier = dashingForceApplier,
+                alwaysUseRootMotion = alwaysUseRootMotion,
                 useRootMotionForMovement = useRootMotionForMovement,
                 useRootMotionForAirMovement = useRootMotionForAirMovement,
                 useRootMotionForJump = useRootMotionForJump,
                 useRootMotionForFall = useRootMotionForFall,
                 useRootMotionUnderWater = useRootMotionUnderWater,
+                useRootMotionClimbing = useRootMotionClimbing,
+                rootMotionGroundedVerticalVelocity = rootMotionGroundedVerticalVelocity,
                 snapThreshold = snapThreshold,
             };
             Functions.StopMoveFunction();
+            _crawlRaycastDegrees = CalculateCrawlRaycastDegrees();
+        }
+
+        private float[] CalculateCrawlRaycastDegrees()
+        {
+            float[] result;
+            if (crawlCheckRaycasts > 0)
+            {
+                result = new float[crawlCheckRaycasts];
+                float increaseRaycastDegree = 360f / crawlCheckRaycasts;
+                result = new float[crawlCheckRaycasts];
+                for (int i = 0; i < crawlCheckRaycasts; ++i)
+                {
+                    result[i] = i * increaseRaycastDegree;
+                }
+                return result;
+            }
+            return null;
         }
 
         public override void EntityStart()
@@ -209,7 +246,6 @@ namespace MultiplayerARPG
             Functions.backwardMoveSpeedRate = backwardMoveSpeedRate;
             Functions.gravity = gravity;
             Functions.maxFallVelocity = maxFallVelocity;
-            Functions.airborneDelay = airborneDelay;
             Functions.doNotChangeVelocityWhileAirborne = doNotChangeVelocityWhileAirborne;
             Functions.landedPauseMovementDuration = landedPauseMovementDuration;
             Functions.beforeCrawlingPauseMovementDuration = beforeCrawlingPauseMovementDuration;
@@ -243,37 +279,141 @@ namespace MultiplayerARPG
         {
             if (_forceUngroundCountdown > 0f)
                 return false;
-            if (CacheCharacterController.isGrounded)
-                return true;
-            return Physics.CheckSphere(GetGroundCheckCenter(), groundCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+            return CacheCharacterController.isGrounded;
         }
+
+        public bool AirborneCheck()
+        {
+            if (_forceUngroundCountdown > 0f)
+                return true;
+            return !Physics.CheckSphere(GetAirborneCheckCenter(), airborneCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+        }
+
+        public virtual bool AllowToJump()
+        {
+            return AllowToJumpOrDash();
+        }
+
+        public virtual bool AllowToDash()
+        {
+            return AllowToJumpOrDash();
+        }
+
+        protected virtual bool AllowToJumpOrDash()
+        {
+            if (Time.frameCount == _allowToJumpOrDashCheckFrame)
+                return _isAllowToJumpOrDash;
+            _allowToJumpOrDashCheckFrame = Time.frameCount;
+            _isAllowToJumpOrDash = Physics.CheckSphere(GetGroundCheckCenter(), groundCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+            return _isAllowToJumpOrDash;
+        }
+
+        public bool AllowToCrouch()
+        {
+            return true;
+        }
+
+        public bool AllowToCrawl()
+        {
+            if (crawlCheckRaycasts == 0f)
+                return true;
+            Vector3 raycastOrigin = GetCrawlCheckCenter();
+            for (int i = 0; i < crawlCheckRaycasts; ++i)
+            {
+                int hitCount = Physics.RaycastNonAlloc(raycastOrigin, Quaternion.Euler(0f, _crawlRaycastDegrees[i], 0f) * EntityTransform.forward, s_findGroundRaycastHits, crawlCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+                if (hitCount > 0)
+                    return false;
+            }
+            return true;
+        }
+
+        private Vector3 AdjustCrawlMotion(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion)
+        {
+            if (extraMovementState != ExtraMovementState.IsCrawling || crawlCheckRaycasts == 0 || !IsClient)
+                return motion;
+            Vector3 raycastOrigin = GetCrawlCheckCenter();
+            Vector3 moveDirection = motion.GetXZ().normalized;
+            float moveSpeed = motion.magnitude;
+            float nearestHitDistance = float.MaxValue;
+            float nearestRaycastAngle = 0f;
+            RaycastHit? nearestHit = null;
+            for (int i = 0; i < crawlCheckRaycasts; ++i)
+            {
+                Vector3 raycastDirection = Quaternion.Euler(0f, _crawlRaycastDegrees[i], 0f) * moveDirection;
+                float raycastAngle = Vector3.Angle(moveDirection, raycastDirection);
+                if (raycastAngle > 90f)
+                    continue;
+                int hitCount = Physics.RaycastNonAlloc(raycastOrigin, raycastDirection, s_findGroundRaycastHits, crawlCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+                if (hitCount <= 0)
+                    continue;
+                for (int j = 0; j < hitCount; ++j)
+                {
+                    RaycastHit hit = s_findGroundRaycastHits[j];
+                    if (hit.distance >= nearestHitDistance)
+                        continue;
+                    nearestRaycastAngle = raycastAngle;
+                    nearestHitDistance = hit.distance;
+                    nearestHit = hit;
+                }
+            }
+            if (nearestHit.HasValue)
+            {
+                Vector3 hitNormal = nearestHit.Value.normal;
+                if (nearestHit.Value.distance < crawlCheckRadius * 0.9f)
+                    return motion + hitNormal * crawlCheckRadius;
+                return Vector3.ProjectOnPlane(motion, hitNormal);
+            }
+            return motion;
+        }
+
+        protected virtual Vector3 GetGroundCheckCenter()
+        {
+            return new Vector3(EntityTransform.position.x, EntityTransform.position.y - groundCheckOffsets, EntityTransform.position.z);
+        }
+
+        protected virtual Vector3 GetAirborneCheckCenter()
+        {
+            return new Vector3(EntityTransform.position.x, EntityTransform.position.y - airborneCheckOffsets, EntityTransform.position.z);
+        }
+
+        protected virtual Vector3 GetCrawlCheckCenter()
+        {
+            return new Vector3(EntityTransform.position.x, EntityTransform.position.y - crawlCheckOffsets, EntityTransform.position.z);
+        }
+
+#if UNITY_EDITOR
+        protected virtual void OnDrawGizmos()
+        {
+            Color prevColor = Gizmos.color;
+            Gizmos.color = groundCheckGizmosColor;
+            Gizmos.DrawWireSphere(GetGroundCheckCenter(), groundCheckRadius);
+            Gizmos.color = airborneCheckGizmosColor;
+            Gizmos.DrawWireSphere(GetAirborneCheckCenter(), airborneCheckRadius);
+            if (crawlCheckRaycasts > 0)
+            {
+                Gizmos.color = crawlCheckGizmosColor;
+                if (_crawlRaycastDegrees == null)
+                    _crawlRaycastDegrees = CalculateCrawlRaycastDegrees();
+                for (int i = 0; i < crawlCheckRaycasts; ++i)
+                {
+                    Gizmos.DrawLine(GetCrawlCheckCenter(), GetCrawlCheckCenter() + Quaternion.Euler(0f, _crawlRaycastDegrees[i], 0f) * EntityTransform.forward * crawlCheckRadius);
+                }
+            }
+            Gizmos.color = prevColor;
+        }
+#endif
 
         public void SetPosition(Vector3 position)
         {
             EntityTransform.position = position;
         }
 
-        private Vector3 GetGroundCheckCenter()
-        {
-            return new Vector3(EntityTransform.position.x, EntityTransform.position.y - groundCheckOffsets, EntityTransform.position.z);
-        }
-
-#if UNITY_EDITOR
-        private void OnDrawGizmos()
-        {
-            Color prevColor = Gizmos.color;
-            Gizmos.color = groundCheckGizmosColor;
-            Gizmos.DrawWireSphere(GetGroundCheckCenter(), groundCheckRadius);
-            Gizmos.color = prevColor;
-        }
-#endif
-
         public Bounds GetMovementBounds()
         {
             return CacheCharacterController.bounds;
         }
 
-        public void Move(Vector3 motion)
+        public void Move(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion)
         {
             CacheCharacterController.Move(motion);
         }

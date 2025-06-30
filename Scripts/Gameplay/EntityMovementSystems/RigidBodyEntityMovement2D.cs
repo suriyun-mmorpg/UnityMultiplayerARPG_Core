@@ -763,5 +763,25 @@ namespace MultiplayerARPG
         {
             return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
         }
+
+        public bool AllowToJump()
+        {
+            return false;
+        }
+
+        public bool AllowToDash()
+        {
+            return true;
+        }
+
+        public bool AllowToCrouch()
+        {
+            return true;
+        }
+
+        public bool AllowToCrawl()
+        {
+            return true;
+        }
     }
 }

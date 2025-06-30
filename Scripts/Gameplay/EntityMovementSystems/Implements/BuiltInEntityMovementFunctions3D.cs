@@ -25,8 +25,6 @@ namespace MultiplayerARPG
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
         public float groundedVerticalVelocity = 0f;
-        [Tooltip("Delay before character change from grounded state to airborne")]
-        public float airborneDelay = 0.01f;
         public bool doNotChangeVelocityWhileAirborne;
 
         [Header("Pausing")]
@@ -122,7 +120,6 @@ namespace MultiplayerARPG
         protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
 
         // Jump simulate codes
-        private float _airborneElapsed;
         private bool _applyingJumpForce;
         private float _applyJumpForceCountDown;
         private ExtraMovementState _extraMovementStateWhenJump;
@@ -238,10 +235,10 @@ namespace MultiplayerARPG
                 _tempMovementState = movementState;
                 if (_inputDirection.sqrMagnitude > 0)
                     NavPaths = null;
-                if (!_isJumping && !_applyingJumpForce)
-                    _isJumping = IsGrounded && _tempMovementState.Has(MovementState.IsJump);
+                if (!_isJumping)
+                    _isJumping = _tempMovementState.Has(MovementState.IsJump);
                 if (!_isDashing)
-                    _isDashing = IsGrounded && _tempMovementState.Has(MovementState.IsDash);
+                    _isDashing = _tempMovementState.Has(MovementState.IsDash);
             }
         }
 
@@ -390,17 +387,7 @@ namespace MultiplayerARPG
             IsUnderWater = WaterCheck(_waterCollider);
             IsClimbing = LadderComponent && LadderComponent.ClimbingLadder;
             IsGrounded = EntityMovement.GroundCheck();
-            IsAirborne = !IsGrounded && !IsUnderWater && !IsClimbing && _airborneElapsed >= airborneDelay;
-
-            // Update airborne elasped
-            if (IsGrounded)
-            {
-                _airborneElapsed = 0f;
-            }
-            else
-            {
-                _airborneElapsed += deltaTime;
-            }
+            IsAirborne = !IsGrounded && !IsUnderWater && !IsClimbing && EntityMovement.AirborneCheck();
 
             // Underwater state, movement state must be setup here to make it able to calculate move speed properly
             if (IsClimbing)
@@ -490,7 +477,7 @@ namespace MultiplayerARPG
             _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
             _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
             _previousMovement = tempMoveVelocity * deltaTime;
-            EntityMovement.Move(_previousMovement);
+            EntityMovement.Move(_tempMovementState, _tempExtraMovementState, _previousMovement);
         }
 
         protected void UpdateGenericMovement(float deltaTime)
@@ -557,14 +544,15 @@ namespace MultiplayerARPG
                 _moveDirection = Vector3.zero;
                 _isJumping = false;
                 _applyingJumpForce = false;
+                _isDashing = false;
             }
 
-            if (!Entity.CanJump())
+            if (_isJumping && (_applyingJumpForce || !Entity.CanJump() || !Entity.AllowToJump()))
             {
                 _isJumping = false;
             }
 
-            if (!Entity.CanDash())
+            if (_isDashing && (!Entity.CanDash() || !Entity.AllowToDash()))
             {
                 _isDashing = false;
             }
@@ -596,12 +584,11 @@ namespace MultiplayerARPG
                 _verticalVelocity = -groundedVerticalVelocity;
             }
 
-            // Jumping 
-            if (_acceptedJump || (_pauseMovementCountDown <= 0f && IsGrounded && _isJumping))
+            // Jumping
+            if (_acceptedJump || (_pauseMovementCountDown <= 0f && _isJumping))
             {
                 _sendingJump = true;
                 _extraMovementStateWhenJump = _tempExtraMovementState;
-                _airborneElapsed = airborneDelay;
                 Entity.PlayJumpAnimation();
                 _applyingJumpForce = true;
                 _applyJumpForceCountDown = 0f;
@@ -740,7 +727,7 @@ namespace MultiplayerARPG
             }
 
             // Move by velocity before jump
-            if ((IsAirborne || _airborneElapsed > 0f) && doNotChangeVelocityWhileAirborne)
+            if (IsAirborne && doNotChangeVelocityWhileAirborne)
                 tempMoveVelocity = _velocityBeforeAirborne;
             // Updating vertical movement (Fall, WASD inputs under water)
             if (IsUnderWater)
@@ -823,7 +810,7 @@ namespace MultiplayerARPG
                     LadderComponent.CallCmdEnterLadder();
                 }
             }
-            EntityMovement.Move(_previousMovement);
+            EntityMovement.Move(_tempMovementState, _tempExtraMovementState, _previousMovement);
         }
 
         public void UpdateRotation(float deltaTime)
@@ -844,7 +831,7 @@ namespace MultiplayerARPG
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
                 if (IsUnderWater)
                     _tempMovementState |= MovementState.IsUnderWater;
-                if (IsGrounded || _airborneElapsed < airborneDelay || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
+                if (IsGrounded || !IsAirborne || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
                     _tempMovementState |= MovementState.IsGrounded;
                 if (_isJumping)
                     _tempMovementState |= MovementState.IsJump;
@@ -1355,7 +1342,6 @@ namespace MultiplayerARPG
         {
             if (!stillMoveAfterTeleport)
                 NavPaths = null;
-            _airborneElapsed = 0;
             _verticalVelocity = 0;
             EntityMovement.SetPosition(position);
             CurrentGameManager.ShouldPhysicSyncTransforms = true;

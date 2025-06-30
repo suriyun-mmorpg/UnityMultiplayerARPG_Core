@@ -344,5 +344,33 @@ namespace MultiplayerARPG
             if (onJumpForceApplied != null)
                 onJumpForceApplied.Invoke(verticalVelocity);
         }
+
+        public bool AllowToJump()
+        {
+            if (!ActiveMovement.IsNull())
+                return ActiveMovement.AllowToJump();
+            return false;
+        }
+
+        public bool AllowToDash()
+        {
+            if (!ActiveMovement.IsNull())
+                return ActiveMovement.AllowToDash();
+            return false;
+        }
+
+        public bool AllowToCrouch()
+        {
+            if (!ActiveMovement.IsNull())
+                return ActiveMovement.AllowToCrouch();
+            return false;
+        }
+
+        public bool AllowToCrawl()
+        {
+            if (!ActiveMovement.IsNull())
+                return ActiveMovement.AllowToCrawl();
+            return false;
+        }
     }
 }

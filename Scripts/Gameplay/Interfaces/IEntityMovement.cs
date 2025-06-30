@@ -24,5 +24,9 @@ namespace MultiplayerARPG
         void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration);
         EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId);
         void ClearAllForces();
+        bool AllowToJump();
+        bool AllowToDash();
+        bool AllowToCrouch();
+        bool AllowToCrawl();
     }
 }
