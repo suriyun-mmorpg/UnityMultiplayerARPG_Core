@@ -1057,22 +1057,26 @@ namespace MultiplayerARPG
                 return false;
             if (!dict.ContainsKey(data.HashAssetId))
             {
-                bool isError = false;
-                AsyncOperationHandle<GameObject> loadOp = Addressables.LoadAssetAsync<GameObject>(data.RuntimeKey);
-                try
+                bool isError = true;
+                object runtimeKey = data.RuntimeKey;
+                var loadOp = data.LoadObject<GameObject>();
+                if (loadOp.HasValue)
                 {
-                    GameObject loadedObject = loadOp.WaitForCompletion();
-                    if (loadedObject.TryGetComponent(out TType loadedData))
-                        loadedData.PrepareRelatesData();
-                }
-                catch (System.Exception ex)
-                {
-                    isError = true;
-                    Debug.LogException(ex);
-                }
-                finally
-                {
-                    Addressables.Release(loadOp);
+                    try
+                    {
+                        GameObject loadedObject = loadOp.Value.Result;
+                        if (loadedObject.TryGetComponent(out TType loadedData))
+                            loadedData.PrepareRelatesData();
+                        isError = false;
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
+                    finally
+                    {
+                        Addressables.Release(loadOp);
+                    }
                 }
                 System.GC.Collect();
                 if (isError)

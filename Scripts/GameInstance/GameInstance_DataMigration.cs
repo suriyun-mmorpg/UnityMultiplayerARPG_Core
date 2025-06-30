@@ -46,12 +46,12 @@ namespace MultiplayerARPG
                 if (meshPrefab != null && meshPrefab.TryGetComponent(out entity))
                     entity.MigrateMaterials();
 
-                if (equipmentModel.AddressableMeshPrefab.IsDataValid())
+                var loadOp = equipmentModel.AddressableMeshPrefab.LoadObject<GameObject>();
+                if (loadOp.HasValue)
                 {
-                    AsyncOperationHandle<GameObject> loadOp = Addressables.LoadAssetAsync<GameObject>(equipmentModel.AddressableMeshPrefab.RuntimeKey);
                     try
                     {
-                        meshPrefab = loadOp.WaitForCompletion();
+                        meshPrefab = loadOp.Value.Result;
                         if (meshPrefab != null && meshPrefab.TryGetComponent(out entity))
                             entity.MigrateMaterials();
                     }
