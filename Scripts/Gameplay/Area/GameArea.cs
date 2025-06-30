@@ -1,8 +1,8 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 using UnityEngine.AI;
-using System.Collections.Generic;
-
 #if UNITY_EDITOR
+using Insthync.UnityEditorUtils;
 using UnityEditor;
 #endif
 
