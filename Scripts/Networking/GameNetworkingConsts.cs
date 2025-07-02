@@ -113,5 +113,6 @@
         public const ushort SafeDisconnect = 189;
         public const ushort ChangeAmmoItem = 190;
         public const ushort RemoveAmmoFromItem = 191;
+        public const ushort PlayerCharacterTransform = 192;
     }
 }

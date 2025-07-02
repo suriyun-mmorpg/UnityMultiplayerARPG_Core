@@ -1,4 +1,5 @@
-﻿using System.Collections.Concurrent;
+﻿using Cysharp.Threading.Tasks;
+using System.Collections.Concurrent;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -120,5 +121,11 @@ namespace MultiplayerARPG
         /// </summary>
         /// <returns></returns>
         public abstract bool IsInstanceMap();
+
+        /// <summary>
+        /// Request player character transform, may use it to get where character will be spawned before ready to play game.
+        /// </summary>
+        /// <returns></returns>
+        public abstract UniTask<ResponsePlayerCharacterTransformMessage> RequestPlayerCharacterTransform(long connectionId);
     }
 }

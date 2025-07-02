@@ -11,8 +11,11 @@ namespace MultiplayerARPG
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersById = new ConcurrentDictionary<string, IPlayerCharacterData>();
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersByUserId = new ConcurrentDictionary<string, IPlayerCharacterData>();
         public static readonly ConcurrentDictionary<string, IPlayerCharacterData> PlayerCharactersByName = new ConcurrentDictionary<string, IPlayerCharacterData>();
-        public static readonly ConcurrentDictionary<string, long> PlayerCharacterConnectionIds = new ConcurrentDictionary<string, long>();
+        public static readonly ConcurrentDictionary<string, long> ConnectionIdsById = new ConcurrentDictionary<string, long>();
+        public static readonly ConcurrentDictionary<string, long> ConnectionIdsByUserId = new ConcurrentDictionary<string, long>();
+        public static readonly ConcurrentDictionary<string, long> ConnectionIdsByName = new ConcurrentDictionary<string, long>();
         public static readonly ConcurrentDictionary<long, string> UserIds = new ConcurrentDictionary<long, string>();
+        public static readonly ConcurrentDictionary<long, string> AccessTokens = new ConcurrentDictionary<long, string>();
 
         public int PlayerCharactersCount
         {
@@ -22,6 +25,11 @@ namespace MultiplayerARPG
         public int UserIdsCount
         {
             get { return UserIds.Count; }
+        }
+
+        public int AccessTokensCount
+        {
+            get { return AccessTokens.Count; }
         }
 
         public IEnumerable<IPlayerCharacterData> GetPlayerCharacters()
@@ -34,24 +42,40 @@ namespace MultiplayerARPG
             return PlayerCharacters.TryGetValue(connectionId, out playerCharacter);
         }
 
-        public bool TryGetConnectionId(string id, out long connectionId)
-        {
-            return PlayerCharacterConnectionIds.TryGetValue(id, out connectionId);
-        }
-
         public bool TryGetPlayerCharacterById(string id, out IPlayerCharacterData playerCharacter)
         {
-            return PlayerCharactersById.TryGetValue(id, out playerCharacter);
+            playerCharacter = null;
+            return !string.IsNullOrWhiteSpace(id) && PlayerCharactersById.TryGetValue(id, out playerCharacter);
         }
 
         public bool TryGetPlayerCharacterByUserId(string userId, out IPlayerCharacterData playerCharacter)
         {
-            return PlayerCharactersByUserId.TryGetValue(userId, out playerCharacter);
+            playerCharacter = null;
+            return !string.IsNullOrWhiteSpace(userId) && PlayerCharactersByUserId.TryGetValue(userId, out playerCharacter);
         }
 
         public bool TryGetPlayerCharacterByName(string name, out IPlayerCharacterData playerCharacter)
         {
-            return PlayerCharactersByName.TryGetValue(name, out playerCharacter);
+            playerCharacter = null;
+            return !string.IsNullOrWhiteSpace(name) && PlayerCharactersByName.TryGetValue(name, out playerCharacter);
+        }
+
+        public bool TryGetConnectionIdById(string id, out long connectionId)
+        {
+            connectionId = -1;
+            return !string.IsNullOrWhiteSpace(id) && ConnectionIdsById.TryGetValue(id, out connectionId);
+        }
+
+        public bool TryGetConnectionIdByUserId(string userId, out long connectionId)
+        {
+            connectionId = -1;
+            return !string.IsNullOrWhiteSpace(userId) && ConnectionIdsByUserId.TryGetValue(userId, out connectionId);
+        }
+
+        public bool TryGetConnectionIdByName(string name, out long connectionId)
+        {
+            connectionId = -1;
+            return !string.IsNullOrWhiteSpace(name) && ConnectionIdsByName.TryGetValue(name, out connectionId);
         }
 
         public bool AddPlayerCharacter(long connectionId, IPlayerCharacterData playerCharacter)
@@ -60,10 +84,12 @@ namespace MultiplayerARPG
                 return false;
             if (PlayerCharacters.TryAdd(connectionId, playerCharacter))
             {
-                PlayerCharactersById.TryAdd(playerCharacter.Id, playerCharacter);
-                PlayerCharactersByUserId.TryAdd(playerCharacter.UserId, playerCharacter);
-                PlayerCharactersByName.TryAdd(playerCharacter.CharacterName, playerCharacter);
-                PlayerCharacterConnectionIds.TryAdd(playerCharacter.Id, connectionId);
+                PlayerCharactersById[playerCharacter.Id] = playerCharacter;
+                PlayerCharactersByUserId[playerCharacter.UserId] = playerCharacter;
+                PlayerCharactersByName[playerCharacter.CharacterName] = playerCharacter;
+                ConnectionIdsById[playerCharacter.Id] = connectionId;
+                ConnectionIdsByUserId[playerCharacter.UserId] = connectionId;
+                ConnectionIdsByName[playerCharacter.CharacterName] = connectionId;
                 return true;
             }
             return false;
@@ -76,10 +102,13 @@ namespace MultiplayerARPG
             {
                 characterId = playerCharacter.Id;
                 userId = playerCharacter.UserId;
+                string name = playerCharacter.CharacterName;
                 PlayerCharactersById.TryRemove(characterId, out _);
                 PlayerCharactersByUserId.TryRemove(userId, out _);
-                PlayerCharactersByName.TryRemove(playerCharacter.CharacterName, out _);
-                PlayerCharacterConnectionIds.TryRemove(characterId, out _);
+                PlayerCharactersByName.TryRemove(name, out _);
+                ConnectionIdsById.TryRemove(characterId, out _);
+                ConnectionIdsByUserId.TryRemove(userId, out _);
+                ConnectionIdsByName.TryRemove(name, out _);
                 return true;
             }
             characterId = null;
@@ -93,8 +122,11 @@ namespace MultiplayerARPG
             PlayerCharactersById.Clear();
             PlayerCharactersByUserId.Clear();
             PlayerCharactersByName.Clear();
-            PlayerCharacterConnectionIds.Clear();
+            ConnectionIdsById.Clear();
+            ConnectionIdsByUserId.Clear();
+            ConnectionIdsByName.Clear();
             UserIds.Clear();
+            AccessTokens.Clear();
         }
 
         public IEnumerable<string> GetUserIds()
@@ -109,12 +141,37 @@ namespace MultiplayerARPG
 
         public bool AddUserId(long connectionId, string userId)
         {
-            return UserIds.TryAdd(connectionId, userId);
+            if (UserIds.TryAdd(connectionId, userId))
+            {
+                ConnectionIdsByUserId[userId] = connectionId;
+                return true;
+            }
+            return false;
         }
 
         public bool RemoveUserId(long connectionId, out string userId)
         {
             return UserIds.TryRemove(connectionId, out userId);
+        }
+
+        public IEnumerable<string> GetAccessTokens()
+        {
+            return AccessTokens.Values;
+        }
+
+        public bool TryGetAccessToken(long connectionId, out string accessToken)
+        {
+            return AccessTokens.TryGetValue(connectionId, out accessToken);
+        }
+
+        public bool AddAccessToken(long connectionId, string accessToken)
+        {
+            return AccessTokens.TryAdd(connectionId, accessToken);
+        }
+
+        public bool RemoveAccessToken(long connectionId, out string accessToken)
+        {
+            return AccessTokens.TryRemove(connectionId, out accessToken);
         }
 
         public virtual void BanUserByCharacterName(string characterName, int days)

@@ -28,15 +28,7 @@ namespace MultiplayerARPG
         bool TryGetPlayerCharacter(long connectionId, out IPlayerCharacterData playerCharacter);
 
         /// <summary>
-        /// Get connection ID by character's ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <param name="connectionId"></param>
-        /// <returns></returns>
-        bool TryGetConnectionId(string id, out long connectionId);
-
-        /// <summary>
-        /// Get character from server's collection
+        /// Get character from server's collection by character's ID
         /// </summary>
         /// <param name="id"></param>
         /// <param name="playerCharacter"></param>
@@ -44,7 +36,7 @@ namespace MultiplayerARPG
         bool TryGetPlayerCharacterById(string id, out IPlayerCharacterData playerCharacter);
 
         /// <summary>
-        /// Get character from server's collection
+        /// Get character from server's collection by user's ID
         /// </summary>
         /// <param name="id"></param>
         /// <param name="playerCharacter"></param>
@@ -52,12 +44,36 @@ namespace MultiplayerARPG
         bool TryGetPlayerCharacterByUserId(string userId, out IPlayerCharacterData playerCharacter);
 
         /// <summary>
-        /// Get character from server's collection
+        /// Get character from server's collection by character's name
         /// </summary>
         /// <param name="name"></param>
         /// <param name="playerCharacter"></param>
         /// <returns></returns>
         bool TryGetPlayerCharacterByName(string name, out IPlayerCharacterData playerCharacter);
+
+        /// <summary>
+        /// Get connection ID by character's ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <param name="connectionId"></param>
+        /// <returns></returns>
+        bool TryGetConnectionIdById(string id, out long connectionId);
+
+        /// <summary>
+        /// Get connection ID by user's ID
+        /// </summary>
+        /// <param name="userId"></param>
+        /// <param name="connectionId"></param>
+        /// <returns></returns>
+        bool TryGetConnectionIdByUserId(string userId, out long connectionId);
+
+        /// <summary>
+        /// Get connection ID by character's name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="connectionId"></param>
+        /// <returns></returns>
+        bool TryGetConnectionIdByName(string name, out long connectionId);
 
         /// <summary>
         /// Add character to server's collection
@@ -115,6 +131,41 @@ namespace MultiplayerARPG
         /// <param name="userId"></param>
         /// <returns></returns>
         bool RemoveUserId(long connectionId, out string userId);
+
+        /// <summary>
+        /// Count user's access tokens
+        /// </summary>
+        int AccessTokensCount { get; }
+
+        /// <summary>
+        /// Get all user's access tokens
+        /// </summary>
+        /// <returns></returns>
+        IEnumerable<string> GetAccessTokens();
+
+        /// <summary>
+        /// Get access token by connection id
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="accessToken"></param>
+        /// <returns></returns>
+        bool TryGetAccessToken(long connectionId, out string accessToken);
+
+        /// <summary>
+        /// Add access token to server's collection
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="accessToken"></param>
+        /// <returns></returns>
+        bool AddAccessToken(long connectionId, string accessToken);
+
+        /// <summary>
+        /// Remove access token from server's collection
+        /// </summary>
+        /// <param name="connectionId"></param>
+        /// <param name="accessToken"></param>
+        /// <returns></returns>
+        bool RemoveAccessToken(long connectionId, out string accessToken);
 
         /// <summary>
         /// Ban user who own character which its name = `characterName`

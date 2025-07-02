@@ -187,7 +187,7 @@ namespace MultiplayerARPG
                 return default;
             }
             if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(request.memberId, out IPlayerCharacterData memberCharacter) &&
-                GameInstance.ServerUserHandlers.TryGetConnectionId(request.memberId, out long memberConnectionId))
+                GameInstance.ServerUserHandlers.TryGetConnectionIdById(request.memberId, out long memberConnectionId))
             {
                 memberCharacter.ClearParty();
                 GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);
@@ -225,7 +225,7 @@ namespace MultiplayerARPG
                 foreach (string memberId in validateResult.Party.GetMemberIds())
                 {
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterById(memberId, out memberCharacter) &&
-                        GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out memberConnectionId))
+                        GameInstance.ServerUserHandlers.TryGetConnectionIdById(memberId, out memberConnectionId))
                     {
                         memberCharacter.ClearParty();
                         GameInstance.ServerGameMessageHandlers.SendClearPartyData(memberConnectionId, validateResult.PartyId);

@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         bool RequestSetIcon(RequestSetIconMessage data, ResponseDelegate<ResponseSetIconMessage> callback);
         bool RequestSetFrame(RequestSetFrameMessage data, ResponseDelegate<ResponseSetFrameMessage> callback);
         bool RequestSetTitle(RequestSetTitleMessage data, ResponseDelegate<ResponseSetTitleMessage> callback);
+        bool RequestPlayerCharacterTransform(ResponseDelegate<ResponsePlayerCharacterTransformMessage> callback);
         void SubscribePlayerCharacter(IPlayerCharacterData playerCharacter);
         void UnsubscribePlayerCharacter(IPlayerCharacterData playerCharacter);
         bool TryGetSubscribedPlayerCharacterById(string characterId, out IPlayerCharacterData playerCharacter);

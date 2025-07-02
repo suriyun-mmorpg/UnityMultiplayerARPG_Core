@@ -81,5 +81,10 @@ namespace MultiplayerARPG
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.SetTitle, data, responseDelegate: callback);
         }
+
+        public bool RequestPlayerCharacterTransform(ResponseDelegate<ResponsePlayerCharacterTransformMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.PlayerCharacterTransform, EmptyMessage.Value, responseDelegate: callback);
+        }
     }
 }

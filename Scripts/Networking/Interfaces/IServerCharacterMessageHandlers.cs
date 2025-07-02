@@ -28,5 +28,9 @@ namespace MultiplayerARPG
         UniTaskVoid HandleRequestSetTitle(
             RequestHandlerData requestHandler, RequestSetTitleMessage request,
             RequestProceedResultDelegate<ResponseSetTitleMessage> result);
+
+        UniTaskVoid HandleRequestPlayerCharacterTransform(
+            RequestHandlerData requestHandler, EmptyMessage request,
+            RequestProceedResultDelegate<ResponsePlayerCharacterTransformMessage> result);
     }
 }

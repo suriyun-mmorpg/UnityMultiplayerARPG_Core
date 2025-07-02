@@ -6,7 +6,6 @@ using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Net.Sockets;
-using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
@@ -19,7 +18,7 @@ namespace MultiplayerARPG
         public const float UPDATE_ONLINE_CHARACTER_DURATION = 1f;
         public const float UPDATE_TIME_OF_DAY_DURATION = 5f;
         public const string INSTANTIATES_OBJECTS_DELAY_STATE_KEY = "INSTANTIATES_OBJECTS_DELAY";
-        public const float INSTANTIATES_OBJECTS_DELAY = 0.5f;
+        public const float INSTANTIATES_OBJECTS_DELAY = 1f;
 
         protected static readonly NetDataWriter s_Writer = new NetDataWriter();
 
@@ -497,14 +496,14 @@ namespace MultiplayerARPG
             {
                 if (playerCharacter.IsMuting())
                 {
-                    if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out long connectionId))
+                    if (ServerUserHandlers.TryGetConnectionIdById(playerCharacter.Id, out long connectionId))
                         ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHAT_MUTED);
                     return;
                 }
                 if (ServerChatHandlers.ChatTooFast(playerCharacter.Id))
                 {
                     ServerChatHandlers.ChatFlooded(playerCharacter.Id);
-                    if (ServerUserHandlers.TryGetConnectionId(playerCharacter.Id, out long connectionId))
+                    if (ServerUserHandlers.TryGetConnectionIdById(playerCharacter.Id, out long connectionId))
                         ServerGameMessageHandlers.SendGameMessage(connectionId, UITextKeys.UI_ERROR_CHAT_ENTER_TOO_FAST);
                     return;
                 }
@@ -986,18 +985,24 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void RegisterUserId(long connectionId, string userId)
+        public virtual void RegisterUserIdAndAccessToken(long connectionId, string userId, string accessToken)
         {
             bool success = ServerUserHandlers.AddUserId(connectionId, userId);
             if (success)
+            {
+                ServerUserHandlers.AddAccessToken(connectionId, accessToken);
                 onRegisterUser?.Invoke(connectionId, userId);
+            }
         }
 
-        public virtual void UnregisterUserId(long connectionId)
+        public virtual void UnregisterUserIdAndAccessToken(long connectionId)
         {
             bool success = ServerUserHandlers.RemoveUserId(connectionId, out string userId);
             if (success)
+            {
+                ServerUserHandlers.RemoveAccessToken(connectionId, out _);
                 onUnregisterUser?.Invoke(connectionId, userId);
+            }
         }
 
         public virtual async UniTask<BuildingEntity> CreateBuildingEntity(BuildingSaveData saveData, bool initialize)

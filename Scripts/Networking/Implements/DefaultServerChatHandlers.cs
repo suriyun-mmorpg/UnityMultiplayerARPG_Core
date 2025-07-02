@@ -113,7 +113,7 @@ namespace MultiplayerARPG
                     {
                         foreach (string memberId in party.GetMemberIds())
                         {
-                            if (GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out connectionId))
+                            if (GameInstance.ServerUserHandlers.TryGetConnectionIdById(memberId, out connectionId))
                             {
                                 // If party member is online, send party message to the member
                                 Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                     {
                         foreach (string memberId in guild.GetMemberIds())
                         {
-                            if (GameInstance.ServerUserHandlers.TryGetConnectionId(memberId, out connectionId))
+                            if (GameInstance.ServerUserHandlers.TryGetConnectionIdById(memberId, out connectionId))
                             {
                                 // If guild member is online, send guild message to the member
                                 Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);

@@ -3,6 +3,7 @@ using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using Unity.Profiling;
@@ -36,8 +37,8 @@ namespace MultiplayerARPG
         public EnableGmCommandType enableGmCommands;
         private float _lastSaveTime;
         private Vector3? _teleportPosition;
-        private readonly Dictionary<long, PlayerCharacterData> _pendingSpawnPlayerCharacters = new Dictionary<long, PlayerCharacterData>();
-        private readonly Dictionary<long, List<CharacterBuff>> _pendingSpawnPlayerCharacterSummonBuffs = new Dictionary<long, List<CharacterBuff>>();
+        private readonly ConcurrentDictionary<long, PlayerCharacterData> _pendingSpawnPlayerCharacters = new ConcurrentDictionary<long, PlayerCharacterData>();
+        private readonly ConcurrentDictionary<long, List<CharacterBuff>> _pendingSpawnPlayerCharacterSummonBuffs = new ConcurrentDictionary<long, List<CharacterBuff>>();
         private readonly HashSet<string> _teleportingPlayerCharacterIds = new HashSet<string>();
 
         public LiteNetLibDiscovery CacheDiscovery { get; private set; }
@@ -214,7 +215,7 @@ namespace MultiplayerARPG
             UnregisterPlayerCharacter(connectionId);
         }
 
-        public override void SerializeClientReadyData(NetDataWriter writer)
+        public override void SerializeEnterGameData(NetDataWriter writer)
         {
             GameInstance.SelectedCharacterId = selectedCharacter.Id;
             GameInstance.PlayingCharacter = selectedCharacter;
@@ -225,24 +226,31 @@ namespace MultiplayerARPG
             writer.PutList(selectedCharacterStorageItems);
         }
 
-        public override UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
+        public override UniTask<bool> DeserializeEnterGameData(long connectionId, NetDataReader reader)
         {
             PlayerCharacterData playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
             List<CharacterBuff> playerSummonBuffs = reader.GetList<CharacterBuff>();
             List<CharacterItem> playerStorageItems = reader.GetList<CharacterItem>();
             ServerStorageHandlers.SetStorageItems(new StorageId(StorageType.Player, playerCharacterData.Id), playerStorageItems);
+            _pendingSpawnPlayerCharacters[connectionId] = playerCharacterData;
+            _pendingSpawnPlayerCharacterSummonBuffs[connectionId] = playerSummonBuffs;
+            return UniTask.FromResult(true);
+        }
+
+        public override UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
+        {
             if (!_isServerReadyToInstantiatePlayers)
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
                 if (LogDev) Logging.Log(LogTag, "Not ready to deserializing client ready extra");
-                if (!_pendingSpawnPlayerCharacters.ContainsKey(connectionId))
-                    _pendingSpawnPlayerCharacters.Add(connectionId, playerCharacterData);
-                if (!_pendingSpawnPlayerCharacterSummonBuffs.ContainsKey(connectionId))
-                    _pendingSpawnPlayerCharacterSummonBuffs.Add(connectionId, playerSummonBuffs);
                 return UniTask.FromResult(true);
             }
             if (LogDev) Logging.Log(LogTag, "Deserializing client ready extra");
-            SpawnPlayerCharacter(connectionId, playerCharacterData, playerSummonBuffs);
+            if (_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData playerCharacterData) &&
+                _pendingSpawnPlayerCharacterSummonBuffs.TryGetValue(connectionId, out List<CharacterBuff> playerSummonBuffs))
+            {
+                SpawnPlayerCharacter(connectionId, playerCharacterData, playerSummonBuffs);
+            }
             return UniTask.FromResult(true);
         }
 
@@ -261,6 +269,7 @@ namespace MultiplayerARPG
                 mapName = playerCharacterData.CurrentMapName,
                 position = playerCharacterData.CurrentPosition,
                 rotation = playerCharacterData.CurrentRotation,
+                safeArea = playerCharacterData.CurrentSafeArea,
             };
 
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName) ||
@@ -276,7 +285,7 @@ namespace MultiplayerARPG
             playerCharacterData.CurrentMapName = mapName;
             playerCharacterData.CurrentPosition = position;
             playerCharacterData.CurrentRotation = rotation;
-            
+
             // Spawn character entity and set its data
             Quaternion characterRotation = Quaternion.identity;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
@@ -449,6 +458,23 @@ namespace MultiplayerARPG
         public override bool IsInstanceMap()
         {
             return false;
+        }
+
+        public override UniTask<ResponsePlayerCharacterTransformMessage> RequestPlayerCharacterTransform(long connectionId)
+        {
+            if (_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData playerCharacterData))
+            {
+                return UniTask.FromResult(new ResponsePlayerCharacterTransformMessage()
+                {
+                    message = UITextKeys.NONE,
+                    position = playerCharacterData.CurrentPosition,
+                    rotation = playerCharacterData.CurrentRotation,
+                });
+            }
+            return UniTask.FromResult(new ResponsePlayerCharacterTransformMessage()
+            {
+                message = UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND,
+            });
         }
     }
 }

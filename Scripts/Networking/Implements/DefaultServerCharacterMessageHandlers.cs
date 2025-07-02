@@ -167,5 +167,26 @@ namespace MultiplayerARPG
             });
             return default;
         }
+
+        public async UniTaskVoid HandleRequestPlayerCharacterTransform(RequestHandlerData requestHandler, EmptyMessage request, RequestProceedResultDelegate<ResponsePlayerCharacterTransformMessage> result)
+        {
+            if (GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
+            {
+                result.InvokeSuccess(new ResponsePlayerCharacterTransformMessage()
+                {
+                    position = playerCharacter.CurrentPosition,
+                    rotation = playerCharacter.CurrentRotation,
+                });
+                return;
+            }
+
+            ResponsePlayerCharacterTransformMessage response = await BaseGameNetworkManager.Singleton.RequestPlayerCharacterTransform(requestHandler.ConnectionId);
+            if (response.message != UITextKeys.NONE)
+            {
+                result.InvokeError(response);
+                return;
+            }
+            result.InvokeSuccess(response);
+        }
     }
 }

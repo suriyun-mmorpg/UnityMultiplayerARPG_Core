@@ -47,7 +47,7 @@ namespace MultiplayerARPG
         {
             connectionId = -1;
             IPlayerCharacterData result;
-            return !string.IsNullOrEmpty(name) && handlers.TryGetPlayerCharacterByName(name, out result) && handlers.TryGetConnectionId(result.Id, out connectionId);
+            return !string.IsNullOrEmpty(name) && handlers.TryGetPlayerCharacterByName(name, out result) && handlers.TryGetConnectionIdById(result.Id, out connectionId);
         }
     }
 }
