@@ -1075,7 +1075,7 @@ namespace MultiplayerARPG
                     }
                     finally
                     {
-                        Addressables.Release(loadOp);
+                        loadOp.Value.Release();
                     }
                 }
                 System.GC.Collect();

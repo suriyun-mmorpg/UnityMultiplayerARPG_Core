@@ -61,7 +61,7 @@ namespace MultiplayerARPG
                     }
                     finally
                     {
-                        Addressables.Release(loadOp);
+                        loadOp.Value.Release();
                     }
                 }
             }
