@@ -202,6 +202,7 @@ namespace MultiplayerARPG
             }
         }
 
+        protected LogicUpdater _logicUpdater;
         protected bool _isTeleporting;
         protected bool _stillMoveAfterTeleport;
         protected Vector3 _teleportingPosition;
@@ -268,18 +269,31 @@ namespace MultiplayerARPG
         }
         protected virtual void EntityStart() { }
 
-        public override void OnStartServer()
+        public override void OnIdentityInitialize()
         {
-            base.OnStartServer();
-            if (BaseGameNetworkManager.Singleton != null)
-                BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
+            _logicUpdater = Manager.LogicUpdater;
+            _logicUpdater.OnTick += OnTickServer;
+            _logicUpdater.OnTick += OnTickClient;
         }
 
-        public override void OnStartClient()
+        private void OnTickServer(LogicUpdater updater)
         {
-            base.OnStartClient();
-            if (!IsServer && BaseGameNetworkManager.Singleton != null)
-                BaseGameNetworkManager.Singleton.RegisterGameEntity(this);
+            if (!isActiveAndEnabled)
+                return;
+            if (!IsServer)
+                return;
+            SendServerState(Manager.ServerTimestamp);
+        }
+
+        private void OnTickClient(LogicUpdater updater)
+        {
+            if (!isActiveAndEnabled)
+                return;
+            if (IsServer)
+                return;
+            if (!IsOwnerClient)
+                return;
+            SendClientState(Manager.ServerTimestamp);
         }
 
         private void OnDestroy()
@@ -292,9 +306,12 @@ namespace MultiplayerARPG
             }
             EntityOnDestroy();
             this.InvokeInstanceDevExtMethods("OnDestroy");
-            if (BaseGameNetworkManager.Singleton != null)
-                BaseGameNetworkManager.Singleton.UnregisterGameEntity(this);
             Clean();
+            if (_logicUpdater != null)
+            {
+                _logicUpdater.OnTick -= OnTickServer;
+                _logicUpdater.OnTick -= OnTickClient;
+            }
         }
         protected virtual void EntityOnDestroy()
         {

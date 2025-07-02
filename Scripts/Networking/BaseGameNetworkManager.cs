@@ -22,8 +22,6 @@ namespace MultiplayerARPG
         public const float INSTANTIATES_OBJECTS_DELAY = 0.5f;
 
         protected static readonly NetDataWriter s_Writer = new NetDataWriter();
-        protected static readonly ProfilerMarker s_SendServerStateProfilerMarker = new ProfilerMarker("BaseGameNetworkManager - SendServerState");
-        protected static readonly ProfilerMarker s_SendClientStateProfilerMarker = new ProfilerMarker("BaseGameNetworkManager - SendClientState");
 
         public static BaseGameNetworkManager Singleton { get; protected set; }
         protected GameInstance CurrentGameInstance { get { return GameInstance.Singleton; } }
@@ -70,7 +68,6 @@ namespace MultiplayerARPG
         protected float _updateTimeOfDayCountDown;
         protected float _serverSceneLoadedTime;
         protected float _clientSceneLoadedTime;
-        protected List<BaseGameEntity> _setOfGameEntity = new List<BaseGameEntity>();
 
         // Instantiate object allowing status
         /// <summary>
@@ -78,7 +75,9 @@ namespace MultiplayerARPG
         /// </summary>
         protected Dictionary<string, bool> _readyToInstantiateObjectsStates { get { return _serverReadyToInstantiateObjectsStates; } set { _serverReadyToInstantiateObjectsStates = value; } }
         protected Dictionary<string, bool> _serverReadyToInstantiateObjectsStates = new Dictionary<string, bool>();
+        public Dictionary<string, bool> ServerReadyToInstantiateObjectsStates => _serverReadyToInstantiateObjectsStates;
         protected Dictionary<string, bool> _clientReadyToInstantiateObjectsStates = new Dictionary<string, bool>();
+        public Dictionary<string, bool> ClientReadyToInstantiateObjectsStates => _clientReadyToInstantiateObjectsStates;
 
         /// <summary>
         /// For backward compatibility, should use `_isServerReadyToInstantiateObjects` instead.
@@ -164,64 +163,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override void OnServerUpdate(LogicUpdater updater)
-        {
-            base.OnServerUpdate(updater);
-            using (s_SendServerStateProfilerMarker.Auto())
-            {
-                long timestamp = ServerTimestamp;
-                for (int i = _setOfGameEntity.Count - 1; i >= 0; --i)
-                {
-                    BaseGameEntity entity = _setOfGameEntity[i];
-                    if (entity == null)
-                    {
-                        _setOfGameEntity.RemoveAt(i);
-                        continue;
-                    }
-                    if (!entity.enabled)
-                        continue;
-                    entity.SendServerState(timestamp);
-                }
-            }
-        }
-
-        protected override void OnClientUpdate(LogicUpdater updater)
-        {
-            base.OnClientUpdate(updater);
-            if (IsServer)
-                return;
-            using (s_SendClientStateProfilerMarker.Auto())
-            {
-                long timestamp = ServerTimestamp;
-                for (int i = _setOfGameEntity.Count - 1; i >= 0; --i)
-                {
-                    BaseGameEntity entity = _setOfGameEntity[i];
-                    if (entity == null)
-                    {
-                        _setOfGameEntity.RemoveAt(i);
-                        continue;
-                    }
-                    if (!entity.enabled)
-                        continue;
-                    if (!entity.IsOwnerClient)
-                        continue;
-                    entity.SendClientState(timestamp);
-                }
-            }
-        }
-
-        public void RegisterGameEntity(BaseGameEntity gameEntity)
-        {
-            if (_setOfGameEntity.Contains(gameEntity))
-                return;
-            _setOfGameEntity.Add(gameEntity);
-        }
-
-        public void UnregisterGameEntity(BaseGameEntity gameEntity)
-        {
-            _setOfGameEntity.Remove(gameEntity);
-        }
-
         protected override void RegisterMessages()
         {
             base.RegisterMessages();
@@ -246,7 +187,6 @@ namespace MultiplayerARPG
             _isServerReadyToInstantiateObjects = false;
             _isClientReadyToInstantiateObjects = false;
             _isServerReadyToInstantiatePlayers = false;
-            _setOfGameEntity.Clear();
             PoolSystem.Clear();
             ClientBankActions.Clean();
             ClientCashShopActions.Clean();
@@ -997,7 +937,11 @@ namespace MultiplayerARPG
 
         protected virtual async UniTaskVoid ProceedUntilClientReady()
         {
-            do { await UniTask.Delay(100); } while (!IsClientReadyToInstantiateObjects());
+            do
+            {
+                await UniTask.Delay(100);
+            }
+            while (!IsClientReadyToInstantiateObjects());
             SendClientReady();
         }
 
