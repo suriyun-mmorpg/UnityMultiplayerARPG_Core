@@ -477,7 +477,7 @@ namespace MultiplayerARPG
             _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
             _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
             _previousMovement = tempMoveVelocity * deltaTime;
-            EntityMovement.Move(_tempMovementState, _tempExtraMovementState, _previousMovement);
+            EntityMovement.Move(_tempMovementState, _tempExtraMovementState, _previousMovement, deltaTime);
         }
 
         protected void UpdateGenericMovement(float deltaTime)
@@ -575,13 +575,13 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    _verticalVelocity = -rootMotionGroundedVerticalVelocity;
+                    _verticalVelocity = rootMotionGroundedVerticalVelocity;
                 }
             }
             else
             {
                 // Not falling set verical velocity to 0
-                _verticalVelocity = -groundedVerticalVelocity;
+                _verticalVelocity = groundedVerticalVelocity;
             }
 
             // Jumping
@@ -810,7 +810,7 @@ namespace MultiplayerARPG
                     LadderComponent.CallCmdEnterLadder();
                 }
             }
-            EntityMovement.Move(_tempMovementState, _tempExtraMovementState, _previousMovement);
+            EntityMovement.Move(_tempMovementState, _tempExtraMovementState, _previousMovement, deltaTime);
         }
 
         public void UpdateRotation(float deltaTime)

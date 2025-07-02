@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         bool GroundCheck();
         bool AirborneCheck();
         void SetPosition(Vector3 position);
-        void Move(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion);
+        void Move(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion, float deltaTime);
         void RotateY(float yAngle);
         void OnJumpForceApplied(float verticalVelocity);
         Bounds GetMovementBounds();

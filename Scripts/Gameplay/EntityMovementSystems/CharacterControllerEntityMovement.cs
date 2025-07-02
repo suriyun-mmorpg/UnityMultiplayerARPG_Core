@@ -333,7 +333,6 @@ namespace MultiplayerARPG
                 return motion;
             Vector3 raycastOrigin = GetCrawlCheckCenter();
             Vector3 moveDirection = motion.GetXZ().normalized;
-            float moveSpeed = motion.magnitude;
             float nearestHitDistance = float.MaxValue;
             float nearestRaycastAngle = 0f;
             RaycastHit? nearestHit = null;
@@ -413,9 +412,9 @@ namespace MultiplayerARPG
             return CacheCharacterController.bounds;
         }
 
-        public void Move(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion)
+        public void Move(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion, float deltaTime)
         {
-            CacheCharacterController.Move(motion);
+            CacheCharacterController.Move(AdjustCrawlMotion(movementState, extraMovementState, motion));
         }
 
         public void RotateY(float yAngle)
