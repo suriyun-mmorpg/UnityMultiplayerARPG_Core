@@ -16,42 +16,40 @@ namespace MultiplayerARPG
 
         public float GetAmount(int level)
         {
-            if (level <= 1)
-                return baseAmount;
-
-            float result = baseAmount;
-            int countLevel = 2;
+            if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
+            {
+                float result = baseAmount;
+                int countLevel = 2;
+                while (countLevel <= level)
+                {
+                    result += amountIncreaseEachLevel;
+                    result += result * rateIncreaseEachLevel;
+                    countLevel++;
+                }
+                return result;
+            }
+            float resultWithByLevel = baseAmount;
+            int countByLevel = 2;
             int indexOfIncremental = 0;
-            int firstMinLevel = amountIncreaseEachLevelByLevels != null && amountIncreaseEachLevelByLevels.Length > 0
-                ? amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel
-                : int.MaxValue;
-
-            while (countLevel <= level)
+            int firstMinLevel = amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
+            while (countByLevel <= level)
             {
                 float flat = amountIncreaseEachLevel;
                 float rate = rateIncreaseEachLevel;
-
-                if (countLevel >= firstMinLevel && amountIncreaseEachLevelByLevels != null && amountIncreaseEachLevelByLevels.Length > 0)
+                if (countByLevel >= firstMinLevel)
                 {
                     flat = amountIncreaseEachLevelByLevels[indexOfIncremental].amountIncreaseEachLevel;
                     rate = amountIncreaseEachLevelByLevels[indexOfIncremental].rateIncreaseEachLevel;
                 }
-
-                result += flat;
-                result += result * rate;
-
-                countLevel++;
-
-                if (amountIncreaseEachLevelByLevels != null &&
-                    indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length &&
-                    countLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
-                {
+                resultWithByLevel += flat;
+                resultWithByLevel += resultWithByLevel * rate;
+                countByLevel++;
+                if (indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length && countByLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
                     indexOfIncremental++;
-                }
             }
-
-            return result;
+            return resultWithByLevel;
         }
+
     }
 
     [System.Serializable]

@@ -21,48 +21,39 @@ namespace MultiplayerARPG
                 min = baseAmount.min,
                 max = baseAmount.max,
             };
-
-            if (level <= 1)
+            if (amountIncreaseEachLevelByLevels == null || amountIncreaseEachLevelByLevels.Length == 0)
             {
+                int countLevel = 2;
+                while (countLevel <= level)
+                {
+                    result += amountIncreaseEachLevel;
+                    result += result * rateIncreaseEachLevel;
+                    countLevel++;
+                }
                 return new MinMaxInt()
                 {
                     min = (int)result.min,
                     max = (int)result.max,
                 };
             }
-
-            int countLevel = 2;
+            int countByLevel = 2;
             int indexOfIncremental = 0;
-            int firstMinLevel = amountIncreaseEachLevelByLevels != null && amountIncreaseEachLevelByLevels.Length > 0
-                ? amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel
-                : int.MaxValue;
-
-            while (countLevel <= level)
+            int firstMinLevel = amountIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
+            while (countByLevel <= level)
             {
                 MinMaxFloat flat = amountIncreaseEachLevel;
                 MinMaxFloat rate = rateIncreaseEachLevel;
-
-                if (countLevel >= firstMinLevel &&
-                    amountIncreaseEachLevelByLevels != null &&
-                    amountIncreaseEachLevelByLevels.Length > 0)
+                if (countByLevel >= firstMinLevel)
                 {
                     flat = amountIncreaseEachLevelByLevels[indexOfIncremental].amountIncreaseEachLevel;
                     rate = amountIncreaseEachLevelByLevels[indexOfIncremental].rateIncreaseEachLevel;
                 }
-
                 result += flat;
                 result += result * rate;
-
-                countLevel++;
-
-                if (amountIncreaseEachLevelByLevels != null &&
-                    indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length &&
-                    countLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
-                {
+                countByLevel++;
+                if (indexOfIncremental + 1 < amountIncreaseEachLevelByLevels.Length && countByLevel >= amountIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
                     indexOfIncremental++;
-                }
             }
-
             return new MinMaxInt()
             {
                 min = (int)result.min,

@@ -260,52 +260,37 @@ namespace MultiplayerARPG
         public CharacterStats baseStats;
         [Tooltip("Increase amount when level > 1 (it will be decreasing when level < 0)")]
         public CharacterStats statsIncreaseEachLevel;
-        [Tooltip("Percentage-based increase per level (0.05 = +5%)")]
+        [Tooltip("Percentage rate increase per level (0.05 = +5% per level)")]
         public CharacterStats rateIncreaseEachLevel;
         [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
         public CharacterStatsIncrementalByLevel[] statsIncreaseEachLevelByLevels;
 
         public CharacterStats GetCharacterStats(int level)
         {
-            if (level <= 1)
-                return baseStats;
-
+            if (statsIncreaseEachLevelByLevels == null || statsIncreaseEachLevelByLevels.Length == 0)
+                return baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0))) + ((baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0)))) * rateIncreaseEachLevel);
             CharacterStats result = baseStats;
             int countLevel = 2;
             int indexOfIncremental = 0;
-
-            int firstMinLevel = statsIncreaseEachLevelByLevels != null && statsIncreaseEachLevelByLevels.Length > 0
-                ? statsIncreaseEachLevelByLevels[indexOfIncremental].minLevel
-                : int.MaxValue;
-
+            int firstMinLevel = statsIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
             while (countLevel <= level)
             {
                 CharacterStats flat = statsIncreaseEachLevel;
                 CharacterStats rate = rateIncreaseEachLevel;
-
-                if (countLevel >= firstMinLevel &&
-                    statsIncreaseEachLevelByLevels != null &&
-                    statsIncreaseEachLevelByLevels.Length > 0)
+                if (countLevel >= firstMinLevel)
                 {
                     flat = statsIncreaseEachLevelByLevels[indexOfIncremental].statsIncreaseEachLevel;
                     rate = statsIncreaseEachLevelByLevels[indexOfIncremental].rateIncreaseEachLevel;
                 }
-
                 result += flat;
                 result += result * rate;
-
                 countLevel++;
-
-                if (statsIncreaseEachLevelByLevels != null &&
-                    indexOfIncremental + 1 < statsIncreaseEachLevelByLevels.Length &&
-                    countLevel >= statsIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
-                {
+                if (indexOfIncremental + 1 < statsIncreaseEachLevelByLevels.Length && countLevel >= statsIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
                     indexOfIncremental++;
-                }
             }
-
             return result;
         }
+
     }
 
     [System.Serializable]
