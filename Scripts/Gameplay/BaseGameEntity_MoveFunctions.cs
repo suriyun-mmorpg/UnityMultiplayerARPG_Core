@@ -1,4 +1,5 @@
-﻿using Insthync.UnityEditorUtils;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -371,6 +372,12 @@ namespace MultiplayerARPG
             if (!ActiveMovement.IsNull())
                 return ActiveMovement.AllowToCrawl();
             return false;
+        }
+
+        public async UniTask WaitClientTeleportConfirm()
+        {
+            if (!ActiveMovement.IsNull())
+                await ActiveMovement.WaitClientTeleportConfirm();
         }
     }
 }

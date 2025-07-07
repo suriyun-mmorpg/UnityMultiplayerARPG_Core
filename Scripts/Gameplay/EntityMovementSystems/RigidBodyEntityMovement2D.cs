@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -782,6 +783,14 @@ namespace MultiplayerARPG
         public bool AllowToCrawl()
         {
             return true;
+        }
+
+        public async UniTask WaitClientTeleportConfirm()
+        {
+            while (this != null && _isServerWaitingTeleportConfirm)
+            {
+                await UniTask.Delay(1000);
+            }
         }
     }
 }

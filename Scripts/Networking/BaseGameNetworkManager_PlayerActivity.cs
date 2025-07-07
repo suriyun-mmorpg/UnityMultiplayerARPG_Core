@@ -104,7 +104,7 @@ namespace MultiplayerARPG
         /// <param name="position"></param>
         /// <param name="overrideRotation"></param>
         /// <param name="rotation"></param>
-        public abstract void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
+        public abstract UniTask WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
 
         /// <summary>
         /// Warp character to instance map
@@ -114,7 +114,7 @@ namespace MultiplayerARPG
         /// <param name="position"></param>
         /// <param name="overrideRotation"></param>
         /// <param name="rotation"></param>
-        public abstract void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
+        public abstract UniTask WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation);
 
         /// <summary>
         /// Check if this game network manager is for instance map or not

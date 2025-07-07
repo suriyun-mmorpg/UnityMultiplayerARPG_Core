@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
@@ -66,6 +67,8 @@ namespace MultiplayerARPG
         public Transform CacheTransform { get { return Entity.EntityTransform; } }
         public Animator Animator { get; private set; }
         public IBuiltInEntityMovement3D EntityMovement { get; private set; }
+        public IEntityTeleportPreparer TeleportPreparer { get; private set; }
+        public bool IsPreparingToTeleport { get { return TeleportPreparer != null && TeleportPreparer.IsPreparingToTeleport; } }
 
         public float StoppingDistance
         {
@@ -159,6 +162,7 @@ namespace MultiplayerARPG
             LadderComponent = entity.GetComponent<CharacterLadderComponent>();
             Animator = animator;
             EntityMovement = entityMovement;
+            TeleportPreparer = entity.GetComponent<IEntityTeleportPreparer>();
             _forceUpdateListeners = entity.GetComponents<IEntityMovementForceUpdateListener>();
             _yAngle = _targetYAngle = CacheTransform.eulerAngles.y;
             _lookRotationApplied = true;
@@ -298,16 +302,20 @@ namespace MultiplayerARPG
             return _yTurnSpeed;
         }
 
-        public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
+        public async void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             if (!IsServer)
             {
                 Logging.LogWarning(nameof(BuiltInEntityMovementFunctions3D), $"Teleport function shouldn't be called at client [{Entity.name}]");
                 return;
             }
+            if (IsServer && !IsOwnedByServer)
+                _isServerWaitingTeleportConfirm = true;
             _acceptedPosition = position;
             _isTeleporting = true;
             _stillMoveAfterTeleport = stillMoveAfterTeleport;
+            if (TeleportPreparer != null)
+                await TeleportPreparer.PrepareToTeleport(position, rotation);
             OnTeleport(position, rotation.eulerAngles.y, stillMoveAfterTeleport);
         }
 
@@ -411,6 +419,9 @@ namespace MultiplayerARPG
 
         protected void UpdateClimbMovement(float deltaTime)
         {
+            if (IsPreparingToTeleport)
+                return;
+
             Vector3 tempPredictPosition;
             Vector3 tempCurrentPosition = CacheTransform.position;
             // Prepare movement speed
@@ -482,6 +493,9 @@ namespace MultiplayerARPG
 
         protected void UpdateGenericMovement(float deltaTime)
         {
+            if (IsPreparingToTeleport)
+                return;
+
             float tempSqrMagnitude;
             float tempPredictSqrMagnitude;
             Vector3 tempPredictPosition;
@@ -1103,7 +1117,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (IsServer)
             {
@@ -1116,9 +1130,11 @@ namespace MultiplayerARPG
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
+                if (TeleportPreparer != null)
+                    await TeleportPreparer.PrepareToTeleport(position, Quaternion.Euler(0f, yAngle, 0f));
                 OnTeleport(position, yAngle, movementState != MovementState.IsTeleport);
             }
-            else if (_acceptedPositionTimestamp <= peerTimestamp)
+            else if (!IsPreparingToTeleport && _acceptedPositionTimestamp <= peerTimestamp)
             {
                 // Prepare time
                 long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
@@ -1404,6 +1420,14 @@ namespace MultiplayerARPG
             {
                 _targetYAngle = _remoteTargetYAngle.Value;
                 _remoteTargetYAngle = null;
+            }
+        }
+
+        public async UniTask WaitClientTeleportConfirm()
+        {
+            while (this != null && _isServerWaitingTeleportConfirm)
+            {
+                await UniTask.Delay(1000);
             }
         }
     }

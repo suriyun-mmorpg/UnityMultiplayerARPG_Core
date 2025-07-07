@@ -397,7 +397,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
+        public override async UniTask WarpCharacter(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             if (!CanWarpCharacter(playerCharacterEntity))
                 return;
@@ -408,6 +408,7 @@ namespace MultiplayerARPG
                 if (overrideRotation)
                     playerCharacterEntity.CurrentRotation = rotation;
                 playerCharacterEntity.Teleport(position, Quaternion.Euler(playerCharacterEntity.CurrentRotation), false);
+                await playerCharacterEntity.WaitClientTeleportConfirm();
                 return;
             }
 
@@ -448,11 +449,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
+        public override async UniTask WarpCharacterToInstance(BasePlayerCharacterEntity playerCharacterEntity, string mapName, Vector3 position, bool overrideRotation, Vector3 rotation)
         {
             // For now just warp follow host
             // TODO: May add instance by load scene additive and offsets for LAN mode
-            WarpCharacter(playerCharacterEntity, mapName, position, overrideRotation, rotation);
+            await WarpCharacter(playerCharacterEntity, mapName, position, overrideRotation, rotation);
         }
 
         public override bool IsInstanceMap()

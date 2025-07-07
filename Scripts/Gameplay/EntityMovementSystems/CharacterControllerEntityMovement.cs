@@ -1,4 +1,5 @@
-﻿using LiteNetLib.Utils;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -525,6 +526,11 @@ namespace MultiplayerARPG
                 return Vector3.down * (hit.distance - CacheCharacterController.skinWidth);
             }
             return Vector3.zero;
+        }
+
+        public UniTask WaitClientTeleportConfirm()
+        {
+            return Functions.WaitClientTeleportConfirm();
         }
     }
 }

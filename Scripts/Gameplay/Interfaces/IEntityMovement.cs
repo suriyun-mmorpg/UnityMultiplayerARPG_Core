@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -28,5 +29,6 @@ namespace MultiplayerARPG
         bool AllowToDash();
         bool AllowToCrouch();
         bool AllowToCrawl();
+        UniTask WaitClientTeleportConfirm();
     }
 }
