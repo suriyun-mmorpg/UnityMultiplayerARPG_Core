@@ -874,7 +874,7 @@ namespace MultiplayerARPG
             }
 
             // It's how much player selling item to NPC, so use `sellItemPriceRate`
-            float sellPriceRate = 1f + GameInstance.PlayingCharacter.GetCaches().Stats.sellItemPriceRate;
+            float sellPriceRate = 1f + (GameInstance.PlayingCharacter == null ? 0 : GameInstance.PlayingCharacter.GetCaches().Stats.sellItemPriceRate);
             if (uiTextSellPrice != null)
             {
                 int sellPrice = Mathf.CeilToInt(Item.SellPrice * sellPriceRate);
