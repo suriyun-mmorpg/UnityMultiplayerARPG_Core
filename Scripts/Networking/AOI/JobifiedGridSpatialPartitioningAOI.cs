@@ -63,34 +63,56 @@ namespace MultiplayerARPG
                 return;
             }
             _system = null;
-            switch (GameInstance.Singleton.DimensionType)
+            var mapBounds = GenericUtils.GetComponentsFromAllLoadedScenes<AOIMapBounds>(true);
+            if (mapBounds.Count > 0)
             {
-                case DimensionType.Dimension3D:
-                    var collider3Ds = GenericUtils.GetComponentsFromAllLoadedScenes<Collider>(true);
-                    if (collider3Ds.Count > 0)
-                    {
-                        _bounds = collider3Ds[0].bounds;
-                        for (int i = 1; i < collider3Ds.Count; ++i)
-                        {
-                            _bounds.Encapsulate(collider3Ds[i].bounds);
-                        }
-                        _bounds.extents += bufferedCells * cellSize * 2;
+                _bounds = mapBounds[0].bounds;
+                for (int i = 0; i < mapBounds.Count; ++i)
+                {
+                    _bounds.Encapsulate(mapBounds[i].bounds);
+                }
+                _bounds.extents += bufferedCells * cellSize * 2;
+                switch (GameInstance.Singleton.DimensionType)
+                {
+                    case DimensionType.Dimension3D:
                         _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects, false, true, false);
-                    }
-                    break;
-                case DimensionType.Dimension2D:
-                    var collider2Ds = GenericUtils.GetComponentsFromAllLoadedScenes<Collider2D>(true);
-                    if (collider2Ds.Count > 0)
-                    {
-                        _bounds = collider2Ds[0].bounds;
-                        for (int i = 0; i < collider2Ds.Count; ++i)
-                        {
-                            _bounds.Encapsulate(collider2Ds[i].bounds);
-                        }
-                        _bounds.extents += bufferedCells * cellSize * 2;
+                        break;
+                    case DimensionType.Dimension2D:
                         _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects, false, false, true);
-                    }
-                    break;
+                        break;
+                }
+            }
+            else
+            {
+                switch (GameInstance.Singleton.DimensionType)
+                {
+                    case DimensionType.Dimension3D:
+                        var collider3Ds = GenericUtils.GetComponentsFromAllLoadedScenes<Collider>(true);
+                        if (collider3Ds.Count > 0)
+                        {
+                            _bounds = collider3Ds[0].bounds;
+                            for (int i = 1; i < collider3Ds.Count; ++i)
+                            {
+                                _bounds.Encapsulate(collider3Ds[i].bounds);
+                            }
+                            _bounds.extents += bufferedCells * cellSize * 2;
+                            _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects, false, true, false);
+                        }
+                        break;
+                    case DimensionType.Dimension2D:
+                        var collider2Ds = GenericUtils.GetComponentsFromAllLoadedScenes<Collider2D>(true);
+                        if (collider2Ds.Count > 0)
+                        {
+                            _bounds = collider2Ds[0].bounds;
+                            for (int i = 1; i < collider2Ds.Count; ++i)
+                            {
+                                _bounds.Encapsulate(collider2Ds[i].bounds);
+                            }
+                            _bounds.extents += bufferedCells * cellSize * 2;
+                            _system = new JobifiedGridSpatialPartitioningSystem(_bounds, cellSize, maxObjects, false, false, true);
+                        }
+                        break;
+                }
             }
         }
 
@@ -136,14 +158,18 @@ namespace MultiplayerARPG
                     for (int i = 0; i < queryResult.Length; ++i)
                     {
                         uint contactedObjectId = queryResult[i].objectId;
-                        if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out foundPlayerObject) &&
-                            ShouldSubscribe(foundPlayerObject, spawnedObject, false))
+                        if (!Manager.Assets.TryGetSpawnedObject(contactedObjectId, out foundPlayerObject))
                         {
-                            if (!_playerSubscribings.TryGetValue(contactedObjectId, out subscribings))
-                                subscribings = new HashSet<uint>();
-                            subscribings.Add(spawnedObject.ObjectId);
-                            _playerSubscribings[contactedObjectId] = subscribings;
+                            continue;
                         }
+                        if (!ShouldSubscribe(foundPlayerObject, spawnedObject, false))
+                        {
+                            continue;
+                        }
+                        if (!_playerSubscribings.TryGetValue(contactedObjectId, out subscribings))
+                            subscribings = new HashSet<uint>();
+                        subscribings.Add(spawnedObject.ObjectId);
+                        _playerSubscribings[contactedObjectId] = subscribings;
                     }
                     queryResult.Dispose();
                 }
