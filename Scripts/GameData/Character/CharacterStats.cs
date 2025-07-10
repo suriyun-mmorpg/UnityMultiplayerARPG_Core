@@ -260,29 +260,37 @@ namespace MultiplayerARPG
         public CharacterStats baseStats;
         [Tooltip("Increase amount when level > 1 (it will be decreasing when level < 0)")]
         public CharacterStats statsIncreaseEachLevel;
+        [Tooltip("Percentage rate increase per level (0.05 = +5% per level)")]
+        public CharacterStats rateIncreaseEachLevel;
         [Tooltip("It won't automatically sort by `minLevel`, you have to sort it from low to high to make it calculate properly")]
         public CharacterStatsIncrementalByLevel[] statsIncreaseEachLevelByLevels;
 
         public CharacterStats GetCharacterStats(int level)
         {
             if (statsIncreaseEachLevelByLevels == null || statsIncreaseEachLevelByLevels.Length == 0)
-                return baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0)));
+                return baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0))) + ((baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0)))) * rateIncreaseEachLevel);
             CharacterStats result = baseStats;
             int countLevel = 2;
             int indexOfIncremental = 0;
             int firstMinLevel = statsIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
             while (countLevel <= level)
             {
-                if (countLevel < firstMinLevel)
-                    result += statsIncreaseEachLevel;
-                else
-                    result += statsIncreaseEachLevelByLevels[indexOfIncremental].statsIncreaseEachLevel;
+                CharacterStats flat = statsIncreaseEachLevel;
+                CharacterStats rate = rateIncreaseEachLevel;
+                if (countLevel >= firstMinLevel)
+                {
+                    flat = statsIncreaseEachLevelByLevels[indexOfIncremental].statsIncreaseEachLevel;
+                    rate = statsIncreaseEachLevelByLevels[indexOfIncremental].rateIncreaseEachLevel;
+                }
+                result += flat;
+                result += result * rate;
                 countLevel++;
                 if (indexOfIncremental + 1 < statsIncreaseEachLevelByLevels.Length && countLevel >= statsIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
                     indexOfIncremental++;
             }
             return result;
         }
+
     }
 
     [System.Serializable]
@@ -290,5 +298,6 @@ namespace MultiplayerARPG
     {
         public int minLevel;
         public CharacterStats statsIncreaseEachLevel;
+        public CharacterStats rateIncreaseEachLevel;
     }
 }
