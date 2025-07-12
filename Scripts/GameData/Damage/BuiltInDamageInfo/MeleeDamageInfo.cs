@@ -111,6 +111,7 @@ namespace MultiplayerARPG
             for (int i = 0; i < tempHitCount; ++i)
             {
                 tempGameObject = attacker.AttackPhysicFunctions.GetOverlapObject(i);
+                Vector3 hitPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePositionWithOffsets);
 
                 if (!tempGameObject.GetComponent<IUnHittable>().IsNull())
                     continue;
@@ -125,20 +126,16 @@ namespace MultiplayerARPG
                 if (hitObjects.Contains(tempDamageableHitBox.GetObjectId()))
                     continue;
 
+                // Target position is not in hit fov?
+                if (!attacker.IsPositionInFov(damagePositionWithOffsets, hitFov, hitPoint))
+                    continue;
+
                 // Add entity to table, if it found entity in the table next time it will skip. 
                 // So it won't applies damage to entity repeatly.
                 hitObjects.Add(tempDamageableHitBox.GetObjectId());
 
                 // Target won't receive damage if dead or can't receive damage from this character
                 if (tempDamageableHitBox.IsDead() || !tempDamageableHitBox.CanReceiveDamageFrom(instigator))
-                    continue;
-
-                // Target position is behind damage position?
-                if (!attacker.IsPositionInFov(damagePosition, 180f, tempDamageableHitBox.GetTransform().position))
-                    continue;
-
-                // Target position is not in hit fov?
-                if (!attacker.IsPositionInFov(damagePositionWithOffsets, hitFov, tempDamageableHitBox.GetTransform().position))
                     continue;
 
                 if (hitOnlySelectedTarget)
