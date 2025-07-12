@@ -1,4 +1,5 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -248,7 +249,7 @@ namespace MultiplayerARPG
             return userLevel > 0;
         }
 
-        public override string HandleGMCommand(string sender, BasePlayerCharacterEntity senderCharacter, string chatMessage)
+        public override async UniTask<string> HandleGMCommand(string sender, BasePlayerCharacterEntity senderCharacter, string chatMessage)
         {
             if (string.IsNullOrEmpty(chatMessage))
                 return string.Empty;
@@ -453,7 +454,7 @@ namespace MultiplayerARPG
                     else if (senderCharacter != null)
                     {
                         BaseMapInfo mapInfo = GameInstance.MapInfos[data[1]];
-                        BaseGameNetworkManager.Singleton.WarpCharacter(senderCharacter, data[1], mapInfo.StartPosition, false, Vector3.zero);
+                        await BaseGameNetworkManager.Singleton.WarpCharacter(senderCharacter, data[1], mapInfo.StartPosition, false, Vector3.zero);
                         response = $"Warping to: {data[1]} {mapInfo.StartPosition}";
                     }
                 }
@@ -484,7 +485,7 @@ namespace MultiplayerARPG
                     }
                     else if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
-                        BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, data[2], new Vector3(x, y, z), false, Vector3.zero);
+                        await BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, data[2], new Vector3(x, y, z), false, Vector3.zero);
                     }
                 }
                 if (commandKey.ToLower().Equals(WarpToCharacter.ToLower()))
@@ -508,7 +509,7 @@ namespace MultiplayerARPG
                     BaseMonsterCharacterEntity targetMonster = null;
                     foreach (AssetReferenceBaseMonsterCharacterEntity addressableMonster in GameInstance.AddressableMonsterCharacterEntities.Values)
                     {
-                        BaseMonsterCharacterEntity monster = addressableMonster.GetOrLoadAsset<BaseCharacterEntity>() as BaseMonsterCharacterEntity;
+                        BaseMonsterCharacterEntity monster = await addressableMonster.GetOrLoadAssetAsync<BaseMonsterCharacterEntity>();
                         if (monster == null)
                             continue;
                         if (monster.name.Equals(data[1]) ||

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using Cysharp.Threading.Tasks;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -25,6 +26,6 @@ namespace MultiplayerARPG
         /// <param name="senderCharacter">Sender's character entity</param>
         /// <param name="chatMessage">Message</param>
         /// <returns></returns>
-        public abstract string HandleGMCommand(string sender, BasePlayerCharacterEntity senderCharacter, string chatMessage);
+        public abstract UniTask<string> HandleGMCommand(string sender, BasePlayerCharacterEntity senderCharacter, string chatMessage);
     }
 }

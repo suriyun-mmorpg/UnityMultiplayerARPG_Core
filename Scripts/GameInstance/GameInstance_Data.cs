@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using System.Collections.Generic;
@@ -526,7 +527,7 @@ namespace MultiplayerARPG
             AddMapWarpPortals((IEnumerable<WarpPortals>)mapWarpPortals);
         }
 
-        public static void AddMapWarpPortals(IEnumerable<WarpPortals> mapWarpPortals)
+        public static async void AddMapWarpPortals(IEnumerable<WarpPortals> mapWarpPortals)
         {
             if (mapWarpPortals == null)
                 return;
@@ -543,7 +544,7 @@ namespace MultiplayerARPG
 #if !EXCLUDE_PREFAB_REFS
                     AddGameEntity(WarpPortalEntities, warpPortal.entityPrefab);
 #endif
-                    AddAssetReference<AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortal.addressableEntityPrefab);
+                    await AddAssetReference<AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortal.addressableEntityPrefab);
                 }
             }
         }
@@ -553,7 +554,7 @@ namespace MultiplayerARPG
             AddMapNpcs((IEnumerable<Npcs>)mapNpcs);
         }
 
-        public static void AddMapNpcs(IEnumerable<Npcs> mapNpcs)
+        public static async void AddMapNpcs(IEnumerable<Npcs> mapNpcs)
         {
             if (mapNpcs == null)
                 return;
@@ -570,7 +571,7 @@ namespace MultiplayerARPG
 #if !EXCLUDE_PREFAB_REFS
                     AddGameEntity(NpcEntities, npc.entityPrefab);
 #endif
-                    AddAssetReference<AssetReferenceLiteNetLibBehaviour<NpcEntity>, NpcEntity>(AddressableNpcEntities, npc.addressableEntityPrefab);
+                    await AddAssetReference<AssetReferenceLiteNetLibBehaviour<NpcEntity>, NpcEntity>(AddressableNpcEntities, npc.addressableEntityPrefab);
                     if (npc.startDialog != null)
                         AddGameData(NpcDialogs, npc.startDialog);
                     if (npc.graph != null)
@@ -1037,7 +1038,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        private static void AddManyAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, IEnumerable<TBehaviour> list)
+        private static async void AddManyAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, IEnumerable<TBehaviour> list)
             where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
             where TType : BaseGameEntity
         {
@@ -1045,11 +1046,11 @@ namespace MultiplayerARPG
                 return;
             foreach (TBehaviour entry in list)
             {
-                AddAssetReference<TBehaviour, TType>(dict, entry);
+                await AddAssetReference<TBehaviour, TType>(dict, entry);
             }
         }
 
-        private static bool AddAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, TBehaviour data)
+        private static async UniTask<bool> AddAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, TBehaviour data)
             where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
             where TType : BaseGameEntity
         {
@@ -1059,7 +1060,7 @@ namespace MultiplayerARPG
             {
                 bool isError = true;
                 object runtimeKey = data.RuntimeKey;
-                var loadOp = data.LoadObject<GameObject>();
+                var loadOp = await data.LoadObjectAsync<GameObject>();
                 if (loadOp.HasValue)
                 {
                     try

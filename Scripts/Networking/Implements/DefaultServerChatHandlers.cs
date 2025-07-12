@@ -38,7 +38,7 @@ namespace MultiplayerARPG
             Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
         }
 
-        public void OnChatMessage(ChatMessage message)
+        public async void OnChatMessage(ChatMessage message)
         {
             message.timestamp = BaseGameNetworkManager.Singleton.ServerTimestamp;
             long connectionId;
@@ -56,7 +56,7 @@ namespace MultiplayerARPG
                             GameInstance.Singleton.GMCommands.CanUseGMCommand(playerCharacterEntity.UserLevel, gmCommand)))
                         {
                             // If it's gm command and sender's user level > 0, handle gm commands
-                            string response = GameInstance.Singleton.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
+                            string response = await GameInstance.Singleton.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
                             if (!string.IsNullOrEmpty(response))
                             {
                                 Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
