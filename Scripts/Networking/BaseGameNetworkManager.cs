@@ -4,6 +4,7 @@ using Insthync.DevExtension;
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using UnityEngine;
@@ -72,11 +73,11 @@ namespace MultiplayerARPG
         /// <summary>
         /// For backward compatibility, should use `_serverReadyToInstantiateObjectsStates` instead.
         /// </summary>
-        protected Dictionary<string, bool> _readyToInstantiateObjectsStates { get { return _serverReadyToInstantiateObjectsStates; } set { _serverReadyToInstantiateObjectsStates = value; } }
-        protected Dictionary<string, bool> _serverReadyToInstantiateObjectsStates = new Dictionary<string, bool>();
-        public Dictionary<string, bool> ServerReadyToInstantiateObjectsStates => _serverReadyToInstantiateObjectsStates;
-        protected Dictionary<string, bool> _clientReadyToInstantiateObjectsStates = new Dictionary<string, bool>();
-        public Dictionary<string, bool> ClientReadyToInstantiateObjectsStates => _clientReadyToInstantiateObjectsStates;
+        protected ConcurrentDictionary<string, bool> _readyToInstantiateObjectsStates { get { return _serverReadyToInstantiateObjectsStates; } set { _serverReadyToInstantiateObjectsStates = value; } }
+        protected ConcurrentDictionary<string, bool> _serverReadyToInstantiateObjectsStates = new ConcurrentDictionary<string, bool>();
+        public ConcurrentDictionary<string, bool> ServerReadyToInstantiateObjectsStates => _serverReadyToInstantiateObjectsStates;
+        protected ConcurrentDictionary<string, bool> _clientReadyToInstantiateObjectsStates = new ConcurrentDictionary<string, bool>();
+        public ConcurrentDictionary<string, bool> ClientReadyToInstantiateObjectsStates => _clientReadyToInstantiateObjectsStates;
 
         /// <summary>
         /// For backward compatibility, should use `_isServerReadyToInstantiateObjects` instead.
@@ -90,6 +91,9 @@ namespace MultiplayerARPG
         /// </summary>
         protected bool _isReadyToInstantiatePlayers { get { return _isServerReadyToInstantiatePlayers; } set { _isServerReadyToInstantiatePlayers = value; } }
         protected bool _isServerReadyToInstantiatePlayers;
+
+        protected ConcurrentDictionary<uint, UITextKeys> _enterGameRequestResponseMessages = new ConcurrentDictionary<uint, UITextKeys>();
+        protected ConcurrentDictionary<uint, UITextKeys> _clientReadyRequestResponseMessages = new ConcurrentDictionary<uint, UITextKeys>();
 
         protected override void Awake()
         {
@@ -183,6 +187,10 @@ namespace MultiplayerARPG
             // Other components
             HitRegistrationManager.ClearData();
             MapInfo = null;
+            _serverReadyToInstantiateObjectsStates.Clear();
+            _clientReadyToInstantiateObjectsStates.Clear();
+            _enterGameRequestResponseMessages.Clear();
+            _clientReadyRequestResponseMessages.Clear();
             _isServerReadyToInstantiateObjects = false;
             _isClientReadyToInstantiateObjects = false;
             _isServerReadyToInstantiatePlayers = false;
@@ -286,7 +294,7 @@ namespace MultiplayerARPG
                 NetDataReader reader = new NetDataReader(data);
                 message = (UITextKeys)reader.GetPackedUShort();
             }
-            UISceneGlobal.Singleton.ShowDisconnectDialog(reason, socketError, message);
+            UISceneGlobal.Singleton.ShowDisconnectDialog(reason, socketError, message, "OnClientDisconnected");
             this.InvokeInstanceDevExtMethods("OnClientDisconnected", reason, socketError, data);
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -360,17 +368,47 @@ namespace MultiplayerARPG
             base.SendClientNotReady();
         }
 
-        protected override UniTaskVoid HandleEnterGameRequest(RequestHandlerData requestHandler, EnterGameRequestMessage request, RequestProceedResultDelegate<EnterGameResponseMessage> result)
+        protected override void WriteExtraEnterGameResponse(uint requestId, long connectionId, EnterGameRequestMessage request, AckResponseCode responseCode, NetDataWriter writer)
         {
-            result += (responseCode, response, extraResponseSerializer) =>
+            if (!_enterGameRequestResponseMessages.TryRemove(requestId, out UITextKeys responseMessage))
+                responseMessage = UITextKeys.NONE;
+            writer.PutPackedUShort((ushort)responseMessage);
+            if (responseMessage == UITextKeys.NONE)
             {
-                if (responseCode == AckResponseCode.Success)
-                {
-                    SendMapInfo(requestHandler.ConnectionId);
-                    SendTimeOfDay(requestHandler.ConnectionId);
-                }
-            };
-            return base.HandleEnterGameRequest(requestHandler, request, result);
+                WriteServerInfo(writer);
+                WriteMapInfo(writer);
+                WriteTimeOfDay(writer);
+            }
+        }
+
+        protected override void ReadExtraEnterGameResponse(AckResponseCode responseCode, EnterGameResponseMessage response, NetDataReader reader)
+        {
+            UITextKeys responseMessage = (UITextKeys)reader.GetPackedUShort();
+            if (responseMessage == UITextKeys.NONE)
+            {
+                ReadServerInfo(reader);
+                ReadMapInfo(reader);
+                ReadTimeOfDay(reader);
+                return;
+            }
+            UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected, SocketError.Success, responseMessage, "ReadExtraEnterGameResponse");
+            StopClient();
+        }
+
+        protected override void WriteExtraClientReadyResponse(uint requestId, long connectionId, AckResponseCode responseCode, NetDataWriter writer)
+        {
+            if (!_clientReadyRequestResponseMessages.TryRemove(requestId, out UITextKeys responseMessage))
+                responseMessage = UITextKeys.NONE;
+            writer.PutPackedUShort((ushort)responseMessage);
+        }
+
+        protected override void ReadExtraClientReadyResponse(AckResponseCode responseCode, EmptyMessage response, NetDataReader reader)
+        {
+            UITextKeys responseMessage = (UITextKeys)reader.GetPackedUShort();
+            if (responseMessage == UITextKeys.NONE)
+                return;
+            UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected, SocketError.Success, responseMessage, "ReadExtraClientReadyResponse");
+            StopClient();
         }
 
         protected virtual void UpdateOnlineCharacter(BasePlayerCharacterEntity playerCharacterEntity)
@@ -715,7 +753,7 @@ namespace MultiplayerARPG
         public override void OnClientConnectionRefused()
         {
             base.OnClientConnectionRefused();
-            UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected, SocketError.Success, UITextKeys.NONE);
+            UISceneGlobal.Singleton.ShowDisconnectDialog(DisconnectReason.ConnectionRejected, SocketError.Success, UITextKeys.NONE, "OnClientConnectionRefused");
         }
 
         public override void OnClientOnlineSceneLoaded()
@@ -1088,19 +1126,46 @@ namespace MultiplayerARPG
         {
             if (!IsServer || MapInfo == null)
                 return;
-            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, new UpdateMapInfoMessage()
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateMapInfo, WriteMapInfo);
+        }
+
+        public void WriteMapInfo(NetDataWriter writer)
+        {
+            writer.Put(new UpdateMapInfoMessage()
             {
                 mapName = MapInfo.Id,
                 className = MapInfo.GetType().FullName,
-            }, (writer) =>
-            {
-                MapInfo.Serialize(writer);
-                this.InvokeInstanceDevExtMethods("WriteMapInfoExtra", writer);
-                foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
-                {
-                    component.WriteMapInfoExtra(this, writer);
-                }
             });
+            MapInfo.Serialize(writer);
+            this.InvokeInstanceDevExtMethods("WriteMapInfoExtra", writer);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.WriteMapInfoExtra(this, writer);
+            }
+        }
+
+        public void ReadMapInfo(NetDataReader reader)
+        {
+            UpdateMapInfoMessage message = reader.Get<UpdateMapInfoMessage>();
+            SetMapInfo(message.mapName);
+            if (MapInfo == null)
+            {
+                Logging.LogError(LogTag, $"Cannot find map info: {message.mapName}, it will create new map info to use, it can affect players' experience.");
+                MapInfo = ScriptableObject.CreateInstance<MapInfo>();
+                MapInfo.Id = message.mapName;
+                return;
+            }
+            if (!MapInfo.GetType().FullName.Equals(message.className))
+            {
+                Logging.LogError(LogTag, $"Invalid map info expect: {message.className}, found {MapInfo.GetType().FullName}, it can affect players' experience.");
+                return;
+            }
+            MapInfo.Deserialize(reader);
+            this.InvokeInstanceDevExtMethods("ReadMapInfoExtra", reader);
+            foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
+            {
+                component.ReadMapInfoExtra(this, reader);
+            }
         }
 
         public void SendTimeOfDay()
@@ -1117,10 +1182,56 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
-            ServerSendPacket(connectionId, 0, DeliveryMethod.Unreliable, GameNetworkingConsts.UpdateTimeOfDay, new UpdateTimeOfDayMessage()
+            ServerSendPacket(connectionId, 0, DeliveryMethod.Unreliable, GameNetworkingConsts.UpdateTimeOfDay, WriteTimeOfDay);
+        }
+
+        public void WriteTimeOfDay(NetDataWriter writer)
+        {
+            writer.Put(new UpdateTimeOfDayMessage()
             {
                 timeOfDay = CurrentGameInstance.DayNightTimeUpdater.TimeOfDay,
             });
+        }
+
+        public void ReadTimeOfDay(NetDataReader reader)
+        {
+            UpdateTimeOfDayMessage message = reader.Get<UpdateTimeOfDayMessage>();
+            CurrentGameInstance.DayNightTimeUpdater.SetTimeOfDay(message.timeOfDay);
+        }
+
+        public void SendServerInfo()
+        {
+            if (!IsServer)
+                return;
+            foreach (long connectionId in Server.ConnectionIds)
+            {
+                SendServerInfo(connectionId);
+            }
+        }
+
+        public void SendServerInfo(long connectionId)
+        {
+            if (!IsServer)
+                return;
+            ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.UpdateServerInfo, WriteServerInfo);
+        }
+
+        public void WriteServerInfo(NetDataWriter writer)
+        {
+            writer.Put(new UpdateServerInfoMessage()
+            {
+                channelId = ChannelId,
+                channelTitle = ChannelTitle,
+                channelDescription = ChannelDescription,
+            });
+        }
+
+        public void ReadServerInfo(NetDataReader reader)
+        {
+            UpdateServerInfoMessage message = reader.Get<UpdateServerInfoMessage>();
+            ChannelId = message.channelId;
+            ChannelTitle = message.channelTitle;
+            ChannelDescription = message.channelDescription;
         }
 
         public void ServerSendSystemAnnounce(string message)

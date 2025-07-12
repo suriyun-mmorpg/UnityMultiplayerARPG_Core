@@ -1,7 +1,7 @@
 using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System.Collections.Generic;
+using System.Collections.Concurrent;
 using System.Net.Sockets;
 using UnityEngine;
 
@@ -81,7 +81,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="networkManager"></param>
         /// <param name="serverReadyToInstantiateObjectsStates"></param>
-        public virtual void UpdateReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, Dictionary<string, bool> serverReadyToInstantiateObjectsStates)
+        public virtual void UpdateReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, ConcurrentDictionary<string, bool> serverReadyToInstantiateObjectsStates)
         {
 
         }
@@ -92,7 +92,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="networkManager"></param>
         /// <param name="serverReadyToInstantiateObjectsStates"></param>
-        public virtual void UpdateServerReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, Dictionary<string, bool> serverReadyToInstantiateObjectsStates)
+        public virtual void UpdateServerReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, ConcurrentDictionary<string, bool> serverReadyToInstantiateObjectsStates)
         {
 
         }
@@ -103,7 +103,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="networkManager"></param>
         /// <param name="clientReadyToInstantiateObjectsStates"></param>
-        public virtual void UpdateClientReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, Dictionary<string, bool> serverReadyToInstantiateObjectsStates)
+        public virtual void UpdateClientReadyToInstantiateObjectsStates(BaseGameNetworkManager networkManager, ConcurrentDictionary<string, bool> serverReadyToInstantiateObjectsStates)
         {
 
         }

@@ -215,9 +215,9 @@ namespace MultiplayerARPG
             UnregisterPlayerCharacter(connectionId);
         }
 
-        public override void SerializeEnterGameData(NetDataWriter writer)
+
+        public override void SerializeClientReadyData(NetDataWriter writer)
         {
-            GameInstance.SelectedCharacterId = selectedCharacter.Id;
             GameInstance.PlayingCharacter = selectedCharacter;
             selectedCharacterSummonBuffs = SaveSystem.LoadSummonBuffs(selectedCharacter);
             selectedCharacterStorageItems = SaveSystem.LoadPlayerStorage(selectedCharacter);
@@ -226,31 +226,22 @@ namespace MultiplayerARPG
             writer.PutList(selectedCharacterStorageItems);
         }
 
-        public override UniTask<bool> DeserializeEnterGameData(long connectionId, NetDataReader reader)
+        public override UniTask<bool> DeserializeClientReadyData(uint requestId, long connectionId, NetDataReader reader, LiteNetLibIdentity playerIdentity)
         {
             PlayerCharacterData playerCharacterData = new PlayerCharacterData().DeserializeCharacterData(reader);
             List<CharacterBuff> playerSummonBuffs = reader.GetList<CharacterBuff>();
             List<CharacterItem> playerStorageItems = reader.GetList<CharacterItem>();
             ServerStorageHandlers.SetStorageItems(new StorageId(StorageType.Player, playerCharacterData.Id), playerStorageItems);
-            _pendingSpawnPlayerCharacters[connectionId] = playerCharacterData;
-            _pendingSpawnPlayerCharacterSummonBuffs[connectionId] = playerSummonBuffs;
-            return UniTask.FromResult(true);
-        }
-
-        public override UniTask<bool> DeserializeClientReadyData(LiteNetLibIdentity playerIdentity, long connectionId, NetDataReader reader)
-        {
-            if (!_isServerReadyToInstantiatePlayers)
+            if (!_isServerReadyToInstantiatePlayers || (IsClient && !_isClientReadyToInstantiateObjects))
             {
                 // Not ready to instantiate objects, add spawning player character to pending dictionary
                 if (LogDev) Logging.Log(LogTag, "Not ready to deserializing client ready extra");
+                _pendingSpawnPlayerCharacters[connectionId] = playerCharacterData;
+                _pendingSpawnPlayerCharacterSummonBuffs[connectionId] = playerSummonBuffs;
                 return UniTask.FromResult(true);
             }
             if (LogDev) Logging.Log(LogTag, "Deserializing client ready extra");
-            if (_pendingSpawnPlayerCharacters.TryGetValue(connectionId, out PlayerCharacterData playerCharacterData) &&
-                _pendingSpawnPlayerCharacterSummonBuffs.TryGetValue(connectionId, out List<CharacterBuff> playerSummonBuffs))
-            {
-                SpawnPlayerCharacter(connectionId, playerCharacterData, playerSummonBuffs);
-            }
+            SpawnPlayerCharacter(connectionId, playerCharacterData, playerSummonBuffs);
             return UniTask.FromResult(true);
         }
 
