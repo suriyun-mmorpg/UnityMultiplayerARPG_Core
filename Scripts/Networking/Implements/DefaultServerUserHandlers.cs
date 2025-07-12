@@ -151,7 +151,12 @@ namespace MultiplayerARPG
 
         public bool RemoveUserId(long connectionId, out string userId)
         {
-            return UserIds.TryRemove(connectionId, out userId);
+            if (UserIds.TryRemove(connectionId, out userId))
+            {
+                ConnectionIdsByUserId.TryRemove(userId, out _);
+                return true;
+            }
+            return false;
         }
 
         public IEnumerable<string> GetAccessTokens()
