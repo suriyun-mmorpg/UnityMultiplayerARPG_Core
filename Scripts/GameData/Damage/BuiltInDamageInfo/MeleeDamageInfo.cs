@@ -167,7 +167,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageableHitBox.EntityGameObject.tag;
-                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageableHitBox, damagePositionWithOffsets);
+                    PlayMeleeImpactEffect(attacker, tempTag, damagePositionWithOffsets, tempDamageableHitBox);
                 }
 #endif
             }
@@ -193,7 +193,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageTakenTarget.EntityGameObject.tag;
-                    PlayMeleeImpactEffect(attacker, tempTag, tempDamageTakenTarget, damagePositionWithOffsets);
+                    PlayMeleeImpactEffect(attacker, tempTag, damagePositionWithOffsets, tempDamageTakenTarget);
                 }
 #endif
             }
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
         }
 
 #if !UNITY_SERVER
-        private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, DamageableHitBox hitBox, Vector3 damagePosition)
+        private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, Vector3 damagePosition, DamageableHitBox hitBox)
         {
             if (impactEffects == null)
                 return;
