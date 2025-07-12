@@ -128,9 +128,10 @@ namespace MultiplayerARPG
                 placeHolder);
         }
 
-        public void ShowDisconnectDialog(DisconnectReason reason, SocketError socketError, UITextKeys message)
+        public void ShowDisconnectDialog(DisconnectReason reason, SocketError socketError, UITextKeys message, string source)
         {
             string errorMessage = LanguageManager.GetUnknowTitle();
+            string socketErrorCode = socketError == SocketError.Success ? "None" : socketError.ToString();
             if (message.IsError())
             {
                 errorMessage = LanguageManager.GetText(message.ToString());
@@ -163,8 +164,17 @@ namespace MultiplayerARPG
                 }
             }
 
-            Singleton.ShowMessageDialog(LanguageManager.GetText(UITextKeys.UI_LABEL_DISCONNECTED.ToString()),
-                errorMessage, true, false, false, false);
+            if (string.IsNullOrWhiteSpace(source))
+                source = LanguageManager.GetUnknowTitle();
+
+            Singleton.ShowMessageDialog(
+                LanguageManager.GetText(UITextKeys.UI_LABEL_DISCONNECTED.ToString()),
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                $"{errorMessage}\nRsn: {reason}\nErr: {socketErrorCode}\nMsg: {message}\nSrc: {source}",
+#else
+                LanguageManager.GetText(errorMessage.ToString()),
+#endif
+                true, false, false, false);
         }
 
         public void ShowRewardDialog(UIRewardingData rewardData)
