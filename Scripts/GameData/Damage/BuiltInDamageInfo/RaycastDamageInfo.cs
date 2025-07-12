@@ -9,6 +9,7 @@ namespace MultiplayerARPG
     {
         public float missileDistance;
         public float missileSpeed;
+        public bool isHeadshotInstantDeath;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [AddressableAssetConversion(nameof(addressableProjectEffect))]
         public ProjectileEffect projectileEffect;
@@ -104,7 +105,7 @@ namespace MultiplayerARPG
 
         public override bool IsHeadshotInstantDeath()
         {
-            return true;
+            return isHeadshotInstantDeath;
         }
 
         public override UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)

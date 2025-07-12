@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public bool hitOnlySelectedTarget;
         public float missileDistance;
         public float missileSpeed;
+        public bool isHeadshotInstantDeath;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [AddressableAssetConversion(nameof(addressableMissileDamageEntity))]
         public MissileDamageEntity missileDamageEntity;
@@ -143,7 +144,7 @@ namespace MultiplayerARPG
 
         public override bool IsHeadshotInstantDeath()
         {
-            return true;
+            return isHeadshotInstantDeath;
         }
 
         private bool IsAcceptHitBetweenTime(float dist, long launchTimestamp, long hitTimestamp, double acceptableRate)
