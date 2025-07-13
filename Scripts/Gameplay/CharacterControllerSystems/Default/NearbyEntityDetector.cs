@@ -145,7 +145,6 @@ namespace MultiplayerARPG
         {
             if (_excludeColliders.Contains(other))
                 return;
-
             if (!AddEntity(other.gameObject))
             {
                 _excludeColliders.Add(other);
