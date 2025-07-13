@@ -1,5 +1,3 @@
-using Insthync.AddressableAssetTools;
-
 namespace MultiplayerARPG
 {
     public class CharacterSummonCacheData : BaseCacheData<CharacterSummon>
@@ -67,19 +65,8 @@ namespace MultiplayerARPG
                 return _cacheBuff;
             _recachingBuff = false;
             Buff tempBuff = null;
-            BaseMonsterCharacterEntity loadedPrefab;
-            if (GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
-            {
-                loadedPrefab = addressablePrefab.GetOrLoadAsset<BaseCharacterEntity>() as BaseMonsterCharacterEntity;
-                if (loadedPrefab != null && loadedPrefab.CharacterDatabase != null)
-                    tempBuff = loadedPrefab.CharacterDatabase.SummonerBuff;
-            }
-            else
-            {
-                loadedPrefab = prefab;
-                if (loadedPrefab != null && loadedPrefab.CharacterDatabase != null)
-                    tempBuff = loadedPrefab.CharacterDatabase.SummonerBuff;
-            }
+            if (GameInstance.MonsterEntitiesData.TryGetValue(_dataId, out MonsterCharacter monsterCharacter) && monsterCharacter != null)
+                tempBuff = monsterCharacter.SummonerBuff;
             _cacheBuff.Build(tempBuff, _level);
             return _cacheBuff;
         }

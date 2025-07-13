@@ -62,6 +62,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, LiteNetLibIdentity> OtherNetworkObjectPrefabs = new Dictionary<int, LiteNetLibIdentity>();
 #endif
         public static readonly Dictionary<int, AssetReferenceLiteNetLibIdentity> AddressableOtherNetworkObjectPrefabs = new Dictionary<int, AssetReferenceLiteNetLibIdentity>();
+        public static readonly Dictionary<int, MonsterCharacter> MonsterEntitiesData = new Dictionary<int, MonsterCharacter>();
 
         #region Add game data functions
         public static void AddAttributes(params Attribute[] attributes)

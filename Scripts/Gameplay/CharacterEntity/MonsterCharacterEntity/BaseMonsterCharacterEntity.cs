@@ -169,6 +169,7 @@ namespace MultiplayerARPG
         {
             base.PrepareRelatesData();
             GameInstance.AddCharacters(CharacterDatabase);
+            GameInstance.MonsterEntitiesData[EntityId] = CharacterDatabase;
         }
 
         public override EntityInfo GetInfo()
