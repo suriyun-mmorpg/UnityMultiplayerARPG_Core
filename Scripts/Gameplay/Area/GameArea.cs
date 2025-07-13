@@ -39,7 +39,7 @@ namespace MultiplayerARPG
         public float squareSizeX = 10f;
         public float squareSizeZ = 10f;
         public bool enableRotation = true;
-        public GameAreaGroundFindingType groundFindingType = GameAreaGroundFindingType.NavMesh;
+        public GameAreaGroundFindingType groundFindingType = GameAreaGroundFindingType.Raycast;
         public float groundDetectionOffsets = 100f;
         public float findGroundUpOffsetsRate = 1f;
         public bool stillUseRandomedPositionIfGroundNotFound = false;
