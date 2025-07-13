@@ -7,6 +7,16 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class PlayerCharacterBuildingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
     {
+        private IPhysicFunctions _detectCostructionAreaPhysicFunctions;
+
+        private void Awake()
+        {
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
+                _detectCostructionAreaPhysicFunctions = new PhysicFunctions(8);
+            else
+                _detectCostructionAreaPhysicFunctions = new PhysicFunctions2D(8);
+        }
+
         public bool CallCmdConstructBuilding(int itemIndex, Vector3 position, Vector3 rotation, uint parentObjectId)
         {
             if (!Entity.CanDoActions())
@@ -41,6 +51,17 @@ namespace MultiplayerARPG
                 // Unable to build in safe area
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_IN_SAFE_AREA);
                 return;
+            }
+
+            int overlapCount = _detectCostructionAreaPhysicFunctions.OverlapObjects(position, Vector3.Distance(position, EntityTransform.position), 1 << PhysicLayers.IgnoreRaycast, false, QueryTriggerInteraction.Collide);
+            for (int i = 0; i < overlapCount; ++i)
+            {
+                if (_detectCostructionAreaPhysicFunctions.GetOverlapObject(i).TryGetComponent<SafeArea>(out _))
+                {
+                    // Unable to build in safe area
+                    GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_IN_SAFE_AREA);
+                    return;
+                }
             }
 
             CharacterItem nonEquipItem = Entity.NonEquipItems[itemIndex];
