@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
         public Color GetTitleColor(int level)
         {
-            int index = level - 1;
+            int index = level - 2;
             if (index > 0 && index < Levels.Length && Levels[index].TitleColor.a != 0)
                 return Levels[index].TitleColor;
             if (index >= Levels.Length && Levels[Levels.Length - 1].TitleColor.a != 0)
