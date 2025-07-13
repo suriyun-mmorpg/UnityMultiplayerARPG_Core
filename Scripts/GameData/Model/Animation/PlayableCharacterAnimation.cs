@@ -126,7 +126,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
 #endif
         public AssetReferenceAudioClip[] addressableAudioClips = new AssetReferenceAudioClip[0];
 
-        public AudioClip GetRandomAudioClip()
+        public async UniTask<AudioClip> GetRandomAudioClip()
         {
 #if !UNITY_SERVER
             AudioClip[] tempAudioClips = null;
@@ -140,7 +140,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             else if (addressableAudioClips != null && addressableAudioClips.Length > 0)
             {
                 AssetReferenceAudioClip clip = addressableAudioClips.GetRandomObjectInArray(out int index);
-                return clip.GetOrLoadObject<AudioClip>();
+                return await clip.GetOrLoadObjectAsync<AudioClip>();
             }
 #endif
             return null;

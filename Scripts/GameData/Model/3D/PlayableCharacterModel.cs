@@ -615,12 +615,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
         private IEnumerator PlayActionAnimationRoutine(ActionAnimation actionAnimation, float playSpeedMultiplier)
         {
             _isDoingAction = true;
-            AudioManager.PlaySfxClipAtAudioSource(actionAnimation.GetRandomAudioClip(), GenericAudioSource);
+            PlayActionAnimationAudioClip(actionAnimation);
             // Wait by animation playing duration
             yield return new WaitForSecondsRealtime(Behaviour.PlayAction(actionAnimation.state, playSpeedMultiplier));
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(actionAnimation.GetExtendDuration() / playSpeedMultiplier);
             _isDoingAction = false;
+        }
+
+        private async void PlayActionAnimationAudioClip(ActionAnimation actionAnimation)
+        {
+            AudioManager.PlaySfxClipAtAudioSource(await actionAnimation.GetRandomAudioClip(), GenericAudioSource);
         }
 
         public override void StopActionAnimation()
