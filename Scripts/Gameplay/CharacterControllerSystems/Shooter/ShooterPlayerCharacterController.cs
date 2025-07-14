@@ -507,6 +507,8 @@ namespace MultiplayerARPG
         protected bool _toggleWalkOn;
         protected bool _toggleCrouchOn;
         protected bool _toggleCrawlOn;
+        protected bool _previouslyCrouch;
+        protected bool _previouslyCrawl;
         protected ShooterControllerViewMode _dirtyViewMode;
         protected IWeaponItem _rightHandWeapon;
         protected IWeaponItem _leftHandWeapon;
@@ -812,17 +814,33 @@ namespace MultiplayerARPG
                 }
                 if (DetectExtraActive("Crouch", crouchActiveMode, isBlockController, ref _toggleCrouchOn))
                 {
-                    _extraMovementState = ExtraMovementState.IsCrouching;
-                    _toggleSprintOn = false;
-                    _toggleWalkOn = false;
-                    _toggleCrawlOn = false;
+                    if (_toggleCrouchOn && (_previouslyCrouch || PlayingCharacterEntity.AllowToCrouch()))
+                    {
+                        _extraMovementState = ExtraMovementState.IsCrouching;
+                        _toggleSprintOn = false;
+                        _toggleWalkOn = false;
+                        _toggleCrawlOn = false;
+                    }
+                    else
+                    {
+                        _toggleCrouchOn = false;
+                        ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_UNABLE_TO_CROUCH);
+                    }
                 }
                 if (DetectExtraActive("Crawl", crawlActiveMode, isBlockController, ref _toggleCrawlOn))
                 {
-                    _extraMovementState = ExtraMovementState.IsCrawling;
-                    _toggleSprintOn = false;
-                    _toggleWalkOn = false;
-                    _toggleCrouchOn = false;
+                    if (_toggleCrawlOn && (_previouslyCrawl || PlayingCharacterEntity.AllowToCrawl()))
+                    {
+                        _extraMovementState = ExtraMovementState.IsCrawling;
+                        _toggleSprintOn = false;
+                        _toggleWalkOn = false;
+                        _toggleCrouchOn = false;
+                    }
+                    else
+                    {
+                        _toggleCrawlOn = false;
+                        ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_UNABLE_TO_CRAWL);
+                    }
                 }
                 // Stand animations
                 if (PlayingCharacterEntity.MovementState.HasDirectionMovement() &&
@@ -846,27 +864,36 @@ namespace MultiplayerARPG
                     _toggleCrouchOn = false;
                     _toggleCrawlOn = false;
                 }
-                if (!isBlockController)
-                {
-                    if (InputManager.GetButtonDown("Jump"))
-                    {
-                        if (unToggleCrouchWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
-                            _toggleCrouchOn = false;
-                        else if (unToggleCrawlWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
-                            _toggleCrawlOn = false;
-                        else
-                            _movementState |= MovementState.IsJump;
-                    }
-                    if (InputManager.GetButtonDown("Dash"))
-                    {
-                        _movementState |= MovementState.IsDash;
-                    }
-                }
             }
             else
             {
                 _toggleCrouchOn = false;
                 _toggleCrawlOn = false;
+            }
+            _previouslyCrouch = _toggleCrouchOn;
+            _previouslyCrawl = _toggleCrawlOn;
+
+            if (!isBlockController)
+            {
+                if (InputManager.GetButtonDown("Jump"))
+                {
+                    if (unToggleCrouchWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrouching)
+                    {
+                        _toggleCrouchOn = false;
+                    }
+                    else if (unToggleCrawlWhenJump && PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsCrawling)
+                    {
+                        _toggleCrawlOn = false;
+                    }
+                    else
+                    {
+                        _movementState |= MovementState.IsJump;
+                    }
+                }
+                if (InputManager.GetButtonDown("Dash"))
+                {
+                    _movementState |= MovementState.IsDash;
+                }
             }
 
             _isAimming = false;
