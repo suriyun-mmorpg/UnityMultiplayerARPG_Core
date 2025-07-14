@@ -34,6 +34,10 @@ namespace MultiplayerARPG
 
         int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false);
 
+        bool GetOverlapIsTrigger(int index);
+
+        Object GetOverlapCollider(int index);
+
         GameObject GetOverlapObject(int index);
 
         Vector3 GetOverlapColliderClosestPoint(int index, Vector3 position);

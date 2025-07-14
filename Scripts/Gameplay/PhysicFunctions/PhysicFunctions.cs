@@ -136,6 +136,8 @@ namespace MultiplayerARPG
         public GameObject GetRaycastObject(int index) => _raycastSlices[index].transform.gameObject;
         public Vector3 GetRaycastColliderClosestPoint(int index, Vector3 position) => _raycastSlices[index].collider.ClosestPoint(position);
 
+        public bool GetOverlapIsTrigger(int index) => _overlapResults[index].collider.isTrigger;
+        public Object GetOverlapCollider(int index) => _overlapResults[index].collider;
         public GameObject GetOverlapObject(int index) => _overlapResults[index].collider.gameObject;
         public Vector3 GetOverlapColliderClosestPoint(int index, Vector3 position) => _overlapResults[index].collider.ClosestPoint(position);
         public bool GetOverlapColliderRaycast(int index, Vector3 origin, Vector3 direction, out Vector3 point, out Vector3 normal, out float distance, out Transform transform, float maxDistance)

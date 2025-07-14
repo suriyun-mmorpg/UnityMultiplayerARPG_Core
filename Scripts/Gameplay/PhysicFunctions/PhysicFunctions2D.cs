@@ -123,6 +123,16 @@ namespace MultiplayerARPG
                 Physics2D.OverlapCircleNonAlloc(position, radius, _overlapColliders2D, layerMask);
         }
 
+        public bool GetOverlapIsTrigger(int index)
+        {
+            return _overlapColliders2D[index].isTrigger;
+        }
+
+        public Object GetOverlapCollider(int index)
+        {
+            return _overlapColliders2D[index];
+        }
+
         public GameObject GetOverlapObject(int index)
         {
             return _overlapColliders2D[index].gameObject;
