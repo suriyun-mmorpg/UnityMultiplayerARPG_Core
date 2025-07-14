@@ -103,31 +103,35 @@ namespace MultiplayerARPG
 #endif
             DamageableHitBox tempDamageableHitBox;
             GameObject tempGameObject;
+            Object tempCollider;
+            bool tempIsTrigger;
             string tempTag;
             DamageableHitBox tempDamageTakenTarget = null;
             DamageableEntity tempSelectedTarget = null;
             bool hasSelectedTarget = hitOnlySelectedTarget && attacker.TryGetTargetEntity(out tempSelectedTarget);
+
             // Find characters that receiving damages
             for (int i = 0; i < tempHitCount; ++i)
             {
                 tempGameObject = attacker.AttackPhysicFunctions.GetOverlapObject(i);
-                Vector3 hitPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePositionWithOffsets);
-
                 if (!tempGameObject.GetComponent<IUnHittable>().IsNull())
                     continue;
 
-                tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
-                if (tempDamageableHitBox == null)
+                tempCollider = attacker.AttackPhysicFunctions.GetOverlapCollider(i);
+                tempIsTrigger = attacker.AttackPhysicFunctions.GetOverlapIsTrigger(i);
+
+                Vector3 hitPoint = attacker.AttackPhysicFunctions.GetOverlapColliderClosestPoint(i, damagePosition);
+                if (!tempGameObject.TryGetComponent(out tempDamageableHitBox))
+                    continue;
+
+                // Target position is not in hit fov?
+                if (!attacker.IsPositionInFov(damagePositionWithOffsets, hitFov, hitPoint))
                     continue;
 
                 if (tempDamageableHitBox.GetObjectId() == attacker.ObjectId)
                     continue;
 
                 if (hitObjects.Contains(tempDamageableHitBox.GetObjectId()))
-                    continue;
-
-                // Target position is not in hit fov?
-                if (!attacker.IsPositionInFov(damagePositionWithOffsets, hitFov, hitPoint))
                     continue;
 
                 // Add entity to table, if it found entity in the table next time it will skip. 
@@ -167,7 +171,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageableHitBox.EntityGameObject.tag;
-                    PlayMeleeImpactEffect(attacker, tempTag, damagePositionWithOffsets, tempDamageableHitBox);
+                    PlayMeleeImpactEffect(attacker, tempTag, damagePosition, tempDamageableHitBox);
                 }
 #endif
             }
@@ -193,7 +197,7 @@ namespace MultiplayerARPG
                 if (isPlayImpactEffects)
                 {
                     tempTag = tempDamageTakenTarget.EntityGameObject.tag;
-                    PlayMeleeImpactEffect(attacker, tempTag, damagePositionWithOffsets, tempDamageTakenTarget);
+                    PlayMeleeImpactEffect(attacker, tempTag, damagePosition, tempDamageTakenTarget);
                 }
 #endif
             }
@@ -209,9 +213,21 @@ namespace MultiplayerARPG
             Vector3 position = hitBox.Bounds.center;
             Vector3 targetPosition = hitBox.Bounds.center;
             targetPosition.y = damagePosition.y;
+            float dist = (targetPosition - damagePosition).magnitude;
             Vector3 dir = (targetPosition - damagePosition).normalized;
-            Quaternion rotation = Quaternion.LookRotation(Vector3.up, dir);
-            impactEffects.PlayEffect(tag, position, rotation);
+            Quaternion rotation = Quaternion.LookRotation(Vector3.up, -dir);
+            impactEffects.PlayEffect(tag, damagePosition + (dir * dist), rotation);
+        }
+#endif
+
+#if !UNITY_SERVER
+        private void PlayMeleeImpactEffect(BaseCharacterEntity attacker, string tag, Vector3 damagePosition, Vector3 hitPoint)
+        {
+            if (impactEffects == null)
+                return;
+            Vector3 dir = (hitPoint - damagePosition).normalized;
+            Quaternion rotation = Quaternion.LookRotation(Vector3.up, -dir);
+            impactEffects.PlayEffect(tag, hitPoint, rotation);
         }
 #endif
     }
