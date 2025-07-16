@@ -51,14 +51,39 @@ namespace MultiplayerARPG
         {
             base.OnEnable();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onRecached += OnUpdateCharacterItems;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation += PlayingCharacterEntity_onEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation += PlayingCharacterEntity_onNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation += PlayingCharacterEntity_onSelectableWeaponSetsOperation;
         }
 
         protected override void OnDisable()
         {
             base.OnDisable();
             if (!GameInstance.PlayingCharacterEntity) return;
-            GameInstance.PlayingCharacterEntity.onRecached -= OnUpdateCharacterItems;
+            GameInstance.PlayingCharacterEntity.onEquipItemsOperation -= PlayingCharacterEntity_onEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= PlayingCharacterEntity_onNonEquipItemsOperation;
+            GameInstance.PlayingCharacterEntity.onSelectableWeaponSetsOperation -= PlayingCharacterEntity_onSelectableWeaponSetsOperation;
+        }
+
+        private void PlayingCharacterEntity_onEquipItemsOperation(LiteNetLibSyncListOp op, int itemIndex, CharacterItem oldItem, CharacterItem newItem)
+        {
+            if (InventoryType != InventoryType.EquipItems || IndexOfData != itemIndex)
+                return;
+            OnUpdateCharacterItems();
+        }
+
+        private void PlayingCharacterEntity_onNonEquipItemsOperation(LiteNetLibSyncListOp op, int itemIndex, CharacterItem oldItem, CharacterItem newItem)
+        {
+            if (InventoryType != InventoryType.NonEquipItems || IndexOfData != itemIndex)
+                return;
+            OnUpdateCharacterItems();
+        }
+
+        private void PlayingCharacterEntity_onSelectableWeaponSetsOperation(LiteNetLibSyncListOp op, int itemIndex, EquipWeapons oldItem, EquipWeapons newItem)
+        {
+            if ((InventoryType != InventoryType.EquipWeaponLeft && InventoryType != InventoryType.EquipWeaponRight) || EquipSlotIndex != itemIndex)
+                return;
+            OnUpdateCharacterItems();
         }
 
         protected override void Update()
@@ -101,6 +126,5 @@ namespace MultiplayerARPG
         }
 
         public abstract void OnUpdateCharacterItems();
-
     }
 }
