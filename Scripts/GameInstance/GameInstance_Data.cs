@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
-using NotifiableCollection;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -9,9 +8,9 @@ namespace MultiplayerARPG
 {
     public partial class GameInstance
     {
-        public static readonly NotifiableDictionary<int, Attribute> Attributes = new NotifiableDictionary<int, Attribute>();
-        public static readonly NotifiableDictionary<int, DamageElement> DamageElements = new NotifiableDictionary<int, DamageElement>();
-        public static readonly NotifiableDictionary<int, Currency> Currencies = new NotifiableDictionary<int, Currency>();
+        public static readonly GameDataDictionary<Attribute> Attributes = new GameDataDictionary<Attribute>();
+        public static readonly GameDataDictionary<DamageElement> DamageElements = new GameDataDictionary<DamageElement>();
+        public static readonly GameDataDictionary<Currency> Currencies = new GameDataDictionary<Currency>();
         public static readonly Dictionary<int, BaseItem> CurrencyDropRepresentItems = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, Dictionary<int, BaseItem>> ItemsByAmmoType = new Dictionary<int, Dictionary<int, BaseItem>>();

@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// `Key` is key from `NotifiableDictionary<int, TType>`, `Value` is indexes which will be prepared in `PrepareIndexes()`
         /// </summary>
-        private Dictionary<int, int> _indexes = new Dictionary<int, int>();
+        private readonly Dictionary<int, int> _indexes = new Dictionary<int, int>();
 
         public bool IsIndexesOutdate()
         {
