@@ -564,6 +564,7 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
+                    Debug.LogError("Reached here");
                     if (oldItem.IsDiffer(newItem, true, true, true, true))
                     {
                         MarkToUpdateAppearances();
@@ -589,6 +590,7 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
+                    Debug.LogError("Reached here 2");
                     if (oldItem.IsDiffer(newItem, true, true, true, true))
                         IsRecaching = true;
                     break;

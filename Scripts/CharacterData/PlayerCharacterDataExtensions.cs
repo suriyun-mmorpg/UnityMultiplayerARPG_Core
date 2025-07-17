@@ -121,7 +121,7 @@ namespace MultiplayerARPG
             return character.SetNewPlayerCharacterData(GameInstance.PlayerCharacters, GameInstance.Attributes, startGold, startItems, characterName, dataId, entityId, factionId);
         }
 
-        public static T SetNewPlayerCharacterData<T>(this T character, Dictionary<int, PlayerCharacter> playerCharacters, Dictionary<int, Attribute> attributes, int startGold, ItemAmount[] startItems, string characterName, int dataId, int entityId, int factionId) where T : IPlayerCharacterData
+        public static T SetNewPlayerCharacterData<T>(this T character, Dictionary<int, PlayerCharacter> playerCharacters, IDictionary<int, Attribute> attributes, int startGold, ItemAmount[] startItems, string characterName, int dataId, int entityId, int factionId) where T : IPlayerCharacterData
         {
             if (!playerCharacters.TryGetValue(dataId, out PlayerCharacter playerCharacter))
                 return character;

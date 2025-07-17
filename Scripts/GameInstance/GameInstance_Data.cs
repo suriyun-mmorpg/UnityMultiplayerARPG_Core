@@ -1,17 +1,17 @@
 using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
+using NotifiableCollection;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.AddressableAssets;
-using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
 {
     public partial class GameInstance
     {
-        public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
-        public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
+        public static readonly NotifiableDictionary<int, Attribute> Attributes = new NotifiableDictionary<int, Attribute>();
+        public static readonly NotifiableDictionary<int, DamageElement> DamageElements = new NotifiableDictionary<int, DamageElement>();
+        public static readonly NotifiableDictionary<int, Currency> Currencies = new NotifiableDictionary<int, Currency>();
         public static readonly Dictionary<int, BaseItem> CurrencyDropRepresentItems = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, BaseItem> Items = new Dictionary<int, BaseItem>();
         public static readonly Dictionary<int, Dictionary<int, BaseItem>> ItemsByAmmoType = new Dictionary<int, Dictionary<int, BaseItem>>();
@@ -34,7 +34,6 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, GuildIcon> GuildIcons = new Dictionary<int, GuildIcon>();
         public static readonly Dictionary<int, Gacha> Gachas = new Dictionary<int, Gacha>();
         public static readonly Dictionary<int, StatusEffect> StatusEffects = new Dictionary<int, StatusEffect>();
-        public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
         public static readonly Dictionary<int, EquipmentSet> EquipmentSets = new Dictionary<int, EquipmentSet>();
 #if !EXCLUDE_PREFAB_REFS
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
@@ -985,7 +984,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private static void AddManyGameData<T>(Dictionary<int, T> dict, IEnumerable<T> list)
+        private static void AddManyGameData<T>(IDictionary<int, T> dict, IEnumerable<T> list)
             where T : IGameData
         {
             if (list == null)
@@ -996,7 +995,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private static bool AddGameData<T>(Dictionary<int, T> dict, T data)
+        private static bool AddGameData<T>(IDictionary<int, T> dict, T data)
             where T : IGameData
         {
             if ((data as Object) == null)
