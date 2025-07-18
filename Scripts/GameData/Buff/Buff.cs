@@ -7,6 +7,8 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial class Buff
     {
+        public static readonly Buff Empty = new Buff();
+
         [Header("Generic Settings")]
         public string tag;
         public string[] restrictTags = new string[0];

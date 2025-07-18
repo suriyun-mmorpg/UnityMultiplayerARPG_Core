@@ -711,11 +711,7 @@ namespace MultiplayerARPG
 
         public void UpdateAppliedAilments(CalculatedBuff buff)
         {
-            if (buff == null)
-                return;
             Buff tempBuff = buff.GetBuff();
-            if (tempBuff == null)
-                return;
             switch (tempBuff.ailment)
             {
                 case AilmentPresets.Stun:

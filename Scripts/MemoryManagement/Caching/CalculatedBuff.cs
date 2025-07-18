@@ -134,6 +134,10 @@ namespace MultiplayerARPG
                     _cacheMountLevel = mount.Level.GetAmount(_level);
                 }
             }
+            else
+            {
+                buff = Buff.Empty;
+            }
 
             if (GameExtensionInstance.onBuildCalculatedBuff != null)
                 GameExtensionInstance.onBuildCalculatedBuff(this);
