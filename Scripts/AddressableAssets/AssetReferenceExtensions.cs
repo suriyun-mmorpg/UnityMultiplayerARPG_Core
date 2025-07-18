@@ -56,6 +56,57 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public static int GetPrefabEntityId(this SummonType summonType, int dataId)
+        {
+            BaseMonsterCharacterEntity prefab = null;
+            AssetReferenceBaseMonsterCharacterEntity addressablePrefab = null;
+            switch (summonType)
+            {
+                case SummonType.Skill:
+                    if (GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill) &&
+                        skill.TryGetSummon(out SkillSummon skillSummon))
+                    {
+                        if (skillSummon.MonsterCharacterEntity != null)
+                        {
+                            prefab = skillSummon.MonsterCharacterEntity;
+                            return prefab.HashAssetId;
+                        }
+                        else if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
+                        {
+                            addressablePrefab = skillSummon.AddressableMonsterCharacterEntity;
+                            return addressablePrefab.HashAssetId;
+                        }
+                    }
+                    break;
+                case SummonType.PetItem:
+                    if (GameInstance.Items.TryGetValue(dataId, out BaseItem item) &&
+                        item.IsPet() && item is IPetItem petItem)
+                    {
+                        if (petItem.MonsterCharacterEntity != null)
+                        {
+                            prefab = petItem.MonsterCharacterEntity;
+                            return prefab.HashAssetId;
+                        }
+                        else if (petItem.AddressableMonsterCharacterEntity.IsDataValid())
+                        {
+                            addressablePrefab = petItem.AddressableMonsterCharacterEntity;
+                            return addressablePrefab.HashAssetId;
+                        }
+                    }
+                    break;
+                case SummonType.Custom:
+                    if (GameInstance.CustomSummonManager.GetPrefab(out prefab, out addressablePrefab))
+                    {
+                        return addressablePrefab.HashAssetId;
+                    }
+                    else
+                    {
+                        return prefab.HashAssetId;
+                    }
+            }
+            return 0;
+        }
+
         public static bool GetPrefab(this MountType mountType, ICharacterData characterData, string sourceId,
             out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab)
         {
