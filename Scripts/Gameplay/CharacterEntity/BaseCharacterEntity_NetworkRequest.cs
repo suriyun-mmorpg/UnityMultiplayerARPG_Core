@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using LiteNetLib;
+
+namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
@@ -6,7 +8,7 @@
         {
             if (!CanPickup())
                 return false;
-            RPC(CmdPickup, objectId);
+            RPC(CmdPickup, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, objectId);
             CallRpcPlayPickupAnimation();
             return true;
         }
@@ -15,7 +17,7 @@
         {
             if (!CanPickup())
                 return false;
-            RPC(CmdPickupItemFromContainer, objectId, itemsContainerIndex, amount);
+            RPC(CmdPickupItemFromContainer, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, objectId, itemsContainerIndex, amount);
             CallRpcPlayPickupAnimation();
             return true;
         }
@@ -24,7 +26,7 @@
         {
             if (!CanPickup())
                 return false;
-            RPC(CmdPickupAllItemsFromContainer, objectId);
+            RPC(CmdPickupAllItemsFromContainer, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, objectId);
             CallRpcPlayPickupAnimation();
             return true;
         }
@@ -33,7 +35,7 @@
         {
             if (!CanPickup())
                 return false;
-            RPC(CmdPickupNearbyItems);
+            RPC(CmdPickupNearbyItems, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
             CallRpcPlayPickupAnimation();
             return true;
         }
@@ -88,13 +90,13 @@
 
         public bool CallRpcOnLevelUp()
         {
-            RPC(RpcOnLevelUp);
+            RPC(RpcOnLevelUp, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
             return true;
         }
 
         public bool CallCmdUnSummon(uint objectId)
         {
-            RPC(CmdUnSummon, objectId);
+            RPC(CmdUnSummon, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, objectId);
             return true;
         }
     }

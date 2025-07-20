@@ -1,3 +1,4 @@
+using LiteNetLib;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -9,7 +10,7 @@ namespace MultiplayerARPG
         public void TogglePkMode()
         {
 #if !DISABLE_CLASSIC_PK
-            RPC(CmdTogglePkMode);
+            RPC(CmdTogglePkMode, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
 #endif
         }
 

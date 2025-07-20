@@ -1,3 +1,4 @@
+using LiteNetLib;
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
@@ -7,7 +8,7 @@ namespace MultiplayerARPG
         #region Play Jump Animation
         public void CallRpcPlayJumpAnimation()
         {
-            RPC(RpcPlayJumpAnimation);
+            RPC(RpcPlayJumpAnimation, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
         }
 
         [AllRpc]
@@ -26,7 +27,7 @@ namespace MultiplayerARPG
         #region Play Pickup Animation
         public void CallRpcPlayPickupAnimation()
         {
-            RPC(RpcPlayPickupAnimation);
+            RPC(RpcPlayPickupAnimation, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
         }
 
         [AllRpc]

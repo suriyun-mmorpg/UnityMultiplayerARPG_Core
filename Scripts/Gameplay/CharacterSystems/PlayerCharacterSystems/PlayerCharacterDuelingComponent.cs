@@ -1,3 +1,4 @@
+using LiteNetLib;
 using LiteNetLibManager;
 using UnityEngine;
 
@@ -161,7 +162,7 @@ namespace MultiplayerARPG
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return false;
             }
-            RPC(CmdSendDuelingRequest, objectId);
+            RPC(CmdSendDuelingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, objectId);
             return true;
         }
 
@@ -203,7 +204,7 @@ namespace MultiplayerARPG
 
         public bool CallOwnerReceiveDuelingRequest(uint objectId)
         {
-            RPC(TargetReceiveDuelingRequest, ConnectionId, objectId);
+            RPC(TargetReceiveDuelingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, ConnectionId, objectId);
             return true;
         }
 
@@ -219,7 +220,7 @@ namespace MultiplayerARPG
 
         public bool CallCmdAcceptDuelingRequest()
         {
-            RPC(CmdAcceptDuelingRequest);
+            RPC(CmdAcceptDuelingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
             return true;
         }
 
@@ -260,7 +261,7 @@ namespace MultiplayerARPG
 
         public bool CallCmdDeclineDuelingRequest()
         {
-            RPC(CmdDeclineDuelingRequest);
+            RPC(CmdDeclineDuelingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
             return true;
         }
 

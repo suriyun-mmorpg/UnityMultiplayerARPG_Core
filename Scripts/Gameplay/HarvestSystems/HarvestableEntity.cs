@@ -1,5 +1,6 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.UnityEditorUtils;
+using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -128,7 +129,7 @@ namespace MultiplayerARPG
 
         public void CallRpcOnHarvestableDestroy()
         {
-            RPC(RpcOnHarvestableDestroy);
+            RPC(RpcOnHarvestableDestroy, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
         }
 
         [AllRpc]

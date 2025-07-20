@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using LiteNetLib;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -58,7 +59,7 @@ namespace MultiplayerARPG
 
         public bool CallCmdAssignHotkey(string hotkeyId, HotkeyType type, string id)
         {
-            RPC(CmdAssignHotkey, hotkeyId, type, id);
+            RPC(CmdAssignHotkey, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, hotkeyId, type, id);
             return true;
         }
 
@@ -137,7 +138,7 @@ namespace MultiplayerARPG
             if (gold > Gold)
                 return false;
 
-            RPC(CmdDropGold, gold);
+            RPC(CmdDropGold, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, gold);
             return true;
         }
     }
