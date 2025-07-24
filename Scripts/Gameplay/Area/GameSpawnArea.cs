@@ -1,9 +1,11 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Serialization;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -87,6 +89,7 @@ namespace MultiplayerARPG
         }
 
         public abstract void SpawnAll();
+        public abstract void CancelAllSpawning();
     }
 
     public abstract class GameSpawnArea<T> : GameSpawnArea where T : LiteNetLibBehaviour
@@ -131,6 +134,7 @@ namespace MultiplayerARPG
 
         protected float _respawnPendingEntitiesTimer = 0f;
         protected List<SpawnPrefabData> _pending = new List<SpawnPrefabData>();
+        protected List<CancellationTokenSource> _spawnCancellations = new List<CancellationTokenSource>();
 
         protected override void OnDestroy()
         {
@@ -139,6 +143,8 @@ namespace MultiplayerARPG
             spawningPrefabs = null;
             _pending?.Clear();
             _pending = null;
+            CancelAllSpawning();
+            _spawnCancellations = null;
         }
 
         protected override void LateUpdate()
@@ -147,6 +153,9 @@ namespace MultiplayerARPG
                 return;
 
             base.LateUpdate();
+
+            if (!AbleToSpawn())
+                return;
 
             if (_pending.Count > 0)
             {
@@ -238,6 +247,16 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void CancelAllSpawning()
+        {
+            _pending.Clear();
+            foreach (CancellationTokenSource spawnCancellation in _spawnCancellations)
+            {
+                spawnCancellation.Cancel();
+            }
+            _spawnCancellations.Clear();
+        }
+
         public virtual void SpawnByAmount(T prefab, AddressablePrefab addressablePrefab, int level, int amount, float destroyRespawnDelay)
         {
             for (int i = 0; i < amount; ++i)
@@ -246,17 +265,31 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual Coroutine Spawn(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay)
+        public virtual async void Spawn(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay)
         {
-            return StartCoroutine(SpawnRoutine(prefab, addressablePrefab, level, delay, destroyRespawnDelay));
+            if (prefab == null && !addressablePrefab.IsDataValid())
+                return;
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            _spawnCancellations.Add(cancellationTokenSource);
+            try
+            {
+                await SpawnRoutine(prefab, addressablePrefab, level, delay, destroyRespawnDelay, cancellationTokenSource);
+            }
+            catch { }
+            finally
+            {
+                _spawnCancellations.Remove(cancellationTokenSource);
+            }
         }
 
-        IEnumerator SpawnRoutine(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay)
+        async UniTask SpawnRoutine(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay, CancellationTokenSource cancellationTokenSource)
         {
-            yield return new WaitForSecondsRealtime(delay);
+            await UniTask.Delay(Mathf.RoundToInt(delay * 1000), cancellationToken: cancellationTokenSource.Token);
             if (!AbleToSpawn())
             {
-                yield break;
+                Debug.Log($"Not able to spawn, Spawn Type={spawnType}, Spawn State={_subscribeHandler.CurrentSpawnState}");
+                return;
             }
             T newEntity = SpawnInternal(prefab, addressablePrefab, level, destroyRespawnDelay);
             if (newEntity == null)

@@ -19,22 +19,16 @@ namespace MultiplayerARPG
 
         protected float _respawnPendingEntitiesTimer = 0f;
         protected List<CharacterItem> _pending = new List<CharacterItem>();
-        protected CancellationTokenSource _cancellationSource;
-
-        protected override void Awake()
-        {
-            base.Awake();
-            _cancellationSource = new CancellationTokenSource();
-        }
+        protected List<CancellationTokenSource> _spawnCancellations = new List<CancellationTokenSource>();
 
         protected override void OnDestroy()
         {
             base.OnDestroy();
             weightTable = null;
-            _cancellationSource?.Cancel();
-            _cancellationSource = null;
             _pending?.Clear();
             _pending = null;
+            CancelAllSpawning();
+            _spawnCancellations = null;
         }
 
         protected override void LateUpdate()
@@ -43,6 +37,9 @@ namespace MultiplayerARPG
                 return;
 
             base.LateUpdate();
+
+            if (!AbleToSpawn())
+                return;
 
             if (_pending.Count > 0)
             {
@@ -84,22 +81,40 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void CancelAllSpawning()
+        {
+            _pending.Clear();
+            foreach (CancellationTokenSource spawnCancellation in _spawnCancellations)
+            {
+                spawnCancellation.Cancel();
+            }
+            _spawnCancellations.Clear();
+        }
+
         public virtual async void Spawn(CharacterItem item, float delay)
         {
             if (item.IsEmptySlot())
-            {
                 return;
-            }
+
+            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
+            _spawnCancellations.Add(cancellationTokenSource);
             try
             {
-                await UniTask.Delay(Mathf.RoundToInt(delay * 1000), cancellationToken: _cancellationSource.Token);
+                await SpawnRoutine(item, delay, cancellationTokenSource);
             }
-            catch
+            catch { }
+            finally
             {
-                return;
+                _spawnCancellations.Remove(cancellationTokenSource);
             }
+        }
+
+        async UniTask SpawnRoutine(CharacterItem item, float delay, CancellationTokenSource cancellationTokenSource)
+        {
+            await UniTask.Delay(Mathf.RoundToInt(delay * 1000), cancellationToken: cancellationTokenSource.Token);
             if (!AbleToSpawn())
             {
+                Debug.Log($"Not able to spawn, Spawn Type={spawnType}, Spawn State={_subscribeHandler.CurrentSpawnState}");
                 return;
             }
             if (GetRandomPosition(out Vector3 dropPosition))

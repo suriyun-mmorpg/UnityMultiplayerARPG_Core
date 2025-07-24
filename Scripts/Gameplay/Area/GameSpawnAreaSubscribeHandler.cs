@@ -145,6 +145,7 @@ namespace MultiplayerARPG
                     entityHandler.Handler = null;
                     entityHandler.Entity.NetworkDestroy();
                 }
+                GameSpawnArea.CancelAllSpawning();
                 _entityHandlers.Clear();
             }
         }
