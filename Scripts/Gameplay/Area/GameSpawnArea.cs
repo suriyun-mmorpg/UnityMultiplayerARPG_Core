@@ -249,7 +249,7 @@ namespace MultiplayerARPG
 
         public override void CancelAllSpawning()
         {
-            _pending.Clear();
+            _pending?.Clear();
             foreach (CancellationTokenSource spawnCancellation in _spawnCancellations)
             {
                 spawnCancellation.Cancel();
