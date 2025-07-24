@@ -37,7 +37,7 @@ namespace MultiplayerARPG
         public string ChannelTag { get; set; } = string.Empty;
         public string ChannelPassword { get; set; } = string.Empty;
         public BaseMapInfo MapInfo { get; protected set; } = null;
-        public static BaseMapInfo CurrentMapInfo => Singleton.MapInfo;
+        public static BaseMapInfo CurrentMapInfo => Singleton == null ? null : Singleton.MapInfo;
         public bool ShouldPhysicSyncTransforms { get; set; }
         public bool ShouldPhysicSyncTransforms2D { get; set; }
 
