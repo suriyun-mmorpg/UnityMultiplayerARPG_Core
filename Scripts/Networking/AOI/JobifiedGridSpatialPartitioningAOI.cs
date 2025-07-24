@@ -66,10 +66,10 @@ namespace MultiplayerARPG
             var mapBounds = GenericUtils.GetComponentsFromAllLoadedScenes<AOIMapBounds>(true);
             if (mapBounds.Count > 0)
             {
-                _bounds = mapBounds[0].bounds;
+                _bounds = mapBounds[0].GetBounds();
                 for (int i = 0; i < mapBounds.Count; ++i)
                 {
-                    _bounds.Encapsulate(mapBounds[i].bounds);
+                    _bounds.Encapsulate(mapBounds[i].GetBounds());
                 }
                 _bounds.extents += bufferedCells * cellSize * 2;
                 switch (GameInstance.Singleton.DimensionType)
