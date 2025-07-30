@@ -2,7 +2,6 @@
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -14,6 +13,7 @@ namespace MultiplayerARPG
 {
     public abstract class GameSpawnArea : GameArea
     {
+        public const float SPAWN_UPDATE_DELAY = 1f;
         public enum SpawnType
         {
             Default,
@@ -73,8 +73,6 @@ namespace MultiplayerARPG
 
         public void SpawnFirstTime()
         {
-            if (spawnType == SpawnType.SpawnIfPlayerNearby)
-                return;
             SpawnAll();
         }
 
@@ -88,8 +86,8 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public abstract void OnDestroyBySubscribeHandler(GameSpawnAreaEntityHandler handler);
         public abstract void SpawnAll();
-        public abstract void CancelAllSpawning();
     }
 
     public abstract class GameSpawnArea<T> : GameSpawnArea where T : LiteNetLibBehaviour
@@ -117,8 +115,30 @@ namespace MultiplayerARPG
             public AddressablePrefab addressablePrefab;
             [Min(1)]
             public int level;
+            [FormerlySerializedAs("amount")]
             [Min(1)]
-            public int amount;
+            public int minAmount = 1;
+            [Min(1)]
+            public int maxAmount = 1;
+            public float destroyRespawnDelay;
+
+            public int GetRandomedSpawnAmount()
+            {
+                if (maxAmount < minAmount)
+                    return minAmount;
+                return Random.Range(minAmount, maxAmount);
+            }
+        }
+
+        [System.Serializable]
+        public class SpawnPendingData
+        {
+#if !EXCLUDE_PREFAB_REFS
+            public T prefab;
+#endif
+            public AddressablePrefab addressablePrefab;
+            public int level;
+            public float countdown;
             public float destroyRespawnDelay;
         }
 
@@ -132,9 +152,9 @@ namespace MultiplayerARPG
         [Header("Multiple Spawning Data")]
         public List<SpawnPrefabData> spawningPrefabs = new List<SpawnPrefabData>();
 
-        protected float _respawnPendingEntitiesTimer = 0f;
-        protected List<SpawnPrefabData> _pending = new List<SpawnPrefabData>();
-        protected List<CancellationTokenSource> _spawnCancellations = new List<CancellationTokenSource>();
+        protected float secondsCounter = 0f;
+        protected List<SpawnPendingData> _pending = new List<SpawnPendingData>();
+        protected List<SpawnPendingData> _unableToSpawns = new List<SpawnPendingData>();
 
         protected override void OnDestroy()
         {
@@ -143,8 +163,8 @@ namespace MultiplayerARPG
             spawningPrefabs = null;
             _pending?.Clear();
             _pending = null;
-            CancelAllSpawning();
-            _spawnCancellations = null;
+            _unableToSpawns?.Clear();
+            _unableToSpawns = null;
         }
 
         protected override void LateUpdate()
@@ -157,34 +177,40 @@ namespace MultiplayerARPG
             if (!AbleToSpawn())
                 return;
 
+            float deltaTime = Time.deltaTime;
             if (_pending.Count > 0)
             {
-                _respawnPendingEntitiesTimer += Time.deltaTime;
-                if (_respawnPendingEntitiesTimer >= respawnPendingEntitiesDelay)
+                secondsCounter += deltaTime;
+                if (secondsCounter < SPAWN_UPDATE_DELAY)
+                    return;
+                float decreaseCountdown = secondsCounter;
+                secondsCounter -= SPAWN_UPDATE_DELAY;
+                for (int i = _pending.Count - 1; i >= 0; --i)
                 {
-                    _respawnPendingEntitiesTimer = 0f;
-                    T prefab;
-                    AddressablePrefab addressablePrefab;
-                    foreach (SpawnPrefabData pendingEntry in _pending)
+                    SpawnPendingData pendingEntry = _pending[i];
+                    if (pendingEntry == null)
                     {
-                        prefab = null;
-#if !EXCLUDE_PREFAB_REFS
-                        prefab = pendingEntry.prefab;
-#endif
-                        addressablePrefab = pendingEntry.addressablePrefab;
-#if UNITY_EDITOR || DEBUG_SPAWN_AREA
-                        Logging.LogWarning(ToString(), $"Spawning pending entities, Prefab: {prefab?.name ?? "None"}, Addressable: {addressablePrefab?.RuntimeKey ?? "None"}, Amount: {pendingEntry.amount}.");
-#endif
-                        for (int i = 0; i < pendingEntry.amount; ++i)
-                        {
-                            float destroyRespawnDelay = pendingEntry.destroyRespawnDelay;
-                            if (destroyRespawnDelay <= 0f)
-                                destroyRespawnDelay = this.destroyRespawnDelay;
-                            Spawn(prefab, addressablePrefab, pendingEntry.level, 0, destroyRespawnDelay);
-                        }
+                        _pending.RemoveAt(i);
+                        continue;
                     }
-                    _pending.Clear();
+
+                    pendingEntry.countdown -= decreaseCountdown;
+                    if (pendingEntry.countdown > 0f)
+                    {
+                        continue;
+                    }
+                    SpawnRoutine(i);
                 }
+            }
+
+            if (_unableToSpawns.Count > 0)
+            {
+                // Add unable spawns to pending list
+                for (int i = 0; i < _unableToSpawns.Count; ++i)
+                {
+                    _pending.Add(_unableToSpawns[i]);
+                }
+                _unableToSpawns.Clear();
             }
         }
 
@@ -215,6 +241,13 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void OnDestroyBySubscribeHandler(GameSpawnAreaEntityHandler handler)
+        {
+            SpawnPendingData pendingData = handler.SpawnData as SpawnPendingData;
+            pendingData.countdown = 1f;
+            AddPending(pendingData);
+        }
+
 #if UNITY_EDITOR
         [ContextMenu("Spawn All")]
 #endif
@@ -227,11 +260,7 @@ namespace MultiplayerARPG
             AddressablePrefab addressablePrefab = this.addressablePrefab;
             if (prefab != null || addressablePrefab.IsDataValid())
             {
-                int amount = GetRandomedSpawnAmount();
-                for (int i = 0; i < amount; ++i)
-                {
-                    Spawn(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), 0, destroyRespawnDelay);
-                }
+                SpawnByAmount(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), GetRandomedSpawnAmount(), destroyRespawnDelay);
             }
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
@@ -243,18 +272,8 @@ namespace MultiplayerARPG
                 float destroyRespawnDelay = spawningPrefab.destroyRespawnDelay;
                 if (destroyRespawnDelay <= 0f)
                     destroyRespawnDelay = this.destroyRespawnDelay;
-                SpawnByAmount(prefab, addressablePrefab, spawningPrefab.level, spawningPrefab.amount, destroyRespawnDelay);
+                SpawnByAmount(prefab, addressablePrefab, spawningPrefab.level, spawningPrefab.GetRandomedSpawnAmount(), destroyRespawnDelay);
             }
-        }
-
-        public override void CancelAllSpawning()
-        {
-            _pending?.Clear();
-            foreach (CancellationTokenSource spawnCancellation in _spawnCancellations)
-            {
-                spawnCancellation.Cancel();
-            }
-            _spawnCancellations.Clear();
         }
 
         public virtual void SpawnByAmount(T prefab, AddressablePrefab addressablePrefab, int level, int amount, float destroyRespawnDelay)
@@ -265,56 +284,59 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual async void Spawn(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay)
+        public virtual void Spawn(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay)
         {
             if (prefab == null && !addressablePrefab.IsDataValid())
                 return;
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            _spawnCancellations.Add(cancellationTokenSource);
-            try
+            AddPending(new SpawnPendingData()
             {
-                await SpawnRoutine(prefab, addressablePrefab, level, delay, destroyRespawnDelay, cancellationTokenSource);
-            }
-            catch { }
-            finally
-            {
-                _spawnCancellations.Remove(cancellationTokenSource);
-            }
+                prefab = prefab,
+                addressablePrefab = addressablePrefab,
+                level = level,
+                countdown = delay,
+                destroyRespawnDelay = destroyRespawnDelay,
+            });
         }
 
-        async UniTask SpawnRoutine(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay, CancellationTokenSource cancellationTokenSource)
+        private void SpawnRoutine(int pendingIndex)
         {
-            await UniTask.Delay(Mathf.RoundToInt(delay * 1000), cancellationToken: cancellationTokenSource.Token);
             if (!AbleToSpawn())
             {
                 Debug.Log($"Not able to spawn, Spawn Type={spawnType}, Spawn State={_subscribeHandler.CurrentSpawnState}");
                 return;
             }
-            T newEntity = SpawnInternal(prefab, addressablePrefab, level, destroyRespawnDelay);
-            if (newEntity == null)
-            {
-                AddPending(new SpawnPrefabData()
-                {
+            SpawnPendingData pendingEntry = _pending[pendingIndex];
+            _pending.RemoveAt(pendingIndex);
+
+            T prefab = null;
 #if !EXCLUDE_PREFAB_REFS
-                    prefab = prefab,
+            prefab = pendingEntry.prefab;
 #endif
-                    addressablePrefab = addressablePrefab,
-                    level = level,
-                    amount = 1,
-                    destroyRespawnDelay = destroyRespawnDelay,
-                });
+            AddressablePrefab addressablePrefab = pendingEntry.addressablePrefab;
+
+            int level = pendingEntry.level <= 0 ? 1 : pendingEntry.level;
+            float destroyRespawnDelay = pendingEntry.destroyRespawnDelay;
+            if (destroyRespawnDelay <= 0f)
+                destroyRespawnDelay = this.destroyRespawnDelay;
+
+            T newEntity = SpawnInternal(prefab, addressablePrefab, level, destroyRespawnDelay);
+            if (newEntity != null)
+            {
+                // Store to entities collection, so the spawner can manage them later
+                _subscribeHandler.AddEntity(newEntity, pendingEntry);
             }
             else
             {
-                // Store to entities collection, so the spawner can manage them later
-                _subscribeHandler.AddEntity(newEntity);
+                // Unable to spawn yet, will add to spawn pending later
+                pendingEntry.countdown = respawnPendingEntitiesDelay;
+                _unableToSpawns.Add(pendingEntry);
             }
         }
 
         protected abstract T SpawnInternal(T prefab, AddressablePrefab addressablePrefab, int level, float destroyRespawnDelay);
 
-        protected virtual void AddPending(SpawnPrefabData data)
+        protected virtual void AddPending(SpawnPendingData data)
         {
             _pending.Add(data);
         }
@@ -329,27 +351,10 @@ namespace MultiplayerARPG
                 List<SpawnPrefabData> spawningPrefabs = new List<SpawnPrefabData>(area.spawningPrefabs);
                 foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
                 {
-                    count += spawningPrefab.amount;
+                    count += spawningPrefab.minAmount;
                 }
             }
             Debug.Log($"Spawning {typeof(T).Name} Amount: {count}");
         }
-
-#if UNITY_EDITOR
-        [ContextMenu("Fix invalid `respawnPendingEntitiesDelay` settings")]
-        public virtual void FixInvalidRespawnPendingEntitiesDelaySettings()
-        {
-            GameSpawnArea[] spawnAreas = FindObjectsOfType<GameSpawnArea>(true);
-            for (int i = 0; i < spawnAreas.Length; ++i)
-            {
-                if (spawnAreas[i].destroyRespawnDelay > 0f)
-                    continue;
-                spawnAreas[i].destroyRespawnDelay = spawnAreas[i].respawnPendingEntitiesDelay;
-                spawnAreas[i].respawnPendingEntitiesDelay = 5f;
-                Debug.Log($"[FIXED] {spawnAreas[i].name}, `destroyRespawnDelay` -> {spawnAreas[i].destroyRespawnDelay}", spawnAreas[i].gameObject);
-                EditorUtility.SetDirty(spawnAreas[i]);
-            }
-        }
-#endif
     }
 }

@@ -9,6 +9,14 @@ namespace MultiplayerARPG
 {
     public class ItemDropByWeightTableSpawnArea : GameSpawnArea
     {
+
+        [System.Serializable]
+        public class SpawnPendingData
+        {
+            public CharacterItem item;
+            public float countdown;
+        }
+
         [Header("Drop settings")]
         public ItemRandomByWeightTable weightTable;
         [FormerlySerializedAs("respawnPickedupDelay")]
@@ -17,9 +25,9 @@ namespace MultiplayerARPG
         public float droppedItemDestroyDelay = 300f;
         public RewardGivenType rewardGivenType = RewardGivenType.KillMonster;
 
-        protected float _respawnPendingEntitiesTimer = 0f;
-        protected List<CharacterItem> _pending = new List<CharacterItem>();
-        protected List<CancellationTokenSource> _spawnCancellations = new List<CancellationTokenSource>();
+        protected float secondsCounter = 0f;
+        protected List<SpawnPendingData> _pending = new List<SpawnPendingData>();
+        protected List<SpawnPendingData> _unableToSpawns = new List<SpawnPendingData>();
 
         protected override void OnDestroy()
         {
@@ -27,8 +35,7 @@ namespace MultiplayerARPG
             weightTable = null;
             _pending?.Clear();
             _pending = null;
-            CancelAllSpawning();
-            _spawnCancellations = null;
+
         }
 
         protected override void LateUpdate()
@@ -41,22 +48,48 @@ namespace MultiplayerARPG
             if (!AbleToSpawn())
                 return;
 
+            float deltaTime = Time.deltaTime;
             if (_pending.Count > 0)
             {
-                _respawnPendingEntitiesTimer += Time.deltaTime;
-                if (_respawnPendingEntitiesTimer >= respawnPendingEntitiesDelay)
+                secondsCounter += deltaTime;
+                if (secondsCounter < SPAWN_UPDATE_DELAY)
+                    return;
+                float decreaseCountdown = secondsCounter;
+                secondsCounter -= SPAWN_UPDATE_DELAY;
+                for (int i = _pending.Count - 1; i >= 0; --i)
                 {
-                    _respawnPendingEntitiesTimer = 0f;
-                    foreach (CharacterItem pendingEntry in _pending)
+                    SpawnPendingData pendingEntry = _pending[i];
+                    if (pendingEntry == null)
                     {
-#if UNITY_EDITOR || DEBUG_SPAWN_AREA
-                        Logging.LogWarning(ToString(), $"Spawning pending items, Item: {pendingEntry.dataId}, Amount: {pendingEntry.amount}.");
-#endif
-                        Spawn(pendingEntry, 0);
+                        _pending.RemoveAt(i);
+                        continue;
                     }
-                    _pending.Clear();
+
+                    pendingEntry.countdown -= decreaseCountdown;
+                    if (pendingEntry.countdown > 0f)
+                    {
+                        continue;
+                    }
+                    SpawnRoutine(i);
                 }
             }
+
+            if (_unableToSpawns.Count > 0)
+            {
+                // Add unable spawns to pending list
+                for (int i = 0; i < _unableToSpawns.Count; ++i)
+                {
+                    _pending.Add(_unableToSpawns[i]);
+                }
+                _unableToSpawns.Clear();
+            }
+        }
+
+        public override void OnDestroyBySubscribeHandler(GameSpawnAreaEntityHandler handler)
+        {
+            SpawnPendingData pendingData = handler.SpawnData as SpawnPendingData;
+            pendingData.countdown = 1f;
+            AddPending(pendingData);
         }
 
 #if UNITY_EDITOR
@@ -81,42 +114,29 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void CancelAllSpawning()
-        {
-            _pending?.Clear();
-            foreach (CancellationTokenSource spawnCancellation in _spawnCancellations)
-            {
-                spawnCancellation.Cancel();
-            }
-            _spawnCancellations.Clear();
-        }
-
-        public virtual async void Spawn(CharacterItem item, float delay)
+        public virtual void Spawn(CharacterItem item, float delay)
         {
             if (item.IsEmptySlot())
                 return;
 
-            CancellationTokenSource cancellationTokenSource = new CancellationTokenSource();
-            _spawnCancellations.Add(cancellationTokenSource);
-            try
+            AddPending(new SpawnPendingData()
             {
-                await SpawnRoutine(item, delay, cancellationTokenSource);
-            }
-            catch { }
-            finally
-            {
-                _spawnCancellations.Remove(cancellationTokenSource);
-            }
+                item = item,
+                countdown = delay,
+            });
         }
 
-        async UniTask SpawnRoutine(CharacterItem item, float delay, CancellationTokenSource cancellationTokenSource)
+        private async void SpawnRoutine(int pendingIndex)
         {
-            await UniTask.Delay(Mathf.RoundToInt(delay * 1000), cancellationToken: cancellationTokenSource.Token);
             if (!AbleToSpawn())
             {
                 Debug.Log($"Not able to spawn, Spawn Type={spawnType}, Spawn State={_subscribeHandler.CurrentSpawnState}");
                 return;
             }
+            SpawnPendingData pendingEntry = _pending[pendingIndex];
+            _pending.RemoveAt(pendingIndex);
+            CharacterItem item = pendingEntry.item;
+
             if (GetRandomPosition(out Vector3 dropPosition))
             {
                 Quaternion dropRotation = Quaternion.identity;
@@ -139,7 +159,7 @@ namespace MultiplayerARPG
 #endif
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
-                        _subscribeHandler.AddEntity(newEntity);
+                        _subscribeHandler.AddEntity(newEntity, pendingEntry);
                     }
                 }
                 else if (GameInstance.Singleton.IsGoldDropRepresentItem(itemData))
@@ -155,7 +175,7 @@ namespace MultiplayerARPG
 #endif
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
-                        _subscribeHandler.AddEntity(newEntity);
+                        _subscribeHandler.AddEntity(newEntity, pendingEntry);
                     }
                 }
 #if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
@@ -173,7 +193,7 @@ namespace MultiplayerARPG
                         newEntity.Currency = currency;
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
-                        _subscribeHandler.AddEntity(newEntity);
+                        _subscribeHandler.AddEntity(newEntity, pendingEntry);
                     }
                 }
 #endif
@@ -190,20 +210,21 @@ namespace MultiplayerARPG
 #endif
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
-                        _subscribeHandler.AddEntity(newEntity);
+                        _subscribeHandler.AddEntity(newEntity, pendingEntry);
                     }
                 }
             }
             else
             {
-                // Unable to spawn?, add to pending list
-                AddPending(item);
+                // Unable to spawn yet, will add to spawn pending later
+                pendingEntry.countdown = respawnPendingEntitiesDelay;
+                _unableToSpawns.Add(pendingEntry);
             }
         }
 
-        protected virtual void AddPending(CharacterItem item)
+        protected virtual void AddPending(SpawnPendingData data)
         {
-            _pending.Add(item);
+            _pending.Add(data);
         }
 
         protected virtual void NewEntity_onNetworkDestroy(byte reasons)

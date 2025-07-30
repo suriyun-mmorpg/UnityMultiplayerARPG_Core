@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     {
         public GameSpawnAreaSubscribeHandler Handler { get; set; }
         public LiteNetLibBehaviour Entity { get; set; }
+        public object SpawnData { get; set; }
 
         private void OnDestroy()
         {
@@ -16,6 +17,7 @@ namespace MultiplayerARPG
             Handler.OnEntityHandlerDestroy(this);
             Handler = null;
             Entity = null;
+            SpawnData = null;
         }
     }
 }

@@ -131,12 +131,6 @@ namespace MultiplayerARPG
         {
             base.CountSpawningObjects();
         }
-
-        [ContextMenu("Fix invalid `respawnPendingEntitiesDelay` settings")]
-        public override void FixInvalidRespawnPendingEntitiesDelaySettings()
-        {
-            base.FixInvalidRespawnPendingEntitiesDelaySettings();
-        }
 #endif
     }
 }
