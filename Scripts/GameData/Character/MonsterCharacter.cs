@@ -57,7 +57,7 @@ namespace MultiplayerARPG
         [SerializeField]
         [FormerlySerializedAs("monsterSkills")]
         [ArrayElementTitle("skill")]
-        private MonsterSkill[] skills = new MonsterSkill[0];
+        public MonsterSkill[] skills = new MonsterSkill[0];
         [SerializeField]
         private Buff summonerBuff = new Buff();
         public Buff SummonerBuff { get { return summonerBuff; } }
