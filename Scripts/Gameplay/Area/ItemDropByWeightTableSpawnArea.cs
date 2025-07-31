@@ -1,7 +1,5 @@
-using Cysharp.Threading.Tasks;
 using LiteNetLibManager;
 using System.Collections.Generic;
-using System.Threading;
 using UnityEngine;
 using UnityEngine.Serialization;
 
@@ -35,7 +33,8 @@ namespace MultiplayerARPG
             weightTable = null;
             _pending?.Clear();
             _pending = null;
-
+            _unableToSpawns?.Clear();
+            _unableToSpawns = null;
         }
 
         protected override void LateUpdate()
