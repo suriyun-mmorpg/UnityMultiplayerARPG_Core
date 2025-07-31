@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         public float respawnPickedupDelayMin = 10f;
         public float respawnPickedupDelayMax = 10f;
         public float droppedItemDestroyDelay = 300f;
-        public RewardGivenType rewardGivenType = RewardGivenType.KillMonster;
+        public RewardGivenType rewardGivenType = RewardGivenType.None;
 
         protected float secondsCounter = 0f;
         protected List<SpawnPendingData> _pending = new List<SpawnPendingData>();
@@ -45,9 +45,6 @@ namespace MultiplayerARPG
 
             base.LateUpdate();
 
-            if (!AbleToSpawn())
-                return;
-
             float deltaTime = Time.deltaTime;
             if (_pending.Count > 0)
             {
@@ -68,9 +65,17 @@ namespace MultiplayerARPG
                     pendingEntry.countdown -= decreaseCountdown;
                     if (pendingEntry.countdown > 0f)
                     {
+                        // Not ready to spawn yet
                         continue;
                     }
-                    SpawnRoutine(i);
+
+                    if (!AbleToSpawn())
+                    {
+                        // Not able to spawn yet
+                        continue;
+                    }
+
+                    SpawnPending(i);
                 }
             }
 
@@ -126,7 +131,7 @@ namespace MultiplayerARPG
             });
         }
 
-        private async void SpawnRoutine(int pendingIndex)
+        private async void SpawnPending(int pendingIndex)
         {
             if (!AbleToSpawn())
             {
@@ -235,6 +240,10 @@ namespace MultiplayerARPG
             }
             weightTable.RandomItem((item, level, amount) =>
             {
+                if (item == null)
+                    return;
+                if (amount > item.MaxStack)
+                    amount = item.MaxStack;
                 Spawn(
                     CharacterItem.Create(item, level, amount),
                     Random.Range(respawnPickedupDelayMin, respawnPickedupDelayMax));

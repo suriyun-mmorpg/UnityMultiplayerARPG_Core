@@ -64,11 +64,18 @@ namespace MultiplayerARPG
                 _subscribeHandler.Update(Time.deltaTime, noPlayerNearbyDestroyDelay);
         }
 
+        public int GetRandomedSpawnLevel()
+        {
+            if (maxLevel < minLevel)
+                return minLevel;
+            return Random.Range(minLevel, maxLevel + 1);
+        }
+
         public int GetRandomedSpawnAmount()
         {
             if (maxAmount < minAmount)
                 return minAmount;
-            return Random.Range(minAmount, maxAmount);
+            return Random.Range(minAmount, maxAmount + 1);
         }
 
         public void SpawnFirstTime()
@@ -113,14 +120,23 @@ namespace MultiplayerARPG
             public T prefab;
 #endif
             public AddressablePrefab addressablePrefab;
+            [FormerlySerializedAs("level")]
             [Min(1)]
-            public int level;
+            public int minLevel = 1;
+            [Min(1)]
+            public int maxLevel = 1;
             [FormerlySerializedAs("amount")]
             [Min(1)]
             public int minAmount = 1;
             [Min(1)]
             public int maxAmount = 1;
             public float destroyRespawnDelay;
+            public int GetRandomedSpawnLevel()
+            {
+                if (maxLevel < minLevel)
+                    return minLevel;
+                return Random.Range(minLevel, maxLevel + 1);
+            }
 
             public int GetRandomedSpawnAmount()
             {
@@ -174,9 +190,6 @@ namespace MultiplayerARPG
 
             base.LateUpdate();
 
-            if (!AbleToSpawn())
-                return;
-
             float deltaTime = Time.deltaTime;
             if (_pending.Count > 0)
             {
@@ -197,9 +210,17 @@ namespace MultiplayerARPG
                     pendingEntry.countdown -= decreaseCountdown;
                     if (pendingEntry.countdown > 0f)
                     {
+                        // Not ready to spawn yet
                         continue;
                     }
-                    SpawnRoutine(i);
+
+                    if (!AbleToSpawn())
+                    {
+                        // Not able to spawn yet
+                        continue;
+                    }
+
+                    SpawnPending(i);
                 }
             }
 
@@ -260,7 +281,7 @@ namespace MultiplayerARPG
             AddressablePrefab addressablePrefab = this.addressablePrefab;
             if (prefab != null || addressablePrefab.IsDataValid())
             {
-                SpawnByAmount(prefab, addressablePrefab, Random.Range(minLevel, maxLevel + 1), GetRandomedSpawnAmount(), destroyRespawnDelay);
+                SpawnByAmount(prefab, addressablePrefab, GetRandomedSpawnLevel(), GetRandomedSpawnAmount(), destroyRespawnDelay);
             }
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
@@ -272,12 +293,15 @@ namespace MultiplayerARPG
                 float destroyRespawnDelay = spawningPrefab.destroyRespawnDelay;
                 if (destroyRespawnDelay <= 0f)
                     destroyRespawnDelay = this.destroyRespawnDelay;
-                SpawnByAmount(prefab, addressablePrefab, spawningPrefab.level, spawningPrefab.GetRandomedSpawnAmount(), destroyRespawnDelay);
+                SpawnByAmount(prefab, addressablePrefab, spawningPrefab.GetRandomedSpawnLevel(), spawningPrefab.GetRandomedSpawnAmount(), destroyRespawnDelay);
             }
         }
 
         public virtual void SpawnByAmount(T prefab, AddressablePrefab addressablePrefab, int level, int amount, float destroyRespawnDelay)
         {
+            if (prefab == null && !addressablePrefab.IsDataValid())
+                return;
+
             for (int i = 0; i < amount; ++i)
             {
                 Spawn(prefab, addressablePrefab, level, 0, destroyRespawnDelay);
@@ -291,7 +315,9 @@ namespace MultiplayerARPG
 
             AddPending(new SpawnPendingData()
             {
+#if !EXCLUDE_PREFAB_REFS
                 prefab = prefab,
+#endif
                 addressablePrefab = addressablePrefab,
                 level = level,
                 countdown = delay,
@@ -299,7 +325,7 @@ namespace MultiplayerARPG
             });
         }
 
-        private void SpawnRoutine(int pendingIndex)
+        private void SpawnPending(int pendingIndex)
         {
             if (!AbleToSpawn())
             {
