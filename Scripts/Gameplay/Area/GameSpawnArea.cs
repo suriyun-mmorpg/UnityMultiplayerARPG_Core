@@ -5,10 +5,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
-#if UNITY_EDITOR
-using UnityEditor;
-#endif
-
 namespace MultiplayerARPG
 {
     public abstract class GameSpawnArea : GameArea
@@ -191,13 +187,14 @@ namespace MultiplayerARPG
             base.LateUpdate();
 
             float deltaTime = Time.deltaTime;
+            secondsCounter += deltaTime;
+            if (secondsCounter < SPAWN_UPDATE_DELAY)
+                return;
+            float decreaseCountdown = secondsCounter;
+            secondsCounter -= SPAWN_UPDATE_DELAY;
+
             if (_pending.Count > 0)
             {
-                secondsCounter += deltaTime;
-                if (secondsCounter < SPAWN_UPDATE_DELAY)
-                    return;
-                float decreaseCountdown = secondsCounter;
-                secondsCounter -= SPAWN_UPDATE_DELAY;
                 for (int i = _pending.Count - 1; i >= 0; --i)
                 {
                     SpawnPendingData pendingEntry = _pending[i];
@@ -211,6 +208,7 @@ namespace MultiplayerARPG
                     if (pendingEntry.countdown > 0f)
                     {
                         // Not ready to spawn yet
+                        _pending[i] = pendingEntry;
                         continue;
                     }
 

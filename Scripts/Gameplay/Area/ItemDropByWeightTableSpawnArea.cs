@@ -26,6 +26,7 @@ namespace MultiplayerARPG
         protected float secondsCounter = 0f;
         protected List<SpawnPendingData> _pending = new List<SpawnPendingData>();
         protected List<SpawnPendingData> _unableToSpawns = new List<SpawnPendingData>();
+        protected List<float> _failedRespawnCountdowns = new List<float>();
 
         protected override void OnDestroy()
         {
@@ -35,6 +36,8 @@ namespace MultiplayerARPG
             _pending = null;
             _unableToSpawns?.Clear();
             _unableToSpawns = null;
+            _failedRespawnCountdowns?.Clear();
+            _failedRespawnCountdowns = null;
         }
 
         protected override void LateUpdate()
@@ -45,13 +48,14 @@ namespace MultiplayerARPG
             base.LateUpdate();
 
             float deltaTime = Time.deltaTime;
+            secondsCounter += deltaTime;
+            if (secondsCounter < SPAWN_UPDATE_DELAY)
+                return;
+            float decreaseCountdown = secondsCounter;
+            secondsCounter -= SPAWN_UPDATE_DELAY;
+
             if (_pending.Count > 0)
             {
-                secondsCounter += deltaTime;
-                if (secondsCounter < SPAWN_UPDATE_DELAY)
-                    return;
-                float decreaseCountdown = secondsCounter;
-                secondsCounter -= SPAWN_UPDATE_DELAY;
                 for (int i = _pending.Count - 1; i >= 0; --i)
                 {
                     SpawnPendingData pendingEntry = _pending[i];
@@ -65,6 +69,7 @@ namespace MultiplayerARPG
                     if (pendingEntry.countdown > 0f)
                     {
                         // Not ready to spawn yet
+                        _pending[i] = pendingEntry;
                         continue;
                     }
 
@@ -87,6 +92,23 @@ namespace MultiplayerARPG
                 }
                 _unableToSpawns.Clear();
             }
+
+            if (_failedRespawnCountdowns.Count > 0)
+            {
+                for (int i = _failedRespawnCountdowns.Count - 1; i >= 0; --i)
+                {
+                    float countdown = _failedRespawnCountdowns[i];
+                    countdown -= decreaseCountdown;
+                    if (countdown > 0f)
+                    {
+                        // Not ready to spawn yet
+                        _failedRespawnCountdowns[i] = countdown;
+                        continue;
+                    }
+                    _failedRespawnCountdowns.RemoveAt(i);
+                    RandomItem(0f);
+                }
+            }
         }
 
         public override void OnDestroyBySubscribeHandler(GameSpawnAreaEntityHandler handler)
@@ -104,17 +126,7 @@ namespace MultiplayerARPG
             int amount = GetRandomedSpawnAmount();
             for (int i = 0; i < amount; ++i)
             {
-                if (weightTable == null)
-                {
-#if UNITY_EDITOR || DEBUG_SPAWN_AREA
-                    Logging.LogWarning(ToString(), $"Unable to spawn item, table is empty.");
-#endif
-                    continue;
-                }
-                weightTable.RandomItem((item, level, amount) =>
-                {
-                    Spawn(CharacterItem.Create(item, level, amount), 0f);
-                });
+                RandomItem(0f);
             }
         }
 
@@ -237,15 +249,26 @@ namespace MultiplayerARPG
             {
                 return;
             }
+            RandomItem(Random.Range(respawnPickedupDelayMin, respawnPickedupDelayMax));
+        }
+
+        protected virtual void RandomItem(float respawnDelay)
+        {
+            if (weightTable == null)
+            {
+#if UNITY_EDITOR || DEBUG_SPAWN_AREA
+                Logging.LogWarning(ToString(), $"Unable to spawn item, table is empty.");
+#endif
+                return;
+            }
             weightTable.RandomItem((item, level, amount) =>
             {
-                if (item == null)
-                    return;
                 if (amount > item.MaxStack)
                     amount = item.MaxStack;
-                Spawn(
-                    CharacterItem.Create(item, level, amount),
-                    Random.Range(respawnPickedupDelayMin, respawnPickedupDelayMax));
+                Spawn(CharacterItem.Create(item, level, amount), respawnDelay);
+            }, onFailed: () =>
+            {
+                _failedRespawnCountdowns.Add(Random.Range(respawnPickedupDelayMin, respawnPickedupDelayMax));
             });
         }
     }
