@@ -1,4 +1,5 @@
-﻿using LiteNetLib;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLib;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Concurrent;
@@ -10,11 +11,11 @@ namespace MultiplayerARPG
     {
         public static readonly ConcurrentDictionary<string, float> OnlineCharacterIds = new ConcurrentDictionary<string, float>();
 
-        public LiteNetLibManager.LiteNetLibManager Manager { get; private set; }
+        public BaseGameNetworkManager Manager { get; private set; }
 
         private void Awake()
         {
-            Manager = GetComponent<LiteNetLibManager.LiteNetLibManager>();
+            Manager = GetComponent<BaseGameNetworkManager>();
         }
 
         public void HandleRequestOnlineCharacter(MessageHandlerData messageHandler)
@@ -46,9 +47,8 @@ namespace MultiplayerARPG
             OnlineCharacterIds.Clear();
         }
 
-        public void Respawn(int option, IPlayerCharacterData playerCharacter)
+        public async UniTask Respawn(int option, IPlayerCharacterData playerCharacter)
         {
-            GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
             WarpPortalType respawnPortalType = WarpPortalType.Default;
 #if !DISABLE_DIFFER_MAP_RESPAWNING
             string respawnMapName = playerCharacter.RespawnMapName;
@@ -59,20 +59,36 @@ namespace MultiplayerARPG
 #endif
             bool respawnOverrideRotation = false;
             Vector3 respawnRotation = Vector3.zero;
-            if (BaseGameNetworkManager.CurrentMapInfo != null)
-                BaseGameNetworkManager.CurrentMapInfo.GetRespawnPoint(playerCharacter, out respawnPortalType, out respawnMapName, out respawnPosition, out respawnOverrideRotation, out respawnRotation);
+            BaseMapInfo mapInfo = BaseGameNetworkManager.CurrentMapInfo;
+            if (GameInstance.MapInfos.TryGetValue(playerCharacter.CurrentMapName, out mapInfo))
+            {
+                mapInfo.GetRespawnPoint(playerCharacter, out respawnPortalType, out respawnMapName, out respawnPosition, out respawnOverrideRotation, out respawnRotation);
+            }
             if (playerCharacter is BasePlayerCharacterEntity entity)
             {
                 switch (respawnPortalType)
                 {
                     case WarpPortalType.Default:
-                        BaseGameNetworkManager.Singleton.WarpCharacter(entity, respawnMapName, respawnPosition, respawnOverrideRotation, respawnRotation);
+                        bool isSameMap = respawnMapName.Equals(BaseGameNetworkManager.CurrentMapInfo.Id);
+                        if (!isSameMap)
+                        {
+                            // Respawn immediately before move
+                            GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
+                        }
+                        await Manager.WarpCharacter(entity, respawnMapName, respawnPosition, respawnOverrideRotation, respawnRotation);
+                        if (isSameMap)
+                        {
+                            // Wait until teleported before respawn
+                            GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
+                            entity.OnRespawn();
+                        }
                         break;
                     case WarpPortalType.EnterInstance:
-                        BaseGameNetworkManager.Singleton.WarpCharacterToInstance(entity, respawnMapName, respawnPosition, respawnOverrideRotation, respawnRotation);
+                        // Respawn immediately before move
+                        GameInstance.Singleton.GameplayRule.OnCharacterRespawn(playerCharacter);
+                        await Manager.WarpCharacterToInstance(entity, respawnMapName, respawnPosition, respawnOverrideRotation, respawnRotation);
                         break;
                 }
-                entity.OnRespawn();
             }
             else
             {

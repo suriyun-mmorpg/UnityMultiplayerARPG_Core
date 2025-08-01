@@ -82,8 +82,8 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            GameInstance.ServerCharacterHandlers.Respawn(request.option, playerCharacter);
             result.InvokeSuccess(new ResponseRespawnMessage());
+            GameInstance.ServerCharacterHandlers.Respawn(request.option, playerCharacter);
             return default;
         }
 

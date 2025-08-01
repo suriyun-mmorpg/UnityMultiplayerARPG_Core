@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using Cysharp.Threading.Tasks;
+using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
@@ -7,6 +8,6 @@ namespace MultiplayerARPG
         void HandleRequestOnlineCharacter(MessageHandlerData messageHandler);
         void MarkOnlineCharacter(string characterId);
         void ClearOnlineCharacters();
-        void Respawn(int option, IPlayerCharacterData playerCharacter);
+        UniTask Respawn(int option, IPlayerCharacterData playerCharacter);
     }
 }
