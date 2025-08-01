@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using ConcurrentCollections;
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using Insthync.DevExtension;
 using LiteNetLib;
@@ -68,6 +69,10 @@ namespace MultiplayerARPG
         protected float _updateTimeOfDayCountDown;
         protected float _serverSceneLoadedTime;
         protected float _clientSceneLoadedTime;
+
+        internal readonly ConcurrentHashSet<int> proceedingGuildIds = new ConcurrentHashSet<int>();
+        internal readonly ConcurrentHashSet<int> proceedingPartyIds = new ConcurrentHashSet<int>();
+        internal readonly ConcurrentHashSet<long> proceedingConnectionIds = new ConcurrentHashSet<long>();
 
         // Instantiate object allowing status
         /// <summary>
@@ -187,6 +192,9 @@ namespace MultiplayerARPG
             // Other components
             HitRegistrationManager.ClearData();
             MapInfo = null;
+            proceedingGuildIds.Clear();
+            proceedingPartyIds.Clear();
+            proceedingConnectionIds.Clear();
             _serverReadyToInstantiateObjectsStates.Clear();
             _clientReadyToInstantiateObjectsStates.Clear();
             _enterGameRequestResponseMessages.Clear();
