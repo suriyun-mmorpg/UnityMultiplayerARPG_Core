@@ -420,8 +420,11 @@ namespace MultiplayerARPG
             syncData.Direction2D = Direction2D;
             _prevSyncData = syncData;
             // Force setup sim tick
-            _hasSimTick = true;
-            _simTick = Manager.LocalTick;
+            if (IsOwnerClientOrOwnedByServer)
+            {
+                _hasSimTick = true;
+                _simTick = Manager.LocalTick;
+            }
         }
 
         public override void EntityStart()
@@ -708,8 +711,16 @@ namespace MultiplayerARPG
             for (int i = 0; i < size; ++i)
             {
                 InputData entry = data[i];
-                if (_inputBuffers.ContainsKey(entry.Tick))
+                if (_hasSimTick && entry.Tick - _simTick > 2)
+                {
+                    // This tick is too far, player might try to hack a game?
                     continue;
+                }
+                if (_inputBuffers.ContainsKey(entry.Tick))
+                {
+                    // This tick is already stored
+                    continue;
+                }
                 _inputBuffers.Add(entry.Tick, entry);
             }
             // Prune old ticks (keep last N)
@@ -737,8 +748,17 @@ namespace MultiplayerARPG
             for (int i = 0; i < size; ++i)
             {
                 SyncData entry = data[i];
-                if (_interpBuffers.ContainsKey(entry.Tick))
+                // TODO: Speed hack checking here
+                if (_hasInterpTick && entry.Tick - _interpTick > 2)
+                {
+                    // This tick is too far, player might try to hack a game?
                     continue;
+                }
+                if (_interpBuffers.ContainsKey(entry.Tick))
+                {
+                    // This tick is already stored
+                    continue;
+                }
                 _interpBuffers.Add(entry.Tick, entry);
             }
             // Prune old ticks (keep last N)
