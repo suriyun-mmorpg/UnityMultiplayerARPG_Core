@@ -671,6 +671,7 @@ namespace MultiplayerARPG
 
                 if (tick1 <= renderTick && renderTick <= tick2)
                 {
+                    // TODO: Speed hack checking here
                     interpFromTick = tick1;
                     interpToTick = tick2;
                     _interpFromSyncData = data1;
@@ -711,11 +712,6 @@ namespace MultiplayerARPG
             for (int i = 0; i < size; ++i)
             {
                 InputData entry = data[i];
-                if (_hasSimTick && entry.Tick - _simTick > 2)
-                {
-                    // This tick is too far, player might try to hack a game?
-                    continue;
-                }
                 if (_inputBuffers.ContainsKey(entry.Tick))
                 {
                     // This tick is already stored
@@ -748,12 +744,6 @@ namespace MultiplayerARPG
             for (int i = 0; i < size; ++i)
             {
                 SyncData entry = data[i];
-                // TODO: Speed hack checking here
-                if (_hasInterpTick && entry.Tick - _interpTick > 2)
-                {
-                    // This tick is too far, player might try to hack a game?
-                    continue;
-                }
                 if (_interpBuffers.ContainsKey(entry.Tick))
                 {
                     // This tick is already stored
