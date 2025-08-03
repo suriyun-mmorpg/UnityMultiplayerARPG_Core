@@ -23,7 +23,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody2D))]
     public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        public const int TICK_COUNT_FOR_INTERPOLATION = 1;
+        public const int TICK_COUNT_FOR_INTERPOLATION = 2;
 
         [Header("Networking Settings")]
         public MovementSecure movementSecure = MovementSecure.NotSecure;
@@ -59,11 +59,7 @@ namespace MultiplayerARPG
         protected SortedList<uint, MovementInputData2D> _inputBuffers = new SortedList<uint, MovementInputData2D>();
         protected SortedList<uint, MovementSyncData2D> _syncBuffers = new SortedList<uint, MovementSyncData2D>();
         protected SortedList<uint, MovementSyncData2D> _interpBuffers = new SortedList<uint, MovementSyncData2D>();
-        protected bool _hasSimTick = false;
-        protected uint _simTick = 0;
-        protected bool _hasInterpTick = false;
-        protected uint _interpTick = 0;
-        public uint RenderTick => _interpTick - TICK_COUNT_FOR_INTERPOLATION;
+        public uint RenderTick => Manager.Tick - TICK_COUNT_FOR_INTERPOLATION;
 
         // Syncing/Interpolating
         protected MovementSyncData2D _prevSyncData;
@@ -87,34 +83,6 @@ namespace MultiplayerARPG
         public bool CanSimulateMovement()
         {
             return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
-        }
-
-        protected void SetupSimulationTick(uint tick)
-        {
-            if (_hasSimTick)
-                return;
-            _hasSimTick = true;
-            _simTick = tick;
-        }
-
-        protected void ClearSimulationTick()
-        {
-            _hasSimTick = false;
-            _simTick = 0;
-        }
-
-        protected void SetupInterpolationTick(uint tick)
-        {
-            if (_hasInterpTick)
-                return;
-            _hasInterpTick = true;
-            _interpTick = tick;
-        }
-
-        protected void ClearInterpolationTick()
-        {
-            _hasInterpTick = false;
-            _interpTick = 0;
         }
 
         public bool AllowToJump()
@@ -197,7 +165,7 @@ namespace MultiplayerARPG
                 return;
             if (!CanSimulateMovement())
                 return;
-            uint tick = Manager.LocalTick;
+            uint tick = Manager.Tick;
             if (_inputBuffers.Count > 0)
             {
                 uint prevTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
@@ -227,7 +195,7 @@ namespace MultiplayerARPG
                 return;
             if (!CanSimulateMovement())
                 return;
-            uint tick = Manager.LocalTick;
+            uint tick = Manager.Tick;
             _inputBuffers.Remove(tick);
             StoreInputBuffer(new MovementInputData2D()
             {
@@ -243,7 +211,7 @@ namespace MultiplayerARPG
                 return;
             if (!CanSimulateMovement())
                 return;
-            uint tick = Manager.LocalTick;
+            uint tick = Manager.Tick;
             if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
                 return;
             if (inputData.ExtraMovementState != ExtraMovementState.None)
@@ -258,7 +226,7 @@ namespace MultiplayerARPG
                 return;
             if (!CanSimulateMovement())
                 return;
-            uint tick = Manager.LocalTick;
+            uint tick = Manager.Tick;
             if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
                 return;
             inputData.LookDirection = (Vector2)(rotation * Vector3.forward);
@@ -275,7 +243,7 @@ namespace MultiplayerARPG
             if (movementSecure == MovementSecure.ServerAuthoritative)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
-                uint tick = Manager.LocalTick;
+                uint tick = Manager.Tick;
                 _inputBuffers[tick] = new MovementInputData2D()
                 {
                     Tick = tick,
@@ -357,22 +325,14 @@ namespace MultiplayerARPG
         public override void OnSetOwnerClient(bool isOwnerClient)
         {
             CacheRigidbody2D.simulated = CanSimulateMovement();
-            ClearInterpolationTick();
-            ClearSimulationTick();
             // Setup data for syncing determining
             MovementSyncData2D syncData = _prevSyncData;
-            syncData.Tick = Manager.LocalTick;
+            syncData.Tick = Manager.Tick;
             syncData.Position = EntityTransform.position;
             syncData.MovementState = MovementState;
             syncData.ExtraMovementState = ExtraMovementState;
             syncData.Rotation = Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles.z;
             _prevSyncData = syncData;
-            // Force setup sim tick
-            if (IsOwnerClientOrOwnedByServer)
-            {
-                _hasSimTick = true;
-                _simTick = Manager.LocalTick;
-            }
         }
 
         public override void EntityStart()
@@ -389,9 +349,6 @@ namespace MultiplayerARPG
 
         protected void LogicUpdater_OnTick(LogicUpdater updater)
         {
-            _simTick++;
-            _interpTick++;
-
             // Storing sync buffers, server will send to other clients, owner client will send to server
             if (IsServer || (IsOwnerClient && movementSecure == MovementSecure.NotSecure))
             {
@@ -401,7 +358,7 @@ namespace MultiplayerARPG
                     Vector2.Distance(EntityTransform.position, syncData.Position) > positionThreshold ||
                     MovementState != syncData.MovementState || ExtraMovementState != syncData.ExtraMovementState ||
                     Mathf.Abs(rotation - syncData.Rotation) > eulerAnglesThreshold;
-                bool keepAlive = updater.LocalTick - syncData.Tick >= keepAliveTicks;
+                bool keepAlive = updater.Tick - syncData.Tick >= keepAliveTicks;
 
                 if (!changed && !keepAlive)
                 {
@@ -412,7 +369,7 @@ namespace MultiplayerARPG
 
                 if (changed)
                 {
-                    syncData.Tick = updater.LocalTick;
+                    syncData.Tick = updater.Tick;
                     syncData.Position = EntityTransform.position;
                     syncData.MovementState = MovementState;
                     syncData.ExtraMovementState = ExtraMovementState;
@@ -420,7 +377,7 @@ namespace MultiplayerARPG
                 }
                 _prevSyncData = syncData;
 
-                syncData.Tick = updater.LocalTick;
+                syncData.Tick = updater.Tick;
                 // Stored buffers will be send later
                 StoreSyncBuffer(syncData);
             }
@@ -447,9 +404,20 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!_inputBuffers.TryGetValue(_simTick, out MovementInputData2D inputData))
+            MovementInputData2D inputData;
+            // Accepts 2 ticks behind
+            if (_inputBuffers.TryGetValue(Manager.Tick, out inputData))
             {
-                // No inputs
+            }
+            else if (_inputBuffers.TryGetValue(Manager.Tick - 1, out inputData))
+            {
+            }
+            else if (_inputBuffers.TryGetValue(Manager.Tick - 2, out inputData))
+            {
+            }
+            else
+            {
+                // Not found any inputs
                 return;
             }
 
@@ -620,7 +588,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!_hasInterpTick || _interpBuffers.Count < 2)
+            if (_interpBuffers.Count < 2)
             {
                 // Not ready for interpolation
                 _prevInterpFromTick = 0;
@@ -812,7 +780,6 @@ namespace MultiplayerARPG
                     if (!IsOwnerClient)
                     {
                         StoreInputBuffers(inputBuffers, size, 30);
-                        SetupSimulationTick(_inputBuffers.Keys[_inputBuffers.Count - 1]);
                     }
                     ArrayPool<MovementInputData2D>.Shared.Return(inputBuffers);
                     break;
@@ -826,7 +793,6 @@ namespace MultiplayerARPG
                         interpoationBuffers[i] = reader.Get<MovementSyncData2D>();
                     }
                     StoreInterpolateBuffers(interpoationBuffers, size, 30);
-                    SetupInterpolationTick(_interpBuffers.Keys[_interpBuffers.Count - 1]);
                     ArrayPool<MovementSyncData2D>.Shared.Return(interpoationBuffers);
                     break;
             }
@@ -855,7 +821,6 @@ namespace MultiplayerARPG
             if (!IsServer)
             {
                 StoreInterpolateBuffers(interpoationBuffers, size, 30);
-                SetupInterpolationTick(_interpBuffers.Keys[_interpBuffers.Count - 1]);
             }
             ArrayPool<MovementSyncData2D>.Shared.Return(interpoationBuffers);
         }
