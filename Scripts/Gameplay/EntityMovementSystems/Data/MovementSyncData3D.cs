@@ -18,7 +18,7 @@ namespace MultiplayerARPG
                 reader.GetFloat(),
                 reader.GetFloat(),
                 reader.GetFloat());
-            Rotation = reader.GetFloat();
+            Rotation = Mathf.HalfToFloat(reader.GetPackedUShort());
             MovementState = (MovementState)reader.GetByte();
             ExtraMovementState = (ExtraMovementState)reader.GetByte();
         }
@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             writer.Put(Position.x);
             writer.Put(Position.y);
             writer.Put(Position.z);
-            writer.Put(Rotation);
+            writer.PutPackedUShort(Mathf.FloatToHalf(Rotation));
             writer.Put((byte)MovementState);
             writer.Put((byte)ExtraMovementState);
         }
