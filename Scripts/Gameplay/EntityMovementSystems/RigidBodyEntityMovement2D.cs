@@ -799,7 +799,7 @@ namespace MultiplayerARPG
                     }
                     if (!IsOwnerClient)
                     {
-                        StoreInputBuffers(inputBuffers, size);
+                        StoreInputBuffers(inputBuffers, size, 30);
                         SetupSimulationTick(_inputBuffers.Keys[_inputBuffers.Count - 1]);
                     }
                     ArrayPool<MovementInputData2D>.Shared.Return(inputBuffers);
