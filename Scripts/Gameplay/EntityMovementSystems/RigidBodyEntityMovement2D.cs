@@ -216,8 +216,8 @@ namespace MultiplayerARPG
                 Tick = tick,
                 IsPointClick = false,
                 MovementState = movementState,
-                MoveDirection2D = moveDirection,
-                LookDirection2D = moveDirection,
+                MoveDirection = moveDirection,
+                LookDirection = moveDirection,
             });
         }
 
@@ -261,7 +261,7 @@ namespace MultiplayerARPG
             uint tick = Manager.LocalTick;
             if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
                 return;
-            inputData.LookDirection2D = (Vector2)(rotation * Vector3.forward);
+            inputData.LookDirection = (Vector2)(rotation * Vector3.forward);
             _inputBuffers[tick] = inputData;
         }
 
@@ -482,8 +482,8 @@ namespace MultiplayerARPG
 
             if (!inputData.IsPointClick)
             {
-                tempInputDirection = inputData.MoveDirection2D;
-                tempLookDirection = inputData.LookDirection2D;
+                tempInputDirection = inputData.MoveDirection;
+                tempLookDirection = inputData.LookDirection;
             }
 
             if (inputData.IsPointClick && (!_prevPointClickPosition.HasValue || Vector3.Distance(_prevPointClickPosition.Value, inputData.Position) > 0.01f))
@@ -497,7 +497,7 @@ namespace MultiplayerARPG
             MovementState = inputData.MovementState;
             ExtraMovementState = inputData.ExtraMovementState;
             if (tempLookDirection.sqrMagnitude > 0f)
-                Direction2D = inputData.LookDirection2D;
+                Direction2D = inputData.LookDirection;
             isDashing = inputData.MovementState.Has(MovementState.IsDash);
 
             if (HasNavPaths)
