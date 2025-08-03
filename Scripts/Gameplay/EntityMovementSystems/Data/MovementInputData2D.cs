@@ -12,7 +12,8 @@ namespace MultiplayerARPG
         public Vector2 Position;
         public MovementState MovementState;
         public ExtraMovementState ExtraMovementState;
-        public DirectionVector2 Direction2D;
+        public DirectionVector2 MoveDirection2D;
+        public DirectionVector2 LookDirection2D;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -26,12 +27,15 @@ namespace MultiplayerARPG
                 Position = new Vector2(
                     reader.GetFloat(),
                     reader.GetFloat());
+                MovementState = (MovementState)reader.GetByte();
+                ExtraMovementState = (ExtraMovementState)reader.GetByte();
             }
             else
             {
                 MovementState = (MovementState)reader.GetByte();
                 ExtraMovementState = (ExtraMovementState)reader.GetByte();
-                Direction2D = reader.Get<DirectionVector2>();
+                MoveDirection2D = reader.Get<DirectionVector2>();
+                LookDirection2D = reader.Get<DirectionVector2>();
             }
         }
 
@@ -46,12 +50,15 @@ namespace MultiplayerARPG
             {
                 writer.Put(Position.x);
                 writer.Put(Position.y);
+                writer.Put((byte)MovementState);
+                writer.Put((byte)ExtraMovementState);
             }
             else
             {
                 writer.Put((byte)MovementState);
                 writer.Put((byte)ExtraMovementState);
-                writer.Put(Direction2D);
+                writer.Put(MoveDirection2D);
+                writer.Put(LookDirection2D);
             }
         }
     }

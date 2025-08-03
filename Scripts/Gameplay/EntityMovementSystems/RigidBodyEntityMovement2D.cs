@@ -23,7 +23,7 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody2D))]
     public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        public const int TICK_COUNT_FOR_INTERPOLATION = 2;
+        public const int TICK_COUNT_FOR_INTERPOLATION = 1;
 
         [Header("Networking Settings")]
         public MovementSecure movementSecure = MovementSecure.NotSecure;
@@ -180,22 +180,6 @@ namespace MultiplayerARPG
             NavPaths.Enqueue(position);
         }
 
-        public virtual void SetLookRotation(Quaternion rotation, bool immediately)
-        {
-            if (!Entity.CanMove() || !Entity.CanTurn())
-                return;
-            if (CanSimulateMovement())
-            {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                Direction2D = (Vector2)(rotation * Vector3.forward);
-            }
-        }
-
-        public Quaternion GetLookRotation()
-        {
-            return Quaternion.LookRotation(Direction2D);
-        }
-
         public void SetSmoothTurnSpeed(float speed)
         {
             // 2D, do nothing
@@ -232,7 +216,8 @@ namespace MultiplayerARPG
                 Tick = tick,
                 IsPointClick = false,
                 MovementState = movementState,
-                Direction2D = moveDirection,
+                MoveDirection2D = moveDirection,
+                LookDirection2D = moveDirection,
             });
         }
 
@@ -265,6 +250,24 @@ namespace MultiplayerARPG
                 return;
             inputData.ExtraMovementState = extraMovementState;
             _inputBuffers[tick] = inputData;
+        }
+
+        public virtual void SetLookRotation(Quaternion rotation, bool immediately)
+        {
+            if (!Entity.CanMove() || !Entity.CanTurn())
+                return;
+            if (!CanSimulateMovement())
+                return;
+            uint tick = Manager.LocalTick;
+            if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
+                return;
+            inputData.LookDirection2D = (Vector2)(rotation * Vector3.forward);
+            _inputBuffers[tick] = inputData;
+        }
+
+        public Quaternion GetLookRotation()
+        {
+            return Quaternion.LookRotation(Direction2D);
         }
 
         public void StopMove()
@@ -462,6 +465,7 @@ namespace MultiplayerARPG
             float tempEntityMoveSpeed;
             float tempMaxMoveSpeed;
             Vector2 tempInputDirection;
+            Vector2 tempLookDirection;
             Vector2 tempMoveDirection;
             Vector2 tempMoveVelocity;
             Vector2 tempCurrentPosition;
@@ -470,12 +474,16 @@ namespace MultiplayerARPG
 
             tempCurrentPosition = EntityTransform.position;
             tempInputDirection = Vector3.zero;
+            tempLookDirection = Vector3.zero;
             tempMoveVelocity = Vector3.zero;
             tempMoveDirection = Vector2.zero;
             tempTargetDistance = 0f;
 
             if (!inputData.IsPointClick)
-                tempInputDirection = inputData.Direction2D;
+            {
+                tempInputDirection = inputData.MoveDirection2D;
+                tempLookDirection = inputData.LookDirection2D;
+            }
 
             if (inputData.IsPointClick && (!_prevPointClickPosition.HasValue || Vector3.Distance(_prevPointClickPosition.Value, inputData.Position) > 0.01f))
             {
@@ -487,6 +495,8 @@ namespace MultiplayerARPG
             }
             MovementState = inputData.MovementState;
             ExtraMovementState = inputData.ExtraMovementState;
+            if (tempLookDirection.sqrMagnitude > 0f)
+                Direction2D = inputData.LookDirection2D;
             isDashing = inputData.MovementState.Has(MovementState.IsDash);
 
             if (HasNavPaths)
@@ -541,7 +551,7 @@ namespace MultiplayerARPG
             }
 
             // Prepare movement speed
-            tempEntityMoveSpeed = Entity.GetMoveSpeed();
+            tempEntityMoveSpeed = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
             tempMaxMoveSpeed = tempEntityMoveSpeed;
 
             // Dashing
