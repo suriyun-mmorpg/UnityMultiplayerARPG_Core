@@ -25,88 +25,6 @@ namespace MultiplayerARPG
     {
         public const int TICK_COUNT_FOR_INTERPOLATION = 2;
 
-        public struct InputData : INetSerializable
-        {
-            public uint Tick;
-            public bool IsStopped;
-            public bool IsPointClick;
-            public Vector2 Position;
-            public MovementState MovementState;
-            public ExtraMovementState ExtraMovementState;
-            public DirectionVector2 Direction2D;
-
-            public void Deserialize(NetDataReader reader)
-            {
-                Tick = reader.GetPackedUInt();
-                IsStopped = reader.GetBool();
-                if (IsStopped)
-                    return;
-                IsPointClick = reader.GetBool();
-                if (IsPointClick)
-                {
-                    Position = new Vector2(
-                        reader.GetFloat(),
-                        reader.GetFloat());
-                }
-                else
-                {
-                    MovementState = (MovementState)reader.GetByte();
-                    ExtraMovementState = (ExtraMovementState)reader.GetByte();
-                    Direction2D = reader.Get<DirectionVector2>();
-                }
-            }
-
-            public void Serialize(NetDataWriter writer)
-            {
-                writer.PutPackedUInt(Tick);
-                writer.Put(IsStopped);
-                if (IsStopped)
-                    return;
-                writer.Put(IsPointClick);
-                if (IsPointClick)
-                {
-                    writer.Put(Position.x);
-                    writer.Put(Position.y);
-                }
-                else
-                {
-                    writer.Put((byte)MovementState);
-                    writer.Put((byte)ExtraMovementState);
-                    writer.Put(Direction2D);
-                }
-            }
-        }
-
-        public struct SyncData : INetSerializable
-        {
-            public uint Tick;
-            public Vector2 Position;
-            public MovementState MovementState;
-            public ExtraMovementState ExtraMovementState;
-            public DirectionVector2 Direction2D;
-
-            public void Deserialize(NetDataReader reader)
-            {
-                Tick = reader.GetPackedUInt();
-                Position = new Vector2(
-                    reader.GetFloat(),
-                    reader.GetFloat());
-                MovementState = (MovementState)reader.GetByte();
-                ExtraMovementState = (ExtraMovementState)reader.GetByte();
-                Direction2D = reader.Get<DirectionVector2>();
-            }
-
-            public void Serialize(NetDataWriter writer)
-            {
-                writer.PutPackedUInt(Tick);
-                writer.Put(Position.x);
-                writer.Put(Position.y);
-                writer.Put((byte)MovementState);
-                writer.Put((byte)ExtraMovementState);
-                writer.Put(Direction2D);
-            }
-        }
-
         [Header("Networking Settings")]
         public MovementSecure movementSecure = MovementSecure.NotSecure;
         [Tooltip("If distance between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
@@ -138,9 +56,9 @@ namespace MultiplayerARPG
         }
 
         // Inputs
-        protected SortedList<uint, InputData> _inputBuffers = new SortedList<uint, InputData>();
-        protected SortedList<uint, SyncData> _syncBuffers = new SortedList<uint, SyncData>();
-        protected SortedList<uint, SyncData> _interpBuffers = new SortedList<uint, SyncData>();
+        protected SortedList<uint, MovementInputData2D> _inputBuffers = new SortedList<uint, MovementInputData2D>();
+        protected SortedList<uint, MovementSyncData2D> _syncBuffers = new SortedList<uint, MovementSyncData2D>();
+        protected SortedList<uint, MovementSyncData2D> _interpBuffers = new SortedList<uint, MovementSyncData2D>();
         protected bool _hasSimTick = false;
         protected uint _simTick = 0;
         protected bool _hasInterpTick = false;
@@ -148,9 +66,9 @@ namespace MultiplayerARPG
         public uint RenderTick => _interpTick - TICK_COUNT_FOR_INTERPOLATION;
 
         // Syncing/Interpolating
-        protected SyncData _prevSyncData;
-        protected SyncData _interpFromSyncData;
-        protected SyncData _interpToSyncData;
+        protected MovementSyncData2D _prevSyncData;
+        protected MovementSyncData2D _interpFromSyncData;
+        protected MovementSyncData2D _interpToSyncData;
         protected float _startInterpTime;
         protected float _endInterpTime;
 
@@ -301,7 +219,7 @@ namespace MultiplayerARPG
                 uint prevTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
                 if (prevTick == tick)
                     return;
-                if (_inputBuffers.TryGetValue(prevTick, out InputData prevInput) &&
+                if (_inputBuffers.TryGetValue(prevTick, out MovementInputData2D prevInput) &&
                     prevInput.IsPointClick && moveDirection.sqrMagnitude <= 0f)
                 {
                     prevInput.Tick = tick;
@@ -309,7 +227,7 @@ namespace MultiplayerARPG
                     return;
                 }
             }
-            StoreInputBuffer(new InputData()
+            StoreInputBuffer(new MovementInputData2D()
             {
                 Tick = tick,
                 IsPointClick = false,
@@ -326,7 +244,7 @@ namespace MultiplayerARPG
                 return;
             uint tick = Manager.LocalTick;
             _inputBuffers.Remove(tick);
-            StoreInputBuffer(new InputData()
+            StoreInputBuffer(new MovementInputData2D()
             {
                 Tick = tick,
                 IsPointClick = true,
@@ -341,7 +259,7 @@ namespace MultiplayerARPG
             if (!CanSimulateMovement())
                 return;
             uint tick = Manager.LocalTick;
-            if (!_inputBuffers.TryGetValue(tick, out InputData inputData))
+            if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
                 return;
             if (inputData.ExtraMovementState != ExtraMovementState.None)
                 return;
@@ -355,7 +273,7 @@ namespace MultiplayerARPG
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 uint tick = Manager.LocalTick;
-                _inputBuffers[tick] = new InputData()
+                _inputBuffers[tick] = new MovementInputData2D()
                 {
                     Tick = tick,
                     IsStopped = true,
@@ -439,7 +357,7 @@ namespace MultiplayerARPG
             ClearInterpolationTick();
             ClearSimulationTick();
             // Setup data for syncing determining
-            SyncData syncData = _prevSyncData;
+            MovementSyncData2D syncData = _prevSyncData;
             syncData.Tick = Manager.LocalTick;
             syncData.Position = EntityTransform.position;
             syncData.MovementState = MovementState;
@@ -474,7 +392,7 @@ namespace MultiplayerARPG
             // Storing sync buffers, server will send to other clients, owner client will send to server
             if (IsServer || (IsOwnerClient && movementSecure == MovementSecure.NotSecure))
             {
-                SyncData syncData = _prevSyncData;
+                MovementSyncData2D syncData = _prevSyncData;
                 bool changed =
                     Vector2.Distance(EntityTransform.position, syncData.Position) > positionThreshold ||
                     MovementState != syncData.MovementState || ExtraMovementState != syncData.ExtraMovementState ||
@@ -525,7 +443,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!_inputBuffers.TryGetValue(_simTick, out InputData inputData))
+            if (!_inputBuffers.TryGetValue(_simTick, out MovementInputData2D inputData))
             {
                 // No inputs
                 return;
@@ -709,8 +627,8 @@ namespace MultiplayerARPG
             {
                 uint tick1 = _interpBuffers.Keys[i];
                 uint tick2 = _interpBuffers.Keys[i + 1];
-                SyncData data1 = _interpBuffers[tick1];
-                SyncData data2 = _interpBuffers[tick2];
+                MovementSyncData2D data1 = _interpBuffers[tick1];
+                MovementSyncData2D data2 = _interpBuffers[tick2];
 
                 if (tick1 <= renderTick && renderTick <= tick2)
                 {
@@ -737,7 +655,7 @@ namespace MultiplayerARPG
             ExtraMovementState = t < 0.75f ? _interpFromSyncData.ExtraMovementState : _interpToSyncData.ExtraMovementState;
         }
 
-        protected void StoreInputBuffer(InputData entry, int maxBuffers = 3)
+        protected void StoreInputBuffer(MovementInputData2D entry, int maxBuffers = 3)
         {
             if (!_inputBuffers.ContainsKey(entry.Tick))
             {
@@ -750,11 +668,11 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void StoreInputBuffers(InputData[] data, int size, int maxBuffers = 3)
+        protected void StoreInputBuffers(MovementInputData2D[] data, int size, int maxBuffers = 3)
         {
             for (int i = 0; i < size; ++i)
             {
-                InputData entry = data[i];
+                MovementInputData2D entry = data[i];
                 if (_inputBuffers.ContainsKey(entry.Tick))
                 {
                     // This tick is already stored
@@ -769,7 +687,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void StoreSyncBuffer(SyncData entry, int maxBuffers = 3)
+        protected void StoreSyncBuffer(MovementSyncData2D entry, int maxBuffers = 3)
         {
             if (!_syncBuffers.ContainsKey(entry.Tick))
             {
@@ -782,11 +700,11 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void StoreInterpolateBuffers(SyncData[] data, int size, int maxBuffers = 3)
+        protected void StoreInterpolateBuffers(MovementSyncData2D[] data, int size, int maxBuffers = 3)
         {
             for (int i = 0; i < size; ++i)
             {
-                SyncData entry = data[i];
+                MovementSyncData2D entry = data[i];
                 if (_interpBuffers.ContainsKey(entry.Tick))
                 {
                     // This tick is already stored
@@ -874,30 +792,30 @@ namespace MultiplayerARPG
                     size = reader.GetByte();
                     if (size == 0)
                         return;
-                    InputData[] inputBuffers = ArrayPool<InputData>.Shared.Rent(size);
+                    MovementInputData2D[] inputBuffers = ArrayPool<MovementInputData2D>.Shared.Rent(size);
                     for (byte i = 0; i < size; ++i)
                     {
-                        inputBuffers[i] = reader.Get<InputData>();
+                        inputBuffers[i] = reader.Get<MovementInputData2D>();
                     }
                     if (!IsOwnerClient)
                     {
                         StoreInputBuffers(inputBuffers, size);
                         SetupSimulationTick(_inputBuffers.Keys[_inputBuffers.Count - 1]);
                     }
-                    ArrayPool<InputData>.Shared.Return(inputBuffers);
+                    ArrayPool<MovementInputData2D>.Shared.Return(inputBuffers);
                     break;
                 default:
                     size = reader.GetByte();
                     if (size == 0)
                         return;
-                    SyncData[] interpoationBuffers = ArrayPool<SyncData>.Shared.Rent(size);
+                    MovementSyncData2D[] interpoationBuffers = ArrayPool<MovementSyncData2D>.Shared.Rent(size);
                     for (byte i = 0; i < size; ++i)
                     {
-                        interpoationBuffers[i] = reader.Get<SyncData>();
+                        interpoationBuffers[i] = reader.Get<MovementSyncData2D>();
                     }
                     StoreInterpolateBuffers(interpoationBuffers, size, 30);
                     SetupInterpolationTick(_interpBuffers.Keys[_interpBuffers.Count - 1]);
-                    ArrayPool<SyncData>.Shared.Return(interpoationBuffers);
+                    ArrayPool<MovementSyncData2D>.Shared.Return(interpoationBuffers);
                     break;
             }
         }
@@ -917,17 +835,17 @@ namespace MultiplayerARPG
             byte size = reader.GetByte();
             if (size == 0)
                 return;
-            SyncData[] interpoationBuffers = ArrayPool<SyncData>.Shared.Rent(size);
+            MovementSyncData2D[] interpoationBuffers = ArrayPool<MovementSyncData2D>.Shared.Rent(size);
             for (byte i = 0; i < size; ++i)
             {
-                interpoationBuffers[i] = reader.Get<SyncData>();
+                interpoationBuffers[i] = reader.Get<MovementSyncData2D>();
             }
             if (!IsServer)
             {
                 StoreInterpolateBuffers(interpoationBuffers, size, 30);
                 SetupInterpolationTick(_interpBuffers.Keys[_interpBuffers.Count - 1]);
             }
-            ArrayPool<SyncData>.Shared.Return(interpoationBuffers);
+            ArrayPool<MovementSyncData2D>.Shared.Return(interpoationBuffers);
         }
     }
 }
