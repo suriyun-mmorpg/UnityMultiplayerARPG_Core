@@ -67,8 +67,9 @@ namespace MultiplayerARPG
 
         // Syncing/Interpolating
         protected MovementSyncData2D _prevSyncData;
-        protected MovementSyncData2D _interpFromSyncData;
-        protected MovementSyncData2D _interpToSyncData;
+        protected MovementSyncData2D _interpFromData;
+        protected MovementSyncData2D _interpToData;
+        protected uint _prevInterpFromTick;
         protected float _startInterpTime;
         protected float _endInterpTime;
 
@@ -82,7 +83,6 @@ namespace MultiplayerARPG
 
         // Interpolation Data
         protected Vector2? _prevPointClickPosition = null;
-        protected uint _prevInterpFromTick;
 
         public bool CanSimulateMovement()
         {
@@ -646,8 +646,8 @@ namespace MultiplayerARPG
                     // TODO: Speed hack checking here
                     interpFromTick = tick1;
                     interpToTick = tick2;
-                    _interpFromSyncData = data1;
-                    _interpToSyncData = data2;
+                    _interpFromData = data1;
+                    _interpToData = data2;
                     if (_prevInterpFromTick != interpFromTick)
                     {
                         _startInterpTime = currentTime;
@@ -659,12 +659,12 @@ namespace MultiplayerARPG
             }
 
             float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
-            EntityTransform.position = Vector2.Lerp(_interpFromSyncData.Position, _interpToSyncData.Position, t);
+            EntityTransform.position = Vector2.Lerp(_interpFromData.Position, _interpToData.Position, t);
             // CacheRigidbody2D.MovePosition(Vector2.Lerp(_interpFromPosition, _interpToPosition, t));
-            float rotation = Mathf.LerpAngle(_interpFromSyncData.Rotation, _interpToSyncData.Rotation, t);
+            float rotation = Mathf.LerpAngle(_interpFromData.Rotation, _interpToData.Rotation, t);
             Direction2D = (Vector2)(Quaternion.Euler(0f, 0f, rotation) * Vector3.up);
-            MovementState = t < 0.75f ? _interpFromSyncData.MovementState : _interpToSyncData.MovementState;
-            ExtraMovementState = t < 0.75f ? _interpFromSyncData.ExtraMovementState : _interpToSyncData.ExtraMovementState;
+            MovementState = t < 0.75f ? _interpFromData.MovementState : _interpToData.MovementState;
+            ExtraMovementState = t < 0.75f ? _interpFromData.ExtraMovementState : _interpToData.ExtraMovementState;
         }
 
         protected void StoreInputBuffer(MovementInputData2D entry, int maxBuffers = 3)
