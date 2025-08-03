@@ -1,4 +1,5 @@
 using LiteNetLib.Utils;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -7,7 +8,7 @@ namespace MultiplayerARPG
     {
         public uint Tick;
         public Vector3 Position;
-        public float Rotation;
+        public HalfPrecision Rotation;
         public MovementState MovementState;
         public ExtraMovementState ExtraMovementState;
 
@@ -18,7 +19,7 @@ namespace MultiplayerARPG
                 reader.GetFloat(),
                 reader.GetFloat(),
                 reader.GetFloat());
-            Rotation = Mathf.HalfToFloat(reader.GetPackedUShort());
+            Rotation = reader.Get<HalfPrecision>();
             MovementState = (MovementState)reader.GetByte();
             ExtraMovementState = (ExtraMovementState)reader.GetByte();
         }
@@ -29,7 +30,7 @@ namespace MultiplayerARPG
             writer.Put(Position.x);
             writer.Put(Position.y);
             writer.Put(Position.z);
-            writer.PutPackedUShort(Mathf.FloatToHalf(Rotation));
+            writer.Put(Rotation);
             writer.Put((byte)MovementState);
             writer.Put((byte)ExtraMovementState);
         }
