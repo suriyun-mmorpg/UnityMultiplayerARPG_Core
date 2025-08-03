@@ -807,7 +807,6 @@ namespace MultiplayerARPG
             {
                 shouldSendReliably = true;
                 writer.Put((byte)_clientTeleportState);
-                writer.PutPackedUInt(Manager.Tick);
                 _clientTeleportState = MovementTeleportState.None;
                 return true;
             }
@@ -843,7 +842,6 @@ namespace MultiplayerARPG
             {
                 shouldSendReliably = true;
                 writer.Put((byte)_serverTeleportState);
-                writer.PutPackedUInt(Manager.Tick);
                 writer.Put(EntityTransform.position.x);
                 writer.Put(EntityTransform.position.y);
                 _serverTeleportState = MovementTeleportState.WaitingForResponse;
@@ -866,7 +864,6 @@ namespace MultiplayerARPG
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Responding))
             {
-                uint tick = reader.GetPackedUInt();
                 _serverTeleportState = MovementTeleportState.None;
                 return;
             }
@@ -910,7 +907,6 @@ namespace MultiplayerARPG
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Requesting))
             {
-                uint tick = reader.GetPackedUInt();
                 Vector2 position = new Vector2(
                     reader.GetFloat(),
                     reader.GetFloat());
