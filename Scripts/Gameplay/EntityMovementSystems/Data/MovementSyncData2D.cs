@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         public Vector2 Position;
         public MovementState MovementState;
         public ExtraMovementState ExtraMovementState;
-        public DirectionVector2 Direction2D;
+        public float Rotation;
 
         public void Deserialize(NetDataReader reader)
         {
@@ -20,7 +20,7 @@ namespace MultiplayerARPG
                 reader.GetFloat());
             MovementState = (MovementState)reader.GetByte();
             ExtraMovementState = (ExtraMovementState)reader.GetByte();
-            Direction2D = reader.Get<DirectionVector2>();
+            Rotation = Mathf.HalfToFloat(reader.GetPackedUShort());
         }
 
         public void Serialize(NetDataWriter writer)
@@ -30,7 +30,7 @@ namespace MultiplayerARPG
             writer.Put(Position.y);
             writer.Put((byte)MovementState);
             writer.Put((byte)ExtraMovementState);
-            writer.Put(Direction2D);
+            writer.PutPackedUShort(Mathf.FloatToHalf(Rotation));
         }
     }
 }

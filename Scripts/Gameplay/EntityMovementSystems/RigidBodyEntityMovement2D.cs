@@ -267,7 +267,7 @@ namespace MultiplayerARPG
 
         public Quaternion GetLookRotation()
         {
-            return Quaternion.LookRotation(Direction2D);
+            return Quaternion.LookRotation(Vector3.forward, Direction2D);
         }
 
         public void StopMove()
@@ -365,7 +365,7 @@ namespace MultiplayerARPG
             syncData.Position = EntityTransform.position;
             syncData.MovementState = MovementState;
             syncData.ExtraMovementState = ExtraMovementState;
-            syncData.Direction2D = Direction2D;
+            syncData.Rotation = Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles.z;
             _prevSyncData = syncData;
             // Force setup sim tick
             if (IsOwnerClientOrOwnedByServer)
@@ -395,11 +395,12 @@ namespace MultiplayerARPG
             // Storing sync buffers, server will send to other clients, owner client will send to server
             if (IsServer || (IsOwnerClient && movementSecure == MovementSecure.NotSecure))
             {
+                float rotation = Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles.z;
                 MovementSyncData2D syncData = _prevSyncData;
                 bool changed =
                     Vector2.Distance(EntityTransform.position, syncData.Position) > positionThreshold ||
                     MovementState != syncData.MovementState || ExtraMovementState != syncData.ExtraMovementState ||
-                    Quaternion.Angle(Quaternion.LookRotation(Vector3.forward, Direction2D), Quaternion.LookRotation(Vector3.forward, syncData.Direction2D)) > eulerAnglesThreshold;
+                    Mathf.Abs(rotation - syncData.Rotation) > eulerAnglesThreshold;
                 bool keepAlive = updater.LocalTick - syncData.Tick >= keepAliveTicks;
 
                 if (!changed && !keepAlive)
@@ -415,7 +416,7 @@ namespace MultiplayerARPG
                     syncData.Position = EntityTransform.position;
                     syncData.MovementState = MovementState;
                     syncData.ExtraMovementState = ExtraMovementState;
-                    syncData.Direction2D = Direction2D;
+                    syncData.Rotation = rotation;
                 }
                 _prevSyncData = syncData;
 
@@ -660,7 +661,8 @@ namespace MultiplayerARPG
             float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
             EntityTransform.position = Vector2.Lerp(_interpFromSyncData.Position, _interpToSyncData.Position, t);
             // CacheRigidbody2D.MovePosition(Vector2.Lerp(_interpFromPosition, _interpToPosition, t));
-            Direction2D = Vector2.Lerp(_interpFromSyncData.Direction2D, _interpToSyncData.Direction2D, t).normalized;
+            float rotation = Mathf.LerpAngle(_interpFromSyncData.Rotation, _interpToSyncData.Rotation, t);
+            Direction2D = (Vector2)(Quaternion.Euler(0f, 0f, rotation) * Vector3.up);
             MovementState = t < 0.75f ? _interpFromSyncData.MovementState : _interpToSyncData.MovementState;
             ExtraMovementState = t < 0.75f ? _interpFromSyncData.ExtraMovementState : _interpToSyncData.ExtraMovementState;
         }
