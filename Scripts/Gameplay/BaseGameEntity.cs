@@ -271,9 +271,12 @@ namespace MultiplayerARPG
 
         public override void OnIdentityInitialize()
         {
-            _logicUpdater = Manager.LogicUpdater;
-            _logicUpdater.OnTick += OnTickServer;
-            _logicUpdater.OnTick += OnTickClient;
+            if (_logicUpdater == null)
+            {
+                _logicUpdater = Manager.LogicUpdater;
+                _logicUpdater.OnTick += OnTickServer;
+                _logicUpdater.OnTick += OnTickClient;
+            }
         }
 
         private void OnTickServer(LogicUpdater updater)
