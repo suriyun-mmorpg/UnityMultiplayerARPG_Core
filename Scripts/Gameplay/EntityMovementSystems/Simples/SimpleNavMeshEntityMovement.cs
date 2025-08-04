@@ -26,8 +26,8 @@ namespace MultiplayerARPG
         [Header("Dashing")]
         public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
 
-        public LiteNetLibTransform CacheNetworkedTransform { get; private set; }
-        public NavMeshAgent CacheNavMeshAgent { get; private set; }
+        public LiteNetLibTransform CacheNetworkedTransform { get; protected set; }
+        public NavMeshAgent CacheNavMeshAgent { get; protected set; }
         public float StoppingDistance
         {
             get { return CacheNavMeshAgent.stoppingDistance; }
@@ -53,10 +53,10 @@ namespace MultiplayerARPG
         protected float _yAngle;
         protected float _targetYAngle;
         protected float _yTurnSpeed;
-        private float? _remoteTargetYAngle;
+        protected float? _remoteTargetYAngle;
 
         // Interpolation Data
-        protected Vector3? _prevPointClickPosition = null;
+        protected SortedList<uint, System.ValueTuple<MovementState, ExtraMovementState>> _interpExtra = new SortedList<uint, System.ValueTuple<MovementState, ExtraMovementState>>();
 
         public override void EntityAwake()
         {
@@ -72,6 +72,9 @@ namespace MultiplayerARPG
             }
             // Setup
             CacheNetworkedTransform.syncByOwnerClient = true;
+            CacheNetworkedTransform.onWriteSyncBuffer += CacheNetworkedTransform_onWriteSyncBuffer;
+            CacheNetworkedTransform.onReadInterpBuffer += CacheNetworkedTransform_onReadInterpBuffer;
+            CacheNetworkedTransform.onInterpolate += CacheNetworkedTransform_onInterpolate;
             CacheNavMeshAgent.enabled = false;
             _yAngle = _targetYAngle = EntityTransform.eulerAngles.y;
             _lookRotationApplied = true;
@@ -80,6 +83,18 @@ namespace MultiplayerARPG
         public override void EntityStart()
         {
             _clientTeleportState = MovementTeleportState.Responding;
+        }
+
+        public override void EntityOnDestroy()
+        {
+            CacheNetworkedTransform.onWriteSyncBuffer -= CacheNetworkedTransform_onWriteSyncBuffer;
+            CacheNetworkedTransform.onReadInterpBuffer -= CacheNetworkedTransform_onReadInterpBuffer;
+            CacheNetworkedTransform.onInterpolate -= CacheNetworkedTransform_onInterpolate;
+        }
+
+        public override void OnSetOwnerClient(bool isOwnerClient)
+        {
+            CacheNavMeshAgent.enabled = CanSimulateMovement();
         }
 
         public override void ComponentOnEnable()
@@ -95,6 +110,43 @@ namespace MultiplayerARPG
         public bool CanSimulateMovement()
         {
             return Entity.IsOwnerClientOrOwnedByServer;
+        }
+
+        protected void CacheNetworkedTransform_onWriteSyncBuffer(NetDataWriter writer, uint tick)
+        {
+            writer.Put((byte)MovementState);
+            writer.Put((byte)ExtraMovementState);
+        }
+
+        protected void CacheNetworkedTransform_onReadInterpBuffer(NetDataReader reader, uint tick)
+        {
+            _interpExtra[tick] = new System.ValueTuple<MovementState, ExtraMovementState>(
+                (MovementState)reader.GetByte(),
+                (ExtraMovementState)reader.GetByte());
+            while (_interpExtra.Count > 30)
+            {
+                _interpExtra.RemoveAt(0);
+            }
+        }
+
+        protected void CacheNetworkedTransform_onInterpolate(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, float interpTime)
+        {
+            if (interpTime <= 0.75f)
+            {
+                if (_interpExtra.TryGetValue(interpFromData.Tick, out var states))
+                {
+                    MovementState = states.Item1;
+                    ExtraMovementState = states.Item2;
+                }
+            }
+            else
+            {
+                if (_interpExtra.TryGetValue(interpToData.Tick, out var states))
+                {
+                    MovementState = states.Item1;
+                    ExtraMovementState = states.Item2;
+                }
+            }
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
@@ -143,7 +195,7 @@ namespace MultiplayerARPG
             StopMoveFunction();
         }
 
-        private void StopMoveFunction()
+        protected void StopMoveFunction()
         {
             MovementInputData3D movementInput = _movementInput;
             movementInput.MoveDirection = Vector3.zero;
@@ -367,12 +419,12 @@ namespace MultiplayerARPG
             return new Bounds(center, size);
         }
 
-        private void RotateY()
+        protected void RotateY()
         {
             EntityTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);
         }
 
-        private void SetMovePaths(Vector3 position)
+        protected void SetMovePaths(Vector3 position)
         {
             if (!Entity.CanMove())
                 return;
