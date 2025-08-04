@@ -59,6 +59,7 @@ namespace MultiplayerARPG
         protected SortedList<uint, MovementInputData2D> _inputBuffers = new SortedList<uint, MovementInputData2D>();
         protected SortedList<uint, MovementSyncData2D> _syncBuffers = new SortedList<uint, MovementSyncData2D>();
         protected SortedList<uint, MovementSyncData2D> _interpBuffers = new SortedList<uint, MovementSyncData2D>();
+        protected LogicUpdater _logicUpdater = null;
         protected bool _hasSimTick = false;
         protected uint _simTick = 0;
         protected bool _hasInterpTick = false;
@@ -354,19 +355,15 @@ namespace MultiplayerARPG
             StopMoveFunction();
         }
 
+        public override void EntityStart()
+        {
+            _clientTeleportState = MovementTeleportState.Responding;
+        }
+
         public override void OnSetOwnerClient(bool isOwnerClient)
         {
             CacheRigidbody2D.simulated = CanSimulateMovement();
-            ClearInterpolationTick();
-            ClearSimulationTick();
-            // Setup data for syncing determining
-            MovementSyncData2D syncData = _prevSyncData;
-            syncData.Tick = Manager.LocalTick;
-            syncData.Position = EntityTransform.position;
-            syncData.MovementState = MovementState;
-            syncData.ExtraMovementState = ExtraMovementState;
-            syncData.Rotation = Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles.z;
-            _prevSyncData = syncData;
+            ResetBuffersAndStates();
             // Force setup sim tick
             if (IsOwnerClientOrOwnedByServer)
             {
@@ -375,16 +372,45 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void EntityStart()
+        public override void OnIdentityInitialize()
         {
-            if (Manager != null)
-                Manager.LogicUpdater.OnTick += LogicUpdater_OnTick;
+            if (_logicUpdater == null)
+            {
+                _logicUpdater = Manager.LogicUpdater;
+                _logicUpdater.OnTick += LogicUpdater_OnTick;
+            }
+            _interpFromData = _interpToData = new MovementSyncData2D()
+            {
+                Position = EntityTransform.position,
+                Rotation = Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles.z,
+                MovementState = MovementState,
+                ExtraMovementState = ExtraMovementState,
+            };
+            ResetBuffersAndStates();
+        }
+
+        protected void ResetBuffersAndStates()
+        {
+            _inputBuffers.Clear();
+            _syncBuffers.Clear();
+            _interpBuffers.Clear();
+            ClearInterpolationTick();
+            ClearSimulationTick();
+            // Setup data for syncing determining
+            _prevSyncData = new MovementSyncData2D()
+            {
+                Tick = Manager.LocalTick,
+                Position = EntityTransform.position,
+                MovementState = MovementState,
+                ExtraMovementState = ExtraMovementState,
+                Rotation = Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles.z,
+            };
         }
 
         public override void EntityOnDestroy()
         {
-            if (Manager != null)
-                Manager.LogicUpdater.OnTick -= LogicUpdater_OnTick;
+            if (_logicUpdater != null)
+                _logicUpdater.OnTick -= LogicUpdater_OnTick;
         }
 
         protected void LogicUpdater_OnTick(LogicUpdater updater)
@@ -495,7 +521,7 @@ namespace MultiplayerARPG
                 NavPaths = null;
             }
             MovementState = inputData.MovementState;
-            ExtraMovementState = inputData.ExtraMovementState;
+            ExtraMovementState = this.ValidateExtraMovementState(MovementState, inputData.ExtraMovementState);
             if (tempLookDirection.sqrMagnitude > 0f)
                 Direction2D = inputData.LookDirection;
             isDashing = inputData.MovementState.Has(MovementState.IsDash);
@@ -651,7 +677,7 @@ namespace MultiplayerARPG
                     if (_prevInterpFromTick != interpFromTick)
                     {
                         _startInterpTime = currentTime;
-                        _endInterpTime = currentTime + (Manager.LogicUpdater.DeltaTimeF * (tick2 - tick1));
+                        _endInterpTime = currentTime + (_logicUpdater.DeltaTimeF * (tick2 - tick1));
                         _prevInterpFromTick = interpFromTick;
                     }
                     break;
@@ -812,7 +838,10 @@ namespace MultiplayerARPG
                     if (!IsOwnerClient)
                     {
                         StoreInputBuffers(inputBuffers, size, 30);
-                        SetupSimulationTick(_inputBuffers.Keys[_inputBuffers.Count - 1]);
+                        uint simTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
+                        if (Player != null)
+                            simTick += LogicUpdater.TimeToTick(Player.Rtt / 2, _logicUpdater.DeltaTime);
+                        SetupSimulationTick(simTick);
                     }
                     ArrayPool<MovementInputData2D>.Shared.Return(inputBuffers);
                     break;
@@ -826,7 +855,10 @@ namespace MultiplayerARPG
                         interpoationBuffers[i] = reader.Get<MovementSyncData2D>();
                     }
                     StoreInterpolateBuffers(interpoationBuffers, size, 30);
-                    SetupInterpolationTick(_interpBuffers.Keys[_interpBuffers.Count - 1]);
+                    uint interpTick = _interpBuffers.Keys[_interpBuffers.Count - 1];
+                    if (Player != null)
+                        interpTick += LogicUpdater.TimeToTick(Player.Rtt / 2, _logicUpdater.DeltaTime);
+                    SetupInterpolationTick(interpTick);
                     ArrayPool<MovementSyncData2D>.Shared.Return(interpoationBuffers);
                     break;
             }
