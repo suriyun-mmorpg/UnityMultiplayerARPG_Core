@@ -131,16 +131,8 @@ namespace MultiplayerARPG
             CacheAnimator = GetComponent<Animator>();
             if (CacheAnimator == null)
                 CacheAnimator = GetComponentInChildren<Animator>();
-            // Prepare 
             // Prepare character controller component
             CacheCharacterController = gameObject.GetOrAddComponent<CharacterController>();
-            // Disable unused component
-            LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
-            if (disablingComp != null)
-            {
-                Logging.LogWarning(nameof(CharacterControllerEntityMovement), "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
-                disablingComp.enabled = false;
-            }
             Rigidbody rigidBody = gameObject.GetComponent<Rigidbody>();
             if (rigidBody != null)
             {
