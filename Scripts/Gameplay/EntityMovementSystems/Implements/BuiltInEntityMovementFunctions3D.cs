@@ -1349,6 +1349,7 @@ namespace MultiplayerARPG
             _verticalVelocity = 0;
             if (!stillMoveAfterTeleport)
                 NavPaths = null;
+
             // Prepare teleporation states
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;
@@ -1356,11 +1357,12 @@ namespace MultiplayerARPG
                 _isClientConfirmingTeleport = true;
             if (TeleportPreparer != null)
                 await TeleportPreparer.PrepareToTeleport(position, rotation);
+
             // Move character to target position
+            _verticalVelocity = 0;
             if (!stillMoveAfterTeleport)
                 NavPaths = null;
             _lastTeleportFrame = Time.frameCount;
-            _verticalVelocity = 0;
             EntityMovement.SetPosition(position);
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             TurnImmediately(rotation.eulerAngles.y);

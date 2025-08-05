@@ -502,6 +502,8 @@ namespace MultiplayerARPG
         {
             _inputDirection = Vector3.zero;
             _moveByDestination = false;
+
+            // Prepare teleporation states
             if (IsServer && !IsOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
@@ -515,7 +517,10 @@ namespace MultiplayerARPG
             }
             if (TeleportPreparer != null)
                 await TeleportPreparer.PrepareToTeleport(position, rotation);
+
             // Move character to target position
+            _inputDirection = Vector3.zero;
+            _moveByDestination = false;
             Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
             CacheNavMeshAgent.Warp(position);
             if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
