@@ -60,9 +60,7 @@ namespace MultiplayerARPG
         protected SortedList<uint, MovementSyncData2D> _syncBuffers = new SortedList<uint, MovementSyncData2D>();
         protected SortedList<uint, MovementSyncData2D> _interpBuffers = new SortedList<uint, MovementSyncData2D>();
         protected LogicUpdater _logicUpdater = null;
-        protected bool _hasSimTick = false;
         protected uint _simTick = 0;
-        protected bool _hasInterpTick = false;
         protected uint _interpTick = 0;
         public uint RenderTick => _interpTick - TICK_COUNT_FOR_INTERPOLATION;
 
@@ -90,31 +88,29 @@ namespace MultiplayerARPG
             return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
         }
 
-        protected void SetupSimulationTick(uint tick)
+        protected void SetupSimulationTick(uint simTick)
         {
-            if (_hasSimTick)
-                return;
-            _hasSimTick = true;
-            _simTick = tick;
+            if (_simTick > simTick && _simTick - simTick > 1)
+                _simTick = simTick;
+            if (simTick > _simTick && simTick - _simTick > 1)
+                _simTick = simTick;
         }
 
         protected void ClearSimulationTick()
         {
-            _hasSimTick = false;
             _simTick = 0;
         }
 
-        protected void SetupInterpolationTick(uint tick)
+        protected void SetupInterpolationTick(uint interpTick)
         {
-            if (_hasInterpTick)
-                return;
-            _hasInterpTick = true;
-            _interpTick = tick;
+            if (_interpTick > interpTick && _interpTick - interpTick > 1)
+                _interpTick = interpTick;
+            if (interpTick > _interpTick && interpTick - _interpTick > 1)
+                _interpTick = interpTick;
         }
 
         protected void ClearInterpolationTick()
         {
-            _hasInterpTick = false;
             _interpTick = 0;
         }
 
@@ -366,10 +362,7 @@ namespace MultiplayerARPG
             ResetBuffersAndStates();
             // Force setup sim tick
             if (IsOwnerClientOrOwnedByServer)
-            {
-                _hasSimTick = true;
                 _simTick = Manager.LocalTick;
-            }
         }
 
         public override void OnIdentityInitialize()
@@ -646,7 +639,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!_hasInterpTick || _interpBuffers.Count < 2)
+            if (_interpBuffers.Count < 2)
             {
                 // Not ready for interpolation
                 _prevInterpFromTick = 0;
