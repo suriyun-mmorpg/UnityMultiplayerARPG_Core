@@ -394,6 +394,9 @@ namespace MultiplayerARPG
 
         public void UpdateMovement(float deltaTime)
         {
+            if (!CanSimulateMovement())
+                return;
+
             _moveDirection = Vector3.zero;
             IsUnderWater = WaterCheck(_waterCollider);
             IsClimbing = LadderComponent && LadderComponent.ClimbingLadder;
@@ -600,7 +603,8 @@ namespace MultiplayerARPG
             if (_pauseMovementCountDown <= 0f && _isJumping)
             {
                 _extraMovementStateWhenJump = _tempExtraMovementState;
-                Entity.PlayJumpAnimation();
+                if (CanSimulateMovement())
+                    Entity.CallRpcPlayJumpAnimation();
                 _applyingJumpForce = true;
                 _applyJumpForceCountDown = 0f;
                 switch (applyJumpForceMode)
@@ -811,6 +815,9 @@ namespace MultiplayerARPG
 
         public void UpdateRotation(float deltaTime)
         {
+            if (!CanSimulateMovement())
+                return;
+
             if (_yTurnSpeed <= 0f)
                 _yAngle = _targetYAngle;
             else if (Mathf.Abs(_yAngle - _targetYAngle) > 1f)

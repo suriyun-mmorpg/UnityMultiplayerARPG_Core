@@ -593,7 +593,8 @@ namespace MultiplayerARPG
             {
                 _sendingJump = true;
                 _extraMovementStateWhenJump = _tempExtraMovementState;
-                Entity.PlayJumpAnimation();
+                if (CanSimulateMovement())
+                    Entity.CallRpcPlayJumpAnimation();
                 _applyingJumpForce = true;
                 _applyJumpForceCountDown = 0f;
                 switch (applyJumpForceMode)
