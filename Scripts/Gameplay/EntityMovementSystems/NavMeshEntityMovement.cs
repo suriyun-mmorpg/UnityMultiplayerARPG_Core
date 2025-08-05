@@ -28,6 +28,8 @@ namespace MultiplayerARPG
         public float snapThreshold = 5.0f;
 
         public NavMeshAgent CacheNavMeshAgent { get; private set; }
+        public IEntityTeleportPreparer TeleportPreparer { get; private set; }
+        public bool IsPreparingToTeleport { get { return TeleportPreparer != null && TeleportPreparer.IsPreparingToTeleport; } }
         public float StoppingDistance
         {
             get { return CacheNavMeshAgent.stoppingDistance; }
@@ -86,6 +88,7 @@ namespace MultiplayerARPG
         {
             // Prepare nav mesh agent component
             CacheNavMeshAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
+            TeleportPreparer = gameObject.GetComponent<IEntityTeleportPreparer>();
             _forceUpdateListeners = gameObject.GetComponents<IEntityMovementForceUpdateListener>();
 
             // Disable unused component
@@ -126,43 +129,37 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (CanPredictMovement())
+            if (!CanSimulateMovement())
+                return;
+            _inputDirection = moveDirection;
+            if (_inputDirection.sqrMagnitude > 0)
             {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                _inputDirection = moveDirection;
-                if (_inputDirection.sqrMagnitude > 0)
-                {
-                    _moveByDestination = false;
-                    CacheNavMeshAgent.updatePosition = true;
-                    CacheNavMeshAgent.updateRotation = false;
-                    if (CacheNavMeshAgent.isOnNavMesh)
-                        CacheNavMeshAgent.isStopped = true;
-                }
-                if (!_isDashing)
-                    _isDashing = movementState.Has(MovementState.IsDash);
+                _moveByDestination = false;
+                CacheNavMeshAgent.updatePosition = true;
+                CacheNavMeshAgent.updateRotation = false;
+                if (CacheNavMeshAgent.isOnNavMesh)
+                    CacheNavMeshAgent.isStopped = true;
             }
+            if (!_isDashing)
+                _isDashing = movementState.Has(MovementState.IsDash);
         }
 
         public void PointClickMovement(Vector3 position)
         {
             if (!Entity.CanMove())
                 return;
-            if (CanPredictMovement())
-            {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                SetMovePaths(position);
-            }
+            if (!CanSimulateMovement())
+                return;
+            SetMovePaths(position);
         }
 
         public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
             if (!Entity.CanMove())
                 return;
-            if (CanPredictMovement())
-            {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                _tempExtraMovementState = extraMovementState;
-            }
+            if (!CanSimulateMovement())
+                return;
+            _tempExtraMovementState = extraMovementState;
         }
 
         public void StopMove()
@@ -189,14 +186,12 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove() || !Entity.CanTurn())
                 return;
-            if (CanPredictMovement())
-            {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                _targetYAngle = rotation.eulerAngles.y;
-                _lookRotationApplied = false;
-                if (immediately)
-                    TurnImmediately(_targetYAngle);
-            }
+            if (!CanSimulateMovement())
+                return;
+            _targetYAngle = rotation.eulerAngles.y;
+            _lookRotationApplied = false;
+            if (immediately)
+                TurnImmediately(_targetYAngle);
         }
 
         public Quaternion GetLookRotation()
@@ -214,17 +209,17 @@ namespace MultiplayerARPG
             return _yTurnSpeed;
         }
 
-        public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
+        public async void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             if (!IsServer)
             {
-                Logging.LogWarning(nameof(NavMeshEntityMovement), "Teleport function shouldn't be called at client [" + name + "]");
+                Logging.LogWarning(nameof(NavMeshEntityMovement), $"Teleport function shouldn't be called at client {name}");
                 return;
             }
             _acceptedPosition = position;
             _isTeleporting = true;
             _stillMoveAfterTeleport = stillMoveAfterTeleport;
-            OnTeleport(position, rotation.eulerAngles.y, stillMoveAfterTeleport);
+            await OnTeleport(position, rotation, stillMoveAfterTeleport);
         }
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
@@ -297,6 +292,9 @@ namespace MultiplayerARPG
 
         public void UpdateMovement(float deltaTime)
         {
+            if (IsPreparingToTeleport)
+                return;
+
             // Prepare speed
             CacheNavMeshAgent.speed = Entity.GetMoveSpeed();
 
@@ -343,7 +341,7 @@ namespace MultiplayerARPG
             }
 
             bool isStationary = !CacheNavMeshAgent.isOnNavMesh || CacheNavMeshAgent.isStopped || GetPathRemainingDistance() <= CacheNavMeshAgent.stoppingDistance;
-            if (CanPredictMovement())
+            if (CanSimulateMovement())
             {
                 CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
                 MovementState = MovementState.IsGrounded;
@@ -562,7 +560,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (IsServer)
             {
@@ -575,7 +573,7 @@ namespace MultiplayerARPG
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Server requested to teleport
-                OnTeleport(position, yAngle, movementState != MovementState.IsTeleport);
+                await OnTeleport(position, Quaternion.Euler(0f, yAngle, 0f), movementState != MovementState.IsTeleport);
             }
             else if (_acceptedPositionTimestamp <= peerTimestamp)
             {
@@ -752,24 +750,27 @@ namespace MultiplayerARPG
             return oldPos + deltaMove;
         }
 
-        protected virtual void OnTeleport(Vector3 position, float yAngle, bool stillMoveAfterTeleport)
+        protected async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             _inputDirection = Vector3.zero;
             _moveByDestination = false;
+            if (IsServer && !IsOwnedByServer)
+                _isServerWaitingTeleportConfirm = true;
+            if (!IsServer && IsOwnerClient)
+                _isClientConfirmingTeleport = true;
+            if (TeleportPreparer != null)
+                await TeleportPreparer.PrepareToTeleport(position, rotation);
+            // Move character to target position
             Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
             CacheNavMeshAgent.Warp(position);
             if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
                 CacheNavMeshAgent.isStopped = true;
             if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
                 CacheNavMeshAgent.SetDestination(beforeWarpDest);
-            TurnImmediately(yAngle);
-            if (IsServer && !IsOwnedByServer)
-                _isServerWaitingTeleportConfirm = true;
-            if (!IsServer && IsOwnerClient)
-                _isClientConfirmingTeleport = true;
+            TurnImmediately(rotation.eulerAngles.y);
         }
 
-        public bool CanPredictMovement()
+        public bool CanSimulateMovement()
         {
             return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
         }

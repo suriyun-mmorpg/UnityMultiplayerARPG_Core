@@ -238,7 +238,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
             {
-                Logging.LogWarning(nameof(NavMeshEntityMovement), "Teleport function shouldn't be called at client [" + name + "]");
+                Logging.LogWarning(nameof(NavMeshEntityMovement), $"Teleport function shouldn't be called at client {name}");
                 return;
             }
             await OnTeleport(position, rotation, stillMoveAfterTeleport);
@@ -309,6 +309,7 @@ namespace MultiplayerARPG
                 float deltaTime = Time.deltaTime;
                 UpdateMovement(deltaTime);
                 UpdateRotation(deltaTime);
+                _isDashing = false;
             }
         }
 
@@ -499,6 +500,8 @@ namespace MultiplayerARPG
 
         protected async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
+            _inputDirection = Vector3.zero;
+            _moveByDestination = false;
             if (IsServer && !IsOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
@@ -513,7 +516,6 @@ namespace MultiplayerARPG
             if (TeleportPreparer != null)
                 await TeleportPreparer.PrepareToTeleport(position, rotation);
             // Move character to target position
-            _inputDirection = Vector3.zero;
             Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
             CacheNavMeshAgent.Warp(position);
             if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)

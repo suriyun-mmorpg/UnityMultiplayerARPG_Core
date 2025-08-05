@@ -991,6 +991,10 @@ namespace MultiplayerARPG
 
         private async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
+            _verticalVelocity = 0;
+            if (!stillMoveAfterTeleport)
+                NavPaths = null;
+            // Prepare teleporation states
             if (IsServer && !IsOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
@@ -1004,11 +1008,11 @@ namespace MultiplayerARPG
             }
             if (TeleportPreparer != null)
                 await TeleportPreparer.PrepareToTeleport(position, rotation);
-            _lastTeleportFrame = Time.frameCount;
             // Move character to target position
-            _verticalVelocity = 0;
             if (!stillMoveAfterTeleport)
                 NavPaths = null;
+            _lastTeleportFrame = Time.frameCount;
+            _verticalVelocity = 0;
             EntityMovement.SetPosition(position);
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             TurnImmediately(rotation.eulerAngles.y);

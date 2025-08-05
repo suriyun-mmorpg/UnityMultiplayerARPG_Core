@@ -119,8 +119,10 @@ namespace MultiplayerARPG
         // Move simulate codes
         private float _pauseMovementCountDown;
         private Vector3 _moveDirection;
+
+        // Force simulation
         private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
-        protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
+        private IEntityMovementForceUpdateListener[] _forceUpdateListeners;
 
         // Jump simulate codes
         private bool _applyingJumpForce;
@@ -232,59 +234,54 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (CanPredictMovement())
-            {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                _inputDirection = moveDirection;
-                _tempMovementState = movementState;
-                if (_inputDirection.sqrMagnitude > 0)
-                    NavPaths = null;
-                if (!_isJumping)
-                    _isJumping = _tempMovementState.Has(MovementState.IsJump);
-                if (!_isDashing)
-                    _isDashing = _tempMovementState.Has(MovementState.IsDash);
-            }
+            if (!CanSimulateMovement())
+                return;
+            // Always apply movement to owner client (it's client prediction for server auth movement)
+            _inputDirection = moveDirection;
+            _tempMovementState = movementState;
+            if (_inputDirection.sqrMagnitude > 0)
+                NavPaths = null;
+            if (!_isJumping)
+                _isJumping = _tempMovementState.Has(MovementState.IsJump);
+            if (!_isDashing)
+                _isDashing = _tempMovementState.Has(MovementState.IsDash);
         }
 
         public void PointClickMovement(Vector3 position)
         {
             if (!Entity.CanMove())
                 return;
-            if (CanPredictMovement())
-            {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                SetMovePaths(position, true);
-            }
+            if (!CanSimulateMovement())
+                return;
+            SetMovePaths(position, true);
         }
 
         public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
             if (!Entity.CanMove())
                 return;
-            if (CanPredictMovement() && !_isJumping)
-            {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                _tempExtraMovementState = extraMovementState;
-            }
+            if (!CanSimulateMovement())
+                return;
+            if (_isJumping)
+                return;
+            _tempExtraMovementState = extraMovementState;
         }
 
         public void SetLookRotation(Quaternion rotation, bool immediately)
         {
             if (!Entity.CanTurn())
                 return;
-            if (CanPredictMovement())
+            if (!CanSimulateMovement())
+                return;
+            _targetYAngle = rotation.eulerAngles.y;
+            if (LadderComponent && LadderComponent.ClimbingLadder)
             {
-                // Always apply movement to owner client (it's client prediction for server auth movement)
-                _targetYAngle = rotation.eulerAngles.y;
-                if (LadderComponent && LadderComponent.ClimbingLadder)
-                {
-                    // Turn to the ladder
-                    _targetYAngle = Quaternion.LookRotation(-LadderComponent.ClimbingLadder.ForwardWithYAngleOffsets).eulerAngles.y;
-                }
-                _lookRotationApplied = false;
-                if (immediately)
-                    TurnImmediately(_targetYAngle);
+                // Turn to the ladder
+                _targetYAngle = Quaternion.LookRotation(-LadderComponent.ClimbingLadder.ForwardWithYAngleOffsets).eulerAngles.y;
             }
+            _lookRotationApplied = false;
+            if (immediately)
+                TurnImmediately(_targetYAngle);
         }
 
         public Quaternion GetLookRotation()
@@ -309,14 +306,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(BuiltInEntityMovementFunctions3D), $"Teleport function shouldn't be called at client [{Entity.name}]");
                 return;
             }
-            if (IsServer && !IsOwnedByServer)
-                _isServerWaitingTeleportConfirm = true;
-            _acceptedPosition = position;
-            _isTeleporting = true;
-            _stillMoveAfterTeleport = stillMoveAfterTeleport;
-            if (TeleportPreparer != null)
-                await TeleportPreparer.PrepareToTeleport(position, rotation);
-            OnTeleport(position, rotation.eulerAngles.y, stillMoveAfterTeleport);
+            await OnTeleport(position, rotation, stillMoveAfterTeleport);
         }
 
         public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
@@ -839,7 +829,7 @@ namespace MultiplayerARPG
 
         public void AfterMovementUpdate(float deltaTime)
         {
-            if (CanPredictMovement())
+            if (CanSimulateMovement())
             {
                 // Re-setup movement state here to make sure it is correct
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
@@ -868,7 +858,7 @@ namespace MultiplayerARPG
 
         public void FixSwimUpPosition(float deltaTime)
         {
-            if (!CanPredictMovement())
+            if (!CanSimulateMovement())
                 return;
 
             if (!IsGrounded && IsUnderWater && _previousMovement.y > 0f)
@@ -1132,7 +1122,7 @@ namespace MultiplayerARPG
                 // Server requested to teleport
                 if (TeleportPreparer != null)
                     await TeleportPreparer.PrepareToTeleport(position, Quaternion.Euler(0f, yAngle, 0f));
-                OnTeleport(position, yAngle, movementState != MovementState.IsTeleport);
+                await OnTeleport(position, Quaternion.Euler(0f, yAngle, 0f), movementState != MovementState.IsTeleport);
             }
             else if (!IsPreparingToTeleport && _acceptedPositionTimestamp <= peerTimestamp)
             {
@@ -1354,23 +1344,30 @@ namespace MultiplayerARPG
             return oldPos + deltaMove;
         }
 
-        private void OnTeleport(Vector3 position, float yAngle, bool stillMoveAfterTeleport)
+        private async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
+            _verticalVelocity = 0;
             if (!stillMoveAfterTeleport)
                 NavPaths = null;
-            _verticalVelocity = 0;
-            EntityMovement.SetPosition(position);
-            CurrentGameManager.ShouldPhysicSyncTransforms = true;
-            TurnImmediately(yAngle);
+            // Prepare teleporation states
             if (IsServer && !IsOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
                 _isClientConfirmingTeleport = true;
+            if (TeleportPreparer != null)
+                await TeleportPreparer.PrepareToTeleport(position, rotation);
+            // Move character to target position
+            if (!stillMoveAfterTeleport)
+                NavPaths = null;
             _lastTeleportFrame = Time.frameCount;
+            _verticalVelocity = 0;
+            EntityMovement.SetPosition(position);
+            CurrentGameManager.ShouldPhysicSyncTransforms = true;
+            TurnImmediately(rotation.eulerAngles.y);
             _previousPosition = CacheTransform.position;
         }
 
-        public bool CanPredictMovement()
+        public bool CanSimulateMovement()
         {
             return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
         }
