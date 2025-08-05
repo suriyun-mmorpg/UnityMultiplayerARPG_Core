@@ -173,6 +173,13 @@ namespace MultiplayerARPG
             NavPaths = null;
         }
 
+        public void EntityOnDestroy()
+        {
+            NetworkedTransform.onWriteSyncBuffer -= NetworkedTransform_onWriteSyncBuffer;
+            NetworkedTransform.onReadInterpBuffer -= NetworkedTransform_onReadInterpBuffer;
+            NetworkedTransform.onInterpolate -= NetworkedTransform_onInterpolate;
+        }
+
         private void NetworkedTransform_onWriteSyncBuffer(NetDataWriter writer, uint tick)
         {
             writer.Put((byte)MovementState);

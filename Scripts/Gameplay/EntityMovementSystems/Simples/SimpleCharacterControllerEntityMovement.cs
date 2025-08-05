@@ -209,6 +209,11 @@ namespace MultiplayerARPG
             Functions.OnSetOwnerClient(isOwnerClient);
         }
 
+        public override void EntityOnDestroy()
+        {
+            Functions.EntityOnDestroy();
+        }
+
         private void OnAnimatorMove()
         {
             Functions.OnAnimatorMove();
