@@ -9,9 +9,9 @@ namespace MultiplayerARPG
 {
     public partial class BuiltInSimpleEntityMovementFunctions3D
     {
-        private static readonly int s_forceGroundedFramesAfterTeleport = 3;
-        private static readonly float s_minDistanceToSimulateMovement = 0.01f;
-        private static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
+        protected const int FORCE_GROUNDED_FRAMES_AFTER_TELEPORT = 3;
+        protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
+        protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -50,8 +50,8 @@ namespace MultiplayerARPG
         public bool useRootMotionClimbing;
         public float rootMotionGroundedVerticalVelocity = 0f;
 
-        public BaseGameEntity Entity { get; private set; }
-        public CharacterLadderComponent LadderComponent { get; private set; }
+        public BaseGameEntity Entity { get; protected set; }
+        public CharacterLadderComponent LadderComponent { get; protected set; }
         public bool IsServer { get { return Entity.IsServer; } }
         public bool IsClient { get { return Entity.IsClient; } }
         public bool IsOwnerClient { get { return Entity.IsOwnerClient; } }
@@ -61,76 +61,75 @@ namespace MultiplayerARPG
         public BaseGameplayRule CurrentGameplayRule { get { return Entity.CurrentGameplayRule; } }
         public BaseGameNetworkManager CurrentGameManager { get { return Entity.CurrentGameManager; } }
         public Transform CacheTransform { get { return Entity.EntityTransform; } }
-        public Animator Animator { get; private set; }
+        public Animator Animator { get; protected set; }
         public LiteNetLibTransform NetworkedTransform { get; protected set; }
-        public IBuiltInEntityMovement3D EntityMovement { get; private set; }
-        public IEntityTeleportPreparer TeleportPreparer { get; private set; }
+        public IBuiltInEntityMovement3D EntityMovement { get; protected set; }
+        public IEntityTeleportPreparer TeleportPreparer { get; protected set; }
         public bool IsPreparingToTeleport { get { return TeleportPreparer != null && TeleportPreparer.IsPreparingToTeleport; } }
 
         public float StoppingDistance
         {
             get { return stoppingDistance; }
         }
-        public MovementState MovementState { get; private set; }
-        public ExtraMovementState ExtraMovementState { get; private set; }
+        public MovementState MovementState { get; protected set; }
+        public ExtraMovementState ExtraMovementState { get; protected set; }
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
-        public float CurrentMoveSpeed { get; private set; }
-        public Queue<Vector3> NavPaths { get; private set; }
+        public float CurrentMoveSpeed { get; protected set; }
+        public Queue<Vector3> NavPaths { get; protected set; }
         public bool HasNavPaths
         {
             get { return NavPaths != null && NavPaths.Count > 0; }
         }
-        public bool IsGrounded { get; private set; } = true;
-        public bool IsAirborne { get; private set; } = false;
-        public bool IsUnderWater { get; private set; } = false;
-        public bool IsClimbing { get; private set; } = false;
+        public bool IsGrounded { get; protected set; } = true;
+        public bool IsAirborne { get; protected set; } = false;
+        public bool IsUnderWater { get; protected set; } = false;
+        public bool IsClimbing { get; protected set; } = false;
 
         // Input codes
-        private bool _isJumping;
-        private bool _isDashing;
-        private Vector3 _inputDirection;
-        private MovementState _tempMovementState;
-        private ExtraMovementState _tempExtraMovementState;
+        protected bool _isJumping;
+        protected bool _isDashing;
+        protected Vector3 _inputDirection;
+        protected MovementState _tempMovementState;
+        protected ExtraMovementState _tempExtraMovementState;
 
         // Teleportation
-        private int _lastTeleportFrame;
-        private MovementTeleportState _serverTeleportState;
-        private MovementTeleportState _clientTeleportState;
+        protected int _lastTeleportFrame;
+        protected MovementTeleportState _serverTeleportState;
+        protected MovementTeleportState _clientTeleportState;
 
         // State simulate codes
-        private float? _lagMoveSpeedRate;
-        private float _verticalVelocity;
-        private Vector3 _velocityBeforeAirborne;
-        private Collider _waterCollider;
-        private byte _underWaterFrameCount;
-        private Transform _groundedTransform;
-        private Vector3 _previousPlatformPosition;
-        private Vector3 _previousPosition;
-        private Vector3 _previousMovement;
-        private bool _previouslyGrounded = false;
-        private bool _previouslyAirborne = false;
-        private bool _simulatingKeyMovement = false;
-        private ExtraMovementState _previouslyExtraMovementState;
+        protected float? _lagMoveSpeedRate;
+        protected float _verticalVelocity;
+        protected Vector3 _velocityBeforeAirborne;
+        protected Collider _waterCollider;
+        protected byte _underWaterFrameCount;
+        protected Transform _groundedTransform;
+        protected Vector3 _previousPlatformPosition;
+        protected Vector3 _previousPosition;
+        protected Vector3 _previousMovement;
+        protected bool _previouslyGrounded = false;
+        protected bool _previouslyAirborne = false;
+        protected bool _simulatingKeyMovement = false;
+        protected ExtraMovementState _previouslyExtraMovementState;
 
         // Move simulate codes
-        private float _pauseMovementCountDown;
-        private Vector3 _moveDirection;
+        protected float _pauseMovementCountDown;
+        protected Vector3 _moveDirection;
 
         // Force simulation
-        private readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
-        private IEntityMovementForceUpdateListener[] _forceUpdateListeners;
+        protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
+        protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
 
         // Jump simulate codes
-        private bool _applyingJumpForce;
-        private float _applyJumpForceCountDown;
-        private ExtraMovementState _extraMovementStateWhenJump;
+        protected bool _applyingJumpForce;
+        protected float _applyJumpForceCountDown;
+        protected ExtraMovementState _extraMovementStateWhenJump;
 
         // Turn simulate codes
-        private bool _lookRotationApplied;
-        private float _yAngle;
-        private float _targetYAngle;
-        private float _yTurnSpeed;
-        private float? _remoteTargetYAngle;
+        protected bool _lookRotationApplied;
+        protected float _yAngle;
+        protected float _targetYAngle;
+        protected float _yTurnSpeed;
 
         // Interpolation Data
         protected SortedList<uint, System.ValueTuple<MovementState, ExtraMovementState>> _interpExtra = new SortedList<uint, System.ValueTuple<MovementState, ExtraMovementState>>();
@@ -180,13 +179,13 @@ namespace MultiplayerARPG
             NetworkedTransform.onInterpolate -= NetworkedTransform_onInterpolate;
         }
 
-        private void NetworkedTransform_onWriteSyncBuffer(NetDataWriter writer, uint tick)
+        protected void NetworkedTransform_onWriteSyncBuffer(NetDataWriter writer, uint tick)
         {
             writer.Put((byte)MovementState);
             writer.Put((byte)ExtraMovementState);
         }
 
-        private void NetworkedTransform_onReadInterpBuffer(NetDataReader reader, uint tick)
+        protected void NetworkedTransform_onReadInterpBuffer(NetDataReader reader, uint tick)
         {
             _interpExtra[tick] = new System.ValueTuple<MovementState, ExtraMovementState>(
                 (MovementState)reader.GetByte(),
@@ -197,7 +196,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private void NetworkedTransform_onInterpolate(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, float interpTime)
+        protected void NetworkedTransform_onInterpolate(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, float interpTime)
         {
             if (interpTime <= 0.75f)
             {
@@ -259,7 +258,7 @@ namespace MultiplayerARPG
             // Always apply movement to owner client (it's client prediction for server auth movement)
             _inputDirection = moveDirection;
             _tempMovementState = movementState;
-            if (_inputDirection.sqrMagnitude > 0)
+            if (_inputDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
                 NavPaths = null;
             if (!_isJumping)
                 _isJumping = _tempMovementState.Has(MovementState.IsJump);
@@ -520,7 +519,7 @@ namespace MultiplayerARPG
                 tempTargetPosition = NavPaths.Peek();
                 _moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
-                float stoppingDistance = _simulatingKeyMovement ? s_minDistanceToSimulateMovement : StoppingDistance;
+                float stoppingDistance = _simulatingKeyMovement ? MIN_MAGNITUDE_TO_DETERMINE_MOVING : StoppingDistance;
                 bool shouldStop = tempTargetDistance < stoppingDistance;
                 if (shouldStop)
                 {
@@ -542,19 +541,18 @@ namespace MultiplayerARPG
                         _tempMovementState |= MovementState.Forward;
                 }
             }
-            else if (_inputDirection.sqrMagnitude > 0f)
+            else if (_inputDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
                 _moveDirection = _inputDirection.normalized;
                 tempTargetPosition = tempCurrentPosition + _moveDirection;
             }
             else
             {
-                if (_previousMovement.sqrMagnitude <= 0f)
+                if (_previousMovement.sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
                     StopMove();
-                ApplyRemoteTurnAngle();
             }
 
-            if ((IsOwnerClientOrOwnedByServer || (HasNavPaths && !_simulatingKeyMovement)) && _lookRotationApplied && _moveDirection.sqrMagnitude > 0f)
+            if ((IsOwnerClientOrOwnedByServer || (HasNavPaths && !_simulatingKeyMovement)) && _lookRotationApplied && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
                 // Turn character by move direction
                 if (Entity.CanTurn())
@@ -677,7 +675,7 @@ namespace MultiplayerARPG
             }
 
             // Movement updating
-            if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > 0f && (!IsAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
+            if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE && (!IsAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
             {
                 // Calculate only horizontal move direction
                 tempHorizontalMoveDirection = _moveDirection;
@@ -807,7 +805,7 @@ namespace MultiplayerARPG
                 LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder &&
                 LadderComponent.EnterExitState == EnterExitState.None &&
                 LadderComponent.EnterExitState != EnterExitState.ConfirmAwaiting &&
-                tempHorizontalMoveDirection.sqrMagnitude > 0f)
+                tempHorizontalMoveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
                 Vector3 dirToLadder = (LadderComponent.TriggeredLadderEntry.TipTransform.position.GetXZ() - Entity.EntityTransform.position.GetXZ()).normalized;
                 float angle = Vector3.Angle(tempHorizontalMoveDirection, dirToLadder);
@@ -838,10 +836,10 @@ namespace MultiplayerARPG
             if (CanSimulateMovement())
             {
                 // Re-setup movement state here to make sure it is correct
-                _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
+                _tempMovementState = _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE ? _tempMovementState : MovementState.None;
                 if (IsUnderWater)
                     _tempMovementState |= MovementState.IsUnderWater;
-                if (IsGrounded || !IsAirborne || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
+                if (IsGrounded || !IsAirborne || Time.frameCount - _lastTeleportFrame < FORCE_GROUNDED_FRAMES_AFTER_TELEPORT)
                     _tempMovementState |= MovementState.IsGrounded;
                 if (_isJumping)
                     _tempMovementState |= MovementState.IsJump;
@@ -872,12 +870,12 @@ namespace MultiplayerARPG
             }
         }
 
-        private void RotateY()
+        protected void RotateY()
         {
             EntityMovement.RotateY(_yAngle);
         }
 
-        private void SetMovePaths(Vector3 position, bool useNavMesh)
+        protected void SetMovePaths(Vector3 position, bool useNavMesh)
         {
             if (useNavMesh)
             {
@@ -898,17 +896,17 @@ namespace MultiplayerARPG
             }
         }
 
-        private float CalculateMaxFallVelocity()
+        protected float CalculateMaxFallVelocity()
         {
             return maxFallVelocity * Entity.GetGravityRate();
         }
 
-        private float CalculateGravity()
+        protected float CalculateGravity()
         {
             return gravity * Entity.GetGravityRate();
         }
 
-        private float CalculateJumpVerticalSpeed()
+        protected float CalculateJumpVerticalSpeed()
         {
             // From the jump height and gravity we deduce the upwards speed 
             // for the character to reach at the apex.
@@ -1003,7 +1001,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
+        protected async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             _verticalVelocity = 0;
             if (!stillMoveAfterTeleport)
@@ -1045,47 +1043,10 @@ namespace MultiplayerARPG
             return alwaysUseRootMotion || useRootMotionForMovement || useRootMotionForAirMovement || useRootMotionForJump || useRootMotionForFall || useRootMotionUnderWater || useRootMotionClimbing;
         }
 
-        public void RemoteTurnSimulation(bool isKeyMovement, float yAngle, float deltaTime)
-        {
-            if (UseRootMotion())
-            {
-                if (isKeyMovement)
-                {
-                    // Turn to target immediately
-                    TurnImmediately(yAngle);
-                }
-                else
-                {
-                    // Turn later after moved
-                    _remoteTargetYAngle = yAngle;
-                }
-                return;
-            }
-
-            if (!IsClient)
-            {
-                // Turn to target immediately
-                TurnImmediately(yAngle);
-                return;
-            }
-            // Will turn smoothly later
-            _targetYAngle = yAngle;
-            _yTurnSpeed = 1f / deltaTime;
-        }
-
         public void TurnImmediately(float yAngle)
         {
             _yAngle = _targetYAngle = yAngle;
             RotateY();
-        }
-
-        public void ApplyRemoteTurnAngle()
-        {
-            if (_remoteTargetYAngle.HasValue)
-            {
-                _targetYAngle = _remoteTargetYAngle.Value;
-                _remoteTargetYAngle = null;
-            }
         }
 
         public async UniTask WaitClientTeleportConfirm()

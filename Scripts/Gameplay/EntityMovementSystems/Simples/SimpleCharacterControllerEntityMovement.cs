@@ -1,7 +1,6 @@
 using Cysharp.Threading.Tasks;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -19,8 +18,8 @@ namespace MultiplayerARPG
         /// <summary>
         /// Add some distant to avoid character falling under ground
         /// </summary>
-        private const float ABOVE_GROUND_OFFSETS = 0.25f;
-        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[8];
+        protected const float ABOVE_GROUND_OFFSETS = 0.25f;
+        protected static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[8];
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -95,7 +94,7 @@ namespace MultiplayerARPG
 #endif
                 return _cacheAnimator;
             }
-            private set => _cacheAnimator = value;
+            protected set => _cacheAnimator = value;
         }
         protected CharacterController _cacheCharacterController;
         public CharacterController CacheCharacterController
@@ -108,9 +107,9 @@ namespace MultiplayerARPG
 #endif
                 return _cacheCharacterController;
             }
-            private set => _cacheCharacterController = value;
+            protected set => _cacheCharacterController = value;
         }
-        public BuiltInSimpleEntityMovementFunctions3D Functions { get; private set; }
+        public BuiltInSimpleEntityMovementFunctions3D Functions { get; protected set; }
 
         public float StoppingDistance { get { return Functions.StoppingDistance; } }
         public MovementState MovementState { get { return Functions.MovementState; } }
@@ -170,7 +169,7 @@ namespace MultiplayerARPG
             _crawlRaycastDegrees = CalculateCrawlRaycastDegrees();
         }
 
-        private float[] CalculateCrawlRaycastDegrees()
+        protected float[] CalculateCrawlRaycastDegrees()
         {
             float[] result;
             if (crawlCheckRaycasts > 0)
@@ -214,22 +213,22 @@ namespace MultiplayerARPG
             Functions.EntityOnDestroy();
         }
 
-        private void OnAnimatorMove()
+        protected void OnAnimatorMove()
         {
             Functions.OnAnimatorMove();
         }
 
-        private void OnTriggerEnter(Collider other)
+        protected void OnTriggerEnter(Collider other)
         {
             Functions.OnTriggerEnter(other);
         }
 
-        private void OnTriggerExit(Collider other)
+        protected void OnTriggerExit(Collider other)
         {
             Functions.OnTriggerExit(other);
         }
 
-        private void OnControllerColliderHit(ControllerColliderHit hit)
+        protected void OnControllerColliderHit(ControllerColliderHit hit)
         {
             Functions.OnControllerColliderHit(hit.point, hit.transform);
         }
@@ -324,7 +323,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        private Vector3 AdjustCrawlMotion(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion)
+        protected Vector3 AdjustCrawlMotion(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion)
         {
             if (extraMovementState != ExtraMovementState.IsCrawling || crawlCheckRaycasts == 0 || !IsClient)
                 return motion;
