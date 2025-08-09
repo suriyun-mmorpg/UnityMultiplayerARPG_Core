@@ -583,7 +583,7 @@ namespace MultiplayerARPG
             }
 
             float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
-            EntityTransform.position = Vector2.Lerp(_interpFromData.Position, _interpToData.Position, t);
+            EntityTransform.position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
             float rotation = Mathf.LerpAngle(_interpFromData.Rotation, _interpToData.Rotation, t);
             EntityTransform.rotation = Quaternion.Euler(0f, rotation, 0f);
             MovementState = t < 0.75f ? _interpFromData.MovementState : _interpToData.MovementState;
