@@ -23,7 +23,8 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(Rigidbody2D))]
     public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
     {
-        public const int TICK_COUNT_FOR_INTERPOLATION = 1;
+        protected const int TICK_COUNT_FOR_INTERPOLATION = 2;
+        protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
 
         [Header("Networking Settings")]
         public MovementSecure movementSecure = MovementSecure.NotSecure;
@@ -45,6 +46,8 @@ namespace MultiplayerARPG
         public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
 
         public Rigidbody2D CacheRigidbody2D { get; protected set; }
+        public IEntityTeleportPreparer TeleportPreparer { get; private set; }
+        public bool IsPreparingToTeleport { get { return TeleportPreparer != null && TeleportPreparer.IsPreparingToTeleport; } }
         public MovementState MovementState { get; protected set; }
         public ExtraMovementState ExtraMovementState { get; protected set; }
         public DirectionVector2 Direction2D { get; set; }
@@ -83,259 +86,11 @@ namespace MultiplayerARPG
         // Interpolation Data
         protected Vector2? _prevPointClickPosition = null;
 
-        public bool CanSimulateMovement()
-        {
-            return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
-        }
-
-        protected void SetupSimulationTick(uint simTick)
-        {
-            if (_simTick > simTick && _simTick - simTick > 1)
-                _simTick = simTick;
-            if (simTick > _simTick && simTick - _simTick > 1)
-                _simTick = simTick;
-        }
-
-        protected void ClearSimulationTick()
-        {
-            _simTick = 0;
-        }
-
-        protected void SetupInterpolationTick(uint interpTick)
-        {
-            if (_interpTick > interpTick && _interpTick - interpTick > 1)
-                _interpTick = interpTick;
-            if (interpTick > _interpTick && interpTick - _interpTick > 1)
-                _interpTick = interpTick;
-        }
-
-        protected void ClearInterpolationTick()
-        {
-            _interpTick = 0;
-        }
-
-        public bool AllowToJump()
-        {
-            return false;
-        }
-
-        public bool AllowToDash()
-        {
-            return true;
-        }
-
-        public bool AllowToCrouch()
-        {
-            return true;
-        }
-
-        public bool AllowToCrawl()
-        {
-            return true;
-        }
-
-        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
-        {
-            if (!IsServer)
-                return;
-            if (mode.IsReplaceMovement())
-            {
-                // Can have only one replace movement force applier, so remove stored ones
-                _movementForceAppliers.RemoveReplaceMovementForces();
-            }
-            _movementForceAppliers.Add(new EntityMovementForceApplier()
-                .Apply(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration));
-        }
-
-        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
-        {
-            return _movementForceAppliers.FindBySource(sourceType, sourceDataId);
-        }
-
-        public void ClearAllForces()
-        {
-            if (!IsServer)
-                return;
-            _movementForceAppliers.Clear();
-        }
-
-        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
-        {
-            result = fromPosition;
-            return true;
-        }
-
-        public Bounds GetMovementBounds()
-        {
-            return GameplayUtils.MakeLocalBoundsByCollider(transform);
-        }
-
-        protected virtual void SetMovePaths(Vector2 position, bool useNavMesh)
-        {
-            // TODO: Implement nav mesh
-            NavPaths = new Queue<Vector2>();
-            NavPaths.Enqueue(position);
-        }
-
-        public void SetSmoothTurnSpeed(float speed)
-        {
-            // 2D, do nothing
-        }
-
-        public float GetSmoothTurnSpeed()
-        {
-            // 2D, do nothing
-            return 0f;
-        }
-
-        public virtual void KeyMovement(Vector3 moveDirection, MovementState movementState)
-        {
-            if (!Entity.CanMove())
-                return;
-            if (!CanSimulateMovement())
-                return;
-            uint tick = Manager.LocalTick;
-            if (_inputBuffers.Count > 0)
-            {
-                uint prevTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
-                if (prevTick == tick)
-                    return;
-                if (_inputBuffers.TryGetValue(prevTick, out MovementInputData2D prevInput) &&
-                    prevInput.IsPointClick && moveDirection.sqrMagnitude <= 0f)
-                {
-                    prevInput.Tick = tick;
-                    StoreInputBuffer(prevInput);
-                    return;
-                }
-            }
-            StoreInputBuffer(new MovementInputData2D()
-            {
-                Tick = tick,
-                IsPointClick = false,
-                MovementState = movementState,
-                MoveDirection = moveDirection,
-                LookDirection = moveDirection,
-            });
-        }
-
-        public virtual void PointClickMovement(Vector3 position)
-        {
-            if (!Entity.CanMove())
-                return;
-            if (!CanSimulateMovement())
-                return;
-            uint tick = Manager.LocalTick;
-            _inputBuffers.Remove(tick);
-            StoreInputBuffer(new MovementInputData2D()
-            {
-                Tick = tick,
-                IsPointClick = true,
-                Position = position,
-            });
-        }
-
-        public void SetExtraMovementState(ExtraMovementState extraMovementState)
-        {
-            if (!Entity.CanMove())
-                return;
-            if (!CanSimulateMovement())
-                return;
-            uint tick = Manager.LocalTick;
-            if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
-                return;
-            if (inputData.ExtraMovementState != ExtraMovementState.None)
-                return;
-            inputData.ExtraMovementState = extraMovementState;
-            _inputBuffers[tick] = inputData;
-        }
-
-        public virtual void SetLookRotation(Quaternion rotation, bool immediately)
-        {
-            if (!Entity.CanMove() || !Entity.CanTurn())
-                return;
-            if (!CanSimulateMovement())
-                return;
-            uint tick = Manager.LocalTick;
-            if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
-                return;
-            inputData.LookDirection = (Vector2)(rotation * Vector3.forward);
-            _inputBuffers[tick] = inputData;
-        }
-
-        public Quaternion GetLookRotation()
-        {
-            return Quaternion.LookRotation(Vector3.forward, Direction2D);
-        }
-
-        public void StopMove()
-        {
-            if (movementSecure == MovementSecure.ServerAuthoritative)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                uint tick = Manager.LocalTick;
-                _inputBuffers[tick] = new MovementInputData2D()
-                {
-                    Tick = tick,
-                    IsStopped = true,
-                };
-            }
-            StopMoveFunction();
-        }
-
-        protected void StopMoveFunction()
-        {
-            NavPaths = null;
-#if UNITY_6000_0_OR_NEWER
-            CacheRigidbody2D.linearVelocity = Vector2.zero;
-#else
-            CacheRigidbody2D.velocity = Vector2.zero;
-#endif
-            MovementState = MovementState.IsGrounded;
-            ExtraMovementState = ExtraMovementState.None;
-        }
-
-        public void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
-        {
-            if (!IsServer)
-            {
-                Logging.LogWarning(nameof(RigidBodyEntityMovement2D), $"Teleport function shouldn't be called at client [{name}]");
-                return;
-            }
-            OnTeleport(position, stillMoveAfterTeleport);
-        }
-
-        protected virtual void OnTeleport(Vector2 position, bool stillMoveAfterTeleport)
-        {
-            if (!stillMoveAfterTeleport)
-                NavPaths = null;
-            EntityTransform.position = position;
-            CacheRigidbody2D.MovePosition(position);
-            CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
-            if (IsServer && !IsOwnedByServer)
-            {
-                _serverTeleportState = MovementTeleportState.Requesting;
-                if (stillMoveAfterTeleport)
-                    _serverTeleportState |= MovementTeleportState.StillMoveAfterTeleport;
-                _serverTeleportState |= MovementTeleportState.WaitingForResponse;
-            }
-            if (!IsServer && IsOwnerClient)
-            {
-                _clientTeleportState = MovementTeleportState.Responding;
-            }
-        }
-
-        public async UniTask WaitClientTeleportConfirm()
-        {
-            while (this != null && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
-            {
-                await UniTask.Delay(100);
-            }
-        }
-
         public override void EntityAwake()
         {
             // Prepare rigidbody component
             CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
+            TeleportPreparer = gameObject.GetComponent<IEntityTeleportPreparer>();
             _forceUpdateListeners = gameObject.GetComponents<IEntityMovementForceUpdateListener>();
             // Disable unused component
             LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
@@ -363,6 +118,16 @@ namespace MultiplayerARPG
             // Force setup sim tick
             if (IsOwnerClientOrOwnedByServer)
                 _simTick = Manager.LocalTick;
+        }
+
+        public override void ComponentOnEnable()
+        {
+            CacheRigidbody2D.simulated = CanSimulateMovement();
+        }
+
+        public override void ComponentOnDisable()
+        {
+            CacheRigidbody2D.simulated = false;
         }
 
         public override void OnIdentityInitialize()
@@ -445,6 +210,238 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool CanSimulateMovement()
+        {
+            return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
+        }
+
+        protected void SetupSimulationTick(uint simTick)
+        {
+            if (_simTick > simTick && _simTick - simTick > 1)
+                _simTick = simTick;
+            if (simTick > _simTick && simTick - _simTick > 1)
+                _simTick = simTick;
+        }
+
+        protected void ClearSimulationTick()
+        {
+            _simTick = 0;
+        }
+
+        protected void SetupInterpolationTick(uint interpTick)
+        {
+            if (_interpTick > interpTick && _interpTick - interpTick > 1)
+                _interpTick = interpTick;
+            if (interpTick > _interpTick && interpTick - _interpTick > 1)
+                _interpTick = interpTick;
+        }
+
+        protected void ClearInterpolationTick()
+        {
+            _interpTick = 0;
+        }
+
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
+        {
+            if (!IsServer)
+                return;
+            if (mode.IsReplaceMovement())
+            {
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+            }
+            _movementForceAppliers.Add(new EntityMovementForceApplier()
+                .Apply(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration));
+        }
+
+        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
+        {
+            return _movementForceAppliers.FindBySource(sourceType, sourceDataId);
+        }
+
+        public void ClearAllForces()
+        {
+            if (!IsServer)
+                return;
+            _movementForceAppliers.Clear();
+        }
+
+        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        {
+            result = fromPosition;
+            return true;
+        }
+
+        public Bounds GetMovementBounds()
+        {
+            return GameplayUtils.MakeLocalBoundsByCollider(transform);
+        }
+
+        protected virtual void SetMovePaths(Vector2 position, bool useNavMesh)
+        {
+            // TODO: Implement nav mesh
+            NavPaths = new Queue<Vector2>();
+            NavPaths.Enqueue(position);
+        }
+
+        public void SetSmoothTurnSpeed(float speed)
+        {
+            // 2D, do nothing
+        }
+
+        public float GetSmoothTurnSpeed()
+        {
+            // 2D, do nothing
+            return 0f;
+        }
+
+        public virtual void KeyMovement(Vector3 moveDirection, MovementState movementState)
+        {
+            if (!Entity.CanMove())
+                return;
+            if (!CanSimulateMovement())
+                return;
+            uint tick = Manager.LocalTick;
+            if (_inputBuffers.Count > 0)
+            {
+                uint prevTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
+                if (prevTick == tick)
+                    return;
+                if (_inputBuffers.TryGetValue(prevTick, out MovementInputData2D prevInput) &&
+                    prevInput.IsPointClick && moveDirection.sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
+                {
+                    prevInput.Tick = tick;
+                    StoreInputBuffer(prevInput);
+                    return;
+                }
+            }
+            StoreInputBuffer(new MovementInputData2D()
+            {
+                Tick = tick,
+                IsPointClick = false,
+                MovementState = movementState,
+                MoveDirection = moveDirection,
+                LookDirection = moveDirection,
+            });
+        }
+
+        public virtual void PointClickMovement(Vector3 position)
+        {
+            if (!Entity.CanMove())
+                return;
+            if (!CanSimulateMovement())
+                return;
+            uint tick = Manager.LocalTick;
+            _inputBuffers.Remove(tick);
+            StoreInputBuffer(new MovementInputData2D()
+            {
+                Tick = tick,
+                IsPointClick = true,
+                Position = position,
+            });
+        }
+
+        public void SetExtraMovementState(ExtraMovementState extraMovementState)
+        {
+            if (!Entity.CanMove())
+                return;
+            if (!CanSimulateMovement())
+                return;
+            uint tick = Manager.LocalTick;
+            if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
+                return;
+            if (inputData.ExtraMovementState != ExtraMovementState.None)
+                return;
+            inputData.ExtraMovementState = extraMovementState;
+            _inputBuffers[tick] = inputData;
+        }
+
+        public virtual void SetLookRotation(Quaternion rotation, bool immediately)
+        {
+            if (!Entity.CanMove() || !Entity.CanTurn())
+                return;
+            if (!CanSimulateMovement())
+                return;
+            uint tick = Manager.LocalTick;
+            if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
+                return;
+            inputData.LookDirection = (Vector2)(rotation * Vector3.forward);
+            _inputBuffers[tick] = inputData;
+        }
+
+        public Quaternion GetLookRotation()
+        {
+            return Quaternion.LookRotation(Vector3.forward, Direction2D);
+        }
+
+        public void StopMove()
+        {
+            if (movementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                uint tick = Manager.LocalTick;
+                _inputBuffers[tick] = new MovementInputData2D()
+                {
+                    Tick = tick,
+                    IsStopped = true,
+                    IsPointClick = false,
+                };
+            }
+            StopMoveFunction();
+        }
+
+        protected void StopMoveFunction()
+        {
+            NavPaths = null;
+#if UNITY_6000_0_OR_NEWER
+            CacheRigidbody2D.linearVelocity = Vector2.zero;
+#else
+            CacheRigidbody2D.velocity = Vector2.zero;
+#endif
+            MovementState = MovementState.IsGrounded;
+            ExtraMovementState = ExtraMovementState.None;
+        }
+
+        public async void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
+        {
+            if (!IsServer)
+            {
+                Logging.LogWarning(nameof(RigidBodyEntityMovement2D), $"Teleport function shouldn't be called at client [{name}]");
+                return;
+            }
+            await OnTeleport(position, stillMoveAfterTeleport);
+        }
+
+        protected virtual async UniTask OnTeleport(Vector2 position, bool stillMoveAfterTeleport)
+        {
+            if (!stillMoveAfterTeleport)
+                NavPaths = null;
+            if (TeleportPreparer != null)
+                await TeleportPreparer.PrepareToTeleport(position, Quaternion.identity);
+            if (IsServer && !IsOwnedByServer)
+            {
+                _serverTeleportState = MovementTeleportState.Requesting;
+                if (stillMoveAfterTeleport)
+                    _serverTeleportState |= MovementTeleportState.StillMoveAfterTeleport;
+                _serverTeleportState |= MovementTeleportState.WaitingForResponse;
+            }
+            if (!IsServer && IsOwnerClient)
+            {
+                _clientTeleportState = MovementTeleportState.Responding;
+            }
+            EntityTransform.position = position;
+            CacheRigidbody2D.MovePosition(position);
+            CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
+        }
+
+        public async UniTask WaitClientTeleportConfirm()
+        {
+            while (this != null && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            {
+                await UniTask.Delay(100);
+            }
+        }
+
         public override void EntityUpdate()
         {
             // Simulate movement by inputs if it can predict movement
@@ -509,13 +506,13 @@ namespace MultiplayerARPG
             {
                 SetMovePaths(inputData.Position, true);
             }
-            else if (tempInputDirection.sqrMagnitude > 0f)
+            else if (tempInputDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
                 NavPaths = null;
             }
             MovementState = inputData.MovementState;
             ExtraMovementState = this.ValidateExtraMovementState(MovementState, inputData.ExtraMovementState);
-            if (tempLookDirection.sqrMagnitude > 0f)
+            if (tempLookDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
                 Direction2D = inputData.LookDirection;
             isDashing = inputData.MovementState.Has(MovementState.IsDash);
 
@@ -549,7 +546,7 @@ namespace MultiplayerARPG
                     Direction2D = tempMoveDirection;
                 }
             }
-            else if (tempInputDirection.sqrMagnitude > 0f)
+            else if (tempInputDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
                 tempMoveDirection = tempInputDirection;
                 tempTargetPosition = tempCurrentPosition + tempMoveDirection;
@@ -604,7 +601,7 @@ namespace MultiplayerARPG
             }
 
             // Updating horizontal movement (WASD inputs)
-            if (tempMoveDirection.sqrMagnitude > 0f)
+            if (tempMoveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
                 // If character move backward
                 CurrentMoveSpeed = tempMaxMoveSpeed;
@@ -857,7 +854,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Requesting))
@@ -866,7 +863,7 @@ namespace MultiplayerARPG
                     reader.GetFloat(),
                     reader.GetFloat());
                 bool stillMoveAfterTeleport = movementTeleportState.Has(MovementTeleportState.StillMoveAfterTeleport);
-                OnTeleport(position, stillMoveAfterTeleport);
+                await OnTeleport(position, stillMoveAfterTeleport);
                 return;
             }
             byte size = reader.GetByte();
@@ -883,6 +880,26 @@ namespace MultiplayerARPG
                 SetupInterpolationTick(_interpBuffers.Keys[_interpBuffers.Count - 1]);
             }
             ArrayPool<MovementSyncData2D>.Shared.Return(interpoationBuffers);
+        }
+
+        public bool AllowToJump()
+        {
+            return false;
+        }
+
+        public bool AllowToDash()
+        {
+            return true;
+        }
+
+        public bool AllowToCrouch()
+        {
+            return true;
+        }
+
+        public bool AllowToCrawl()
+        {
+            return true;
         }
     }
 }
