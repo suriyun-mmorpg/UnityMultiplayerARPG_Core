@@ -212,14 +212,20 @@ namespace MultiplayerARPG
 
         public bool CanSimulateMovement()
         {
-            return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
+            switch (movementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    return Entity.IsServer || Entity.IsOwnerClientOrOwnedByServer;
+                default:
+                    return Entity.IsOwnerClientOrOwnedByServer;
+            }
         }
 
         protected void SetupSimulationTick(uint simTick)
         {
-            if (_simTick > simTick && _simTick - simTick > 1)
+            if (_simTick > simTick && _simTick - simTick > 2)
                 _simTick = simTick;
-            if (simTick > _simTick && simTick - _simTick > 1)
+            if (simTick > _simTick && simTick - _simTick > 2)
                 _simTick = simTick;
         }
 
@@ -230,9 +236,9 @@ namespace MultiplayerARPG
 
         protected void SetupInterpolationTick(uint interpTick)
         {
-            if (_interpTick > interpTick && _interpTick - interpTick > 1)
+            if (_interpTick > interpTick && _interpTick - interpTick > 2)
                 _interpTick = interpTick;
-            if (interpTick > _interpTick && interpTick - _interpTick > 1)
+            if (interpTick > _interpTick && interpTick - _interpTick > 2)
                 _interpTick = interpTick;
         }
 
@@ -299,7 +305,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
             if (_inputBuffers.Count > 0)
@@ -329,7 +335,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
             _inputBuffers.Remove(tick);
@@ -345,7 +351,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
             if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
@@ -360,7 +366,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove() || !Entity.CanTurn())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
             if (!_inputBuffers.TryGetValue(tick, out MovementInputData2D inputData))
@@ -376,7 +382,7 @@ namespace MultiplayerARPG
 
         public void StopMove()
         {
-            if (movementSecure == MovementSecure.ServerAuthoritative)
+            if (Entity.IsOwnerClientOrOwnedByServer)
             {
                 // Send movement input to server, then server will apply movement and sync transform to clients
                 uint tick = Manager.LocalTick;
@@ -463,7 +469,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!_inputBuffers.TryGetValue(_simTick, out MovementInputData2D inputData))
+            if (!TryGetInputBuffer(out MovementInputData2D inputData))
             {
                 // No inputs
                 return;
@@ -715,6 +721,22 @@ namespace MultiplayerARPG
             }
         }
 
+        protected bool TryGetInputBuffer(out MovementInputData2D inputData, byte maxLookback = 2)
+        {
+            for (byte i = 0; i <= maxLookback; ++i)
+            {
+                if (_simTick > 0 && _simTick <= i)
+                {
+                    // Not able to look back
+                    break;
+                }
+                if (_inputBuffers.TryGetValue(_simTick - i, out inputData))
+                    return true;
+            }
+            inputData = default;
+            return false;
+        }
+
         protected void StoreSyncBuffer(MovementSyncData2D entry, int maxBuffers = 3)
         {
             if (!_syncBuffers.ContainsKey(entry.Tick))
@@ -829,8 +851,6 @@ namespace MultiplayerARPG
                     {
                         StoreInputBuffers(inputBuffers, size, 30);
                         uint simTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
-                        if (Player != null)
-                            simTick += LogicUpdater.TimeToTick(Player.Rtt / 2, _logicUpdater.DeltaTime);
                         SetupSimulationTick(simTick);
                     }
                     ArrayPool<MovementInputData2D>.Shared.Return(inputBuffers);
