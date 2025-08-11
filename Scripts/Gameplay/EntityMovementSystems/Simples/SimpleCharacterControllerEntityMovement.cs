@@ -260,7 +260,6 @@ namespace MultiplayerARPG
             float deltaTime = Time.deltaTime;
             Functions.UpdateMovement(deltaTime);
             Functions.UpdateRotation(deltaTime);
-            Functions.AfterMovementUpdate(deltaTime);
             if (_forceUngroundCountdown > 0f)
                 _forceUngroundCountdown -= deltaTime;
         }
