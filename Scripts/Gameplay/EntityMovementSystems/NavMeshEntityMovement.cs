@@ -60,7 +60,6 @@ namespace MultiplayerARPG
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
         public float CurrentMoveSpeed { get { return CacheNavMeshAgent.isStopped ? 0f : CacheNavMeshAgent.speed; } }
 
-
         // Inputs
         protected SortedList<uint, MovementInputData3D> _inputBuffers = new SortedList<uint, MovementInputData3D>();
         protected SortedList<uint, MovementSyncData3D> _syncBuffers = new SortedList<uint, MovementSyncData3D>();
@@ -404,7 +403,6 @@ namespace MultiplayerARPG
 
         public void SetLookRotation(Quaternion rotation, bool immediately)
         {
-
             if (!Entity.CanMove() || !Entity.CanTurn())
                 return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
