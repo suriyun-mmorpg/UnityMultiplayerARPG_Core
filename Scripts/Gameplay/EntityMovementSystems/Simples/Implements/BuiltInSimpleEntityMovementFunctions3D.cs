@@ -253,7 +253,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             // Always apply movement to owner client (it's client prediction for server auth movement)
             _inputDirection = moveDirection;
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             SetMovePaths(position, true);
         }
@@ -279,7 +279,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             if (_isJumping)
                 return;
@@ -290,7 +290,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanTurn())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             _targetYAngle = rotation.eulerAngles.y;
             if (LadderComponent && LadderComponent.ClimbingLadder)

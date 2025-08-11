@@ -158,7 +158,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             _inputDirection = moveDirection;
             if (!_isDashing)
@@ -169,7 +169,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             SetMovePaths(position);
         }
@@ -178,7 +178,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             _tempExtraMovementState = extraMovementState;
         }
@@ -201,7 +201,7 @@ namespace MultiplayerARPG
         {
             if (!Entity.CanMove() || !Entity.CanTurn())
                 return;
-            if (!CanSimulateMovement())
+            if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             _targetYAngle = rotation.eulerAngles.y;
             _lookRotationApplied = false;
