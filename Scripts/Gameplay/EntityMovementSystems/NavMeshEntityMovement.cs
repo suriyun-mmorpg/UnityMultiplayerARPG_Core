@@ -81,6 +81,9 @@ namespace MultiplayerARPG
         protected MovementTeleportState _serverTeleportState;
         protected MovementTeleportState _clientTeleportState;
 
+        // Move simulate codes
+        protected Vector3? _prevPointClickPosition = null;
+
         // Force simulation
         protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
         protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
@@ -89,9 +92,6 @@ namespace MultiplayerARPG
         protected bool _lookRotationApplied;
         protected float _yAngle;
         protected float _yTurnSpeed;
-
-        // Interpolation Data
-        protected Vector2? _prevPointClickPosition = null;
 
         public override void EntityAwake()
         {
@@ -461,7 +461,7 @@ namespace MultiplayerARPG
         protected virtual async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
             // Prepare teleporation states
-            if (IsServer && !IsOwnedByServer)
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
                 if (stillMoveAfterTeleport)
