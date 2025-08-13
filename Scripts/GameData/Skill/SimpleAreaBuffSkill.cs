@@ -59,11 +59,10 @@ namespace MultiplayerARPG
                 // Spawn area entity
                 // Aim position type always is `Position`
                 int hashAssetId = 0;
-#if !EXCLUDE_PREFAB_REFS
-                hashAssetId = areaBuffEntity.Identity.HashAssetId;
-#endif
-                if (addressableAreaBuffEntity.IsDataValid())
-                    hashAssetId = addressableAreaBuffEntity.HashAssetId;
+                if (AreaBuffEntity != null)
+                    hashAssetId = AreaBuffEntity.Identity.HashAssetId;
+                else if (AddressableAreaBuffEntity.IsDataValid())
+                    hashAssetId = AddressableAreaBuffEntity.HashAssetId;
                 if (hashAssetId == 0)
                 {
                     Logging.LogError("SimpleAreaBuffSkill", $"Unable to spawn area buff entity, skill ID: {Id}");
