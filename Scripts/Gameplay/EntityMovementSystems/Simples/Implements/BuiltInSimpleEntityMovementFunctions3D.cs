@@ -565,11 +565,6 @@ namespace MultiplayerARPG
                 _moveDirection = _inputDirection.normalized;
                 tempTargetPosition = tempCurrentPosition + _moveDirection;
             }
-            else
-            {
-                if (_previousMovement.sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
-                    StopMove();
-            }
 
             if ((IsOwnerClientOrOwnedByServer || HasNavPaths) && _lookRotationApplied && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
@@ -1001,7 +996,7 @@ namespace MultiplayerARPG
                 NavPaths = null;
 
             // Prepare teleporation states
-            if (IsServer && !IsOwnedByServer)
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
                 if (stillMoveAfterTeleport)
