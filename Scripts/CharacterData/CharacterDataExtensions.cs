@@ -8,7 +8,19 @@ namespace MultiplayerARPG
     {
         public static BaseCharacter GetDatabase(this ICharacterData data)
         {
-            if (data == null || data.DataId == 0)
+            if (data == null)
+            {
+                // Data has not been set
+                return null;
+            }
+
+            if (data is Object unityObject && unityObject == null)
+            {
+                // Data has not been set
+                return null;
+            }
+
+            if (data.DataId == 0)
             {
                 // Data has not been set
                 return null;
