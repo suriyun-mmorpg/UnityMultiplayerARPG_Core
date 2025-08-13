@@ -79,12 +79,12 @@ namespace MultiplayerARPG
         protected MovementTeleportState _serverTeleportState;
         protected MovementTeleportState _clientTeleportState;
 
+        // Move simulate codes
+        protected Vector2? _prevPointClickPosition = null;
+
         // Force simulation
         protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
         protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
-
-        // Interpolation Data
-        protected Vector2? _prevPointClickPosition = null;
 
         public override void EntityAwake()
         {
@@ -424,7 +424,7 @@ namespace MultiplayerARPG
                 NavPaths = null;
             if (TeleportPreparer != null)
                 await TeleportPreparer.PrepareToTeleport(position, Quaternion.identity);
-            if (IsServer && !IsOwnedByServer)
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
                 if (stillMoveAfterTeleport)
