@@ -15,10 +15,20 @@ namespace MultiplayerARPG
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
         protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
 
+        [Header("Network Settings")]
+        public MovementSecure movementSecure = MovementSecure.NotSecure;
+        [Tooltip("If distance between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
+        [Min(0.01f)]
+        public float positionThreshold = 0.01f;
+        [Tooltip("If angle between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
+        [Min(0.01f)]
+        public float eulerAnglesThreshold = 1f;
+        [Tooltip("Keep alive ticks before it is stop syncing (after has no changes)")]
+        public int keepAliveTicks = 10;
+
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
-        public MovementSecure movementSecure = MovementSecure.NotSecure;
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
@@ -127,6 +137,7 @@ namespace MultiplayerARPG
         protected ExtraMovementState _previouslyExtraMovementState;
 
         // Move simulate codes
+        protected Vector3? _prevPointClickPosition = null;
         protected float _pauseMovementCountDown;
         protected Vector3 _moveDirection;
         protected bool _isJumping;
@@ -169,6 +180,7 @@ namespace MultiplayerARPG
 
         public void ComponentEnabled()
         {
+            _yAngle = EntityTransform.eulerAngles.y;
             _verticalVelocity = 0;
             _lastTeleportFrame = Time.frameCount;
             _previousPosition = EntityTransform.position;
@@ -177,6 +189,92 @@ namespace MultiplayerARPG
         public void OnSetOwnerClient(bool isOwnerClient)
         {
             NavPaths = null;
+            ResetBuffersAndStates();
+            // Force setup sim tick
+            if (IsOwnerClientOrOwnedByServer)
+                _simTick = Manager.LocalTick;
+        }
+
+        public void OnIdentityInitialize()
+        {
+            if (_logicUpdater == null)
+            {
+                _logicUpdater = Manager.LogicUpdater;
+                _logicUpdater.OnTick += LogicUpdater_OnTick;
+            }
+            _interpFromData = _interpToData = new MovementSyncData3D()
+            {
+                Position = EntityTransform.position,
+                Rotation = EntityTransform.eulerAngles.y,
+                MovementState = MovementState,
+                ExtraMovementState = ExtraMovementState,
+            };
+            ResetBuffersAndStates();
+        }
+
+        protected void ResetBuffersAndStates()
+        {
+            _inputBuffers.Clear();
+            _syncBuffers.Clear();
+            _interpBuffers.Clear();
+            ClearInterpolationTick();
+            ClearSimulationTick();
+            // Setup data for syncing determining
+            _prevSyncData = new MovementSyncData3D()
+            {
+                Tick = Manager.LocalTick,
+                Position = EntityTransform.position,
+                MovementState = MovementState,
+                ExtraMovementState = ExtraMovementState,
+                Rotation = EntityTransform.eulerAngles.y,
+            };
+            _yAngle = EntityTransform.eulerAngles.y;
+            _lookRotationApplied = true;
+        }
+
+        public void EntityOnDestroy()
+        {
+            if (_logicUpdater != null)
+                _logicUpdater.OnTick -= LogicUpdater_OnTick;
+        }
+
+        protected void LogicUpdater_OnTick(LogicUpdater updater)
+        {
+            _simTick++;
+            _interpTick++;
+
+            // Storing sync buffers, server will send to other clients, owner client will send to server
+            if (IsServer || (IsOwnerClient && movementSecure == MovementSecure.NotSecure))
+            {
+                float rotation = EntityTransform.eulerAngles.y;
+                MovementSyncData3D syncData = _prevSyncData;
+                bool changed =
+                    Vector3.Distance(EntityTransform.position, syncData.Position) > positionThreshold ||
+                    MovementState != syncData.MovementState || ExtraMovementState != syncData.ExtraMovementState ||
+                    Mathf.Abs(rotation - syncData.Rotation) > eulerAnglesThreshold;
+                bool keepAlive = updater.LocalTick - syncData.Tick >= keepAliveTicks;
+
+                if (!changed && !keepAlive)
+                {
+                    // No changes, not going to keep alive, clear sync buffers
+                    _syncBuffers.Clear();
+                    return;
+                }
+
+                if (changed)
+                {
+                    syncData.Tick = updater.LocalTick;
+                    syncData.Position = EntityTransform.position;
+                    syncData.MovementState = MovementState;
+                    syncData.ExtraMovementState = ExtraMovementState;
+                    syncData.Rotation = rotation;
+                }
+                _prevSyncData = syncData;
+
+                syncData.Tick = updater.LocalTick;
+                // Stored buffers will be send later
+                StoreSyncBuffer(syncData);
+            }
         }
 
         public void OnAnimatorMove()
@@ -730,6 +828,18 @@ namespace MultiplayerARPG
             Vector3 tempCurrentPosition = EntityTransform.position;
             Vector3 tempTargetPosition = tempCurrentPosition;
             bool forceUseRootMotion = alwaysUseRootMotion || Entity.ShouldUseRootMotion;
+            Vector3 tempInputDirection = Vector3.zero;
+
+            if (!inputData.IsPointClick)
+            {
+                tempInputDirection = inputData.MoveDirection;
+                NavPaths = null;
+            }
+
+            if (inputData.IsPointClick && (!_prevPointClickPosition.HasValue || Vector3.Distance(_prevPointClickPosition.Value, inputData.Position) > 0.01f))
+            {
+                SetMovePaths(inputData.Position, true);
+            }
 
             if (HasNavPaths)
             {
@@ -758,15 +868,10 @@ namespace MultiplayerARPG
                         inputData.MovementState |= MovementState.Forward;
                 }
             }
-            else if (inputData.MoveDirection.ToVector3().sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
+            else if (tempInputDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
-                _moveDirection = inputData.MoveDirection.ToVector3().normalized;
+                _moveDirection = tempInputDirection.normalized;
                 tempTargetPosition = tempCurrentPosition + _moveDirection;
-            }
-            else
-            {
-                if (_previousMovement.sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
-                    StopMove();
             }
 
             if ((IsOwnerClientOrOwnedByServer || HasNavPaths) && _lookRotationApplied && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
@@ -863,7 +968,7 @@ namespace MultiplayerARPG
                 _velocityBeforeAirborne = Vector3.zero;
 
             // Dashing
-            if (_pauseMovementCountDown <= 0f && IsGrounded)
+            if (_pauseMovementCountDown <= 0f && IsGrounded && _isDashing)
             {
                 // Can have only one replace movement force applier, so remove stored ones
                 _movementForceAppliers.RemoveReplaceMovementForces();
@@ -892,7 +997,7 @@ namespace MultiplayerARPG
             }
 
             // Movement updating
-            if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > 0f && (!IsAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
+            if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE && (!IsAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
             {
                 // Calculate only horizontal move direction
                 tempHorizontalMoveDirection = _moveDirection;
@@ -1294,7 +1399,7 @@ namespace MultiplayerARPG
                 NavPaths = null;
 
             // Prepare teleporation states
-            if (IsServer && !IsOwnedByServer)
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
                 if (stillMoveAfterTeleport)

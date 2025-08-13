@@ -16,10 +16,20 @@ namespace MultiplayerARPG
         private const float ABOVE_GROUND_OFFSETS = 0.25f;
         private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[8];
 
+        [Header("Network Settings")]
+        public MovementSecure movementSecure = MovementSecure.NotSecure;
+        [Tooltip("If distance between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
+        [Min(0.01f)]
+        public float positionThreshold = 0.01f;
+        [Tooltip("If angle between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
+        [Min(0.01f)]
+        public float eulerAnglesThreshold = 1f;
+        [Tooltip("Keep alive ticks before it is stop syncing (after has no changes)")]
+        public int keepAliveTicks = 10;
+
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
-        public MovementSecure movementSecure = MovementSecure.NotSecure;
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
@@ -147,8 +157,11 @@ namespace MultiplayerARPG
             // Setup
             Functions = new BuiltInEntityMovementFunctions3D(Entity, CacheAnimator, this)
             {
-                stoppingDistance = stoppingDistance,
                 movementSecure = movementSecure,
+                positionThreshold = positionThreshold,
+                eulerAnglesThreshold = eulerAnglesThreshold,
+                keepAliveTicks = keepAliveTicks,
+                stoppingDistance = stoppingDistance,
                 jumpHeight = jumpHeight,
                 applyJumpForceMode = applyJumpForceMode,
                 applyJumpForceFixedDuration = applyJumpForceFixedDuration,
@@ -216,6 +229,18 @@ namespace MultiplayerARPG
             Functions.OnSetOwnerClient(isOwnerClient);
         }
 
+        public override void OnIdentityInitialize()
+        {
+            base.OnIdentityInitialize();
+            Functions.OnIdentityInitialize();
+        }
+
+        public override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            Functions.EntityOnDestroy();
+        }
+
         private void OnAnimatorMove()
         {
             Functions.OnAnimatorMove();
@@ -239,8 +264,11 @@ namespace MultiplayerARPG
         public override void EntityUpdate()
         {
 #if UNITY_EDITOR
-            Functions.stoppingDistance = stoppingDistance;
             Functions.movementSecure = movementSecure;
+            Functions.positionThreshold = positionThreshold;
+            Functions.eulerAnglesThreshold = eulerAnglesThreshold;
+            Functions.keepAliveTicks = keepAliveTicks;
+            Functions.stoppingDistance = stoppingDistance;
             Functions.jumpHeight = jumpHeight;
             Functions.applyJumpForceMode = applyJumpForceMode;
             Functions.applyJumpForceFixedDuration = applyJumpForceFixedDuration;
