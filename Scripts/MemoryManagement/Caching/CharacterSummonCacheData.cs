@@ -59,14 +59,13 @@ namespace MultiplayerARPG
 
         public CalculatedBuff GetBuff()
         {
-            if (!_recachingBuff && _cacheBuff != null)
-                return _cacheBuff;
-            _recachingBuff = false;
             if (_cacheBuff == null)
                 _cacheBuff = new CalculatedBuff();
+            if (!_recachingBuff)
+                return _cacheBuff;
+            _recachingBuff = false;
             Buff tempBuff = null;
-            int entityId = _type.GetPrefabEntityId(_dataId);
-            if (GameInstance.MonsterEntitiesData.TryGetValue(entityId, out MonsterCharacter monsterCharacter) && monsterCharacter != null)
+            if (GameInstance.MonsterEntitiesData.TryGetValue(_type.GetPrefabEntityId(_dataId), out MonsterCharacter monsterCharacter) && monsterCharacter != null)
                 tempBuff = monsterCharacter.SummonerBuff;
             _cacheBuff.Build(tempBuff, _level);
             return _cacheBuff;
