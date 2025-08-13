@@ -497,7 +497,7 @@ namespace MultiplayerARPG
             _inputDirection = Vector3.zero;
 
             // Prepare teleporation states
-            if (IsServer && !IsOwnedByServer)
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
                 if (stillMoveAfterTeleport)
