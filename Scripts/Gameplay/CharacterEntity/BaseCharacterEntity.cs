@@ -321,8 +321,6 @@ namespace MultiplayerARPG
             {
                 // Clear data when character dead
                 ExitVehicleAndForget();
-                // Disable movement when character dead
-                tempEnableMovement = false;
             }
 
             // Enable movement or not
