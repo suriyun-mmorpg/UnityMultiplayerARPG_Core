@@ -558,5 +558,10 @@ namespace MultiplayerARPG
         {
             return Functions.WaitClientTeleportConfirm();
         }
+
+        public bool IsWaitingClientTeleportConfirm()
+        {
+            return Functions.IsWaitingClientTeleportConfirm();
+        }
     }
 }

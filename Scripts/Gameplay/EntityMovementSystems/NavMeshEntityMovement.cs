@@ -493,6 +493,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool IsWaitingClientTeleportConfirm()
+        {
+            return _serverTeleportState.Has(MovementTeleportState.WaitingForResponse);
+        }
+
         protected float GetPathRemainingDistance()
         {
             if (CacheNavMeshAgent.pathPending ||

@@ -1465,8 +1465,13 @@ namespace MultiplayerARPG
         {
             while (this != null && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
             {
-                await UniTask.Delay(1000);
+                await UniTask.Delay(100);
             }
+        }
+
+        public bool IsWaitingClientTeleportConfirm()
+        {
+            return _serverTeleportState.Has(MovementTeleportState.WaitingForResponse);
         }
     }
 }

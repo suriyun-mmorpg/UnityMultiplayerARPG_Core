@@ -448,6 +448,11 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool IsWaitingClientTeleportConfirm()
+        {
+            return _serverTeleportState.Has(MovementTeleportState.WaitingForResponse);
+        }
+
         public override void EntityUpdate()
         {
             // Simulate movement by inputs if it can predict movement

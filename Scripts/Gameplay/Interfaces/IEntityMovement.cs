@@ -30,5 +30,6 @@ namespace MultiplayerARPG
         bool AllowToCrouch();
         bool AllowToCrawl();
         UniTask WaitClientTeleportConfirm();
+        bool IsWaitingClientTeleportConfirm();
     }
 }

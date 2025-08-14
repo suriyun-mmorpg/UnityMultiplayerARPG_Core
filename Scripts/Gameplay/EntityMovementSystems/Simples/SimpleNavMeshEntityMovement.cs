@@ -154,6 +154,89 @@ namespace MultiplayerARPG
             }
         }
 
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
+        {
+            if (!IsServer)
+                return;
+            if (mode.IsReplaceMovement())
+            {
+                // Can have only one replace movement force applier, so remove stored ones
+                _movementForceAppliers.RemoveReplaceMovementForces();
+            }
+            _movementForceAppliers.Add(new EntityMovementForceApplier()
+                .Apply(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration));
+        }
+
+        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
+        {
+            return _movementForceAppliers.FindBySource(sourceType, sourceDataId);
+        }
+
+        public void ClearAllForces()
+        {
+            if (!IsServer)
+                return;
+            _movementForceAppliers.Clear();
+        }
+
+        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        {
+            result = fromPosition;
+            float findDist = 1f;
+            NavMeshHit navHit;
+            while (!NavMesh.SamplePosition(fromPosition, out navHit, findDist, NavMesh.AllAreas))
+            {
+                findDist += 1f;
+                if (findDist > findDistance)
+                    return false;
+            }
+            result = navHit.position;
+            return true;
+        }
+
+        public Bounds GetMovementBounds()
+        {
+            Vector3 agentPosition = transform.position;
+            Vector3 lossyScale = transform.lossyScale;
+
+            // Calculate the scaled extents using lossy scale
+            float scaledRadius = CacheNavMeshAgent.radius * Mathf.Max(lossyScale.x, lossyScale.z);
+            float scaledHeight = CacheNavMeshAgent.height * lossyScale.y;
+            float baseOffset = CacheNavMeshAgent.baseOffset * lossyScale.y;
+
+            // Adjust the center to include the baseOffset and scale
+            Vector3 center = new Vector3(agentPosition.x, agentPosition.y + baseOffset + (scaledHeight * 0.5f), agentPosition.z);
+            Vector3 size = new Vector3(scaledRadius * 2, scaledHeight, scaledRadius * 2);
+            return new Bounds(center, size);
+        }
+
+        protected void SetMovePaths(Vector3 position)
+        {
+            if (!Entity.CanMove())
+                return;
+            _inputDirection = Vector3.zero;
+            CacheNavMeshAgent.updatePosition = true;
+            CacheNavMeshAgent.updateRotation = false;
+            if (CacheNavMeshAgent.isOnNavMesh)
+            {
+                CacheNavMeshAgent.isStopped = false;
+
+                NavMeshPath path = new NavMeshPath();
+                NavMesh.CalculatePath(transform.position, position, CacheNavMeshAgent.areaMask, path);
+                CacheNavMeshAgent.SetPath(path);
+            }
+        }
+
+        public void SetSmoothTurnSpeed(float turnDuration)
+        {
+            _yTurnSpeed = turnDuration;
+        }
+
+        public float GetSmoothTurnSpeed()
+        {
+            return _yTurnSpeed;
+        }
+
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
             if (!Entity.CanMove())
@@ -183,20 +266,6 @@ namespace MultiplayerARPG
             _tempExtraMovementState = extraMovementState;
         }
 
-        public void StopMove()
-        {
-            StopMoveFunction();
-        }
-
-        protected void StopMoveFunction()
-        {
-            _inputDirection = Vector3.zero;
-            CacheNavMeshAgent.updatePosition = false;
-            CacheNavMeshAgent.updateRotation = false;
-            if (CacheNavMeshAgent.isOnNavMesh)
-                CacheNavMeshAgent.isStopped = true;
-        }
-
         public void SetLookRotation(Quaternion rotation, bool immediately)
         {
             if (!Entity.CanMove() || !Entity.CanTurn())
@@ -214,14 +283,18 @@ namespace MultiplayerARPG
             return Quaternion.Euler(0f, EntityTransform.eulerAngles.y, 0f);
         }
 
-        public void SetSmoothTurnSpeed(float turnDuration)
+        public void StopMove()
         {
-            _yTurnSpeed = turnDuration;
+            StopMoveFunction();
         }
 
-        public float GetSmoothTurnSpeed()
+        protected void StopMoveFunction()
         {
-            return _yTurnSpeed;
+            _inputDirection = Vector3.zero;
+            CacheNavMeshAgent.updatePosition = false;
+            CacheNavMeshAgent.updateRotation = false;
+            if (CacheNavMeshAgent.isOnNavMesh)
+                CacheNavMeshAgent.isStopped = true;
         }
 
         public async void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
@@ -234,44 +307,47 @@ namespace MultiplayerARPG
             await OnTeleport(position, rotation, stillMoveAfterTeleport);
         }
 
-        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        protected async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
-            result = fromPosition;
-            float findDist = 1f;
-            NavMeshHit navHit;
-            while (!NavMesh.SamplePosition(fromPosition, out navHit, findDist, NavMesh.AllAreas))
+            _inputDirection = Vector3.zero;
+
+            // Prepare teleporation states
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
-                findDist += 1f;
-                if (findDist > findDistance)
-                    return false;
+                _serverTeleportState = MovementTeleportState.Requesting;
+                if (stillMoveAfterTeleport)
+                    _serverTeleportState |= MovementTeleportState.StillMoveAfterTeleport;
+                _serverTeleportState |= MovementTeleportState.WaitingForResponse;
             }
-            result = navHit.position;
-            return true;
-        }
-
-        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
-        {
-            if (!IsServer)
-                return;
-            if (mode.IsReplaceMovement())
+            if (!IsServer && IsOwnerClient)
             {
-                // Can have only one replace movement force applier, so remove stored ones
-                _movementForceAppliers.RemoveReplaceMovementForces();
+                _clientTeleportState = MovementTeleportState.Responding;
             }
-            _movementForceAppliers.Add(new EntityMovementForceApplier()
-                .Apply(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration));
+            if (TeleportPreparer != null)
+                await TeleportPreparer.PrepareToTeleport(position, rotation);
+
+            // Move character to target position
+            _inputDirection = Vector3.zero;
+            Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
+            CacheNavMeshAgent.Warp(position);
+            if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
+                CacheNavMeshAgent.isStopped = true;
+            if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
+                CacheNavMeshAgent.SetDestination(beforeWarpDest);
+            TurnImmediately(rotation.eulerAngles.y);
         }
 
-        public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)
+        public async UniTask WaitClientTeleportConfirm()
         {
-            return _movementForceAppliers.FindBySource(sourceType, sourceDataId);
+            while (this != null && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            {
+                await UniTask.Delay(100);
+            }
         }
 
-        public void ClearAllForces()
+        public bool IsWaitingClientTeleportConfirm()
         {
-            if (!IsServer)
-                return;
-            _movementForceAppliers.Clear();
+            return _serverTeleportState.Has(MovementTeleportState.WaitingForResponse);
         }
 
         protected float GetPathRemainingDistance()
@@ -398,42 +474,9 @@ namespace MultiplayerARPG
             RotateY();
         }
 
-        public Bounds GetMovementBounds()
-        {
-            Vector3 agentPosition = transform.position;
-            Vector3 lossyScale = transform.lossyScale;
-
-            // Calculate the scaled extents using lossy scale
-            float scaledRadius = CacheNavMeshAgent.radius * Mathf.Max(lossyScale.x, lossyScale.z);
-            float scaledHeight = CacheNavMeshAgent.height * lossyScale.y;
-            float baseOffset = CacheNavMeshAgent.baseOffset * lossyScale.y;
-
-            // Adjust the center to include the baseOffset and scale
-            Vector3 center = new Vector3(agentPosition.x, agentPosition.y + baseOffset + (scaledHeight * 0.5f), agentPosition.z);
-            Vector3 size = new Vector3(scaledRadius * 2, scaledHeight, scaledRadius * 2);
-            return new Bounds(center, size);
-        }
-
         protected void RotateY()
         {
             EntityTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);
-        }
-
-        protected void SetMovePaths(Vector3 position)
-        {
-            if (!Entity.CanMove())
-                return;
-            _inputDirection = Vector3.zero;
-            CacheNavMeshAgent.updatePosition = true;
-            CacheNavMeshAgent.updateRotation = false;
-            if (CacheNavMeshAgent.isOnNavMesh)
-            {
-                CacheNavMeshAgent.isStopped = false;
-
-                NavMeshPath path = new NavMeshPath();
-                NavMesh.CalculatePath(transform.position, position, CacheNavMeshAgent.areaMask, path);
-                CacheNavMeshAgent.SetPath(path);
-            }
         }
 
         public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
@@ -492,36 +535,6 @@ namespace MultiplayerARPG
             }
         }
 
-        protected async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
-        {
-            _inputDirection = Vector3.zero;
-
-            // Prepare teleporation states
-            if (IsServer && !IsOwnerClientOrOwnedByServer)
-            {
-                _serverTeleportState = MovementTeleportState.Requesting;
-                if (stillMoveAfterTeleport)
-                    _serverTeleportState |= MovementTeleportState.StillMoveAfterTeleport;
-                _serverTeleportState |= MovementTeleportState.WaitingForResponse;
-            }
-            if (!IsServer && IsOwnerClient)
-            {
-                _clientTeleportState = MovementTeleportState.Responding;
-            }
-            if (TeleportPreparer != null)
-                await TeleportPreparer.PrepareToTeleport(position, rotation);
-
-            // Move character to target position
-            _inputDirection = Vector3.zero;
-            Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
-            CacheNavMeshAgent.Warp(position);
-            if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
-                CacheNavMeshAgent.isStopped = true;
-            if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
-                CacheNavMeshAgent.SetDestination(beforeWarpDest);
-            TurnImmediately(rotation.eulerAngles.y);
-        }
-
         public void TurnImmediately(float yAngle)
         {
             _yAngle = _targetYAngle = yAngle;
@@ -546,14 +559,6 @@ namespace MultiplayerARPG
         public bool AllowToCrawl()
         {
             return true;
-        }
-
-        public async UniTask WaitClientTeleportConfirm()
-        {
-            while (this != null && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
-            {
-                await UniTask.Delay(1000);
-            }
         }
     }
 }
