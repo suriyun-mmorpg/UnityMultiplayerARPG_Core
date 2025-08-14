@@ -541,8 +541,22 @@ namespace MultiplayerARPG
 
             if (!TryGetInputBuffer(out MovementInputData3D inputData))
             {
-                // No inputs
-                return;
+                inputData = new MovementInputData3D()
+                {
+                    Tick = 0,
+                    IsStopped = false,
+                    IsPointClick = false,
+                    Position = Vector3.zero,
+                    MovementState = MovementState.None,
+                    ExtraMovementState = ExtraMovementState.None,
+                    MoveDirection = Vector3.zero,
+                    LookDirection = Vector3.zero,
+                };
+                if (_prevPointClickPosition.HasValue)
+                {
+                    inputData.IsPointClick = true;
+                    inputData.Position = _prevPointClickPosition.Value;
+                }
             }
 
             UpdateMovement(deltaTime, ref inputData);
@@ -838,6 +852,7 @@ namespace MultiplayerARPG
 
             if (inputData.IsPointClick && (!_prevPointClickPosition.HasValue || Vector3.Distance(_prevPointClickPosition.Value, inputData.Position) > 0.01f))
             {
+                _prevPointClickPosition = inputData.Position;
                 SetMovePaths(inputData.Position, true);
             }
 
