@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             characterController.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
             characterController.center = Vector3.zero + (Vector3.up * characterController.height * 0.5f);
 
-            return obj.AddComponent<CharacterControllerEntityMovement>();
+            return obj.AddComponent<SimpleCharacterControllerEntityMovement>();
         }
     }
 }

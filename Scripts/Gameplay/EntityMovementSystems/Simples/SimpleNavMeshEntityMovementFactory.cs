@@ -54,7 +54,7 @@ namespace MultiplayerARPG
             navMeshAgent.height = bounds.size.y;
             navMeshAgent.radius = Mathf.Min(bounds.extents.x, bounds.extents.z);
 
-            return obj.AddComponent<NavMeshEntityMovement>();
+            return obj.AddComponent<SimpleNavMeshEntityMovement>();
         }
     }
 }
