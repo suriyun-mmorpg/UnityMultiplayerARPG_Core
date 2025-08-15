@@ -23,6 +23,7 @@ namespace MultiplayerARPG
         private Bounds _bounds;
         private List<SpatialObject> _spatialObjects = new List<SpatialObject>();
         private Dictionary<uint, HashSet<uint>> _playerSubscribings = new Dictionary<uint, HashSet<uint>>();
+        private HashSet<uint> _alwaysVisibleObjects = new HashSet<uint>();
 
         private void OnDrawGizmosSelected()
         {
@@ -146,7 +147,7 @@ namespace MultiplayerARPG
                     }
                 }
                 _system.UpdateGrid(_spatialObjects);
-
+                _alwaysVisibleObjects.Clear();
                 NativeList<SpatialObject> queryResult;
                 HashSet<uint> subscribings;
                 LiteNetLibIdentity foundPlayerObject;
@@ -154,6 +155,11 @@ namespace MultiplayerARPG
                 {
                     if (spawnedObject == null)
                         continue;
+                    if (spawnedObject.AlwaysVisible)
+                    {
+                        _alwaysVisibleObjects.Add(spawnedObject.ObjectId);
+                        continue;
+                    }
                     queryResult = _system.QuerySphere(spawnedObject.transform.position, GetVisibleRange(spawnedObject));
                     for (int i = 0; i < queryResult.Length; ++i)
                     {
@@ -210,10 +216,17 @@ namespace MultiplayerARPG
                     {
                         if (_playerSubscribings.TryGetValue(playerObject.ObjectId, out subscribings))
                         {
+                            if (_alwaysVisibleObjects.Count > 0)
+                            {
+                                foreach (uint alwaysVisibleObject in _alwaysVisibleObjects)
+                                {
+                                    subscribings.Add(alwaysVisibleObject);
+                                }
+                            }
                             playerObject.UpdateSubscribings(subscribings);
                             subscribings.Clear();
                         }
-                        else
+                        else if (_alwaysVisibleObjects.Count <= 0)
                         {
                             playerObject.ClearSubscribings();
                         }
