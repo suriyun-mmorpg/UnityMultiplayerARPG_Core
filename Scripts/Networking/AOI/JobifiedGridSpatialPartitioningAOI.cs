@@ -226,7 +226,11 @@ namespace MultiplayerARPG
                             playerObject.UpdateSubscribings(subscribings);
                             subscribings.Clear();
                         }
-                        else if (_alwaysVisibleObjects.Count <= 0)
+                        else if (_alwaysVisibleObjects.Count > 0)
+                        {
+                            playerObject.UpdateSubscribings(_alwaysVisibleObjects);
+                        }
+                        else
                         {
                             playerObject.ClearSubscribings();
                         }
