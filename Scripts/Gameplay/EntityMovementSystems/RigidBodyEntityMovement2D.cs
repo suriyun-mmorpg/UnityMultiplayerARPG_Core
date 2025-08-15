@@ -311,9 +311,20 @@ namespace MultiplayerARPG
             if (_inputBuffers.Count > 0)
             {
                 uint prevTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
+                MovementInputData2D prevInput;
                 if (prevTick == tick)
+                {
+                    if (_inputBuffers.TryGetValue(prevTick, out prevInput))
+                    {
+                        if (movementState.Has(MovementState.IsJump) && !prevInput.MovementState.Has(MovementState.IsJump))
+                            prevInput.MovementState |= MovementState.IsJump;
+                        if (movementState.Has(MovementState.IsDash) && !prevInput.MovementState.Has(MovementState.IsDash))
+                            prevInput.MovementState |= MovementState.IsDash;
+                        _inputBuffers[prevTick] = prevInput;
+                    }
                     return;
-                if (_inputBuffers.TryGetValue(prevTick, out MovementInputData2D prevInput) &&
+                }
+                if (_inputBuffers.TryGetValue(prevTick, out prevInput) &&
                     prevInput.IsPointClick && moveDirection.sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
                 {
                     prevInput.Tick = tick;
