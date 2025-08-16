@@ -1080,7 +1080,7 @@ namespace MultiplayerARPG
 
             if (ActiveViewMode == ShooterControllerViewMode.Fps || (Mode == ControllerMode.Combat && alwaysTurnForwardWhileCombat))
                 _targetLookDirection = _moveLookDirection = _cameraForward;
-            PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection), false);
+            PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection), true);
         }
 
         protected bool DetectExtraActive(string key, ExtraMoveActiveMode activeMode, bool isBlockController, ref bool state)
