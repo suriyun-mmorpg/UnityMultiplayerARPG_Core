@@ -566,7 +566,7 @@ namespace MultiplayerARPG
                 tempTargetPosition = tempCurrentPosition + _moveDirection;
             }
 
-            if ((IsOwnerClientOrOwnedByServer || HasNavPaths) && _lookRotationApplied && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
+            if (HasNavPaths && _lookRotationApplied && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
                 // Turn character by move direction
                 if (Entity.CanTurn())
