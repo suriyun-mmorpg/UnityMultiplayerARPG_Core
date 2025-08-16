@@ -399,14 +399,20 @@ namespace MultiplayerARPG
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
+            Vector3 lookDirection = rotation * Vector3.forward;
+            if (LadderComponent && LadderComponent.ClimbingLadder)
+            {
+                // Turn to the ladder
+                lookDirection = -LadderComponent.ClimbingLadder.ForwardWithYAngleOffsets;
+            }
             if (_inputBuffers.TryGetValue(tick, out MovementInputData3D inputData))
             {
-                inputData.LookDirection = rotation * Vector3.forward;
+                inputData.LookDirection = lookDirection;
                 _inputBuffers[tick] = inputData;
             }
             _lookRotationApplied = false;
             if (immediately)
-                TurnImmediately(Quaternion.LookRotation(inputData.LookDirection).eulerAngles.y);
+                TurnImmediately(rotation.eulerAngles.y);
         }
 
         public Quaternion GetLookRotation()
