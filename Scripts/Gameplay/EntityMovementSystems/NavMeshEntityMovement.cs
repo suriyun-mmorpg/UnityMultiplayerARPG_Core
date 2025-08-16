@@ -419,13 +419,15 @@ namespace MultiplayerARPG
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
-            if (!_inputBuffers.TryGetValue(tick, out MovementInputData3D inputData))
-                return;
-            inputData.LookDirection = rotation * Vector3.forward;
-            _inputBuffers[tick] = inputData;
+            Vector3 lookDirection = rotation * Vector3.forward;
+            if (_inputBuffers.TryGetValue(tick, out MovementInputData3D inputData))
+            {
+                inputData.LookDirection = lookDirection;
+                _inputBuffers[tick] = inputData;
+            }
             _lookRotationApplied = false;
             if (immediately)
-                TurnImmediately(Quaternion.LookRotation(inputData.LookDirection).eulerAngles.y);
+                TurnImmediately(rotation.eulerAngles.y);
         }
 
         public Quaternion GetLookRotation()
@@ -557,7 +559,7 @@ namespace MultiplayerARPG
                     MovementState = MovementState.None,
                     ExtraMovementState = ExtraMovementState.None,
                     MoveDirection = Vector3.zero,
-                    LookDirection = Vector3.zero,
+                    LookDirection = EntityTransform.forward,
                 };
                 if (_prevPointClickPosition.HasValue)
                 {
