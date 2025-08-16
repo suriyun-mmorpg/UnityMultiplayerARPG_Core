@@ -399,10 +399,11 @@ namespace MultiplayerARPG
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
-            if (!_inputBuffers.TryGetValue(tick, out MovementInputData3D inputData))
-                return;
-            inputData.LookDirection = rotation * Vector3.forward;
-            _inputBuffers[tick] = inputData;
+            if (_inputBuffers.TryGetValue(tick, out MovementInputData3D inputData))
+            {
+                inputData.LookDirection = rotation * Vector3.forward;
+                _inputBuffers[tick] = inputData;
+            }
             _lookRotationApplied = false;
             if (immediately)
                 TurnImmediately(Quaternion.LookRotation(inputData.LookDirection).eulerAngles.y);
@@ -561,7 +562,7 @@ namespace MultiplayerARPG
                     MovementState = MovementState.None,
                     ExtraMovementState = ExtraMovementState.None,
                     MoveDirection = Vector3.zero,
-                    LookDirection = Vector3.zero,
+                    LookDirection = EntityTransform.forward,
                 };
                 if (_prevPointClickPosition.HasValue)
                 {
@@ -900,7 +901,7 @@ namespace MultiplayerARPG
                 tempTargetPosition = tempCurrentPosition + _moveDirection;
             }
 
-            if ((IsOwnerClientOrOwnedByServer || HasNavPaths) && _lookRotationApplied && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
+            if (HasNavPaths && _lookRotationApplied && _moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
             {
                 // Turn character by move direction
                 if (Entity.CanTurn())
