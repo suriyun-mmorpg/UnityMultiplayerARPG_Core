@@ -342,8 +342,6 @@ namespace MultiplayerARPG
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
@@ -383,8 +381,6 @@ namespace MultiplayerARPG
 
         public virtual void PointClickMovement(Vector3 position)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
@@ -399,8 +395,6 @@ namespace MultiplayerARPG
 
         public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
@@ -414,8 +408,6 @@ namespace MultiplayerARPG
 
         public void SetLookRotation(Quaternion rotation, bool immediately)
         {
-            if (!Entity.CanMove() || !Entity.CanTurn())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
@@ -426,7 +418,7 @@ namespace MultiplayerARPG
                 _inputBuffers[tick] = inputData;
             }
             _lookRotationApplied = false;
-            if (immediately)
+            if (immediately && Entity.CanTurn())
                 TurnImmediately(rotation.eulerAngles.y);
         }
 
@@ -817,6 +809,9 @@ namespace MultiplayerARPG
 
         public void UpdateRotation(float deltaTime, ref MovementInputData3D inputData)
         {
+            if (!Entity.CanTurn())
+                return;
+
             Vector3 lookDirection = inputData.LookDirection;
 
             // Ignore zero direction to avoid errors

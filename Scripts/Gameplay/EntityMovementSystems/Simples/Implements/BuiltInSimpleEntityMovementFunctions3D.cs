@@ -248,8 +248,6 @@ namespace MultiplayerARPG
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             // Always apply movement to owner client (it's client prediction for server auth movement)
@@ -265,8 +263,6 @@ namespace MultiplayerARPG
 
         public void PointClickMovement(Vector3 position)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             SetMovePaths(position, true);
@@ -274,8 +270,6 @@ namespace MultiplayerARPG
 
         public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             if (_isJumping)
@@ -285,8 +279,6 @@ namespace MultiplayerARPG
 
         public void SetLookRotation(Quaternion rotation, bool immediately)
         {
-            if (!Entity.CanTurn())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             _targetYAngle = rotation.eulerAngles.y;
@@ -296,7 +288,7 @@ namespace MultiplayerARPG
                 _targetYAngle = Quaternion.LookRotation(-LadderComponent.ClimbingLadder.ForwardWithYAngleOffsets).eulerAngles.y;
             }
             _lookRotationApplied = false;
-            if (immediately)
+            if (immediately && Entity.CanTurn())
                 TurnImmediately(_targetYAngle);
         }
 
@@ -834,6 +826,9 @@ namespace MultiplayerARPG
 
         public void UpdateRotation(float deltaTime)
         {
+            if (!Entity.CanTurn())
+                return;
+
             if (!CanSimulateMovement())
                 return;
 
@@ -841,6 +836,7 @@ namespace MultiplayerARPG
                 _yAngle = _targetYAngle;
             else if (Mathf.Abs(_yAngle - _targetYAngle) > 1f)
                 _yAngle = Mathf.LerpAngle(_yAngle, _targetYAngle, _yTurnSpeed * deltaTime);
+
             _lookRotationApplied = true;
             RotateY();
         }

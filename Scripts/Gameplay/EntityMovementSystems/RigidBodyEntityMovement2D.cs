@@ -303,8 +303,6 @@ namespace MultiplayerARPG
 
         public virtual void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
@@ -344,8 +342,6 @@ namespace MultiplayerARPG
 
         public virtual void PointClickMovement(Vector3 position)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
@@ -360,8 +356,6 @@ namespace MultiplayerARPG
 
         public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
@@ -375,8 +369,6 @@ namespace MultiplayerARPG
 
         public virtual void SetLookRotation(Quaternion rotation, bool immediately)
         {
-            if (!Entity.CanMove() || !Entity.CanTurn())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             uint tick = Manager.LocalTick;
