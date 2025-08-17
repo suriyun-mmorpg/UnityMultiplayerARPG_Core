@@ -826,10 +826,10 @@ namespace MultiplayerARPG
 
         public void UpdateRotation(float deltaTime)
         {
-            if (!Entity.CanTurn())
+            if (!CanSimulateMovement())
                 return;
 
-            if (!CanSimulateMovement())
+            if (!Entity.CanTurn())
                 return;
 
             if (_yTurnSpeed <= 0f)

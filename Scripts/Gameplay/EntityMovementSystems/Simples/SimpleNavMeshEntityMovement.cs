@@ -239,8 +239,6 @@ namespace MultiplayerARPG
 
         public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             _inputDirection = moveDirection;
@@ -250,8 +248,6 @@ namespace MultiplayerARPG
 
         public void PointClickMovement(Vector3 position)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             SetMovePaths(position);
@@ -259,8 +255,6 @@ namespace MultiplayerARPG
 
         public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
-            if (!Entity.CanMove())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             _tempExtraMovementState = extraMovementState;
@@ -268,13 +262,11 @@ namespace MultiplayerARPG
 
         public void SetLookRotation(Quaternion rotation, bool immediately)
         {
-            if (!Entity.CanMove() || !Entity.CanTurn())
-                return;
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
             _targetYAngle = rotation.eulerAngles.y;
             _lookRotationApplied = false;
-            if (immediately)
+            if (immediately && Entity.CanTurn())
                 TurnImmediately(_targetYAngle);
         }
 
@@ -466,10 +458,14 @@ namespace MultiplayerARPG
 
         public void UpdateRotation(float deltaTime)
         {
+            if (!Entity.CanTurn())
+                return;
+
             if (_yTurnSpeed <= 0f)
                 _yAngle = _targetYAngle;
             else if (Mathf.Abs(_yAngle - _targetYAngle) > 1f)
                 _yAngle = Mathf.LerpAngle(_yAngle, _targetYAngle, _yTurnSpeed * deltaTime);
+
             _lookRotationApplied = true;
             RotateY();
         }
