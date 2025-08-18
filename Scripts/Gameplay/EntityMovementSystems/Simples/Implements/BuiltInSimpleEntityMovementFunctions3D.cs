@@ -926,7 +926,7 @@ namespace MultiplayerARPG
 
         public void OnTriggerExit(Collider other)
         {
-            if (other.gameObject.layer == PhysicLayers.Water)
+            if (other.gameObject.layer == PhysicLayers.Water && _waterCollider == other)
             {
                 // Exit water
                 _waterCollider = null;
