@@ -12,6 +12,7 @@ namespace MultiplayerARPG
         protected const int FORCE_GROUNDED_FRAMES_AFTER_TELEPORT = 3;
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
         protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
+        protected const float MIN_DISTANCE_TO_TELEPORT = 0.1f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -140,6 +141,7 @@ namespace MultiplayerARPG
             NetworkedTransform.syncByOwnerClient = true;
             NetworkedTransform.onWriteSyncBuffer += NetworkedTransform_onWriteSyncBuffer;
             NetworkedTransform.onReadInterpBuffer += NetworkedTransform_onReadInterpBuffer;
+            NetworkedTransform.onValidateInterpolation += NetworkedTransform_onValidateInterpolation;
             NetworkedTransform.onInterpolate += NetworkedTransform_onInterpolate;
             TeleportPreparer = entity.GetComponent<IEntityTeleportPreparer>();
             Animator = animator;
@@ -174,6 +176,7 @@ namespace MultiplayerARPG
         {
             NetworkedTransform.onWriteSyncBuffer -= NetworkedTransform_onWriteSyncBuffer;
             NetworkedTransform.onReadInterpBuffer -= NetworkedTransform_onReadInterpBuffer;
+            NetworkedTransform.onValidateInterpolation -= NetworkedTransform_onValidateInterpolation;
             NetworkedTransform.onInterpolate -= NetworkedTransform_onInterpolate;
         }
 
@@ -192,6 +195,16 @@ namespace MultiplayerARPG
             {
                 _interpExtra.RemoveAt(0);
             }
+        }
+
+        private bool NetworkedTransform_onValidateInterpolation(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, LiteNetLibTransform.TransformData currentData, float interpTime)
+        {
+            if (IsServer && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            {
+                // Waiting for client teleport confirmation
+                return false;
+            }
+            return true;
         }
 
         protected void NetworkedTransform_onInterpolate(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, float interpTime)
@@ -312,6 +325,11 @@ namespace MultiplayerARPG
             if (!IsServer)
             {
                 Logging.LogWarning(nameof(BuiltInEntityMovementFunctions3D), $"Teleport function shouldn't be called at client [{Entity.name}]");
+                return;
+            }
+            if (_serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            {
+                // Still waiting for teleport responding
                 return;
             }
             await OnTeleport(position, rotation, stillMoveAfterTeleport);
@@ -980,17 +998,44 @@ namespace MultiplayerARPG
                     reader.GetFloat());
                 float rotation = Mathf.HalfToFloat(reader.GetPackedUShort());
                 bool stillMoveAfterTeleport = movementTeleportState.Has(MovementTeleportState.StillMoveAfterTeleport);
-                await OnTeleport(position, Quaternion.Euler(0f, rotation, 0f), stillMoveAfterTeleport);
+                if (!IsServer)
+                    await OnTeleport(position, Quaternion.Euler(0f, rotation, 0f), stillMoveAfterTeleport);
                 return;
             }
         }
 
         protected async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
+            if (Vector3.Distance(position, EntityTransform.position) <= MIN_DISTANCE_TO_TELEPORT)
+            {
+                // Too close to teleport
+                return;
+            }
+            // Prepare before move
             _verticalVelocity = 0;
             if (!stillMoveAfterTeleport)
+            {
                 NavPaths = null;
-
+            }
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
+            {
+                _serverTeleportState = MovementTeleportState.WaitingForResponse;
+            }
+            if (TeleportPreparer != null)
+            {
+                await TeleportPreparer.PrepareToTeleport(position, rotation);
+            }
+            // Move character to target position
+            _verticalVelocity = 0;
+            if (!stillMoveAfterTeleport)
+            {
+                NavPaths = null;
+            }
+            _lastTeleportFrame = Time.frameCount;
+            EntityMovement.SetPosition(position);
+            CurrentGameManager.ShouldPhysicSyncTransforms = true;
+            TurnImmediately(rotation.eulerAngles.y);
+            _previousPosition = EntityTransform.position;
             // Prepare teleporation states
             if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
@@ -1003,18 +1048,6 @@ namespace MultiplayerARPG
             {
                 _clientTeleportState = MovementTeleportState.Responding;
             }
-            if (TeleportPreparer != null)
-                await TeleportPreparer.PrepareToTeleport(position, rotation);
-
-            // Move character to target position
-            _verticalVelocity = 0;
-            if (!stillMoveAfterTeleport)
-                NavPaths = null;
-            _lastTeleportFrame = Time.frameCount;
-            EntityMovement.SetPosition(position);
-            CurrentGameManager.ShouldPhysicSyncTransforms = true;
-            TurnImmediately(rotation.eulerAngles.y);
-            _previousPosition = EntityTransform.position;
         }
 
         public bool CanSimulateMovement()

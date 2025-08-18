@@ -25,6 +25,7 @@ namespace MultiplayerARPG
     {
         protected const int TICK_COUNT_FOR_INTERPOLATION = 2;
         protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
+        protected const float MIN_DISTANCE_TO_TELEPORT = 0.1f;
 
         [Header("Networking Settings")]
         public MovementSecure movementSecure = MovementSecure.NotSecure;
@@ -418,15 +419,43 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(RigidBodyEntityMovement2D), $"Teleport function shouldn't be called at client [{name}]");
                 return;
             }
+            if (_serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            {
+                // Still waiting for teleport responding
+                return;
+            }
             await OnTeleport(position, stillMoveAfterTeleport);
         }
 
         protected virtual async UniTask OnTeleport(Vector2 position, bool stillMoveAfterTeleport)
         {
+            if (Vector3.Distance(position, EntityTransform.position) <= MIN_DISTANCE_TO_TELEPORT)
+            {
+                // Too close to teleport
+                return;
+            }
+            // Prepare before move
             if (!stillMoveAfterTeleport)
+            {
                 NavPaths = null;
+            }
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
+            {
+                _serverTeleportState = MovementTeleportState.WaitingForResponse;
+            }
             if (TeleportPreparer != null)
+            {
                 await TeleportPreparer.PrepareToTeleport(position, Quaternion.identity);
+            }
+            // Move character to target position
+            if (!stillMoveAfterTeleport)
+            {
+                NavPaths = null;
+            }
+            EntityTransform.position = position;
+            CacheRigidbody2D.MovePosition(position);
+            CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
+            // Prepare teleporation states
             if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
@@ -438,9 +467,6 @@ namespace MultiplayerARPG
             {
                 _clientTeleportState = MovementTeleportState.Responding;
             }
-            EntityTransform.position = position;
-            CacheRigidbody2D.MovePosition(position);
-            CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
         }
 
         public async UniTask WaitClientTeleportConfirm()
@@ -906,7 +932,8 @@ namespace MultiplayerARPG
                     reader.GetFloat(),
                     reader.GetFloat());
                 bool stillMoveAfterTeleport = movementTeleportState.Has(MovementTeleportState.StillMoveAfterTeleport);
-                await OnTeleport(position, stillMoveAfterTeleport);
+                if (!IsServer)
+                    await OnTeleport(position, stillMoveAfterTeleport);
                 return;
             }
             byte size = reader.GetByte();

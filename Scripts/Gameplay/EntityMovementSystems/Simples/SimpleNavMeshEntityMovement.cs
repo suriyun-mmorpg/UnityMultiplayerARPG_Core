@@ -18,6 +18,7 @@ namespace MultiplayerARPG
     {
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
         protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
+        protected const float MIN_DISTANCE_TO_TELEPORT = 0.1f;
         protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("SimpleNavMeshEntityMovement - Update");
 
         [Header("Movement Settings")]
@@ -27,7 +28,7 @@ namespace MultiplayerARPG
         [Header("Dashing")]
         public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
 
-        public LiteNetLibTransform CacheNetworkedTransform { get; protected set; }
+        public LiteNetLibTransform NetworkedTransform { get; protected set; }
         public NavMeshAgent CacheNavMeshAgent { get; protected set; }
         public IEntityTeleportPreparer TeleportPreparer { get; protected set; }
         public bool IsPreparingToTeleport { get { return TeleportPreparer != null && TeleportPreparer.IsPreparingToTeleport; } }
@@ -65,7 +66,7 @@ namespace MultiplayerARPG
         public override void EntityAwake()
         {
             // Prepare nav mesh agent component
-            CacheNetworkedTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
+            NetworkedTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
             CacheNavMeshAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
             TeleportPreparer = gameObject.GetComponent<IEntityTeleportPreparer>();
             _forceUpdateListeners = gameObject.GetComponents<IEntityMovementForceUpdateListener>();
@@ -76,10 +77,11 @@ namespace MultiplayerARPG
                 rigidBody.isKinematic = true;
             }
             // Setup
-            CacheNetworkedTransform.syncByOwnerClient = true;
-            CacheNetworkedTransform.onWriteSyncBuffer += CacheNetworkedTransform_onWriteSyncBuffer;
-            CacheNetworkedTransform.onReadInterpBuffer += CacheNetworkedTransform_onReadInterpBuffer;
-            CacheNetworkedTransform.onInterpolate += CacheNetworkedTransform_onInterpolate;
+            NetworkedTransform.syncByOwnerClient = true;
+            NetworkedTransform.onWriteSyncBuffer += NetworkedTransform_onWriteSyncBuffer;
+            NetworkedTransform.onReadInterpBuffer += NetworkedTransform_onReadInterpBuffer;
+            NetworkedTransform.onValidateInterpolation += NetworkedTransform_onValidateInterpolation;
+            NetworkedTransform.onInterpolate += NetworkedTransform_onInterpolate;
             CacheNavMeshAgent.enabled = false;
             _yAngle = _targetYAngle = EntityTransform.eulerAngles.y;
             _lookRotationApplied = true;
@@ -92,9 +94,10 @@ namespace MultiplayerARPG
 
         public override void EntityOnDestroy()
         {
-            CacheNetworkedTransform.onWriteSyncBuffer -= CacheNetworkedTransform_onWriteSyncBuffer;
-            CacheNetworkedTransform.onReadInterpBuffer -= CacheNetworkedTransform_onReadInterpBuffer;
-            CacheNetworkedTransform.onInterpolate -= CacheNetworkedTransform_onInterpolate;
+            NetworkedTransform.onWriteSyncBuffer -= NetworkedTransform_onWriteSyncBuffer;
+            NetworkedTransform.onReadInterpBuffer -= NetworkedTransform_onReadInterpBuffer;
+            NetworkedTransform.onValidateInterpolation -= NetworkedTransform_onValidateInterpolation;
+            NetworkedTransform.onInterpolate -= NetworkedTransform_onInterpolate;
         }
 
         public override void OnSetOwnerClient(bool isOwnerClient)
@@ -117,13 +120,13 @@ namespace MultiplayerARPG
             return Entity.IsOwnerClientOrOwnedByServer;
         }
 
-        protected void CacheNetworkedTransform_onWriteSyncBuffer(NetDataWriter writer, uint tick)
+        protected void NetworkedTransform_onWriteSyncBuffer(NetDataWriter writer, uint tick)
         {
             writer.Put((byte)MovementState);
             writer.Put((byte)ExtraMovementState);
         }
 
-        protected void CacheNetworkedTransform_onReadInterpBuffer(NetDataReader reader, uint tick)
+        protected void NetworkedTransform_onReadInterpBuffer(NetDataReader reader, uint tick)
         {
             _interpExtra[tick] = new System.ValueTuple<MovementState, ExtraMovementState>(
                 (MovementState)reader.GetByte(),
@@ -134,7 +137,17 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void CacheNetworkedTransform_onInterpolate(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, float interpTime)
+        private bool NetworkedTransform_onValidateInterpolation(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, LiteNetLibTransform.TransformData currentData, float interpTime)
+        {
+            if (IsServer && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            {
+                // Waiting for client teleport confirmation
+                return false;
+            }
+            return true;
+        }
+
+        protected void NetworkedTransform_onInterpolate(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, float interpTime)
         {
             if (interpTime <= 0.75f)
             {
@@ -296,13 +309,42 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(NavMeshEntityMovement), $"Teleport function shouldn't be called at client {name}");
                 return;
             }
+            if (_serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            {
+                // Still waiting for teleport responding
+                return;
+            }
             await OnTeleport(position, rotation, stillMoveAfterTeleport);
         }
 
         protected async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
         {
-            _inputDirection = Vector3.zero;
-
+            if (Vector3.Distance(position, EntityTransform.position) <= MIN_DISTANCE_TO_TELEPORT)
+            {
+                // Too close to teleport
+                return;
+            }
+            // Prepare before move
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
+            {
+                _serverTeleportState = MovementTeleportState.WaitingForResponse;
+            }
+            if (TeleportPreparer != null)
+            {
+                await TeleportPreparer.PrepareToTeleport(position, rotation);
+            }
+            // Move character to target position
+            Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
+            CacheNavMeshAgent.Warp(position);
+            if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
+            {
+                CacheNavMeshAgent.isStopped = true;
+            }
+            if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
+            {
+                CacheNavMeshAgent.SetDestination(beforeWarpDest);
+            }
+            TurnImmediately(rotation.eulerAngles.y);
             // Prepare teleporation states
             if (IsServer && !IsOwnerClientOrOwnedByServer)
             {
@@ -315,18 +357,6 @@ namespace MultiplayerARPG
             {
                 _clientTeleportState = MovementTeleportState.Responding;
             }
-            if (TeleportPreparer != null)
-                await TeleportPreparer.PrepareToTeleport(position, rotation);
-
-            // Move character to target position
-            _inputDirection = Vector3.zero;
-            Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
-            CacheNavMeshAgent.Warp(position);
-            if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
-                CacheNavMeshAgent.isStopped = true;
-            if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
-                CacheNavMeshAgent.SetDestination(beforeWarpDest);
-            TurnImmediately(rotation.eulerAngles.y);
         }
 
         public async UniTask WaitClientTeleportConfirm()
@@ -526,7 +556,8 @@ namespace MultiplayerARPG
                     reader.GetFloat());
                 float rotation = Mathf.HalfToFloat(reader.GetPackedUShort());
                 bool stillMoveAfterTeleport = movementTeleportState.Has(MovementTeleportState.StillMoveAfterTeleport);
-                await OnTeleport(position, Quaternion.Euler(0f, rotation, 0f), stillMoveAfterTeleport);
+                if (!IsServer)
+                    await OnTeleport(position, Quaternion.Euler(0f, rotation, 0f), stillMoveAfterTeleport);
                 return;
             }
         }
