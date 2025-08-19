@@ -62,6 +62,8 @@ namespace MultiplayerARPG
         public float CurrentMoveSpeed { get { return CacheNavMeshAgent.isStopped ? 0f : CacheNavMeshAgent.speed; } }
 
         // Inputs
+        protected MovementInputData3D _currentInput;
+        protected int? _resetInputFrame = null;
         protected SortedList<uint, MovementInputData3D> _inputBuffers = new SortedList<uint, MovementInputData3D>();
         protected SortedList<uint, MovementSyncData3D> _syncBuffers = new SortedList<uint, MovementSyncData3D>();
         protected SortedList<uint, MovementSyncData3D> _interpBuffers = new SortedList<uint, MovementSyncData3D>();
@@ -114,6 +116,7 @@ namespace MultiplayerARPG
                 rigidBody.useGravity = false;
                 rigidBody.isKinematic = true;
             }
+            _currentInput = new MovementInputData3D();
             StopMoveFunction();
         }
 
@@ -220,6 +223,13 @@ namespace MultiplayerARPG
                 syncData.Tick = updater.LocalTick;
                 // Stored buffers will be send later
                 StoreSyncBuffer(syncData);
+            }
+
+            if (IsOwnerClientOrOwnedByServer)
+            {
+                _currentInput.Tick = _simTick - 1;
+                StoreInputBuffer(_currentInput);
+                _resetInputFrame = Time.frameCount;
             }
         }
 
@@ -345,79 +355,49 @@ namespace MultiplayerARPG
         {
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
-            uint tick = Manager.LocalTick;
-            if (_inputBuffers.Count > 0)
-            {
-                uint prevTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
-                MovementInputData3D prevInput;
-                if (prevTick == tick)
-                {
-                    if (_inputBuffers.TryGetValue(prevTick, out prevInput))
-                    {
-                        if (movementState.Has(MovementState.IsJump) && !prevInput.MovementState.Has(MovementState.IsJump))
-                            prevInput.MovementState |= MovementState.IsJump;
-                        if (movementState.Has(MovementState.IsDash) && !prevInput.MovementState.Has(MovementState.IsDash))
-                            prevInput.MovementState |= MovementState.IsDash;
-                        _inputBuffers[prevTick] = prevInput;
-                    }
-                    return;
-                }
-                if (_inputBuffers.TryGetValue(prevTick, out prevInput) &&
-                    prevInput.IsPointClick && moveDirection.sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
-                {
-                    prevInput.Tick = tick;
-                    StoreInputBuffer(prevInput);
-                    return;
-                }
-            }
-            StoreInputBuffer(new MovementInputData3D()
-            {
-                Tick = tick,
-                IsPointClick = false,
-                MovementState = movementState,
-                MoveDirection = moveDirection,
-                LookDirection = moveDirection,
-            });
+
+            if (moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
+                _currentInput.IsPointClick = false;
+            bool hasIsJump = movementState.Has(MovementState.IsJump);
+            bool hasIsDash = movementState.Has(MovementState.IsDash);
+            bool prevHasIsJump = _currentInput.MovementState.Has(MovementState.IsJump);
+            bool prevHasIsDash = _currentInput.MovementState.Has(MovementState.IsDash);
+            if (!_currentInput.MovementState.HasDirectionMovement())
+                _currentInput.MovementState = movementState;
+            if (hasIsJump || prevHasIsJump)
+                _currentInput.MovementState |= MovementState.IsJump;
+            if (hasIsDash || prevHasIsDash)
+                _currentInput.MovementState |= MovementState.IsDash;
+            if (_currentInput.MoveDirection.ToVector3().sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
+                _currentInput.MoveDirection = moveDirection;
+            if (_currentInput.LookDirection.ToVector3().sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
+                _currentInput.LookDirection = moveDirection;
         }
 
         public virtual void PointClickMovement(Vector3 position)
         {
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
-            uint tick = Manager.LocalTick;
-            _inputBuffers.Remove(tick);
-            StoreInputBuffer(new MovementInputData3D()
-            {
-                Tick = tick,
-                IsPointClick = true,
-                Position = position,
-            });
+            _currentInput.IsPointClick = true;
+            _currentInput.Position = position;
+            _currentInput.MoveDirection = Vector3.zero;
+            _currentInput.LookDirection = Vector3.zero;
         }
 
         public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
-            uint tick = Manager.LocalTick;
-            if (!_inputBuffers.TryGetValue(tick, out MovementInputData3D inputData))
-                return;
-            if (inputData.ExtraMovementState != ExtraMovementState.None)
-                return;
-            inputData.ExtraMovementState = extraMovementState;
-            _inputBuffers[tick] = inputData;
+            if (_currentInput.ExtraMovementState == ExtraMovementState.None)
+                _currentInput.ExtraMovementState = extraMovementState;
         }
 
         public void SetLookRotation(Quaternion rotation, bool immediately)
         {
             if (!Entity.IsOwnerClientOrOwnedByServer)
                 return;
-            uint tick = Manager.LocalTick;
             Vector3 lookDirection = rotation * Vector3.forward;
-            if (_inputBuffers.TryGetValue(tick, out MovementInputData3D inputData))
-            {
-                inputData.LookDirection = lookDirection;
-                _inputBuffers[tick] = inputData;
-            }
+            _currentInput.LookDirection = lookDirection;
             _lookRotationApplied = false;
             if (immediately && Entity.CanTurn())
                 TurnImmediately(rotation.eulerAngles.y);
@@ -546,6 +526,14 @@ namespace MultiplayerARPG
             if (CanSimulateMovement())
             {
                 SimulateMovementFromInput(Time.deltaTime);
+                if (_resetInputFrame.HasValue && Time.frameCount >= _resetInputFrame.Value)
+                {
+                    _currentInput = new MovementInputData3D()
+                    {
+                        IsPointClick = _currentInput.IsPointClick,
+                        Position = _currentInput.Position,
+                    };
+                }
             }
             else
             {
@@ -561,7 +549,12 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!TryGetInputBuffer(out MovementInputData3D inputData))
+            MovementInputData3D inputData;
+            if (IsOwnerClientOrOwnedByServer)
+            {
+                inputData = _currentInput;
+            }
+            else if (!TryGetInputBuffer(out inputData))
             {
                 inputData = new MovementInputData3D()
                 {
@@ -570,7 +563,7 @@ namespace MultiplayerARPG
                     IsPointClick = false,
                     Position = Vector3.zero,
                     MovementState = MovementState.None,
-                    ExtraMovementState = ExtraMovementState.None,
+                    ExtraMovementState = ExtraMovementState,
                     MoveDirection = Vector3.zero,
                     LookDirection = EntityTransform.forward,
                 };
