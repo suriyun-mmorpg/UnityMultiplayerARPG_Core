@@ -61,7 +61,7 @@ namespace MultiplayerARPG
 
         // Inputs
         protected MovementInputData2D _currentInput;
-        protected int? _resetInputFrame = null;
+        protected bool _willResetInput = false;
         protected SortedList<uint, MovementInputData2D> _inputBuffers = new SortedList<uint, MovementInputData2D>();
         protected SortedList<uint, MovementSyncData2D> _syncBuffers = new SortedList<uint, MovementSyncData2D>();
         protected SortedList<uint, MovementSyncData2D> _interpBuffers = new SortedList<uint, MovementSyncData2D>();
@@ -217,7 +217,7 @@ namespace MultiplayerARPG
             {
                 _currentInput.Tick = _simTick - 1;
                 StoreInputBuffer(_currentInput);
-                _resetInputFrame = Time.frameCount;
+                _willResetInput = true;
             }
         }
 
@@ -469,8 +469,9 @@ namespace MultiplayerARPG
             if (CanSimulateMovement())
             {
                 SimulateMovementFromInput(Time.deltaTime);
-                if (_resetInputFrame.HasValue && Time.frameCount >= _resetInputFrame.Value)
+                if (_willResetInput)
                 {
+                    _willResetInput = false;
                     _currentInput = new MovementInputData2D()
                     {
                         IsPointClick = _currentInput.IsPointClick,
