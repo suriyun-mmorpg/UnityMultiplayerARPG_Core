@@ -365,17 +365,17 @@ namespace MultiplayerARPG
             return animation2D;
         }
 
-        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier = 1f)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier, float changeClipLength, float overrideClipLength)
         {
             skipMovementValidation = false;
             shouldUseRootMotion = false;
             StopActionAnimation();
             StopSkillCastAnimation();
             StopWeaponChargeAnimation();
-            StartActionCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier));
+            StartActionCoroutine(PlayActionAnimation_Animator(animActionType, dataId, index, playSpeedMultiplier, changeClipLength, overrideClipLength));
         }
 
-        private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimation_Animator(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier, float changeClipLength, float overrideClipLength)
         {
             // If animator is not null, play the action animation
             AnimatorActionAnimation2D animation2D = GetActionAnimation(animActionType, dataId);
@@ -390,11 +390,13 @@ namespace MultiplayerARPG
             CacheAnimatorController[CLIP_ACTION_UP_RIGHT] = animation2D.upRight;
             AnimationClip clip = animation2D.GetClipByDirection(DirectionType2D);
             AudioManager.PlaySfxClipAtAudioSource(animation2D.GetRandomAudioClip(), GenericAudioSource);
-            animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, playSpeedMultiplier);
+            float clipLength = overrideClipLength > 0f ? overrideClipLength : clip.length;
+            float clipSpeedRate = GetAnimationSpeedRate(clipLength, playSpeedMultiplier, changeClipLength);
+            animator.SetFloat(ANIM_ACTION_CLIP_MULTIPLIER, clipSpeedRate);
             animator.SetBool(ANIM_DO_ACTION, true);
             animator.Play(actionStateNameHash, 0, 0f);
             // Waits by current transition + clip duration before end animation
-            yield return new WaitForSecondsRealtime(clip.length / playSpeedMultiplier);
+            yield return new WaitForSecondsRealtime(clipLength / clipSpeedRate);
             animator.SetBool(ANIM_DO_ACTION, false);
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(animation2D.extraDuration / playSpeedMultiplier);

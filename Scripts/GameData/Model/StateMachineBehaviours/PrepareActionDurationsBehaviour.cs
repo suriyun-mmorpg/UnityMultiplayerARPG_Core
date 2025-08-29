@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         [Tooltip("This will be in used with attacking/skill animations, This is rate of total animation duration at when it should hit enemy or apply skill")]
         [Range(0f, 1f)]
         public float[] triggerDurationRates = new float[0];
+        public bool useAnimSpeedRate = false;
         private CharacterActionComponentManager _actionManager;
         private static readonly List<float> s_triggerDurations = new List<float>();
 
@@ -31,7 +32,7 @@ namespace MultiplayerARPG
             {
                 s_triggerDurations.Add(stateInfo.length * 0.5f);
             }
-            _actionManager.PrepareActionDurations(s_triggerDurations.ToArray(), stateInfo.length * stateInfo.speedMultiplier);
+            _actionManager.PrepareActionDurations(s_triggerDurations.ToArray(), stateInfo.length * stateInfo.speedMultiplier, useAnimSpeedRate);
         }
     }
 }

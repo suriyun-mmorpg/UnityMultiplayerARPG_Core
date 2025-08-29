@@ -400,7 +400,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (actionState1 != null && actionState1.clip != null)
             {
                 // Setup animation playing duration
-                animationDelay = Behaviour.PlayAction(0, actionState1, 1f);
+                animationDelay = Behaviour.PlayAction(0, actionState1, 1f, 0f);
                 triggeredDelay = animationDelay * triggeredDurationRate1;
             }
 
@@ -409,7 +409,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (actionState2 != null && actionState2.clip != null)
             {
                 // Setup animation playing duration
-                animationDelay2 = Behaviour.PlayAction(1, actionState2, 1f);
+                animationDelay2 = Behaviour.PlayAction(1, actionState2, 1f, 0f);
                 triggeredDelay2 = animationDelay2 * triggeredDurationRate2;
             }
 
@@ -604,20 +604,20 @@ namespace MultiplayerARPG.GameData.Model.Playables
         #endregion
 
         #region Action animations
-        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier = 1)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier, float changeClipLength, float overrideClipLength)
         {
             ActionAnimation anim = GetActionAnimation(animActionType, dataId, index);
             skipMovementValidation = anim.state.skipMovementValidation;
             shouldUseRootMotion = anim.state.shouldUseRootMotion;
-            StartActionCoroutine(PlayActionAnimationRoutine(anim, playSpeedMultiplier));
+            StartActionCoroutine(PlayActionAnimationRoutine(anim, playSpeedMultiplier, changeClipLength, overrideClipLength));
         }
 
-        private IEnumerator PlayActionAnimationRoutine(ActionAnimation actionAnimation, float playSpeedMultiplier)
+        private IEnumerator PlayActionAnimationRoutine(ActionAnimation actionAnimation, float playSpeedMultiplier, float changeClipLength, float overrideClipLength)
         {
             _isDoingAction = true;
             PlayActionAnimationAudioClip(actionAnimation);
             // Wait by animation playing duration
-            yield return new WaitForSecondsRealtime(Behaviour.PlayAction(actionAnimation.state, playSpeedMultiplier));
+            yield return new WaitForSecondsRealtime(Behaviour.PlayAction(actionAnimation.state, playSpeedMultiplier, changeClipLength, overrideClipLength));
             // Waits by current transition + extra duration before end playing animation state
             yield return new WaitForSecondsRealtime(actionAnimation.GetExtendDuration() / playSpeedMultiplier);
             _isDoingAction = false;
@@ -645,14 +645,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 {
                     skipMovementValidation = weaponAnimations.leftHandChargeState.skipMovementValidation;
                     shouldUseRootMotion = weaponAnimations.leftHandChargeState.shouldUseRootMotion;
-                    Behaviour.PlayAction(weaponAnimations.leftHandChargeState, 1f, loop: true);
+                    Behaviour.PlayAction(weaponAnimations.leftHandChargeState, 1f, 0f, loop: true);
                     return;
                 }
                 if (!isLeftHand && weaponAnimations.rightHandChargeState.clip != null)
                 {
                     skipMovementValidation = weaponAnimations.rightHandChargeState.skipMovementValidation;
                     shouldUseRootMotion = weaponAnimations.rightHandChargeState.shouldUseRootMotion;
-                    Behaviour.PlayAction(weaponAnimations.rightHandChargeState, 1f, loop: true);
+                    Behaviour.PlayAction(weaponAnimations.rightHandChargeState, 1f, 0f, loop: true);
                     return;
                 }
             }
@@ -660,13 +660,13 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 skipMovementValidation = defaultAnimations.leftHandChargeState.skipMovementValidation;
                 shouldUseRootMotion = defaultAnimations.leftHandChargeState.shouldUseRootMotion;
-                Behaviour.PlayAction(defaultAnimations.leftHandChargeState, 1f, loop: true);
+                Behaviour.PlayAction(defaultAnimations.leftHandChargeState, 1f, 0f, loop: true);
             }
             else
             {
                 skipMovementValidation = defaultAnimations.rightHandChargeState.skipMovementValidation;
                 shouldUseRootMotion = defaultAnimations.rightHandChargeState.shouldUseRootMotion;
-                Behaviour.PlayAction(defaultAnimations.rightHandChargeState, 1f, loop: true);
+                Behaviour.PlayAction(defaultAnimations.rightHandChargeState, 1f, 0f, loop: true);
             }
         }
 
@@ -695,7 +695,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public virtual void PlayEnterVehicleAnimation(IVehicleEntity vehicleEntity)
         {
             if (defaultAnimations.vehicleEnterExitStates.enterState.clip != null)
-                Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.enterState, 1f);
+                Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.enterState, 1f, 0f);
         }
 
         public virtual float GetExitVehicleAnimationDuration(IVehicleEntity vehicleEntity)
@@ -708,7 +708,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         public virtual void PlayExitVehicleAnimation(IVehicleEntity vehicleEntity)
         {
             if (defaultAnimations.vehicleEnterExitStates.exitState.clip != null)
-                Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.exitState, 1f);
+                Behaviour.PlayAction(defaultAnimations.vehicleEnterExitStates.exitState, 1f, 0f);
         }
 
         public EnterExitStates GetLadderEnterExitStates(LadderEntranceType entranceType)
@@ -735,7 +735,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             EnterExitStates states = GetLadderEnterExitStates(entranceType);
             if (states.enterState.clip != null)
-                Behaviour.PlayAction(states.enterState, 1f);
+                Behaviour.PlayAction(states.enterState, 1f, 0f);
         }
 
         public virtual float GetExitLadderAnimationDuration(LadderEntranceType entranceType)
@@ -750,7 +750,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             EnterExitStates states = GetLadderEnterExitStates(entranceType);
             if (states.exitState.clip != null)
-                Behaviour.PlayAction(states.exitState, 1f);
+                Behaviour.PlayAction(states.exitState, 1f, 0f);
         }
 
         public override void PlayHitAnimation()
@@ -758,11 +758,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
             WeaponAnimations weaponAnimations;
             if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.hurtState.clip != null)
             {
-                Behaviour.PlayAction(weaponAnimations.hurtState, 1f);
+                Behaviour.PlayAction(weaponAnimations.hurtState, 1f, 0f);
                 return;
             }
             if (defaultAnimations.hurtState.clip != null)
-                Behaviour.PlayAction(defaultAnimations.hurtState, 1f);
+                Behaviour.PlayAction(defaultAnimations.hurtState, 1f, 0f);
         }
 
         public override void PlayJumpAnimation()
@@ -777,11 +777,11 @@ namespace MultiplayerARPG.GameData.Model.Playables
             WeaponAnimations weaponAnimations;
             if (_equippedWeaponType != null && TryGetWeaponAnimations(_equippedWeaponType.DataId, out weaponAnimations) && weaponAnimations.pickupState.clip != null)
             {
-                Behaviour.PlayAction(weaponAnimations.pickupState, 1f);
+                Behaviour.PlayAction(weaponAnimations.pickupState, 1f, 0f);
                 return;
             }
             if (defaultAnimations.pickupState.clip != null)
-                Behaviour.PlayAction(defaultAnimations.pickupState, 1f);
+                Behaviour.PlayAction(defaultAnimations.pickupState, 1f, 0f);
         }
 
         public void PlayCustomAnimation(int id, bool loop)
@@ -793,7 +793,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (customAnimations[id].clip != null)
             {
                 _latestCustomAnimationActionId = OFFSET_FOR_CUSTOM_ANIMATION_ACTION_ID + id;
-                Behaviour.PlayAction(customAnimations[id], 1f, 0f, loop, _latestCustomAnimationActionId);
+                Behaviour.PlayAction(customAnimations[id], 1f, 0f, 0f, loop, _latestCustomAnimationActionId);
             }
         }
 

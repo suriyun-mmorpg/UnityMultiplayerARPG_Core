@@ -234,7 +234,7 @@ namespace MultiplayerARPG
                 // Play cast animation
                 if (CastingSkillDuration > 0f)
                 {
-                    LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionEndTime(CastingSkillDuration, 1f);
+                    LastUseSkillEndTime = Time.unscaledTime + CastingSkillDuration + 1f;
                     if (vehicleModelAvailable)
                         vehicleModel.PlaySkillCastClip(skill.DataId, CastingSkillDuration, out _skipMovementValidation, out _shouldUseRootMotion);
                     if (!overridePassengerActionAnimations)
@@ -275,19 +275,19 @@ namespace MultiplayerARPG
 
                 // Play action animation
                 if (vehicleModelAvailable)
-                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                    vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate, 0f, 0f);
                 if (!overridePassengerActionAnimations)
                 {
                     if (tpsModelAvailable)
-                        tpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                        tpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate, 0f, 0f);
                     if (fpsModelAvailable)
-                        fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                        fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate, 0f, 0f);
                 }
 
                 // Prepare action durations
-                float remainsDuration = totalDuration;
-                LastUseSkillEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
-                await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, skillCancellationTokenSource.Token,
+                float remainsDuration = BaseCharacterModel.GetAnimationDuration(totalDuration, animSpeedRate, 0f);
+                LastUseSkillEndTime = Time.unscaledTime + remainsDuration;
+                await _manager.PrepareActionDurations(triggerDurations, totalDuration, animSpeedRate, 0f, skillCancellationTokenSource.Token,
                     (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
                     {
                         triggerDurations = __triggerDurations;
