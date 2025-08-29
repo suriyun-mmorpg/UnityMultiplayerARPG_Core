@@ -1,8 +1,8 @@
 ﻿using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
-using LiteNetLib;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections;
 
 namespace MultiplayerARPG
 {
@@ -72,8 +72,42 @@ namespace MultiplayerARPG
         public virtual int TitleDataId { get; set; }
         public virtual int FactionId { get; set; }
         public virtual int Reputation { get; set; }
-        public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
-        public bool IsWeaponsSheathed { get { return isWeaponsSheathed.Value; } set { isWeaponsSheathed.Value = value; } }
+        protected byte _nextEquipWeaponSet;
+        public byte EquipWeaponSet
+        {
+            get
+            {
+                return equipWeaponSet.Value;
+            }
+            set
+            {
+                if (IsPlayingActionAnimation())
+                {
+                    _nextEquipWeaponSet = value;
+                    StartCoroutine(ChangeToNextEquipWeaponSet());
+                    return;
+                }
+                equipWeaponSet.Value = value;
+            }
+        }
+        protected bool _nextIsWeaponsSheathed;
+        public bool IsWeaponsSheathed
+        {
+            get
+            {
+                return isWeaponsSheathed.Value;
+            }
+            set
+            {
+                if (IsPlayingActionAnimation())
+                {
+                    _nextIsWeaponsSheathed = value;
+                    StartCoroutine(ChangeToNextIsWeaponsSheathed());
+                    return;
+                }
+                isWeaponsSheathed.Value = value;
+            }
+        }
         public EquipWeapons EquipWeapons
         {
             get
@@ -605,6 +639,26 @@ namespace MultiplayerARPG
             IsRecaching = true;
             if (onSummonsOperation != null)
                 onSummonsOperation.Invoke(operation, index, oldItem, newItem);
+        }
+        #endregion
+
+        #region Weapon state changing
+        IEnumerator ChangeToNextEquipWeaponSet()
+        {
+            while (IsPlayingAttackOrUseSkillAnimation())
+            {
+                yield return 0;
+            }
+            equipWeaponSet.Value = _nextEquipWeaponSet;
+        }
+
+        IEnumerator ChangeToNextIsWeaponsSheathed()
+        {
+            while (IsPlayingAttackOrUseSkillAnimation())
+            {
+                yield return 0;
+            }
+            isWeaponsSheathed.Value = _nextIsWeaponsSheathed;
         }
         #endregion
     }

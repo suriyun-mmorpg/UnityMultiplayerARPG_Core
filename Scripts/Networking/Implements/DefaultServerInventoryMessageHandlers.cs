@@ -174,6 +174,13 @@ namespace MultiplayerARPG
                 return default;
             }
 
+            byte equipWeaponSet = request.equipWeaponSet;
+            if (playerCharacter.EquipWeaponSet == equipWeaponSet)
+            {
+                result.InvokeSuccess(new ResponseSwitchEquipWeaponSetMessage());
+                return default;
+            }
+
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null)
             {
@@ -191,7 +198,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            byte equipWeaponSet = request.equipWeaponSet;
             if (equipWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
                 equipWeaponSet = 0;
             playerCharacter.FillWeaponSetsIfNeeded(equipWeaponSet);
