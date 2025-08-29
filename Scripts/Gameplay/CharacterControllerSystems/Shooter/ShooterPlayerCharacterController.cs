@@ -1298,12 +1298,6 @@ namespace MultiplayerARPG
             _normalizedInput = new Vector2(_inputV, _inputH).normalized;
             _moveDirection += _cameraForward * _inputV;
             _moveDirection += _cameraRight * _inputH;
-            if (_moveDirection.sqrMagnitude > 0f)
-            {
-                if (pitch > 180f)
-                    pitch -= 360f;
-                _moveDirection.y = -pitch / 90f;
-            }
 
             // Set look direction
             switch (Mode)
