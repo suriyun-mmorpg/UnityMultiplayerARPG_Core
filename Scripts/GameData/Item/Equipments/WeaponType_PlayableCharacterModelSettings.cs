@@ -22,9 +22,17 @@ namespace MultiplayerARPG
         [NotPatchable]
         [SerializeField]
         private PlayableCharacterModelSettingsData playableCharacterModelSettings;
+
+        partial void ModifyPlayableCharacterModelSettings(ref PlayableCharacterModelSettingsData settings);
+
         public PlayableCharacterModelSettingsData PlayableCharacterModelSettings
         {
-            get { return playableCharacterModelSettings; }
+            get
+            {
+                var result = playableCharacterModelSettings;
+                ModifyPlayableCharacterModelSettings(ref result);
+                return result;
+            }
         }
     }
 }
