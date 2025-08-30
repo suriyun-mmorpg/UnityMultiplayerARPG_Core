@@ -38,6 +38,5 @@ namespace MultiplayerARPG
                 return result;
             }
         }
-
     }
 }
