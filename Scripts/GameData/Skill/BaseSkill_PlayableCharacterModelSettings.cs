@@ -26,7 +26,11 @@ namespace MultiplayerARPG
             get
             {
                 var result = playableCharacterModelSettings;
-                ModifyPlayableCharacterModelSettings(ref result);
+                if (result.applySkillAnimations)
+                {
+                    ModifyPlayableCharacterModelSettings(ref result);
+                }
+
                 return result;
             }
         }

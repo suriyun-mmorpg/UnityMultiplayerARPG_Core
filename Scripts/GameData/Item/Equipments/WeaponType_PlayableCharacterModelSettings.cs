@@ -30,9 +30,14 @@ namespace MultiplayerARPG
             get
             {
                 var result = playableCharacterModelSettings;
-                ModifyPlayableCharacterModelSettings(ref result);
+                if (result.applyWeaponAnimations || result.applyLeftHandWeaponAnimations)
+                {
+                    ModifyPlayableCharacterModelSettings(ref result);
+                }
+
                 return result;
             }
         }
+
     }
 }
