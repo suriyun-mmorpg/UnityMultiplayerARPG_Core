@@ -18,24 +18,9 @@ namespace MultiplayerARPG
         [NotPatchable]
         [SerializeField]
         private PlayableCharacterModelSettingsData playableCharacterModelSettings;
-
-        /// <summary>
-        /// Allows overriding skill animations, e.g. with gender-specific settings.
-        /// </summary>
-        partial void ModifyPlayableCharacterModelSettings(ref PlayableCharacterModelSettingsData settings);
-
         public PlayableCharacterModelSettingsData PlayableCharacterModelSettings
         {
-            get
-            {
-                var result = playableCharacterModelSettings;
-                if (result.applySkillAnimations)
-                {
-                    ModifyPlayableCharacterModelSettings(ref result);
-                }
-
-                return result;
-            }
+            get { return playableCharacterModelSettings; }
         }
     }
 }

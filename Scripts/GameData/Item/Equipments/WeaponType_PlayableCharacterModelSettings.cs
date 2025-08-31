@@ -22,24 +22,9 @@ namespace MultiplayerARPG
         [NotPatchable]
         [SerializeField]
         private PlayableCharacterModelSettingsData playableCharacterModelSettings;
-
-        /// <summary>
-        /// Allows overriding weapon animations, e.g. with gender-specific settings.
-        /// </summary>
-        partial void ModifyPlayableCharacterModelSettings(ref PlayableCharacterModelSettingsData settings);
-
         public PlayableCharacterModelSettingsData PlayableCharacterModelSettings
         {
-            get
-            {
-                var result = playableCharacterModelSettings;
-                if (result.applyWeaponAnimations || result.applyLeftHandWeaponAnimations)
-                {
-                    ModifyPlayableCharacterModelSettings(ref result);
-                }
-
-                return result;
-            }
+            get { return playableCharacterModelSettings; }
         }
     }
 }
