@@ -378,13 +378,27 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)
                 {
-                    if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
-                        EntityComponents[i].EntityUpdate();
+                    try
+                    {
+                        if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
+                            EntityComponents[i].EntityUpdate();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Logging.LogException(LogTag, ex);
+                    }
                 }
             }
             using (s_EntityUpdateProfilerMarker.Auto())
             {
-                EntityUpdate();
+                try
+                {
+                    EntityUpdate();
+                }
+                catch (System.Exception ex)
+                {
+                    Logging.LogException(LogTag, ex);
+                }
             }
             using (s_OnUpdateInvokeProfilerMarker.Auto())
             {
@@ -428,8 +442,15 @@ namespace MultiplayerARPG
             {
                 for (int i = 0; i < EntityComponents.Length; ++i)
                 {
-                    if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
-                        EntityComponents[i].EntityLateUpdate();
+                    try
+                    {
+                        if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
+                            EntityComponents[i].EntityLateUpdate();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Logging.LogException(LogTag, ex);
+                    }
                 }
             }
             using (s_ComponentsChangedStateUpdateProfilerMarker.Auto())
@@ -443,7 +464,14 @@ namespace MultiplayerARPG
             }
             using (s_EntityLateUpdateProfilerMarker.Auto())
             {
-                EntityLateUpdate();
+                try
+                {
+                    EntityLateUpdate();
+                }
+                catch (System.Exception ex)
+                {
+                    Logging.LogException(LogTag, ex);
+                }
             }
             using (s_OnLateUpdateInvokeProfilerMarker.Auto())
             {
