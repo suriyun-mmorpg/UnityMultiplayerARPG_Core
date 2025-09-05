@@ -1,5 +1,6 @@
 using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
+using System.Buffers;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -86,21 +87,41 @@ namespace MultiplayerARPG
             // Prevent pass through wall hacking
             // It will raycast from origin to hit position
             int layerMask = GameInstance.Singleton.GetAttackObstacleLayerMask();
+            GameObject tempGameObject;
             RaycastHit[] tempWallHits;
             RaycastHit2D[] tempWallHit2Ds;
-            int tempWallHitCount = 0;
+            int tempObstacleHitCount = 0;
+            int rayCastCount;
             switch (GameInstance.Singleton.DimensionType)
             {
                 case DimensionType.Dimension3D:
-                    tempWallHits = new RaycastHit[pierceThroughEntities + 1];
-                    tempWallHitCount = PhysicUtils.SortedRaycastNonAlloc3D(new Ray(hitData.Origin, hitData.Direction), tempWallHits, Vector3.Distance(hitData.Origin, hitData.HitOrigin), layerMask, QueryTriggerInteraction.Ignore);
+                    tempWallHits = ArrayPool<RaycastHit>.Shared.Rent(pierceThroughEntities + 1);
+                    rayCastCount = PhysicUtils.SortedRaycastNonAlloc3D(new Ray(hitData.Origin, hitData.Direction), tempWallHits, Vector3.Distance(hitData.Origin, hitData.HitOrigin), layerMask, QueryTriggerInteraction.Ignore);
+                    for (int i = 0; i < rayCastCount; ++i)
+                    {
+                        tempGameObject = tempWallHits[i].collider.gameObject;
+                        if (!tempGameObject.GetComponent<IUnHittable>().IsNull())
+                            continue;
+
+                        tempObstacleHitCount++;
+                    }
+                    ArrayPool<RaycastHit>.Shared.Return(tempWallHits);
                     break;
                 case DimensionType.Dimension2D:
-                    tempWallHit2Ds = new RaycastHit2D[pierceThroughEntities + 1];
-                    tempWallHitCount = PhysicUtils.SortedRaycastNonAlloc2D(new Ray2D(hitData.Origin, (Vector3)hitData.Direction), tempWallHit2Ds, Vector2.Distance(hitData.Origin, hitData.HitOrigin), layerMask);
+                    tempWallHit2Ds = ArrayPool<RaycastHit2D>.Shared.Rent(pierceThroughEntities + 1);
+                    rayCastCount = PhysicUtils.SortedRaycastNonAlloc2D(new Ray2D(hitData.Origin, (Vector3)hitData.Direction), tempWallHit2Ds, Vector2.Distance(hitData.Origin, hitData.HitOrigin), layerMask);
+                    for (int i = 0; i < rayCastCount; ++i)
+                    {
+                        tempGameObject = tempWallHit2Ds[i].collider.gameObject;
+                        if (!tempGameObject.GetComponent<IUnHittable>().IsNull())
+                            continue;
+
+                        tempObstacleHitCount++;
+                    }
+                    ArrayPool<RaycastHit2D>.Shared.Return(tempWallHit2Ds);
                     break;
             }
-            return tempWallHitCount <= pierceThroughEntities;
+            return tempObstacleHitCount + hitCount <= pierceThroughEntities;
         }
 
         public override bool IsHeadshotInstantDeath()
@@ -174,7 +195,6 @@ namespace MultiplayerARPG
             Vector3 tempHitNormal;
             float tempHitDistance;
             GameObject tempGameObject;
-            string tempTag;
             DamageableHitBox tempDamageableHitBox;
             // Find characters that receiving damages
             for (int tempLoopCounter = 0; tempLoopCounter < tempHitCount; ++tempLoopCounter)
@@ -187,8 +207,7 @@ namespace MultiplayerARPG
                 if (!tempGameObject.GetComponent<IUnHittable>().IsNull())
                     continue;
 
-                tempDamageableHitBox = tempGameObject.GetComponent<DamageableHitBox>();
-                if (tempDamageableHitBox == null || !tempDamageableHitBox.Entity)
+                if (!tempGameObject.TryGetComponent(out tempDamageableHitBox) || !tempDamageableHitBox.Entity)
                 {
                     if (GameInstance.Singleton.IsDamageableLayer(tempGameObject.layer))
                     {
@@ -201,10 +220,9 @@ namespace MultiplayerARPG
                     // Prepare data to instantiate impact effects
                     if (isPlayImpactEffects)
                     {
-                        tempTag = tempGameObject.tag;
                         impactEffectsData.Add(new ImpactEffectPlayingData()
                         {
-                            tag = tempTag,
+                            tag = GetImpactEffectTag(tempGameObject),
                             point = tempHitPoint,
                             normal = tempHitNormal,
                         });
@@ -254,10 +272,9 @@ namespace MultiplayerARPG
                 // Prepare data to instantiate impact effects
                 if (isPlayImpactEffects)
                 {
-                    tempTag = tempGameObject.tag;
                     impactEffectsData.Add(new ImpactEffectPlayingData()
                     {
-                        tag = tempTag,
+                        tag = GetImpactEffectTag(tempGameObject),
                         point = tempHitPoint,
                         normal = tempHitNormal,
                     });
@@ -292,6 +309,20 @@ namespace MultiplayerARPG
 
             PoolSystem.GetInstance(loadedProjectileEffect, damagePosition, damageRotation)
                 .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
+        }
+#endif
+
+#if !UNITY_SERVER
+        private string GetImpactEffectTag(GameObject gameObject)
+        {
+            if (gameObject.TryGetComponent(out Collider collider) && collider.sharedMaterial != null)
+            {
+                return collider.sharedMaterial.name;
+            }
+            else
+            {
+                return gameObject.tag;
+            }
         }
 #endif
     }
