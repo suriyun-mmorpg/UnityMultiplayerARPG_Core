@@ -434,7 +434,14 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            validateResult.Guild.AddSkillLevel(request.dataId);
+            if (!validateResult.Guild.AddSkillLevel(request.dataId))
+            {
+                result.InvokeError(new ResponseIncreaseGuildSkillLevelMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_POINT,
+                });
+                return default;
+            }
             GameInstance.ServerGuildHandlers.SetGuild(validateResult.GuildId, validateResult.Guild);
             GameInstance.ServerGameMessageHandlers.SendSetGuildSkillLevelToMembers(validateResult.Guild, request.dataId);
             GameInstance.ServerGameMessageHandlers.SendSetGuildLevelExpSkillPointToMembers(validateResult.Guild);
