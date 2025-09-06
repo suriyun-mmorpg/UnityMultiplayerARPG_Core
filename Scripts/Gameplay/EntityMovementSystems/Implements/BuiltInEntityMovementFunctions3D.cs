@@ -26,6 +26,9 @@ namespace MultiplayerARPG
         public float eulerAnglesThreshold = 1f;
         [Tooltip("Keep alive ticks before it is stop syncing (after has no changes)")]
         public int keepAliveTicks = 10;
+        [Tooltip("If distance between two interpolating positions more than this value, it will change position to target position immediately")]
+        [Min(0.01f)]
+        public float interpSnapThreshold = 2f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -622,12 +625,22 @@ namespace MultiplayerARPG
                 }
             }
 
-            float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
-            EntityTransform.position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
-            float rotation = Mathf.LerpAngle(_interpFromData.Rotation, _interpToData.Rotation, t);
-            EntityTransform.rotation = Quaternion.Euler(0f, rotation, 0f);
-            MovementState = t < 0.75f ? _interpFromData.MovementState : _interpToData.MovementState;
-            ExtraMovementState = t < 0.75f ? _interpFromData.ExtraMovementState : _interpToData.ExtraMovementState;
+            if (Vector3.Distance(EntityTransform.position, _interpToData.Position) >= interpSnapThreshold)
+            {
+                EntityTransform.position = _interpToData.Position;
+                EntityTransform.rotation = Quaternion.Euler(0f, _interpToData.Rotation, 0f);
+                MovementState = _interpToData.MovementState;
+                ExtraMovementState = _interpToData.ExtraMovementState;
+            }
+            else
+            {
+                float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
+                EntityTransform.position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
+                float rotation = Mathf.LerpAngle(_interpFromData.Rotation, _interpToData.Rotation, t);
+                EntityTransform.rotation = Quaternion.Euler(0f, rotation, 0f);
+                MovementState = t < 0.75f ? _interpFromData.MovementState : _interpToData.MovementState;
+                ExtraMovementState = t < 0.75f ? _interpFromData.ExtraMovementState : _interpToData.ExtraMovementState;
+            }
         }
 
         protected bool TryGetInputBuffer(out MovementInputData3D inputData, byte maxLookback = 2)

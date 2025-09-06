@@ -26,6 +26,9 @@ namespace MultiplayerARPG
         public float eulerAnglesThreshold = 1f;
         [Tooltip("Keep alive ticks before it is stop syncing (after has no changes)")]
         public int keepAliveTicks = 10;
+        [Tooltip("If distance between two interpolating positions more than this value, it will change position to target position immediately")]
+        [Min(0.01f)]
+        public float interpSnapThreshold = 2f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -161,6 +164,7 @@ namespace MultiplayerARPG
                 positionThreshold = positionThreshold,
                 eulerAnglesThreshold = eulerAnglesThreshold,
                 keepAliveTicks = keepAliveTicks,
+                interpSnapThreshold = interpSnapThreshold,
                 stoppingDistance = stoppingDistance,
                 jumpHeight = jumpHeight,
                 applyJumpForceMode = applyJumpForceMode,
@@ -268,6 +272,7 @@ namespace MultiplayerARPG
             Functions.positionThreshold = positionThreshold;
             Functions.eulerAnglesThreshold = eulerAnglesThreshold;
             Functions.keepAliveTicks = keepAliveTicks;
+            Functions.interpSnapThreshold = interpSnapThreshold;
             Functions.stoppingDistance = stoppingDistance;
             Functions.jumpHeight = jumpHeight;
             Functions.applyJumpForceMode = applyJumpForceMode;
