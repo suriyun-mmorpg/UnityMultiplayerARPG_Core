@@ -416,7 +416,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(BuiltInEntityMovementFunctions3D), $"Teleport function shouldn't be called at client [{Entity.name}]");
                 return;
             }
-            if (_serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            if (_serverTeleportState != MovementTeleportState.None)
             {
                 // Still waiting for teleport responding
                 return;
@@ -544,7 +544,7 @@ namespace MultiplayerARPG
 
         protected void SimulateMovementFromInput(float deltaTime)
         {
-            if (IsServer && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            if (IsServer && _serverTeleportState != MovementTeleportState.None)
             {
                 // Waiting for client teleport confirmation
                 return;
@@ -581,7 +581,7 @@ namespace MultiplayerARPG
 
         protected void InterpolateTransform()
         {
-            if (IsServer && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            if (IsServer && _serverTeleportState != MovementTeleportState.None)
             {
                 // Waiting for client teleport confirmation
                 return;
@@ -627,7 +627,15 @@ namespace MultiplayerARPG
 
             if (Vector3.Distance(EntityTransform.position, _interpToData.Position) >= interpSnapThreshold)
             {
+                MovementSyncData3D interpFromData = _interpFromData;
+                interpFromData.Position = _interpToData.Position;
+                interpFromData.Rotation = _interpToData.Rotation;
+                interpFromData.MovementState = _interpToData.MovementState;
+                interpFromData.ExtraMovementState = _interpToData.ExtraMovementState;
+                _interpFromData = interpFromData;
+                _interpBuffers[interpFromData.Tick] = interpFromData;
                 EntityTransform.position = _interpToData.Position;
+                _prevPos = EntityTransform.position;
                 EntityTransform.rotation = Quaternion.Euler(0f, _interpToData.Rotation, 0f);
                 MovementState = _interpToData.MovementState;
                 ExtraMovementState = _interpToData.ExtraMovementState;
@@ -635,13 +643,16 @@ namespace MultiplayerARPG
             else
             {
                 float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
-                EntityTransform.position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
+                Vector3 position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
+                EntityTransform.position = position;
+                _prevPos = EntityTransform.position;
                 float rotation = Mathf.LerpAngle(_interpFromData.Rotation, _interpToData.Rotation, t);
                 EntityTransform.rotation = Quaternion.Euler(0f, rotation, 0f);
                 MovementState = t < 0.75f ? _interpFromData.MovementState : _interpToData.MovementState;
                 ExtraMovementState = t < 0.75f ? _interpFromData.ExtraMovementState : _interpToData.ExtraMovementState;
             }
         }
+        private Vector3 _prevPos;
 
         protected bool TryGetInputBuffer(out MovementInputData3D inputData, byte maxLookback = 2)
         {
@@ -1362,16 +1373,27 @@ namespace MultiplayerARPG
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Responding))
             {
-                _serverTeleportState = MovementTeleportState.None;
+                _serverTeleportState = MovementTeleportState.Responded;
                 return;
             }
+            if (_serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            {
+                // Wait for teleportation confirmation
+                return;
+            }
+            if (_serverTeleportState == MovementTeleportState.Responded)
+                ResetBuffersAndStates();
             byte size;
+            int maxBuffers;
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
                     size = reader.GetByte();
                     if (size == 0)
+                    {
+                        _serverTeleportState = MovementTeleportState.None;
                         return;
+                    }
                     MovementInputData3D[] inputBuffers = ArrayPool<MovementInputData3D>.Shared.Rent(size);
                     for (byte i = 0; i < size; ++i)
                     {
@@ -1379,29 +1401,36 @@ namespace MultiplayerARPG
                     }
                     if (!IsOwnerClient)
                     {
-                        StoreInputBuffers(inputBuffers, size, 30);
+                        maxBuffers = _serverTeleportState == MovementTeleportState.Responded ? 1 : 30;
+                        StoreInputBuffers(inputBuffers, size, maxBuffers);
                         uint simTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
                         if (Entity.Player != null)
                             simTick += LogicUpdater.TimeToTick(Entity.Player.Rtt / 2, _logicUpdater.DeltaTime);
                         SetupSimulationTick(simTick);
                     }
                     ArrayPool<MovementInputData3D>.Shared.Return(inputBuffers);
+                    _serverTeleportState = MovementTeleportState.None;
                     break;
                 default:
                     size = reader.GetByte();
                     if (size == 0)
+                    {
+                        _serverTeleportState = MovementTeleportState.None;
                         return;
+                    }
                     MovementSyncData3D[] interpoationBuffers = ArrayPool<MovementSyncData3D>.Shared.Rent(size);
                     for (byte i = 0; i < size; ++i)
                     {
                         interpoationBuffers[i] = reader.Get<MovementSyncData3D>();
                     }
-                    StoreInterpolateBuffers(interpoationBuffers, size, 30);
+                    maxBuffers = _serverTeleportState == MovementTeleportState.Responded ? 1 : 30;
+                    StoreInterpolateBuffers(interpoationBuffers, size, maxBuffers);
                     uint interpTick = _interpBuffers.Keys[_interpBuffers.Count - 1];
                     if (Entity.Player != null)
                         interpTick += LogicUpdater.TimeToTick(Entity.Player.Rtt / 2, _logicUpdater.DeltaTime);
                     SetupInterpolationTick(interpTick);
                     ArrayPool<MovementSyncData3D>.Shared.Return(interpoationBuffers);
+                    _serverTeleportState = MovementTeleportState.None;
                     break;
             }
         }
@@ -1465,6 +1494,7 @@ namespace MultiplayerARPG
                 NavPaths = null;
             }
             _lastTeleportFrame = Time.frameCount;
+            EntityTransform.position = position;
             EntityMovement.SetPosition(position);
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             TurnImmediately(rotation.eulerAngles.y);
@@ -1507,7 +1537,7 @@ namespace MultiplayerARPG
 
         public async UniTask WaitClientTeleportConfirm()
         {
-            while (this != null && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            while (this != null && _serverTeleportState != MovementTeleportState.None)
             {
                 await UniTask.Delay(100);
             }
@@ -1515,7 +1545,7 @@ namespace MultiplayerARPG
 
         public bool IsWaitingClientTeleportConfirm()
         {
-            return _serverTeleportState.Has(MovementTeleportState.WaitingForResponse);
+            return _serverTeleportState != MovementTeleportState.None;
         }
     }
 }

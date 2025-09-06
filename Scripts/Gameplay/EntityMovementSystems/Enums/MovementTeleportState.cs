@@ -8,6 +8,7 @@ namespace MultiplayerARPG
         StillMoveAfterTeleport = 1 << 1,
         Responding = 1 << 2,
         WaitingForResponse = 1 << 3,
+        Responded = 1 << 4,
     }
 
     public static class ServerTeleportRequestStateExtensions
