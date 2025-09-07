@@ -513,9 +513,9 @@ namespace MultiplayerARPG
         protected void HandleServerEntityStateAtClient(MessageHandlerData messageHandler)
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
-            long peerTimestamp = messageHandler.Reader.GetPackedLong();
+            uint peerTick = messageHandler.Reader.GetPackedUInt();
             if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity))
-                gameEntity.ReadServerStateAtClient(peerTimestamp, messageHandler.Reader);
+                gameEntity.ReadServerStateAtClient(peerTick, messageHandler.Reader);
         }
 
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
@@ -564,9 +564,9 @@ namespace MultiplayerARPG
         protected void HandleClientEntityStateAtServer(MessageHandlerData messageHandler)
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
-            long peerTimestamp = messageHandler.Reader.GetPackedLong();
+            uint peerTick = messageHandler.Reader.GetPackedUInt();
             if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity) && gameEntity.Identity.ConnectionId == messageHandler.ConnectionId)
-                gameEntity.ReadClientStateAtServer(peerTimestamp, messageHandler.Reader);
+                gameEntity.ReadClientStateAtServer(peerTick, messageHandler.Reader);
         }
 
         public virtual void InitPrefabs()

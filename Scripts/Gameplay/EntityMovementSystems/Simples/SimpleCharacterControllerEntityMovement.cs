@@ -422,24 +422,24 @@ namespace MultiplayerARPG
             _forceUngroundCountdown = forceUngroundAfterJumpDuration;
         }
 
-        public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteClientState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
         {
-            return Functions.WriteClientState(writeTimestamp, writer, out shouldSendReliably);
+            return Functions.WriteClientState(writeTick, writer, out shouldSendReliably);
         }
 
-        public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteServerState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
         {
-            return Functions.WriteServerState(writeTimestamp, writer, out shouldSendReliably);
+            return Functions.WriteServerState(writeTick, writer, out shouldSendReliably);
         }
 
-        public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
+        public void ReadClientStateAtServer(uint peerTick, NetDataReader reader)
         {
-            Functions.ReadClientStateAtServer(peerTimestamp, reader);
+            Functions.ReadClientStateAtServer(peerTick, reader);
         }
 
-        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public void ReadServerStateAtClient(uint peerTick, NetDataReader reader)
         {
-            Functions.ReadServerStateAtClient(peerTimestamp, reader);
+            Functions.ReadServerStateAtClient(peerTick, reader);
         }
 
         public void StopMove()

@@ -229,14 +229,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void SendServerState(long writeTimestamp)
+        public override void SendServerState(uint writeTick)
         {
             if (!IsUpdateEntityComponents)
             {
-                // Don't updates while there is no subscrubers
+                // Don't updates while there is no subscribers
                 return;
             }
-            base.SendServerState(writeTimestamp);
+            base.SendServerState(writeTick);
         }
 
         public virtual void InitStats()

@@ -8,21 +8,21 @@ namespace MultiplayerARPG
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
-        /// <param name="writeTimestamp"></param>
+        /// <param name="writeTick"></param>
         /// <param name="writer"></param>
         /// <param name="shouldSendReliably"></param>
         /// <returns></returns>
-        bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably);
+        bool WriteClientState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably);
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>
-        /// <param name="writeTimestamp"></param>
+        /// <param name="writeTick"></param>
         /// <param name="writer"></param>
         /// <param name="shouldSendReliably"></param>
         /// <returns></returns>
-        bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably);
-        void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader);
-        void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader);
+        bool WriteServerState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably);
+        void ReadClientStateAtServer(uint peerTick, NetDataReader reader);
+        void ReadServerStateAtClient(uint peerTick, NetDataReader reader);
         Bounds GetMovementBounds();
     }
 }

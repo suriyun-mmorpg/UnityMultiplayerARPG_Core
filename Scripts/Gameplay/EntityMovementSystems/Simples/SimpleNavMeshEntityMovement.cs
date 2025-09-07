@@ -139,7 +139,7 @@ namespace MultiplayerARPG
 
         private bool NetworkedTransform_onValidateInterpolation(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, LiteNetLibTransform.TransformData currentData, float interpTime)
         {
-            if (IsServer && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            if (IsServer && _serverTeleportState != MovementTeleportState.None)
             {
                 // Waiting for client teleport confirmation
                 return false;
@@ -309,7 +309,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(NavMeshEntityMovement), $"Teleport function shouldn't be called at client {name}");
                 return;
             }
-            if (_serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            if (_serverTeleportState != MovementTeleportState.None)
             {
                 // Still waiting for teleport responding
                 return;
@@ -361,7 +361,7 @@ namespace MultiplayerARPG
 
         public async UniTask WaitClientTeleportConfirm()
         {
-            while (this != null && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            while (this != null && _serverTeleportState != MovementTeleportState.None)
             {
                 await UniTask.Delay(100);
             }
@@ -369,7 +369,7 @@ namespace MultiplayerARPG
 
         public bool IsWaitingClientTeleportConfirm()
         {
-            return _serverTeleportState.Has(MovementTeleportState.WaitingForResponse);
+            return _serverTeleportState != MovementTeleportState.None;
         }
 
         protected float GetPathRemainingDistance()
@@ -505,7 +505,7 @@ namespace MultiplayerARPG
             EntityTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);
         }
 
-        public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteClientState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
         {
             if (_clientTeleportState.Has(MovementTeleportState.Responding))
             {
@@ -518,7 +518,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteServerState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
         {
             if (_serverTeleportState.Has(MovementTeleportState.Requesting))
             {
@@ -535,7 +535,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
+        public void ReadClientStateAtServer(uint peerTick, NetDataReader reader)
         {
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Responding))
@@ -545,7 +545,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public async void ReadServerStateAtClient(uint peerTick, NetDataReader reader)
         {
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Requesting))

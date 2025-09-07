@@ -127,6 +127,7 @@ namespace MultiplayerARPG
         // Teleportation
         protected int _lastTeleportFrame;
         protected MovementTeleportState _serverTeleportState;
+        protected uint _teleportRespondedTick;
         protected MovementTeleportState _clientTeleportState;
 
         // State simulate codes
@@ -281,13 +282,13 @@ namespace MultiplayerARPG
 
                 syncData.Tick = updater.LocalTick;
                 // Stored buffers will be send later
-                StoreSyncBuffer(syncData);
+                StoreSyncBuffer(syncData, 3);
             }
 
             if (IsOwnerClientOrOwnedByServer)
             {
                 _currentInput.Tick = _simTick - 1;
-                StoreInputBuffer(_currentInput);
+                StoreInputBuffer(_currentInput, 3);
                 _willResetInput = true;
             }
         }
@@ -625,34 +626,14 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (Vector3.Distance(EntityTransform.position, _interpToData.Position) >= interpSnapThreshold)
-            {
-                MovementSyncData3D interpFromData = _interpFromData;
-                interpFromData.Position = _interpToData.Position;
-                interpFromData.Rotation = _interpToData.Rotation;
-                interpFromData.MovementState = _interpToData.MovementState;
-                interpFromData.ExtraMovementState = _interpToData.ExtraMovementState;
-                _interpFromData = interpFromData;
-                _interpBuffers[interpFromData.Tick] = interpFromData;
-                EntityTransform.position = _interpToData.Position;
-                _prevPos = EntityTransform.position;
-                EntityTransform.rotation = Quaternion.Euler(0f, _interpToData.Rotation, 0f);
-                MovementState = _interpToData.MovementState;
-                ExtraMovementState = _interpToData.ExtraMovementState;
-            }
-            else
-            {
-                float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
-                Vector3 position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
-                EntityTransform.position = position;
-                _prevPos = EntityTransform.position;
-                float rotation = Mathf.LerpAngle(_interpFromData.Rotation, _interpToData.Rotation, t);
-                EntityTransform.rotation = Quaternion.Euler(0f, rotation, 0f);
-                MovementState = t < 0.75f ? _interpFromData.MovementState : _interpToData.MovementState;
-                ExtraMovementState = t < 0.75f ? _interpFromData.ExtraMovementState : _interpToData.ExtraMovementState;
-            }
+            float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
+            Vector3 position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
+            EntityTransform.position = position;
+            float rotation = Mathf.LerpAngle(_interpFromData.Rotation, _interpToData.Rotation, t);
+            EntityTransform.rotation = Quaternion.Euler(0f, rotation, 0f);
+            MovementState = t < 0.75f ? _interpFromData.MovementState : _interpToData.MovementState;
+            ExtraMovementState = t < 0.75f ? _interpFromData.ExtraMovementState : _interpToData.ExtraMovementState;
         }
-        private Vector3 _prevPos;
 
         protected bool TryGetInputBuffer(out MovementInputData3D inputData, byte maxLookback = 2)
         {
@@ -670,7 +651,7 @@ namespace MultiplayerARPG
             return false;
         }
 
-        protected void StoreInputBuffer(MovementInputData3D entry, int maxBuffers = 3)
+        protected void StoreInputBuffer(MovementInputData3D entry, int maxBuffers)
         {
             if (!_inputBuffers.ContainsKey(entry.Tick))
             {
@@ -683,11 +664,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void StoreInputBuffers(MovementInputData3D[] data, int size, int maxBuffers = 3)
+        protected void StoreInputBuffers(MovementInputData3D[] data, int size, uint acceptTick, int maxBuffers)
         {
             for (int i = 0; i < size; ++i)
             {
                 MovementInputData3D entry = data[i];
+                if (entry.Tick < acceptTick)
+                {
+                    // Don't accept this tick
+                    continue;
+                }
                 if (_inputBuffers.ContainsKey(entry.Tick))
                 {
                     // This tick is already stored
@@ -702,7 +688,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void StoreSyncBuffer(MovementSyncData3D entry, int maxBuffers = 3)
+        protected void StoreSyncBuffer(MovementSyncData3D entry, int maxBuffers)
         {
             if (!_syncBuffers.ContainsKey(entry.Tick))
             {
@@ -715,11 +701,16 @@ namespace MultiplayerARPG
             }
         }
 
-        protected void StoreInterpolateBuffers(MovementSyncData3D[] data, int size, int maxBuffers = 3)
+        protected void StoreInterpolateBuffers(MovementSyncData3D[] data, int size, uint acceptTick, int maxBuffers)
         {
             for (int i = 0; i < size; ++i)
             {
                 MovementSyncData3D entry = data[i];
+                if (entry.Tick < acceptTick)
+                {
+                    // Don't accept this tick
+                    continue;
+                }
                 if (_interpBuffers.ContainsKey(entry.Tick))
                 {
                     // This tick is already stored
@@ -1308,7 +1299,7 @@ namespace MultiplayerARPG
             _groundedTransform = null;
         }
 
-        public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteClientState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
         {
             if (_clientTeleportState.Has(MovementTeleportState.Responding))
             {
@@ -1343,7 +1334,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteServerState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
         {
             if (_serverTeleportState.Has(MovementTeleportState.Requesting))
             {
@@ -1368,11 +1359,12 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
+        public void ReadClientStateAtServer(uint peerTick, NetDataReader reader)
         {
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Responding))
             {
+                _teleportRespondedTick = peerTick;
                 _serverTeleportState = MovementTeleportState.Responded;
                 return;
             }
@@ -1402,7 +1394,7 @@ namespace MultiplayerARPG
                     if (!IsOwnerClient)
                     {
                         maxBuffers = _serverTeleportState == MovementTeleportState.Responded ? 1 : 30;
-                        StoreInputBuffers(inputBuffers, size, maxBuffers);
+                        StoreInputBuffers(inputBuffers, size, _teleportRespondedTick, maxBuffers);
                         uint simTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
                         if (Entity.Player != null)
                             simTick += LogicUpdater.TimeToTick(Entity.Player.Rtt / 2, _logicUpdater.DeltaTime);
@@ -1424,7 +1416,7 @@ namespace MultiplayerARPG
                         interpoationBuffers[i] = reader.Get<MovementSyncData3D>();
                     }
                     maxBuffers = _serverTeleportState == MovementTeleportState.Responded ? 1 : 30;
-                    StoreInterpolateBuffers(interpoationBuffers, size, maxBuffers);
+                    StoreInterpolateBuffers(interpoationBuffers, size, _teleportRespondedTick, maxBuffers);
                     uint interpTick = _interpBuffers.Keys[_interpBuffers.Count - 1];
                     if (Entity.Player != null)
                         interpTick += LogicUpdater.TimeToTick(Entity.Player.Rtt / 2, _logicUpdater.DeltaTime);
@@ -1435,7 +1427,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public async void ReadServerStateAtClient(uint peerTick, NetDataReader reader)
         {
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Requesting))
@@ -1460,7 +1452,7 @@ namespace MultiplayerARPG
             }
             if (!IsServer)
             {
-                StoreInterpolateBuffers(interpoationBuffers, size, 30);
+                StoreInterpolateBuffers(interpoationBuffers, size, 0, 30);
                 SetupInterpolationTick(_interpBuffers.Keys[_interpBuffers.Count - 1]);
             }
             ArrayPool<MovementSyncData3D>.Shared.Return(interpoationBuffers);
