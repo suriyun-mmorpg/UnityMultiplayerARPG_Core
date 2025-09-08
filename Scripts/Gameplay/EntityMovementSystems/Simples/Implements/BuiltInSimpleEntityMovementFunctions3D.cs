@@ -182,15 +182,15 @@ namespace MultiplayerARPG
 
         protected void NetworkedTransform_onWriteSyncBuffer(NetDataWriter writer, uint tick)
         {
-            writer.Put((byte)MovementState);
-            writer.Put((byte)ExtraMovementState);
+            writer.PutPackedUInt((uint)MovementState);
+            writer.PutPackedUInt((uint)ExtraMovementState);
         }
 
         protected void NetworkedTransform_onReadInterpBuffer(NetDataReader reader, uint tick)
         {
             _interpExtra[tick] = new System.ValueTuple<MovementState, ExtraMovementState>(
-                (MovementState)reader.GetByte(),
-                (ExtraMovementState)reader.GetByte());
+                (MovementState)reader.GetPackedUInt(),
+                (ExtraMovementState)reader.GetPackedUInt());
             while (_interpExtra.Count > 30)
             {
                 _interpExtra.RemoveAt(0);

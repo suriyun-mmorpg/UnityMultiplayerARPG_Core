@@ -78,6 +78,8 @@ namespace MultiplayerARPG
         protected string firstPersonCameraRotationSpeedScaleSaveKey = "1ST_PERSON_CAMERA_SCALE";
         [SerializeField]
         protected float sprintDelayAfterActions = 1f;
+        [SerializeField]
+        protected float walkDelayAfterActions = 1f;
 
         [Header("TPS Settings")]
         [SerializeField]
@@ -85,11 +87,13 @@ namespace MultiplayerARPG
         [SerializeField]
         protected Vector3 tpsTargetOffset = new Vector3(0.75f, 1.25f, 0f);
         [SerializeField]
+        protected Vector3 tpsTargetOffsetWhileSprinting = new Vector3(0.75f, 0.5f, 0f);
+        [SerializeField]
+        protected Vector3 tpsTargetOffsetWhileWalking = new Vector3(0.75f, 0.5f, 0f);
+        [SerializeField]
         protected Vector3 tpsTargetOffsetWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
         [SerializeField]
         protected Vector3 tpsTargetOffsetWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
-        [SerializeField]
-        protected Vector3 tpsTargetOffsetWhileSprinting = new Vector3(0.75f, 0.5f, 0f);
         [SerializeField]
         protected float tpsTargetOffsetDamping = 10f;
         [SerializeField]
@@ -135,6 +139,8 @@ namespace MultiplayerARPG
         protected Vector3 shoulderTargetOffset = new Vector3(0f, 0f, 0f);
         [SerializeField]
         protected Vector3 shoulderTargetOffsetWhileSprinting = new Vector3(0f, -0.25f, 0f);
+        [SerializeField]
+        protected Vector3 shoulderTargetOffsetWhileWalking = new Vector3(0f, -0.25f, 0f);
         [SerializeField]
         protected Vector3 shoulderTargetOffsetWhileCrouching = new Vector3(0f, -0.25f, 0f);
         [SerializeField]
@@ -333,6 +339,8 @@ namespace MultiplayerARPG
                                 return shoulderTargetOffsetWhileCrawling;
                             case ExtraMovementState.IsSprinting:
                                 return shoulderTargetOffsetWhileSprinting;
+                            case ExtraMovementState.IsWalking:
+                                return shoulderTargetOffsetWhileWalking;
                             default:
                                 return shoulderTargetOffset;
                         }
@@ -345,6 +353,8 @@ namespace MultiplayerARPG
                                 return tpsTargetOffsetWhileCrawling;
                             case ExtraMovementState.IsSprinting:
                                 return tpsTargetOffsetWhileSprinting;
+                            case ExtraMovementState.IsWalking:
+                                return tpsTargetOffsetWhileWalking;
                             default:
                                 return tpsTargetOffset;
                         }
@@ -805,13 +815,7 @@ namespace MultiplayerARPG
             }
             else if (PlayingCharacterEntity.MovementState.Has(MovementState.IsGrounded))
             {
-                if (DetectExtraActive("Walk", walkActiveMode, isBlockController, ref _toggleWalkOn))
-                {
-                    _extraMovementState = ExtraMovementState.IsWalking;
-                    _toggleSprintOn = false;
-                    _toggleCrouchOn = false;
-                    _toggleCrawlOn = false;
-                }
+                // Crouch
                 if (DetectExtraActive("Crouch", crouchActiveMode, isBlockController, ref _toggleCrouchOn))
                 {
                     if (_toggleCrouchOn && (_previouslyCrouch || PlayingCharacterEntity.AllowToCrouch()))
@@ -827,6 +831,7 @@ namespace MultiplayerARPG
                         ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_UNABLE_TO_CROUCH);
                     }
                 }
+                // Crawl
                 if (DetectExtraActive("Crawl", crawlActiveMode, isBlockController, ref _toggleCrawlOn))
                 {
                     if (_toggleCrawlOn && (_previouslyCrawl || PlayingCharacterEntity.AllowToCrawl()))
@@ -843,6 +848,31 @@ namespace MultiplayerARPG
                     }
                 }
                 // Stand animations
+                // Stand up from crouching/crawling
+                if ((_previouslyCrouch || _previouslyCrawl) && !_toggleCrouchOn && !_toggleCrawlOn)
+                {
+                    if (PlayingCharacterEntity.AllowToStand())
+                    {
+                        _extraMovementState = ExtraMovementState.None;
+                        _toggleSprintOn = false;
+                        _toggleWalkOn = false;
+                        _toggleCrouchOn = false;
+                        _toggleCrawlOn = false;
+                    }
+                    else if (_previouslyCrouch)
+                    {
+                        _extraMovementState = ExtraMovementState.IsCrouching;
+                        _toggleCrouchOn = true;
+                        ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_UNABLE_TO_STAND);
+                    }
+                    else if (_previouslyCrawl)
+                    {
+                        _extraMovementState = ExtraMovementState.IsCrawling;
+                        _toggleCrawlOn = true;
+                        ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_UNABLE_TO_STAND);
+                    }
+                }
+                // Sprinting
                 if (PlayingCharacterEntity.MovementState.HasDirectionMovement() &&
                     Time.unscaledTime - _lastActionTime > sprintDelayAfterActions)
                 {
@@ -857,6 +887,28 @@ namespace MultiplayerARPG
                     }
                 }
                 else if (_extraMovementState == ExtraMovementState.IsSprinting)
+                {
+                    _extraMovementState = ExtraMovementState.None;
+                    _toggleSprintOn = false;
+                    _toggleWalkOn = false;
+                    _toggleCrouchOn = false;
+                    _toggleCrawlOn = false;
+                }
+                // Walking
+                if (PlayingCharacterEntity.MovementState.HasDirectionMovement() &&
+                    Time.unscaledTime - _lastActionTime > walkDelayAfterActions)
+                {
+                    if ((_extraMovementState == ExtraMovementState.None ||
+                        _extraMovementState == ExtraMovementState.IsWalking) &&
+                        DetectExtraActive("Walk", walkActiveMode, isBlockController, ref _toggleWalkOn))
+                    {
+                        _extraMovementState = ExtraMovementState.IsWalking;
+                        _toggleSprintOn = false;
+                        _toggleCrouchOn = false;
+                        _toggleCrawlOn = false;
+                    }
+                }
+                else if (_extraMovementState == ExtraMovementState.IsWalking)
                 {
                     _extraMovementState = ExtraMovementState.None;
                     _toggleSprintOn = false;

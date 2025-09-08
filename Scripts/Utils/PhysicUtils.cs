@@ -232,57 +232,6 @@ public static class PhysicUtils
         return foundGround;
     }
 
-    public static Vector3 FindGroundedPositionWithCapsule(Vector3 origin, Quaternion rotation, Vector3 capsuleCenter, float capsuleRadius, float capsuleHeight, int raycastLength, float distance, int layerMask, Transform excludingObject = null, float upOffsetsRate = 0.5f)
-    {
-        return FindGroundedPositionWithCapsule(origin, rotation, capsuleCenter, capsuleRadius, capsuleHeight, new RaycastHit[raycastLength], distance, layerMask, excludingObject, upOffsetsRate);
-    }
-
-    public static Vector3 FindGroundedPositionWithCapsule(Vector3 origin, Quaternion rotation, Vector3 capsuleCenter, float capsuleRadius, float capsuleHeight, RaycastHit[] allocHits, float distance, int layerMask, Transform excludingObject = null, float upOffsetsRate = 0.5f)
-    {
-        FindGroundedPositionWithCapsule(origin, rotation, capsuleCenter, capsuleRadius, capsuleHeight, allocHits, distance, layerMask, out Vector3 result, excludingObject, upOffsetsRate);
-        return result;
-    }
-
-    public static bool FindGroundedPositionWithCapsule(Vector3 origin, Quaternion rotation, Vector3 capsuleCenter, float capsuleRadius, float capsuleHeight, RaycastHit[] allocHits, float distance, int layerMask, out Vector3 result, Transform excludingObject = null, float upOffsetsRate = 0.5f)
-    {
-        result = origin;
-        float sideHeight = capsuleHeight - capsuleRadius * 2.0f;
-        Vector3 worldUp = Vector3.up;
-
-        Vector3 bottomCenterHemi = capsuleCenter - (worldUp * capsuleHeight * 0.5f) + (worldUp * capsuleRadius);
-        Vector3 topCenterHemi = capsuleCenter + (worldUp * capsuleHeight * 0.5f) - (worldUp * capsuleRadius);
-
-        Vector3 bottom = origin + (rotation * bottomCenterHemi) + (Vector3.up * distance * upOffsetsRate);
-        Vector3 top = origin + (rotation * topCenterHemi) + (Vector3.up * distance * upOffsetsRate);
-
-        float nearestDistance = float.MaxValue;
-        bool foundGround = false;
-        float tempDistance;
-        // Capsule cast to find hit floor
-        int hitCount = Physics.CapsuleCastNonAlloc(
-            bottom,
-            top,
-            capsuleRadius,
-            Vector3.down,
-            allocHits,
-            distance,
-            layerMask,
-            QueryTriggerInteraction.Ignore);
-        for (int i = hitCount - 1; i >= 0; --i)
-        {
-            if (excludingObject != null && excludingObject.root == allocHits[i].transform.root)
-                continue;
-            tempDistance = Vector3.Distance(origin, allocHits[i].point);
-            if (tempDistance < nearestDistance)
-            {
-                result = allocHits[i].point;
-                nearestDistance = tempDistance;
-                foundGround = true;
-            }
-        }
-        return foundGround;
-    }
-
     /// <summary>
     /// Sort ASC by distance from position to collider's position
     /// </summary>
