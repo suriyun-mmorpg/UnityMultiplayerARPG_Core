@@ -25,6 +25,8 @@ namespace MultiplayerARPG
             gizmosColor = Color.blue
 #endif
         };
+        public Settings StandSettings => standSettings;
+
         [SerializeField]
         private Settings crouchSettings = new Settings()
         {
@@ -32,6 +34,8 @@ namespace MultiplayerARPG
             gizmosColor = Color.magenta
 #endif
         };
+        public Settings CrouchSettings => crouchSettings;
+
         [SerializeField]
         private Settings crawlSettings = new Settings()
         {
@@ -39,6 +43,8 @@ namespace MultiplayerARPG
             gizmosColor = Color.red
 #endif
         };
+        public Settings CrawlSettings => crawlSettings;
+
         [SerializeField]
         private Settings swimSettings = new Settings()
         {
@@ -46,6 +52,7 @@ namespace MultiplayerARPG
             gizmosColor = Color.yellow
 #endif
         };
+        public Settings SwimSettings => swimSettings;
 
         private CharacterController _characterController;
         private bool _previousIsUnderWater;

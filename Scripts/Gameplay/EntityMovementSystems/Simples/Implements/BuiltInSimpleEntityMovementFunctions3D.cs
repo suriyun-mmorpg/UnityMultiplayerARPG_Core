@@ -199,7 +199,7 @@ namespace MultiplayerARPG
 
         private bool NetworkedTransform_onValidateInterpolation(LiteNetLibTransform.TransformData interpFromData, LiteNetLibTransform.TransformData interpToData, LiteNetLibTransform.TransformData currentData, float interpTime)
         {
-            if (IsServer && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            if (IsServer && _serverTeleportState != MovementTeleportState.None)
             {
                 // Waiting for client teleport confirmation
                 return false;
@@ -327,7 +327,7 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(BuiltInEntityMovementFunctions3D), $"Teleport function shouldn't be called at client [{Entity.name}]");
                 return;
             }
-            if (_serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            if (_serverTeleportState != MovementTeleportState.None)
             {
                 // Still waiting for teleport responding
                 return;
@@ -1032,6 +1032,7 @@ namespace MultiplayerARPG
                 NavPaths = null;
             }
             _lastTeleportFrame = Time.frameCount;
+            EntityTransform.position = position;
             EntityMovement.SetPosition(position);
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             TurnImmediately(rotation.eulerAngles.y);
@@ -1068,7 +1069,7 @@ namespace MultiplayerARPG
 
         public async UniTask WaitClientTeleportConfirm()
         {
-            while (this != null && _serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
+            while (this != null && _serverTeleportState != MovementTeleportState.None)
             {
                 await UniTask.Delay(100);
             }
@@ -1076,7 +1077,7 @@ namespace MultiplayerARPG
 
         public bool IsWaitingClientTeleportConfirm()
         {
-            return _serverTeleportState.Has(MovementTeleportState.WaitingForResponse);
+            return _serverTeleportState != MovementTeleportState.None;
         }
     }
 }

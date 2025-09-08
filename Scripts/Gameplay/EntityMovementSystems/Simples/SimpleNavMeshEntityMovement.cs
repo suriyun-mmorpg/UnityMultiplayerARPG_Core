@@ -587,5 +587,10 @@ namespace MultiplayerARPG
         {
             return true;
         }
+
+        public bool AllowToStand()
+        {
+            return true;
+        }
     }
 }

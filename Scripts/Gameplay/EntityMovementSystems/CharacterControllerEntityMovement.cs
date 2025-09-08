@@ -122,6 +122,7 @@ namespace MultiplayerARPG
             private set => _cacheCharacterController = value;
         }
         public BuiltInEntityMovementFunctions3D Functions { get; private set; }
+        public MovementColliderAdjustment ColliderAdjustment { get; private set; }
 
         public float StoppingDistance { get { return Functions.StoppingDistance; } }
         public MovementState MovementState { get { return Functions.MovementState; } }
@@ -333,6 +334,8 @@ namespace MultiplayerARPG
 
         protected virtual bool AllowToJumpOrDash()
         {
+            if (!AllowToStand())
+                return false;
             if (Time.frameCount == _allowToJumpOrDashCheckFrame)
                 return _isAllowToJumpOrDash;
             _allowToJumpOrDashCheckFrame = Time.frameCount;
@@ -342,7 +345,13 @@ namespace MultiplayerARPG
 
         public bool AllowToCrouch()
         {
-            return true;
+            if (ColliderAdjustment == null)
+                return true;
+            int hitCount = Physics.CapsuleCastNonAlloc(
+                EntityTransform.position, EntityTransform.position + Vector3.up * ColliderAdjustment.CrouchSettings.height,
+                ColliderAdjustment.CrouchSettings.radius, Vector3.up, s_findGroundRaycastHits, 0.1f,
+                GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+            return hitCount <= 0;
         }
 
         public bool AllowToCrawl()
@@ -352,11 +361,25 @@ namespace MultiplayerARPG
             Vector3 raycastOrigin = GetCrawlCheckCenter();
             for (int i = 0; i < crawlCheckRaycasts; ++i)
             {
-                int hitCount = Physics.RaycastNonAlloc(raycastOrigin, Quaternion.Euler(0f, _crawlRaycastDegrees[i], 0f) * EntityTransform.forward, s_findGroundRaycastHits, crawlCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+                int hitCount = Physics.RaycastNonAlloc(
+                    raycastOrigin, Quaternion.Euler(0f, _crawlRaycastDegrees[i], 0f) * EntityTransform.forward, 
+                    s_findGroundRaycastHits, crawlCheckRadius,
+                    GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
                 if (hitCount > 0)
                     return false;
             }
             return true;
+        }
+
+        public bool AllowToStand()
+        {
+            if (ColliderAdjustment == null)
+                return true;
+            int hitCount = Physics.CapsuleCastNonAlloc(
+                EntityTransform.position, EntityTransform.position + Vector3.up * ColliderAdjustment.StandSettings.height,
+                ColliderAdjustment.StandSettings.radius, Vector3.up, s_findGroundRaycastHits, 0.1f,
+                GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
+            return hitCount <= 0;
         }
 
         private Vector3 AdjustCrawlMotion(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion)
