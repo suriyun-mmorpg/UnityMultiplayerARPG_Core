@@ -184,10 +184,6 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null)
             {
-                if (playerCharacterEntity.ReloadComponent.IsReloading)
-                {
-                    playerCharacterEntity.ReloadComponent.CancelReload();
-                }
                 if (!playerCharacterEntity.CanEquipItem())
                 {
                     result.InvokeError(new ResponseSwitchEquipWeaponSetMessage()
