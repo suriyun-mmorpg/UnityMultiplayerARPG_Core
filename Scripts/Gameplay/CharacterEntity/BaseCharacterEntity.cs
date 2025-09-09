@@ -140,6 +140,7 @@ namespace MultiplayerARPG
         public float RespawnGroundedCheckCountDown { get; protected set; }
         public float RespawnInvincibleCountDown { get; protected set; }
         public float LastUseItemTime { get; set; }
+        public float LastActionEndTime => Mathf.Max(LastAttackEndTime, LastUseSkillEndTime, LastReloadEndTime);
 
         protected int _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         protected float _lastActionTime;

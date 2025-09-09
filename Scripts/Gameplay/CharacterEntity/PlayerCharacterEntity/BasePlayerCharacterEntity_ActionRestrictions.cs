@@ -1,3 +1,5 @@
+using UnityEngine;
+
 namespace MultiplayerARPG
 {
     public partial class BasePlayerCharacterEntity
@@ -19,7 +21,7 @@ namespace MultiplayerARPG
             return base.CanDoActions() && !IsDealing && !IsVendingStarted && !IsWarping;
         }
 
-        public override bool CanEquipItem()
+        public bool CanManageItem()
         {
             if (IsWarping)
                 return false;
@@ -27,22 +29,27 @@ namespace MultiplayerARPG
                 return false;
             if (IsDealing)
                 return false;
-            if (!CanDoActions())
+            if (IsVendingStarted)
+                return false;
+            if (IsAttacking)
+                return false;
+            if (IsUsingSkill)
+                return false;
+            if (IsReloading)
+                return false;
+            if (IsPlayingActionAnimation())
                 return false;
             return true;
         }
 
+        public override bool CanEquipItem()
+        {
+            return CanManageItem() && Time.unscaledTime - LastActionEndTime > 0.5f;
+        }
+
         public override bool CanUnEquipItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem() && Time.unscaledTime - LastActionEndTime > 0.5f;
         }
 
         public override bool CanPickup()
@@ -73,67 +80,27 @@ namespace MultiplayerARPG
 
         public override bool CanRepairItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem();
         }
 
         public override bool CanRefineItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem();
         }
 
         public override bool CanEnhanceSocketItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem();
         }
 
         public override bool CanRemoveEnhancerFromItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem();
         }
 
         public override bool CanDismantleItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem();
         }
 
         public override bool CanSellItem()
@@ -151,15 +118,7 @@ namespace MultiplayerARPG
 
         public override bool CanMoveItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem();
         }
 
         public override bool CanUseItem()
@@ -175,28 +134,12 @@ namespace MultiplayerARPG
 
         public override bool CanChangeAmmoItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem();
         }
 
         public override bool CanRemoveAmmoFromItem()
         {
-            if (IsWarping)
-                return false;
-            if (IsUpdatingItems)
-                return false;
-            if (IsDealing)
-                return false;
-            if (!CanDoActions())
-                return false;
-            return true;
+            return CanManageItem();
         }
     }
 }
