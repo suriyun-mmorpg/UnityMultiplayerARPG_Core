@@ -199,6 +199,9 @@ namespace MultiplayerARPG
             playerCharacter.FillWeaponSetsIfNeeded(equipWeaponSet);
             playerCharacter.EquipWeaponSet = equipWeaponSet;
 
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.ForceMakeCaches();
+
             result.InvokeSuccess(new ResponseSwitchEquipWeaponSetMessage());
             return default;
         }
