@@ -1,146 +1,217 @@
 using System.Collections.Generic;
+using System.IO;
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
 using UnityEditor.Build.Pipeline.Utilities;
+using UnityEditor.Build.Reporting;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public static class Builder
     {
-        [MenuItem(EditorMenuConsts.PREPARE_ADDRESSABLE_ASSETS_MENU, false, EditorMenuConsts.PREPARE_ADDRESSABLE_ASSETS_ORDER)]
-        public static void PrepareAddressableAssets()
+        public static void Build(BuildTarget target, StandaloneBuildSubtarget subTarget)
         {
-            // Delete all from both server and client
-            foreach (var group in EditorGlobalData.SettingsInstance.serverAddressableGroups)
+            string outputPath = $"./Builds/{target}";
+            string exeName = "Build.exe";
+            string bundleVersion = PlayerSettings.bundleVersion;
+            string addressableProfileName = "Default";
+
+            string versionCode = "";
+            string keystoreName = PlayerSettings.Android.keystoreName;
+            string keystorePass = PlayerSettings.Android.keystorePass;
+            string keyaliasName = PlayerSettings.Android.keyaliasName;
+            string keyaliasPass = PlayerSettings.Android.keyaliasPass;
+            bool buildAppBundle = EditorUserBuildSettings.buildAppBundle;
+
+            bool cleanContent = false;
+            bool purgeCache = false;
+            bool generateMapServerDockerfile = false;
+            int mapServerPortInDockerfile = 6000;
+
+            switch (target)
             {
-                AddressableAssetSettingsDefaultObject.Settings.groups.Remove(group);
+                case BuildTarget.Android:
+                    versionCode = PlayerSettings.Android.bundleVersionCode.ToString();
+                    break;
+                case BuildTarget.iOS:
+                    versionCode = PlayerSettings.iOS.buildNumber;
+                    break;
             }
-            foreach (var group in EditorGlobalData.SettingsInstance.clientAddressableGroups)
+
+            string[] args = System.Environment.GetCommandLineArgs();
+            for (int i = 0; i < args.Length; ++i)
             {
-                AddressableAssetSettingsDefaultObject.Settings.groups.Remove(group);
+                if (args[i].ToLower().Equals("-outputpath") && i + 1 < args.Length)
+                    outputPath = args[i + 1];
+                if (args[i].ToLower().Equals("-exename") && i + 1 < args.Length)
+                    exeName = args[i + 1];
+                if (args[i].ToLower().Equals("-bundleversion") && i + 1 < args.Length)
+                    bundleVersion = args[i + 1];
+                if (args[i].ToLower().Equals("-versioncode") && i + 1 < args.Length)
+                    versionCode = args[i + 1];
+                if (args[i].ToLower().Equals("-keystorename") && i + 1 < args.Length)
+                    keystoreName = args[i + 1];
+                if (args[i].ToLower().Equals("-keystorepass") && i + 1 < args.Length)
+                    keystorePass = args[i + 1];
+                if (args[i].ToLower().Equals("-keyaliasname") && i + 1 < args.Length)
+                    keyaliasName = args[i + 1];
+                if (args[i].ToLower().Equals("-keyaliaspass") && i + 1 < args.Length)
+                    keyaliasPass = args[i + 1];
+                if (args[i].ToLower().Equals("-addressableprofilename") && i + 1 < args.Length)
+                    addressableProfileName = args[i + 1];
+                if (args[i].ToLower().Equals("-buildappbundle") && i + 1 < args.Length)
+                    buildAppBundle = bool.Parse(args[i + 1]);
+                if (args[i].ToLower().Equals("-cleancontent") && i + 1 < args.Length)
+                    cleanContent = bool.Parse(args[i + 1]);
+                if (args[i].ToLower().Equals("-purgecache") && i + 1 < args.Length)
+                    purgeCache = bool.Parse(args[i + 1]);
+                if (args[i].ToLower().Equals("-generatemapserverdockerfile") && i + 1 < args.Length)
+                    generateMapServerDockerfile = bool.Parse(args[i + 1]);
+                if (args[i].ToLower().Equals("-mapserverportindockerfile") && i + 1 < args.Length)
+                    mapServerPortInDockerfile = int.Parse(args[i + 1]);
             }
-#if UNITY_SERVER
-            string profileName = EditorGlobalData.SettingsInstance.serverBuildProfileName;
-            if (!string.IsNullOrWhiteSpace(profileName) &&
-                AddressableAssetSettingsDefaultObject.Settings.profileSettings.GetAllProfileNames().Contains(profileName))
-                AddressableAssetSettingsDefaultObject.Settings.activeProfileId = AddressableAssetSettingsDefaultObject.Settings.profileSettings.GetProfileId(profileName);
-            foreach (var group in EditorGlobalData.SettingsInstance.serverAddressableGroups)
+
+            if (string.IsNullOrEmpty(outputPath))
             {
-                AddressableAssetSettingsDefaultObject.Settings.groups.Add(group);
+                Debug.LogError("No output path");
+                return;
             }
+
+            switch (target)
+            {
+                case BuildTarget.Android:
+                    PlayerSettings.Android.bundleVersionCode = int.Parse(versionCode);
+                    PlayerSettings.Android.keystoreName = keystoreName;
+                    PlayerSettings.Android.keystorePass = keystorePass;
+                    PlayerSettings.Android.keyaliasName = keyaliasName;
+                    PlayerSettings.Android.keyaliasPass = keyaliasPass;
+                    EditorUserBuildSettings.buildAppBundle = buildAppBundle;
+                    break;
+                case BuildTarget.iOS:
+                    PlayerSettings.iOS.buildNumber = versionCode;
+                    break;
+            }
+
+            PlayerSettings.bundleVersion = bundleVersion;
+
+            List<string> scenes = new List<string>();
+            for (int i = 0; i < EditorBuildSettings.scenes.Length; ++i)
+            {
+                if (EditorBuildSettings.scenes[i].enabled)
+                {
+                    scenes.Add(EditorBuildSettings.scenes[i].path);
+                    Debug.Log($"Add {EditorBuildSettings.scenes[i].path} to scenes in build list.");
+                }
+            }
+
+#if UNITY_2021_1_OR_NEWER
+            BuildPlayerOptions options = new BuildPlayerOptions
+            {
+                target = target,
+                options = BuildOptions.None,
+                subtarget = (int)subTarget,
+                locationPathName = Path.Combine(outputPath, exeName),
+                scenes = scenes.ToArray(),
+            };
 #else
-            string profileName = EditorGlobalData.SettingsInstance.clientBuildProfileName;
-            if (!string.IsNullOrWhiteSpace(profileName) &&
-                AddressableAssetSettingsDefaultObject.Settings.profileSettings.GetAllProfileNames().Contains(profileName))
-                AddressableAssetSettingsDefaultObject.Settings.activeProfileId = AddressableAssetSettingsDefaultObject.Settings.profileSettings.GetProfileId(profileName);
-            foreach (var group in EditorGlobalData.SettingsInstance.clientAddressableGroups)
+            BuildPlayerOptions options = new BuildPlayerOptions
             {
-                AddressableAssetSettingsDefaultObject.Settings.groups.Add(group);
-            }
+                target = target,
+                options = BuildOptions.None,
+                locationPathName = Path.Combine(outputPath, exeName),
+                scenes = scenes.ToArray(),
+            };
 #endif
+            AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
+            string profileId = settings.profileSettings.GetProfileId(addressableProfileName);
+            settings.activeProfileId = profileId;
+            AddressableAssetSettings.PlayerBuildOption preChangeBuildOption = settings.BuildAddressablesWithPlayerBuild;
+            settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.BuildWithPlayer;
+            if (cleanContent)
+                CleanAddressablePlayerContent();
+            if (purgeCache)
+                PurgeBuildCache();
+            BuildReport report = BuildPipeline.BuildPlayer(options);
+            if (generateMapServerDockerfile)
+                GenerateMapServerDockerfile(outputPath, exeName, mapServerPortInDockerfile);
+            Debug.Log($"Build {target}, {subTarget}, v.{bundleVersion}({versionCode}), aa profile: {addressableProfileName}\nResult: {report.summary.result}");
+            settings.BuildAddressablesWithPlayerBuild = preChangeBuildOption;
+            EditorApplication.Exit(0);
         }
 
         public static void BuildWindows64Server()
         {
-            string outputPath = string.Empty;
-            string[] args = System.Environment.GetCommandLineArgs();
-            for (int i = 0; i < args.Length; ++i)
-            {
-                if (args[i].Equals("-outputPath") && i + 1 < args.Length)
-                    outputPath = args[i + 1];
-            }
-
-            if (string.IsNullOrEmpty(outputPath))
-            {
-                UnityEngine.Debug.LogError("No output path");
-                return;
-            }
-
-            List<string> scenes = new List<string>();
-            for (int i = 0; i < EditorBuildSettings.scenes.Length; ++i)
-            {
-                if (EditorBuildSettings.scenes[i].enabled)
-                {
-                    scenes.Add(EditorBuildSettings.scenes[i].path);
-                    UnityEngine.Debug.Log($"Add {EditorBuildSettings.scenes[i].path} to scenes in build list.");
-                }
-            }
-#if UNITY_2021_1_OR_NEWER
-            BuildPlayerOptions options = new BuildPlayerOptions
-            {
-                target = BuildTarget.StandaloneWindows64,
-                options = BuildOptions.None,
-                subtarget = (int)StandaloneBuildSubtarget.Server,
-                locationPathName = outputPath,
-                scenes = scenes.ToArray(),
-            };
-#else
-            BuildPlayerOptions options = new BuildPlayerOptions
-            {
-                target = BuildTarget.StandaloneWindows64,
-                options = BuildOptions.None,
-                locationPathName = outputPath,
-                scenes = scenes.ToArray(),
-            };
-#endif
-            PrepareAddressableAssets();
-            AddressableAssetSettingsDefaultObject.Settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
-            AddressableAssetSettings.CleanPlayerContent();
-            BuildCache.PurgeCache(false);
-            AddressableAssetSettings.BuildPlayerContent();
-            BuildPipeline.BuildPlayer(options);
+            Build(BuildTarget.StandaloneWindows64, StandaloneBuildSubtarget.Server);
         }
 
         public static void BuildLinux64Server()
         {
-            string outputPath = string.Empty;
-            string[] args = System.Environment.GetCommandLineArgs();
-            for (int i = 0; i < args.Length; ++i)
-            {
-                if (args[i].Equals("-outputPath") && i + 1 < args.Length)
-                    outputPath = args[i + 1];
-            }
+            Build(BuildTarget.StandaloneLinux64, StandaloneBuildSubtarget.Server);
+        }
 
-            if (string.IsNullOrEmpty(outputPath))
-            {
-                UnityEngine.Debug.LogError("No output path");
-                return;
-            }
+        public static void BuildAndroid()
+        {
+            Build(BuildTarget.Android, StandaloneBuildSubtarget.Player);
+        }
 
-            List<string> scenes = new List<string>();
-            for (int i = 0; i < EditorBuildSettings.scenes.Length; ++i)
-            {
-                if (EditorBuildSettings.scenes[i].enabled)
-                {
-                    scenes.Add(EditorBuildSettings.scenes[i].path);
-                    UnityEngine.Debug.Log($"Add {EditorBuildSettings.scenes[i].path} to scenes in build list.");
-                }
-            }
-#if UNITY_2021_1_OR_NEWER
-            BuildPlayerOptions options = new BuildPlayerOptions
-            {
-                target = BuildTarget.StandaloneLinux64,
-                options = BuildOptions.None,
-                subtarget = (int)StandaloneBuildSubtarget.Server,
-                locationPathName = outputPath,
-                scenes = scenes.ToArray(),
-            };
-#else
-            BuildPlayerOptions options = new BuildPlayerOptions
-            {
-                target = BuildTarget.StandaloneLinux64,
-                options = BuildOptions.None,
-                locationPathName = outputPath,
-                scenes = scenes.ToArray(),
-            };
-#endif
-            PrepareAddressableAssets();
-            AddressableAssetSettingsDefaultObject.Settings.BuildAddressablesWithPlayerBuild = AddressableAssetSettings.PlayerBuildOption.DoNotBuildWithPlayer;
+        public static void BuildiOS()
+        {
+            Build(BuildTarget.iOS, StandaloneBuildSubtarget.Player);
+        }
+
+        public static void CleanAddressablePlayerContent()
+        {
             AddressableAssetSettings.CleanPlayerContent();
+            Debug.Log("Cleaned previous Addressables build output.");
+        }
+
+        public static void PurgeBuildCache()
+        {
             BuildCache.PurgeCache(false);
-            AddressableAssetSettings.BuildPlayerContent();
-            BuildPipeline.BuildPlayer(options);
+            Debug.Log("Purged global SBP build cache.");
+        }
+        public static void GenerateMapServerDockerfile(string buildPath, string exeName, int port = 6000)
+        {
+            string dockerfilePath = Path.Combine(buildPath, "Dockerfile");
+
+            string dockerfileContent = $@"
+# Use a lightweight base image with the necessary dependencies
+FROM ubuntu:20.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install necessary packages
+RUN apt-get update && apt-get install -y \
+    libgcc1 \
+    libgconf-2-4 \
+    libnss3 \
+    libxss1 \
+    libc6-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set the working directory
+WORKDIR /unity-server
+
+# Copy the Unity build to the container
+COPY . /unity-server
+
+# Ensure the server binary has execution permissions
+RUN chmod +x /unity-server/{exeName}
+
+# Expose any ports the server needs to communicate on
+EXPOSE {port}/tcp {port}/udp
+
+# `mapPort` map-server port
+ENV mapPort={port}
+
+# Define the command to run the server
+ENTRYPOINT [""./{exeName}"", ""-batchmode"", ""-nographics"", ""-logfile"", ""/dev/stdout"", ""-startMapServer""]";
+
+            File.WriteAllText(dockerfilePath, dockerfileContent);
+            Debug.Log($"Dockerfile generated at: {dockerfilePath}");
         }
     }
 }
