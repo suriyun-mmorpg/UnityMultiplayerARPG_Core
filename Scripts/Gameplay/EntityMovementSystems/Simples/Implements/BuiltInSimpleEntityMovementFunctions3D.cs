@@ -22,6 +22,9 @@ namespace MultiplayerARPG
         public float jumpHeight = 2f;
         public ApplyJumpForceMode applyJumpForceMode = ApplyJumpForceMode.ApplyImmediately;
         public float applyJumpForceFixedDuration;
+        public float forwardSideMoveSpeedRate = 0.75f;
+        public float sideMoveSpeedRate = 1f;
+        public float backwardSideMoveSpeedRate = 0.75f;
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
@@ -706,9 +709,37 @@ namespace MultiplayerARPG
                 tempHorizontalMoveDirection.y = 0;
                 tempHorizontalMoveDirection.Normalize();
 
-                // If character move backward
-                if (Vector3.Angle(tempHorizontalMoveDirection, EntityTransform.forward) > 120)
-                    tempMaxMoveSpeed *= backwardMoveSpeedRate;
+                // Get angle between move direction and forward
+                float moveAngle = Vector3.Angle(tempHorizontalMoveDirection, EntityTransform.forward);
+
+                // Start with base speed
+                float moveSpeedRate = 1f;
+
+                // Forward (0-34)
+                if (moveAngle < 35f)
+                {
+                    moveSpeedRate = 1f; // full speed
+                }
+                // Forward-side (diagonal, 35-55)
+                else if (moveAngle >= 35f && moveAngle <= 55f)
+                {
+                    moveSpeedRate = forwardSideMoveSpeedRate;
+                }
+                // Pure side (56-124)
+                else if (moveAngle > 55f && moveAngle < 125f)
+                {
+                    moveSpeedRate = sideMoveSpeedRate;
+                }
+                // Backward-side (diagonal, 125-145)
+                else if (moveAngle >= 125f && moveAngle <= 145f)
+                {
+                    moveSpeedRate = backwardSideMoveSpeedRate;
+                }
+                // Backward (146-180)
+                else if (moveAngle > 145f)
+                {
+                    moveSpeedRate = backwardMoveSpeedRate;
+                }
                 CurrentMoveSpeed = tempMaxMoveSpeed;
 
                 // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above

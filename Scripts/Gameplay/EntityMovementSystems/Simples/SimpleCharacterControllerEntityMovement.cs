@@ -28,6 +28,9 @@ namespace MultiplayerARPG
         public float jumpHeight = 2f;
         public ApplyJumpForceMode applyJumpForceMode = ApplyJumpForceMode.ApplyImmediately;
         public float applyJumpForceFixedDuration;
+        public float forwardSideMoveSpeedRate = 0.75f;
+        public float sideMoveSpeedRate = 1f;
+        public float backwardSideMoveSpeedRate = 0.75f;
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
@@ -145,6 +148,9 @@ namespace MultiplayerARPG
                 jumpHeight = jumpHeight,
                 applyJumpForceMode = applyJumpForceMode,
                 applyJumpForceFixedDuration = applyJumpForceFixedDuration,
+                forwardSideMoveSpeedRate = forwardSideMoveSpeedRate,
+                sideMoveSpeedRate = sideMoveSpeedRate,
+                backwardSideMoveSpeedRate = backwardSideMoveSpeedRate,
                 backwardMoveSpeedRate = backwardMoveSpeedRate,
                 gravity = gravity,
                 maxFallVelocity = maxFallVelocity,
@@ -222,6 +228,9 @@ namespace MultiplayerARPG
             Functions.jumpHeight = jumpHeight;
             Functions.applyJumpForceMode = applyJumpForceMode;
             Functions.applyJumpForceFixedDuration = applyJumpForceFixedDuration;
+            Functions.forwardSideMoveSpeedRate = forwardSideMoveSpeedRate;
+            Functions.sideMoveSpeedRate = sideMoveSpeedRate;
+            Functions.backwardSideMoveSpeedRate = backwardSideMoveSpeedRate;
             Functions.backwardMoveSpeedRate = backwardMoveSpeedRate;
             Functions.gravity = gravity;
             Functions.maxFallVelocity = maxFallVelocity;
