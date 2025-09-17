@@ -6,7 +6,7 @@ namespace MultiplayerARPG
 {
     public static class EntityMovementFunctions
     {
-        internal static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[8];
+        internal const int FIND_GROUND_HIT_ARRAY_LENGTH = 16;
         internal static readonly Vector3[] s_changePoseRaycastOffsets = new Vector3[]
         {
             Vector3.zero,
@@ -74,10 +74,12 @@ namespace MultiplayerARPG
             for (int i = 0; i < s_changePoseRaycastOffsets.Length; ++i)
             {
                 Vector3 origin = (s_changePoseRaycastOffsets[i] * radius * (transform.lossyScale.x + transform.lossyScale.z) * 0.5f) + transform.position;
+                RaycastHit[] findGroundRaycastHits = ArrayPool<RaycastHit>.Shared.Rent(FIND_GROUND_HIT_ARRAY_LENGTH);
                 int hitCount = Physics.RaycastNonAlloc(
                     origin, Vector3.up,
-                    s_findGroundRaycastHits, height * transform.lossyScale.y,
+                    findGroundRaycastHits, height * transform.lossyScale.y,
                     layerMask, QueryTriggerInteraction.Ignore);
+                ArrayPool<RaycastHit>.Shared.Return(findGroundRaycastHits);
 #if UNITY_EDITOR
                 Debug.DrawLine(origin, origin + Vector3.up * height * transform.lossyScale.y, Color.blue, 30f);
 #endif
@@ -111,20 +113,23 @@ namespace MultiplayerARPG
             Transform transform = movement.Entity.EntityTransform;
             Vector3 center = new Vector3(transform.position.x, transform.position.y - crawlCheckOffsets, transform.position.z);
             float[] crawlRaycastDegrees = ArrayPool<float>.Shared.Rent(crawlCheckRaycasts);
+            RaycastHit[] findGroundRaycastHits = ArrayPool<RaycastHit>.Shared.Rent(FIND_GROUND_HIT_ARRAY_LENGTH);
             crawlRaycastDegrees = CalculateCrawlRaycastDegrees(crawlCheckRaycasts);
             for (int i = 0; i < crawlCheckRaycasts; ++i)
             {
                 int hitCount = Physics.RaycastNonAlloc(
                     center, Quaternion.Euler(0f, crawlRaycastDegrees[i], 0f) * transform.forward,
-                    s_findGroundRaycastHits, crawlCheckRadius,
+                    findGroundRaycastHits, crawlCheckRadius,
                     GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
                 if (hitCount > 0)
                 {
                     ArrayPool<float>.Shared.Return(crawlRaycastDegrees);
+                    ArrayPool<RaycastHit>.Shared.Return(findGroundRaycastHits);
                     return false;
                 }
             }
             ArrayPool<float>.Shared.Return(crawlRaycastDegrees);
+            ArrayPool<RaycastHit>.Shared.Return(findGroundRaycastHits);
             return true;
         }
 
@@ -139,6 +144,7 @@ namespace MultiplayerARPG
             float nearestRaycastAngle = 0f;
             RaycastHit? nearestHit = null;
             float[] crawlRaycastDegrees = ArrayPool<float>.Shared.Rent(crawlCheckRaycasts);
+            RaycastHit[] findGroundRaycastHits = ArrayPool<RaycastHit>.Shared.Rent(FIND_GROUND_HIT_ARRAY_LENGTH);
             crawlRaycastDegrees = CalculateCrawlRaycastDegrees(crawlCheckRaycasts);
             for (int i = 0; i < crawlCheckRaycasts; ++i)
             {
@@ -146,12 +152,12 @@ namespace MultiplayerARPG
                 float raycastAngle = Vector3.Angle(moveDirection, raycastDirection);
                 if (raycastAngle > 90f)
                     continue;
-                int hitCount = Physics.RaycastNonAlloc(center, raycastDirection, s_findGroundRaycastHits, crawlCheckRadius, layerMask, QueryTriggerInteraction.Ignore);
+                int hitCount = Physics.RaycastNonAlloc(center, raycastDirection, findGroundRaycastHits, crawlCheckRadius, layerMask, QueryTriggerInteraction.Ignore);
                 if (hitCount <= 0)
                     continue;
                 for (int j = 0; j < hitCount; ++j)
                 {
-                    RaycastHit hit = s_findGroundRaycastHits[j];
+                    RaycastHit hit = findGroundRaycastHits[j];
                     if (hit.distance >= nearestHitDistance)
                         continue;
                     nearestRaycastAngle = raycastAngle;
@@ -160,6 +166,7 @@ namespace MultiplayerARPG
                 }
             }
             ArrayPool<float>.Shared.Return(crawlRaycastDegrees);
+            ArrayPool<RaycastHit>.Shared.Return(findGroundRaycastHits);
             if (nearestHit.HasValue)
             {
                 Vector3 hitNormal = nearestHit.Value.normal;
@@ -172,41 +179,43 @@ namespace MultiplayerARPG
 
         public static bool FindGroundedPosition(this IEntityMovement movement, Vector3 fromPosition, float radius, float findDistance, int layerMask, float resultUpOffsets, out Vector3 result)
         {
-            result = fromPosition;
             s_findGroundHitPoints.Clear();
             Transform transform = movement.Entity.EntityTransform;
+            RaycastHit[] findGroundRaycastHits = ArrayPool<RaycastHit>.Shared.Rent(FIND_GROUND_HIT_ARRAY_LENGTH);
             for (int i = 0; i < s_changePoseRaycastOffsets.Length; ++i)
             {
                 Vector3 origin = (s_changePoseRaycastOffsets[i] * radius * (transform.lossyScale.x + transform.lossyScale.z) * 0.5f) + fromPosition + (Vector3.up * findDistance);
                 int hitCount = Physics.RaycastNonAlloc(
                     origin, Vector3.down,
-                    s_findGroundRaycastHits, findDistance + 0.5f,
+                    findGroundRaycastHits, findDistance + 0.5f,
                     layerMask, QueryTriggerInteraction.Ignore);
 #if UNITY_EDITOR
                 Debug.DrawLine(origin, origin + Vector3.down * (findDistance + 0.5f), Color.red, 30f);
 #endif
                 for (int j = 0; j < hitCount; ++j)
                 {
-                    s_findGroundHitPoints.Add(s_findGroundRaycastHits[j].point);
+                    s_findGroundHitPoints.Add(findGroundRaycastHits[j].point);
                 }
             }
+            ArrayPool<RaycastHit>.Shared.Return(findGroundRaycastHits);
             if (s_findGroundHitPoints.Count <= 0)
             {
-                result = Vector3.up * resultUpOffsets;
+                result = new Vector3(fromPosition.x, fromPosition.y + resultUpOffsets, fromPosition.z);
                 return false;
             }
             float minDistance = float.MaxValue;
             float tempDistance;
+            float resultY = fromPosition.y;
             for (int i = 0; i < s_findGroundHitPoints.Count; ++i)
             {
-                tempDistance = Vector3.Distance(s_findGroundHitPoints[i], fromPosition);
+                tempDistance = Mathf.Abs(s_findGroundHitPoints[i].y - fromPosition.y);
                 if (tempDistance < minDistance)
                 {
                     minDistance = tempDistance;
-                    result = s_findGroundHitPoints[i];
+                    resultY = s_findGroundHitPoints[i].y;
                 }
             }
-            result += Vector3.up * resultUpOffsets;
+            result = new Vector3(fromPosition.x, resultY + resultUpOffsets, fromPosition.z);
             return true;
         }
 
