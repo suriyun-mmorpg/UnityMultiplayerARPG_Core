@@ -206,7 +206,7 @@ namespace MultiplayerARPG
                     result = s_findGroundHitPoints[i];
                 }
             }
-            result = Vector3.up * resultUpOffsets;
+            result += Vector3.up * resultUpOffsets;
             return true;
         }
 
