@@ -29,7 +29,7 @@ namespace MultiplayerARPG
                 return;
 
             await UniTask.SwitchToMainThread();
-            CurrentEventSystem = FindObjectOfType<EventSystem>();
+            CurrentEventSystem = FindFirstObjectByType<EventSystem>();
             // Create a new event system
             if (CurrentEventSystem == null)
             {

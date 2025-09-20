@@ -322,7 +322,7 @@ namespace MultiplayerARPG
 
         public void CallRpcOnVehicleDestroy()
         {
-            RPC(RpcOnVehicleDestroy);
+            RPC(RpcOnVehicleDestroy, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
         }
 
         [AllRpc]

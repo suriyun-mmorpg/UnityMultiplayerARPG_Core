@@ -29,7 +29,7 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             if (uiNonEquipItems == null)
-                uiNonEquipItems = FindObjectOfType<UINonEquipItems>();
+                uiNonEquipItems = FindFirstObjectByType<UINonEquipItems>();
         }
 
         private void OnDisable()

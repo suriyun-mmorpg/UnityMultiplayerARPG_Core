@@ -174,13 +174,16 @@ namespace MultiplayerARPG
                 return default;
             }
 
+            byte equipWeaponSet = request.equipWeaponSet;
+            if (playerCharacter.EquipWeaponSet == equipWeaponSet)
+            {
+                result.InvokeSuccess(new ResponseSwitchEquipWeaponSetMessage());
+                return default;
+            }
+
             BasePlayerCharacterEntity playerCharacterEntity = playerCharacter as BasePlayerCharacterEntity;
             if (playerCharacterEntity != null)
             {
-                if (playerCharacterEntity.ReloadComponent.IsReloading)
-                {
-                    playerCharacterEntity.ReloadComponent.CancelReload();
-                }
                 if (!playerCharacterEntity.CanEquipItem())
                 {
                     result.InvokeError(new ResponseSwitchEquipWeaponSetMessage()
@@ -191,11 +194,13 @@ namespace MultiplayerARPG
                 }
             }
 
-            byte equipWeaponSet = request.equipWeaponSet;
             if (equipWeaponSet >= GameInstance.Singleton.maxEquipWeaponSet)
                 equipWeaponSet = 0;
             playerCharacter.FillWeaponSetsIfNeeded(equipWeaponSet);
             playerCharacter.EquipWeaponSet = equipWeaponSet;
+
+            if (playerCharacterEntity != null)
+                playerCharacterEntity.ForceMakeCaches();
 
             result.InvokeSuccess(new ResponseSwitchEquipWeaponSetMessage());
             return default;

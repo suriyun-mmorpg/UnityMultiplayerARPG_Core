@@ -77,71 +77,25 @@ namespace MultiplayerARPG
             return PhysicUtils.SortedLinecastNonAlloc2D(position, position, _raycasts2D, layerMask);
         }
 
-        public bool GetRaycastIsTrigger(int index)
-        {
-            return _raycasts2D[index].collider.isTrigger;
-        }
-
-        public Vector3 GetRaycastPoint(int index)
-        {
-            return _raycasts2D[index].point;
-        }
-
-        public Vector3 GetRaycastNormal(int index)
-        {
-            return _raycasts2D[index].normal;
-        }
-
-        public Bounds GetRaycastColliderBounds(int index)
-        {
-            return _raycasts2D[index].collider.bounds;
-        }
-
-        public float GetRaycastDistance(int index)
-        {
-            return _raycasts2D[index].distance;
-        }
-
-        public Transform GetRaycastTransform(int index)
-        {
-            return _raycasts2D[index].transform;
-        }
-
-        public GameObject GetRaycastObject(int index)
-        {
-            return _raycasts2D[index].transform.gameObject;
-        }
-
-        public Vector3 GetRaycastColliderClosestPoint(int index, Vector3 position)
-        {
-            return _raycasts2D[index].collider.ClosestPoint(position);
-        }
-
         public int OverlapObjects(Vector3 position, float radius, int layerMask, bool sort = false, QueryTriggerInteraction hitTriggers = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false, bool hitMultipleFaces = false)
         {
             return sort ? PhysicUtils.SortedOverlapCircleNonAlloc(position, radius, _overlapColliders2D, layerMask) :
                 Physics2D.OverlapCircleNonAlloc(position, radius, _overlapColliders2D, layerMask);
         }
 
-        public bool GetOverlapIsTrigger(int index)
-        {
-            return _overlapColliders2D[index].isTrigger;
-        }
+        public bool GetRaycastIsTrigger(int index) => _raycasts2D[index].collider.isTrigger;
+        public Vector3 GetRaycastPoint(int index) => _raycasts2D[index].point;
+        public Vector3 GetRaycastNormal(int index) => _raycasts2D[index].normal;
+        public Bounds GetRaycastColliderBounds(int index) => _raycasts2D[index].collider.bounds;
+        public float GetRaycastDistance(int index) => _raycasts2D[index].distance;
+        public Transform GetRaycastTransform(int index) => _raycasts2D[index].transform;
+        public GameObject GetRaycastObject(int index) => _raycasts2D[index].transform.gameObject;
+        public Vector3 GetRaycastColliderClosestPoint(int index, Vector3 position) => _raycasts2D[index].collider.ClosestPoint(position);
 
-        public Object GetOverlapCollider(int index)
-        {
-            return _overlapColliders2D[index];
-        }
-
-        public GameObject GetOverlapObject(int index)
-        {
-            return _overlapColliders2D[index].gameObject;
-        }
-
-        public Vector3 GetOverlapColliderClosestPoint(int index, Vector3 position)
-        {
-            return _overlapColliders2D[index].ClosestPoint(position);
-        }
+        public bool GetOverlapIsTrigger(int index) => _overlapColliders2D[index].isTrigger;
+        public Object GetOverlapCollider(int index) => _overlapColliders2D[index];
+        public GameObject GetOverlapObject(int index) => _overlapColliders2D[index].gameObject;
+        public Vector3 GetOverlapColliderClosestPoint(int index, Vector3 position) => _overlapColliders2D[index].ClosestPoint(position);
 
         public bool GetOverlapColliderRaycast(int index, Vector3 origin, Vector3 direction, out Vector3 point, out Vector3 normal, out float distance, out Transform transform, float maxDistance)
         {

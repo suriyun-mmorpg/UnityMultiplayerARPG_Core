@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using ConcurrentCollections;
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using Insthync.DevExtension;
 using LiteNetLib;
@@ -37,7 +38,7 @@ namespace MultiplayerARPG
         public string ChannelTag { get; set; } = string.Empty;
         public string ChannelPassword { get; set; } = string.Empty;
         public BaseMapInfo MapInfo { get; protected set; } = null;
-        public static BaseMapInfo CurrentMapInfo => Singleton.MapInfo;
+        public static BaseMapInfo CurrentMapInfo => Singleton == null ? null : Singleton.MapInfo;
         public bool ShouldPhysicSyncTransforms { get; set; }
         public bool ShouldPhysicSyncTransforms2D { get; set; }
 
@@ -68,6 +69,10 @@ namespace MultiplayerARPG
         protected float _updateTimeOfDayCountDown;
         protected float _serverSceneLoadedTime;
         protected float _clientSceneLoadedTime;
+
+        internal readonly ConcurrentHashSet<int> proceedingGuildIds = new ConcurrentHashSet<int>();
+        internal readonly ConcurrentHashSet<int> proceedingPartyIds = new ConcurrentHashSet<int>();
+        internal readonly ConcurrentHashSet<long> proceedingConnectionIds = new ConcurrentHashSet<long>();
 
         // Instantiate object allowing status
         /// <summary>
@@ -187,6 +192,9 @@ namespace MultiplayerARPG
             // Other components
             HitRegistrationManager.ClearData();
             MapInfo = null;
+            proceedingGuildIds.Clear();
+            proceedingPartyIds.Clear();
+            proceedingConnectionIds.Clear();
             _serverReadyToInstantiateObjectsStates.Clear();
             _clientReadyToInstantiateObjectsStates.Clear();
             _enterGameRequestResponseMessages.Clear();
@@ -505,9 +513,9 @@ namespace MultiplayerARPG
         protected void HandleServerEntityStateAtClient(MessageHandlerData messageHandler)
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
-            long peerTimestamp = messageHandler.Reader.GetPackedLong();
+            uint peerTick = messageHandler.Reader.GetPackedUInt();
             if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity))
-                gameEntity.ReadServerStateAtClient(peerTimestamp, messageHandler.Reader);
+                gameEntity.ReadServerStateAtClient(peerTick, messageHandler.Reader);
         }
 
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
@@ -556,9 +564,9 @@ namespace MultiplayerARPG
         protected void HandleClientEntityStateAtServer(MessageHandlerData messageHandler)
         {
             uint objectId = messageHandler.Reader.GetPackedUInt();
-            long peerTimestamp = messageHandler.Reader.GetPackedLong();
+            uint peerTick = messageHandler.Reader.GetPackedUInt();
             if (Assets.TryGetSpawnedObject(objectId, out BaseGameEntity gameEntity) && gameEntity.Identity.ConnectionId == messageHandler.ConnectionId)
-                gameEntity.ReadClientStateAtServer(peerTimestamp, messageHandler.Reader);
+                gameEntity.ReadClientStateAtServer(peerTick, messageHandler.Reader);
         }
 
         public virtual void InitPrefabs()

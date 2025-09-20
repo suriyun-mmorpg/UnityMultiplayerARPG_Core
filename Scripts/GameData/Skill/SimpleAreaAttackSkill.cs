@@ -121,11 +121,10 @@ namespace MultiplayerARPG
                 // Spawn area entity
                 // Aim position type always is `Position`
                 int hashAssetId = 0;
-#if !EXCLUDE_PREFAB_REFS
-                hashAssetId = areaDamageEntity.Identity.HashAssetId;
-#endif
-                if (addressableAreaDamageEntity.IsDataValid())
-                    hashAssetId = addressableAreaDamageEntity.HashAssetId;
+                if (AreaDamageEntity != null)
+                    hashAssetId = AreaDamageEntity.Identity.HashAssetId;
+                else if (AddressableAreaDamageEntity.IsDataValid())
+                    hashAssetId = AddressableAreaDamageEntity.HashAssetId;
                 if (hashAssetId == 0)
                 {
                     Logging.LogError("SimpleAreaDamageSkill", $"Unable to spawn area damage entity, skill ID: {Id}");

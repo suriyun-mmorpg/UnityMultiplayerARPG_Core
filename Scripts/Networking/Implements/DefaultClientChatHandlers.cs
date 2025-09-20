@@ -14,7 +14,7 @@ namespace MultiplayerARPG
 
         public void SendChatMessage(ChatMessage message)
         {
-            Manager.ClientSendPacket(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+            Manager.ClientSendPacket(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
         }
     }
 }

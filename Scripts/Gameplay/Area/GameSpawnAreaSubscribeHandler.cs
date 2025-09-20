@@ -94,7 +94,7 @@ namespace MultiplayerARPG
             _subscribers.Clear();
         }
 
-        public void AddEntity(LiteNetLibBehaviour entity)
+        public void AddEntity(LiteNetLibBehaviour entity, object spawnData)
         {
             if (entity == null)
                 return;
@@ -102,6 +102,7 @@ namespace MultiplayerARPG
                 entityHandler = entity.gameObject.AddComponent<GameSpawnAreaEntityHandler>();
             entityHandler.Handler = this;
             entityHandler.Entity = entity;
+            entityHandler.SpawnData = spawnData;
             _entityHandlers.Add(entityHandler);
         }
 
@@ -142,6 +143,7 @@ namespace MultiplayerARPG
                 {
                     if (entityHandler.Entity == null)
                         continue;
+                    GameSpawnArea.OnDestroyBySubscribeHandler(entityHandler);
                     entityHandler.Handler = null;
                     entityHandler.Entity.NetworkDestroy();
                 }
@@ -154,7 +156,6 @@ namespace MultiplayerARPG
             if (_subscribers.Count <= 0)
                 return;
             _spawnState = SpawnState.Spawned;
-            GameSpawnArea.SpawnAll();
         }
     }
 }

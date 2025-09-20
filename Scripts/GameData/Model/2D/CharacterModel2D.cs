@@ -308,14 +308,14 @@ namespace MultiplayerARPG
             return animation2D;
         }
 
-        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier = 1f)
+        public override void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier, float changeClipLength, float overrideClipLength)
         {
             skipMovementValidation = false;
             shouldUseRootMotion = false;
-            StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier));
+            StartCoroutine(PlayActionAnimationRoutine(animActionType, dataId, index, playSpeedMultiplier, changeClipLength, overrideClipLength));
         }
 
-        IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier)
+        IEnumerator PlayActionAnimationRoutine(AnimActionType animActionType, int dataId, int index, float playSpeedMultiplier, float changeClipLength, float overrideClipLength)
         {
             playingAction = true;
             // If animator is not null, play the action animation
@@ -328,7 +328,9 @@ namespace MultiplayerARPG
                     AudioManager.PlaySfxClipAtAudioSource(animation2D.GetRandomAudioClip(), GenericAudioSource);
                     // Waits by current transition + clip duration before end animation
                     Play(anim);
-                    yield return new WaitForSecondsRealtime(anim.length / playSpeedMultiplier);
+                    float clipLength = overrideClipLength > 0f ? overrideClipLength : anim.length;
+                    float clipSpeedRate = GetAnimationSpeedRate(clipLength, playSpeedMultiplier, changeClipLength);
+                    yield return new WaitForSecondsRealtime(clipLength / clipSpeedRate);
                     Play(idleAnimation2D, DirectionType2D);
                     yield return new WaitForSecondsRealtime(animation2D.extraDuration / playSpeedMultiplier);
                     transitionToMoveAnim = 0.25f;

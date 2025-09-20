@@ -1,3 +1,4 @@
+using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -216,7 +217,7 @@ namespace MultiplayerARPG
 
         public void CallCmdBuyItem(int index)
         {
-            RPC(CmdBuyItem, index);
+            RPC(CmdBuyItem, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, index);
         }
 
         [ServerRpc]

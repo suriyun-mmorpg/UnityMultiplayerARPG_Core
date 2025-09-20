@@ -14,17 +14,32 @@ namespace MultiplayerARPG
         /// Add some distant to avoid character falling under ground
         /// </summary>
         private const float ABOVE_GROUND_OFFSETS = 0.25f;
-        private static readonly RaycastHit[] s_findGroundRaycastHits = new RaycastHit[8];
+
+        [Header("Network Settings")]
+        public MovementSecure movementSecure = MovementSecure.NotSecure;
+        [Tooltip("If distance between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
+        [Min(0.01f)]
+        public float positionThreshold = 0.01f;
+        [Tooltip("If angle between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
+        [Min(0.01f)]
+        public float eulerAnglesThreshold = 1f;
+        [Tooltip("Keep alive ticks before it is stop syncing (after has no changes)")]
+        public int keepAliveTicks = 10;
+        [Tooltip("If distance between two interpolating positions more than this value, it will change position to target position immediately")]
+        [Min(0.01f)]
+        public float interpSnapThreshold = 2f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
-        public MovementSecure movementSecure = MovementSecure.NotSecure;
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
         public ApplyJumpForceMode applyJumpForceMode = ApplyJumpForceMode.ApplyImmediately;
         public float applyJumpForceFixedDuration;
+        public float forwardSideMoveSpeedRate = 0.75f;
+        public float sideMoveSpeedRate = 1f;
+        public float backwardSideMoveSpeedRate = 0.75f;
         public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
@@ -45,12 +60,16 @@ namespace MultiplayerARPG
         [Header("Ground Checking")]
         public float groundCheckOffsets = 0.14f;
         public float groundCheckRadius = 0.28f;
+#if UNITY_EDITOR
         public Color groundCheckGizmosColor = Color.blue;
+#endif
 
         [Header("Airborne Checking")]
         public float airborneCheckOffsets = 0.14f;
         public float airborneCheckRadius = 0.28f;
+#if UNITY_EDITOR
         public Color airborneCheckGizmosColor = Color.cyan;
+#endif
         public float forceUngroundAfterJumpDuration = 0.1f;
 
         [Header("Crawl Checking")]
@@ -59,7 +78,9 @@ namespace MultiplayerARPG
         public int crawlCheckRaycasts = 0;
         [Min(0f)]
         public float crawlCheckRadius = 1f;
+#if UNITY_EDITOR
         public Color crawlCheckGizmosColor = Color.yellow;
+#endif
 
         [Header("Dashing")]
         public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
@@ -109,6 +130,7 @@ namespace MultiplayerARPG
             private set => _cacheCharacterController = value;
         }
         public BuiltInEntityMovementFunctions3D Functions { get; private set; }
+        public MovementColliderAdjustment ColliderAdjustment { get; private set; }
 
         public float StoppingDistance { get { return Functions.StoppingDistance; } }
         public MovementState MovementState { get { return Functions.MovementState; } }
@@ -121,7 +143,6 @@ namespace MultiplayerARPG
         protected float _forceUngroundCountdown = 0f;
         protected int _allowToJumpOrDashCheckFrame = 0;
         protected bool _isAllowToJumpOrDash = true;
-        protected float[] _crawlRaycastDegrees;
 
         public override void EntityAwake()
         {
@@ -131,6 +152,7 @@ namespace MultiplayerARPG
                 CacheAnimator = GetComponentInChildren<Animator>();
             // Prepare character controller component
             CacheCharacterController = gameObject.GetOrAddComponent<CharacterController>();
+            ColliderAdjustment = gameObject.GetComponent<MovementColliderAdjustment>();
             // Disable unused component
             LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
             if (disablingComp != null)
@@ -147,11 +169,18 @@ namespace MultiplayerARPG
             // Setup
             Functions = new BuiltInEntityMovementFunctions3D(Entity, CacheAnimator, this)
             {
-                stoppingDistance = stoppingDistance,
                 movementSecure = movementSecure,
+                positionThreshold = positionThreshold,
+                eulerAnglesThreshold = eulerAnglesThreshold,
+                keepAliveTicks = keepAliveTicks,
+                interpSnapThreshold = interpSnapThreshold,
+                stoppingDistance = stoppingDistance,
                 jumpHeight = jumpHeight,
                 applyJumpForceMode = applyJumpForceMode,
                 applyJumpForceFixedDuration = applyJumpForceFixedDuration,
+                forwardSideMoveSpeedRate = forwardSideMoveSpeedRate,
+                sideMoveSpeedRate = sideMoveSpeedRate,
+                backwardSideMoveSpeedRate = backwardSideMoveSpeedRate,
                 backwardMoveSpeedRate = backwardMoveSpeedRate,
                 gravity = gravity,
                 maxFallVelocity = maxFallVelocity,
@@ -174,24 +203,6 @@ namespace MultiplayerARPG
                 snapThreshold = snapThreshold,
             };
             Functions.StopMoveFunction();
-            _crawlRaycastDegrees = CalculateCrawlRaycastDegrees();
-        }
-
-        private float[] CalculateCrawlRaycastDegrees()
-        {
-            float[] result;
-            if (crawlCheckRaycasts > 0)
-            {
-                result = new float[crawlCheckRaycasts];
-                float increaseRaycastDegree = 360f / crawlCheckRaycasts;
-                result = new float[crawlCheckRaycasts];
-                for (int i = 0; i < crawlCheckRaycasts; ++i)
-                {
-                    result[i] = i * increaseRaycastDegree;
-                }
-                return result;
-            }
-            return null;
         }
 
         public override void EntityStart()
@@ -214,6 +225,18 @@ namespace MultiplayerARPG
         {
             base.OnSetOwnerClient(isOwnerClient);
             Functions.OnSetOwnerClient(isOwnerClient);
+        }
+
+        public override void OnIdentityInitialize()
+        {
+            base.OnIdentityInitialize();
+            Functions.OnIdentityInitialize();
+        }
+
+        public override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            Functions.EntityOnDestroy();
         }
 
         private void OnAnimatorMove()
@@ -239,11 +262,18 @@ namespace MultiplayerARPG
         public override void EntityUpdate()
         {
 #if UNITY_EDITOR
-            Functions.stoppingDistance = stoppingDistance;
             Functions.movementSecure = movementSecure;
+            Functions.positionThreshold = positionThreshold;
+            Functions.eulerAnglesThreshold = eulerAnglesThreshold;
+            Functions.keepAliveTicks = keepAliveTicks;
+            Functions.interpSnapThreshold = interpSnapThreshold;
+            Functions.stoppingDistance = stoppingDistance;
             Functions.jumpHeight = jumpHeight;
             Functions.applyJumpForceMode = applyJumpForceMode;
             Functions.applyJumpForceFixedDuration = applyJumpForceFixedDuration;
+            Functions.forwardSideMoveSpeedRate = forwardSideMoveSpeedRate;
+            Functions.sideMoveSpeedRate = sideMoveSpeedRate;
+            Functions.backwardSideMoveSpeedRate = backwardSideMoveSpeedRate;
             Functions.backwardMoveSpeedRate = backwardMoveSpeedRate;
             Functions.gravity = gravity;
             Functions.maxFallVelocity = maxFallVelocity;
@@ -263,9 +293,7 @@ namespace MultiplayerARPG
             Functions.snapThreshold = snapThreshold;
 #endif
             float deltaTime = Time.deltaTime;
-            Functions.UpdateMovement(deltaTime);
-            Functions.UpdateRotation(deltaTime);
-            Functions.AfterMovementUpdate(deltaTime);
+            Functions.EntityUpdate(deltaTime);
             if (_forceUngroundCountdown > 0f)
                 _forceUngroundCountdown -= deltaTime;
         }
@@ -302,6 +330,8 @@ namespace MultiplayerARPG
 
         protected virtual bool AllowToJumpOrDash()
         {
+            if (!AllowToStand())
+                return false;
             if (Time.frameCount == _allowToJumpOrDashCheckFrame)
                 return _isAllowToJumpOrDash;
             _allowToJumpOrDashCheckFrame = Time.frameCount;
@@ -311,74 +341,38 @@ namespace MultiplayerARPG
 
         public bool AllowToCrouch()
         {
-            return true;
+            if (ColliderAdjustment == null)
+                return true;
+            var settings = ColliderAdjustment.CrouchSettings;
+            return this.AllowToChangePose(settings.height, settings.radius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask());
         }
 
         public bool AllowToCrawl()
         {
-            if (crawlCheckRaycasts == 0f)
+            return this.AllowToCrawl(crawlCheckRaycasts, crawlCheckOffsets, crawlCheckRadius);
+        }
+
+        public bool AllowToStand()
+        {
+            if (ColliderAdjustment == null)
                 return true;
-            Vector3 raycastOrigin = GetCrawlCheckCenter();
-            for (int i = 0; i < crawlCheckRaycasts; ++i)
-            {
-                int hitCount = Physics.RaycastNonAlloc(raycastOrigin, Quaternion.Euler(0f, _crawlRaycastDegrees[i], 0f) * EntityTransform.forward, s_findGroundRaycastHits, crawlCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
-                if (hitCount > 0)
-                    return false;
-            }
-            return true;
+            var settings = ColliderAdjustment.StandSettings;
+            return this.AllowToChangePose(settings.height, settings.radius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask());
         }
 
         private Vector3 AdjustCrawlMotion(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion)
         {
-            if (extraMovementState != ExtraMovementState.IsCrawling || crawlCheckRaycasts == 0 || !IsClient)
-                return motion;
-            Vector3 raycastOrigin = GetCrawlCheckCenter();
-            Vector3 moveDirection = motion.GetXZ().normalized;
-            float nearestHitDistance = float.MaxValue;
-            float nearestRaycastAngle = 0f;
-            RaycastHit? nearestHit = null;
-            for (int i = 0; i < crawlCheckRaycasts; ++i)
-            {
-                Vector3 raycastDirection = Quaternion.Euler(0f, _crawlRaycastDegrees[i], 0f) * moveDirection;
-                float raycastAngle = Vector3.Angle(moveDirection, raycastDirection);
-                if (raycastAngle > 90f)
-                    continue;
-                int hitCount = Physics.RaycastNonAlloc(raycastOrigin, raycastDirection, s_findGroundRaycastHits, crawlCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore);
-                if (hitCount <= 0)
-                    continue;
-                for (int j = 0; j < hitCount; ++j)
-                {
-                    RaycastHit hit = s_findGroundRaycastHits[j];
-                    if (hit.distance >= nearestHitDistance)
-                        continue;
-                    nearestRaycastAngle = raycastAngle;
-                    nearestHitDistance = hit.distance;
-                    nearestHit = hit;
-                }
-            }
-            if (nearestHit.HasValue)
-            {
-                Vector3 hitNormal = nearestHit.Value.normal;
-                if (nearestHit.Value.distance < crawlCheckRadius * 0.9f)
-                    return motion + hitNormal * crawlCheckRadius;
-                return Vector3.ProjectOnPlane(motion, hitNormal);
-            }
-            return motion;
+            return this.AdjustCrawlMotion(movementState, extraMovementState, motion, crawlCheckRaycasts, crawlCheckOffsets, crawlCheckRadius, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask());
         }
 
-        protected virtual Vector3 GetGroundCheckCenter()
+        protected Vector3 GetGroundCheckCenter()
         {
             return new Vector3(EntityTransform.position.x, EntityTransform.position.y - groundCheckOffsets, EntityTransform.position.z);
         }
 
-        protected virtual Vector3 GetAirborneCheckCenter()
+        protected Vector3 GetAirborneCheckCenter()
         {
             return new Vector3(EntityTransform.position.x, EntityTransform.position.y - airborneCheckOffsets, EntityTransform.position.z);
-        }
-
-        protected virtual Vector3 GetCrawlCheckCenter()
-        {
-            return new Vector3(EntityTransform.position.x, EntityTransform.position.y - crawlCheckOffsets, EntityTransform.position.z);
         }
 
 #if UNITY_EDITOR
@@ -389,16 +383,7 @@ namespace MultiplayerARPG
             Gizmos.DrawWireSphere(GetGroundCheckCenter(), groundCheckRadius);
             Gizmos.color = airborneCheckGizmosColor;
             Gizmos.DrawWireSphere(GetAirborneCheckCenter(), airborneCheckRadius);
-            if (crawlCheckRaycasts > 0)
-            {
-                Gizmos.color = crawlCheckGizmosColor;
-                if (_crawlRaycastDegrees == null)
-                    _crawlRaycastDegrees = CalculateCrawlRaycastDegrees();
-                for (int i = 0; i < crawlCheckRaycasts; ++i)
-                {
-                    Gizmos.DrawLine(GetCrawlCheckCenter(), GetCrawlCheckCenter() + Quaternion.Euler(0f, _crawlRaycastDegrees[i], 0f) * EntityTransform.forward * crawlCheckRadius);
-                }
-            }
+            this.DrawCrawlCheckRaycasts(crawlCheckRaycasts, crawlCheckOffsets, crawlCheckRadius, crawlCheckGizmosColor);
             Gizmos.color = prevColor;
         }
 #endif
@@ -428,24 +413,24 @@ namespace MultiplayerARPG
             _forceUngroundCountdown = forceUngroundAfterJumpDuration;
         }
 
-        public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteClientState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
         {
-            return Functions.WriteClientState(writeTimestamp, writer, out shouldSendReliably);
+            return Functions.WriteClientState(writeTick, writer, out shouldSendReliably);
         }
 
-        public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteServerState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
         {
-            return Functions.WriteServerState(writeTimestamp, writer, out shouldSendReliably);
+            return Functions.WriteServerState(writeTick, writer, out shouldSendReliably);
         }
 
-        public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
+        public void ReadClientStateAtServer(uint peerTick, NetDataReader reader)
         {
-            Functions.ReadClientStateAtServer(peerTimestamp, reader);
+            Functions.ReadClientStateAtServer(peerTick, reader);
         }
 
-        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public void ReadServerStateAtClient(uint peerTick, NetDataReader reader)
         {
-            Functions.ReadServerStateAtClient(peerTimestamp, reader);
+            Functions.ReadServerStateAtClient(peerTick, reader);
         }
 
         public void StopMove()
@@ -495,13 +480,7 @@ namespace MultiplayerARPG
 
         public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
         {
-            if (PhysicUtils.FindGroundedPositionWithCapsule(fromPosition, EntityTransform.rotation, CacheCharacterController.center, CacheCharacterController.radius, CacheCharacterController.height, s_findGroundRaycastHits, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), out result, EntityTransform))
-            {
-                result = result + Vector3.up * ABOVE_GROUND_OFFSETS;
-                return true;
-            }
-            result = fromPosition + Vector3.up * ABOVE_GROUND_OFFSETS;
-            return false;
+            return this.FindGroundedPosition(fromPosition, groundCheckRadius, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), ABOVE_GROUND_OFFSETS, out result);
         }
 
         public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
@@ -531,6 +510,11 @@ namespace MultiplayerARPG
         public UniTask WaitClientTeleportConfirm()
         {
             return Functions.WaitClientTeleportConfirm();
+        }
+
+        public bool IsWaitingClientTeleportConfirm()
+        {
+            return Functions.IsWaitingClientTeleportConfirm();
         }
     }
 }

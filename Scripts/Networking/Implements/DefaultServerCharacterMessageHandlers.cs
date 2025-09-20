@@ -7,6 +7,13 @@ namespace MultiplayerARPG
 {
     public partial class DefaultServerCharacterMessageHandlers : MonoBehaviour, IServerCharacterMessageHandlers
     {
+        public BaseGameNetworkManager Manager { get; protected set; }
+
+        protected virtual void Awake()
+        {
+            Manager = GetComponent<BaseGameNetworkManager>();
+        }
+
         public UniTaskVoid HandleRequestIncreaseAttributeAmount(RequestHandlerData requestHandler, RequestIncreaseAttributeAmountMessage request, RequestProceedResultDelegate<ResponseIncreaseAttributeAmountMessage> result)
         {
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
@@ -64,27 +71,41 @@ namespace MultiplayerARPG
             return default;
         }
 
-        public UniTaskVoid HandleRequestRespawn(RequestHandlerData requestHandler, RequestRespawnMessage request, RequestProceedResultDelegate<ResponseRespawnMessage> result)
+        public async UniTaskVoid HandleRequestRespawn(RequestHandlerData requestHandler, RequestRespawnMessage request, RequestProceedResultDelegate<ResponseRespawnMessage> result)
         {
-            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
+            long connectionId = requestHandler.ConnectionId;
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(connectionId, out IPlayerCharacterData playerCharacter))
             {
                 result.InvokeError(new ResponseRespawnMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
                 });
-                return default;
+                return;
             }
+
             if (playerCharacter.CurrentHp > 0)
             {
                 result.InvokeError(new ResponseRespawnMessage()
                 {
                     message = UITextKeys.UI_ERROR_NOT_DEAD,
                 });
-                return default;
+                return;
             }
-            GameInstance.ServerCharacterHandlers.Respawn(request.option, playerCharacter);
+
+            if (Manager.proceedingConnectionIds.Contains(connectionId))
+            {
+                // TODO: Should send error message?
+                result.InvokeError(new ResponseRespawnMessage()
+                {
+                    message = UITextKeys.NONE,
+                });
+                return;
+            }
+            Manager.proceedingConnectionIds.Add(connectionId);
+
             result.InvokeSuccess(new ResponseRespawnMessage());
-            return default;
+            await GameInstance.ServerCharacterHandlers.Respawn(request.option, playerCharacter);
+            Manager.proceedingConnectionIds.TryRemove(connectionId);
         }
 
         public UniTaskVoid HandleRequestSetIcon(RequestHandlerData requestHandler, RequestSetIconMessage request, RequestProceedResultDelegate<ResponseSetIconMessage> result)

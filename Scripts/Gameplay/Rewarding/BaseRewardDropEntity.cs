@@ -167,7 +167,7 @@ namespace MultiplayerARPG
 
         public void CallRpcOnPickedUp()
         {
-            RPC(RpcOnPickedUp);
+            RPC(RpcOnPickedUp, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
         }
 
         [AllRpc]

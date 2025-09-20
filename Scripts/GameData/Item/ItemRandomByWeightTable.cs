@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void RandomItem(OnDropItemDelegate onRandomItem, int seed = 0, HashSet<int> excludeItemDataIds = null)
+        public void RandomItem(OnDropItemDelegate onRandomItem, int seed = 0, HashSet<int> excludeItemDataIds = null, System.Action onFailed = null)
         {
             ItemRandomByWeight randomedItem;
             if (CacheRandomItems.Count > 1 && excludeItemDataIds != null && excludeItemDataIds.Count > 0)
@@ -63,8 +63,11 @@ namespace MultiplayerARPG
                 randomedItem = WeightedRandomizer.From(CacheRandomItems, noDropWeight).TakeOne(seed);
             }
             if (randomedItem.item == null)
+            {
+                onFailed?.Invoke();
                 return;
-            onRandomItem.Invoke(randomedItem.item, randomedItem.GetRandomedLevel(), randomedItem.GetRandomedAmount());
+            }
+            onRandomItem?.Invoke(randomedItem.item, randomedItem.GetRandomedLevel(), randomedItem.GetRandomedAmount());
         }
 
 #if UNITY_EDITOR

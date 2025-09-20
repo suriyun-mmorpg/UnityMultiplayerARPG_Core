@@ -4,20 +4,12 @@ namespace MultiplayerARPG
 {
     public class MovementColliderAdjustment : BaseGameEntityComponent<BaseGameEntity>
     {
-        public enum Direction : int
-        {
-            X = 0,
-            Y = 1,
-            Z = 2,
-        }
-
         [System.Serializable]
         public struct Settings
         {
             public Vector3 center;
             public float radius;
             public float height;
-            public Direction direction;
 #if UNITY_EDITOR
             public bool drawGizmos;
             public Color gizmosColor;
@@ -33,6 +25,8 @@ namespace MultiplayerARPG
             gizmosColor = Color.blue
 #endif
         };
+        public Settings StandSettings => standSettings;
+
         [SerializeField]
         private Settings crouchSettings = new Settings()
         {
@@ -40,6 +34,8 @@ namespace MultiplayerARPG
             gizmosColor = Color.magenta
 #endif
         };
+        public Settings CrouchSettings => crouchSettings;
+
         [SerializeField]
         private Settings crawlSettings = new Settings()
         {
@@ -47,6 +43,8 @@ namespace MultiplayerARPG
             gizmosColor = Color.red
 #endif
         };
+        public Settings CrawlSettings => crawlSettings;
+
         [SerializeField]
         private Settings swimSettings = new Settings()
         {
@@ -54,20 +52,21 @@ namespace MultiplayerARPG
             gizmosColor = Color.yellow
 #endif
         };
+        public Settings SwimSettings => swimSettings;
 
-        private CapsuleCollider _capsuleCollider;
+        private CharacterController _characterController;
         private bool _previousIsUnderWater;
         private ExtraMovementState _previousExtraMovementState;
 
         public override void EntityAwake()
         {
-            _capsuleCollider = GetComponent<CapsuleCollider>();
+            _characterController = GetComponent<CharacterController>();
         }
 
 #if UNITY_EDITOR
         private void OnValidate()
         {
-            _capsuleCollider = GetComponent<CapsuleCollider>();
+            _characterController = GetComponent<CharacterController>();
             ApplyingSettings(ref standSettings);
             ApplyingSettings(ref crouchSettings);
             ApplyingSettings(ref crawlSettings);
@@ -102,51 +101,22 @@ namespace MultiplayerARPG
             Vector3 center = settings.center * verticalScale;
             float height = (settings.height - settings.radius * 2) / 2 * verticalScale;
             float radius = settings.radius * horizontalScale;
-            switch (settings.direction)
-            {
-                case Direction.X:
-                    Gizmos.DrawWireSphere(localPosition + center + Vector3.right * height, radius);
-                    Gizmos.DrawWireSphere(localPosition + center + Vector3.left * height, radius);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.up * radius) + Vector3.left * height,
-                        localPosition + center + (Vector3.up * radius) + Vector3.right * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.down * radius) + Vector3.left * height,
-                        localPosition + center + (Vector3.down * radius) + Vector3.right * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.forward * radius) + Vector3.left * height,
-                        localPosition + center + (Vector3.forward * radius) + Vector3.right * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.back * radius) + Vector3.left * height,
-                        localPosition + center + (Vector3.back * radius) + Vector3.right * height);
-                    break;
-                case Direction.Y:
-                    Gizmos.DrawWireSphere(localPosition + center + Vector3.up * height, radius);
-                    Gizmos.DrawWireSphere(localPosition + center + Vector3.down * height, radius);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.forward * radius) + Vector3.down * height,
-                        localPosition + center + (Vector3.forward * radius) + Vector3.up * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.back * radius) + Vector3.down * height,
-                        localPosition + center + (Vector3.back * radius) + Vector3.up * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.right * radius) + Vector3.down * height,
-                        localPosition + center + (Vector3.right * radius) + Vector3.up * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.left * radius) + Vector3.down * height,
-                        localPosition + center + (Vector3.left * radius) + Vector3.up * height);
-                    break;
-                case Direction.Z:
-                    Gizmos.DrawWireSphere(localPosition + center + Vector3.forward * height, radius);
-                    Gizmos.DrawWireSphere(localPosition + center + Vector3.back * height, radius);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.up * radius) + Vector3.back * height,
-                        localPosition + center + (Vector3.up * radius) + Vector3.forward * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.down * radius) + Vector3.back * height,
-                        localPosition + center + (Vector3.down * radius) + Vector3.forward * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.forward * radius) + Vector3.back * height,
-                        localPosition + center + (Vector3.right * radius) + Vector3.forward * height);
-                    Gizmos.DrawLine(localPosition + center + (Vector3.back * radius) + Vector3.back * height,
-                        localPosition + center + (Vector3.left * radius) + Vector3.forward * height);
-                    break;
-            }
+            Gizmos.DrawWireSphere(localPosition + center + Vector3.up * height, radius);
+            Gizmos.DrawWireSphere(localPosition + center + Vector3.down * height, radius);
+            Gizmos.DrawLine(localPosition + center + (Vector3.forward * radius) + Vector3.down * height,
+                localPosition + center + (Vector3.forward * radius) + Vector3.up * height);
+            Gizmos.DrawLine(localPosition + center + (Vector3.back * radius) + Vector3.down * height,
+                localPosition + center + (Vector3.back * radius) + Vector3.up * height);
+            Gizmos.DrawLine(localPosition + center + (Vector3.right * radius) + Vector3.down * height,
+                localPosition + center + (Vector3.right * radius) + Vector3.up * height);
+            Gizmos.DrawLine(localPosition + center + (Vector3.left * radius) + Vector3.down * height,
+                localPosition + center + (Vector3.left * radius) + Vector3.up * height);
         }
 #endif
 
         public override void EntityLateUpdate()
         {
-            if (_capsuleCollider == null)
+            if (_characterController == null)
                 return;
 
             bool isUnderWater = Entity.MovementState.Has(MovementState.IsUnderWater);
@@ -175,13 +145,12 @@ namespace MultiplayerARPG
 
         private void Apply(Settings settings)
         {
-            if (_capsuleCollider == null)
+            if (_characterController == null)
                 return;
 
-            _capsuleCollider.center = settings.center;
-            _capsuleCollider.radius = settings.radius;
-            _capsuleCollider.height = settings.height;
-            _capsuleCollider.direction = (int)settings.direction;
+            _characterController.center = settings.center;
+            _characterController.radius = settings.radius;
+            _characterController.height = settings.height;
         }
     }
 }

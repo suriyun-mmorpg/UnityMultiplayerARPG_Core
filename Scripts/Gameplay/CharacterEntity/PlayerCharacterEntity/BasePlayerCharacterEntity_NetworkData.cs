@@ -135,7 +135,7 @@ namespace MultiplayerARPG
             {
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                     return EntityTransform.eulerAngles;
-                return Quaternion.LookRotation(Direction2D).eulerAngles;
+                return Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles;
             }
             set
             {

@@ -1055,7 +1055,7 @@ namespace MultiplayerARPG
         public virtual void PlayPickupAnimation() { }
 
         public abstract void PlayMoveAnimation();
-        public abstract void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier = 1f);
+        public abstract void PlayActionAnimation(AnimActionType animActionType, int dataId, int index, out bool skipMovementValidation, out bool shouldUseRootMotion, float playSpeedMultiplier, float changeClipLength, float overrideClipLength);
         public abstract void PlaySkillCastClip(int dataId, float duration, out bool skipMovementValidation, out bool shouldUseRootMotion);
         public abstract void PlayWeaponChargeClip(int dataId, bool isLeftHand, out bool skipMovementValidation, out bool shouldUseRootMotion);
         public abstract void StopActionAnimation();
@@ -1139,5 +1139,21 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public abstract bool GetLeftHandReloadAnimation(int dataId, out float animSpeedRate, out float[] triggerDurations, out float totalDuration);
         public abstract SkillActivateAnimationType GetSkillActivateAnimationType(int dataId);
+
+        public static float GetAnimationSpeedRate(float clipLength, float playSpeedMultiplier, float changeClipLength)
+        {
+            if (-changeClipLength > clipLength)
+                changeClipLength = -clipLength * 0.999f;
+            float animLengthWithChange = clipLength + changeClipLength;
+            float animLengthDiffToRate = animLengthWithChange / clipLength;
+            return playSpeedMultiplier * animLengthDiffToRate;
+        }
+
+        public static float GetAnimationDuration(float clipLength, float playSpeedMultiplier, float changeClipLength)
+        {
+            if (clipLength <= 0f)
+                return 0f;
+            return clipLength / GetAnimationSpeedRate(clipLength, playSpeedMultiplier, changeClipLength);
+        }
     }
 }

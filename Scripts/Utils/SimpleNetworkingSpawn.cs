@@ -11,7 +11,7 @@ namespace UtilsComponents
         {
             if (prefab == null)
                 return;
-            LiteNetLibGameManager manager = FindObjectOfType<LiteNetLibGameManager>();
+            LiteNetLibGameManager manager = FindFirstObjectByType<LiteNetLibGameManager>();
             if (manager == null || !manager.IsServer)
                 return;
             manager.Assets.NetworkSpawn(prefab.HashAssetId, transform.position, transform.rotation);

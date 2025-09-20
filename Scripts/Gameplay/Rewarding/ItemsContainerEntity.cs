@@ -1,6 +1,7 @@
 ﻿using Cysharp.Text;
 using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
+using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
@@ -84,7 +85,7 @@ namespace MultiplayerARPG
 
         public void CallRpcOnPickedUp()
         {
-            RPC(RpcOnPickedUp);
+            RPC(RpcOnPickedUp, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
         }
 
         [AllRpc]

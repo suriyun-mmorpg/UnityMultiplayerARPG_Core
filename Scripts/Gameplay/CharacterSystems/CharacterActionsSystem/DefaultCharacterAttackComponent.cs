@@ -178,18 +178,17 @@ namespace MultiplayerARPG
                         if (fpsModelAvailable)
                             fpsModel.CacheAttackRecoiler?.PlayRecoiling();
                     }
-                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
                 }
                 else
                 {
                     if (vehicleModelAvailable)
-                        vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                        vehicleModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate, 0f, 0f);
                     if (!overridePassengerActionAnimations)
                     {
                         if (tpsModelAvailable)
-                            tpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate);
+                            tpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate, 0f, 0f);
                         if (fpsModelAvailable)
-                            fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate);
+                            fpsModel.PlayActionAnimation(AnimActionType, AnimActionDataId, animationIndex, out _, out _, animSpeedRate, 0f, 0f);
                     }
                 }
 
@@ -197,20 +196,23 @@ namespace MultiplayerARPG
                 float remainsDuration = totalDuration;
                 if (weaponItem.RateOfFire > 0)
                 {
-                    remainsDuration = totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire + entityCaches.RateOfFire);
+                    totalDuration = RATE_OF_FIRE_BASE / (weaponItem.RateOfFire + entityCaches.RateOfFire);
+                    remainsDuration = BaseCharacterModel.GetAnimationDuration(totalDuration, animSpeedRate, 0f);
                     triggerDurations = new float[] { 0f };
-                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                    LastAttackEndTime = Time.unscaledTime + remainsDuration;
                 }
                 else if (weaponItem.DoRecoilingAsAttackAnimation)
                 {
-                    remainsDuration = totalDuration = tpsModel.CacheAttackRecoiler?.DefaultRecoilDuration ?? 1f;
+                    totalDuration = tpsModel.CacheAttackRecoiler?.DefaultRecoilDuration ?? 1f;
+                    remainsDuration = BaseCharacterModel.GetAnimationDuration(totalDuration, animSpeedRate, 0f);
                     triggerDurations = new float[] { 0f };
-                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                    LastAttackEndTime = Time.unscaledTime + remainsDuration;
                 }
                 else
                 {
-                    LastAttackEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
-                    await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, attackCancellationTokenSource.Token,
+                    remainsDuration = BaseCharacterModel.GetAnimationDuration(totalDuration, animSpeedRate, 0f);
+                    LastAttackEndTime = Time.unscaledTime + remainsDuration;
+                    await _manager.PrepareActionDurations(triggerDurations, totalDuration, animSpeedRate, 0f, attackCancellationTokenSource.Token,
                         (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
                         {
                             triggerDurations = __triggerDurations;

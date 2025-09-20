@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using LiteNetLib;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -210,7 +211,7 @@ namespace MultiplayerARPG
                 ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_FEATURE_IS_DISABLED);
                 return false;
             }
-            RPC(CmdSendDealingRequest, objectId);
+            RPC(CmdSendDealingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, objectId);
             return true;
         }
 
@@ -247,12 +248,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerReceiveDealingRequest(uint objectId)
         {
-            RPC(TargetRpcReceiveDealingRequest, ConnectionId, objectId);
+            RPC(TargetReceiveDealingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, ConnectionId, objectId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetRpcReceiveDealingRequest(uint objectId)
+        protected void TargetReceiveDealingRequest(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
@@ -263,7 +264,7 @@ namespace MultiplayerARPG
 
         public bool CallCmdAcceptDealingRequest()
         {
-            RPC(CmdAcceptDealingRequest);
+            RPC(CmdAcceptDealingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
             return true;
         }
 
@@ -296,7 +297,7 @@ namespace MultiplayerARPG
 
         public bool CallCmdDeclineDealingRequest()
         {
-            RPC(CmdDeclineDealingRequest);
+            RPC(CmdDeclineDealingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
             return true;
         }
 
@@ -313,7 +314,7 @@ namespace MultiplayerARPG
 
         public bool CallOwnerAcceptedDealingRequest(uint objectId)
         {
-            RPC(TargetRpcAcceptedDealingRequest, ConnectionId, objectId);
+            RPC(TargetRpcAcceptedDealingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, ConnectionId, objectId);
             return true;
         }
 

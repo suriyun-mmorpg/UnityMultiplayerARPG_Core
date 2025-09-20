@@ -99,8 +99,10 @@ namespace MultiplayerARPG
 
             // Prepare requires data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
+            float overrideDuration = 0f;
             if (weaponItem.ReloadDuration > 0f)
-                totalDuration = weaponItem.ReloadDuration;
+                totalDuration = overrideDuration = weaponItem.ReloadDuration;
+            float changedDuration = Entity.CachedData.ReloadDuration;
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileReloading = Entity.GetMoveSpeedRateWhileReloading(weaponItem);
@@ -118,21 +120,21 @@ namespace MultiplayerARPG
 
                 // Play animation
                 if (vehicleModelAvailable)
-                    vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
+                    vehicleModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate, changedDuration, overrideDuration);
                 if (!overridePassengerActionAnimations)
                 {
                     if (tpsModelAvailable)
-                        tpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion);
+                        tpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _skipMovementValidation, out _shouldUseRootMotion, animSpeedRate, changedDuration, overrideDuration);
                     if (fpsModelAvailable)
-                        fpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _);
+                        fpsModel.PlayActionAnimation(AnimActionType, animActionDataId, 0, out _, out _, animSpeedRate, changedDuration, overrideDuration);
                 }
 
                 // Prepare action durations
-                float remainsDuration = totalDuration;
-                LastReloadEndTime = CharacterActionComponentManager.PrepareActionEndTime(totalDuration, animSpeedRate);
+                float remainsDuration = BaseCharacterModel.GetAnimationDuration(totalDuration, animSpeedRate, changedDuration);
+                LastReloadEndTime = Time.unscaledTime + remainsDuration;
                 if (weaponItem.ReloadDuration <= 0f)
                 {
-                    await _manager.PrepareActionDurations(triggerDurations, totalDuration, 0f, animSpeedRate, reloadCancellationTokenSource.Token,
+                    await _manager.PrepareActionDurations(triggerDurations, totalDuration, animSpeedRate, changedDuration, reloadCancellationTokenSource.Token,
                         (__triggerDurations, __totalDuration, __remainsDuration, __endTime) =>
                         {
                             triggerDurations = __triggerDurations;

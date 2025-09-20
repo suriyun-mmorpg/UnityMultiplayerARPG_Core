@@ -2485,13 +2485,13 @@ namespace MultiplayerARPG
         {
             if (selectionManager != null)
                 selectionManager.DeselectSelectedUI();
-            UIStartVending ui = FindObjectOfType<UIStartVending>();
+            UIStartVending ui = FindFirstObjectByType<UIStartVending>();
             ui.AddItem(CharacterItem.id, amount, 0);
         }
 
         public void OnClickRemoveVendingItem()
         {
-            UIStartVending ui = FindObjectOfType<UIStartVending>();
+            UIStartVending ui = FindFirstObjectByType<UIStartVending>();
             ui.RemoveItem(IndexOfData);
         }
 

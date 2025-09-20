@@ -374,10 +374,24 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public bool AllowToStand()
+        {
+            if (!ActiveMovement.IsNull())
+                return ActiveMovement.AllowToStand();
+            return false;
+        }
+
         public async UniTask WaitClientTeleportConfirm()
         {
             if (!ActiveMovement.IsNull())
                 await ActiveMovement.WaitClientTeleportConfirm();
+        }
+
+        public bool IsWaitingClientTeleportConfirm()
+        {
+            if (!ActiveMovement.IsNull())
+                return ActiveMovement.IsWaitingClientTeleportConfirm();
+            return false;
         }
     }
 }

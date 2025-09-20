@@ -26,9 +26,12 @@ public static class PhysicUtils
     /// <param name="colliders"></param>
     /// <param name="layerMask"></param>
     /// <returns></returns>
-    public static int SortedOverlapSphereNonAlloc(Vector3 position, float distance, Collider[] colliders, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+    public static int SortedOverlapSphereNonAlloc(Vector3 position, float distance, Collider[] colliders, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false)
     {
+        bool prevHitBackfaces = Physics.queriesHitBackfaces;
+        Physics.queriesHitBackfaces = hitBackfaces;
         int count = Physics.OverlapSphereNonAlloc(position, distance, colliders, layerMask, queryTriggerInteraction);
+        Physics.queriesHitBackfaces = prevHitBackfaces;
         System.Array.Sort(colliders, 0, count, new ColliderComparer(position));
         return count;
     }
@@ -72,7 +75,7 @@ public static class PhysicUtils
     /// <param name="distance"></param>
     /// <param name="layerMask"></param>
     /// <returns></returns>
-    public static int SortedCastNonNonAlloc3D(Vector2 origin, float radius, Vector2 direction, RaycastHit2D[] hits, float distance, int layerMask)
+    public static int SortedCircleCastNonAlloc2D(Vector2 origin, float radius, Vector2 direction, RaycastHit2D[] hits, float distance, int layerMask)
     {
         int count = Physics2D.CircleCastNonAlloc(origin, radius, direction, hits, distance, layerMask);
         System.Array.Sort(hits, 0, count, new RaycastHitComparer());
@@ -106,7 +109,7 @@ public static class PhysicUtils
     /// <param name="layerMask"></param>
     /// <param name="queryTriggerInteraction"></param>
     /// <returns></returns>
-    public static int SortedRaycastNonAlloc3D(Ray ray, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+    public static int SortedRaycastNonAlloc3D(Ray ray, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false)
     {
         return SortedRaycastNonAlloc3D(ray.origin, ray.direction, hits, distance, layerMask, queryTriggerInteraction);
     }
@@ -121,9 +124,12 @@ public static class PhysicUtils
     /// <param name="layerMask"></param>
     /// <param name="queryTriggerInteraction"></param>
     /// <returns></returns>
-    public static int SortedRaycastNonAlloc3D(Vector3 origin, Vector3 direction, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+    public static int SortedRaycastNonAlloc3D(Vector3 origin, Vector3 direction, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false)
     {
+        bool prevHitBackfaces = Physics.queriesHitBackfaces;
+        Physics.queriesHitBackfaces = hitBackfaces;
         int count = Physics.RaycastNonAlloc(origin, direction, hits, distance, layerMask, queryTriggerInteraction);
+        Physics.queriesHitBackfaces = prevHitBackfaces;
         System.Array.Sort(hits, 0, count, new RaycastHitComparer());
         return count;
     }
@@ -139,9 +145,12 @@ public static class PhysicUtils
     /// <param name="layerMask"></param>
     /// <param name="queryTriggerInteraction"></param>
     /// <returns></returns>
-    public static int SortedSphereCastNonAlloc3D(Vector3 origin, float radius, Vector3 direction, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+    public static int SortedSphereCastNonAlloc3D(Vector3 origin, float radius, Vector3 direction, RaycastHit[] hits, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false)
     {
+        bool prevHitBackfaces = Physics.queriesHitBackfaces;
+        Physics.queriesHitBackfaces = hitBackfaces;
         int count = Physics.SphereCastNonAlloc(origin, radius, direction, hits, distance, layerMask, queryTriggerInteraction);
+        Physics.queriesHitBackfaces = prevHitBackfaces;
         System.Array.Sort(hits, 0, count, new RaycastHitComparer());
         return count;
     }
@@ -158,9 +167,12 @@ public static class PhysicUtils
     /// <param name="layerMask"></param>
     /// <param name="queryTriggerInteraction"></param>
     /// <returns></returns>
-    public static int SortedBoxCastNonAlloc3D(Vector3 origin, Vector3 halfExtents, Vector3 direction, RaycastHit[] hits, Quaternion orientation, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal)
+    public static int SortedBoxCastNonAlloc3D(Vector3 origin, Vector3 halfExtents, Vector3 direction, RaycastHit[] hits, Quaternion orientation, float distance, int layerMask, QueryTriggerInteraction queryTriggerInteraction = QueryTriggerInteraction.UseGlobal, bool hitBackfaces = false)
     {
+        bool prevHitBackfaces = Physics.queriesHitBackfaces;
+        Physics.queriesHitBackfaces = hitBackfaces;
         int count = Physics.BoxCastNonAlloc(origin, halfExtents, direction, hits, orientation, distance, layerMask, queryTriggerInteraction);
+        Physics.queriesHitBackfaces = prevHitBackfaces;
         System.Array.Sort(hits, 0, count, new RaycastHitComparer());
         return count;
     }
@@ -200,57 +212,6 @@ public static class PhysicUtils
         // Raycast to find hit floor
         int hitCount = Physics.RaycastNonAlloc(
             origin + (Vector3.up * distance * upOffsetsRate),
-            Vector3.down,
-            allocHits,
-            distance,
-            layerMask,
-            QueryTriggerInteraction.Ignore);
-        for (int i = hitCount - 1; i >= 0; --i)
-        {
-            if (excludingObject != null && excludingObject.root == allocHits[i].transform.root)
-                continue;
-            tempDistance = Vector3.Distance(origin, allocHits[i].point);
-            if (tempDistance < nearestDistance)
-            {
-                result = allocHits[i].point;
-                nearestDistance = tempDistance;
-                foundGround = true;
-            }
-        }
-        return foundGround;
-    }
-
-    public static Vector3 FindGroundedPositionWithCapsule(Vector3 origin, Quaternion rotation, Vector3 capsuleCenter, float capsuleRadius, float capsuleHeight, int raycastLength, float distance, int layerMask, Transform excludingObject = null, float upOffsetsRate = 0.5f)
-    {
-        return FindGroundedPositionWithCapsule(origin, rotation, capsuleCenter, capsuleRadius, capsuleHeight, new RaycastHit[raycastLength], distance, layerMask, excludingObject, upOffsetsRate);
-    }
-
-    public static Vector3 FindGroundedPositionWithCapsule(Vector3 origin, Quaternion rotation, Vector3 capsuleCenter, float capsuleRadius, float capsuleHeight, RaycastHit[] allocHits, float distance, int layerMask, Transform excludingObject = null, float upOffsetsRate = 0.5f)
-    {
-        FindGroundedPositionWithCapsule(origin, rotation, capsuleCenter, capsuleRadius, capsuleHeight, allocHits, distance, layerMask, out Vector3 result, excludingObject, upOffsetsRate);
-        return result;
-    }
-
-    public static bool FindGroundedPositionWithCapsule(Vector3 origin, Quaternion rotation, Vector3 capsuleCenter, float capsuleRadius, float capsuleHeight, RaycastHit[] allocHits, float distance, int layerMask, out Vector3 result, Transform excludingObject = null, float upOffsetsRate = 0.5f)
-    {
-        result = origin;
-        float sideHeight = capsuleHeight - capsuleRadius * 2.0f;
-        Vector3 worldUp = Vector3.up;
-
-        Vector3 bottomCenterHemi = capsuleCenter - (worldUp * capsuleHeight * 0.5f) + (worldUp * capsuleRadius);
-        Vector3 topCenterHemi = capsuleCenter + (worldUp * capsuleHeight * 0.5f) - (worldUp * capsuleRadius);
-
-        Vector3 bottom = origin + (rotation * bottomCenterHemi) + (Vector3.up * distance * upOffsetsRate);
-        Vector3 top = origin + (rotation * topCenterHemi) + (Vector3.up * distance * upOffsetsRate);
-
-        float nearestDistance = float.MaxValue;
-        bool foundGround = false;
-        float tempDistance;
-        // Capsule cast to find hit floor
-        int hitCount = Physics.CapsuleCastNonAlloc(
-            bottom,
-            top,
-            capsuleRadius,
             Vector3.down,
             allocHits,
             distance,

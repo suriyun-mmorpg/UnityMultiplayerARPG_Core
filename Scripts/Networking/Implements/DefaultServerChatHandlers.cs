@@ -59,7 +59,7 @@ namespace MultiplayerARPG
                             string response = await GameInstance.Singleton.GMCommands.HandleGMCommand(message.senderName, playerCharacterEntity, message.message);
                             if (!string.IsNullOrEmpty(response))
                             {
-                                Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, new ChatMessage()
+                                Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, new ChatMessage()
                                 {
                                     channel = ChatChannel.System,
                                     message = response,
@@ -75,15 +75,15 @@ namespace MultiplayerARPG
                                 List<BasePlayerCharacterEntity> receivers = playerCharacterEntity.FindEntities<BasePlayerCharacterEntity>(GameInstance.Singleton.localChatDistance, false, true, true, true, GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.playingLayer.Mask);
                                 foreach (BasePlayerCharacterEntity receiver in receivers)
                                 {
-                                    Manager.ServerSendPacket(receiver.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                    Manager.ServerSendPacket(receiver.ConnectionId, 0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                                 }
                                 // Send messages to sender
-                                Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                Manager.ServerSendPacket(playerCharacterEntity.ConnectionId, 0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                             }
                             else
                             {
                                 // Character is not the entity, assume that player enter chat message in lobby, so broadcast message to other players in the lobby
-                                Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
@@ -92,20 +92,20 @@ namespace MultiplayerARPG
                     if (!string.IsNullOrEmpty(message.senderName))
                     {
                         // Send message to all clients
-                        Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                     }
                     break;
                 case ChatChannel.Whisper:
                     if (GameInstance.ServerUserHandlers.TryGetConnectionIdByName(message.senderName, out connectionId))
                     {
                         // If found sender send whisper message to sender
-                        Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                     }
                     if (!string.IsNullOrEmpty(message.receiverName) && !message.receiverName.Equals(message.senderName) &&
                         GameInstance.ServerUserHandlers.TryGetConnectionIdByName(message.receiverName, out connectionId))
                     {
                         // If found receiver send whisper message to receiver
-                        Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                        Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                     }
                     break;
                 case ChatChannel.Party:
@@ -116,7 +116,7 @@ namespace MultiplayerARPG
                             if (GameInstance.ServerUserHandlers.TryGetConnectionIdById(memberId, out connectionId))
                             {
                                 // If party member is online, send party message to the member
-                                Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
@@ -129,14 +129,14 @@ namespace MultiplayerARPG
                             if (GameInstance.ServerUserHandlers.TryGetConnectionIdById(memberId, out connectionId))
                             {
                                 // If guild member is online, send guild message to the member
-                                Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                                Manager.ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                             }
                         }
                     }
                     break;
                 case ChatChannel.System:
                     // Send message to all clients
-                    Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.Chat, message);
+                    Manager.ServerSendPacketToAllConnections(0, DeliveryMethod.ReliableUnordered, GameNetworkingConsts.Chat, message);
                     break;
             }
             if (!string.IsNullOrEmpty(message.senderId))

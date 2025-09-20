@@ -1,6 +1,6 @@
-﻿using Insthync.UnityEditorUtils;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
-using LiteNetLib;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -72,8 +72,16 @@ namespace MultiplayerARPG
         public virtual int TitleDataId { get; set; }
         public virtual int FactionId { get; set; }
         public virtual int Reputation { get; set; }
-        public byte EquipWeaponSet { get { return equipWeaponSet.Value; } set { equipWeaponSet.Value = value; } }
-        public bool IsWeaponsSheathed { get { return isWeaponsSheathed.Value; } set { isWeaponsSheathed.Value = value; } }
+        public byte EquipWeaponSet
+        {
+            get { return equipWeaponSet.Value; }
+            set { equipWeaponSet.Value = value; }
+        }
+        public bool IsWeaponsSheathed
+        {
+            get { return isWeaponsSheathed.Value; }
+            set { isWeaponsSheathed.Value = value; }
+        }
         public EquipWeapons EquipWeapons
         {
             get

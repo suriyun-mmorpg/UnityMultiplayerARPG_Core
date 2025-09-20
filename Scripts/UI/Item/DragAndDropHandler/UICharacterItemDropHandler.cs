@@ -93,7 +93,7 @@ namespace MultiplayerARPG
                     // Drop equip item to storage item
                     UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
                     if (uiStorageItems == null)
-                        uiStorageItems = FindObjectOfType<UIStorageItems>();
+                        uiStorageItems = FindFirstObjectByType<UIStorageItems>();
                     if (uiStorageItems == null)
                     {
                         Debug.LogError("Unable to drop non equip item, no opened storage items UI");
@@ -143,7 +143,7 @@ namespace MultiplayerARPG
                     // Drop non equip item to storage item
                     UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
                     if (uiStorageItems == null)
-                        uiStorageItems = FindObjectOfType<UIStorageItems>();
+                        uiStorageItems = FindFirstObjectByType<UIStorageItems>();
                     if (uiStorageItems == null)
                     {
                         Debug.LogError("Unable to drop non equip item, no opened storage items UI");
@@ -191,7 +191,7 @@ namespace MultiplayerARPG
                     // Drop storage item to storage item
                     UIStorageItems uiStorageItems = GetComponentInParent<UIStorageItems>();
                     if (uiStorageItems == null)
-                        uiStorageItems = FindObjectOfType<UIStorageItems>();
+                        uiStorageItems = FindFirstObjectByType<UIStorageItems>();
                     if (uiStorageItems == null)
                     {
                         Debug.LogError("Unable to drop storage item, no opened storage items UI");

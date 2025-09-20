@@ -140,6 +140,7 @@ namespace MultiplayerARPG
         public float RespawnGroundedCheckCountDown { get; protected set; }
         public float RespawnInvincibleCountDown { get; protected set; }
         public float LastUseItemTime { get; set; }
+        public float LastActionEndTime => Mathf.Max(LastAttackEndTime, LastUseSkillEndTime, LastReloadEndTime);
 
         protected int _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         protected float _lastActionTime;
@@ -321,8 +322,6 @@ namespace MultiplayerARPG
             {
                 // Clear data when character dead
                 ExitVehicleAndForget();
-                // Disable movement when character dead
-                tempEnableMovement = false;
             }
 
             // Enable movement or not
@@ -356,42 +355,42 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void SendClientState(long writeTimestamp)
+        public override void SendClientState(uint writeTick)
         {
             s_EntityStateDataWriter.Reset();
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out bool shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(writeTick, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
+                s_EntityStateMessageWriter.PutPackedUInt(writeTick);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ClientSendMessage(MOVEMENT_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
-        public override void SendServerState(long writeTimestamp)
+        public override void SendServerState(uint writeTick)
         {
             s_EntityStateDataWriter.Reset();
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out bool shouldSendReliably))
+            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(writeTick, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
+                s_EntityStateMessageWriter.PutPackedUInt(writeTick);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ServerSendMessageToSubscribers(MOVEMENT_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
-        public override void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
+        public override void ReadClientStateAtServer(uint peerTick, NetDataReader reader)
         {
             if (Movement != null)
-                Movement.ReadClientStateAtServer(peerTimestamp, reader);
+                Movement.ReadClientStateAtServer(peerTick, reader);
         }
 
-        public override void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public override void ReadServerStateAtClient(uint peerTick, NetDataReader reader)
         {
             if (Movement != null)
-                Movement.ReadServerStateAtClient(peerTimestamp, reader);
+                Movement.ReadServerStateAtClient(peerTick, reader);
         }
 
         public override void PlayJumpAnimation()

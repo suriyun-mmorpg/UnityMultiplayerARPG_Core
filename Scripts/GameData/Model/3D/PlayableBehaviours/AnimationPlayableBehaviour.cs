@@ -289,7 +289,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             private float _actionTransitionDuration = 0f;
             private float _actionClipLength = 0f;
             private float _actionPlayElapsed = 0f;
-            private float _actionLayerClipSpeed = 0f;
+            private float _actionLayerClipSpeedRate = 0f;
             public AnimationMixerPlayable ActionLayerMixer { get; private set; }
 
             public void Update(AnimationPlayableBehaviour behaviour, FrameData info)
@@ -305,7 +305,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
 
                 // Update freezing state
-                ActionLayerMixer.GetInput(0).SetSpeed(behaviour.IsFreeze ? 0 : _actionLayerClipSpeed);
+                ActionLayerMixer.GetInput(0).SetSpeed(behaviour.IsFreeze ? 0 : _actionLayerClipSpeedRate);
 
                 // Update transition
                 float weightUpdate = info.deltaTime / _actionTransitionDuration;
@@ -345,7 +345,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
             }
 
-            public float PlayAction(AnimationPlayableBehaviour behaviour, int layerId, ActionState actionState, float speedRate, float duration = 0f, bool loop = false, int actionId = 0)
+            public float PlayAction(AnimationPlayableBehaviour behaviour, int layerId, ActionState actionState, float speedRate, float changedDuration, float overrideDuration = 0f, bool loop = false, int actionId = 0)
             {
                 _layer = ACTION_LAYER + layerId;
                 uint castedLayer = (uint)_layer;
@@ -411,15 +411,17 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 behaviour.LayerMixer.SetLayerMaskFromAvatarMask(castedLayer, avatarMask);
 
                 // Set clip info
-                _actionLayerClipSpeed = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
+                float animLength = overrideDuration > 0f ? overrideDuration : clip.length;
+                float animSpeedRate = (actionState.animSpeedRate > 0f ? actionState.animSpeedRate : 1f) * speedRate;
+                _actionLayerClipSpeedRate = BaseCharacterModel.GetAnimationSpeedRate(animLength, animSpeedRate, changedDuration);
                 // Set transition duration
                 _actionTransitionDuration = actionState.transitionDuration;
                 if (_actionTransitionDuration <= 0f)
                     _actionTransitionDuration = behaviour.CharacterModel.transitionDuration;
-                _actionTransitionDuration /= _actionLayerClipSpeed;
+                _actionTransitionDuration /= _actionLayerClipSpeedRate;
                 // Set clip length
                 ActionLayerMixer.GetInput(0).SetTime(0f);
-                _actionClipLength = (duration > 0f ? duration : clip.length) / _actionLayerClipSpeed;
+                _actionClipLength = animLength / _actionLayerClipSpeedRate;
                 // Set layer additive
                 behaviour.LayerMixer.SetLayerAdditive(castedLayer, actionState.isAdditive);
                 // Reset play elapsed
@@ -1163,15 +1165,16 @@ namespace MultiplayerARPG.GameData.Model.Playables
         /// <param name="layerId"></param>
         /// <param name="actionState"></param>
         /// <param name="speedRate"></param>
-        /// <param name="duration"></param>
+        /// <param name="changedDuration"></param>
+        /// <param name="overrideDuration"></param>
         /// <param name="loop"></param>
         /// <param name="actionId"></param>
         /// <returns></returns>
-        public float PlayAction(int layerId, ActionState actionState, float speedRate, float duration = 0f, bool loop = false, int actionId = 0)
+        public float PlayAction(int layerId, ActionState actionState, float speedRate, float changedDuration, float overrideDuration = 0f, bool loop = false, int actionId = 0)
         {
             if (!_actionStatePlayings.TryGetValue(layerId, out ActionStatePlayingData playingData))
                 playingData = new ActionStatePlayingData();
-            float length = playingData.PlayAction(this, layerId, actionState, speedRate, duration, loop, actionId);
+            float length = playingData.PlayAction(this, layerId, actionState, speedRate, changedDuration, overrideDuration, loop, actionId);
             _actionStatePlayings[layerId] = playingData;
             return length;
         }
@@ -1181,13 +1184,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
         /// </summary>
         /// <param name="actionState"></param>
         /// <param name="speedRate"></param>
-        /// <param name="duration"></param>
+        /// <param name="changedDuration"></param>
+        /// <param name="overrideDuration"></param>
         /// <param name="loop"></param>
         /// <param name="actionId"></param>
         /// <returns></returns>
-        public float PlayAction(ActionState actionState, float speedRate, float duration = 0f, bool loop = false, int actionId = 0)
+        public float PlayAction(ActionState actionState, float speedRate, float changedDuration, float overrideDuration = 0f, bool loop = false, int actionId = 0)
         {
-            return PlayAction(0, actionState, speedRate, duration, loop, actionId);
+            return PlayAction(0, actionState, speedRate, changedDuration, overrideDuration, loop, actionId);
         }
 
         public void StopActionIfActionIdIs(int layerId, int actionId)
