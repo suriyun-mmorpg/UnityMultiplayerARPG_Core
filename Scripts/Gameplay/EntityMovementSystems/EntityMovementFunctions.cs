@@ -89,21 +89,16 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static float[] CalculateCrawlRaycastDegrees(int crawlCheckRaycasts)
+        public static void CalculateCrawlRaycastDegrees(int crawlCheckRaycasts, ref float[] result)
         {
-            float[] result;
             if (crawlCheckRaycasts > 0)
             {
-                result = new float[crawlCheckRaycasts];
                 float increaseRaycastDegree = 360f / crawlCheckRaycasts;
-                result = new float[crawlCheckRaycasts];
                 for (int i = 0; i < crawlCheckRaycasts; ++i)
                 {
                     result[i] = i * increaseRaycastDegree;
                 }
-                return result;
             }
-            return null;
         }
 
         public static bool AllowToCrawl(this IEntityMovement movement, int crawlCheckRaycasts, float crawlCheckOffsets, float crawlCheckRadius)
@@ -114,7 +109,7 @@ namespace MultiplayerARPG
             Vector3 center = new Vector3(transform.position.x, transform.position.y - crawlCheckOffsets, transform.position.z);
             float[] crawlRaycastDegrees = ArrayPool<float>.Shared.Rent(crawlCheckRaycasts);
             RaycastHit[] findGroundRaycastHits = ArrayPool<RaycastHit>.Shared.Rent(FIND_GROUND_HIT_ARRAY_LENGTH);
-            crawlRaycastDegrees = CalculateCrawlRaycastDegrees(crawlCheckRaycasts);
+            CalculateCrawlRaycastDegrees(crawlCheckRaycasts, ref crawlRaycastDegrees);
             for (int i = 0; i < crawlCheckRaycasts; ++i)
             {
                 int hitCount = Physics.RaycastNonAlloc(
@@ -145,7 +140,7 @@ namespace MultiplayerARPG
             RaycastHit? nearestHit = null;
             float[] crawlRaycastDegrees = ArrayPool<float>.Shared.Rent(crawlCheckRaycasts);
             RaycastHit[] findGroundRaycastHits = ArrayPool<RaycastHit>.Shared.Rent(FIND_GROUND_HIT_ARRAY_LENGTH);
-            crawlRaycastDegrees = CalculateCrawlRaycastDegrees(crawlCheckRaycasts);
+            CalculateCrawlRaycastDegrees(crawlCheckRaycasts, ref crawlRaycastDegrees);
             for (int i = 0; i < crawlCheckRaycasts; ++i)
             {
                 Vector3 raycastDirection = Quaternion.Euler(0f, crawlRaycastDegrees[i], 0f) * moveDirection;
@@ -227,7 +222,7 @@ namespace MultiplayerARPG
             Transform transform = movement.Entity.EntityTransform;
             Vector3 center = new Vector3(transform.position.x, transform.position.y - crawlCheckOffsets, transform.position.z);
             float[] crawlRaycastDegrees = ArrayPool<float>.Shared.Rent(crawlCheckRaycasts);
-            crawlRaycastDegrees = CalculateCrawlRaycastDegrees(crawlCheckRaycasts);
+            CalculateCrawlRaycastDegrees(crawlCheckRaycasts, ref crawlRaycastDegrees);
             Gizmos.color = crawlCheckGizmosColor;
             for (int i = 0; i < crawlCheckRaycasts; ++i)
             {
