@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         [Header("Generic Settings")]
         public string effectSocket;
         public bool isLoop;
+        public bool stayInPlace = false;
         public float lifeTime;
 
         [Header("Sound Effect Playing")]
@@ -49,8 +50,9 @@ namespace MultiplayerARPG
             get { return _followingTarget; }
             set
             {
-                if (value == null)
+                if (stayInPlace || value == null)
                     return;
+
                 _followingTarget = value;
                 _intendToFollowTarget = true;
             }
