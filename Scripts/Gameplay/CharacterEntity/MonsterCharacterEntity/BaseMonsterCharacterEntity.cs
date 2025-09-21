@@ -163,7 +163,6 @@ namespace MultiplayerARPG
         protected readonly List<CharacterItem> _droppingItems = new List<CharacterItem>();
         protected Reward _killedReward;
         protected float _lastTeleportToSummonerTime = 0f;
-        protected int _beforeDamageReceivedHp;
 
         public override void PrepareRelatesData()
         {
@@ -331,12 +330,6 @@ namespace MultiplayerARPG
             return base.GetMoveSpeed(movementState, extraMovementState);
         }
 
-        public override void ReceivingDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel)
-        {
-            _beforeDamageReceivedHp = CurrentHp;
-            base.ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
-        }
-
         public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType damageAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             RecordRecivingDamage(instigator, totalDamage);
@@ -345,7 +338,6 @@ namespace MultiplayerARPG
 
         public override void OnBuffHpDecrease(EntityInfo causer, int amount)
         {
-            _beforeDamageReceivedHp = CurrentHp;
             base.OnBuffHpDecrease(causer, amount);
             RecordRecivingDamage(causer, amount);
         }
@@ -361,8 +353,6 @@ namespace MultiplayerARPG
                 // Add received damage entry
                 if (attackerCharacter != null)
                 {
-                    if (damage > _beforeDamageReceivedHp)
-                        damage = _beforeDamageReceivedHp;
                     ReceivedDamageRecord receivedDamageRecord = new ReceivedDamageRecord();
                     receivedDamageRecord.totalReceivedDamage = damage;
                     if (receivedDamageRecords.ContainsKey(attackerCharacter))
