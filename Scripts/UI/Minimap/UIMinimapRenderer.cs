@@ -93,7 +93,6 @@ namespace MultiplayerARPG
         protected float _updateMarkerCountdown;
         protected BaseMapInfo _currentMapInfo;
         protected List<MarkerData> _markers = new List<MarkerData>();
-        protected Dictionary<string, RectTransform> _mapMarkers = new Dictionary<string, RectTransform>();
         protected Dictionary<int, Queue<RectTransform>> _markersPool = new Dictionary<int, Queue<RectTransform>>();
         protected Dictionary<string, MapMarkerPrefabData> _cachedMapMarkerPrefabs;
         public Dictionary<string, MapMarkerPrefabData> CachedMapMarkerPrefabs
