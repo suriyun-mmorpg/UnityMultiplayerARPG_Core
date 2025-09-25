@@ -431,8 +431,14 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.updateRotation = false;
             if (CacheNavMeshAgent.isOnNavMesh)
                 CacheNavMeshAgent.isStopped = true;
-            MovementState = MovementState.IsGrounded;
-            ExtraMovementState = ExtraMovementState.None;
+            MovementState movementState = MovementState;
+            movementState &= ~MovementState.Forward;
+            movementState &= ~MovementState.Backward;
+            movementState &= ~MovementState.Right;
+            movementState &= ~MovementState.Left;
+            movementState &= ~MovementState.Up;
+            movementState &= ~MovementState.Down;
+            MovementState = movementState;
         }
 
         public async void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
@@ -625,6 +631,9 @@ namespace MultiplayerARPG
                     break;
                 }
             }
+
+            if (_interpToData.Tick < 2)
+                return;
 
             float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
             Vector3 position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
