@@ -4,6 +4,7 @@ using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -22,14 +23,38 @@ namespace MultiplayerARPG
         public float jumpHeight = 2f;
         public ApplyJumpForceMode applyJumpForceMode = ApplyJumpForceMode.ApplyImmediately;
         public float applyJumpForceFixedDuration;
-        public float forwardSideMoveSpeedRate = 0.75f;
-        public float sideMoveSpeedRate = 1f;
-        public float backwardSideMoveSpeedRate = 0.75f;
-        public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
         public float groundedVerticalVelocity = 0f;
         public bool doNotChangeVelocityWhileAirborne;
+
+        [Header("Stand Speed Rate")]
+        public float standForwardMoveSpeedRate = 1f;
+        public float standForwardSideMoveSpeedRate = 1f;
+        public float standSideMoveSpeedRate = 1f;
+        public float standBackwardSideMoveSpeedRate = 0.75f;
+        public float standBackwardMoveSpeedRate = 0.75f;
+
+        [Header("Crouch Speed Rate")]
+        public float crouchForwardMoveSpeedRate = 1f;
+        public float crouchForwardSideMoveSpeedRate = 1f;
+        public float crouchSideMoveSpeedRate = 1f;
+        public float crouchBackwardSideMoveSpeedRate = 0.75f;
+        public float crouchBackwardMoveSpeedRate = 0.75f;
+
+        [Header("Crawl Speed Rate")]
+        public float crawlForwardMoveSpeedRate = 1f;
+        public float crawlForwardSideMoveSpeedRate = 1f;
+        public float crawlSideMoveSpeedRate = 1f;
+        public float crawlBackwardSideMoveSpeedRate = 0.75f;
+        public float crawlBackwardMoveSpeedRate = 0.75f;
+
+        [Header("Swim Speed Rate")]
+        public float swimForwardMoveSpeedRate = 1f;
+        public float swimForwardSideMoveSpeedRate = 1f;
+        public float swimSideMoveSpeedRate = 1f;
+        public float swimBackwardSideMoveSpeedRate = 0.75f;
+        public float swimBackwardMoveSpeedRate = 0.75f;
 
         [Header("Pausing")]
         public float landedPauseMovementDuration = 0f;
@@ -718,29 +743,119 @@ namespace MultiplayerARPG
                 // Forward (0-34)
                 if (moveAngle < 35f)
                 {
-                    moveSpeedRate = 1f; // full speed
+                    if (IsUnderWater)
+                    {
+                        moveSpeedRate = swimForwardMoveSpeedRate;
+                    }
+                    else
+                    {
+                        switch (_tempExtraMovementState)
+                        {
+                            case ExtraMovementState.IsCrawling:
+                                moveSpeedRate = crawlForwardMoveSpeedRate;
+                                break;
+                            case ExtraMovementState.IsCrouching:
+                                moveSpeedRate = crouchForwardMoveSpeedRate;
+                                break;
+                            default:
+                                moveSpeedRate = standForwardMoveSpeedRate;
+                                break;
+                        }
+                    }
                 }
                 // Forward-side (diagonal, 35-55)
                 else if (moveAngle >= 35f && moveAngle <= 55f)
                 {
-                    moveSpeedRate = forwardSideMoveSpeedRate;
+                    if (IsUnderWater)
+                    {
+                        moveSpeedRate = swimForwardSideMoveSpeedRate;
+                    }
+                    else
+                    {
+                        switch (_tempExtraMovementState)
+                        {
+                            case ExtraMovementState.IsCrawling:
+                                moveSpeedRate = crawlForwardSideMoveSpeedRate;
+                                break;
+                            case ExtraMovementState.IsCrouching:
+                                moveSpeedRate = crouchForwardSideMoveSpeedRate;
+                                break;
+                            default:
+                                moveSpeedRate = standForwardSideMoveSpeedRate;
+                                break;
+                        }
+                    }
                 }
                 // Pure side (56-124)
                 else if (moveAngle > 55f && moveAngle < 125f)
                 {
-                    moveSpeedRate = sideMoveSpeedRate;
+                    if (IsUnderWater)
+                    {
+                        moveSpeedRate = swimSideMoveSpeedRate;
+                    }
+                    else
+                    {
+                        switch (_tempExtraMovementState)
+                        {
+                            case ExtraMovementState.IsCrawling:
+                                moveSpeedRate = crawlSideMoveSpeedRate;
+                                break;
+                            case ExtraMovementState.IsCrouching:
+                                moveSpeedRate = crouchSideMoveSpeedRate;
+                                break;
+                            default:
+                                moveSpeedRate = standSideMoveSpeedRate;
+                                break;
+                        }
+                    }
                 }
                 // Backward-side (diagonal, 125-145)
                 else if (moveAngle >= 125f && moveAngle <= 145f)
                 {
-                    moveSpeedRate = backwardSideMoveSpeedRate;
+                    if (IsUnderWater)
+                    {
+                        moveSpeedRate = swimBackwardSideMoveSpeedRate;
+                    }
+                    else
+                    {
+                        switch (_tempExtraMovementState)
+                        {
+                            case ExtraMovementState.IsCrawling:
+                                moveSpeedRate = crawlBackwardSideMoveSpeedRate;
+                                break;
+                            case ExtraMovementState.IsCrouching:
+                                moveSpeedRate = crouchBackwardSideMoveSpeedRate;
+                                break;
+                            default:
+                                moveSpeedRate = standBackwardSideMoveSpeedRate;
+                                break;
+                        }
+                    }
                 }
                 // Backward (146-180)
                 else if (moveAngle > 145f)
                 {
-                    moveSpeedRate = backwardMoveSpeedRate;
+                    if (IsUnderWater)
+                    {
+                        moveSpeedRate = swimBackwardMoveSpeedRate;
+                    }
+                    else
+                    {
+                        switch (_tempExtraMovementState)
+                        {
+                            case ExtraMovementState.IsCrawling:
+                                moveSpeedRate = crawlBackwardMoveSpeedRate;
+                                break;
+                            case ExtraMovementState.IsCrouching:
+                                moveSpeedRate = crouchBackwardMoveSpeedRate;
+                                break;
+                            default:
+                                moveSpeedRate = standBackwardMoveSpeedRate;
+                                break;
+                        }
+                    }
                 }
-                CurrentMoveSpeed = tempMaxMoveSpeed;
+                CurrentMoveSpeed = tempMaxMoveSpeed * moveSpeedRate;
 
                 // NOTE: `tempTargetPosition` and `tempCurrentPosition` were set above
                 tempSqrMagnitude = (tempTargetPosition - tempCurrentPosition).sqrMagnitude;

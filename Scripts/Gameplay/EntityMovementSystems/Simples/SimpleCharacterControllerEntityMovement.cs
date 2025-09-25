@@ -28,15 +28,43 @@ namespace MultiplayerARPG
         public float jumpHeight = 2f;
         public ApplyJumpForceMode applyJumpForceMode = ApplyJumpForceMode.ApplyImmediately;
         public float applyJumpForceFixedDuration;
-        public float forwardSideMoveSpeedRate = 0.75f;
-        public float sideMoveSpeedRate = 1f;
-        public float backwardSideMoveSpeedRate = 0.75f;
-        public float backwardMoveSpeedRate = 0.75f;
         public float gravity = 9.81f;
         public float maxFallVelocity = 40f;
         public float groundedVerticalVelocity = -2f;
         public float groundSnapDistance = 2f;
         public bool doNotChangeVelocityWhileAirborne;
+
+        [Header("Stand Speed Rate")]
+        public float standForwardMoveSpeedRate = 1f;
+        [FormerlySerializedAs("forwardSideMoveSpeedRate")]
+        public float standForwardSideMoveSpeedRate = 1f;
+        [FormerlySerializedAs("sideMoveSpeedRate")]
+        public float standSideMoveSpeedRate = 1f;
+        [FormerlySerializedAs("backwardSideMoveSpeedRate")]
+        public float standBackwardSideMoveSpeedRate = 0.75f;
+        [FormerlySerializedAs("backwardMoveSpeedRate")]
+        public float standBackwardMoveSpeedRate = 0.75f;
+
+        [Header("Crouch Speed Rate")]
+        public float crouchForwardMoveSpeedRate = 1f;
+        public float crouchForwardSideMoveSpeedRate = 1f;
+        public float crouchSideMoveSpeedRate = 1f;
+        public float crouchBackwardSideMoveSpeedRate = 0.75f;
+        public float crouchBackwardMoveSpeedRate = 0.75f;
+
+        [Header("Crawl Speed Rate")]
+        public float crawlForwardMoveSpeedRate = 1f;
+        public float crawlForwardSideMoveSpeedRate = 1f;
+        public float crawlSideMoveSpeedRate = 1f;
+        public float crawlBackwardSideMoveSpeedRate = 0.75f;
+        public float crawlBackwardMoveSpeedRate = 0.75f;
+
+        [Header("Swim Speed Rate")]
+        public float swimForwardMoveSpeedRate = 1f;
+        public float swimForwardSideMoveSpeedRate = 1f;
+        public float swimSideMoveSpeedRate = 1f;
+        public float swimBackwardSideMoveSpeedRate = 0.75f;
+        public float swimBackwardMoveSpeedRate = 0.75f;
 
         [Header("Pausing")]
         public float landedPauseMovementDuration = 0f;
@@ -148,20 +176,44 @@ namespace MultiplayerARPG
                 jumpHeight = jumpHeight,
                 applyJumpForceMode = applyJumpForceMode,
                 applyJumpForceFixedDuration = applyJumpForceFixedDuration,
-                forwardSideMoveSpeedRate = forwardSideMoveSpeedRate,
-                sideMoveSpeedRate = sideMoveSpeedRate,
-                backwardSideMoveSpeedRate = backwardSideMoveSpeedRate,
-                backwardMoveSpeedRate = backwardMoveSpeedRate,
+
+                standForwardMoveSpeedRate = standForwardMoveSpeedRate,
+                standForwardSideMoveSpeedRate = standForwardSideMoveSpeedRate,
+                standSideMoveSpeedRate = standSideMoveSpeedRate,
+                standBackwardSideMoveSpeedRate = standBackwardSideMoveSpeedRate,
+                standBackwardMoveSpeedRate = standBackwardMoveSpeedRate,
+
+                crouchForwardMoveSpeedRate = crouchForwardMoveSpeedRate,
+                crouchForwardSideMoveSpeedRate = crouchForwardSideMoveSpeedRate,
+                crouchSideMoveSpeedRate = crouchSideMoveSpeedRate,
+                crouchBackwardSideMoveSpeedRate = crouchBackwardSideMoveSpeedRate,
+                crouchBackwardMoveSpeedRate = crouchBackwardMoveSpeedRate,
+
+                crawlForwardMoveSpeedRate = crawlForwardMoveSpeedRate,
+                crawlForwardSideMoveSpeedRate = crawlForwardSideMoveSpeedRate,
+                crawlSideMoveSpeedRate = crawlSideMoveSpeedRate,
+                crawlBackwardSideMoveSpeedRate = crawlBackwardSideMoveSpeedRate,
+                crawlBackwardMoveSpeedRate = crawlBackwardMoveSpeedRate,
+
+                swimForwardMoveSpeedRate = swimForwardMoveSpeedRate,
+                swimForwardSideMoveSpeedRate = swimForwardSideMoveSpeedRate,
+                swimSideMoveSpeedRate = swimSideMoveSpeedRate,
+                swimBackwardSideMoveSpeedRate = swimBackwardSideMoveSpeedRate,
+                swimBackwardMoveSpeedRate = swimBackwardMoveSpeedRate,
+
                 gravity = gravity,
                 maxFallVelocity = maxFallVelocity,
                 groundedVerticalVelocity = groundedVerticalVelocity,
                 doNotChangeVelocityWhileAirborne = doNotChangeVelocityWhileAirborne,
                 landedPauseMovementDuration = landedPauseMovementDuration,
+
                 beforeCrawlingPauseMovementDuration = beforeCrawlingPauseMovementDuration,
                 afterCrawlingPauseMovementDuration = afterCrawlingPauseMovementDuration,
+
                 underWaterThreshold = underWaterThreshold,
                 autoSwimToSurface = autoSwimToSurface,
                 dashingForceApplier = dashingForceApplier,
+
                 alwaysUseRootMotion = alwaysUseRootMotion,
                 useRootMotionForMovement = useRootMotionForMovement,
                 useRootMotionForAirMovement = useRootMotionForAirMovement,
@@ -227,21 +279,43 @@ namespace MultiplayerARPG
             Functions.stoppingDistance = stoppingDistance;
             Functions.jumpHeight = jumpHeight;
             Functions.applyJumpForceMode = applyJumpForceMode;
-            Functions.applyJumpForceFixedDuration = applyJumpForceFixedDuration;
-            Functions.forwardSideMoveSpeedRate = forwardSideMoveSpeedRate;
-            Functions.sideMoveSpeedRate = sideMoveSpeedRate;
-            Functions.backwardSideMoveSpeedRate = backwardSideMoveSpeedRate;
-            Functions.backwardMoveSpeedRate = backwardMoveSpeedRate;
+
+            Functions.standForwardMoveSpeedRate = standForwardMoveSpeedRate;
+            Functions.standForwardSideMoveSpeedRate = standForwardSideMoveSpeedRate;
+            Functions.standSideMoveSpeedRate = standSideMoveSpeedRate;
+            Functions.standBackwardSideMoveSpeedRate = standBackwardSideMoveSpeedRate;
+            Functions.standBackwardMoveSpeedRate = standBackwardMoveSpeedRate;
+
+            Functions.crouchForwardMoveSpeedRate = crouchForwardMoveSpeedRate;
+            Functions.crouchForwardSideMoveSpeedRate = crouchForwardSideMoveSpeedRate;
+            Functions.crouchSideMoveSpeedRate = crouchSideMoveSpeedRate;
+            Functions.crouchBackwardSideMoveSpeedRate = crouchBackwardSideMoveSpeedRate;
+            Functions.crouchBackwardMoveSpeedRate = crouchBackwardMoveSpeedRate;
+
+            Functions.crawlForwardMoveSpeedRate = crawlForwardMoveSpeedRate;
+            Functions.crawlForwardSideMoveSpeedRate = crawlForwardSideMoveSpeedRate;
+            Functions.crawlSideMoveSpeedRate = crawlSideMoveSpeedRate;
+            Functions.crawlBackwardSideMoveSpeedRate = crawlBackwardSideMoveSpeedRate;
+            Functions.crawlBackwardMoveSpeedRate = crawlBackwardMoveSpeedRate;
+
+            Functions.swimForwardMoveSpeedRate = swimForwardMoveSpeedRate;
+            Functions.swimForwardSideMoveSpeedRate = swimForwardSideMoveSpeedRate;
+            Functions.swimSideMoveSpeedRate = swimSideMoveSpeedRate;
+            Functions.swimBackwardSideMoveSpeedRate = swimBackwardSideMoveSpeedRate;
+            Functions.swimBackwardMoveSpeedRate = swimBackwardMoveSpeedRate;
+
             Functions.gravity = gravity;
             Functions.maxFallVelocity = maxFallVelocity;
             Functions.doNotChangeVelocityWhileAirborne = doNotChangeVelocityWhileAirborne;
             Functions.landedPauseMovementDuration = landedPauseMovementDuration;
             Functions.beforeCrawlingPauseMovementDuration = beforeCrawlingPauseMovementDuration;
             Functions.afterCrawlingPauseMovementDuration = afterCrawlingPauseMovementDuration;
+
             Functions.underWaterThreshold = underWaterThreshold;
             Functions.autoSwimToSurface = autoSwimToSurface;
-            Functions.alwaysUseRootMotion = alwaysUseRootMotion;
             Functions.dashingForceApplier = dashingForceApplier;
+
+            Functions.alwaysUseRootMotion = alwaysUseRootMotion;
             Functions.useRootMotionForMovement = useRootMotionForMovement;
             Functions.useRootMotionForAirMovement = useRootMotionForAirMovement;
             Functions.useRootMotionForJump = useRootMotionForJump;
