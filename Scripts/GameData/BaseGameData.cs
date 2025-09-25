@@ -17,6 +17,11 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseGameData : ScriptableObject, IGameData, IPatchableData, IComparable
     {
+#if UNITY_EDITOR
+        [InspectorButton(nameof(Validate), "Force Validate")]
+        public bool btnValidate;
+#endif
+
         [Tooltip("Game data ID, if this is empty it will uses file's name as ID")]
         [SerializeField]
         protected string id = string.Empty;
