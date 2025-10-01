@@ -431,45 +431,50 @@ namespace MultiplayerARPG
         {
             float rate = 1f + character.GetCaches().BuyItemPriceRate;
             int sellPrice = Mathf.CeilToInt(sellItem.sellPrice * rate);
-            if (character.Gold < sellPrice * amount)
+            int totalSellPrice = sellPrice * amount;
+            if (totalSellPrice < 0)
                 return false;
-            if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
-                return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(sellItem.sellPrices, null, rate), out _, out _, amount);
+            if (character.Gold < totalSellPrice)
+                return false;
+            if (sellItem.sellPrices != null && sellItem.sellPrices.Length > 0)
+                return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(sellItem.sellPrices, null, rate), out _, out _, amount);
+            return true;
         }
 
         public virtual void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
             float rate = 1f + character.GetCaches().BuyItemPriceRate;
             int sellPrice = Mathf.CeilToInt(sellItem.sellPrice * rate);
-            character.Gold -= sellPrice * amount;
-            if (sellItem.sellPrices == null || sellItem.sellPrices.Length == 0)
-                return;
-            character.DecreaseCurrencies(sellItem.sellPrices, amount);
+            int totalSellPrice = sellPrice * amount;
+            if (totalSellPrice > 0)
+                character.Gold -= totalSellPrice;
+            if (sellItem.sellPrices != null && sellItem.sellPrices.Length > 0)
+                character.DecreaseCurrencies(sellItem.sellPrices, amount);
         }
 
         public virtual void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, int amount)
         {
             float rate = 1f + character.GetCaches().SellItemPriceRate;
             int sellPrice = Mathf.CeilToInt(item.SellPrice * rate);
-            character.Gold += sellPrice * amount;
+            int totalSellPrice = sellPrice * amount;
+            if (totalSellPrice > 0)
+                character.Gold = character.Gold.Increase(totalSellPrice);
         }
 
         public virtual bool CurrenciesEnoughToRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
         {
             if (character.Gold < GetRefineItemRequireGold(character, refineLevel, decreaseRate))
                 return false;
-            if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
-                return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, null, 1f), out _, out _);
+            if (refineLevel.RequireCurrencies != null && refineLevel.RequireCurrencies.Length > 0)
+                return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, null, 1f), out _, out _);
+            return true;
         }
 
         public virtual void DecreaseCurrenciesWhenRefineItem(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
         {
             character.Gold -= GetRefineItemRequireGold(character, refineLevel, decreaseRate);
-            if (refineLevel.RequireCurrencies == null || refineLevel.RequireCurrencies.Length == 0)
-                return;
-            character.DecreaseCurrencies(refineLevel.RequireCurrencies);
+            if (refineLevel.RequireCurrencies != null && refineLevel.RequireCurrencies.Length > 0)
+                character.DecreaseCurrencies(refineLevel.RequireCurrencies);
         }
 
         public virtual int GetRefineItemRequireGold(IPlayerCharacterData character, ItemRefineLevel refineLevel, float decreaseRate)
@@ -482,73 +487,74 @@ namespace MultiplayerARPG
 
         public virtual bool CurrenciesEnoughToRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
         {
-            if (character.Gold < repairPrice.RequireGold)
+            if (repairPrice.RequireGold > 0 && character.Gold < repairPrice.RequireGold)
                 return false;
-            if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
-                return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, null, 1f), out _, out _);
+            if (repairPrice.RequireCurrencies != null && repairPrice.RequireCurrencies.Length > 0)
+                return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, null, 1f), out _, out _);
+            return true;
         }
 
         public virtual void DecreaseCurrenciesWhenRepairItem(IPlayerCharacterData character, ItemRepairPrice repairPrice)
         {
-            character.Gold -= repairPrice.RequireGold;
-            if (repairPrice.RequireCurrencies == null || repairPrice.RequireCurrencies.Length == 0)
-                return;
-            character.DecreaseCurrencies(repairPrice.RequireCurrencies);
+            if (repairPrice.RequireGold > 0)
+                character.Gold -= repairPrice.RequireGold;
+            if (repairPrice.RequireCurrencies != null && repairPrice.RequireCurrencies.Length > 0)
+                character.DecreaseCurrencies(repairPrice.RequireCurrencies);
         }
 
         public virtual bool CurrenciesEnoughToCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
         {
-            if (character.Gold < itemCraft.RequireGold)
+            if (itemCraft.RequireGold > 0 && character.Gold < itemCraft.RequireGold)
                 return false;
-            if (itemCraft.RequireCurrencies == null || itemCraft.RequireCurrencies.Length == 0)
-                return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(itemCraft.RequireCurrencies, null, 1f), out _, out _);
+            if (itemCraft.RequireCurrencies != null && itemCraft.RequireCurrencies.Length > 0)
+                return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(itemCraft.RequireCurrencies, null, 1f), out _, out _);
+            return true;
         }
 
         public virtual void DecreaseCurrenciesWhenCraftItem(IPlayerCharacterData character, ItemCraft itemCraft)
         {
-            character.Gold -= itemCraft.RequireGold;
-            if (itemCraft.RequireCurrencies == null || itemCraft.RequireCurrencies.Length == 0)
-                return;
-            character.DecreaseCurrencies(itemCraft.RequireCurrencies);
+            if (itemCraft.RequireGold > 0)
+                character.Gold -= itemCraft.RequireGold;
+            if (itemCraft.RequireCurrencies != null && itemCraft.RequireCurrencies.Length > 0)
+                character.DecreaseCurrencies(itemCraft.RequireCurrencies);
         }
 
         public virtual bool CurrenciesEnoughToRemoveEnhancer(IPlayerCharacterData character)
         {
-            if (character.Gold < GameInstance.Singleton.enhancerRemoval.RequireGold)
+            if (GameInstance.Singleton.enhancerRemoval.RequireGold > 0 && character.Gold < GameInstance.Singleton.enhancerRemoval.RequireGold)
                 return false;
-            if (GameInstance.Singleton.enhancerRemoval.RequireCurrencies == null || GameInstance.Singleton.enhancerRemoval.RequireCurrencies.Length == 0)
-                return true;
-            return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, null, 1f), out _, out _);
+            if (GameInstance.Singleton.enhancerRemoval.RequireCurrencies != null && GameInstance.Singleton.enhancerRemoval.RequireCurrencies.Length > 0)
+                return character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, null, 1f), out _, out _);
+            return true;
         }
 
         public virtual void DecreaseCurrenciesWhenRemoveEnhancer(IPlayerCharacterData character)
         {
-            character.Gold -= GameInstance.Singleton.enhancerRemoval.RequireGold;
-            if (GameInstance.Singleton.enhancerRemoval.RequireCurrencies == null || GameInstance.Singleton.enhancerRemoval.RequireCurrencies.Length == 0)
-                return;
-            character.DecreaseCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies);
+            if (GameInstance.Singleton.enhancerRemoval.RequireGold > 0)
+                character.Gold -= GameInstance.Singleton.enhancerRemoval.RequireGold;
+            if (GameInstance.Singleton.enhancerRemoval.RequireCurrencies != null && GameInstance.Singleton.enhancerRemoval.RequireCurrencies.Length > 0)
+                character.DecreaseCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies);
         }
 
         public virtual bool CurrenciesEnoughToCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
         {
-            if (character.Gold < setting.CreateGuildRequiredGold)
+            if (setting.CreateGuildRequiredGold > 0 && character.Gold < setting.CreateGuildRequiredGold)
                 return false;
-            if (character.UserCash < setting.CreateGuildRequiredCash)
+            if (setting.CreateGuildRequiredCash > 0 && character.UserCash < setting.CreateGuildRequiredCash)
                 return false;
-            if (setting.CreateGuildRequireCurrencies.Count == 0)
-                return true;
-            return character.HasEnoughCurrencyAmounts(setting.CreateGuildRequireCurrencies, out _, out _);
+            if (setting.CreateGuildRequireCurrencies.Count > 0)
+                return character.HasEnoughCurrencyAmounts(setting.CreateGuildRequireCurrencies, out _, out _);
+            return true;
         }
 
         public virtual void DecreaseCurrenciesWhenCreateGuild(IPlayerCharacterData character, SocialSystemSetting setting)
         {
-            character.Gold -= setting.CreateGuildRequiredGold;
-            GameInstance.ServerUserHandlers.ChangeUserCash(character.UserId, -setting.CreateGuildRequiredCash);
-            if (setting.CreateGuildRequireCurrencies.Count == 0)
-                return;
-            character.DecreaseCurrencies(setting.CreateGuildRequireCurrencies);
+            if (setting.CreateGuildRequiredGold > 0)
+                character.Gold -= setting.CreateGuildRequiredGold;
+            if (setting.CreateGuildRequiredCash > 0)
+                GameInstance.ServerUserHandlers.ChangeUserCash(character.UserId, -setting.CreateGuildRequiredCash);
+            if (setting.CreateGuildRequireCurrencies.Count > 0)
+                character.DecreaseCurrencies(setting.CreateGuildRequireCurrencies);
         }
 
         public virtual Reward MakeMonsterReward(MonsterCharacter monster, int level)

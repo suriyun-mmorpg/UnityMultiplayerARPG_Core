@@ -601,6 +601,7 @@ namespace MultiplayerARPG
         {
 #if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             if (currency == null) return;
+            if (amount < 0) return;
             int indexOfCurrency = character.IndexOfCurrency(currency.DataId);
             if (indexOfCurrency >= 0)
             {
@@ -621,8 +622,9 @@ namespace MultiplayerARPG
             currentCurrencyAmounts = data.GetCurrencies();
             foreach (Currency requireCurrency in requiredCurrencyAmounts.Keys)
             {
-                if (!currentCurrencyAmounts.ContainsKey(requireCurrency) ||
-                    currentCurrencyAmounts[requireCurrency] < Mathf.CeilToInt(requiredCurrencyAmounts[requireCurrency] * multiplier))
+                int requiredCurrency = Mathf.CeilToInt(requiredCurrencyAmounts[requireCurrency] * multiplier);
+                if (requiredCurrency < 0 || !currentCurrencyAmounts.ContainsKey(requireCurrency) ||
+                    currentCurrencyAmounts[requireCurrency] < requiredCurrency)
                 {
                     gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
                     return false;
