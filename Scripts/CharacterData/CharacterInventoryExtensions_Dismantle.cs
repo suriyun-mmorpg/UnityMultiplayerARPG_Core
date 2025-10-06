@@ -81,6 +81,20 @@ namespace MultiplayerARPG
             }
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
+
+            var entity = character as BasePlayerCharacterEntity;
+            if (entity != null)
+            {
+                if (returningGold > 0)
+                    entity.OnRewardGold(RewardGivenType.Crafting, returningGold);
+
+                foreach (var currencyAmount in returningCurrencies)
+                    entity.OnRewardCurrency(RewardGivenType.Crafting, currencyAmount.currency, currencyAmount.amount);
+
+                foreach (var itemAmount in returningItems)
+                    entity.OnRewardItem(RewardGivenType.Crafting, itemAmount.item, itemAmount.amount);
+            }
+
             GameInstance.ServerLogHandlers.LogDismantleItems(character, dismantleItems);
             return true;
 #else
@@ -132,6 +146,20 @@ namespace MultiplayerARPG
             character.NonEquipItems = simulateCharacter.NonEquipItems;
             character.IncreaseCurrencies(returningCurrencies);
             character.FillEmptySlots();
+
+            var entity = character as BasePlayerCharacterEntity;
+            if (entity != null)
+            {
+                if (returningGold > 0)
+                    entity.OnRewardGold(RewardGivenType.Crafting, returningGold);
+
+                foreach (var currencyAmount in returningCurrencies)
+                    entity.OnRewardCurrency(RewardGivenType.Crafting, currencyAmount.currency, currencyAmount.amount);
+
+                foreach (var itemAmount in returningItems)
+                    entity.OnRewardItem(RewardGivenType.Crafting, itemAmount.item, itemAmount.amount);
+            }
+
             GameInstance.ServerLogHandlers.LogDismantleItems(character, dismantleItems);
             return true;
 #else
