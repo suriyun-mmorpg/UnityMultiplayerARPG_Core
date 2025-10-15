@@ -202,6 +202,9 @@ namespace MultiplayerARPG
             _isServerReadyToInstantiateObjects = false;
             _isClientReadyToInstantiateObjects = false;
             _isServerReadyToInstantiatePlayers = false;
+            GameInstance.PlayingCharacter = null;
+            GameInstance.JoinedGuild = null;
+            GameInstance.JoinedGuild = null;
             PoolSystem.Clear();
             ClientBankActions.Clean();
             ClientCashShopActions.Clean();
