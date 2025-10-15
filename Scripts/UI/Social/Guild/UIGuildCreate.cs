@@ -47,6 +47,7 @@ namespace MultiplayerARPG
             uiTextSimpleRequireCash = null;
             onGuildCreate?.RemoveAllListeners();
             onGuildCreate = null;
+            GameInstance.OnSetGuildDataEvent -= GameInstance_OnSetGuildDataEvent;
         }
 
         protected virtual void OnEnable()
@@ -111,6 +112,17 @@ namespace MultiplayerARPG
             ClientGuildActions.ResponseCreateGuild(requestHandler, responseCode, response);
             if (responseCode.ShowUnhandledResponseMessageDialog(response.message)) return;
             inputFieldGuildName.text = string.Empty;
+            if (GameInstance.JoinedGuild == null)
+            {
+                GameInstance.OnSetGuildDataEvent += GameInstance_OnSetGuildDataEvent;
+                return;
+            }
+            GameInstance_OnSetGuildDataEvent(GameInstance.JoinedGuild);
+        }
+
+        private void GameInstance_OnSetGuildDataEvent(GuildData guildData)
+        {
+            GameInstance.OnSetGuildDataEvent -= GameInstance_OnSetGuildDataEvent;
             onGuildCreate.Invoke();
             Hide();
         }
