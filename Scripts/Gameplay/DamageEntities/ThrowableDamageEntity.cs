@@ -127,7 +127,7 @@ namespace MultiplayerARPG
             else
             {
 #if UNITY_6000_0_OR_NEWER
-                CacheRigidbody.linearVelocity = Vector2.zero;
+                CacheRigidbody.linearVelocity = Vector3.zero;
 #else
                 CacheRigidbody.velocity = Vector3.zero;
 #endif
