@@ -119,8 +119,28 @@ namespace MultiplayerARPG
             }
         }
         public static BasePlayerCharacterEntity PlayingCharacterEntity { get { return PlayingCharacter as BasePlayerCharacterEntity; } }
-        public static PartyData JoinedParty { get; set; }
-        public static GuildData JoinedGuild { get; set; }
+        private static PartyData s_joinedParty;
+        public static PartyData JoinedParty
+        {
+            get { return s_joinedParty; }
+            set
+            {
+                s_joinedParty = value;
+                if (OnSetPartyDataEvent != null)
+                    OnSetPartyDataEvent.Invoke(value);
+            }
+        }
+        private static GuildData s_joinedGuild;
+        public static GuildData JoinedGuild
+        {
+            get { return s_joinedGuild; }
+            set
+            {
+                s_joinedGuild = value;
+                if (OnSetGuildDataEvent != null)
+                    OnSetGuildDataEvent.Invoke(value);
+            }
+        }
         public static Dictionary<StorageId, List<CharacterItem>> OpenedStorages { get; set; } = new Dictionary<StorageId, List<CharacterItem>>();
 
         [Header("Gameplay Systems")]
@@ -492,6 +512,8 @@ namespace MultiplayerARPG
 
         // Static events
         public static event System.Action<IPlayerCharacterData> OnSetPlayingCharacterEvent;
+        public static event System.Action<GuildData> OnSetGuildDataEvent;
+        public static event System.Action<PartyData> OnSetPartyDataEvent;
         public static event System.Action OnGameDataLoadedEvent;
 
         #region Cache Data
