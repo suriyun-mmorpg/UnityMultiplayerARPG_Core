@@ -216,21 +216,85 @@ namespace MultiplayerARPG
                 onNotifyGuildUpdated.Invoke(updateType, guild);
             if (guild == null)
                 return;
-            GuildInfoCacheManager.SetCache(new GuildListEntry()
+            GuildListEntry cachedData;
+            switch (updateType)
             {
-                Id = guild.id,
-                GuildName = guild.guildName,
-                Level = guild.level,
-                FieldOptions = GuildListFieldOptions.All,
-                GuildMessage = guild.guildMessage,
-                GuildMessage2 = guild.guildMessage2,
-                Score = guild.score,
-                Options = guild.options,
-                AutoAcceptRequests = guild.autoAcceptRequests,
-                Rank = guild.rank,
-                CurrentMembers = guild.CountMember(),
-                MaxMembers = guild.MaxMember(),
-            });
+                case UpdateGuildMessage.UpdateType.Create:
+                    cachedData = new GuildListEntry()
+                    {
+                        Id = guild.id,
+                        GuildName = guild.guildName,
+                        Level = guild.level,
+                        FieldOptions = GuildListFieldOptions.All,
+                        GuildMessage = guild.guildMessage,
+                        GuildMessage2 = guild.guildMessage2,
+                        Score = guild.score,
+                        Options = guild.options,
+                        AutoAcceptRequests = guild.autoAcceptRequests,
+                        Rank = guild.rank,
+                        CurrentMembers = guild.CountMember(),
+                        MaxMembers = guild.MaxMember(),
+                    };
+                    GuildInfoCacheManager.SetCache(cachedData);
+                    break;
+                case UpdateGuildMessage.UpdateType.SetGuildMessage:
+                    if (GuildInfoCacheManager.TryGetFromCache(guild.id, out cachedData))
+                    {
+                        cachedData.GuildMessage = guild.guildMessage;
+                        GuildInfoCacheManager.SetCache(cachedData);
+                    }
+                    break;
+                case UpdateGuildMessage.UpdateType.SetGuildMessage2:
+                    if (GuildInfoCacheManager.TryGetFromCache(guild.id, out cachedData))
+                    {
+                        cachedData.GuildMessage2 = guild.guildMessage2;
+                        GuildInfoCacheManager.SetCache(cachedData);
+                    }
+                    break;
+                case UpdateGuildMessage.UpdateType.LevelExpSkillPoint:
+                    if (GuildInfoCacheManager.TryGetFromCache(guild.id, out cachedData))
+                    {
+                        cachedData.Level = guild.level;
+                        GuildInfoCacheManager.SetCache(cachedData);
+                    }
+                    break;
+                case UpdateGuildMessage.UpdateType.SetScore:
+                    if (GuildInfoCacheManager.TryGetFromCache(guild.id, out cachedData))
+                    {
+                        cachedData.Score = guild.score;
+                        GuildInfoCacheManager.SetCache(cachedData);
+                    }
+                    break;
+                case UpdateGuildMessage.UpdateType.SetOptions:
+                    if (GuildInfoCacheManager.TryGetFromCache(guild.id, out cachedData))
+                    {
+                        cachedData.Options = guild.options;
+                        GuildInfoCacheManager.SetCache(cachedData);
+                    }
+                    break;
+                case UpdateGuildMessage.UpdateType.SetAutoAcceptRequests:
+                    if (GuildInfoCacheManager.TryGetFromCache(guild.id, out cachedData))
+                    {
+                        cachedData.AutoAcceptRequests = guild.autoAcceptRequests;
+                        GuildInfoCacheManager.SetCache(cachedData);
+                    }
+                    break;
+                case UpdateGuildMessage.UpdateType.SetRank:
+                    if (GuildInfoCacheManager.TryGetFromCache(guild.id, out cachedData))
+                    {
+                        cachedData.Rank = guild.rank;
+                        GuildInfoCacheManager.SetCache(cachedData);
+                    }
+                    break;
+                case UpdateGuildMessage.UpdateType.Member:
+                    if (GuildInfoCacheManager.TryGetFromCache(guild.id, out cachedData))
+                    {
+                        cachedData.CurrentMembers = guild.CountMember();
+                        cachedData.MaxMembers = guild.MaxMember();
+                        GuildInfoCacheManager.SetCache(cachedData);
+                    }
+                    break;
+            }
         }
 
         public static void NotifyGuildMemberUpdated(UpdateSocialMemberMessage.UpdateType updateType, int socialId, SocialCharacterData character)

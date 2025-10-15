@@ -46,6 +46,11 @@ namespace MultiplayerARPG
                 onSetGuildInfo.Invoke(guild);
         }
 
+        public static bool TryGetFromCache(int id, out GuildListEntry data)
+        {
+            return s_caches.TryGetValue(id, out data);
+        }
+
         public static void ClearCache(int guildId)
         {
             s_caches.Remove(guildId);
