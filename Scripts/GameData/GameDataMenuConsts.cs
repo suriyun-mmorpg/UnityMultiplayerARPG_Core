@@ -296,24 +296,30 @@ namespace MultiplayerARPG
         public const int NEW_CHARACTER_SETTING_ORDER = -5196;
         #endregion
 
+        #region Player Character Appearance Setting
+        public const string PLAYER_CHARACTER_BODY_PART_COMPONENT_OPTION_FILE = "Player Character Body Part Component Option";
+        public const string PLAYER_CHARACTER_BODY_PART_COMPONENT_OPTION_MENU = "Create Player Character Appearance Option/Player Character Body Part Component Option";
+        public const int PLAYER_CHARACTER_BODY_PART_COMPONENT_OPTION_ORDER = -3499;
+        #endregion
+
         #region Network Setting
         public const string NETWORK_SETTING_FILE = "Network Setting";
         public const string NETWORK_SETTING_MENU = "Create NetworkSetting/Network Setting";
-        public const int NETWORK_SETTING_ORDER = -3999;
+        public const int NETWORK_SETTING_ORDER = -2999;
         #endregion
 
         #region Cash Shop
         public const string CASH_SHOP_DATABASE_FILE = "Cash Shop Database";
         public const string CASH_SHOP_DATABASE_MENU = "Create CashShop/Cash Shop Database";
-        public const int CASH_SHOP_DATABASE_ORDER = -2999;
+        public const int CASH_SHOP_DATABASE_ORDER = -2499;
 
         public const string CASH_SHOP_ITEM_FILE = "Cash Shop Item";
         public const string CASH_SHOP_ITEM_MENU = "Create CashShop/Cash Shop Item";
-        public const int CASH_SHOP_ITEM_ORDER = -2998;
+        public const int CASH_SHOP_ITEM_ORDER = -2498;
 
         public const string CASH_PACKAGE_FILE = "Cash Package";
         public const string CASH_PACKAGE_MENU = "Create CashShop/Cash Package";
-        public const int CASH_PACKAGE_ORDER = -2997;
+        public const int CASH_PACKAGE_ORDER = -2497;
         #endregion
 
         #region Gameplay Rule

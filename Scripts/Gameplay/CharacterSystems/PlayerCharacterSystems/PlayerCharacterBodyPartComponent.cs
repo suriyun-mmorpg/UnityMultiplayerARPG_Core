@@ -102,15 +102,28 @@ namespace MultiplayerARPG
 
         public string modelSettingId;
         public string colorSettingId;
-        public ModelOption[] options = new ModelOption[0];
+        public List<ModelOption> options = new List<ModelOption>();
+        public List<PlayerCharacterBodyPartComponentOption> optionObjects = new List<PlayerCharacterBodyPartComponentOption>();
         protected int _currentModelIndex;
         protected int _currentColorIndex;
         public IEnumerable<ModelOption> ModelOptions { get => options; }
-        public int MaxModelOptions { get => options.Length; }
+        public int MaxModelOptions { get => options.Count; }
         public IEnumerable<ColorOption> ColorOptions { get => options[_currentModelIndex].colors; }
         public int MaxColorOptions { get => options[_currentModelIndex].colors.Length; }
 
         private BaseCharacterModel[] _models;
+
+        public override void EntityAwake()
+        {
+            base.EntityAwake();
+            if (optionObjects.Count > 0)
+            {
+                foreach (PlayerCharacterBodyPartComponentOption optionObject in optionObjects)
+                {
+                    options.Add(optionObject.data);
+                }
+            }
+        }
 
         public override void EntityStart()
         {
@@ -293,13 +306,13 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (options.Length <= 0)
+            if (options.Count <= 0)
             {
                 // No model options to select
                 return;
             }
 
-            if (_currentModelIndex >= options.Length)
+            if (_currentModelIndex >= options.Count)
             {
                 Debug.LogError("Invalid index of model option", this);
                 return;
@@ -325,13 +338,22 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (model.indexOfModel >= colorOption.modelColorSettings.Length)
+            int indexOfModelColorSetting = model.indexOfModel;
+            if (indexOfModelColorSetting >= colorOption.modelColorSettings.Length)
             {
-                Debug.LogError("Invalid index of model color setup", this);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+                Debug.LogError("Invalid index of model color setting, will use the latest one. This message won't be written in build to improve performance", this);
+#endif
+                indexOfModelColorSetting = colorOption.modelColorSettings.Length - 1;
+            }
+
+            if (indexOfModelColorSetting < 0)
+            {
+                Debug.LogError("Ivalid index of model color setting");
                 return;
             }
 
-            ModelColorSetting modelColorSetting = colorOption.modelColorSettings[model.indexOfModel];
+            ModelColorSetting modelColorSetting = colorOption.modelColorSettings[indexOfModelColorSetting];
 
             if (modelObject != null && modelColorSetting.materials.Length > 0)
             {
