@@ -5,7 +5,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [DefaultExecutionOrder(DefaultExecutionOrders.UI_ITEM_CRAFT_FORMULAS)]
-    public class UIItemCraftFormulas : UIBase
+    public partial class UIItemCraftFormulas : UIBase
     {
         [Header("Filter")]
         public List<string> filterCategories = new List<string>();
