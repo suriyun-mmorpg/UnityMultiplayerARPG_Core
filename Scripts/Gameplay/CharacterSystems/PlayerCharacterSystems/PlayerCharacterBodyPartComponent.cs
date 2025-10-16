@@ -4,6 +4,7 @@ using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -23,11 +24,17 @@ namespace MultiplayerARPG
             [Tooltip("Property name for main texture's color, usually `_BaseColor` for HDRP/URP, `_Color` for BRP")]
             public string materialColorProperty = "_BaseColor";
             public Color materialColor = Color.white;
+            public bool useUpperLevelMaterialColorSetting;
         }
 
         [System.Serializable]
         public class MaterialGroup
         {
+#if UNITY_EDITOR
+            [Tooltip("Set any name for clarity; it doesn’t have to be unique and isn’t used anywhere.")]
+            public string name;
+#endif
+
             [Tooltip("Material Settings for each mesh's materials, its index is index of `MeshRenderer` -> `materials`")]
             public Material[] materials = new Material[0];
             public MaterialPropertiesSetting[] properties = new MaterialPropertiesSetting[0];
@@ -36,6 +43,13 @@ namespace MultiplayerARPG
         [System.Serializable]
         public class ModelColorSetting
         {
+#if UNITY_EDITOR
+            [Tooltip("Set any name for clarity; it doesn’t have to be unique and isn’t used anywhere.")]
+            public string name;
+#endif
+            public bool useUpperLevelMaterialColorSetting;
+            public Color materialColor = Color.white;
+
             [Header("Setting for model's single instantiated object setting")]
             [Tooltip("Material Settings for each mesh's materials, its index is index of `MeshRenderer` -> `materials`")]
             public Material[] materials = new Material[0];
@@ -56,8 +70,10 @@ namespace MultiplayerARPG
             public Color iconColor = Color.white;
 
             [Header("Settings for In-Game Appearances")]
+            public Color materialColor = Color.white;
             [Tooltip("Color settings for each model, its index is index of `models`")]
-            public ModelColorSetting[] ModelColorSettings = new ModelColorSetting[0];
+            [FormerlySerializedAs("ModelColorSettings")]
+            public ModelColorSetting[] modelColorSettings = new ModelColorSetting[0];
 
             public string Title
             {
@@ -271,14 +287,56 @@ namespace MultiplayerARPG
             if (model == null)
                 return;
 
-            if (model.indexOfModel < 0 || options[_currentModelIndex].colors.Length <= 0 || model.indexOfModel >= options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings.Length)
+            if (model.indexOfModel < 0)
+            {
+                Debug.LogError("Invalid index of model", this);
                 return;
+            }
 
-            ModelColorSetting modelColorSetting = options[_currentModelIndex].colors[_currentColorIndex].ModelColorSettings[model.indexOfModel];
+            if (options.Length <= 0)
+            {
+                // No model options to select
+                return;
+            }
+
+            if (_currentModelIndex >= options.Length)
+            {
+                Debug.LogError("Invalid index of model option", this);
+                return;
+            }
+
+            ModelOption option = options[_currentModelIndex];
+            if (option.colors.Length <= 0)
+            {
+                // No color options to select
+                return;
+            }
+
+            if (_currentColorIndex >= option.colors.Length)
+            {
+                Debug.LogError("Invalid index of color option", this);
+                return;
+            }
+
+            ColorOption colorOption = option.colors[_currentColorIndex];
+            if (colorOption.modelColorSettings.Length <= 0)
+            {
+                // No model color setup
+                return;
+            }
+
+            if (model.indexOfModel >= colorOption.modelColorSettings.Length)
+            {
+                Debug.LogError("Invalid index of model color setup", this);
+                return;
+            }
+
+            ModelColorSetting modelColorSetting = colorOption.modelColorSettings[model.indexOfModel];
 
             if (modelObject != null && modelColorSetting.materials.Length > 0)
             {
-                SetMaterial(modelObject, modelColorSetting.materials, modelColorSetting.properties);
+                Color materialColor = modelColorSetting.useUpperLevelMaterialColorSetting ? colorOption.materialColor : modelColorSetting.materialColor;
+                SetMaterial(modelObject, materialColor, modelColorSetting.materials, modelColorSetting.properties);
             }
 
             if (instantiatedObjectGroup != null && modelColorSetting.materialGroups.Length > 0)
@@ -287,12 +345,13 @@ namespace MultiplayerARPG
                 {
                     if (i >= modelColorSetting.materialGroups.Length)
                         break;
-                    SetMaterial(instantiatedObjectGroup.instantiatedObjects[i], modelColorSetting.materialGroups[i].materials, modelColorSetting.materialGroups[i].properties);
+                    Color materialColor = modelColorSetting.useUpperLevelMaterialColorSetting ? colorOption.materialColor : modelColorSetting.materialColor;
+                    SetMaterial(instantiatedObjectGroup.instantiatedObjects[i], materialColor, modelColorSetting.materialGroups[i].materials, modelColorSetting.materialGroups[i].properties);
                 }
             }
         }
 
-        private void SetMaterial(GameObject modelObject, Material[] materials, MaterialPropertiesSetting[] properties)
+        private void SetMaterial(GameObject modelObject, Color upperLevelColorSetting, Material[] materials, MaterialPropertiesSetting[] properties)
         {
             Renderer renderer = modelObject.GetComponentInChildren<Renderer>();
             if (renderer != null)
@@ -306,7 +365,7 @@ namespace MultiplayerARPG
                     if (property.applyMaterialTexture)
                         renderer.materials[i].SetTexture(property.materialTextureProperty, property.materialTexture);
                     if (property.applyMaterialColor)
-                        renderer.materials[i].SetColor(property.materialColorProperty, property.materialColor);
+                        renderer.materials[i].SetColor(property.materialColorProperty, property.useUpperLevelMaterialColorSetting ? upperLevelColorSetting : property.materialColor);
                 }
             }
         }
