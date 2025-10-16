@@ -10,17 +10,38 @@ namespace MultiplayerARPG
     public class PlayerCharacterBodyPartComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
     {
         [System.Serializable]
+        public class MaterialPropertiesSetting
+        {
+            [Header("Texture")]
+            public bool applyMaterialTexture = false;
+            [Tooltip("Property name for main texture, usually `_BaseMap` for HDRP/URP, `_MainTex` for BRP")]
+            public string materialTextureProperty = "_BaseMap";
+            public Texture materialTexture = null;
+
+            [Header("Color")]
+            public bool applyMaterialColor = false;
+            [Tooltip("Property name for main texture's color, usually `_BaseColor` for HDRP/URP, `_Color` for BRP")]
+            public string materialColorProperty = "_BaseColor";
+            public Color materialColor = Color.white;
+        }
+
+        [System.Serializable]
         public class MaterialGroup
         {
             [Tooltip("Material Settings for each mesh's materials, its index is index of `MeshRenderer` -> `materials`")]
             public Material[] materials = new Material[0];
+            public MaterialPropertiesSetting[] properties = new MaterialPropertiesSetting[0];
         }
 
         [System.Serializable]
         public class ModelColorSetting
         {
+            [Header("Setting for model's single instantiated object setting")]
             [Tooltip("Material Settings for each mesh's materials, its index is index of `MeshRenderer` -> `materials`")]
             public Material[] materials = new Material[0];
+            public MaterialPropertiesSetting[] properties = new MaterialPropertiesSetting[0];
+
+            [Header("Setting for model's multiple instantiated object setting")]
             public MaterialGroup[] materialGroups = new MaterialGroup[0];
         }
 
@@ -257,7 +278,7 @@ namespace MultiplayerARPG
 
             if (modelObject != null && modelColorSetting.materials.Length > 0)
             {
-                SetMaterial(modelObject, modelColorSetting.materials);
+                SetMaterial(modelObject, modelColorSetting.materials, modelColorSetting.properties);
             }
 
             if (instantiatedObjectGroup != null && modelColorSetting.materialGroups.Length > 0)
@@ -266,16 +287,28 @@ namespace MultiplayerARPG
                 {
                     if (i >= modelColorSetting.materialGroups.Length)
                         break;
-                    SetMaterial(instantiatedObjectGroup.instantiatedObjects[i], modelColorSetting.materialGroups[i].materials);
+                    SetMaterial(instantiatedObjectGroup.instantiatedObjects[i], modelColorSetting.materialGroups[i].materials, modelColorSetting.materialGroups[i].properties);
                 }
             }
         }
 
-        private void SetMaterial(GameObject modelObject, Material[] materials)
+        private void SetMaterial(GameObject modelObject, Material[] materials, MaterialPropertiesSetting[] properties)
         {
             Renderer renderer = modelObject.GetComponentInChildren<Renderer>();
             if (renderer != null)
+            {
                 renderer.materials = materials;
+                for (int i = 0; i < renderer.materials.Length; ++i)
+                {
+                    if (i >= properties.Length)
+                        break;
+                    MaterialPropertiesSetting property = properties[i];
+                    if (property.applyMaterialTexture)
+                        renderer.materials[i].SetTexture(property.materialTextureProperty, property.materialTexture);
+                    if (property.applyMaterialColor)
+                        renderer.materials[i].SetColor(property.materialColorProperty, property.materialColor);
+                }
+            }
         }
 
         public int CreateFakeItemDataId()
