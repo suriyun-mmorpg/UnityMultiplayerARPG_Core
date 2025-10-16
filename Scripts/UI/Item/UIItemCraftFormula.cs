@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class UIItemCraftFormula : UISelectionEntry<ItemCraftFormula>
+    public partial class UIItemCraftFormula : UISelectionEntry<ItemCraftFormula>
     {
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Craft Duration}")]
