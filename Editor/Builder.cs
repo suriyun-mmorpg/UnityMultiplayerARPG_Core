@@ -17,6 +17,7 @@ namespace MultiplayerARPG
             string exeName = "Build.exe";
             string bundleVersion = PlayerSettings.bundleVersion;
             string addressableProfileName = "Default";
+            bool developmentMode = false;
 
             string versionCode = "";
             string keystoreName = PlayerSettings.Android.keystoreName;
@@ -63,6 +64,8 @@ namespace MultiplayerARPG
                     addressableProfileName = args[i + 1];
                 if (args[i].ToLower().Equals("-buildappbundle") && i + 1 < args.Length)
                     buildAppBundle = bool.Parse(args[i + 1]);
+                if (args[i].ToLower().Equals("-developmentmode") && i + 1 < args.Length)
+                    developmentMode = bool.Parse(args[i + 1]);
                 if (args[i].ToLower().Equals("-cleancontent") && i + 1 < args.Length)
                     cleanContent = bool.Parse(args[i + 1]);
                 if (args[i].ToLower().Equals("-purgecache") && i + 1 < args.Length)
@@ -110,7 +113,7 @@ namespace MultiplayerARPG
             BuildPlayerOptions options = new BuildPlayerOptions
             {
                 target = target,
-                options = BuildOptions.None,
+                options = developmentMode ? BuildOptions.Development : BuildOptions.None,
                 subtarget = (int)subTarget,
                 locationPathName = Path.Combine(outputPath, exeName),
                 scenes = scenes.ToArray(),
@@ -174,10 +177,30 @@ namespace MultiplayerARPG
         }
         public static void GenerateMapServerDockerfile(string buildPath, string exeName, int port = 6000)
         {
-            string dockerfilePath = Path.Combine(buildPath, "Dockerfile");
+            string shFilePath = Path.Combine(buildPath, "run.sh");
+            string shFileContent = $@"#!/bin/bash
 
-            string dockerfileContent = $@"
-# Use a lightweight base image with the necessary dependencies
+# Command to run your Unity server executable
+EXECUTABLE=""./{exeName}""
+ARGS=""-batchmode -nographics -logfile /dev/stdout -startMapServer""
+
+while true; do
+    echo ""Starting server...""
+    $EXECUTABLE $ARGS
+    EXIT_CODE=$?
+    echo ""Server exited with code $EXIT_CODE. Restarting in 2 seconds...""
+    sleep 2
+done
+";
+            File.WriteAllText(
+                shFilePath,
+                shFileContent.Replace("\r\n", "\n"), // force LF
+                new System.Text.UTF8Encoding(false) // no BOM
+            );
+            Debug.Log($"Sh generated at: {shFilePath}");
+
+            string dockerFilePath = Path.Combine(buildPath, "Dockerfile");
+            string dockerFileContent = $@"# Use a lightweight base image with the necessary dependencies
 FROM ubuntu:20.04
 
 # Set environment variables
@@ -185,6 +208,14 @@ ENV DEBIAN_FRONTEND=noninteractive
 
 # Install necessary packages
 RUN apt-get update && apt-get install -y \
+    libglib2.0-0 \
+    libsm6 \
+    libxi6 \
+    libxcursor1 \
+    libxrandr2 \
+    libxinerama1 \
+    libglu1-mesa \
+    libnss3 \
     libgcc1 \
     libgconf-2-4 \
     libnss3 \
@@ -200,6 +231,10 @@ COPY . /unity-server
 
 # Ensure the server binary has execution permissions
 RUN chmod +x /unity-server/{exeName}
+RUN chmod +x /unity-server/run.sh
+
+# Convert CRLF -> LF just in case
+RUN sed -i 's/\r$//' /unity-server/run.sh
 
 # Expose any ports the server needs to communicate on
 EXPOSE {port}/tcp {port}/udp
@@ -208,10 +243,10 @@ EXPOSE {port}/tcp {port}/udp
 ENV mapPort={port}
 
 # Define the command to run the server
-ENTRYPOINT [""./{exeName}"", ""-batchmode"", ""-nographics"", ""-logfile"", ""/dev/stdout"", ""-startMapServer""]";
+ENTRYPOINT [""./run.sh""]";
 
-            File.WriteAllText(dockerfilePath, dockerfileContent);
-            Debug.Log($"Dockerfile generated at: {dockerfilePath}");
+            File.WriteAllText(dockerFilePath, dockerFileContent);
+            Debug.Log($"Dockerfile generated at: {dockerFilePath}");
         }
     }
 }
