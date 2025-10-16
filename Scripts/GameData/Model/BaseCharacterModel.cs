@@ -603,6 +603,7 @@ namespace MultiplayerARPG
                     if (!tempContainer.ActivateInstantiatedObject(tempEquipmentModel.instantiatedObjectIndex))
                     {
                         tempContainer.SetActiveDefaultModel(true);
+                        tempEquipmentObject = tempContainer.defaultModel;
                         modelActivated = true;
                     }
                     else
@@ -614,6 +615,7 @@ namespace MultiplayerARPG
                     if (!tempContainer.ActivateInstantiatedObjectGroup(tempEquipmentModel.instantiatedObjectIndex))
                     {
                         tempContainer.SetActiveDefaultModelGroup(true);
+                        tempEquipmentObjectGroup = tempContainer.defaultInstantiatedObjectGroup;
                         modelActivated = true;
                     }
                     else
