@@ -117,7 +117,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             animationLodUpdater.Update(deltaTime);
         }
 
-        protected void CreateGraph()
+        public void CreateGraph()
         {
             Graph = PlayableGraph.Create($"{name}.PlayableCharacterModel");
             Graph.SetTimeUpdateMode(DirectorUpdateMode.Manual);
@@ -127,7 +127,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             output.SetSourcePlayable(playable);
         }
 
-        protected void DestroyGraph()
+        public void DestroyGraph()
         {
             if (Graph.IsValid())
                 Graph.Destroy();
