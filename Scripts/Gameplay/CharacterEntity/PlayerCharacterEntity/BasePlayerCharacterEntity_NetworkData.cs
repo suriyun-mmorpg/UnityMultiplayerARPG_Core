@@ -30,6 +30,14 @@ namespace MultiplayerARPG
         protected SyncFieldInt partyId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldInt guildId = new SyncFieldInt();
+        [SerializeField]
+        protected SyncFieldString persistChannel = new SyncFieldString();
+        [SerializeField]
+        protected SyncFieldString persistMapName = new SyncFieldString();
+        [SerializeField]
+        protected SyncFieldVector3 persistPosition = new SyncFieldVector3();
+        [SerializeField]
+        protected SyncFieldString persistSafeArea = new SyncFieldString();
 #if !DISABLE_DIFFER_MAP_RESPAWNING
         [SerializeField]
         protected SyncFieldString respawnMapName = new SyncFieldString();
@@ -122,12 +130,55 @@ namespace MultiplayerARPG
         public byte GuildRole { get; set; }
         public string UserId { get; set; }
         public byte UserLevel { get; set; }
-        public string CurrentChannel { get { return CurrentGameManager.GetCurrentChannel(this); } set { } }
-        public string CurrentMapName { get { return CurrentGameManager.GetCurrentMapId(this); } set { } }
+        public string CurrentChannel
+        {
+            get
+            {
+                if (CurrentGameManager.IsInstanceMap())
+                    return persistChannel.Value;
+                return CurrentGameManager.ChannelId;
+            }
+            set
+            {
+                persistChannel.Value = value;
+            }
+        }
+        public string CurrentMapName
+        {
+            get
+            {
+                if (CurrentGameManager.IsInstanceMap())
+                    return persistMapName.Value;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
+                if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition || !CurrentMapInfo.SaveCurrentMapPosition)
+                    return RespawnMapName;
+#endif
+                return CurrentMapInfo.Id;
+            }
+            set
+            {
+                persistMapName.Value = value;
+            }
+        }
         public Vec3 CurrentPosition
         {
-            get { return CurrentGameManager.GetCurrentPosition(this); }
-            set { CurrentGameManager.SetCurrentPosition(this, value); }
+            get
+            {
+                if (CurrentGameManager.IsInstanceMap())
+                    return persistPosition.Value;
+#if !DISABLE_DIFFER_MAP_RESPAWNING
+                if (CurrentGameInstance.currentPositionSaveMode == CurrentPositionSaveMode.UseRespawnPosition || !CurrentMapInfo.SaveCurrentMapPosition)
+                    return RespawnPosition;
+#endif
+                Vector3 currentPosition = EntityTransform.position;
+                if (!PassengingVehicleEntity.IsNull())
+                    currentPosition.y = PassengingVehicleEntity.Entity.EntityTransform.position.y;
+                return currentPosition;
+            }
+            set
+            {
+                persistPosition.Value = value;
+            }
         }
         public Vec3 CurrentRotation
         {
@@ -135,7 +186,7 @@ namespace MultiplayerARPG
             {
                 if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
                     return EntityTransform.eulerAngles;
-                return Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles;
+                return Quaternion.LookRotation(Direction2D).eulerAngles;
             }
             set
             {
@@ -147,7 +198,19 @@ namespace MultiplayerARPG
                 Direction2D = Quaternion.Euler(value) * Vector3.forward;
             }
         }
-        public string CurrentSafeArea { get { return CurrentGameManager.GetCurrentSafeArea(this); } set { } }
+        public string CurrentSafeArea
+        {
+            get
+            {
+                if (CurrentGameManager.IsInstanceMap())
+                    return persistSafeArea.Value;
+                return SafeArea != null ? SafeArea.name : string.Empty;
+            }
+            set
+            {
+                persistSafeArea.Value = value;
+            }
+        }
 #if !DISABLE_DIFFER_MAP_RESPAWNING
         public string RespawnMapName
         {

@@ -254,15 +254,6 @@ namespace MultiplayerARPG
                 return;
             }
 
-            // Store location when enter game
-            _characterLocationsWhenEnterGame[playerCharacterData.Id] = new EnterGameCharacterLocation()
-            {
-                mapName = playerCharacterData.CurrentMapName,
-                position = playerCharacterData.CurrentPosition,
-                rotation = playerCharacterData.CurrentRotation,
-                safeArea = playerCharacterData.CurrentSafeArea,
-            };
-
             if (!CurrentMapInfo.Id.Equals(playerCharacterData.CurrentMapName) ||
                 _teleportingPlayerCharacterIds.Contains(playerCharacterData.Id))
             {
@@ -272,10 +263,13 @@ namespace MultiplayerARPG
             _teleportingPlayerCharacterIds.Remove(playerCharacterData.Id);
 
             // Set proper spawn position
-            CurrentMapInfo.GetEnterMapPoint(playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation);
-            playerCharacterData.CurrentMapName = mapName;
-            playerCharacterData.CurrentPosition = position;
-            playerCharacterData.CurrentRotation = rotation;
+            if (!IsInstanceMap())
+            {
+                CurrentMapInfo.GetEnterMapPoint(playerCharacterData, out string mapName, out Vector3 position, out Vector3 rotation);
+                playerCharacterData.CurrentMapName = mapName;
+                playerCharacterData.CurrentPosition = position;
+                playerCharacterData.CurrentRotation = rotation;
+            }
 
             // Spawn character entity and set its data
             Quaternion characterRotation = Quaternion.identity;
