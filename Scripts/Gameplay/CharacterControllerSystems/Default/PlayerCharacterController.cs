@@ -75,6 +75,10 @@ namespace MultiplayerARPG
         [SerializeField]
         [Tooltip("If this value is `0`, this value will be set as `GameInstance` -> `pickUpItemDistance`")]
         protected float distanceToActivateByPickupKey = 0f;
+        [SerializeField]
+        [Tooltip("This value will being used for distance decreasing in overlap entity functions to make character move a bit closer to target")]
+        [Min(0.01f)]
+        protected float activateDistanceBuffer = 0.1f;
 
         [Header("UI Blocking Settings")]
         [SerializeField]

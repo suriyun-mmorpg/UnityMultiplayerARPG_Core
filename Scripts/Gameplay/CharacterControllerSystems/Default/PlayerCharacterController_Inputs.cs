@@ -751,6 +751,7 @@ namespace MultiplayerARPG
 
         protected virtual bool OverlappedEntity(ITargetableEntity entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
         {
+            distance -= activateDistanceBuffer;
             if (Vector3.Distance(sourcePosition, targetPosition) <= distance)
                 return true;
             // Target is far from controlling entity, try overlap the entity
@@ -762,6 +763,7 @@ namespace MultiplayerARPG
         protected virtual bool OverlappedEntityHitBox<T>(T entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
             where T : BaseGameEntity
         {
+            distance -= activateDistanceBuffer;
             if (Vector3.Distance(sourcePosition, targetPosition) <= distance)
                 return true;
             // Target is far from controlling entity, try overlap the entity
