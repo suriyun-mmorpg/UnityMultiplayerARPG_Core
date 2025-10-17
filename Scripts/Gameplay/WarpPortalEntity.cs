@@ -216,6 +216,9 @@ namespace MultiplayerARPG
             if (playerCharacterEntity.IsDead())
                 return;
 
+            if (playerCharacterEntity.IsWarping)
+                return;
+
             WarpPortalType portalType = warpPortalType;
             string mapName = warpToMapInfo == null ? string.Empty : warpToMapInfo.Id;
             Vector3 position = warpToPosition;
