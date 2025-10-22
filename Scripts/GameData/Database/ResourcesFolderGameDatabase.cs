@@ -20,6 +20,7 @@ namespace MultiplayerARPG
             Quest[] quests = Resources.LoadAll<Quest>("");
             PlayerIcon[] playerIcons = Resources.LoadAll<PlayerIcon>("");
             PlayerFrame[] playerFrames = Resources.LoadAll<PlayerFrame>("");
+            PlayerBackground[] playerBackgrounds = Resources.LoadAll<PlayerBackground>("");
             PlayerTitle[] playerTitles = Resources.LoadAll<PlayerTitle>("");
             GuildSkill[] guildSkills = Resources.LoadAll<GuildSkill>("");
             GuildIcon[] guildIcons = Resources.LoadAll<GuildIcon>("");
@@ -40,6 +41,7 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(quests);
             GameInstance.AddPlayerIcons(playerIcons);
             GameInstance.AddPlayerFrames(playerFrames);
+            GameInstance.AddPlayerBackgrounds(playerBackgrounds);
             GameInstance.AddPlayerTitles(playerTitles);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddGuildIcons(guildIcons);

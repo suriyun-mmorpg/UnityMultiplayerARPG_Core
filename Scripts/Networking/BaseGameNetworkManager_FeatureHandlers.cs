@@ -118,6 +118,7 @@ namespace MultiplayerARPG
                 RegisterRequestToServer<RequestRespawnMessage, ResponseRespawnMessage>(GameNetworkingConsts.Respawn, ServerCharacterMessageHandlers.HandleRequestRespawn);
                 RegisterRequestToServer<RequestSetIconMessage, ResponseSetIconMessage>(GameNetworkingConsts.SetIcon, ServerCharacterMessageHandlers.HandleRequestSetIcon);
                 RegisterRequestToServer<RequestSetFrameMessage, ResponseSetFrameMessage>(GameNetworkingConsts.SetFrame, ServerCharacterMessageHandlers.HandleRequestSetFrame);
+                RegisterRequestToServer<RequestSetBackgroundMessage, ResponseSetBackgroundMessage>(GameNetworkingConsts.SetBackground, ServerCharacterMessageHandlers.HandleRequestSetBackground);
                 RegisterRequestToServer<RequestSetTitleMessage, ResponseSetTitleMessage>(GameNetworkingConsts.SetTitle, ServerCharacterMessageHandlers.HandleRequestSetTitle);
                 RegisterRequestToServer<EmptyMessage, ResponsePlayerCharacterTransformMessage>(GameNetworkingConsts.PlayerCharacterTransform, ServerCharacterMessageHandlers.HandleRequestPlayerCharacterTransform);
             }

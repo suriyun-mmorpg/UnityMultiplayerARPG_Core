@@ -47,6 +47,7 @@ namespace MultiplayerARPG
         public BaseSkill[] skills;
         public PlayerIcon[] playerIcons;
         public PlayerFrame[] playerFrames;
+        public PlayerBackground[] playerBackgrounds;
         public PlayerTitle[] playerTitles;
         public GuildSkill[] guildSkills;
         public GuildIcon[] guildIcons;
@@ -89,6 +90,7 @@ namespace MultiplayerARPG
             GameInstance.AddSkills(skills);
             GameInstance.AddPlayerIcons(playerIcons);
             GameInstance.AddPlayerFrames(playerFrames);
+            GameInstance.AddPlayerBackgrounds(playerBackgrounds);
             GameInstance.AddPlayerTitles(playerTitles);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddGuildIcons(guildIcons);
@@ -119,6 +121,7 @@ namespace MultiplayerARPG
             GameInstance.AddSkills(skills);
             GameInstance.AddPlayerIcons(playerIcons);
             GameInstance.AddPlayerFrames(playerFrames);
+            GameInstance.AddPlayerBackgrounds(playerBackgrounds);
             GameInstance.AddPlayerTitles(playerTitles);
             GameInstance.AddGuildSkills(guildSkills);
             GameInstance.AddGuildIcons(guildIcons);
@@ -187,6 +190,10 @@ namespace MultiplayerARPG
             List<PlayerFrame> tempPlayerFrames = new List<PlayerFrame>(GameInstance.PlayerFrames.Values);
             tempPlayerFrames.Sort();
             playerFrames = tempPlayerFrames.ToArray();
+
+            List<PlayerBackground> tempPlayerBackgrounds = new List<PlayerBackground>(GameInstance.PlayerBackgrounds.Values);
+            tempPlayerBackgrounds.Sort();
+            playerBackgrounds = tempPlayerBackgrounds.ToArray();
 
             List<PlayerTitle> tempPlayerTitles = new List<PlayerTitle>(GameInstance.PlayerTitles.Values);
             tempPlayerTitles.Sort();

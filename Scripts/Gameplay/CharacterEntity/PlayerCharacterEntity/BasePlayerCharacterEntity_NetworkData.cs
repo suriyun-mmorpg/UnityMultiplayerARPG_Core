@@ -49,6 +49,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldInt frameDataId = new SyncFieldInt();
         [SerializeField]
+        protected SyncFieldInt backgroundDataId = new SyncFieldInt();
+        [SerializeField]
         protected SyncFieldInt titleDataId = new SyncFieldInt();
         [SerializeField]
         protected SyncFieldLong lastDeadTime = new SyncFieldLong();
@@ -232,6 +234,11 @@ namespace MultiplayerARPG
         {
             get { return frameDataId.Value; }
             set { frameDataId.Value = value; }
+        }
+        public override int BackgroundDataId
+        {
+            get { return backgroundDataId.Value; }
+            set { backgroundDataId.Value = value; }
         }
         public override int TitleDataId
         {
@@ -438,6 +445,7 @@ namespace MultiplayerARPG
 #endif
             iconDataId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             frameDataId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            backgroundDataId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             titleDataId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             lastDeadTime.syncMode = LiteNetLibSyncFieldMode.ServerToOwnerClient;
 #if !DISABLE_CLASSIC_PK
@@ -484,6 +492,7 @@ namespace MultiplayerARPG
             guildId.onChange += OnGuildIdChange;
             iconDataId.onChange += OnIconDataIdChange;
             frameDataId.onChange += OnFrameDataIdChange;
+            backgroundDataId.onChange += OnBackgroundDataIdChange;
             titleDataId.onChange += OnTitleDataIdChange;
 #if !DISABLE_CLASSIC_PK
             isPkOn.onChange += OnIsPkOnChange;
@@ -529,6 +538,7 @@ namespace MultiplayerARPG
             guildId.onChange -= OnGuildIdChange;
             iconDataId.onChange -= OnIconDataIdChange;
             frameDataId.onChange -= OnFrameDataIdChange;
+            backgroundDataId.onChange += OnBackgroundDataIdChange;
             titleDataId.onChange -= OnTitleDataIdChange;
 #if !DISABLE_CLASSIC_PK
             isPkOn.onChange -= OnIsPkOnChange;
@@ -745,6 +755,13 @@ namespace MultiplayerARPG
             IsRecaching = true;
             if (onFrameDataIdChange != null)
                 onFrameDataIdChange.Invoke(frameDataId);
+        }
+
+        private void OnBackgroundDataIdChange(bool isInitial, int oldBackgroundDataId, int backgroundDataId)
+        {
+            IsRecaching = true;
+            if (onBackgroundDataIdChange != null)
+                onBackgroundDataIdChange.Invoke(backgroundDataId);
         }
 
         private void OnTitleDataIdChange(bool isInitial, int oldTitleDataId, int titleDataId)

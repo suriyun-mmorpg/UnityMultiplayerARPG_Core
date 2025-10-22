@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, Quest> Quests = new Dictionary<int, Quest>();
         public static readonly Dictionary<int, PlayerIcon> PlayerIcons = new Dictionary<int, PlayerIcon>();
         public static readonly Dictionary<int, PlayerFrame> PlayerFrames = new Dictionary<int, PlayerFrame>();
+        public static readonly Dictionary<int, PlayerBackground> PlayerBackgrounds = new Dictionary<int, PlayerBackground>();
         public static readonly Dictionary<int, PlayerTitle> PlayerTitles = new Dictionary<int, PlayerTitle>();
         public static readonly Dictionary<int, GuildSkill> GuildSkills = new Dictionary<int, GuildSkill>();
         public static readonly Dictionary<int, GuildIcon> GuildIcons = new Dictionary<int, GuildIcon>();
@@ -395,6 +396,16 @@ namespace MultiplayerARPG
         public static void AddPlayerFrames(IEnumerable<PlayerFrame> playerFrames)
         {
             AddManyGameData(PlayerFrames, playerFrames);
+        }
+
+        public static void AddPlayerBackgrounds(params PlayerBackground[] playerBackgrounds)
+        {
+            AddPlayerBackgrounds((IEnumerable<PlayerBackground>)playerBackgrounds);
+        }
+
+        public static void AddPlayerBackgrounds(IEnumerable<PlayerBackground> playerBackgrounds)
+        {
+            AddManyGameData(PlayerBackgrounds, playerBackgrounds);
         }
 
         public static void AddPlayerTitles(params PlayerTitle[] playerTitles)
@@ -1106,6 +1117,12 @@ namespace MultiplayerARPG
                         result[kv.Key] = kv.Value.UnlockRequirement;
                     }
                     break;
+                case UnlockableContentType.Background:
+                    foreach (var kv in PlayerBackgrounds)
+                    {
+                        result[kv.Key] = kv.Value.UnlockRequirement;
+                    }
+                    break;
                 case UnlockableContentType.Title:
                     foreach (var kv in PlayerTitles)
                     {
@@ -1128,6 +1145,12 @@ namespace MultiplayerARPG
                 case UnlockableContentType.Frame:
                     if (PlayerFrames.TryGetValue(dataId, out PlayerFrame playerFrame))
                         result = playerFrame.UnlockRequirement;
+                    break;
+                case UnlockableContentType.Background:
+                    foreach (var kv in PlayerBackgrounds)
+                    {
+                        result[kv.Key] = kv.Value.UnlockRequirement;
+                    }
                     break;
                 case UnlockableContentType.Title:
                     if (PlayerTitles.TryGetValue(dataId, out PlayerTitle playerTitle))

@@ -18,6 +18,7 @@ namespace MultiplayerARPG
         public event System.Action<int> onGuildIdChange;
         public event System.Action<int> onIconDataIdChange;
         public event System.Action<int> onFrameDataIdChange;
+        public event System.Action<int> onBackgroundDataIdChange;
         public event System.Action<int> onTitleDataIdChange;
 #if !DISABLE_CLASSIC_PK
         public event System.Action<bool> onIsPkOnChange;

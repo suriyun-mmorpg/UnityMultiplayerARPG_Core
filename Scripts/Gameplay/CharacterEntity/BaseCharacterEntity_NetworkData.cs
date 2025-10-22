@@ -69,6 +69,7 @@ namespace MultiplayerARPG
         public int CurrentWater { get { return currentWater.Value; } set { currentWater.Value = value; } }
         public virtual int IconDataId { get; set; }
         public virtual int FrameDataId { get; set; }
+        public virtual int BackgroundDataId { get; set; }
         public virtual int TitleDataId { get; set; }
         public virtual int FactionId { get; set; }
         public virtual int Reputation { get; set; }
