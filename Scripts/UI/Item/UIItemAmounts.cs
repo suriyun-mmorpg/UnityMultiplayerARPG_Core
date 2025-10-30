@@ -209,12 +209,36 @@ namespace MultiplayerARPG
         {
             if (uiEntryPrefab == null || uiListContainer == null)
                 return;
+
             CacheList.HideAll();
-            UICharacterItem tempUI;
+
             CacheList.Generate(Data, (index, data, ui) =>
             {
-                tempUI = ui.GetComponent<UICharacterItem>();
-                tempUI.Data = new UICharacterItemData(CharacterItem.Create(data.Key, 1, data.Value), InventoryType.Unknow);
+                UICharacterItem uiItem = ui.GetComponent<UICharacterItem>();
+                int targetAmount = data.Value;
+
+                // Current = how many player has
+                int currentAmount = 0;
+                if (GameInstance.PlayingCharacter != null)
+                    currentAmount = GameInstance.PlayingCharacter.CountNonEquipItems(data.Key.DataId);
+
+                // Assign item normally
+                uiItem.Data = new UICharacterItemData(
+                    CharacterItem.Create(data.Key, 1, targetAmount),
+                    InventoryType.Unknow
+                );
+
+                // Requirement 
+                if (displayType == DisplayType.Requirement && uiItem.uiTextStack != null)
+                {
+                    bool enough = currentAmount >= targetAmount;
+                    string format = LanguageManager.GetText(enough ? formatKeyAmount : formatKeyAmountNotEnough);
+                    string curStr = currentAmount.ToString(numberFormatSimple);
+                    string tgtStr = targetAmount.ToString(numberFormatSimple);
+                    uiItem.uiTextStack.text = ZString.Format(format, data.Key.Title, curStr, tgtStr);
+
+                    uiItem.uiTextStack.SetGameObjectActive(true);
+                }
             });
         }
     }
