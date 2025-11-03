@@ -21,6 +21,9 @@ namespace MultiplayerARPG
         protected UILocaleKeySetting formatKeyCorpseTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CORPSE_TITLE);
 
         [Category("Events")]
+        [Tooltip("If this is `TRUE` it will show items when character activate on this entity")]
+        [SerializeField]
+        protected bool canActivate = false;
         [FormerlySerializedAs("onItemsContainerDestroy")]
         [SerializeField]
         protected UnityEvent onPickedUp = new UnityEvent();
@@ -68,6 +71,13 @@ namespace MultiplayerARPG
         protected bool _isDestroyed;
         protected float _dropTime;
         protected float _appearDuration;
+
+        protected override void EntityAwake()
+        {
+            base.EntityAwake();
+            gameObject.tag = CurrentGameInstance.itemDropTag;
+            gameObject.layer = CurrentGameInstance.itemDropLayer;
+        }
 
         protected override void SetupNetElements()
         {
@@ -199,7 +209,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanActivate()
         {
-            return true;
+            return canActivate;
         }
 
         public virtual void OnActivate()
