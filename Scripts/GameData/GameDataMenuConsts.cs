@@ -275,6 +275,10 @@ namespace MultiplayerARPG
         public const string PLAYER_FRAME_MENU = "Create GameData/Player Frame";
         public const int PLAYER_FRAME_ORDER = -5198;
 
+        public const string PLAYER_BACKGROUND_FILE = "Player Background";
+        public const string PLAYER_BACKGROUND_MENU = "Create GameData/Player Background";
+        public const int PLAYER_BACKGROUND_ORDER = -5198;
+
         public const string PLAYER_TITLE_FILE = "Player Title";
         public const string PLAYER_TITLE_MENU = "Create GameData/Player Title";
         public const int PLAYER_TITLE_ORDER = -5197;

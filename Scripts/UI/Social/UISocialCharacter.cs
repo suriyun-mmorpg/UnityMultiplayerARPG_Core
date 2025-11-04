@@ -24,6 +24,7 @@ namespace MultiplayerARPG
         public UIGageValue uiGageMp;
         public UIPlayerIcon uiPlayerIcon;
         public UIPlayerFrame uiPlayerFrame;
+        public UIPlayerBackground uiPlayerBackground;
         public UIPlayerTitle uiPlayerTitle;
         public TextWrapper uiTextOnlineStatus;
         public UICharacterBuffs uiCharacterBuffs;
@@ -74,6 +75,7 @@ namespace MultiplayerARPG
             uiGageMp = null;
             uiPlayerIcon = null;
             uiPlayerFrame = null;
+            uiPlayerBackground = null;
             uiPlayerTitle = null;
             uiTextOnlineStatus = null;
             uiCharacterBuffs = null;
@@ -170,6 +172,10 @@ namespace MultiplayerARPG
             // Frame
             if (uiPlayerFrame != null)
                 uiPlayerFrame.SetDataByDataId(Data.frameDataId);
+
+            // Background
+            if (uiPlayerBackground != null)
+                uiPlayerBackground.SetDataByDataId(Data.backgroundDataId);
 
             // Title
             if (uiPlayerTitle != null)

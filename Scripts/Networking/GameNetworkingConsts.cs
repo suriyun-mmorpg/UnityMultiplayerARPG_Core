@@ -107,13 +107,14 @@
         public const ushort GuildRequestNotification = 179;
         public const ushort SetIcon = 183;
         public const ushort SetFrame = 184;
-        public const ushort SetTitle = 185;
-        public const ushort SortItems = 186;
-        public const ushort AvailableContents = 187;
-        public const ushort UnlockContent = 188;
-        public const ushort SafeDisconnect = 189;
-        public const ushort ChangeAmmoItem = 190;
-        public const ushort RemoveAmmoFromItem = 191;
-        public const ushort PlayerCharacterTransform = 192;
+        public const ushort SetBackground = 185;
+        public const ushort SetTitle = 186;
+        public const ushort SortItems = 187;
+        public const ushort AvailableContents = 188;
+        public const ushort UnlockContent = 189;
+        public const ushort SafeDisconnect = 190;
+        public const ushort ChangeAmmoItem = 191;
+        public const ushort RemoveAmmoFromItem = 192;
+        public const ushort PlayerCharacterTransform = 193;
     }
 }

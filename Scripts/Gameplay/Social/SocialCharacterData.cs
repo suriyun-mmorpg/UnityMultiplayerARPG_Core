@@ -20,6 +20,7 @@
                 maxMp = character.MaxMp,
                 iconDataId = character.IconDataId,
                 frameDataId = character.FrameDataId,
+                backgroundDataId = character.BackgroundDataId,
                 titleDataId = character.TitleDataId,
             };
         }

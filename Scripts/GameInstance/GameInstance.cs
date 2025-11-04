@@ -1185,6 +1185,7 @@ namespace MultiplayerARPG
             Quests.Clear();
             PlayerIcons.Clear();
             PlayerFrames.Clear();
+            PlayerBackgrounds.Clear();
             PlayerTitles.Clear();
             GuildSkills.Clear();
             GuildIcons.Clear();

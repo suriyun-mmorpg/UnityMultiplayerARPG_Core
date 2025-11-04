@@ -77,6 +77,11 @@ namespace MultiplayerARPG
             return Manager.ClientSendRequest(GameNetworkingConsts.SetFrame, data, responseDelegate: callback);
         }
 
+        public bool RequestSetBackground(RequestSetBackgroundMessage data, ResponseDelegate<ResponseSetBackgroundMessage> callback)
+        {
+            return Manager.ClientSendRequest(GameNetworkingConsts.SetBackground, data, responseDelegate: callback);
+        }
+
         public bool RequestSetTitle(RequestSetTitleMessage data, ResponseDelegate<ResponseSetTitleMessage> callback)
         {
             return Manager.ClientSendRequest(GameNetworkingConsts.SetTitle, data, responseDelegate: callback);

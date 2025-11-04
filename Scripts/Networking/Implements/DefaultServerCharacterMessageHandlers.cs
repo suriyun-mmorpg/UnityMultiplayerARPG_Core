@@ -162,6 +162,33 @@ namespace MultiplayerARPG
             return default;
         }
 
+        public UniTaskVoid HandleRequestSetBackground(RequestHandlerData requestHandler, RequestSetBackgroundMessage request, RequestProceedResultDelegate<ResponseSetBackgroundMessage> result)
+        {
+            if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))
+            {
+                result.InvokeError(new ResponseSetBackgroundMessage()
+                {
+                    message = UITextKeys.UI_ERROR_NOT_LOGGED_IN,
+                });
+                return default;
+            }
+            // TODO: Implement data unlocking
+            if (!GameInstance.PlayerBackgrounds.TryGetValue(request.dataId, out PlayerBackground data) || data.UnlockRequirement.isLocked)
+            {
+                result.InvokeError(new ResponseSetBackgroundMessage()
+                {
+                    message = UITextKeys.UI_ERROR_INVALID_DATA,
+                });
+                return default;
+            }
+            playerCharacter.BackgroundDataId = request.dataId;
+            result.InvokeSuccess(new ResponseSetBackgroundMessage()
+            {
+                dataId = request.dataId,
+            });
+            return default;
+        }
+
         public UniTaskVoid HandleRequestSetTitle(RequestHandlerData requestHandler, RequestSetTitleMessage request, RequestProceedResultDelegate<ResponseSetTitleMessage> result)
         {
             if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacter(requestHandler.ConnectionId, out IPlayerCharacterData playerCharacter))

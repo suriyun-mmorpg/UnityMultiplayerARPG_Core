@@ -61,6 +61,7 @@ namespace MultiplayerARPG
         public UICharacterClass uiCharacterClass;
         public UIPlayerIcon uiPlayerIcon;
         public UIPlayerFrame uiPlayerFrame;
+        public UIPlayerBackground uiPlayerBackground;
         public UIPlayerTitle uiPlayerTitle;
         public UIFaction uiFaction;
 
@@ -168,6 +169,7 @@ namespace MultiplayerARPG
             uiCharacterClass = null;
             uiPlayerIcon = null;
             uiPlayerFrame = null;
+            uiPlayerBackground = null;
             uiPlayerTitle = null;
             uiFaction = null;
             _cacheAttributes?.Clear();
@@ -359,6 +361,16 @@ namespace MultiplayerARPG
                 else
                     uiPlayerFrame.SetDataByDataId(GameInstance.PlayerFrames.Keys.FirstOrDefault());
                 uiPlayerFrame.SetVisible(true);
+            }
+
+            // Background
+            if (uiPlayerBackground != null)
+            {
+                if (playerCharacter != null && GameInstance.PlayerBackgrounds.ContainsKey(playerCharacter.BackgroundDataId))
+                    uiPlayerBackground.SetDataByDataId(playerCharacter.BackgroundDataId);
+                else
+                    uiPlayerBackground.SetDataByDataId(GameInstance.PlayerBackgrounds.Keys.FirstOrDefault());
+                uiPlayerBackground.SetVisible(true);
             }
 
             // Title

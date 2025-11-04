@@ -25,6 +25,10 @@ namespace MultiplayerARPG
             RequestHandlerData requestHandler, RequestSetFrameMessage request,
             RequestProceedResultDelegate<ResponseSetFrameMessage> result);
 
+        UniTaskVoid HandleRequestSetBackground(
+            RequestHandlerData requestHandler, RequestSetBackgroundMessage request,
+            RequestProceedResultDelegate<ResponseSetBackgroundMessage> result);
+
         UniTaskVoid HandleRequestSetTitle(
             RequestHandlerData requestHandler, RequestSetTitleMessage request,
             RequestProceedResultDelegate<ResponseSetTitleMessage> result);
