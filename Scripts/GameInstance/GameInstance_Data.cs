@@ -1147,10 +1147,8 @@ namespace MultiplayerARPG
                         result = playerFrame.UnlockRequirement;
                     break;
                 case UnlockableContentType.Background:
-                    foreach (var kv in PlayerBackgrounds)
-                    {
-                        result[kv.Key] = kv.Value.UnlockRequirement;
-                    }
+                    if (PlayerBackgrounds.TryGetValue(dataId, out PlayerBackground playerBackground))
+                        result = playerBackground.UnlockRequirement;
                     break;
                 case UnlockableContentType.Title:
                     if (PlayerTitles.TryGetValue(dataId, out PlayerTitle playerTitle))
