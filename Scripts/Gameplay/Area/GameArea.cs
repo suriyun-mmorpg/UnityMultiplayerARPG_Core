@@ -109,7 +109,7 @@ namespace MultiplayerARPG
                         if (randomPositionMode == GameAreaRandomPositionMode.FullyRandom)
                             index = Random.Range(0, randomedPosition2Ds.Count);
                         randomedPosition = GetRandomPosition2D(index);
-                        if (randomPositionMode != GameAreaRandomPositionMode.ByOrder)
+                        if (randomPositionMode == GameAreaRandomPositionMode.ByOrder)
                         {
                             _indexOfRandomPosition++;
                             if (_indexOfRandomPosition >= randomedPosition2Ds.Count)
@@ -130,7 +130,7 @@ namespace MultiplayerARPG
                         if (randomPositionMode == GameAreaRandomPositionMode.FullyRandom)
                             index = Random.Range(0, randomedPosition3Ds.Count);
                         randomedPosition = GetRandomPosition3D(index);
-                        if (randomPositionMode != GameAreaRandomPositionMode.ByOrder)
+                        if (randomPositionMode == GameAreaRandomPositionMode.ByOrder)
                         {
                             _indexOfRandomPosition++;
                             if (_indexOfRandomPosition >= randomedPosition3Ds.Count)
