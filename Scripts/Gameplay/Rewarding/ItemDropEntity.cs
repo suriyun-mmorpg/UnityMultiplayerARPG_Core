@@ -31,8 +31,8 @@ namespace MultiplayerARPG
         [SerializeField]
         protected UnityEvent onSpawned = new UnityEvent();
         public UnityEvent OnSpawned { get { return onSpawned; } }
-        [FormerlySerializedAs("onItemDropDestroy")]
 
+        [FormerlySerializedAs("onItemDropDestroy")]
         [SerializeField]
         protected UnityEvent onPickedUp = new UnityEvent();
         public UnityEvent OnPickedUp { get { return onPickedUp; } }
