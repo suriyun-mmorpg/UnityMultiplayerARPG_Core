@@ -183,6 +183,7 @@ namespace MultiplayerARPG
                 EntityTypes.Monster,
                 ObjectId,
                 ObjectId.ToString(),
+                SubChannelId,
                 DataId,
                 FactionId,
                 0 /* Party ID */,

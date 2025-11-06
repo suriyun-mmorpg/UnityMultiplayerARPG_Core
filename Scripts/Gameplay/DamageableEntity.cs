@@ -400,6 +400,12 @@ namespace MultiplayerARPG
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
         {
+            if (string.Equals(instigator.SubChannelId, SubChannelId))
+            {
+                // Difference channel
+                return false;
+            }
+
             if (instigator.IsInSafeArea)
             {
                 // If attacker is in safe area, it will not receives damages

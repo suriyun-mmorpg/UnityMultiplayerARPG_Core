@@ -147,6 +147,7 @@ namespace MultiplayerARPG
                 EntityTypes.Player,
                 ObjectId,
                 Id,
+                SubChannelId,
                 DataId,
                 FactionId,
                 PartyId,
