@@ -229,6 +229,8 @@ namespace MultiplayerARPG
                                 Teleport(GameInstance.Singleton.GameplayRule.GetSummonPosition(Summoner), GameInstance.Singleton.GameplayRule.GetSummonRotation(Summoner), false);
                                 _lastTeleportToSummonerTime = currentTime;
                             }
+                            // Set its sub channel ID follow summoner
+                            Identity.SubChannelId = Summoner.SubChannelId;
                         }
                     }
                 }
