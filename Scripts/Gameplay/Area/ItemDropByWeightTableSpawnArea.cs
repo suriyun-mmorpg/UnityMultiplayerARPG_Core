@@ -174,6 +174,7 @@ namespace MultiplayerARPG
                         newEntity.name = string.Empty;
 #endif
                         newEntity.Identity.SubChannelId = subChannelId;
+                        newEntity.CallRpcOnSpawned();
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity, pendingEntry);
@@ -191,6 +192,7 @@ namespace MultiplayerARPG
                         newEntity.name = string.Empty;
 #endif
                         newEntity.Identity.SubChannelId = subChannelId;
+                        newEntity.CallRpcOnSpawned();
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity, pendingEntry);
@@ -210,6 +212,7 @@ namespace MultiplayerARPG
 #endif
                         newEntity.Currency = currency;
                         newEntity.Identity.SubChannelId = subChannelId;
+                        newEntity.CallRpcOnSpawned();
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity, pendingEntry);
@@ -228,6 +231,7 @@ namespace MultiplayerARPG
                         newEntity.name = string.Empty;
 #endif
                         newEntity.Identity.SubChannelId = subChannelId;
+                        newEntity.CallRpcOnSpawned();
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity, pendingEntry);

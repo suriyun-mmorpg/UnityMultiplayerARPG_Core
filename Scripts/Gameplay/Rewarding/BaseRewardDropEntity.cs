@@ -39,7 +39,12 @@ namespace MultiplayerARPG
 
         [Category(99, "Events")]
         [SerializeField]
+        protected UnityEvent onSpawned = new UnityEvent();
+        public UnityEvent OnSpawned { get { return onSpawned; } }
+
+        [SerializeField]
         protected UnityEvent onPickedUp = new UnityEvent();
+        public UnityEvent OnPickedUp { get { return onPickedUp; } }
 
         public float Multiplier { get; protected set; }
 
@@ -157,6 +162,18 @@ namespace MultiplayerARPG
             SpawnAddressablePrefab = spawnAddressablePrefab;
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
+        }
+
+        public void CallRpcOnSpawned()
+        {
+            RPC(RpcOnSpawned, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
+        }
+
+        [AllRpc]
+        protected virtual void RpcOnSpawned()
+        {
+            if (onSpawned != null)
+                onSpawned.Invoke();
         }
 
         protected override void EntityOnDestroy()

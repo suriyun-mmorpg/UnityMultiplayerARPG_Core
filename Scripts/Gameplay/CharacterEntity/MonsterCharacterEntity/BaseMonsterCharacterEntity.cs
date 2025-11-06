@@ -5,6 +5,7 @@ using LiteNetLibManager;
 using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -31,6 +32,11 @@ namespace MultiplayerARPG
         protected float destroyDelay = 2f;
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
+
+        [Category(99, "Events")]
+        [SerializeField]
+        protected UnityEvent onSpawned = new UnityEvent();
+        public UnityEvent OnSpawned { get { return onSpawned; } }
 
         [Category("Sync Fields")]
         [SerializeField]
@@ -252,24 +258,6 @@ namespace MultiplayerARPG
             CurrentWater = (int)stats.water;
         }
 
-        public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
-        {
-            SpawnArea = spawnArea;
-            SpawnPrefab = spawnPrefab;
-            SpawnAddressablePrefab = null;
-            SpawnLevel = spawnLevel;
-            SpawnPosition = spawnPosition;
-        }
-
-        public virtual void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, GameSpawnArea<BaseMonsterCharacterEntity>.AddressablePrefab spawnAddressablePrefab, int spawnLevel, Vector3 spawnPosition)
-        {
-            SpawnArea = spawnArea;
-            SpawnPrefab = null;
-            SpawnAddressablePrefab = spawnAddressablePrefab;
-            SpawnLevel = spawnLevel;
-            SpawnPosition = spawnPosition;
-        }
-
         protected override void SetupNetElements()
         {
             base.SetupNetElements();
@@ -311,6 +299,36 @@ namespace MultiplayerARPG
                 SpawnPosition = EntityTransform.position;
             if (IsServer)
                 InitStats();
+        }
+
+        public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
+        {
+            SpawnArea = spawnArea;
+            SpawnPrefab = spawnPrefab;
+            SpawnAddressablePrefab = null;
+            SpawnLevel = spawnLevel;
+            SpawnPosition = spawnPosition;
+        }
+
+        public virtual void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, GameSpawnArea<BaseMonsterCharacterEntity>.AddressablePrefab spawnAddressablePrefab, int spawnLevel, Vector3 spawnPosition)
+        {
+            SpawnArea = spawnArea;
+            SpawnPrefab = null;
+            SpawnAddressablePrefab = spawnAddressablePrefab;
+            SpawnLevel = spawnLevel;
+            SpawnPosition = spawnPosition;
+        }
+
+        public void CallRpcOnSpawned()
+        {
+            RPC(RpcOnSpawned, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
+        }
+
+        [AllRpc]
+        protected virtual void RpcOnSpawned()
+        {
+            if (onSpawned != null)
+                onSpawned.Invoke();
         }
 
         public void SetAttackTarget(IDamageableEntity target)
@@ -781,6 +799,7 @@ namespace MultiplayerARPG
                 Identity.HashSceneObjectId,
                 SpawnPosition,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+            CallRpcOnSpawned();
             OnRespawn();
         }
 

@@ -115,6 +115,7 @@ namespace MultiplayerARPG
 
             entity.InitStats();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            entity.CallRpcOnSpawned();
             return entity;
         }
 

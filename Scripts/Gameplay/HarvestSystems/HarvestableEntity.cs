@@ -35,7 +35,12 @@ namespace MultiplayerARPG
 
         [Category("Events")]
         [SerializeField]
+        protected UnityEvent onSpawned = new UnityEvent();
+        public UnityEvent OnSpawned { get { return onSpawned; } }
+
+        [SerializeField]
         protected UnityEvent onHarvestableDestroy = new UnityEvent();
+        public UnityEvent OnHarvestableDestroy { get { return onHarvestableDestroy; } }
 
         public override string EntityTitle
         {
@@ -100,6 +105,15 @@ namespace MultiplayerARPG
             CurrentHp = MaxHp;
         }
 
+        public override void OnSetup()
+        {
+            base.OnSetup();
+            if (SpawnArea == null)
+                SpawnPosition = EntityTransform.position;
+            if (IsServer)
+                InitStats();
+        }
+
         public virtual void SetSpawnArea(GameSpawnArea<HarvestableEntity> spawnArea, HarvestableEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
@@ -118,13 +132,16 @@ namespace MultiplayerARPG
             SpawnPosition = spawnPosition;
         }
 
-        public override void OnSetup()
+        public void CallRpcOnSpawned()
         {
-            base.OnSetup();
-            if (SpawnArea == null)
-                SpawnPosition = EntityTransform.position;
-            if (IsServer)
-                InitStats();
+            RPC(RpcOnSpawned, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
+        }
+
+        [AllRpc]
+        protected virtual void RpcOnSpawned()
+        {
+            if (onSpawned != null)
+                onSpawned.Invoke();
         }
 
         public void CallRpcOnHarvestableDestroy()
@@ -255,6 +272,7 @@ namespace MultiplayerARPG
                 Identity.HashSceneObjectId,
                 SpawnPosition,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+            CallRpcOnSpawned();
         }
 
         public override bool CanReceiveDamageFrom(EntityInfo entityInfo)

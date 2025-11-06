@@ -119,6 +119,7 @@ namespace MultiplayerARPG
             entity.Teleport(spawnPosition, spawnRotation, false);
             entity.InitStats();
             BaseGameNetworkManager.Singleton.Assets.NetworkSpawn(spawnObj);
+            entity.CallRpcOnSpawned();
             return entity;
         }
 

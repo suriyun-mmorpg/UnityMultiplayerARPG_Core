@@ -28,7 +28,11 @@ namespace MultiplayerARPG
         protected float destroyRespawnDelay = 5f;
 
         [Category(99, "Events")]
+        [SerializeField]
+        protected UnityEvent onSpawned = new UnityEvent();
+        public UnityEvent OnSpawned { get { return onSpawned; } }
         [FormerlySerializedAs("onItemDropDestroy")]
+
         [SerializeField]
         protected UnityEvent onPickedUp = new UnityEvent();
         public UnityEvent OnPickedUp { get { return onPickedUp; } }
@@ -250,10 +254,16 @@ namespace MultiplayerARPG
             SpawnPosition = spawnPosition;
         }
 
-        protected override void EntityOnDestroy()
+        public void CallRpcOnSpawned()
         {
-            base.EntityOnDestroy();
-            itemDropData.onChange -= OnItemDropDataChange;
+            RPC(RpcOnSpawned, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered);
+        }
+
+        [AllRpc]
+        protected virtual void RpcOnSpawned()
+        {
+            if (onSpawned != null)
+                onSpawned.Invoke();
         }
 
         public void CallRpcOnPickedUp()
@@ -266,6 +276,12 @@ namespace MultiplayerARPG
         {
             if (onPickedUp != null)
                 onPickedUp.Invoke();
+        }
+
+        protected override void EntityOnDestroy()
+        {
+            base.EntityOnDestroy();
+            itemDropData.onChange -= OnItemDropDataChange;
         }
 
         protected virtual async void OnItemDropDataChange(bool isInitial, ItemDropData oldItemDropData, ItemDropData itemDropData)
@@ -288,6 +304,11 @@ namespace MultiplayerARPG
                 _dropModel.gameObject.SetActive(true);
                 _dropModel.RemoveComponentsInChildren<Collider>(false);
                 _dropModel.transform.localPosition = Vector3.zero;
+                // Hide from host client
+                if (IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                {
+                    Identity.OnServerSubscribingRemoved();
+                }
             }
 #endif
         }
@@ -334,6 +355,7 @@ namespace MultiplayerARPG
                 Identity.HashSceneObjectId,
                 EntityTransform.position,
                 CurrentGameInstance.DimensionType == DimensionType.Dimension3D ? Quaternion.Euler(Vector3.up * Random.Range(0, 360)) : Quaternion.identity);
+            CallRpcOnSpawned();
         }
 
         public static UniTask<ItemDropEntity> Drop(BaseGameEntity dropper, RewardGivenType givenType, CharacterItem dropData, IEnumerable<string> looters)
