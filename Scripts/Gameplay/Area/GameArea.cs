@@ -20,6 +20,12 @@ namespace MultiplayerARPG
         Raycast,
     }
 
+    public enum GameAreaRandomPositionMode
+    {
+        ByOrder,
+        FullyRandom,
+    }
+
     public class GameArea : MonoBehaviour
     {
         protected static System.Random randomizer = new System.Random();
@@ -49,6 +55,7 @@ namespace MultiplayerARPG
         public List<Vector3> randomedPosition3Ds = new List<Vector3>();
         public List<Vector3> randomedPosition2Ds = new List<Vector3>();
         public bool excludeFromAllAreaBaking = false;
+        public GameAreaRandomPositionMode randomPositionMode = GameAreaRandomPositionMode.ByOrder;
 #if UNITY_EDITOR
         [InspectorButton(nameof(BakeRandomPositions), "Bake Random Positions")]
         public bool btnBakeRandomPositions;
@@ -98,10 +105,16 @@ namespace MultiplayerARPG
                 case DimensionType.Dimension2D:
                     if (randomedPosition2Ds != null && randomedPosition2Ds.Count > 0)
                     {
-                        randomedPosition = GetRandomPosition2D(_indexOfRandomPosition);
-                        _indexOfRandomPosition++;
-                        if (_indexOfRandomPosition >= randomedPosition2Ds.Count)
-                            _indexOfRandomPosition = 0;
+                        int index = _indexOfRandomPosition;
+                        if (randomPositionMode == GameAreaRandomPositionMode.FullyRandom)
+                            index = Random.Range(0, randomedPosition2Ds.Count);
+                        randomedPosition = GetRandomPosition2D(index);
+                        if (randomPositionMode != GameAreaRandomPositionMode.ByOrder)
+                        {
+                            _indexOfRandomPosition++;
+                            if (_indexOfRandomPosition >= randomedPosition2Ds.Count)
+                                _indexOfRandomPosition = 0;
+                        }
                         return true;
                     }
                     if (GetRandomedPosition2D(randomizer, out randomedPosition))
@@ -113,10 +126,16 @@ namespace MultiplayerARPG
                 default:
                     if (randomedPosition3Ds != null && randomedPosition3Ds.Count > 0)
                     {
-                        randomedPosition = GetRandomPosition3D(_indexOfRandomPosition);
-                        _indexOfRandomPosition++;
-                        if (_indexOfRandomPosition >= randomedPosition3Ds.Count)
-                            _indexOfRandomPosition = 0;
+                        int index = _indexOfRandomPosition;
+                        if (randomPositionMode == GameAreaRandomPositionMode.FullyRandom)
+                            index = Random.Range(0, randomedPosition3Ds.Count);
+                        randomedPosition = GetRandomPosition3D(index);
+                        if (randomPositionMode != GameAreaRandomPositionMode.ByOrder)
+                        {
+                            _indexOfRandomPosition++;
+                            if (_indexOfRandomPosition >= randomedPosition3Ds.Count)
+                                _indexOfRandomPosition = 0;
+                        }
                         return true;
                     }
                     if (GetRandomedPosition3D(randomizer, out randomedPosition, stillUseRandomedPositionIfGroundNotFound))
