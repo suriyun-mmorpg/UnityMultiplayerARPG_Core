@@ -92,7 +92,7 @@ namespace MultiplayerARPG
             }
 
             // Find hitting objects
-            int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
+            int layerMask = GameInstance.Singleton.GetDamageableLayerMask();
             int tempHitCount = attacker.AttackPhysicFunctions.OverlapObjects(damagePositionWithOffsets, hitDistanceWithOffsets, layerMask, true, QueryTriggerInteraction.Collide);
             if (tempHitCount <= 0)
                 return default;
@@ -115,6 +115,10 @@ namespace MultiplayerARPG
             {
                 tempGameObject = attacker.AttackPhysicFunctions.GetOverlapObject(i);
                 if (!tempGameObject.GetComponent<IUnHittable>().IsNull())
+                    continue;
+
+                // Hit obstacles before hit target object
+                if (attacker.AttackPhysicFunctions.SingleRaycast(damagePositionWithOffsets, damageDirection, out _, hitDistanceWithOffsets, GameInstance.Singleton.GetAttackObstacleLayerMask(), QueryTriggerInteraction.Ignore))
                     continue;
 
                 tempCollider = attacker.AttackPhysicFunctions.GetOverlapCollider(i);
