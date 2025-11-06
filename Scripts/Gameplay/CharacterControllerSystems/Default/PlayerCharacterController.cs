@@ -302,7 +302,7 @@ namespace MultiplayerARPG
                     character = null;
                     return false;
                 }
-                bool isHiddenFromHost = PlayingCharacterEntity.IsServer && SelectedGameEntity.Identity && SelectedGameEntity.Identity.IsHideFrom(PlayingCharacterEntity.Identity);
+                bool isHiddenFromHost = PlayingCharacterEntity.IsServer && SelectedGameEntity.Identity.IsHideFrom(PlayingCharacterEntity.Identity);
                 if (isHiddenFromHost)
                     return false;
                 return true;
