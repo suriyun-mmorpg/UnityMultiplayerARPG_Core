@@ -393,7 +393,13 @@ namespace MultiplayerARPG
                     dropPosition = DropEntityUtils.GetDroppedPosition2D(dropPosition, GameInstance.Singleton.dropDistance);
                     break;
             }
-            return Drop(prefab, dropPosition, dropRotation, givenType, dropData, looters, appearDuration);
+            ItemDropEntity entity = Drop(prefab, dropPosition, dropRotation, givenType, dropData, looters, appearDuration);
+            if (entity != null)
+            {
+                // Set sub channel ID follow dropper, so it won't 
+                entity.Identity.SubChannelId = dropper.SubChannelId;
+            }
+            return entity;
         }
 
         public static ItemDropEntity Drop(ItemDropEntity prefab, Vector3 dropPosition, Quaternion dropRotation, RewardGivenType givenType, CharacterItem dropItem, IEnumerable<string> looters, float appearDuration)
