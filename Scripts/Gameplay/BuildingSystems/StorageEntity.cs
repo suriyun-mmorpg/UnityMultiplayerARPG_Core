@@ -118,6 +118,8 @@ namespace MultiplayerARPG
 
         public override bool CanActivate()
         {
+            if (Identity.IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                return false;
             return !this.IsDead();
         }
 

@@ -339,6 +339,8 @@ namespace MultiplayerARPG
 
         public virtual bool CanPickupActivate()
         {
+            if (IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                return false;
             return true;
         }
 

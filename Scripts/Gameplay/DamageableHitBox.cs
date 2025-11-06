@@ -501,6 +501,8 @@ namespace MultiplayerARPG
 
         public bool CanActivate()
         {
+            if (Identity.IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                return false;
             if (ActivatableEntity != null)
                 return ActivatableEntity.CanActivate();
             return false;
@@ -514,6 +516,8 @@ namespace MultiplayerARPG
 
         public bool CanHoldActivate()
         {
+            if (Identity.IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                return false;
             if (HoldActivatableEntity != null)
                 return HoldActivatableEntity.CanHoldActivate();
             return false;

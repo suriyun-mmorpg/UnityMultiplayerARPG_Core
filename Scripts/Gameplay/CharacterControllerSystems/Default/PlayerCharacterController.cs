@@ -1,4 +1,5 @@
 ﻿using Insthync.CameraAndInput;
+using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -301,6 +302,9 @@ namespace MultiplayerARPG
                     character = null;
                     return false;
                 }
+                bool isHiddenFromHost = PlayingCharacterEntity.IsServer && SelectedGameEntity.Identity && SelectedGameEntity.Identity.IsHideFrom(PlayingCharacterEntity.Identity);
+                if (isHiddenFromHost)
+                    return false;
                 return true;
             }
             return false;
@@ -342,6 +346,9 @@ namespace MultiplayerARPG
                 return false;
             entity = TargetEntity as T;
             if (entity == null)
+                return false;
+            bool isHiddenFromHost = PlayingCharacterEntity.IsServer && entity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(PlayingCharacterEntity.Identity);
+            if (isHiddenFromHost)
                 return false;
             return true;
         }
