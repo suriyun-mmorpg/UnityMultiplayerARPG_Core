@@ -1033,6 +1033,18 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual void UnregisterPlayerCharacterById(string characterId)
+        {
+            if (ServerUserHandlers.TryGetConnectionIdById(characterId, out long connectionId))
+                UnregisterPlayerCharacter(connectionId);
+        }
+
+        public virtual void UnregisterPlayerCharacterByUserId(string userId)
+        {
+            if (ServerUserHandlers.TryGetConnectionIdByUserId(userId, out long connectionId))
+                UnregisterPlayerCharacter(connectionId);
+        }
+
         public virtual void RegisterUserIdAndAccessToken(long connectionId, string userId, string accessToken)
         {
             bool success = ServerUserHandlers.AddUserId(connectionId, userId);
@@ -1051,6 +1063,18 @@ namespace MultiplayerARPG
                 ServerUserHandlers.RemoveAccessToken(connectionId, out _);
                 onUnregisterUser?.Invoke(connectionId, userId);
             }
+        }
+
+        public virtual void UnregisterUserIdAndAccessTokenById(string characterId)
+        {
+            if (ServerUserHandlers.TryGetConnectionIdById(characterId, out long connectionId))
+                UnregisterUserIdAndAccessToken(connectionId);
+        }
+
+        public virtual void UnregisterUserIdAndAccessTokenByUserId(string userId)
+        {
+            if (ServerUserHandlers.TryGetConnectionIdByUserId(userId, out long connectionId))
+                UnregisterUserIdAndAccessToken(connectionId);
         }
 
         public virtual async UniTask<BuildingEntity> CreateBuildingEntity(BuildingSaveData saveData, bool initialize)
