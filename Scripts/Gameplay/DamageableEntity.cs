@@ -400,7 +400,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanReceiveDamageFrom(EntityInfo instigator)
         {
-            if (string.Equals(instigator.SubChannelId, SubChannelId))
+            if (!string.Equals(instigator.SubChannelId, SubChannelId))
             {
                 // Difference channel
                 return false;
