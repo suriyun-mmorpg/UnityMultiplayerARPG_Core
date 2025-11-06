@@ -2,9 +2,12 @@
 {
     public partial struct EntityInfo
     {
-        public static readonly EntityInfo Empty = new EntityInfo(string.Empty, 0, string.Empty, string.Empty, 0, 0, 0, 0, false);
+        public static readonly EntityInfo Empty = new EntityInfo(0, 0, string.Empty, string.Empty, 0, 0, 0, 0, false);
 
-        public string Type { get; private set; }
+        /// <summary>
+        /// If `Type` = `0`, determine that it is `NULL`, so if `Summoner Type` is `0`, determine that it has no summoner
+        /// </summary>
+        public byte Type { get; private set; }
         public uint ObjectId { get; private set; }
         public string Id { get; private set; }
         public string SubChannelId { get; private set; }
@@ -14,8 +17,7 @@
         public int GuildId { get; private set; }
         public bool IsInSafeArea { get; private set; }
 
-        public bool HasSummoner { get; private set; }
-        public string SummonerType { get; private set; }
+        public byte SummonerType { get; private set; }
         public uint SummonerObjectId { get; private set; }
         public string SummonerId { get; private set; }
         public string SummonerSubChannelId { get; private set; }
@@ -24,6 +26,8 @@
         public int SummonerPartyId { get; private set; }
         public int SummonerGuildId { get; private set; }
         public bool SummonerIsInSafeArea { get; private set; }
+
+        public bool HasSummoner => SummonerType > 0;
 
         public EntityInfo Summoner
         {
@@ -43,7 +47,7 @@
         }
 
         public EntityInfo(
-            string type,
+            byte type,
             uint objectId,
             string id,
             string subChannelId,
@@ -63,8 +67,7 @@
             GuildId = guildId;
             IsInSafeArea = isInSafeArea;
 
-            HasSummoner = false;
-            SummonerType = string.Empty;
+            SummonerType = 0;
             SummonerObjectId = 0;
             SummonerId = string.Empty;
             SummonerSubChannelId = string.Empty;
@@ -76,7 +79,7 @@
         }
 
         public EntityInfo(
-            string type,
+            byte type,
             uint objectId,
             string id,
             string subChannelId,
@@ -100,7 +103,6 @@
             if (summonerEntity != null)
             {
                 EntityInfo summonerInfo = summonerEntity.GetInfo();
-                HasSummoner = true;
                 SummonerType = summonerInfo.Type;
                 SummonerObjectId = summonerInfo.ObjectId;
                 SummonerId = summonerInfo.Id;
