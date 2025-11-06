@@ -33,7 +33,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected float destroyRespawnDelay = 5f;
 
-        [Category(99, "Events")]
+        [Category("Events")]
         [SerializeField]
         protected UnityEvent onSpawned = new UnityEvent();
         public UnityEvent OnSpawned { get { return onSpawned; } }
