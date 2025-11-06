@@ -347,9 +347,16 @@ namespace MultiplayerARPG
             entity = TargetEntity as T;
             if (entity == null)
                 return false;
-            bool isHiddenFromHost = PlayingCharacterEntity.IsServer && entity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(PlayingCharacterEntity.Identity);
-            if (isHiddenFromHost)
-                return false;
+            if (PlayingCharacterEntity.IsServer)
+            {
+                bool isHiddenFromHost;
+                isHiddenFromHost = entity.EntityGameObject.TryGetComponent(out BaseGameEntity gameEntity) && gameEntity.IsHideFrom(PlayingCharacterEntity);
+                if (isHiddenFromHost)
+                    return false;
+                isHiddenFromHost = entity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(PlayingCharacterEntity.Identity);
+                if (isHiddenFromHost)
+                    return false;
+            }
             return true;
         }
 
