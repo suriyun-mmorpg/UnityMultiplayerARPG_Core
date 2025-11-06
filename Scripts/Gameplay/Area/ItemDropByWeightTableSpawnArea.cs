@@ -12,7 +12,7 @@ namespace MultiplayerARPG
         public class SpawnPendingData
         {
             public CharacterItem item;
-            public float countdown;
+            public float countdown = 0f;
         }
 
         [Header("Drop settings")]
@@ -173,6 +173,7 @@ namespace MultiplayerARPG
 #else
                         newEntity.name = string.Empty;
 #endif
+                        newEntity.Identity.SubChannelId = subChannelId;
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity, pendingEntry);
@@ -189,6 +190,7 @@ namespace MultiplayerARPG
 #else
                         newEntity.name = string.Empty;
 #endif
+                        newEntity.Identity.SubChannelId = subChannelId;
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity, pendingEntry);
@@ -207,6 +209,7 @@ namespace MultiplayerARPG
                         newEntity.name = string.Empty;
 #endif
                         newEntity.Currency = currency;
+                        newEntity.Identity.SubChannelId = subChannelId;
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity, pendingEntry);
@@ -224,6 +227,7 @@ namespace MultiplayerARPG
 #else
                         newEntity.name = string.Empty;
 #endif
+                        newEntity.Identity.SubChannelId = subChannelId;
                         newEntity.onNetworkDestroy -= NewEntity_onNetworkDestroy;
                         newEntity.onNetworkDestroy += NewEntity_onNetworkDestroy;
                         _subscribeHandler.AddEntity(newEntity, pendingEntry);

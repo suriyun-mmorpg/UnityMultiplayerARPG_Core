@@ -29,6 +29,7 @@ namespace MultiplayerARPG
         public int maxAmount = 1;
         public float destroyRespawnDelay = 0f;
         public float respawnPendingEntitiesDelay = 5f;
+        public string subChannelId;
         public SpawnType spawnType = SpawnType.Default;
         [Tooltip("If `spawnType` is `SpawnIfPlayerNearby`, and there is no players nearby this spawn area, it will destroy all spawned objects within `noPlayerNearbyDestroyDelay`")]
         public float noPlayerNearbyDestroyDelay = 60f;

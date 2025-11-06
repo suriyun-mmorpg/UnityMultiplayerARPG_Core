@@ -35,6 +35,7 @@ namespace MultiplayerARPG
                     spawnPosition, spawnRotation);
                 if (spawnObj == null)
                     return null;
+                spawnObj.SubChannelId = subChannelId;
                 entity = spawnObj.GetComponent<ItemDropEntity>();
                 entity.SetSpawnArea(this, prefab, level, spawnPosition);
                 if (destroyRespawnDelay > 0f)
@@ -47,6 +48,7 @@ namespace MultiplayerARPG
                     spawnPosition, spawnRotation);
                 if (spawnObj == null)
                     return null;
+                spawnObj.SubChannelId = subChannelId;
                 entity = spawnObj.GetComponent<ItemDropEntity>();
                 entity.SetSpawnArea(this, addressablePrefab, level, spawnPosition);
                 if (destroyRespawnDelay > 0f)
