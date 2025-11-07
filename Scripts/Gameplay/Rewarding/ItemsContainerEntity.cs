@@ -170,6 +170,8 @@ namespace MultiplayerARPG
                 prefab.Identity.HashAssetId,
                 dropPosition, dropRotation);
             ItemsContainerEntity itemsContainerEntity = spawnObj.GetComponent<ItemsContainerEntity>();
+            if (dropper != null)
+                itemsContainerEntity.Identity.SubChannelId = dropper.SubChannelId;
             itemsContainerEntity.Items.AddRange(dropItems);
             itemsContainerEntity.GivenType = givenType;
             itemsContainerEntity.Looters = new HashSet<string>(looters);
