@@ -1279,7 +1279,8 @@ namespace MultiplayerARPG
                     tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
                     if (!tempGameEntity.IsNull())
                     {
-                        if (tempGameEntity.IsHideFrom(PlayingCharacterEntity) || tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
+                        if (tempGameEntity.IsHideFrom(PlayingCharacterEntity) ||
+                            tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
                         {
                             // Skip hiddeing entity / controlling player's entity
                             continue;
