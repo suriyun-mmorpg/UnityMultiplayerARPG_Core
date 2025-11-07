@@ -1,13 +1,15 @@
-﻿using System.Collections.Generic;
+﻿using LiteNetLibManager;
+using System.Buffers;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public class NearbyEntityDetector : MonoBehaviour
     {
-        public Transform CacheTransform { get; private set; }
-
         public float detectingRadius;
+        public int resultAllocSize = 128;
+        public float delay = 1f;
         public bool findPlayer;
         public bool findOnlyAlivePlayers;
         public bool findPlayerToAttack;
@@ -41,20 +43,24 @@ namespace MultiplayerARPG
         public readonly List<IPickupActivatableEntity> pickupActivatableEntities = new List<IPickupActivatableEntity>();
         private readonly HashSet<Collider> _excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> _excludeCollider2Ds = new HashSet<Collider2D>();
-        private SphereCollider _cacheCollider;
-        private CircleCollider2D _cacheCollider2D;
+        private float _latestDetectTime = -1f;
 
         public System.Action onUpdateList;
 
         private void Awake()
         {
-            CacheTransform = transform;
             gameObject.layer = PhysicLayers.IgnoreRaycast;
         }
 
         private void OnDestroy()
         {
-            CacheTransform = null;
+            ClearDetection();
+            ClearExclusion();
+            onUpdateList = null;
+        }
+
+        public void ClearDetection()
+        {
             characters.Nulling();
             characters?.Clear();
             players.Nulling();
@@ -78,34 +84,13 @@ namespace MultiplayerARPG
             activatableEntities?.Clear();
             holdActivatableEntities?.Clear();
             pickupActivatableEntities?.Clear();
-            _excludeColliders?.Clear();
-            _excludeCollider2Ds?.Clear();
-            _cacheCollider = null;
-            _cacheCollider2D = null;
-            onUpdateList = null;
         }
 
-        private void Start()
+
+        public void ClearExclusion()
         {
-            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
-            {
-                _cacheCollider = gameObject.AddComponent<SphereCollider>();
-                _cacheCollider.radius = detectingRadius;
-                _cacheCollider.isTrigger = true;
-                Rigidbody rigidbody = gameObject.AddComponent<Rigidbody>();
-                rigidbody.useGravity = false;
-                rigidbody.isKinematic = true;
-                rigidbody.constraints = RigidbodyConstraints.FreezeAll;
-            }
-            else
-            {
-                _cacheCollider2D = gameObject.AddComponent<CircleCollider2D>();
-                _cacheCollider2D.radius = detectingRadius;
-                _cacheCollider2D.isTrigger = true;
-                Rigidbody2D rigidbody2D = gameObject.AddComponent<Rigidbody2D>();
-                rigidbody2D.isKinematic = true;
-                rigidbody2D.constraints = RigidbodyConstraints2D.FreezeAll;
-            }
+            _excludeColliders.Clear();
+            _excludeCollider2Ds.Clear();
         }
 
         private void Update()
@@ -113,12 +98,45 @@ namespace MultiplayerARPG
             if (GameInstance.PlayingCharacterEntity == null)
                 return;
 
-            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
-                _cacheCollider.radius = detectingRadius;
-            else
-                _cacheCollider2D.radius = detectingRadius;
+            float currentTime = Time.unscaledTime;
+            if (currentTime - _latestDetectTime > delay)
+            {
+                _latestDetectTime = currentTime;
+                int tempHitCount;
+                ClearDetection();
+                switch (GameInstance.Singleton.DimensionType)
+                {
+                    case DimensionType.Dimension2D:
+                        Collider2D[] collider2Ds = ArrayPool<Collider2D>.Shared.Rent(resultAllocSize);
+                        tempHitCount = Physics2D.OverlapCircleNonAlloc(GameInstance.PlayingCharacterEntity.EntityTransform.position, detectingRadius, collider2Ds);
+                        for (int i = 0; i < tempHitCount; ++i)
+                        {
+                            Collider2D other = collider2Ds[i];
+                            if (_excludeCollider2Ds.Contains(other))
+                                continue;
+                            AddEntity(other.gameObject);
+                        }
+                        ArrayPool<Collider2D>.Shared.Return(collider2Ds);
+                        if (onUpdateList != null)
+                            onUpdateList.Invoke();
+                        break;
+                    default:
+                        Collider[] colliders = ArrayPool<Collider>.Shared.Rent(resultAllocSize);
+                        tempHitCount = Physics.OverlapSphereNonAlloc(GameInstance.PlayingCharacterEntity.EntityTransform.position, detectingRadius, colliders);
+                        for (int i = 0; i < tempHitCount; ++i)
+                        {
+                            Collider other = colliders[i];
+                            if (_excludeColliders.Contains(other))
+                                continue;
+                            AddEntity(other.gameObject);
+                        }
+                        ArrayPool<Collider>.Shared.Return(colliders);
+                        if (onUpdateList != null)
+                            onUpdateList.Invoke();
+                        break;
+                }
+            }
 
-            CacheTransform.position = GameInstance.PlayingCharacterEntity.EntityTransform.position;
             // Find nearby entities
             RemoveInactiveAndSortNearestEntity(characters);
             RemoveInactiveAndSortNearestEntity(players);
@@ -135,55 +153,7 @@ namespace MultiplayerARPG
             RemoveInactiveAndSortNearestActivatableEntity(pickupActivatableEntities);
         }
 
-        public void ClearExcludeColliders()
-        {
-            _excludeColliders.Clear();
-            _excludeCollider2Ds.Clear();
-        }
-
-        private void OnTriggerEnter(Collider other)
-        {
-            if (_excludeColliders.Contains(other))
-                return;
-            if (!AddEntity(other.gameObject))
-            {
-                _excludeColliders.Add(other);
-                return;
-            }
-            if (onUpdateList != null)
-                onUpdateList.Invoke();
-        }
-
-        private void OnTriggerExit(Collider other)
-        {
-            if (!RemoveEntity(other.gameObject))
-                return;
-            if (onUpdateList != null)
-                onUpdateList.Invoke();
-        }
-
-        private void OnTriggerEnter2D(Collider2D other)
-        {
-            if (_excludeCollider2Ds.Contains(other))
-                return;
-            if (!AddEntity(other.gameObject))
-            {
-                _excludeCollider2Ds.Add(other);
-                return;
-            }
-            if (onUpdateList != null)
-                onUpdateList.Invoke();
-        }
-
-        private void OnTriggerExit2D(Collider2D other)
-        {
-            if (!RemoveEntity(other.gameObject))
-                return;
-            if (onUpdateList != null)
-                onUpdateList.Invoke();
-        }
-
-        private bool AddEntity(GameObject other)
+        public bool AddEntity(GameObject other)
         {
             BasePlayerCharacterEntity player;
             BaseMonsterCharacterEntity monster;
@@ -279,7 +249,7 @@ namespace MultiplayerARPG
             return foundSomething;
         }
 
-        private bool RemoveEntity(GameObject other)
+        public bool RemoveEntity(GameObject other)
         {
             BasePlayerCharacterEntity player;
             BaseMonsterCharacterEntity monster;
@@ -357,6 +327,8 @@ namespace MultiplayerARPG
                 if (findPlayer)
                 {
                     player = gameEntity.Entity as BasePlayerCharacterEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && player.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        player = null;
                     if (player == GameInstance.PlayingCharacterEntity)
                         player = null;
                     if (findWithAdvanceOptions)
@@ -371,6 +343,8 @@ namespace MultiplayerARPG
                 if (findMonster)
                 {
                     monster = gameEntity.Entity as BaseMonsterCharacterEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && monster.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        monster = null;
                     if (findWithAdvanceOptions)
                     {
                         if (findOnlyAliveMonsters && monster != null && monster.IsDead())
@@ -381,17 +355,31 @@ namespace MultiplayerARPG
                 }
 
                 if (findNpc)
+                {
                     npc = gameEntity.Entity as NpcEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && npc.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        npc = null;
+                }
 
                 if (findItemDrop)
+                {
                     itemDrop = gameEntity.Entity as ItemDropEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && itemDrop.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        itemDrop = null;
+                }
 
                 if (findRewardDrop)
+                {
                     rewardDrop = gameEntity.Entity as BaseRewardDropEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && rewardDrop.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        rewardDrop = null;
+                }
 
                 if (findBuilding)
                 {
                     building = gameEntity.Entity as BuildingEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && building.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        building = null;
                     if (findWithAdvanceOptions)
                     {
                         if (findOnlyAliveBuildings && building != null && building.IsDead())
@@ -402,34 +390,61 @@ namespace MultiplayerARPG
                 }
 
                 if (findVehicle)
+                {
                     vehicle = gameEntity.Entity as VehicleEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && vehicle.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        vehicle = null;
+                }
 
                 if (findWarpPortal)
+                {
                     warpPortal = gameEntity.Entity as WarpPortalEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && warpPortal.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        warpPortal = null;
+                }
 
                 if (findItemsContainer)
+                {
                     itemsContainer = gameEntity.Entity as ItemsContainerEntity;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && itemsContainer.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        itemsContainer = null;
+                }
             }
 
             if (findActivatableEntity)
             {
                 activatableEntity = other.GetComponent<IActivatableEntity>();
-                if (!activatableEntity.IsNull() && GameInstance.PlayingCharacterEntity != null && activatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
-                    activatableEntity = null;
+                if (!activatableEntity.IsNull())
+                {
+                    if (activatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                        activatableEntity = null;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && activatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        activatableEntity = null;
+                }
             }
 
             if (findHoldActivatableEntity)
             {
                 holdActivatableEntity = other.GetComponent<IHoldActivatableEntity>();
-                if (!holdActivatableEntity.IsNull() && GameInstance.PlayingCharacterEntity != null && holdActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
-                    holdActivatableEntity = null;
+                if (!holdActivatableEntity.IsNull())
+                {
+                    if (holdActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                        holdActivatableEntity = null;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && holdActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        holdActivatableEntity = null;
+                }
             }
 
             if (findPickupActivatableEntity)
             {
                 pickupActivatableEntity = other.GetComponent<IPickupActivatableEntity>();
-                if (!pickupActivatableEntity.IsNull() && GameInstance.PlayingCharacterEntity != null && pickupActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
-                    pickupActivatableEntity = null;
+                if (!pickupActivatableEntity.IsNull())
+                {
+                    if (pickupActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
+                        pickupActivatableEntity = null;
+                    if (GameInstance.PlayingCharacterEntity.IsServer && pickupActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                        pickupActivatableEntity = null;
+                }
             }
         }
 
@@ -451,8 +466,8 @@ namespace MultiplayerARPG
             {
                 for (int j = 0; j < entities.Count - 1; j++)
                 {
-                    if (Vector3.Distance(entities[j].transform.position, CacheTransform.position) >
-                        Vector3.Distance(entities[j + 1].transform.position, CacheTransform.position))
+                    if (Vector3.Distance(entities[j].transform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) >
+                        Vector3.Distance(entities[j + 1].transform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position))
                     {
                         temp = entities[j + 1];
                         entities[j + 1] = entities[j];
@@ -481,8 +496,8 @@ namespace MultiplayerARPG
             {
                 for (int j = 0; j < entities.Count - 1; j++)
                 {
-                    if (Vector3.Distance(entities[j].EntityTransform.position, CacheTransform.position) >
-                        Vector3.Distance(entities[j + 1].EntityTransform.position, CacheTransform.position))
+                    if (Vector3.Distance(entities[j].EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position) >
+                        Vector3.Distance(entities[j + 1].EntityTransform.position, GameInstance.PlayingCharacterEntity.EntityTransform.position))
                     {
                         temp = entities[j + 1];
                         entities[j + 1] = entities[j];
