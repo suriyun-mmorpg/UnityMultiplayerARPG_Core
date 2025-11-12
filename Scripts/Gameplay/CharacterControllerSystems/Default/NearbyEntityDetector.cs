@@ -327,7 +327,7 @@ namespace MultiplayerARPG
                 if (findPlayer)
                 {
                     player = gameEntity.Entity as BasePlayerCharacterEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && player.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && player != null && player.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         player = null;
                     if (player == GameInstance.PlayingCharacterEntity)
                         player = null;
@@ -343,7 +343,7 @@ namespace MultiplayerARPG
                 if (findMonster)
                 {
                     monster = gameEntity.Entity as BaseMonsterCharacterEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && monster.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && monster != null && monster.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         monster = null;
                     if (findWithAdvanceOptions)
                     {
@@ -357,28 +357,28 @@ namespace MultiplayerARPG
                 if (findNpc)
                 {
                     npc = gameEntity.Entity as NpcEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && npc.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && npc != null && npc.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         npc = null;
                 }
 
                 if (findItemDrop)
                 {
                     itemDrop = gameEntity.Entity as ItemDropEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && itemDrop.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && itemDrop != null && itemDrop.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         itemDrop = null;
                 }
 
                 if (findRewardDrop)
                 {
                     rewardDrop = gameEntity.Entity as BaseRewardDropEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && rewardDrop.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && rewardDrop != null && rewardDrop.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         rewardDrop = null;
                 }
 
                 if (findBuilding)
                 {
                     building = gameEntity.Entity as BuildingEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && building.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && building != null && building.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         building = null;
                     if (findWithAdvanceOptions)
                     {
@@ -392,21 +392,21 @@ namespace MultiplayerARPG
                 if (findVehicle)
                 {
                     vehicle = gameEntity.Entity as VehicleEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && vehicle.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && vehicle != null && vehicle.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         vehicle = null;
                 }
 
                 if (findWarpPortal)
                 {
                     warpPortal = gameEntity.Entity as WarpPortalEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && warpPortal.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && warpPortal != null && warpPortal.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         warpPortal = null;
                 }
 
                 if (findItemsContainer)
                 {
                     itemsContainer = gameEntity.Entity as ItemsContainerEntity;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && itemsContainer.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && itemsContainer != null && itemsContainer.Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         itemsContainer = null;
                 }
             }
@@ -418,7 +418,7 @@ namespace MultiplayerARPG
                 {
                     if (activatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                         activatableEntity = null;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && activatableEntity != null && activatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && !activatableEntity.IsNull() && activatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         activatableEntity = null;
                 }
             }
@@ -430,7 +430,7 @@ namespace MultiplayerARPG
                 {
                     if (holdActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                         holdActivatableEntity = null;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && holdActivatableEntity != null && holdActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && !holdActivatableEntity.IsNull() && holdActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         holdActivatableEntity = null;
                 }
             }
@@ -442,7 +442,7 @@ namespace MultiplayerARPG
                 {
                     if (pickupActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                         pickupActivatableEntity = null;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && pickupActivatableEntity != null && pickupActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && !pickupActivatableEntity.IsNull() && pickupActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         pickupActivatableEntity = null;
                 }
             }
