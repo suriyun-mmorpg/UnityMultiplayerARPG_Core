@@ -112,7 +112,7 @@ namespace MultiplayerARPG
                         for (int i = 0; i < tempHitCount; ++i)
                         {
                             Collider2D other = collider2Ds[i];
-                            if (_excludeCollider2Ds.Contains(other))
+                            if (other == null || _excludeCollider2Ds.Contains(other))
                                 continue;
                             AddEntity(other.gameObject);
                         }
@@ -126,7 +126,7 @@ namespace MultiplayerARPG
                         for (int i = 0; i < tempHitCount; ++i)
                         {
                             Collider other = colliders[i];
-                            if (_excludeColliders.Contains(other))
+                            if (other == null || _excludeColliders.Contains(other))
                                 continue;
                             AddEntity(other.gameObject);
                         }
@@ -418,7 +418,7 @@ namespace MultiplayerARPG
                 {
                     if (activatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                         activatableEntity = null;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && activatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && activatableEntity != null && activatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         activatableEntity = null;
                 }
             }
@@ -430,7 +430,7 @@ namespace MultiplayerARPG
                 {
                     if (holdActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                         holdActivatableEntity = null;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && holdActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && holdActivatableEntity != null && holdActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         holdActivatableEntity = null;
                 }
             }
@@ -442,7 +442,7 @@ namespace MultiplayerARPG
                 {
                     if (pickupActivatableEntity.EntityGameObject == GameInstance.PlayingCharacterEntity.EntityGameObject)
                         pickupActivatableEntity = null;
-                    if (GameInstance.PlayingCharacterEntity.IsServer && pickupActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                    if (GameInstance.PlayingCharacterEntity.IsServer && pickupActivatableEntity != null && pickupActivatableEntity.EntityGameObject.TryGetComponent(out LiteNetLibIdentity identity) && identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                         pickupActivatableEntity = null;
                 }
             }
