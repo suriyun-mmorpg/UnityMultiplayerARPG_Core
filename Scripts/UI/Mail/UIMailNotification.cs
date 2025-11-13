@@ -1,5 +1,4 @@
-﻿using LiteNetLibManager;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -18,22 +17,27 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             Refresh();
+            MailNotificationCacheManager.onSetMailNotification += SetNotificationCount;
+        }
+
+        private void OnDisable()
+        {
+            MailNotificationCacheManager.onSetMailNotification -= SetNotificationCount;
         }
 
         public void Refresh()
+        {
+            Refresh(false);
+        }
+
+        public void Refresh(bool force)
         {
             if (GameInstance.ClientMailHandlers == null)
             {
                 SetNotificationCount(0);
                 return;
             }
-            GameInstance.ClientMailHandlers.RequestMailNotification(MailNotificationCallback);
-        }
-
-        public void MailNotificationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailNotificationMessage response)
-        {
-            ClientMailActions.ResponseMailNotification(requestHandler, responseCode, response);
-            SetNotificationCount(response.notificationCount);
+            MailNotificationCacheManager.LoadOrGetMailNotificationFromCache(SetNotificationCount, force);
         }
 
         public void SetNotificationCount(int count)

@@ -1,4 +1,3 @@
-using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -18,22 +17,27 @@ namespace MultiplayerARPG
         private void OnEnable()
         {
             Refresh();
+            FriendRequestNotificationCacheManager.onSetFriendRequestNotification += SetNotificationCount;
+        }
+
+        private void OnDisable()
+        {
+            FriendRequestNotificationCacheManager.onSetFriendRequestNotification -= SetNotificationCount;
         }
 
         public void Refresh()
+        {
+            Refresh(false);
+        }
+
+        public void Refresh(bool force)
         {
             if (GameInstance.ClientFriendHandlers == null)
             {
                 SetNotificationCount(0);
                 return;
             }
-            GameInstance.ClientFriendHandlers.RequestFriendRequestNotification(FriendRequestNotificationCallback);
-        }
-
-        public void FriendRequestNotificationCallback(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseFriendRequestNotificationMessage response)
-        {
-            ClientFriendActions.ResponseFriendRequestNotification(requestHandler, responseCode, response);
-            SetNotificationCount(response.notificationCount);
+            FriendRequestNotificationCacheManager.LoadOrGetFriendRequestNotificationFromCache(SetNotificationCount, force);
         }
 
         public void SetNotificationCount(int count)

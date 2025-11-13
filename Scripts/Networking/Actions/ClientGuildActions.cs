@@ -55,6 +55,7 @@ namespace MultiplayerARPG
             onNotifyGuildInvitation = null;
             onNotifyGuildUpdated = null;
             onNotifyGuildMemberUpdated = null;
+            GuildRequestNotificationCacheManager.ClearCache();
         }
 
         public static void ResponseSendGuildInvitation(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendGuildInvitationMessage response)
@@ -167,6 +168,8 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseAcceptGuildRequest != null)
                 onResponseAcceptGuildRequest.Invoke(requestHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+                GuildRequestNotificationCacheManager.LoadOrGetGuildRequestNotificationFromCache(null, true);
         }
 
         public static void ResponseDeclineGuildRequest(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclineGuildRequestMessage response)
@@ -174,6 +177,8 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseDeclineGuildRequest != null)
                 onResponseDeclineGuildRequest.Invoke(requestHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+                GuildRequestNotificationCacheManager.LoadOrGetGuildRequestNotificationFromCache(null, true);
         }
 
         public static void ResponseGetGuildRequests(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetGuildRequestsMessage response)

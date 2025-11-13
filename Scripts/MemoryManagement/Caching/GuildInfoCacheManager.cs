@@ -6,21 +6,22 @@ namespace MultiplayerARPG
 {
     public static class GuildInfoCacheManager
     {
+        public static float CACHE_EXPIRE_DURATION = 10f;
         private static readonly Dictionary<int, GuildListEntry> s_caches = new Dictionary<int, GuildListEntry>();
         private static readonly Dictionary<int, float> s_cachedTimes = new Dictionary<int, float>();
         private static readonly HashSet<int> s_loadingIds = new HashSet<int>();
         public static System.Action<GuildListEntry> onSetGuildInfo;
 
-        public static void LoadOrGetGuildInfoFromCache(int guildId, System.Action<GuildListEntry> callback)
+        public static void LoadOrGetGuildInfoFromCache(int guildId, System.Action<GuildListEntry> callback, bool force = false)
         {
             if (s_loadingIds.Contains(guildId))
             {
-                // Guild info is loading
+                if (s_cachedTimes.ContainsKey(guildId))
+                    callback.Invoke(s_caches[guildId]);
                 return;
             }
-            if (s_cachedTimes.ContainsKey(guildId) && Time.unscaledTime - s_cachedTimes[guildId] < 5f)
+            if (!force && s_cachedTimes.ContainsKey(guildId) && Time.unscaledTime - s_cachedTimes[guildId] < CACHE_EXPIRE_DURATION)
             {
-                // Can reload after 5 seconds
                 callback.Invoke(s_caches[guildId]);
                 return;
             }
@@ -38,12 +39,12 @@ namespace MultiplayerARPG
             });
         }
 
-        public static void SetCache(GuildListEntry guild)
+        public static void SetCache(GuildListEntry data)
         {
-            s_caches[guild.Id] = guild;
-            s_cachedTimes[guild.Id] = Time.unscaledTime;
+            s_caches[data.Id] = data;
+            s_cachedTimes[data.Id] = Time.unscaledTime;
             if (onSetGuildInfo != null)
-                onSetGuildInfo.Invoke(guild);
+                onSetGuildInfo.Invoke(data);
         }
 
         public static bool TryGetFromCache(int id, out GuildListEntry data)

@@ -23,6 +23,7 @@ namespace MultiplayerARPG
             onResponseMailNotification = null;
             onResponseClaimAllMailsItems = null;
             onResponseDeleteAllMails = null;
+            MailNotificationCacheManager.ClearCache();
         }
 
         public static void ResponseMailList(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseMailListMessage response)
@@ -43,6 +44,8 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseClaimMailItems != null)
                 onResponseClaimMailItems.Invoke(requestHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+                MailNotificationCacheManager.LoadOrGetMailNotificationFromCache(null, true);
         }
 
         public static void ResponseDeleteMail(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeleteMailMessage response)
@@ -50,6 +53,8 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseDeleteMail != null)
                 onResponseDeleteMail.Invoke(requestHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+                MailNotificationCacheManager.LoadOrGetMailNotificationFromCache(null, true);
         }
 
         public static void ResponseSendMail(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSendMailMessage response)

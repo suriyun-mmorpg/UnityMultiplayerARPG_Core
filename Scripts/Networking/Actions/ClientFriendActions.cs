@@ -25,6 +25,7 @@ namespace MultiplayerARPG
             onResponseDeclineFriendRequest = null;
             onResponseGetFriendRequests = null;
             onResponseFriendRequestNotification = null;
+            FriendRequestNotificationCacheManager.ClearCache();
         }
 
         public static void ResponseFindCharacters(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseSocialCharacterListMessage response)
@@ -67,6 +68,8 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseAcceptFriendRequest != null)
                 onResponseAcceptFriendRequest.Invoke(requestHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+                FriendRequestNotificationCacheManager.LoadOrGetFriendRequestNotificationFromCache(null, true);
         }
 
         public static void ResponseDeclineFriendRequest(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseDeclineFriendRequestMessage response)
@@ -74,6 +77,8 @@ namespace MultiplayerARPG
             ClientGenericActions.ClientReceiveGameMessage(response.message);
             if (onResponseDeclineFriendRequest != null)
                 onResponseDeclineFriendRequest.Invoke(requestHandler, responseCode, response);
+            if (responseCode == AckResponseCode.Success)
+                FriendRequestNotificationCacheManager.LoadOrGetFriendRequestNotificationFromCache(null, true);
         }
 
         public static void ResponseGetFriendRequests(ResponseHandlerData requestHandler, AckResponseCode responseCode, ResponseGetFriendRequestsMessage response)
