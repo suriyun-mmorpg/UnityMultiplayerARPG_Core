@@ -288,10 +288,7 @@ namespace MultiplayerARPG
             // Instantiates monster minimap objects
             await CurrentGameInstance.AddressableMonsterCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.MonsterCharacterMiniMapObjects, EntityTransform);
             // Instantiates monster character UI
-            if (CurrentGameInstance.monsterCharacterUI != null)
-            {
-                InstantiateUI(CurrentGameInstance.monsterCharacterUI);
-            }
+            InstantiateUI(await CurrentGameInstance.GetLoadedMonsterCharacterUIPrefab());
         }
 
         public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)

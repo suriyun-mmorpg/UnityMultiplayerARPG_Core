@@ -1,5 +1,4 @@
 ﻿using Insthync.AddressableAssetTools;
-using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
 using NotifiableCollection;
@@ -628,10 +627,7 @@ namespace MultiplayerARPG
                 // Instantiates owning minimap objects
                 await CurrentGameInstance.AddressableOwningCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.OwningCharacterMiniMapObjects, EntityTransform);
                 // Instantiates owning character UI
-                if (CurrentGameInstance.owningCharacterUI != null)
-                {
-                    InstantiateUI(CurrentGameInstance.owningCharacterUI);
-                }
+                InstantiateUI(await CurrentGameInstance.GetLoadedOwningCharacterUIPrefab());
             }
             else if (IsClient)
             {
@@ -640,10 +636,7 @@ namespace MultiplayerARPG
                 // Instantiates non-owning minimap objects
                 await CurrentGameInstance.AddressableNonOwningCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.NonOwningCharacterMiniMapObjects, EntityTransform);
                 // Instantiates non-owning character UI
-                if (CurrentGameInstance.nonOwningCharacterUI != null)
-                {
-                    InstantiateUI(CurrentGameInstance.nonOwningCharacterUI);
-                }
+                InstantiateUI(await CurrentGameInstance.GetLoadedNonOwningCharacterUIPrefab());
             }
         }
         #endregion

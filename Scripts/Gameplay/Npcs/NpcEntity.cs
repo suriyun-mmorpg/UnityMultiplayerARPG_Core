@@ -131,11 +131,9 @@ namespace MultiplayerARPG
             // Instantiates npc minimap objects
             await CurrentGameInstance.AddressableNpcMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.NpcMiniMapObjects, EntityTransform);
             // Instantiates npc UI
-            if (CurrentGameInstance.npcUI != null)
-                InstantiateUI(CurrentGameInstance.npcUI);
+            InstantiateUI(await CurrentGameInstance.GetLoadedNpcUIPrefab());
             // Instantiates npc quest indicator
-            if (CurrentGameInstance.npcQuestIndicator != null)
-                InstantiateQuestIndicator(CurrentGameInstance.npcQuestIndicator);
+            InstantiateQuestIndicator(await CurrentGameInstance.GetLoadedNpcQuestIndicatorPrefab());
         }
 
         public void InstantiateUI(UINpcEntity prefab)

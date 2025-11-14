@@ -286,16 +286,41 @@ namespace MultiplayerARPG
         private AssetReference[] addressableNpcMiniMapObjects = new AssetReference[0];
 
         [Header("Character UIs")]
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox effectHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
-        public UICharacterEntity owningCharacterUI = null;
+        [SerializeField]
+        private UICharacterEntity owningCharacterUI = null;
         [Tooltip("This UI will be instaniate as non owning character's child to show character name / HP / MP / Food / Water")]
-        public UICharacterEntity nonOwningCharacterUI = null;
+        [SerializeField]
+        private UICharacterEntity nonOwningCharacterUI = null;
         [Tooltip("This UI will be instaniate as monster character's child to show character name / HP / MP / Food / Water")]
-        public UICharacterEntity monsterCharacterUI = null;
+        [SerializeField]
+        private UICharacterEntity monsterCharacterUI = null;
         [Tooltip("This UI will be instaniate as NPC's child to show character name")]
-        public UINpcEntity npcUI = null;
+        [SerializeField]
+        private UINpcEntity npcUI = null;
         [Tooltip("This UI will be instaniate as NPC's child to show quest indecator")]
-        public NpcQuestIndicator npcQuestIndicator = null;
+        [SerializeField]
+        private NpcQuestIndicator npcQuestIndicator = null;
+#endif
+        [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
+        [SerializeField]
+        private AssetReferenceUICharacterEntity addressableOwningCharacterUI = null;
+        [Tooltip("This UI will be instaniate as non owning character's child to show character name / HP / MP / Food / Water")]
+        [SerializeField]
+        private AssetReferenceUICharacterEntity addressableNonOwningCharacterUI = null;
+        [Tooltip("This UI will be instaniate as monster character's child to show character name / HP / MP / Food / Water")]
+        [SerializeField]
+        private AssetReferenceUICharacterEntity addressableMonsterCharacterUI = null;
+        [Tooltip("This UI will be instaniate as NPC's child to show character name")]
+        [SerializeField]
+        private AssetReferenceUINpcEntity addressableNpcUI = null;
+        [Tooltip("This UI will be instaniate as NPC's child to show quest indecator")]
+        [SerializeField]
+        private AssetReferenceNpcQuestIndicator addressableNpcQuestIndicator = null;
 
         [Header("Gameplay Effects")]
 #if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
@@ -1053,6 +1078,116 @@ namespace MultiplayerARPG
             get { return addressableNpcMiniMapObjects; }
         }
 
+        public UICharacterEntity OwningCharacterUI
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return owningCharacterUI;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public UICharacterEntity NonOwningCharacterUI
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return nonOwningCharacterUI;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public UICharacterEntity MonsterCharacterUI
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return monsterCharacterUI;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public UINpcEntity NpcUI
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return npcUI;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public NpcQuestIndicator NpcQuestIndicator
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return npcQuestIndicator;
+#else
+                return null;
+#endif
+            }
+        }
+
+        public AssetReferenceUICharacterEntity AddressableOwningCharacterUI
+        {
+            get { return addressableOwningCharacterUI; }
+        }
+
+        public AssetReferenceUICharacterEntity AddressableNonOwningCharacterUI
+        {
+            get { return addressableNonOwningCharacterUI; }
+        }
+
+        public AssetReferenceUICharacterEntity AddressableMonsterCharacterUI
+        {
+            get { return addressableMonsterCharacterUI; }
+        }
+
+        public AssetReferenceUINpcEntity AddressableNpcUI
+        {
+            get { return addressableNpcUI; }
+        }
+
+        public AssetReferenceNpcQuestIndicator AddressableNpcQuestIndicator
+        {
+            get { return addressableNpcQuestIndicator; }
+        }
+
+        public async UniTask<UICharacterEntity> GetLoadedOwningCharacterUIPrefab()
+        {
+            return await AddressableOwningCharacterUI.GetOrLoadAssetAsyncOrUsePrefab(OwningCharacterUI);
+        }
+
+        public async UniTask<UICharacterEntity> GetLoadedNonOwningCharacterUIPrefab()
+        {
+            return await AddressableNonOwningCharacterUI.GetOrLoadAssetAsyncOrUsePrefab(NonOwningCharacterUI);
+        }
+
+        public async UniTask<UICharacterEntity> GetLoadedMonsterCharacterUIPrefab()
+        {
+            return await AddressableMonsterCharacterUI.GetOrLoadAssetAsyncOrUsePrefab(MonsterCharacterUI);
+        }
+
+        public async UniTask<UINpcEntity> GetLoadedNpcUIPrefab()
+        {
+            return await AddressableNpcUI.GetOrLoadAssetAsyncOrUsePrefab(NpcUI);
+        }
+
+        public async UniTask<NpcQuestIndicator> GetLoadedNpcQuestIndicatorPrefab()
+        {
+            return await AddressableNpcQuestIndicator.GetOrLoadAssetAsyncOrUsePrefab(NpcQuestIndicator);
+        }
+
         public GameEffect[] LevelUpEffects
         {
             get
@@ -1063,11 +1198,6 @@ namespace MultiplayerARPG
                 return System.Array.Empty<GameEffect>();
 #endif
             }
-        }
-
-        public AssetReferenceGameEffect[] AddressableLevelUpEffects
-        {
-            get { return addressableLevelUpEffects; }
         }
 
         public GameEffect[] StunEffects
@@ -1082,11 +1212,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public AssetReferenceGameEffect[] AddressableStunEffects
-        {
-            get { return addressableStunEffects; }
-        }
-
         public GameEffect[] MuteEffects
         {
             get
@@ -1099,11 +1224,6 @@ namespace MultiplayerARPG
             }
         }
 
-        public AssetReferenceGameEffect[] AddressableMuteEffects
-        {
-            get { return addressableMuteEffects; }
-        }
-
         public GameEffect[] FreezeEffects
         {
             get
@@ -1114,6 +1234,21 @@ namespace MultiplayerARPG
                 return System.Array.Empty<GameEffect>();
 #endif
             }
+        }
+
+        public AssetReferenceGameEffect[] AddressableLevelUpEffects
+        {
+            get { return addressableLevelUpEffects; }
+        }
+
+        public AssetReferenceGameEffect[] AddressableStunEffects
+        {
+            get { return addressableStunEffects; }
+        }
+
+        public AssetReferenceGameEffect[] AddressableMuteEffects
+        {
+            get { return addressableMuteEffects; }
         }
 
         public AssetReferenceGameEffect[] AddressableFreezeEffects
