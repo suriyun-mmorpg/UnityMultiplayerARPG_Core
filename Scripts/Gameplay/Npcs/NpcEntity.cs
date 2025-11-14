@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
 using UnityEngine;
@@ -118,34 +119,23 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
+            InstantiateNpcObjects();
+        }
 
-            if (IsClient)
-            {
-                // Instantiates npc objects
-                if (CurrentGameInstance.npcObjects != null && CurrentGameInstance.npcObjects.Length > 0)
-                {
-                    foreach (GameObject obj in CurrentGameInstance.npcObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
-                    }
-                }
-                // Instantiates npc minimap objects
-                if (CurrentGameInstance.npcMiniMapObjects != null && CurrentGameInstance.npcMiniMapObjects.Length > 0)
-                {
-                    foreach (GameObject obj in CurrentGameInstance.npcMiniMapObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
-                    }
-                }
-                // Instantiates npc UI
-                if (CurrentGameInstance.npcUI != null)
-                    InstantiateUI(CurrentGameInstance.npcUI);
-                // Instantiates npc quest indicator
-                if (CurrentGameInstance.npcQuestIndicator != null)
-                    InstantiateQuestIndicator(CurrentGameInstance.npcQuestIndicator);
-            }
+        private async void InstantiateNpcObjects()
+        {
+            if (!IsClient)
+                return;
+            // Instantiates npc objects
+            await CurrentGameInstance.AddressableNpcObjects.InstantiateGameObjects(CurrentGameInstance.NpcObjects, EntityTransform);
+            // Instantiates npc minimap objects
+            await CurrentGameInstance.AddressableNpcMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.NpcMiniMapObjects, EntityTransform);
+            // Instantiates npc UI
+            if (CurrentGameInstance.npcUI != null)
+                InstantiateUI(CurrentGameInstance.npcUI);
+            // Instantiates npc quest indicator
+            if (CurrentGameInstance.npcQuestIndicator != null)
+                InstantiateQuestIndicator(CurrentGameInstance.npcQuestIndicator);
         }
 
         public void InstantiateUI(UINpcEntity prefab)

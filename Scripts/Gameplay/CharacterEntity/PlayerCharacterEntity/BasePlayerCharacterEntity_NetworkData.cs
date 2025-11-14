@@ -1,6 +1,6 @@
 ﻿using Insthync.AddressableAssetTools;
+using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
-using LiteNetLib;
 using LiteNetLibManager;
 using NotifiableCollection;
 using System.Collections.Generic;
@@ -574,10 +574,14 @@ namespace MultiplayerARPG
                 GameInstance.ClientCharacterHandlers.UnsubscribePlayerCharacter(this);
         }
 
-        protected override async void EntityOnSetOwnerClient()
+        protected override void EntityOnSetOwnerClient()
         {
             base.EntityOnSetOwnerClient();
+            InstantiatePlayerCharacterObjects();
+        }
 
+        private async void InstantiatePlayerCharacterObjects()
+        {
             // Setup relates elements
             if (IsOwnerClient)
             {
@@ -619,24 +623,10 @@ namespace MultiplayerARPG
                     BasePlayerCharacterController controller = Instantiate(prefab);
                     controller.PlayingCharacterEntity = this;
                 }
-                // Instantiates owning character objects
-                if (CurrentGameInstance.owningCharacterObjects != null && CurrentGameInstance.owningCharacterObjects.Length > 0)
-                {
-                    foreach (GameObject obj in CurrentGameInstance.owningCharacterObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
-                    }
-                }
-                // Instantiates owning character minimap objects
-                if (CurrentGameInstance.owningCharacterMiniMapObjects != null && CurrentGameInstance.owningCharacterMiniMapObjects.Length > 0)
-                {
-                    foreach (GameObject obj in CurrentGameInstance.owningCharacterMiniMapObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
-                    }
-                }
+                // Instantiates owning objects
+                await CurrentGameInstance.AddressableOwningCharacterObjects.InstantiateGameObjects(CurrentGameInstance.OwningCharacterObjects, EntityTransform);
+                // Instantiates owning minimap objects
+                await CurrentGameInstance.AddressableOwningCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.OwningCharacterMiniMapObjects, EntityTransform);
                 // Instantiates owning character UI
                 if (CurrentGameInstance.owningCharacterUI != null)
                 {
@@ -645,24 +635,10 @@ namespace MultiplayerARPG
             }
             else if (IsClient)
             {
-                // Instantiates non-owning character objects
-                if (CurrentGameInstance.nonOwningCharacterObjects != null && CurrentGameInstance.nonOwningCharacterObjects.Length > 0)
-                {
-                    foreach (GameObject obj in CurrentGameInstance.nonOwningCharacterObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
-                    }
-                }
-                // Instantiates non-owning character minimap objects
-                if (CurrentGameInstance.nonOwningCharacterMiniMapObjects != null && CurrentGameInstance.nonOwningCharacterMiniMapObjects.Length > 0)
-                {
-                    foreach (GameObject obj in CurrentGameInstance.nonOwningCharacterMiniMapObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
-                    }
-                }
+                // Instantiates non-owning objects
+                await CurrentGameInstance.AddressableNonOwningCharacterObjects.InstantiateGameObjects(CurrentGameInstance.NonOwningCharacterObjects, EntityTransform);
+                // Instantiates non-owning minimap objects
+                await CurrentGameInstance.AddressableNonOwningCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.NonOwningCharacterMiniMapObjects, EntityTransform);
                 // Instantiates non-owning character UI
                 if (CurrentGameInstance.nonOwningCharacterUI != null)
                 {
@@ -672,7 +648,7 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Sync data changes callback
+            #region Sync data changes callback
         private void OnPlayerIdChange(bool isInitial, string oldId, string id)
         {
             if (!string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(CharacterName) && GameInstance.ClientCharacterHandlers != null)

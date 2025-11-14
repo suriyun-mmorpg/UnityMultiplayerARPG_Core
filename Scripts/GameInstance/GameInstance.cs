@@ -6,6 +6,7 @@ using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
@@ -222,27 +223,69 @@ namespace MultiplayerARPG
         [Tooltip("If this is empty, it will use `Addressable UI Scene Gameplay Prefab` as gameplay UI prefab")]
         [SerializeField]
         private AssetReferenceBaseUISceneGameplay addressableUiSceneGameplayConsolePrefab = null;
+        [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
         [SerializeField]
         private AssetReferenceBasePlayerCharacterController addressableDefaultControllerPrefab = null;
 
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
         public ServerCharacter serverCharacterPrefab = null;
+
+        [Header("Character Objects")]
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+        public UnityHelpBox effectHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
+#endif
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
         [Tooltip("These objects will be instantiate as owning character's children")]
-        public GameObject[] owningCharacterObjects = new GameObject[0];
+        [SerializeField]
+        private GameObject[] owningCharacterObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as owning character's children to show in minimap")]        
+        [SerializeField]
+        private GameObject[] owningCharacterMiniMapObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as non-owning character's children")]        
+        [SerializeField]
+        private GameObject[] nonOwningCharacterObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as non-owning character's children to show in minimap")]        
+        [SerializeField]
+        private GameObject[] nonOwningCharacterMiniMapObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as monster character's children")]        
+        [SerializeField]
+        private GameObject[] monsterCharacterObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as monster character's children to show in minimap")]        
+        [SerializeField]
+        private GameObject[] monsterCharacterMiniMapObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as npc's children")]        
+        [SerializeField]
+        private GameObject[] npcObjects = new GameObject[0];
+        [Tooltip("These objects will be instantiate as npc's children to show in minimap")]        
+        [SerializeField]
+        private GameObject[] npcMiniMapObjects = new GameObject[0];
+#endif
+        [Tooltip("These objects will be instantiate as owning character's children")]
+        [SerializeField]
+        private AssetReference[] addressableOwningCharacterObjects = new AssetReference[0];
         [Tooltip("These objects will be instantiate as owning character's children to show in minimap")]
-        public GameObject[] owningCharacterMiniMapObjects = new GameObject[0];
+        [SerializeField]
+        private AssetReference[] addressableOwningCharacterMiniMapObjects = new AssetReference[0];
         [Tooltip("These objects will be instantiate as non-owning character's children")]
-        public GameObject[] nonOwningCharacterObjects = new GameObject[0];
+        [SerializeField]
+        private AssetReference[] addressableNonOwningCharacterObjects = new AssetReference[0];
         [Tooltip("These objects will be instantiate as non-owning character's children to show in minimap")]
-        public GameObject[] nonOwningCharacterMiniMapObjects = new GameObject[0];
+        [SerializeField]
+        private AssetReference[] addressableNonOwningCharacterMiniMapObjects = new AssetReference[0];
         [Tooltip("These objects will be instantiate as monster character's children")]
-        public GameObject[] monsterCharacterObjects = new GameObject[0];
+        [SerializeField]
+        private AssetReference[] addressableMonsterCharacterObjects = new AssetReference[0];
         [Tooltip("These objects will be instantiate as monster character's children to show in minimap")]
-        public GameObject[] monsterCharacterMiniMapObjects = new GameObject[0];
+        [SerializeField]
+        private AssetReference[] addressableMonsterCharacterMiniMapObjects = new AssetReference[0];
         [Tooltip("These objects will be instantiate as npc's children")]
-        public GameObject[] npcObjects = new GameObject[0];
+        [SerializeField]
+        private AssetReference[] addressableNpcObjects = new AssetReference[0];
         [Tooltip("These objects will be instantiate as npc's children to show in minimap")]
-        public GameObject[] npcMiniMapObjects = new GameObject[0];
+        [SerializeField]
+        private AssetReference[] addressableNpcMiniMapObjects = new AssetReference[0];
+
+        [Header("Character UIs")]
         [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
         public UICharacterEntity owningCharacterUI = null;
         [Tooltip("This UI will be instaniate as non owning character's child to show character name / HP / MP / Food / Water")]
@@ -872,6 +915,142 @@ namespace MultiplayerARPG
         public async UniTask<BasePlayerCharacterController> GetLoadedDefaultControllerPrefab()
         {
             return await AddressableDefaultControllerPrefab.GetOrLoadAssetAsyncOrUsePrefab(DefaultControllerPrefab);
+        }
+
+        public GameObject[] OwningCharacterObjects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return owningCharacterObjects;
+#else
+                return System.Array.Empty<GameObject>();
+#endif
+            }
+        }
+
+        public AssetReference[] AddressableOwningCharacterObjects
+        {
+            get { return addressableOwningCharacterObjects; }
+        }
+
+        public GameObject[] OwningCharacterMiniMapObjects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return owningCharacterMiniMapObjects;
+#else
+                return System.Array.Empty<GameObject>();
+#endif
+            }
+        }
+
+        public AssetReference[] AddressableOwningCharacterMiniMapObjects
+        {
+            get { return addressableOwningCharacterMiniMapObjects; }
+        }
+
+        public GameObject[] NonOwningCharacterObjects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return nonOwningCharacterObjects;
+#else
+                return System.Array.Empty<GameObject>();
+#endif
+            }
+        }
+
+        public AssetReference[] AddressableNonOwningCharacterObjects
+        {
+            get { return addressableNonOwningCharacterObjects; }
+        }
+
+        public GameObject[] NonOwningCharacterMiniMapObjects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return nonOwningCharacterMiniMapObjects;
+#else
+                return System.Array.Empty<GameObject>();
+#endif
+            }
+        }
+
+        public AssetReference[] AddressableNonOwningCharacterMiniMapObjects
+        {
+            get { return addressableNonOwningCharacterMiniMapObjects; }
+        }
+
+        public GameObject[] MonsterCharacterObjects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return monsterCharacterObjects;
+#else
+                return System.Array.Empty<GameObject>();
+#endif
+            }
+        }
+
+        public AssetReference[] AddressableMonsterCharacterObjects
+        {
+            get { return addressableMonsterCharacterObjects; }
+        }
+
+        public GameObject[] MonsterCharacterMiniMapObjects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return monsterCharacterMiniMapObjects;
+#else
+                return System.Array.Empty<GameObject>();
+#endif
+            }
+        }
+
+        public AssetReference[] AddressableMonsterCharacterMiniMapObjects
+        {
+            get { return addressableMonsterCharacterMiniMapObjects; }
+        }
+
+        public GameObject[] NpcObjects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return npcObjects;
+#else
+                return System.Array.Empty<GameObject>();
+#endif
+            }
+        }
+
+        public AssetReference[] AddressableNpcObjects
+        {
+            get { return addressableNpcObjects; }
+        }
+
+        public GameObject[] NpcMiniMapObjects
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS
+                return npcMiniMapObjects;
+#else
+                return System.Array.Empty<GameObject>();
+#endif
+            }
+        }
+
+        public AssetReference[] AddressableNpcMiniMapObjects
+        {
+            get { return addressableNpcMiniMapObjects; }
         }
 
         public GameEffect[] LevelUpEffects

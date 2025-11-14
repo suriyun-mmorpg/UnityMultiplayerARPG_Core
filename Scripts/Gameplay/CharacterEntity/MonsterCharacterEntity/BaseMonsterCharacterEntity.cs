@@ -1,4 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -271,37 +272,26 @@ namespace MultiplayerARPG
         public override void OnSetup()
         {
             base.OnSetup();
-
-            if (IsClient)
-            {
-                // Instantiates monster objects
-                if (CurrentGameInstance.monsterCharacterObjects != null && CurrentGameInstance.monsterCharacterObjects.Length > 0)
-                {
-                    foreach (GameObject obj in CurrentGameInstance.monsterCharacterObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, EntityTransform.position, EntityTransform.rotation, EntityTransform);
-                    }
-                }
-                // Instantiates monster minimap objects
-                if (CurrentGameInstance.monsterCharacterMiniMapObjects != null && CurrentGameInstance.monsterCharacterMiniMapObjects.Length > 0)
-                {
-                    foreach (GameObject obj in CurrentGameInstance.monsterCharacterMiniMapObjects)
-                    {
-                        if (obj == null) continue;
-                        Instantiate(obj, MiniMapUiTransform.position, MiniMapUiTransform.rotation, MiniMapUiTransform);
-                    }
-                }
-                // Instantiates monster character UI
-                if (CurrentGameInstance.monsterCharacterUI != null)
-                {
-                    InstantiateUI(CurrentGameInstance.monsterCharacterUI);
-                }
-            }
+            InstantiateMonsterCharacterObjects();
             if (SpawnArea == null)
                 SpawnPosition = EntityTransform.position;
             if (IsServer)
                 InitStats();
+        }
+
+        private async void InstantiateMonsterCharacterObjects()
+        {
+            if (!IsClient)
+                return;
+            // Instantiates monster objects
+            await CurrentGameInstance.AddressableMonsterCharacterObjects.InstantiateGameObjects(CurrentGameInstance.MonsterCharacterObjects, EntityTransform);
+            // Instantiates monster minimap objects
+            await CurrentGameInstance.AddressableMonsterCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.MonsterCharacterMiniMapObjects, EntityTransform);
+            // Instantiates monster character UI
+            if (CurrentGameInstance.monsterCharacterUI != null)
+            {
+                InstantiateUI(CurrentGameInstance.monsterCharacterUI);
+            }
         }
 
         public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
