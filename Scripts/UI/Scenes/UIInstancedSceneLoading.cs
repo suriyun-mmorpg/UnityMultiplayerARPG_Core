@@ -1,6 +1,5 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
-using System.Collections;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -22,15 +21,10 @@ namespace MultiplayerARPG
                 rootObject.SetActive(false);
         }
 
-        public virtual Coroutine LoadScene(string sceneName)
-        {
-            return StartCoroutine(LoadSceneRoutine(sceneName));
-        }
-
-        protected virtual IEnumerator LoadSceneRoutine(string sceneName)
+        public virtual async UniTask LoadScene(string sceneName)
         {
             if (SceneManager.GetActiveScene().name.Equals(sceneName))
-                yield break;
+                return;
             if (rootObject != null)
                 rootObject.SetActive(true);
             if (uiTextProgress != null)
@@ -39,7 +33,7 @@ namespace MultiplayerARPG
                 imageGage.fillAmount = 0;
             if (sliderGage != null)
                 sliderGage.value = 0;
-            yield return null;
+            await UniTask.Yield();
             AsyncOperation asyncOp = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Single);
             while (!asyncOp.isDone)
             {
@@ -49,36 +43,26 @@ namespace MultiplayerARPG
                     imageGage.fillAmount = asyncOp.progress;
                 if (sliderGage != null)
                     sliderGage.value = asyncOp.progress;
-                yield return null;
+                await UniTask.Yield();
             }
-            yield return null;
+            await UniTask.Yield();
             if (uiTextProgress != null)
                 uiTextProgress.text = "100.00%";
             if (imageGage != null)
                 imageGage.fillAmount = 1;
             if (sliderGage != null)
                 sliderGage.value = 1;
-            yield return new WaitForSecondsRealtime(finishedDelay);
+            await UniTask.Delay(Mathf.CeilToInt(finishedDelay * 1000));
             if (rootObject != null)
                 rootObject.SetActive(false);
             AddressableAssetsManager.ReleaseAll();
-            yield return Resources.UnloadUnusedAssets();
+            await Resources.UnloadUnusedAssets();
         }
 
-        public async UniTask LoadSceneTask(string sceneName)
-        {
-            await LoadSceneRoutine(sceneName);
-        }
-
-        public virtual Coroutine LoadScene(AssetReferenceScene sceneRef)
-        {
-            return StartCoroutine(LoadSceneRoutine(sceneRef));
-        }
-
-        protected virtual IEnumerator LoadSceneRoutine(AssetReferenceScene sceneRef)
+        public virtual async UniTask LoadScene(AssetReferenceScene sceneRef)
         {
             if (SceneManager.GetActiveScene().name.Equals(sceneRef.SceneName))
-                yield break;
+                return;
             if (rootObject != null)
                 rootObject.SetActive(true);
             if (uiTextProgress != null)
@@ -87,8 +71,8 @@ namespace MultiplayerARPG
                 imageGage.fillAmount = 0;
             if (sliderGage != null)
                 sliderGage.value = 0;
-            yield return null;
-            var asyncOp = sceneRef.LoadSceneAsync(LoadSceneMode.Single);
+            await UniTask.Yield();
+            var asyncOp = GameInstance.LoadAddressableScene(sceneRef, LoadSceneMode.Single);
             while (!asyncOp.IsDone)
             {
                 if (uiTextProgress != null)
@@ -97,25 +81,20 @@ namespace MultiplayerARPG
                     imageGage.fillAmount = asyncOp.PercentComplete;
                 if (sliderGage != null)
                     sliderGage.value = asyncOp.PercentComplete;
-                yield return null;
+                await UniTask.Yield();
             }
-            yield return null;
+            await UniTask.Yield();
             if (uiTextProgress != null)
                 uiTextProgress.text = "100.00%";
             if (imageGage != null)
                 imageGage.fillAmount = 1;
             if (sliderGage != null)
                 sliderGage.value = 1;
-            yield return new WaitForSecondsRealtime(finishedDelay);
+            await UniTask.Delay(Mathf.CeilToInt(finishedDelay * 1000));
             if (rootObject != null)
                 rootObject.SetActive(false);
             AddressableAssetsManager.ReleaseAll();
-            yield return Resources.UnloadUnusedAssets();
-        }
-
-        public async UniTask LoadSceneTask(AssetReferenceScene sceneRef)
-        {
-            await LoadSceneRoutine(sceneRef);
+            await Resources.UnloadUnusedAssets();
         }
     }
 }

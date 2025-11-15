@@ -1,7 +1,11 @@
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
-using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.ResourceManagement.ResourceProviders;
 using UnityEngine.SceneManagement;
 
 namespace MultiplayerARPG
@@ -18,33 +22,58 @@ namespace MultiplayerARPG
         public SceneField homeConsoleScene;
         public AssetReferenceScene addressableHomeConsoleScene;
 
-        public void LoadHomeScene()
+        private static List<AsyncOperationHandle<SceneInstance>> s_loadingAddressableSceneHandles = new List<AsyncOperationHandle<SceneInstance>>();
+
+        public static AsyncOperationHandle<SceneInstance> LoadAddressableScene(AssetReferenceScene addressableScene, LoadSceneMode loadSceneMode = LoadSceneMode.Single)
         {
-            StartCoroutine(LoadHomeSceneRoutine());
+            AsyncOperationHandle<SceneInstance> addressableAsyncOp = addressableScene.LoadSceneAsync(loadSceneMode, true);
+            s_loadingAddressableSceneHandles.Add(addressableAsyncOp);
+            return addressableAsyncOp;
         }
 
-        IEnumerator LoadHomeSceneRoutine()
+        public static async UniTask UnloadAddressableScenes()
         {
+            if (s_loadingAddressableSceneHandles.Count == 0)
+                return;
+            for (int i = 0; i < s_loadingAddressableSceneHandles.Count; ++i)
+            {
+                AsyncOperationHandle<SceneInstance> addressableAsyncOp = Addressables.UnloadSceneAsync(s_loadingAddressableSceneHandles[i], UnloadSceneOptions.UnloadAllEmbeddedSceneObjects, true);
+                while (!addressableAsyncOp.IsDone)
+                {
+                    await UniTask.Yield();
+                }
+            }
+            s_loadingAddressableSceneHandles.Clear();
+        }
+
+        public async void LoadHomeScene()
+        {
+            await LoadHomeSceneTask();
+        }
+
+        public async UniTask LoadHomeSceneTask()
+        {
+            await UnloadAddressableScenes();
             if (UISceneLoading.Singleton)
             {
                 if (GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
                 {
-                    yield return UISceneLoading.Singleton.LoadScene(addressableScene);
+                    await UISceneLoading.Singleton.LoadScene(addressableScene);
                 }
                 else
                 {
-                    yield return UISceneLoading.Singleton.LoadScene(scene);
+                    await UISceneLoading.Singleton.LoadScene(scene);
                 }
             }
             else
             {
                 if (GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
                 {
-                    yield return addressableScene.LoadSceneAsync();
+                    await LoadAddressableScene(addressableScene);
                 }
                 else
                 {
-                    yield return SceneManager.LoadSceneAsync(scene);
+                    await SceneManager.LoadSceneAsync(scene).ToUniTask();
                 }
             }
         }
