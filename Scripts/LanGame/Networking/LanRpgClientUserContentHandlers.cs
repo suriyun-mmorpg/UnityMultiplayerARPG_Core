@@ -7,6 +7,29 @@ namespace MultiplayerARPG
 {
     public class LanRpgClientUserContentHandlers : MonoBehaviour, IClientUserContentHandlers
     {
+        public bool RequestUnlockContentProgression(RequestUnlockContentProgressionMessage data, ResponseDelegate<ResponseUnlockContentProgressionMessage> callback)
+        {
+            // Don't actual request, just do it in local device
+            ResponseUnlockContentProgression(data, callback).Forget();
+            return true;
+        }
+
+        private async UniTaskVoid ResponseUnlockContentProgression(RequestUnlockContentProgressionMessage data, ResponseDelegate<ResponseUnlockContentProgressionMessage> callback)
+        {
+            await UniTask.NextFrame();
+            callback.Invoke(new ResponseHandlerData(0, null, 0, null), AckResponseCode.Success, new ResponseUnlockContentProgressionMessage()
+            {
+                message = UITextKeys.NONE,
+                unlockableContent = new UnlockableContent()
+                {
+                    type = data.type,
+                    dataId = data.dataId,
+                    progression = 0,
+                    unlocked = true,
+                }
+            });
+        }
+
         public bool RequestAvailableContents(RequestAvailableContentsMessage data, ResponseDelegate<ResponseAvailableContentsMessage> callback)
         {
             // Don't actual request, just do it in local device

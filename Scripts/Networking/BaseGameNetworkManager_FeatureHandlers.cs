@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         protected IServerPartyHandlers ServerPartyHandlers { get; set; }
         protected IServerGuildHandlers ServerGuildHandlers { get; set; }
         protected IServerChatHandlers ServerChatHandlers { get; set; }
+        protected IServerUserContentHandlers ServerUserContentHandlers { get; set; }
         protected IServerLogHandlers ServerLogHandlers { get; set; }
         // Server Message Handlers
         protected IServerCashShopMessageHandlers ServerCashShopMessageHandlers { get; set; }
@@ -211,6 +212,7 @@ namespace MultiplayerARPG
             // User Content
             if (ServerUserContentMessageHandlers != null)
             {
+                RegisterRequestToServer<RequestUnlockContentProgressionMessage, ResponseUnlockContentProgressionMessage>(GameNetworkingConsts.UnlockContentProgression, ServerUserContentMessageHandlers.HandleRequestUnlockContentProgression);
                 RegisterRequestToServer<RequestAvailableContentsMessage, ResponseAvailableContentsMessage>(GameNetworkingConsts.AvailableContents, ServerUserContentMessageHandlers.HandleRequestAvailableContents);
                 RegisterRequestToServer<RequestUnlockContentMessage, ResponseUnlockContentMessage>(GameNetworkingConsts.UnlockContent, ServerUserContentMessageHandlers.HandleRequestUnlockContent);
             }
@@ -249,6 +251,7 @@ namespace MultiplayerARPG
             GameInstance.ServerPartyHandlers = ServerPartyHandlers;
             GameInstance.ServerGuildHandlers = ServerGuildHandlers;
             GameInstance.ServerChatHandlers = ServerChatHandlers;
+            GameInstance.ServerUserContentHandlers = ServerUserContentHandlers;
             GameInstance.ServerLogHandlers = ServerLogHandlers;
         }
 

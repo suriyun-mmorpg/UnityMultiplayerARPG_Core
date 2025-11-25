@@ -6,6 +6,12 @@ namespace MultiplayerARPG
 {
     public class LanRpgServerUserContentMessageHandlers : MonoBehaviour, IServerUserContentMessageHandlers
     {
+        public UniTaskVoid HandleRequestUnlockContentProgression(RequestHandlerData requestHandler, RequestUnlockContentProgressionMessage request, RequestProceedResultDelegate<ResponseUnlockContentProgressionMessage> result)
+        {
+            // Do nothing
+            return default;
+        }
+
         public UniTaskVoid HandleRequestAvailableContents(RequestHandlerData requestHandler, RequestAvailableContentsMessage request, RequestProceedResultDelegate<ResponseAvailableContentsMessage> result)
         {
             // Do nothing

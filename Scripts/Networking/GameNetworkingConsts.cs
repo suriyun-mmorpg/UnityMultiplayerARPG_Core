@@ -116,5 +116,6 @@
         public const ushort ChangeAmmoItem = 191;
         public const ushort RemoveAmmoFromItem = 192;
         public const ushort PlayerCharacterTransform = 193;
+        public const ushort UnlockContentProgression = 194;
     }
 }

@@ -3,7 +3,7 @@ using LiteNetLib.Utils;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct ResponseUnlockContentMessage : INetSerializable
+    public struct ResponseUnlockContentProgressionMessage : INetSerializable
     {
         public UITextKeys message;
         public UnlockableContent unlockableContent;

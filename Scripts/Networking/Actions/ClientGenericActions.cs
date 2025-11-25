@@ -7,18 +7,44 @@ namespace MultiplayerARPG
     public static class ClientGenericActions
     {
         public static event System.Action onClientConnected;
-        public static event System.Action<DisconnectReason, SocketError, UITextKeys> onClientDisconnected;
         public static event System.Action onClientStopped;
         public static event System.Action onClientWarp;
-        public static event System.Action<ChatMessage> onClientReceiveChatMessage;
-        public static event System.Action<UITextKeys> onClientReceiveGameMessage;
-        public static event System.Action<UIFormatKeys, string[]> onClientReceiveFormattedGameMessage;
-        public static event System.Action<RewardGivenType, int> onNotifyRewardExp;
-        public static event System.Action<RewardGivenType, int> onNotifyRewardGold;
-        public static event System.Action<RewardGivenType, int, int> onNotifyRewardItem;
-        public static event System.Action<RewardGivenType, int, int> onNotifyRewardCurrency;
-        public static event System.Action<int> onNotifyBattlePointsChanged;
-        public static event System.Action<AckResponseCode> onClientReadyResponse;
+
+        public delegate void ClientDisconnectedHandler(DisconnectReason reason, SocketError socketError, UITextKeys message);
+        public static event ClientDisconnectedHandler onClientDisconnected;
+
+        public delegate void ChatMessageHandler(ChatMessage message);
+        public static event ChatMessageHandler onClientReceiveChatMessage;
+
+        public delegate void GameMessageHandler(UITextKeys message);
+        public static event GameMessageHandler onClientReceiveGameMessage;
+
+        public delegate void FormattedGameMessageHandler(UIFormatKeys format, string[] args);
+        public static event FormattedGameMessageHandler onClientReceiveFormattedGameMessage;
+
+        public delegate void RewardExpHandler(RewardGivenType givenType, int amount);
+        public static event RewardExpHandler onNotifyRewardExp;
+
+        public delegate void RewardGoldHandler(RewardGivenType givenType, int amount);
+        public static event RewardGoldHandler onNotifyRewardGold;
+
+        public delegate void RewardItemHandler(RewardGivenType givenType, int dataId, int amount);
+        public static event RewardItemHandler onNotifyRewardItem;
+
+        public delegate void RewardCurrencyHandler(RewardGivenType givenType, int dataId, int amount);
+        public static event RewardCurrencyHandler onNotifyRewardCurrency;
+
+        public delegate void RewardUnlockableContentHandler(RewardGivenType givenType, UnlockableContentType type, int dataId, int changedProgression, bool unlocked);
+        public static event RewardUnlockableContentHandler onNotifyRewardUnlockableContent;
+
+        public delegate void BattlePointsChangedHandler(int amount);
+        public static event BattlePointsChangedHandler onNotifyBattlePointsChanged;
+
+        public delegate void EnterGameResponseHandler(AckResponseCode responseCode);
+        public static event EnterGameResponseHandler onEnterGameResponse;
+
+        public delegate void ClientReadyResponseHandler(AckResponseCode responseCode);
+        public static event ClientReadyResponseHandler onClientReadyResponse;
 
         public static void Clean()
         {
@@ -33,7 +59,9 @@ namespace MultiplayerARPG
             onNotifyRewardGold = null;
             onNotifyRewardItem = null;
             onNotifyRewardCurrency = null;
+            onNotifyRewardUnlockableContent = null;
             onNotifyBattlePointsChanged = null;
+            onEnterGameResponse = null;
             onClientReadyResponse = null;
         }
 
@@ -81,16 +109,16 @@ namespace MultiplayerARPG
                 onClientReceiveFormattedGameMessage.Invoke(format, args);
         }
 
-        public static void NotifyRewardExp(RewardGivenType givenType, int exp)
+        public static void NotifyRewardExp(RewardGivenType givenType, int amount)
         {
             if (onNotifyRewardExp != null)
-                onNotifyRewardExp.Invoke(givenType, exp);
+                onNotifyRewardExp.Invoke(givenType, amount);
         }
 
-        public static void NotifyRewardGold(RewardGivenType givenType, int gold)
+        public static void NotifyRewardGold(RewardGivenType givenType, int amount)
         {
             if (onNotifyRewardGold != null)
-                onNotifyRewardGold.Invoke(givenType, gold);
+                onNotifyRewardGold.Invoke(givenType, amount);
         }
 
         public static void NotifyRewardItem(RewardGivenType givenType, int dataId, int amount)
@@ -105,10 +133,22 @@ namespace MultiplayerARPG
                 onNotifyRewardCurrency.Invoke(givenType, dataId, amount);
         }
 
+        public static void NotifyRewardUnlockableContent(RewardGivenType givenType, UnlockableContentType type, int dataId, int changedProgression, bool unlocked)
+        {
+            if (onNotifyRewardUnlockableContent != null)
+                onNotifyRewardUnlockableContent.Invoke(givenType, type, dataId, changedProgression, unlocked);
+        }
+
         public static void NotifyBattlePointsChanged(int amount)
         {
             if (onNotifyBattlePointsChanged != null)
                 onNotifyBattlePointsChanged.Invoke(amount);
+        }
+
+        public static void OnEnterGameResponse(AckResponseCode responseCode)
+        {
+            if (onEnterGameResponse != null)
+                onEnterGameResponse.Invoke(responseCode);
         }
 
         public static void OnClientReadyResponse(AckResponseCode responseCode)

@@ -745,6 +745,7 @@ namespace MultiplayerARPG
             {
                 component.HandleEnterGameResponse(this, responseHandler, responseCode, response);
             }
+            ClientGenericActions.OnEnterGameResponse(responseCode);
         }
 
         protected override void HandleClientReadyResponse(ResponseHandlerData responseHandler, AckResponseCode responseCode, EmptyMessage response)
