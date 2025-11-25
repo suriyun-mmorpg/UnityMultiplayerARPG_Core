@@ -284,9 +284,9 @@ namespace MultiplayerARPG
             if (!IsClient)
                 return;
             // Instantiates monster objects
-            await CurrentGameInstance.AddressableMonsterCharacterObjects.InstantiateGameObjects(CurrentGameInstance.MonsterCharacterObjects, EntityTransform);
+            await CurrentGameInstance.AddressableMonsterCharacterObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.MonsterCharacterObjects, EntityTransform);
             // Instantiates monster minimap objects
-            await CurrentGameInstance.AddressableMonsterCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.MonsterCharacterMiniMapObjects, EntityTransform);
+            await CurrentGameInstance.AddressableMonsterCharacterMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.MonsterCharacterMiniMapObjects, EntityTransform);
             // Instantiates monster character UI
             InstantiateUI(await CurrentGameInstance.GetLoadedMonsterCharacterUIPrefab());
         }

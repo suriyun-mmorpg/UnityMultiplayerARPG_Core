@@ -7,6 +7,7 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
 
 namespace MultiplayerARPG
@@ -688,9 +689,11 @@ namespace MultiplayerARPG
             int metaDataId;
             if (data.TryGetEntityAddressablePrefab(out var assetRef, out metaDataId))
             {
-                AsyncOperationHandle<BasePlayerCharacterEntity> handler = assetRef.InstantiateAsync();
-                result = handler.WaitForCompletion();
+                AsyncOperationHandle<GameObject> handler = Addressables.LoadAssetAsync<GameObject>(assetRef.RuntimeKey);
+                handler.WaitForCompletion();
+                result = Object.Instantiate(handler.Result).GetComponent<BaseCharacterEntity>();
                 result.gameObject.AddComponent<AssetReferenceReleaser>();
+                Addressables.Release(handler);
             }
             else if (data.TryGetEntityPrefab(out var prefab, out metaDataId))
             {

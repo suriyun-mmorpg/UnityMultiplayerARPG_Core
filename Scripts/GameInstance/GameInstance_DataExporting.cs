@@ -140,12 +140,12 @@ namespace MultiplayerARPG
                     continue;
                 var op = kv.Value.InstantiateAsync();
                 op.WaitForCompletion();
-                BasePlayerCharacterEntity comp = op.Result;
+                BasePlayerCharacterEntity comp = op.Result.GetComponent<BasePlayerCharacterEntity>();
                 if (comp.CharacterDatabases == null || comp.CharacterDatabases.Length == 0)
                 {
-                    Addressables.ReleaseInstance(comp.gameObject);
+                    Addressables.ReleaseInstance(op.Result);
                     Addressables.Release(op);
-                    DestroyImmediate(comp.gameObject);
+                    DestroyImmediate(op.Result);
                     continue;
                 }
                 if (!data.AvailableCharacters.ContainsKey(kv.Key))
@@ -154,9 +154,9 @@ namespace MultiplayerARPG
                 {
                     data.AvailableCharacters[kv.Key][database.DataId] = new PlayerCharacterData().SetNewPlayerCharacterData(string.Empty, database.DataId, kv.Key, 0);
                 }
-                Addressables.ReleaseInstance(comp.gameObject);
+                Addressables.ReleaseInstance(op.Result);
                 Addressables.Release(op);
-                DestroyImmediate(comp.gameObject);
+                DestroyImmediate(op.Result);
             }
 
             foreach (var kv in Factions)

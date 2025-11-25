@@ -1072,24 +1072,23 @@ namespace MultiplayerARPG
             {
                 bool isError = true;
                 object runtimeKey = data.RuntimeKey;
-                var loadOp = await data.LoadObjectAsync<GameObject>();
-                if (loadOp.HasValue)
+                try
                 {
-                    try
+                    var loadedObject = await data.LoadObjectAsync<GameObject>();
+                    if (loadedObject != null)
                     {
-                        GameObject loadedObject = loadOp.Value.Result;
                         if (loadedObject.TryGetComponent(out TType loadedData))
                             loadedData.PrepareRelatesData();
                         isError = false;
                     }
-                    catch (System.Exception ex)
-                    {
-                        Debug.LogException(ex);
-                    }
-                    finally
-                    {
-                        loadOp.Value.Release();
-                    }
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogException(ex);
+                }
+                finally
+                {
+                    data.Release();
                 }
                 System.GC.Collect();
                 if (isError)
@@ -1098,6 +1097,67 @@ namespace MultiplayerARPG
                     dict[data.HashAssetId] = data;
             }
             return true;
+        }
+
+        public static IUnlockableGameData GetUnlockableGameData(UnlockableContentType type, int dataId)
+        {
+            TryGetUnlockableGameData(type, dataId, out IUnlockableGameData result);
+            return result;
+        }
+
+        public static bool TryGetUnlockableGameData(UnlockableContentType type, int dataId, out IUnlockableGameData result)
+        {
+            switch (type)
+            {
+                case UnlockableContentType.Icon:
+                    if (PlayerIcons.TryGetValue(dataId, out PlayerIcon playerIcon))
+                    {
+                        result = playerIcon;
+                        return true;
+                    }
+                    break;
+                case UnlockableContentType.Frame:
+                    if (PlayerFrames.TryGetValue(dataId, out PlayerFrame playerFrame))
+                    {
+                        result = playerFrame;
+                        return true;
+                    }
+                    break;
+                case UnlockableContentType.Title:
+                    if (PlayerTitles.TryGetValue(dataId, out PlayerTitle playerTitle))
+                    {
+                        result = playerTitle;
+                        return true;
+                    }
+                    break;
+                case UnlockableContentType.Background:
+                    if (PlayerBackgrounds.TryGetValue(dataId, out PlayerBackground playerBanner))
+                    {
+                        result = playerBanner;
+                        return true;
+                    }
+                    break;
+            }
+            result = null;
+            return false;
+        }
+
+        public static UnlockRequirement GetUnlockableContentRequirement(UnlockableContentType type, int dataId)
+        {
+            TryGetUnlockableContentRequirement(type, dataId, out UnlockRequirement result);
+            return result;
+        }
+
+        public static bool TryGetUnlockableContentRequirement(UnlockableContentType type, int dataId, out UnlockRequirement result)
+        {
+            IUnlockableGameData unlockableGameData = GetUnlockableGameData(type, dataId);
+            if (unlockableGameData != null)
+            {
+                result = unlockableGameData.UnlockRequirement;
+                return true;
+            }
+            result = default;
+            return false;
         }
 
         public static Dictionary<int, UnlockRequirement> GetUnlockableContentRequirements(UnlockableContentType type)
@@ -1117,42 +1177,17 @@ namespace MultiplayerARPG
                         result[kv.Key] = kv.Value.UnlockRequirement;
                     }
                     break;
-                case UnlockableContentType.Background:
-                    foreach (var kv in PlayerBackgrounds)
-                    {
-                        result[kv.Key] = kv.Value.UnlockRequirement;
-                    }
-                    break;
                 case UnlockableContentType.Title:
                     foreach (var kv in PlayerTitles)
                     {
                         result[kv.Key] = kv.Value.UnlockRequirement;
                     }
                     break;
-            }
-            return result;
-        }
-
-        public static UnlockRequirement GetUnlockableContentRequirement(UnlockableContentType type, int dataId)
-        {
-            UnlockRequirement result = default;
-            switch (type)
-            {
-                case UnlockableContentType.Icon:
-                    if (PlayerIcons.TryGetValue(dataId, out PlayerIcon playerIcon))
-                        result = playerIcon.UnlockRequirement;
-                    break;
-                case UnlockableContentType.Frame:
-                    if (PlayerFrames.TryGetValue(dataId, out PlayerFrame playerFrame))
-                        result = playerFrame.UnlockRequirement;
-                    break;
                 case UnlockableContentType.Background:
-                    if (PlayerBackgrounds.TryGetValue(dataId, out PlayerBackground playerBackground))
-                        result = playerBackground.UnlockRequirement;
-                    break;
-                case UnlockableContentType.Title:
-                    if (PlayerTitles.TryGetValue(dataId, out PlayerTitle playerTitle))
-                        result = playerTitle.UnlockRequirement;
+                    foreach (var kv in PlayerBackgrounds)
+                    {
+                        result[kv.Key] = kv.Value.UnlockRequirement;
+                    }
                     break;
             }
             return result;

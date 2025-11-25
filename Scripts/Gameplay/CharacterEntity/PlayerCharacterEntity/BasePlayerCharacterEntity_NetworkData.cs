@@ -623,18 +623,18 @@ namespace MultiplayerARPG
                     controller.PlayingCharacterEntity = this;
                 }
                 // Instantiates owning objects
-                await CurrentGameInstance.AddressableOwningCharacterObjects.InstantiateGameObjects(CurrentGameInstance.OwningCharacterObjects, EntityTransform);
+                await CurrentGameInstance.AddressableOwningCharacterObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.OwningCharacterObjects, EntityTransform);
                 // Instantiates owning minimap objects
-                await CurrentGameInstance.AddressableOwningCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.OwningCharacterMiniMapObjects, EntityTransform);
+                await CurrentGameInstance.AddressableOwningCharacterMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.OwningCharacterMiniMapObjects, EntityTransform);
                 // Instantiates owning character UI
                 InstantiateUI(await CurrentGameInstance.GetLoadedOwningCharacterUIPrefab());
             }
             else if (IsClient)
             {
                 // Instantiates non-owning objects
-                await CurrentGameInstance.AddressableNonOwningCharacterObjects.InstantiateGameObjects(CurrentGameInstance.NonOwningCharacterObjects, EntityTransform);
+                await CurrentGameInstance.AddressableNonOwningCharacterObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NonOwningCharacterObjects, EntityTransform);
                 // Instantiates non-owning minimap objects
-                await CurrentGameInstance.AddressableNonOwningCharacterMiniMapObjects.InstantiateGameObjects(CurrentGameInstance.NonOwningCharacterMiniMapObjects, EntityTransform);
+                await CurrentGameInstance.AddressableNonOwningCharacterMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NonOwningCharacterMiniMapObjects, EntityTransform);
                 // Instantiates non-owning character UI
                 InstantiateUI(await CurrentGameInstance.GetLoadedNonOwningCharacterUIPrefab());
             }
