@@ -817,9 +817,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            // Only items will have skill buffs
-            resultSkills = GameDataHelpers.CombineSkills(resultSkills, buffSkills);
-
             if (sumWithBuffs)
             {
                 // From buffs
@@ -892,6 +889,9 @@ namespace MultiplayerARPG
                     }
                 }
             }
+
+            // Sum skills from base and buffs
+            resultSkills = GameDataHelpers.CombineSkills(resultSkills, buffSkills);
 
             if (sumWithSkills)
             {
