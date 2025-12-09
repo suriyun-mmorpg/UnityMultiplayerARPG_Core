@@ -567,7 +567,7 @@ namespace MultiplayerARPG
             {
                 NavPaths = null;
             }
-            MovementState = inputData.MovementState;
+            MovementState = inputData.MovementState | MovementState.IsGrounded;
             ExtraMovementState = this.ValidateExtraMovementState(MovementState, inputData.ExtraMovementState);
             if (tempLookDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
                 Direction2D = inputData.LookDirection;
