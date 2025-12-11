@@ -1072,23 +1072,21 @@ namespace MultiplayerARPG
             {
                 bool isError = true;
                 object runtimeKey = data.RuntimeKey;
+                AsyncOperationHandle<GameObject> loadOp = Addressables.LoadAssetAsync<GameObject>(runtimeKey);
                 try
                 {
-                    var loadedObject = await data.LoadObjectAsync<GameObject>();
-                    if (loadedObject != null)
-                    {
-                        if (loadedObject.TryGetComponent(out TType loadedData))
-                            loadedData.PrepareRelatesData();
-                        isError = false;
-                    }
+                    GameObject loadedObject = await loadOp.Task;
+                    if (loadedObject.TryGetComponent(out TType loadedData))
+                        loadedData.PrepareRelatesData();
                 }
                 catch (System.Exception ex)
                 {
+                    isError = true;
                     Debug.LogException(ex);
                 }
                 finally
                 {
-                    data.Release();
+                    Addressables.Release(loadOp);
                 }
                 System.GC.Collect();
                 if (isError)

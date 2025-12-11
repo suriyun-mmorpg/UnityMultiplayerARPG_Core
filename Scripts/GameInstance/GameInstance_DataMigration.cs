@@ -1,6 +1,8 @@
 ﻿using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AddressableAssets;
+using UnityEngine.ResourceManagement.AsyncOperations;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -44,19 +46,23 @@ namespace MultiplayerARPG
                 if (meshPrefab != null && meshPrefab.TryGetComponent(out entity))
                     entity.MigrateMaterials();
 
-                try
+                if (equipmentModel.AddressableMeshPrefab.IsDataValid())
                 {
-                    meshPrefab = equipmentModel.AddressableMeshPrefab.LoadObject<GameObject>();
-                    if (meshPrefab != null && meshPrefab.TryGetComponent(out entity))
-                        entity.MigrateMaterials();
-                }
-                catch (System.Exception ex)
-                {
-                    Debug.LogException(ex);
-                }
-                finally
-                {
-                    equipmentModel.AddressableMeshPrefab.Release();
+                    AsyncOperationHandle<GameObject> loadOp = Addressables.LoadAssetAsync<GameObject>(equipmentModel.AddressableMeshPrefab.RuntimeKey);
+                    try
+                    {
+                        meshPrefab = loadOp.WaitForCompletion();
+                        if (meshPrefab != null && meshPrefab.TryGetComponent(out entity))
+                            entity.MigrateMaterials();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        Debug.LogException(ex);
+                    }
+                    finally
+                    {
+                        Addressables.Release(loadOp);
+                    }
                 }
             }
 #endif
