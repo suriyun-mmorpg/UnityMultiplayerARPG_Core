@@ -11,7 +11,7 @@ namespace MultiplayerARPG
 {
     public partial class BuiltInEntityMovementFunctions3D
     {
-        protected const int TICK_COUNT_FOR_INTERPOLATION = 2;
+        protected const int TICK_COUNT_FOR_INTERPOLATION = 1;
         protected const int FORCE_GROUNDED_FRAMES_AFTER_TELEPORT = 3;
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
         protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
@@ -1467,7 +1467,7 @@ namespace MultiplayerARPG
             switch (movementSecure)
             {
                 case MovementSecure.ServerAuthoritative:
-                    if (_inputBuffers.Count == 0)
+                    if (_inputBuffers.Count == 0 && _clientTeleportState == MovementTeleportState.None)
                         return false;
                     writer.Put((byte)_clientTeleportState);
                     writer.Put((byte)_inputBuffers.Count);
@@ -1477,7 +1477,7 @@ namespace MultiplayerARPG
                     }
                     return true;
                 default:
-                    if (_syncBuffers.Count == 0)
+                    if (_syncBuffers.Count == 0 && _clientTeleportState == MovementTeleportState.None)
                         return false;
                     writer.Put((byte)_clientTeleportState);
                     writer.Put((byte)_syncBuffers.Count);
@@ -1503,7 +1503,7 @@ namespace MultiplayerARPG
                 return true;
             }
             shouldSendReliably = false;
-            if (_syncBuffers.Count == 0)
+            if (_syncBuffers.Count == 0 && _serverTeleportState == MovementTeleportState.None)
                 return false;
             writer.Put((byte)_serverTeleportState);
             writer.Put((byte)_syncBuffers.Count);
