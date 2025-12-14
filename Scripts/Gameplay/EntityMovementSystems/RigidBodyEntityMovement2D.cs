@@ -444,12 +444,13 @@ namespace MultiplayerARPG
             CacheRigidbody2D.MovePosition(position);
             CurrentGameManager.ShouldPhysicSyncTransforms2D = true;
             // Prepare teleporation states
-            if (IsServer && !IsOwnerClientOrOwnedByServer)
+            if (IsServer && !IsOwnerClient)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
                 if (stillMoveAfterTeleport)
                     _serverTeleportState |= MovementTeleportState.StillMoveAfterTeleport;
-                _serverTeleportState |= MovementTeleportState.WaitingForResponse;
+                if (!IsOwnedByServer)
+                    _serverTeleportState |= MovementTeleportState.WaitingForResponse;
             }
             if (!IsServer && IsOwnerClient)
             {
@@ -873,11 +874,15 @@ namespace MultiplayerARPG
         {
             if (_serverTeleportState.Has(MovementTeleportState.Requesting))
             {
+                _syncBuffers.Clear();
                 shouldSendReliably = true;
                 writer.Put((byte)_serverTeleportState);
                 writer.Put(EntityTransform.position.x);
                 writer.Put(EntityTransform.position.y);
-                _serverTeleportState = MovementTeleportState.WaitingForResponse;
+                if (!IsOwnerClientOrOwnedByServer)
+                    _serverTeleportState = MovementTeleportState.WaitingForResponse;
+                else
+                    _serverTeleportState = MovementTeleportState.None;
                 return true;
             }
             shouldSendReliably = false;

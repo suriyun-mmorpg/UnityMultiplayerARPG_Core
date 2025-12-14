@@ -95,9 +95,6 @@ namespace MultiplayerARPG
         public bool useRootMotionClimbing;
         public float rootMotionGroundedVerticalVelocity = 0f;
 
-        [Header("Networking Settings")]
-        public float snapThreshold = 5.0f;
-
         public BaseGameEntity Entity { get; protected set; }
         public LiteNetLibGameManager Manager => Entity.Manager;
         public CharacterLadderComponent LadderComponent { get; protected set; }
@@ -1493,13 +1490,17 @@ namespace MultiplayerARPG
         {
             if (_serverTeleportState.Has(MovementTeleportState.Requesting))
             {
+                _syncBuffers.Clear();
                 shouldSendReliably = true;
                 writer.Put((byte)_serverTeleportState);
                 writer.Put(EntityTransform.position.x);
                 writer.Put(EntityTransform.position.y);
                 writer.Put(EntityTransform.position.z);
                 writer.PutPackedUShort(Mathf.FloatToHalf(EntityTransform.eulerAngles.y));
-                _serverTeleportState = MovementTeleportState.WaitingForResponse;
+                if (!IsOwnerClientOrOwnedByServer)
+                    _serverTeleportState = MovementTeleportState.WaitingForResponse;
+                else
+                    _serverTeleportState = MovementTeleportState.None;
                 return true;
             }
             shouldSendReliably = false;
@@ -1594,7 +1595,10 @@ namespace MultiplayerARPG
                 float rotation = Mathf.HalfToFloat(reader.GetPackedUShort());
                 bool stillMoveAfterTeleport = movementTeleportState.Has(MovementTeleportState.StillMoveAfterTeleport);
                 if (!IsServer)
+                {
+                    _interpBuffers.Clear();
                     await OnTeleport(position, Quaternion.Euler(0f, rotation, 0f), stillMoveAfterTeleport);
+                }
                 return;
             }
             byte size = reader.GetByte();
@@ -1647,12 +1651,13 @@ namespace MultiplayerARPG
             TurnImmediately(rotation.eulerAngles.y);
             _previousPosition = EntityTransform.position;
             // Prepare teleporation states
-            if (IsServer && !IsOwnerClientOrOwnedByServer)
+            if (IsServer && !IsOwnerClient)
             {
                 _serverTeleportState = MovementTeleportState.Requesting;
                 if (stillMoveAfterTeleport)
                     _serverTeleportState |= MovementTeleportState.StillMoveAfterTeleport;
-                _serverTeleportState |= MovementTeleportState.WaitingForResponse;
+                if (!IsOwnedByServer)
+                    _serverTeleportState |= MovementTeleportState.WaitingForResponse;
             }
             if (!IsServer && IsOwnerClient)
             {
