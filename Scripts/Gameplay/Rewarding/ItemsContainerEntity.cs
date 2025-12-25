@@ -21,9 +21,6 @@ namespace MultiplayerARPG
         protected UILocaleKeySetting formatKeyCorpseTitle = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_CORPSE_TITLE);
 
         [Category("Events")]
-        [Tooltip("If this is `TRUE` it will show items when character activate on this entity")]
-        [SerializeField]
-        protected bool canActivate = false;
         [FormerlySerializedAs("onItemsContainerDestroy")]
         [SerializeField]
         protected UnityEvent onPickedUp = new UnityEvent();
@@ -211,7 +208,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanActivate()
         {
-            return canActivate;
+            return true;
         }
 
         public virtual void OnActivate()
