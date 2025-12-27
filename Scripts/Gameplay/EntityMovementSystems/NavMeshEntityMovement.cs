@@ -145,7 +145,7 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.enabled = false;
         }
 
-        public override void OnIdentityInitialize()
+        public override void EntityOnIdentityInitialize()
         {
             if (_logicUpdater == null)
             {
@@ -190,8 +190,13 @@ namespace MultiplayerARPG
 
         protected void LogicUpdater_OnTick(LogicUpdater updater)
         {
+            // Tick count for interpolation
             _simTick++;
             _interpTick++;
+
+            // Manage only owned objects
+            if (!IsOwnerClientOrOwnedByServer)
+                return;
 
             // Storing sync buffers, server will send to other clients, owner client will send to server
             if (IsServer || (IsOwnerClient && movementSecure == MovementSecure.NotSecure))
@@ -202,7 +207,7 @@ namespace MultiplayerARPG
                     Vector3.Distance(EntityTransform.position, syncData.Position) > positionThreshold ||
                     MovementState != syncData.MovementState || ExtraMovementState != syncData.ExtraMovementState ||
                     Mathf.Abs(rotation - syncData.Rotation) > eulerAnglesThreshold;
-                bool keepAlive = updater.LocalTick - syncData.Tick >= keepAliveTicks;
+                bool keepAlive = updater.LocalTick - syncData.Tick <= keepAliveTicks;
 
                 if (!changed && !keepAlive)
                 {
@@ -226,12 +231,9 @@ namespace MultiplayerARPG
                 StoreSyncBuffer(syncData, 3);
             }
 
-            if (IsOwnerClientOrOwnedByServer)
-            {
-                _currentInput.Tick = _simTick - 1;
-                StoreInputBuffer(_currentInput, 3);
-                _willResetInput = true;
-            }
+            _currentInput.Tick = _simTick - 1;
+            StoreInputBuffer(_currentInput, 3);
+            _willResetInput = true;
         }
 
         public bool CanSimulateMovement()
@@ -996,6 +998,7 @@ namespace MultiplayerARPG
                     for (byte i = 0; i < size; ++i)
                     {
                         interpoationBuffers[i] = reader.Get<MovementSyncData3D>();
+                        StoreSyncBuffer(interpoationBuffers[i], 3);
                     }
                     maxBuffers = _serverTeleportState == MovementTeleportState.Responded ? 1 : 30;
                     StoreInterpolateBuffers(interpoationBuffers, size, _teleportRespondedTick, maxBuffers);
@@ -1005,6 +1008,8 @@ namespace MultiplayerARPG
                     SetupInterpolationTick(interpTick);
                     ArrayPool<MovementSyncData3D>.Shared.Return(interpoationBuffers);
                     _serverTeleportState = MovementTeleportState.None;
+                    // Broadcast to other clients immediately
+                    Entity.SendServerState(_logicUpdater.LocalTick);
                     break;
             }
         }

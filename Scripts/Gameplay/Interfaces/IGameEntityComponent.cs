@@ -6,6 +6,7 @@
         bool AlwaysUpdate { get; }
         void EntityAwake();
         void EntityStart();
+        void EntityOnIdentityInitialize();
         void EntityUpdate();
         void EntityLateUpdate();
         void EntityOnDestroy();

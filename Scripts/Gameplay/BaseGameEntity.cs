@@ -271,6 +271,10 @@ namespace MultiplayerARPG
 
         public override void OnIdentityInitialize()
         {
+            for (int i = 0; i < EntityComponents.Length; ++i)
+            {
+                EntityComponents[i].EntityOnIdentityInitialize();
+            }
             if (_logicUpdater == null)
             {
                 _logicUpdater = Manager.LogicUpdater;

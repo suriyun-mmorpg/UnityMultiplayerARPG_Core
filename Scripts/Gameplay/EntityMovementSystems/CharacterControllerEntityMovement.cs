@@ -272,14 +272,12 @@ namespace MultiplayerARPG
 
         public override void OnSetOwnerClient(bool isOwnerClient)
         {
-            base.OnSetOwnerClient(isOwnerClient);
             Functions.OnSetOwnerClient(isOwnerClient);
         }
 
-        public override void OnIdentityInitialize()
+        public override void EntityOnIdentityInitialize()
         {
-            base.OnIdentityInitialize();
-            Functions.OnIdentityInitialize();
+            Functions.EntityOnIdentityInitialize();
         }
 
         public override void EntityOnDestroy()

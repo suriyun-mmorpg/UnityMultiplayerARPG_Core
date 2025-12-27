@@ -53,6 +53,10 @@ namespace MultiplayerARPG
         {
         }
 
+        public virtual void EntityOnIdentityInitialize()
+        {
+        }
+
         public virtual void EntityUpdate()
         {
         }
