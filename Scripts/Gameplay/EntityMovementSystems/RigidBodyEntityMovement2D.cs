@@ -182,12 +182,20 @@ namespace MultiplayerARPG
             _simTick++;
             _interpTick++;
 
-            // Manage only owned objects
-            if (!IsOwnerClientOrOwnedByServer)
-                return;
-
             // Storing sync buffers, server will send to other clients, owner client will send to server
-            if (IsServer || (IsOwnerClient && movementSecure == MovementSecure.NotSecure))
+            bool willSync = false;
+            switch (movementSecure)
+            {
+                case MovementSecure.ServerAuthoritative:
+                    if (IsServer)
+                        willSync = true;
+                    break;
+                default:
+                    if (IsServer || IsOwnerClient)
+                        willSync = true;
+                    break;
+            }
+            if (willSync)
             {
                 float rotation = Quaternion.LookRotation(Vector3.forward, Direction2D).eulerAngles.z;
                 MovementSyncData2D syncData = _prevSyncData;
@@ -219,9 +227,12 @@ namespace MultiplayerARPG
                 StoreSyncBuffer(syncData, 3);
             }
 
-            _currentInput.Tick = _simTick - 1;
-            StoreInputBuffer(_currentInput, 3);
-            _willResetInput = true;
+            if (!IsServer && IsOwnerClient)
+            {
+                _currentInput.Tick = _simTick - 1;
+                StoreInputBuffer(_currentInput, 3);
+                _willResetInput = true;
+            }
         }
 
         public bool CanSimulateMovement()
