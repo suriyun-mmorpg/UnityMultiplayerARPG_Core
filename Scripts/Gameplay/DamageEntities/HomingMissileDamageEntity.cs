@@ -69,6 +69,11 @@ namespace MultiplayerARPG
                 if (direction > SeekDirection())
                     CacheTransform.rotation = Quaternion.Slerp(CacheTransform.rotation, rotation, Time.deltaTime * seekDamping);
             }
+
+            if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
+                CacheTransform.position += -CacheTransform.up * _missileSpeed * Time.deltaTime;
+            else
+                CacheTransform.position += CacheTransform.forward * _missileSpeed * Time.deltaTime;
         }
     }
 }
