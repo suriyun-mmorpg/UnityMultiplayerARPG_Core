@@ -255,7 +255,7 @@ namespace MultiplayerARPG
         protected readonly HashSet<BuildingEntity> _children = new HashSet<BuildingEntity>();
         protected readonly HashSet<BuildingMaterial> _buildingMaterials = new HashSet<BuildingMaterial>();
         protected int _lastAddedTriggerObjectFrame;
-        protected bool _parentFound;
+        protected bool _parentFound = true; // No parent by default
         protected bool _isDestroyed;
 
         protected override void EntityAwake()
@@ -400,7 +400,12 @@ namespace MultiplayerARPG
 
         private void OnParentIdChange(bool isInitial, string oldParentId, string parentId)
         {
-            _parentFound = false;
+            _parentFound = false; // Set `_parentFound` to `false` to find parent (in `LateUpdate)
+            if (string.IsNullOrEmpty(parentId))
+            {
+                // No parent
+                _parentFound = true;
+            }
         }
 
         public void AddChildren(BuildingEntity buildingEntity)

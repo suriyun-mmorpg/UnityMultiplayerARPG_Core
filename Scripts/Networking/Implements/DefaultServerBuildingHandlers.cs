@@ -20,6 +20,11 @@ namespace MultiplayerARPG
 
         public bool TryGetBuilding(string id, out IBuildingSaveData building)
         {
+            if (id == null)
+            {
+                building = null;
+                return false;
+            }
             return BuildingEntities.TryGetValue(id, out building);
         }
 
