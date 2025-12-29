@@ -66,7 +66,8 @@ namespace MultiplayerARPG
             bool checkRandomSeed = false,
             bool checkAmmoDataId = false,
             bool checkAmmoAmount = false,
-            bool checkDurability = false)
+            bool checkDurability = false,
+            bool checkAmount = false)
         {
             if (checkLevel && data.level != anotherData.level)
                 return true;
@@ -79,6 +80,8 @@ namespace MultiplayerARPG
             if (checkAmmoAmount && data.ammo != anotherData.ammo)
                 return true;
             if (checkDurability && !Mathf.Approximately(data.durability, anotherData.durability))
+                return true;
+            if (checkAmount && data.amount != anotherData.amount)
                 return true;
             return !string.Equals(data.id, anotherData.id) || data.dataId != anotherData.dataId;
         }
@@ -110,10 +113,11 @@ namespace MultiplayerARPG
             bool checkRandomSeed = false,
             bool checkAmmoDataId = false,
             bool checkAmmoAmount = false,
-            bool checkDurability = false)
+            bool checkDurability = false,
+            bool checkAmount = false)
         {
-            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand, checkLevel, checkSockets, checkRandomSeed, checkAmmoDataId, checkAmmoAmount, checkDurability);
-            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand, checkLevel, checkSockets, checkRandomSeed, checkAmmoDataId, checkAmmoAmount, checkDurability);
+            rightIsDiffer = data.rightHand.IsDiffer(anotherData.rightHand, checkLevel, checkSockets, checkRandomSeed, checkAmmoDataId, checkAmmoAmount, checkDurability, checkAmount);
+            leftIsDiffer = data.leftHand.IsDiffer(anotherData.leftHand, checkLevel, checkSockets, checkRandomSeed, checkAmmoDataId, checkAmmoAmount, checkDurability, checkAmount);
             return rightIsDiffer || leftIsDiffer;
         }
 

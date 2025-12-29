@@ -582,6 +582,10 @@ namespace MultiplayerARPG
                     {
                         IsRecaching = true;
                     }
+                    else if (oldItem.amount != newItem.amount)
+                    {
+                        IsRecaching = true;
+                    }
                     break;
                 default:
                     MarkToUpdateAppearances();
@@ -598,7 +602,7 @@ namespace MultiplayerARPG
             {
                 case LiteNetLibSyncListOp.Set:
                 case LiteNetLibSyncListOp.Dirty:
-                    if (oldItem.IsDiffer(newItem, true, true, true, true))
+                    if (oldItem.IsDiffer(newItem, true, true, true, true, checkAmount: true))
                         IsRecaching = true;
                     break;
                 default:
