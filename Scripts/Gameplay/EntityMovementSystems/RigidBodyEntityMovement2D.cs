@@ -231,8 +231,8 @@ namespace MultiplayerARPG
             {
                 _currentInput.Tick = _simTick - 1;
                 StoreInputBuffer(_currentInput, 3);
-                _willResetInput = true;
             }
+            _willResetInput = true;
         }
 
         public bool CanSimulateMovement()
