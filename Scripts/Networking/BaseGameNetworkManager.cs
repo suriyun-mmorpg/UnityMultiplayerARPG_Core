@@ -1299,13 +1299,19 @@ namespace MultiplayerARPG
             HandleChatAtServer(new MessageHandlerData(GameNetworkingConsts.Chat, Server, -1, new NetDataReader(s_Writer.Data, 0, s_Writer.Length)));
         }
 
-        public void KickClient(long connectionId, UITextKeys message)
+        public async void KickClient(long connectionId, UITextKeys message)
         {
             if (!IsServer)
                 return;
             s_Writer.Reset();
             s_Writer.PutPackedUShort((ushort)message);
-            KickClient(connectionId, s_Writer.CopyData());
+            if (!await KickClient(connectionId, s_Writer.CopyData()))
+            {
+                // Force remove client data
+                Logging.LogWarning(LogTag, $"Unable to kick client, Force removing client data for connectionId: {connectionId}");
+                UnregisterPlayerCharacter(connectionId);
+                UnregisterUserIdAndAccessToken(connectionId);
+            }
         }
 
         public virtual async UniTask<AsyncResponseData<EmptyMessage>> SendClientSafeDisconnect()
