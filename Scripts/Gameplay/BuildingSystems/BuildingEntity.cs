@@ -744,7 +744,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanHoldActivate()
         {
-            if (Identity.IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+            if (Identity != null && Identity.IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                 return false;
             return !this.IsDead();
         }
