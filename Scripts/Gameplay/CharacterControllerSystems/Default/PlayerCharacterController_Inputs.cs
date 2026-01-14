@@ -244,8 +244,9 @@ namespace MultiplayerARPG
                 // Detected mouse dragging or hold on an UIs
                 _isMouseDragOrHoldOrOverUI = true;
             }
+            bool updatingMobileMovement = InputManager.IsUpdatingMobileAxis("Horizontal") || InputManager.IsUpdatingMobileAxis("Vertical");
             // Will set move target when pointer isn't point on an UIs 
-            if (!_isPointerOverUI && !_isWASDAttackInputLastFrame && (_getMouse || _getMouseUp))
+            if (!updatingMobileMovement && !_isPointerOverUI && !_isWASDAttackInputLastFrame && (_getMouse || _getMouseUp))
             {
                 // Clear target
                 ClearTarget(true);
