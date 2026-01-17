@@ -1,11 +1,11 @@
 ﻿using Insthync.CameraAndInput;
+using Insthync.ManagedUpdating;
 using LiteNetLibManager;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER)]
-    public partial class PlayerCharacterController : BasePlayerCharacterController
+    public partial class PlayerCharacterController : BasePlayerCharacterController, IManagedLateUpdate
     {
         public enum PlayerCharacterControllerMode
         {
@@ -232,7 +232,7 @@ namespace MultiplayerARPG
                 Destroy(EnemyEntityDetector.gameObject);
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
             if (PlayingCharacterEntity == null || !PlayingCharacterEntity.IsOwnerClient)
                 return;
@@ -279,7 +279,7 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.SetSmoothTurnSpeed(turnSmoothSpeed);
         }
 
-        private void LateUpdate()
+        public virtual void ManagedLateUpdate()
         {
             _activateInput.OnLateUpdate();
             _pickupItemInput.OnLateUpdate();

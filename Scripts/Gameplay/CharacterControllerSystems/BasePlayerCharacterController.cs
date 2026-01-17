@@ -1,10 +1,11 @@
 ﻿using Insthync.AddressableAssetTools;
 using Insthync.DevExtension;
+using Insthync.ManagedUpdating;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BasePlayerCharacterController : MonoBehaviour
+    public abstract partial class BasePlayerCharacterController : MonoBehaviour, IManagedUpdate
     {
         public struct UsingSkillData
         {
@@ -119,7 +120,17 @@ namespace MultiplayerARPG
             this.InvokeInstanceDevExtMethods("Awake");
         }
 
-        protected virtual void Update()
+        protected virtual void OnEnable()
+        {
+            UpdateManager.Register(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER, this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            UpdateManager.Unregister(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER, this);
+        }
+
+        public virtual void ManagedUpdate()
         {
         }
 

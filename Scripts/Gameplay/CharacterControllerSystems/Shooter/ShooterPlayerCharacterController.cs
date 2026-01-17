@@ -1,13 +1,13 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.CameraAndInput;
+using Insthync.ManagedUpdating;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER)]
-    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController
+    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController, IManagedLateUpdate
     {
         public const byte PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD = 3;
 
@@ -670,7 +670,7 @@ namespace MultiplayerARPG
                 ChangeWeaponAbility(0);
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
             if (PauseFireInputFrames > 0)
                 --PauseFireInputFrames;
@@ -1113,7 +1113,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void LateUpdate()
+        public virtual void ManagedLateUpdate()
         {
             if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
             {
