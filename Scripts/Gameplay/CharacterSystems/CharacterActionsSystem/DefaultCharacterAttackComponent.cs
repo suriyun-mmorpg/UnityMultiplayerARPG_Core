@@ -53,7 +53,7 @@ namespace MultiplayerARPG
         bool _entityIsPlayer = false;
         BasePlayerCharacterEntity _playerCharacterEntity = null;
 
-        public override void EntityStart()
+        protected virtual void Start()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
             if (Entity is BasePlayerCharacterEntity)
@@ -63,8 +63,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void EntityOnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             CancelAttack();
             ClearAttackStates();
             _manager = null;

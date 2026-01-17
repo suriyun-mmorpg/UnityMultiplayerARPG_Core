@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using MultiplayerARPG.Updater;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(DefaultExecutionOrders.CHARACTER_ALIGN_ON_GROUND)]
-    public class CharacterAlignOnGround : MonoBehaviour
+    public class CharacterAlignOnGround : MonoBehaviour, IManagedLateUpdate
     {
         public Transform rootBoneTransform;
         public Vector3 rootBoneRotation;
@@ -20,7 +20,17 @@ namespace MultiplayerARPG
             _aligningQuaternion = Quaternion.identity;
         }
 
-        private void LateUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(DefaultExecutionOrders.CHARACTER_ALIGN_ON_GROUND, this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(DefaultExecutionOrders.CHARACTER_ALIGN_ON_GROUND, this);
+        }
+
+        public void ManagedLateUpdate()
         {
             if (rootBoneTransform == null)
                 return;

@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using MultiplayerARPG.Updater;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class CharacterSkillAndBuffComponent : BaseGameEntityComponent<BaseCharacterEntity>
+    public class CharacterSkillAndBuffComponent : BaseGameEntityComponent<BaseCharacterEntity>, IManagedUpdate
     {
         public const float SKILL_BUFF_UPDATE_DURATION = 1f;
         public const string KEY_VEHICLE_BUFF = "<VEHICLE_BUFF>";
@@ -13,18 +14,22 @@ namespace MultiplayerARPG
         private float _deltaTime;
         private Dictionary<string, CharacterRecoveryData> _recoveryBuffs;
 
-        public override void EntityAwake()
+        private void Awake()
         {
-            base.EntityAwake();
-            AlwaysUpdate = true;
+            UpdateManager.Register(this);
         }
 
-        public override void EntityStart()
+        private void Start()
         {
             _recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
         }
 
-        public override void EntityUpdate()
+        private void OnDestroy()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public void ManagedUpdate()
         {
             if (!Entity.IsServer)
                 return;

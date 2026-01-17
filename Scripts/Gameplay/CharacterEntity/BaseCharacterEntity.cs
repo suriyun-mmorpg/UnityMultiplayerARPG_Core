@@ -327,12 +327,12 @@ namespace MultiplayerARPG
             // Enable movement or not
             if (!Movement.IsNull())
             {
-                if (Movement.Enabled != tempEnableMovement)
+                if (Movement.enabled != tempEnableMovement)
                 {
                     if (!tempEnableMovement)
                         Movement.StopMove();
                     // Enable movement while not passenging any vehicle
-                    Movement.Enabled = tempEnableMovement;
+                    Movement.enabled = tempEnableMovement;
                 }
             }
 
@@ -358,7 +358,7 @@ namespace MultiplayerARPG
         public override void SendClientState(uint writeTick)
         {
             s_EntityStateDataWriter.Reset();
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteClientState(writeTick, s_EntityStateDataWriter, out bool shouldSendReliably))
+            if (!Movement.IsNull() && Movement.enabled && Movement.WriteClientState(writeTick, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
@@ -371,7 +371,7 @@ namespace MultiplayerARPG
         public override void SendServerState(uint writeTick)
         {
             s_EntityStateDataWriter.Reset();
-            if (!Movement.IsNull() && Movement.Enabled && Movement.WriteServerState(writeTick, s_EntityStateDataWriter, out bool shouldSendReliably))
+            if (!Movement.IsNull() && Movement.enabled && Movement.WriteServerState(writeTick, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);

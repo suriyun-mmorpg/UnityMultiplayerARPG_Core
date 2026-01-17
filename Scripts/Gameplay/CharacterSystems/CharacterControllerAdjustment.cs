@@ -1,8 +1,9 @@
 using UnityEngine;
+using MultiplayerARPG.Updater;
 
 namespace MultiplayerARPG
 {
-    public class CharacterControllerAdjustment : BaseGameEntityComponent<BaseGameEntity>
+    public class CharacterControllerAdjustment : BaseGameEntityComponent<BaseGameEntity>, IManagedLateUpdate
     {
         [System.Serializable]
         public struct Settings
@@ -51,9 +52,19 @@ namespace MultiplayerARPG
         private bool _previousIsUnderWater;
         private ExtraMovementState _previousExtraMovementState;
 
-        public override void EntityAwake()
+        private void Awake()
         {
             _characterController = GetComponent<CharacterController>();
+        }
+
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
         }
 
 #if UNITY_EDITOR
@@ -107,7 +118,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public override void EntityLateUpdate()
+        public void ManagedLateUpdate()
         {
             if (_characterController == null)
                 return;

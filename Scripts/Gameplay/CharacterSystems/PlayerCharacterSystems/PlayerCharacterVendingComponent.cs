@@ -28,18 +28,23 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void OnSetup()
+        private void Awake()
         {
-            base.OnSetup();
             data.onChange += OnDataChange;
             Entity.onDead.AddListener(OnDead);
+            Entity.onDestroy += Entity_onDestroy;
         }
 
-        public override void EntityOnDestroy()
+        private void Entity_onDestroy()
         {
-            base.EntityOnDestroy();
-            data.onChange -= OnDataChange;
+            Entity.onDestroy -= Entity_onDestroy;
             Entity.onDead.RemoveListener(OnDead);
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            data.onChange -= OnDataChange;
         }
 
         protected void OnDead()

@@ -113,9 +113,8 @@ namespace MultiplayerARPG
 
         private BaseCharacterModel[] _models;
 
-        public override void EntityAwake()
+        private void Awake()
         {
-            base.EntityAwake();
             if (optionObjects.Count > 0)
             {
                 foreach (PlayerCharacterBodyPartComponentOption optionObject in optionObjects)
@@ -125,14 +124,14 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void EntityStart()
+        private void Start()
         {
             _models = GetComponentsInChildren<BaseCharacterModel>(true);
             SetupEvents();
             ApplyModelAndColorBySavedData();
         }
 
-        public override void EntityOnDestroy()
+        private void OnDestroy()
         {
             ClearEvents();
             if (_models != null && _models.Length > 0)

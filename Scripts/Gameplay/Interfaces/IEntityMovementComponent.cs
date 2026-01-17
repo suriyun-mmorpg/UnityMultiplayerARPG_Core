@@ -3,8 +3,9 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public interface IEntityMovementComponent : IEntityMovement, IGameEntityComponent
+    public interface IEntityMovementComponent : IEntityMovement
     {
+        bool enabled { get; set; }
         /// <summary>
         /// Return `TRUE` if it have something written
         /// </summary>

@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using MultiplayerARPG.Updater;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public partial class PlayerCharacterCraftingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>, ICraftingQueueSource
+    public partial class PlayerCharacterCraftingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>, ICraftingQueueSource, IManagedUpdate
     {
         [SerializeField]
         private int maxQueueSize = 5;
@@ -43,7 +44,17 @@ namespace MultiplayerARPG
             queueItems.forOwnerOnly = true;
         }
 
-        public override void EntityUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public void ManagedUpdate()
         {
             if (!IsServer)
                 return;

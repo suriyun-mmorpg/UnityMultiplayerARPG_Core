@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using MultiplayerARPG.Updater;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -8,7 +9,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterController))]
-    public partial class CharacterControllerEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IBuiltInEntityMovement3D
+    public partial class CharacterControllerEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IBuiltInEntityMovement3D, IManagedUpdate, IManagedLateUpdate
     {
         /// <summary>
         /// Add some distant to avoid character falling under ground
@@ -172,7 +173,7 @@ namespace MultiplayerARPG
         protected int _allowToJumpOrDashCheckFrame = 0;
         protected bool _isAllowToJumpOrDash = true;
 
-        public override void EntityAwake()
+        private void Awake()
         {
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
@@ -252,22 +253,31 @@ namespace MultiplayerARPG
                 rootMotionGroundedVerticalVelocity = rootMotionGroundedVerticalVelocity,
             };
             Functions.StopMoveFunction();
+            Entity.onIdentityInitialize += EntityOnIdentityInitialize;
         }
 
-        public override void EntityStart()
+        private void EntityOnIdentityInitialize()
+        {
+            Entity.onIdentityInitialize -= EntityOnIdentityInitialize;
+            Functions.EntityOnIdentityInitialize();
+        }
+
+        private void Start()
         {
             Functions.EntityStart();
         }
 
-        public override void ComponentOnEnable()
+        private void OnEnable()
         {
             Functions.ComponentEnabled();
             CacheCharacterController.enabled = true;
+            UpdateManager.Register(this);
         }
 
-        public override void ComponentOnDisable()
+        private void OnDisable()
         {
             CacheCharacterController.enabled = false;
+            UpdateManager.Unregister(this);
         }
 
         public override void OnSetOwnerClient(bool isOwnerClient)
@@ -275,14 +285,9 @@ namespace MultiplayerARPG
             Functions.OnSetOwnerClient(isOwnerClient);
         }
 
-        public override void EntityOnIdentityInitialize()
+        protected override void OnDestroy()
         {
-            Functions.EntityOnIdentityInitialize();
-        }
-
-        public override void EntityOnDestroy()
-        {
-            base.EntityOnDestroy();
+            base.OnDestroy();
             Functions.EntityOnDestroy();
         }
 
@@ -306,7 +311,7 @@ namespace MultiplayerARPG
             Functions.OnControllerColliderHit(hit.point, hit.transform);
         }
 
-        public override void EntityUpdate()
+        public void ManagedUpdate()
         {
 #if UNITY_EDITOR
             Functions.movementSecure = movementSecure;
@@ -367,7 +372,7 @@ namespace MultiplayerARPG
                 _forceUngroundCountdown -= deltaTime;
         }
 
-        public override void EntityLateUpdate()
+        public void ManagedLateUpdate()
         {
             float deltaTime = Time.deltaTime;
             Functions.FixSwimUpPosition(deltaTime);

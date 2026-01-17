@@ -1,8 +1,9 @@
-﻿using UnityEngine;
+﻿using MultiplayerARPG.Updater;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class MovementTransformAdjustment : BaseGameEntityComponent<BaseGameEntity>
+    public class MovementTransformAdjustment : BaseGameEntityComponent<BaseGameEntity>, IManagedUpdate, IManagedLateUpdate
     {
         [System.Serializable]
         public struct Settings
@@ -51,6 +52,16 @@ namespace MultiplayerARPG
 
         private Vector3 _targetPosition;
 
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
 #if UNITY_EDITOR
         private void OnValidate()
         {
@@ -91,14 +102,12 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public override void EntityUpdate()
+        public void ManagedUpdate()
         {
-            base.EntityUpdate();
-
             targetTransform.localPosition = Vector3.MoveTowards(targetTransform.localPosition, _targetPosition, translateSpeed * Time.deltaTime);
         }
 
-        public override void EntityLateUpdate()
+        public void ManagedLateUpdate()
         {
             if (targetTransform == null)
                 return;

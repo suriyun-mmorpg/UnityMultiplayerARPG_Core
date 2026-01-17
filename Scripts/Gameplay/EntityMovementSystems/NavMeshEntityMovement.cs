@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Cysharp.Threading.Tasks;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using MultiplayerARPG.Updater;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.AI;
@@ -23,7 +24,7 @@ namespace MultiplayerARPG
     /// - Other clients will interpolate transform by synced buffers (stored in `_syncBuffers`)
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
-    public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IManagedUpdate
     {
         protected const int TICK_COUNT_FOR_INTERPOLATION = 1;
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
@@ -97,7 +98,7 @@ namespace MultiplayerARPG
         protected float _yAngle;
         protected float _yTurnSpeed;
 
-        public override void EntityAwake()
+        protected virtual void Awake()
         {
             // Prepare nav mesh agent component
             CacheNavMeshAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
@@ -119,34 +120,13 @@ namespace MultiplayerARPG
             }
             _currentInput = new MovementInputData3D();
             StopMoveFunction();
-        }
-
-        public override void EntityStart()
-        {
             _clientTeleportState = MovementTeleportState.Responding;
+            Entity.onIdentityInitialize += EntityOnIdentityInitialize;
         }
 
-        public override void OnSetOwnerClient(bool isOwnerClient)
+        private void EntityOnIdentityInitialize()
         {
-            CacheNavMeshAgent.enabled = CanSimulateMovement();
-            ResetBuffersAndStates();
-            // Force setup sim tick
-            if (IsOwnerClientOrOwnedByServer)
-                _simTick = Manager.LocalTick;
-        }
-
-        public override void ComponentOnEnable()
-        {
-            CacheNavMeshAgent.enabled = CanSimulateMovement();
-        }
-
-        public override void ComponentOnDisable()
-        {
-            CacheNavMeshAgent.enabled = false;
-        }
-
-        public override void EntityOnIdentityInitialize()
-        {
+            Entity.onIdentityInitialize -= EntityOnIdentityInitialize;
             if (_logicUpdater == null)
             {
                 _logicUpdater = Manager.LogicUpdater;
@@ -160,6 +140,27 @@ namespace MultiplayerARPG
                 ExtraMovementState = ExtraMovementState,
             };
             ResetBuffersAndStates();
+        }
+
+        public override void OnSetOwnerClient(bool isOwnerClient)
+        {
+            CacheNavMeshAgent.enabled = CanSimulateMovement();
+            ResetBuffersAndStates();
+            // Force setup sim tick
+            if (IsOwnerClientOrOwnedByServer)
+                _simTick = Manager.LocalTick;
+        }
+
+        private void OnEnable()
+        {
+            CacheNavMeshAgent.enabled = CanSimulateMovement();
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            CacheNavMeshAgent.enabled = false;
+            UpdateManager.Unregister(this);
         }
 
         protected void ResetBuffersAndStates()
@@ -182,8 +183,9 @@ namespace MultiplayerARPG
             _lookRotationApplied = true;
         }
 
-        public override void EntityOnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             if (_logicUpdater != null)
                 _logicUpdater.OnTick -= LogicUpdater_OnTick;
         }
@@ -541,7 +543,7 @@ namespace MultiplayerARPG
             return distance;
         }
 
-        public override void EntityUpdate()
+        public void ManagedUpdate()
         {
             // Simulate movement by inputs if it can predict movement
             if (CanSimulateMovement())

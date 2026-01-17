@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using MultiplayerARPG.Updater;
 using System.Buffers;
 using System.Collections.Generic;
 using UnityEngine;
@@ -21,7 +22,7 @@ namespace MultiplayerARPG
     /// - Other clients will interpolate transform by synced buffers (stored in `_syncBuffers`)
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D))]
-    public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IManagedUpdate
     {
         protected const int TICK_COUNT_FOR_INTERPOLATION = 1;
         protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
@@ -90,7 +91,7 @@ namespace MultiplayerARPG
         protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
         protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
 
-        public override void EntityAwake()
+        protected virtual void Awake()
         {
             // Prepare rigidbody component
             CacheRigidbody2D = gameObject.GetOrAddComponent<Rigidbody2D>();
@@ -109,34 +110,13 @@ namespace MultiplayerARPG
             CacheRigidbody2D.collisionDetectionMode = CollisionDetectionMode2D.Continuous;
             _currentInput = new MovementInputData2D();
             StopMoveFunction();
-        }
-
-        public override void EntityStart()
-        {
             _clientTeleportState = MovementTeleportState.Responding;
+            Entity.onIdentityInitialize += EntityOnIdentityInitialize;
         }
 
-        public override void OnSetOwnerClient(bool isOwnerClient)
+        public void EntityOnIdentityInitialize()
         {
-            CacheRigidbody2D.simulated = CanSimulateMovement();
-            ResetBuffersAndStates();
-            // Force setup sim tick
-            if (IsOwnerClientOrOwnedByServer)
-                _simTick = Manager.LocalTick;
-        }
-
-        public override void ComponentOnEnable()
-        {
-            CacheRigidbody2D.simulated = CanSimulateMovement();
-        }
-
-        public override void ComponentOnDisable()
-        {
-            CacheRigidbody2D.simulated = false;
-        }
-
-        public override void EntityOnIdentityInitialize()
-        {
+            Entity.onIdentityInitialize -= EntityOnIdentityInitialize;
             if (_logicUpdater == null)
             {
                 _logicUpdater = Manager.LogicUpdater;
@@ -150,6 +130,27 @@ namespace MultiplayerARPG
                 ExtraMovementState = ExtraMovementState,
             };
             ResetBuffersAndStates();
+        }
+
+        public override void OnSetOwnerClient(bool isOwnerClient)
+        {
+            CacheRigidbody2D.simulated = CanSimulateMovement();
+            ResetBuffersAndStates();
+            // Force setup sim tick
+            if (IsOwnerClientOrOwnedByServer)
+                _simTick = Manager.LocalTick;
+        }
+
+        private void OnEnable()
+        {
+            CacheRigidbody2D.simulated = CanSimulateMovement();
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            CacheRigidbody2D.simulated = false;
+            UpdateManager.Unregister(this);
         }
 
         protected void ResetBuffersAndStates()
@@ -170,8 +171,9 @@ namespace MultiplayerARPG
             };
         }
 
-        public override void EntityOnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             if (_logicUpdater != null)
                 _logicUpdater.OnTick -= LogicUpdater_OnTick;
         }
@@ -484,7 +486,7 @@ namespace MultiplayerARPG
             return _serverTeleportState != MovementTeleportState.None;
         }
 
-        public override void EntityUpdate()
+        public virtual void ManagedUpdate()
         {
             // Simulate movement by inputs if it can predict movement
             if (CanSimulateMovement())

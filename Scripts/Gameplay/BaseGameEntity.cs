@@ -6,21 +6,19 @@ using LiteNetLib.Utils;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
+using MultiplayerARPG.Updater;
 
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(LiteNetLibIdentity))]
-    [DefaultExecutionOrder(DefaultExecutionOrders.BASE_GAME_ENTITY)]
-    public abstract partial class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement
+    public abstract partial class BaseGameEntity : LiteNetLibBehaviour, IGameEntity, IEntityMovement, IManagedUpdate, IManagedLateUpdate
     {
         public const byte MOVEMENT_DATA_CHANNEL = 2;
         public const byte ACTION_DATA_CHANNEL = 3;
         protected static readonly NetDataWriter s_EntityStateMessageWriter = new NetDataWriter();
         protected static readonly NetDataWriter s_EntityStateDataWriter = new NetDataWriter();
-        protected static readonly ProfilerMarker s_ComponentsUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - ComponentsUpdate");
         protected static readonly ProfilerMarker s_EntityUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - EntityUpdate");
         protected static readonly ProfilerMarker s_OnUpdateInvokeProfilerMarker = new ProfilerMarker("BaseGameEntity - OnUpdateInvoke");
-        protected static readonly ProfilerMarker s_ComponentsLateUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - ComponentsLateUpdate");
         protected static readonly ProfilerMarker s_ComponentsChangedStateUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - ComponentsChangedStateUpdate");
         protected static readonly ProfilerMarker s_EntityLateUpdateProfilerMarker = new ProfilerMarker("BaseGameEntity - EntityLateUpdate");
         protected static readonly ProfilerMarker s_OnLateUpdateInvokeProfilerMarker = new ProfilerMarker("BaseGameEntity - OnLateUpdateInvoke");
@@ -191,7 +189,6 @@ namespace MultiplayerARPG
             get { return gameObject; }
         }
 
-        protected IGameEntityComponent[] EntityComponents { get; private set; }
         protected virtual bool IsUpdateEntityComponents
         {
             get
@@ -245,12 +242,6 @@ namespace MultiplayerARPG
         private void Awake()
         {
             InitialRequiredComponents();
-            EntityComponents = GetComponents<IGameEntityComponent>();
-            for (int i = 0; i < EntityComponents.Length; ++i)
-            {
-                EntityComponents[i].EntityAwake();
-                EntityComponents[i].Enabled = true;
-            }
             EntityAwake();
             this.InvokeInstanceDevExtMethods("Awake");
         }
@@ -258,11 +249,6 @@ namespace MultiplayerARPG
 
         private void Start()
         {
-            for (int i = 0; i < EntityComponents.Length; ++i)
-            {
-                if (EntityComponents[i].Enabled)
-                    EntityComponents[i].EntityStart();
-            }
             EntityStart();
             if (onStart != null)
                 onStart.Invoke();
@@ -271,10 +257,8 @@ namespace MultiplayerARPG
 
         public override void OnIdentityInitialize()
         {
-            for (int i = 0; i < EntityComponents.Length; ++i)
-            {
-                EntityComponents[i].EntityOnIdentityInitialize();
-            }
+            if (onIdentityInitialize != null)
+                onIdentityInitialize.Invoke();
             if (_logicUpdater == null)
             {
                 _logicUpdater = Manager.LogicUpdater;
@@ -305,13 +289,9 @@ namespace MultiplayerARPG
 
         private void OnDestroy()
         {
-            for (int i = 0; i < EntityComponents.Length; ++i)
-            {
-                EntityComponents[i].EntityOnDestroy();
-                EntityComponents[i].Clean();
-                EntityComponents[i] = null;
-            }
             EntityOnDestroy();
+            if (onDestroy != null)
+                onDestroy.Invoke();
             this.InvokeInstanceDevExtMethods("OnDestroy");
             Clean();
             if (_logicUpdater != null)
@@ -334,6 +314,7 @@ namespace MultiplayerARPG
             EntityOnEnable();
             if (onEnable != null)
                 onEnable.Invoke();
+            UpdateManager.Register(DefaultExecutionOrders.BASE_GAME_ENTITY, this);
         }
         protected virtual void EntityOnEnable() { }
 
@@ -342,6 +323,7 @@ namespace MultiplayerARPG
             EntityOnDisable();
             if (onDisable != null)
                 onDisable.Invoke();
+            UpdateManager.Unregister(DefaultExecutionOrders.BASE_GAME_ENTITY, this);
         }
         protected virtual void EntityOnDisable() { }
 
@@ -376,23 +358,8 @@ namespace MultiplayerARPG
             }
         }
 
-        internal void Update()
+        public void ManagedUpdate()
         {
-            using (s_ComponentsUpdateProfilerMarker.Auto())
-            {
-                for (int i = 0; i < EntityComponents.Length; ++i)
-                {
-                    try
-                    {
-                        if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
-                            EntityComponents[i].EntityUpdate();
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Logging.LogException(LogTag, ex);
-                    }
-                }
-            }
             using (s_EntityUpdateProfilerMarker.Auto())
             {
                 try
@@ -417,12 +384,12 @@ namespace MultiplayerARPG
             {
                 bool tempEnableMovement = PassengingVehicleEntity.IsNull();
                 // Enable movement or not
-                if (Movement.Enabled != tempEnableMovement)
+                if (Movement.enabled != tempEnableMovement)
                 {
                     if (!tempEnableMovement)
                         Movement.StopMove();
                     // Enable movement while not passenging any vehicle
-                    Movement.Enabled = tempEnableMovement;
+                    Movement.enabled = tempEnableMovement;
                 }
             }
 
@@ -439,24 +406,9 @@ namespace MultiplayerARPG
             }
         }
 
-        internal void LateUpdate()
+        public void ManagedLateUpdate()
         {
             bool isUpdateEntityComponents = IsUpdateEntityComponents;
-            using (s_ComponentsLateUpdateProfilerMarker.Auto())
-            {
-                for (int i = 0; i < EntityComponents.Length; ++i)
-                {
-                    try
-                    {
-                        if (EntityComponents[i].Enabled && (IsUpdateEntityComponents || EntityComponents[i].AlwaysUpdate))
-                            EntityComponents[i].EntityLateUpdate();
-                    }
-                    catch (System.Exception ex)
-                    {
-                        Logging.LogException(LogTag, ex);
-                    }
-                }
-            }
             using (s_ComponentsChangedStateUpdateProfilerMarker.Auto())
             {
                 if (!_wasUpdateEntityComponents.HasValue || _wasUpdateEntityComponents.Value != isUpdateEntityComponents)
@@ -510,7 +462,7 @@ namespace MultiplayerARPG
 
         public virtual void SendClientState(uint writeTick)
         {
-            if (Movement != null && Movement.Enabled)
+            if (Movement != null && Movement.enabled)
             {
                 bool shouldSendReliably;
                 s_EntityStateDataWriter.Reset();
@@ -527,7 +479,7 @@ namespace MultiplayerARPG
 
         public virtual void SendServerState(uint writeTick)
         {
-            if (Movement != null && Movement.Enabled)
+            if (Movement != null && Movement.enabled)
             {
                 bool shouldSendReliably;
                 s_EntityStateDataWriter.Reset();

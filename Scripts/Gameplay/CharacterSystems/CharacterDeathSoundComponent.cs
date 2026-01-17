@@ -1,9 +1,10 @@
 ﻿using Insthync.AudioManager;
+using MultiplayerARPG.Updater;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class CharacterDeathSoundComponent : BaseGameEntityComponent<BaseCharacterEntity>
+    public class CharacterDeathSoundComponent : BaseGameEntityComponent<BaseCharacterEntity>, IManagedUpdate
     {
         [System.Serializable]
         public struct DeathSoundData
@@ -43,11 +44,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void EntityStart()
+        private void Start()
         {
             if (!Entity.IsClient)
             {
-                Enabled = false;
+                enabled = false;
                 return;
             }
             if (audioSource == null)
@@ -62,7 +63,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void EntityUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public void ManagedUpdate()
         {
             if (_dirtyIsDead != Entity.IsDead())
             {

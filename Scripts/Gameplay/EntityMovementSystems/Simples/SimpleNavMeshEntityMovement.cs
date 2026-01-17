@@ -1,6 +1,7 @@
 using Cysharp.Threading.Tasks;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
+using MultiplayerARPG.Updater;
 using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace MultiplayerARPG
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class SimpleNavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent
+    public class SimpleNavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IManagedUpdate
     {
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
         protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
@@ -63,7 +64,7 @@ namespace MultiplayerARPG
         // Interpolation Data
         protected SortedList<uint, System.ValueTuple<MovementState, ExtraMovementState>> _interpExtra = new SortedList<uint, System.ValueTuple<MovementState, ExtraMovementState>>();
 
-        public override void EntityAwake()
+        private void Awake()
         {
             // Prepare nav mesh agent component
             NetworkedTransform = gameObject.GetOrAddComponent<LiteNetLibTransform>();
@@ -85,15 +86,12 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.enabled = false;
             _yAngle = _targetYAngle = EntityTransform.eulerAngles.y;
             _lookRotationApplied = true;
-        }
-
-        public override void EntityStart()
-        {
             _clientTeleportState = MovementTeleportState.Responding;
         }
 
-        public override void EntityOnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             NetworkedTransform.onWriteSyncBuffer -= NetworkedTransform_onWriteSyncBuffer;
             NetworkedTransform.onReadInterpBuffer -= NetworkedTransform_onReadInterpBuffer;
             NetworkedTransform.onValidateInterpolation -= NetworkedTransform_onValidateInterpolation;
@@ -105,14 +103,16 @@ namespace MultiplayerARPG
             CacheNavMeshAgent.enabled = CanSimulateMovement();
         }
 
-        public override void ComponentOnEnable()
+        private void OnEnable()
         {
             CacheNavMeshAgent.enabled = CanSimulateMovement();
+            UpdateManager.Register(this);
         }
 
-        public override void ComponentOnDisable()
+        private void OnDisable()
         {
             CacheNavMeshAgent.enabled = false;
+            UpdateManager.Unregister(this);
         }
 
         public bool CanSimulateMovement()
@@ -388,7 +388,7 @@ namespace MultiplayerARPG
             return distance;
         }
 
-        public override void EntityUpdate()
+        public void ManagedUpdate()
         {
             if (!CanSimulateMovement())
                 return;

@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using MultiplayerARPG.Updater;
+using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public partial class MonsterActivityComponent : BaseMonsterActivityComponent
+    public partial class MonsterActivityComponent : BaseMonsterActivityComponent, IManagedUpdate
     {
         protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("MonsterActivityComponent - Update");
 
@@ -58,20 +59,29 @@ namespace MultiplayerARPG
         protected float _pauseCountdown;
         protected float _lastSwitchTargetTime;
 
-        public override void EntityAwake()
+        protected virtual void Awake()
         {
-            base.EntityAwake();
             Entity.onNotifyEnemySpotted += Entity_onNotifyEnemySpotted;
             Entity.onNotifyEnemySpottedByAlly += Entity_onNotifyEnemySpottedByAlly;
             Entity.onReceivedDamage += Entity_onReceivedDamage;
         }
 
-        public override void EntityOnDestroy()
+        protected virtual void OnEnable()
         {
-            base.EntityOnDestroy();
+            UpdateManager.Register(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        protected override void OnDestroy()
+        {
             Entity.onNotifyEnemySpotted -= Entity_onNotifyEnemySpotted;
             Entity.onNotifyEnemySpottedByAlly -= Entity_onNotifyEnemySpottedByAlly;
             Entity.onReceivedDamage -= Entity_onReceivedDamage;
+            base.OnDestroy();
         }
 
         private void Entity_onNotifyEnemySpotted(BaseCharacterEntity enemy)
@@ -117,7 +127,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void EntityUpdate()
+        public virtual void ManagedUpdate()
         {
             if (!Entity.IsServer || Entity.Identity.CountSubscribers() == 0 || CharacterDatabase == null)
                 return;

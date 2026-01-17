@@ -1,11 +1,12 @@
 using Cysharp.Text;
 using Insthync.UnityEditorUtils;
+using MultiplayerARPG.Updater;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class PlayerCharacterBlendshapeComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
+    public class PlayerCharacterBlendshapeComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>, IManagedUpdate
     {
         [System.Serializable]
         public class BlendshapeOption
@@ -38,7 +39,7 @@ namespace MultiplayerARPG
         private Dictionary<int, BlendshapeOption> _optionsByHashedId = new Dictionary<int, BlendshapeOption>();
         private Dictionary<string, int> _blendshapeIndexesByName = new Dictionary<string, int>();
 
-        public override void EntityAwake()
+        private void Awake()
         {
             if (skinnedMeshRenderer == null)
                 return;
@@ -56,7 +57,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void EntityUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public void ManagedUpdate()
         {
             if (_applying)
             {

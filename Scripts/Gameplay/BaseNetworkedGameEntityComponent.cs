@@ -3,7 +3,7 @@ using LiteNetLibManager;
 
 namespace MultiplayerARPG
 {
-    public abstract class BaseNetworkedGameEntityComponent<T> : LiteNetLibBehaviour, IGameEntityComponent
+    public abstract class BaseNetworkedGameEntityComponent<T> : LiteNetLibBehaviour
         where T : BaseGameEntity
     {
         private bool _isFoundEntity;
@@ -28,57 +28,7 @@ namespace MultiplayerARPG
         public BaseGameNetworkManager CurrentGameManager { get { return Entity.CurrentGameManager; } }
         public Transform EntityTransform { get { return Entity.EntityTransform; } }
 
-        private bool _isEnabled;
-        public bool Enabled
-        {
-            get { return _isEnabled; }
-            set
-            {
-                if (_isEnabled == value)
-                    return;
-                _isEnabled = value;
-                if (_isEnabled)
-                    ComponentOnEnable();
-                else
-                    ComponentOnDisable();
-            }
-        }
-
-        public bool AlwaysUpdate { get; protected set; }
-
-        public virtual void EntityAwake()
-        {
-        }
-
-        public virtual void EntityStart()
-        {
-        }
-
-        public virtual void EntityOnIdentityInitialize()
-        { 
-        }
-
-        public virtual void EntityUpdate()
-        {
-        }
-
-        public virtual void EntityLateUpdate()
-        {
-        }
-
-        public virtual void EntityOnDestroy()
-        {
-        }
-
-        public virtual void ComponentOnEnable()
-        {
-        }
-
-        public virtual void ComponentOnDisable()
-        {
-        }
-
-        public virtual void Clean()
+        protected virtual void OnDestroy()
         {
             _cacheEntity = null;
         }

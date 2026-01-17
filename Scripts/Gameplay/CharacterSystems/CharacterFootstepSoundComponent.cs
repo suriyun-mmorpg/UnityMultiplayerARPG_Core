@@ -1,5 +1,6 @@
 ﻿using Insthync.AudioManager;
 using LiteNetLibManager;
+using MultiplayerARPG.Updater;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -7,7 +8,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public class CharacterFootstepSoundComponent : BaseGameEntityComponent<BaseGameEntity>
+    public class CharacterFootstepSoundComponent : BaseGameEntityComponent<BaseGameEntity>, IManagedUpdate
     {
         public AudioSource audioSource;
         public AudioComponentSettingType settingType = AudioComponentSettingType.Sfx;
@@ -64,11 +65,11 @@ namespace MultiplayerARPG
         private FootstepSettings currentFootstepSettings;
         private float delayCounter = 0f;
 
-        public override void EntityStart()
+        private void Start()
         {
             if (!Entity.IsClient)
             {
-                Enabled = false;
+                enabled = false;
                 return;
             }
             MigrateSettings();
@@ -115,7 +116,17 @@ namespace MultiplayerARPG
             return false;
         }
 
-        public override void EntityUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public void ManagedUpdate()
         {
             audioSource.mute = !AudioManager.Singleton.sfxVolumeSetting.IsOn;
 

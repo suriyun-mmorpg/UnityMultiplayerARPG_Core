@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using LiteNetLib;
 using LiteNetLibManager;
+using MultiplayerARPG.Updater;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;
@@ -8,7 +9,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(CharacterActionComponentManager))]
-    public class DefaultCharacterUseSkillComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterUseSkillComponent
+    public class DefaultCharacterUseSkillComponent : BaseNetworkedGameEntityComponent<BaseCharacterEntity>, ICharacterUseSkillComponent, IManagedUpdate
     {
         protected struct UseSkillState
         {
@@ -78,7 +79,7 @@ namespace MultiplayerARPG
         bool _entityIsPlayer = false;
         BasePlayerCharacterEntity _playerCharacterEntity = null;
 
-        public override void EntityStart()
+        protected virtual void Start()
         {
             _manager = GetComponent<CharacterActionComponentManager>();
             if (Entity is BasePlayerCharacterEntity)
@@ -88,8 +89,9 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void EntityOnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             CancelSkill();
             ClearUseSkillStates();
             _manager = null;
@@ -97,7 +99,17 @@ namespace MultiplayerARPG
             _playerCharacterEntity = null;
         }
 
-        public override void EntityUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public virtual void ManagedUpdate()
         {
             // Update casting skill count down, will show gage at clients
             if (CastingSkillCountDown > 0)

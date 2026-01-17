@@ -1,16 +1,27 @@
-﻿using UnityEngine;
+﻿using MultiplayerARPG.Updater;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public partial class PlayerCharacterItemLockAndExpireComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>
+    public partial class PlayerCharacterItemLockAndExpireComponent : BaseGameEntityComponent<BasePlayerCharacterEntity>, IManagedUpdate
     {
         public const float ITEM_UPDATE_DURATION = 1f;
 
         private float _updatingTime;
         private float _deltaTime;
 
-        public override void EntityUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public void ManagedUpdate()
         {
             if (!Entity.IsServer)
                 return;

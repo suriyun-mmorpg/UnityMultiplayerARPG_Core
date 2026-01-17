@@ -1,11 +1,12 @@
 using LiteNetLib;
 using LiteNetLibManager;
+using MultiplayerARPG.Updater;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [DisallowMultipleComponent]
-    public class PlayerCharacterDuelingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>
+    public class PlayerCharacterDuelingComponent : BaseNetworkedGameEntityComponent<BasePlayerCharacterEntity>, IManagedUpdate
     {
         [SerializeField]
         private SyncFieldByte duelingState = new SyncFieldByte();
@@ -104,7 +105,17 @@ namespace MultiplayerARPG
         protected float _countDownDuration;
         protected float _duelDuration;
 
-        public override void EntityUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public void ManagedUpdate()
         {
             if (IsServer && DuelingStartTime > 0)
             {
@@ -355,8 +366,9 @@ namespace MultiplayerARPG
             StopDueling();
         }
 
-        public override void EntityOnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             // Player disconnect?
             if (IsServer && DuelingStarted)
                 EndDueling(Entity);

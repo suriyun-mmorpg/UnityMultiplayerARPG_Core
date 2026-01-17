@@ -1,9 +1,9 @@
-﻿using UnityEngine;
+﻿using MultiplayerARPG.Updater;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [DefaultExecutionOrder(DefaultExecutionOrders.PITCH_IK)]
-    public class CharacterPitchIK : MonoBehaviour
+    public class CharacterPitchIK : MonoBehaviour, IManagedLateUpdate
     {
         public enum Axis
         {
@@ -73,7 +73,17 @@ namespace MultiplayerARPG
                 Animator = CharacterEntity.GetComponentInChildren<Animator>();
         }
 
-        public void LateUpdate()
+        private void OnEnable()
+        {
+            UpdateManager.Register(DefaultExecutionOrders.PITCH_IK, this);
+        }
+
+        private void OnDisable()
+        {
+            UpdateManager.Unregister(DefaultExecutionOrders.PITCH_IK, this);
+        }
+
+        public void ManagedLateUpdate()
         {
             if (!Enabling)
                 return;

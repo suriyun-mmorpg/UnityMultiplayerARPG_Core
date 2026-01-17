@@ -1,26 +1,31 @@
-﻿using UnityEngine;
+﻿using MultiplayerARPG.Updater;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class CharacterRecoveryComponent : BaseGameEntityComponent<BaseCharacterEntity>
+    public class CharacterRecoveryComponent : BaseGameEntityComponent<BaseCharacterEntity>, IManagedUpdate
     {
         private float _updatingTime;
         private float _deltaTime;
         private CharacterRecoveryData _recoveryData;
         private bool _isClearRecoveryData;
 
-        public override void EntityAwake()
+        private void Awake()
         {
-            base.EntityAwake();
-            AlwaysUpdate = true;
+            UpdateManager.Register(this);
         }
 
-        public override void EntityStart()
+        private void Start()
         {
             _recoveryData = new CharacterRecoveryData(Entity);
         }
 
-        public override void EntityUpdate()
+        private void OnDestroy()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public void ManagedUpdate()
         {
             if (!Entity.IsServer)
                 return;

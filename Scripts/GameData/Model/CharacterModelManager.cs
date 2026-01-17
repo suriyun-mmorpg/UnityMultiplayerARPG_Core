@@ -121,14 +121,16 @@ namespace MultiplayerARPG
         private byte _dirtySeatIndex;
         private byte _modelIdCounter = 0;
 
-        public override void EntityAwake()
+        private void Awake()
         {
             ValidateMainTpsModel();
             MigrateVehicleModels();
         }
 
-        public override void EntityOnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
+
             mainTpsModel = null;
 #if !EXCLUDE_PREFAB_REFS
             fpsModelPrefab = null;

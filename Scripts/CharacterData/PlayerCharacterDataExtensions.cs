@@ -712,7 +712,7 @@ namespace MultiplayerARPG
             }
             IEntityMovementComponent movementComponent = result.GetComponent<IEntityMovementComponent>();
             if (!movementComponent.IsNull())
-                movementComponent.Enabled = false;
+                movementComponent.enabled = false;
             GameObject[] ownerObjects = result.OwnerObjects;
             foreach (GameObject ownerObject in ownerObjects)
             {

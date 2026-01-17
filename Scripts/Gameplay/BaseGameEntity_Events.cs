@@ -3,6 +3,8 @@
     public partial class BaseGameEntity
     {
         public event System.Action onStart;
+        public event System.Action onDestroy;
+        public event System.Action onIdentityInitialize;
         public event System.Action onEnable;
         public event System.Action onDisable;
         public event System.Action onUpdate;
