@@ -50,3 +50,7 @@
 	path = SpatialPartitioningSystems
 	url = https://github.com/insthync/unity-spatial-partitioning-systems.git
 	branch = main
+[submodule "UpdateManager"]
+	path = UpdateManager
+	url = https://github.com/insthync/unity-update-manager.git
+	branch = main
