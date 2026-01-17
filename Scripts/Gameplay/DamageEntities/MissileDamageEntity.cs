@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using MultiplayerARPG.Updater;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public partial class MissileDamageEntity : BaseDamageEntity
+    public partial class MissileDamageEntity : BaseDamageEntity, IManagedUpdate
     {
         public enum HitDetectionMode
         {
@@ -123,6 +124,12 @@ namespace MultiplayerARPG
         {
             base.OnEnable();
             _previousPosition = CacheTransform.position;
+            UpdateManager.Register(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            UpdateManager.Unregister(this);
         }
 
 #if UNITY_EDITOR
@@ -196,7 +203,7 @@ namespace MultiplayerARPG
             _previousPosition = CacheTransform.position;
         }
 
-        protected virtual void Update()
+        public virtual void ManagedUpdate()
         {
             if (Destroying)
                 return;

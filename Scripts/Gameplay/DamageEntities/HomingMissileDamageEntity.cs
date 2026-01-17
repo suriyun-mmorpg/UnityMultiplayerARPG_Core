@@ -13,7 +13,7 @@ namespace MultiplayerARPG
 
         private PhysicFunctions _physicFunctions = new PhysicFunctions(32);
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
             if (Destroying)
                 return;

@@ -1,4 +1,5 @@
 ﻿using LiteNetLibManager;
+using MultiplayerARPG.Updater;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.Events;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(LiteNetLibIdentity))]
-    public partial class AreaDamageEntity : BaseDamageEntity
+    public partial class AreaDamageEntity : BaseDamageEntity, IManagedUpdate
     {
         public bool canApplyDamageToUser;
         public bool canApplyDamageToAllies;
@@ -32,6 +33,17 @@ namespace MultiplayerARPG
         {
             base.Awake();
             Identity.onGetInstance.AddListener(OnGetInstance);
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            UpdateManager.Register(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            UpdateManager.Unregister(this);
         }
 
         protected override void OnDestroy()
@@ -78,7 +90,7 @@ namespace MultiplayerARPG
             _lastAppliedTime = Time.unscaledTime;
         }
 
-        protected virtual void Update()
+        public virtual void ManagedUpdate()
         {
             if (!IsServer)
                 return;

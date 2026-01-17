@@ -1,10 +1,11 @@
-﻿using System.Collections.Generic;
+﻿using MultiplayerARPG.Updater;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
 namespace MultiplayerARPG
 {
-    public class ThrowableDamageEntity : BaseDamageEntity
+    public class ThrowableDamageEntity : BaseDamageEntity, IManagedUpdate
     {
         public bool canApplyDamageToUser;
         public bool canApplyDamageToAllies;
@@ -41,6 +42,17 @@ namespace MultiplayerARPG
             SetReadyToHitWalls(false);
             _exittedThrower = false;
             _awakenFrame = Time.frameCount;
+        }
+
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            UpdateManager.Register(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            UpdateManager.Unregister(this);
         }
 
         public void SetReadyToHitWalls(bool isReady)
@@ -136,7 +148,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual void Update()
+        public virtual void ManagedUpdate()
         {
             if (_destroying)
                 return;
