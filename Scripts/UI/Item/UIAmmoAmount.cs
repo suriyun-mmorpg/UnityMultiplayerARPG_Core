@@ -28,15 +28,15 @@ namespace MultiplayerARPG
             uiTextRightHandCurrentAmmo = null;
             uiTextRightHandReserveAmmo = null;
             uiTextRightHandSumAmmo = null;
-            rightHandRequireAmmoSymbols.Nulling();
-            rightHandNoRequireAmmoSymbols.Nulling();
+            rightHandRequireAmmoSymbols.Nullify();
+            rightHandNoRequireAmmoSymbols.Nullify();
             gageRightHandAmmo = null;
             uiLeftHandAmmoRoot = null;
             uiTextLeftHandCurrentAmmo = null;
             uiTextLeftHandReserveAmmo = null;
             uiTextLeftHandSumAmmo = null;
-            leftHandRequireAmmoSymbols.Nulling();
-            leftHandNoRequireAmmoSymbols.Nulling();
+            leftHandRequireAmmoSymbols.Nullify();
+            leftHandNoRequireAmmoSymbols.Nullify();
             gageLeftHandAmmo = null;
         }
 

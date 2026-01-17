@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             uiTextCash = null;
             _cacheList = null;
             _cacheSelectionManager = null;
-            LoadedList.Nulling();
+            LoadedList.Nullify();
             LoadedList?.Clear();
         }
 

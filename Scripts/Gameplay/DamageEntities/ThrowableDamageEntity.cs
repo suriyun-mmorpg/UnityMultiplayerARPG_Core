@@ -80,8 +80,8 @@ namespace MultiplayerARPG
             CacheRigidbody = null;
             CacheRigidbody2D = null;
             _alreadyHitObjects?.Clear();
-            _colliders.Nulling();
-            _colliders2D.Nulling();
+            _colliders.Nullify();
+            _colliders2D.Nullify();
         }
 
         /// <summary>

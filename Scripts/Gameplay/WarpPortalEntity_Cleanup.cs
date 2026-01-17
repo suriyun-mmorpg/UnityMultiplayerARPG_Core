@@ -5,7 +5,7 @@ namespace MultiplayerARPG
         public override void Clean()
         {
             base.Clean();
-            warpSignals?.Nulling();
+            warpSignals?.Nullify();
             warpToMapInfo = null;
         }
     }

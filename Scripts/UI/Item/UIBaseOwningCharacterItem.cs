@@ -43,8 +43,8 @@ namespace MultiplayerARPG
         {
             base.OnDestroy();
             uiCharacterItem = null;
-            hasItemObjects.Nulling();
-            noItemObjects.Nulling();
+            hasItemObjects.Nullify();
+            noItemObjects.Nullify();
         }
 
         protected override void OnEnable()

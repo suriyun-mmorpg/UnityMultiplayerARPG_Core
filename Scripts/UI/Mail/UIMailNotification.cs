@@ -10,8 +10,8 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            notificationObjects.Nulling();
-            notificationCountTexts.Nulling();
+            notificationObjects.Nullify();
+            notificationCountTexts.Nullify();
         }
 
         private void OnEnable()

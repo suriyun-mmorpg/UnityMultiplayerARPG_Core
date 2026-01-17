@@ -30,8 +30,8 @@ namespace MultiplayerARPG
             base.OnDestroy();
             GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
             GameInstance_onSetPlayingCharacter(null);
-            pkOnObjects.Nulling();
-            pkOffObjects.Nulling();
+            pkOnObjects.Nullify();
+            pkOffObjects.Nullify();
             uiTextPkPoint = null;
             uiTextConsecutivePkKills = null;
             _previousEntity = null;

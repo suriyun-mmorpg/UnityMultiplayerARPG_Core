@@ -57,9 +57,9 @@ namespace MultiplayerARPG
             listEmptyObject = null;
             uiPrefab = null;
             uiContainer = null;
-            selectedTitles.Nulling();
+            selectedTitles.Nullify();
             _availableTitleIds?.Clear();
-            _list.Nulling();
+            _list.Nullify();
             _list?.Clear();
             _cacheList = null;
             _cacheSelectionManager = null;

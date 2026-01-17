@@ -118,8 +118,8 @@ namespace MultiplayerARPG
             uiTextCoolDownDuration = null;
             uiTextCoolDownRemainsDuration = null;
             imageCoolDownGage = null;
-            countDownObjects.Nulling();
-            noCountDownObjects.Nulling();
+            countDownObjects.Nullify();
+            noCountDownObjects.Nullify();
             uiRequirement = null;
             uiTextSummon = null;
             uiTextMount = null;

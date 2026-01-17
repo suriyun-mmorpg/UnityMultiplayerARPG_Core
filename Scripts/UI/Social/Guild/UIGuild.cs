@@ -195,8 +195,8 @@ namespace MultiplayerARPG
             toggleNotAutoAcceptRequests = null;
             textScore = null;
             textRank = null;
-            autoAcceptRequestsObjects.Nulling();
-            notAutoAcceptRequestsObjects.Nulling();
+            autoAcceptRequestsObjects.Nullify();
+            notAutoAcceptRequestsObjects.Nullify();
             _roleList = null;
             _roleSelectionManager = null;
             _skillList = null;

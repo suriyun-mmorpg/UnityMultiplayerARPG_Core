@@ -179,9 +179,9 @@ namespace MultiplayerARPG
             uiIsWarping = null;
             toggleUis?.Clear();
             ignorePointerOverUITags?.Clear();
-            ignorePointerOverUIObjects.Nulling();
+            ignorePointerOverUIObjects.Nullify();
             ignorePointerOverUIObjects?.Clear();
-            blockControllerUis.Nulling();
+            blockControllerUis.Nullify();
             blockControllerUis?.Clear();
             onCharacterDead?.RemoveAllListeners();
             onCharacterDead = null;
@@ -191,7 +191,7 @@ namespace MultiplayerARPG
             onHideConstructBuildingDialog = null;
             onShowCurrentBuildingDialog = null;
             onHideCurrentBuildingDialog = null;
-            _openedNpcDialogs.Nulling();
+            _openedNpcDialogs.Nullify();
             _openedNpcDialogs?.Clear();
             _pointerOverUIResults?.Clear();
             this.InvokeInstanceDevExtMethods("OnDestroy");

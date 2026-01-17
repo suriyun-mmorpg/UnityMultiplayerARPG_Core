@@ -21,7 +21,7 @@ namespace MultiplayerARPG
         public void Clean()
         {
             _raycasts = null;
-            _overlapColliders.Nulling();
+            _overlapColliders.Nullify();
             _overlapColliders = null;
         }
 

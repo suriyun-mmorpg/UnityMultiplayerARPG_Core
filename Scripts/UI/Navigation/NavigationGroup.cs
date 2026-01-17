@@ -32,15 +32,15 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            upSelectables.Nulling();
+            upSelectables.Nullify();
             upSelectables?.Clear();
-            downSelectables.Nulling();
+            downSelectables.Nullify();
             downSelectables?.Clear();
-            leftSelectables.Nulling();
+            leftSelectables.Nullify();
             leftSelectables?.Clear();
-            rightSelectables.Nulling();
+            rightSelectables.Nullify();
             rightSelectables?.Clear();
-            childs.Nulling();
+            childs.Nullify();
             childs?.Clear();
             _lastSelectedChild = null;
         }

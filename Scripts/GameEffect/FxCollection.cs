@@ -39,10 +39,10 @@ namespace MultiplayerARPG
 
         ~FxCollection()
         {
-            _particles?.Nulling();
-            _lineRenderers?.Nulling();
-            _audioSources?.Nulling();
-            _audioSourceSetters?.Nulling();
+            _particles?.Nullify();
+            _lineRenderers?.Nullify();
+            _audioSources?.Nullify();
+            _audioSourceSetters?.Nullify();
         }
 
         public void RevertLoop()

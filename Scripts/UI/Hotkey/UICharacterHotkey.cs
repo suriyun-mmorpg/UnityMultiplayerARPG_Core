@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             uiCharacterSkill = null;
             uiCharacterItem = null;
             uiGuildSkill = null;
-            placeHolders.Nulling();
+            placeHolders.Nullify();
             placeHolders = null;
             _usingItem = null;
             _usingSkill = null;

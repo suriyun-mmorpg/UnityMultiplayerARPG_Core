@@ -16,7 +16,7 @@ namespace MultiplayerARPG
             SpawnArea = null;
             SpawnPrefab = null;
             SpawnAddressablePrefab = null;
-            _allActivatingObjects.Nulling();
+            _allActivatingObjects.Nullify();
             _allActivatingObjects?.Clear();
             _allActivatingObjects = null;
         }

@@ -135,12 +135,12 @@ namespace MultiplayerARPG
             onPlayReloaded.RemoveAllListeners();
             onPlayCharge.RemoveAllListeners();
             onItemChanged.RemoveAllListeners();
-            hiddingRenderers.DestroyAndNulling();
-            fpsHiddingRenderers.DestroyAndNulling();
-            hiddingObjects.DestroyAndNulling();
-            fpsHiddingObjects.DestroyAndNulling();
+            hiddingRenderers.DestroyAndNullify();
+            fpsHiddingRenderers.DestroyAndNullify();
+            hiddingObjects.DestroyAndNullify();
+            fpsHiddingObjects.DestroyAndNullify();
 #if UNITY_EDITOR || !UNITY_SERVER
-            weaponLaunchEffects.DestroyAndNulling();
+            weaponLaunchEffects.DestroyAndNullify();
 #endif
         }
 

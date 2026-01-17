@@ -26,8 +26,8 @@ namespace MultiplayerARPG
             textSenderName = null;
             textTitle = null;
             textSentDate = null;
-            readObjects.Nulling();
-            unreadObjects.Nulling();
+            readObjects.Nullify();
+            unreadObjects.Nullify();
         }
 
         protected override void UpdateData()

@@ -5,7 +5,7 @@ namespace MultiplayerARPG
         public override void Clean()
         {
             base.Clean();
-            itemCraftFormulas.Nulling();
+            itemCraftFormulas.Nullify();
             _cacheItemCraftFormulas?.Clear();
         }
     }

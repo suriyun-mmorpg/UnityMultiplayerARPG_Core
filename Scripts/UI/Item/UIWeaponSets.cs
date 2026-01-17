@@ -9,7 +9,7 @@
         {
             base.OnDestroy();
             currentWeaponSet = null;
-            otherWeaponSets.Nulling();
+            otherWeaponSets.Nullify();
         }
 
         private void OnEnable()

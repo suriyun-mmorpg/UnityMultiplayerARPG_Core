@@ -54,8 +54,8 @@ namespace MultiplayerARPG
             uiSelectedItem = null;
             uiItemPrefab = null;
             uiItemContainer = null;
-            ownerObjects.Nulling();
-            nonOwnerObjects.Nulling();
+            ownerObjects.Nullify();
+            nonOwnerObjects.Nullify();
             _itemList = null;
             _itemSelectionManager = null;
             _itemListEventSetupManager = null;

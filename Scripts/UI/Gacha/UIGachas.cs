@@ -64,7 +64,7 @@ namespace MultiplayerARPG
             uiRewarding = null;
             _cacheList = null;
             _cacheSelectionManager = null;
-            LoadedList.Nulling();
+            LoadedList.Nullify();
             LoadedList?.Clear();
         }
 

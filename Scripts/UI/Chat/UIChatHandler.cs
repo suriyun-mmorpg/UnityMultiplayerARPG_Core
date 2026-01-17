@@ -95,7 +95,7 @@ namespace MultiplayerARPG
             base.OnDestroy();
             RemoveOnClientReceiveChatMessage();
             ChannelBasedChatMessages?.Clear();
-            enterChatActiveObjects.Nulling();
+            enterChatActiveObjects.Nullify();
             uiReceiverField = null;
             uiMessageField = null;
             uiPrefab = null;

@@ -36,9 +36,9 @@ namespace MultiplayerARPG
         {
             base.OnDestroy();
             uiAnotherCharacter = null;
-            partyInviteObjects.Nulling();
-            guildInviteObjects.Nulling();
-            vendingObjects.Nulling();
+            partyInviteObjects.Nullify();
+            guildInviteObjects.Nullify();
+            vendingObjects.Nullify();
             _data = null;
         }
 

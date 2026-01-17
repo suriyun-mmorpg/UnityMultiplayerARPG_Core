@@ -73,8 +73,8 @@ namespace MultiplayerARPG
             uiReceiveCurrencies = null;
             uiReceiveItems = null;
             inputAmount = null;
-            cashObjects.Nulling();
-            goldObjects.Nulling();
+            cashObjects.Nullify();
+            goldObjects.Nullify();
             _data = null;
         }
 

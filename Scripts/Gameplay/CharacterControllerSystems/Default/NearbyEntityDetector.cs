@@ -61,25 +61,25 @@ namespace MultiplayerARPG
 
         public void ClearDetection()
         {
-            characters.Nulling();
+            characters.Nullify();
             characters?.Clear();
-            players.Nulling();
+            players.Nullify();
             players?.Clear();
-            monsters.Nulling();
+            monsters.Nullify();
             monsters?.Clear();
-            npcs.Nulling();
+            npcs.Nullify();
             npcs?.Clear();
-            itemDrops.Nulling();
+            itemDrops.Nullify();
             itemDrops?.Clear();
-            rewardDrops.Nulling();
+            rewardDrops.Nullify();
             rewardDrops?.Clear();
-            buildings.Nulling();
+            buildings.Nullify();
             buildings?.Clear();
-            vehicles.Nulling();
+            vehicles.Nullify();
             vehicles?.Clear();
-            warpPortals.Nulling();
+            warpPortals.Nullify();
             warpPortals?.Clear();
-            itemsContainers.Nulling();
+            itemsContainers.Nullify();
             itemsContainers?.Clear();
             activatableEntities?.Clear();
             holdActivatableEntities?.Clear();

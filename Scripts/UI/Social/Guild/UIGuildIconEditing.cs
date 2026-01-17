@@ -61,7 +61,7 @@ namespace MultiplayerARPG
             listEmptyObject = null;
             uiPrefab = null;
             uiContainer = null;
-            selectedIcons.Nulling();
+            selectedIcons.Nullify();
             _cacheList = null;
             _cacheSelectionManager = null;
             _guildIconUpdater = null;

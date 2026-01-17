@@ -122,18 +122,18 @@ namespace MultiplayerARPG
 
         private void OnDestroy()
         {
-            canBuildMaterials.Nulling();
-            cannotBuildMaterials.Nulling();
+            canBuildMaterials.Nullify();
+            cannotBuildMaterials.Nullify();
             meshRenderer = null;
             spriteRenderer = null;
             tilemap = null;
-            extraMeshRenderers.Nulling();
-            extraSpriteRenderers.Nulling();
-            extraTilemaps.Nulling();
+            extraMeshRenderers.Nullify();
+            extraSpriteRenderers.Nullify();
+            extraTilemaps.Nullify();
             BuildingEntity = null;
             CacheNavMeshObstacle = null;
             _buildModeHandler = null;
-            _defaultMaterials.Nulling();
+            _defaultMaterials.Nullify();
         }
 
         private void PrepareDefaultExtraMeshRenderersValues()

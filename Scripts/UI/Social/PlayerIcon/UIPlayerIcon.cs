@@ -25,8 +25,8 @@ namespace MultiplayerARPG
         {
             base.OnDestroy();
             imageIcon = null;
-            lockedObjects.Nulling();
-            unlockedObjects.Nulling();
+            lockedObjects.Nullify();
+            unlockedObjects.Nullify();
             _data = null;
         }
 

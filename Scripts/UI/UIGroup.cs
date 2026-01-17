@@ -5,7 +5,7 @@
     protected override void OnDestroy()
     {
         base.OnDestroy();
-        subSet.Nulling();
+        subSet.Nullify();
     }
 
     public override void Show()

@@ -15,14 +15,14 @@ namespace MultiplayerARPG
         private void OnDisable()
         {
             GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
-            container.RemoveChildren();
+            container.DestroyChildren();
         }
 
         private void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playerCharacter)
         {
             if (playerCharacter == null)
                 return;
-            container.RemoveChildren();
+            container.DestroyChildren();
             BaseCharacterModel characterModel = playerCharacter.InstantiateModel(container);
             characterModel.SetupModelBodyParts(playerCharacter);
             characterModel.SetEquipItemsImmediately(playerCharacter.EquipItems, playerCharacter.SelectableWeaponSets, playerCharacter.EquipWeaponSet, true);

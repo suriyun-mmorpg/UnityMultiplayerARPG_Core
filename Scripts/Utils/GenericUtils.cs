@@ -611,7 +611,7 @@ public static partial class GenericUtils
         return new System.Uri(paths.Aggregate(uri.AbsoluteUri, (current, path) => ZString.Format("{0}/{1}", current.TrimEnd('/'), path.TrimStart('/'))));
     }
 
-    public static void Nulling<T>(this IList<T> objects)
+    public static void Nullify<T>(this IList<T> objects)
         where T : class
     {
         if (objects == null)
@@ -622,7 +622,7 @@ public static partial class GenericUtils
         }
     }
 
-    public static void Defaulting<T>(this IList<T> objects)
+    public static void SetDefaultValues<T>(this IList<T> objects)
         where T : struct
     {
         if (objects == null)
@@ -633,7 +633,7 @@ public static partial class GenericUtils
         }
     }
 
-    public static void DestroyAndNulling<T>(this IList<T> objects)
+    public static void DestroyAndNullify<T>(this IList<T> objects)
         where T : Object
     {
         if (objects == null)

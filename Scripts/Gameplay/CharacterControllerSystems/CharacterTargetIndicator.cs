@@ -29,8 +29,8 @@ namespace MultiplayerARPG
             indicatorPrefab = null;
             indicatorObject = null;
             currentTarget = null;
-            colliders2D.Nulling();
-            colliders.Nulling();
+            colliders2D.Nullify();
+            colliders.Nullify();
         }
 
         private void LateUpdate()

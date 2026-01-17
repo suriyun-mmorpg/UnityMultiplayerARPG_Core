@@ -5,7 +5,7 @@ namespace MultiplayerARPG
         public override void Clean()
         {
             base.Clean();
-            characterDatabases.Nulling();
+            characterDatabases.Nullify();
             characterDatabases = null;
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
             controllerPrefab = null;

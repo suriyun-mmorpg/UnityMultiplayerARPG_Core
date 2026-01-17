@@ -29,9 +29,9 @@ namespace MultiplayerARPG
             textCanKick = null;
             textCanUseStorage = null;
             textShareExpPercentage = null;
-            canInviteObjects.Nulling();
-            canKickObjects.Nulling();
-            canUseStorageObjects.Nulling();
+            canInviteObjects.Nullify();
+            canKickObjects.Nullify();
+            canUseStorageObjects.Nullify();
         }
 
         protected override void UpdateData()

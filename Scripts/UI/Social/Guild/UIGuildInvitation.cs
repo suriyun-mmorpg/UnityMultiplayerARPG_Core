@@ -41,8 +41,8 @@ namespace MultiplayerARPG
             uiTextGuildName = null;
             uiTextGuildLevel = null;
             uiTimeoutGage = null;
-            timeoutSigns.Nulling();
-            notTimeoutSigns.Nulling();
+            timeoutSigns.Nullify();
+            notTimeoutSigns.Nullify();
         }
 
         public override void ManagedUpdate()

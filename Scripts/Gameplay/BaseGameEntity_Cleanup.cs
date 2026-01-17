@@ -4,8 +4,8 @@ namespace MultiplayerARPG
     {
         public virtual void Clean()
         {
-            ownerObjects.DestroyAndNulling();
-            nonOwnerObjects.DestroyAndNulling();
+            ownerObjects.DestroyAndNullify();
+            nonOwnerObjects.DestroyAndNullify();
             model = null;
             cameraTargetTransform = null;
             fpsCameraTargetTransform = null;

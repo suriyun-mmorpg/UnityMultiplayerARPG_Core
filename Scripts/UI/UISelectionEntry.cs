@@ -47,7 +47,7 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry, IManagedU
     {
         base.OnDestroy();
         objectSelected = null;
-        clones.Nulling();
+        clones.Nullify();
         selectionManager = null;
         onUpdateUI = null;
         onUpdateData = null;

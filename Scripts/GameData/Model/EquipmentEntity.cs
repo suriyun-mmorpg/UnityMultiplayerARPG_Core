@@ -37,8 +37,8 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             base.OnDestroy();
-            effects.Nulling();
-            _allEffectObjects.DestroyAndNulling();
+            effects.Nullify();
+            _allEffectObjects.DestroyAndNullify();
         }
 
 #if UNITY_EDITOR

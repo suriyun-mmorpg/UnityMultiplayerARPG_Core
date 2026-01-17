@@ -17,7 +17,7 @@ namespace MultiplayerARPG
 
             public void Clean()
             {
-                activatingObjects.Nulling();
+                activatingObjects.Nullify();
             }
         }
 

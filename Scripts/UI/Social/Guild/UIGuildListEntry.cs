@@ -46,8 +46,8 @@ namespace MultiplayerARPG
             textScore = null;
             textRank = null;
             textMemberAmount = null;
-            autoAcceptRequestsObjects.Nulling();
-            notAutoAcceptRequestsObjects.Nulling();
+            autoAcceptRequestsObjects.Nullify();
+            notAutoAcceptRequestsObjects.Nullify();
             onGuildRequested?.RemoveAllListeners();
             onGuildRequested = null;
         }

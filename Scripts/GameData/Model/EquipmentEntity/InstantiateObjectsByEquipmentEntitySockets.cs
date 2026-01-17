@@ -71,7 +71,7 @@ namespace MultiplayerARPG
                 break;
             }
 
-            container.RemoveChildren();
+            container.DestroyChildren();
             GameObject tempNewObject;
             if (itemData != null && CacheSettingsBySocketEnhancerItem.TryGetValue(itemData.DataId, out Setting setting))
             {

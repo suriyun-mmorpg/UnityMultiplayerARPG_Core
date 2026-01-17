@@ -39,7 +39,7 @@ namespace MultiplayerARPG
             uiRequireSkillLevels = null;
             uiRequireCurrencyAmounts = null;
             uiRequireItemAmounts = null;
-            disallowStateObjects.Nulling();
+            disallowStateObjects.Nullify();
         }
 
         protected override void UpdateData()

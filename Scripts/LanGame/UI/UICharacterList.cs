@@ -66,7 +66,7 @@ namespace MultiplayerARPG
             characterModelContainer = null;
             buttonStart = null;
             buttonDelete = null;
-            selectedCharacterObjects.Nulling();
+            selectedCharacterObjects.Nullify();
             selectedCharacterObjects?.Clear();
             eventOnNoCharacter?.RemoveAllListeners();
             eventOnNoCharacter = null;
@@ -105,7 +105,7 @@ namespace MultiplayerARPG
                 obj.SetActive(false);
             }
             // Remove all models
-            characterModelContainer.RemoveChildren();
+            characterModelContainer.DestroyChildren();
             _characterModelById.Clear();
             // Remove all cached data
             _playerCharacterDataById.Clear();
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnDisable()
         {
-            characterModelContainer.RemoveChildren();
+            characterModelContainer.DestroyChildren();
         }
 
         protected virtual void Update()

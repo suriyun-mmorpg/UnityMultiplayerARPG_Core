@@ -276,10 +276,10 @@ namespace MultiplayerARPG
             uiTextExpireDuration = null;
             uiTextExpireTime = null;
             uiTextLockRemainsDuration = null;
-            lockObjects.Nulling();
-            notLockObjects.Nulling();
-            emptyObjects.Nulling();
-            notEmptyObjects.Nulling();
+            lockObjects.Nullify();
+            notLockObjects.Nullify();
+            emptyObjects.Nullify();
+            notEmptyObjects.Nullify();
             uiRequirement = null;
             uiIncreaseStats = null;
             uiIncreaseStatsRate = null;
@@ -303,8 +303,8 @@ namespace MultiplayerARPG
             uiTextCurrentAmmo = null;
             uiTextReserveAmmo = null;
             uiTextSumAmmo = null;
-            requireAmmoSymbols.Nulling();
-            noRequireAmmoSymbols.Nulling();
+            requireAmmoSymbols.Nullify();
+            noRequireAmmoSymbols.Nullify();
             gageAmmo = null;
             uiTextBuilding = null;
             uiTextMonster = null;
@@ -321,8 +321,8 @@ namespace MultiplayerARPG
             uiTextCoolDownDuration = null;
             uiTextCoolDownRemainsDuration = null;
             imageCoolDownGage = null;
-            countDownObjects.Nulling();
-            noCountDownObjects.Nulling();
+            countDownObjects.Nullify();
+            noCountDownObjects.Nullify();
             onSetLevelZeroData?.RemoveAllListeners();
             onSetLevelZeroData = null;
             onSetNonLevelZeroData?.RemoveAllListeners();
@@ -379,7 +379,7 @@ namespace MultiplayerARPG
             onSetEquipmentWithoutAmmo = null;
             uiDragging = null;
             uiNextLevelItem = null;
-            uiComparingEquipments.Nulling();
+            uiComparingEquipments.Nullify();
             _randomBonus = null;
         }
 

@@ -196,7 +196,7 @@ namespace MultiplayerARPG
             uiFactionContainer = null;
             uiInputCharacterName = null;
             buttonCreate = null;
-            uiBodyPartManagers.Nulling();
+            uiBodyPartManagers.Nullify();
             uiBlendshapeManager = null;
             eventOnCreateCharacter?.RemoveAllListeners();
             eventOnCreateCharacter = null;
@@ -223,7 +223,7 @@ namespace MultiplayerARPG
             _characterModelByEntityId?.Clear();
             _selectedModel = null;
             _playerCharactersByEntityId?.Clear();
-            _selectableCharacterClasses.Nulling();
+            _selectableCharacterClasses.Nullify();
             _selectedPlayerCharacter = null;
             _selectedPlayerCharacterData = null;
             SelectedRaces?.Clear();
@@ -360,7 +360,7 @@ namespace MultiplayerARPG
         protected virtual async void LoadCharacters()
         {
             // Remove all models
-            characterModelContainer.RemoveChildren();
+            characterModelContainer.DestroyChildren();
             _characterModelByEntityId.Clear();
             // Remove all cached data
             _playerCharactersByEntityId.Clear();
@@ -468,7 +468,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnDisable()
         {
-            characterModelContainer.RemoveChildren();
+            characterModelContainer.DestroyChildren();
             uiInputCharacterName.text = string.Empty;
         }
 

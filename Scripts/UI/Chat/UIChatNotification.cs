@@ -28,10 +28,10 @@ namespace MultiplayerARPG
         {
             base.OnDestroy();
             RemoveOnClientReceiveChatMessage();
-            objectsToStopCounting.Nulling();
-            togglesToStopCounting.Nulling();
-            notificationObjects.Nulling();
-            notificationCountTexts.Nulling();
+            objectsToStopCounting.Nullify();
+            togglesToStopCounting.Nullify();
+            notificationObjects.Nullify();
+            notificationCountTexts.Nullify();
         }
 
         private void Update()

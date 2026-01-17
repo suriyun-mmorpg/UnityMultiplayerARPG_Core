@@ -18,7 +18,7 @@ public class UIList : MonoBehaviour
         uiPrefab = null;
         uiContainer = null;
         onGenerateEntry = null;
-        _uis.Nulling();
+        _uis.Nullify();
         _uis?.Clear();
     }
 

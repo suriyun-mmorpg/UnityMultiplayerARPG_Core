@@ -123,9 +123,9 @@ namespace MultiplayerARPG
             _cacheDealingItemsList = null;
             _cacheAnotherDealingItemsList = null;
             _cacheItemSelectionManager = null;
-            _tempDealingItemUIs.Nulling();
+            _tempDealingItemUIs.Nullify();
             _tempDealingItemUIs?.Clear();
-            _tempAnotherDealingItemUIs.Nulling();
+            _tempAnotherDealingItemUIs.Nullify();
             _tempAnotherDealingItemUIs?.Clear();
             _data = null;
         }

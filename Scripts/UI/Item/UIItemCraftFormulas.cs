@@ -58,7 +58,7 @@ namespace MultiplayerARPG
             _cacheList = null;
             _cacheSelectionManager = null;
             CraftingQueueManager = null;
-            LoadedList.Nulling();
+            LoadedList.Nullify();
             LoadedList?.Clear();
         }
 
