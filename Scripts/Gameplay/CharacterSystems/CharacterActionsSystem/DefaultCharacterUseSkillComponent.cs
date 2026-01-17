@@ -1,7 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
+using Insthync.ManagedUpdating;
 using LiteNetLib;
 using LiteNetLibManager;
-using MultiplayerARPG.Updater;
 using System.Collections.Generic;
 using System.Threading;
 using UnityEngine;

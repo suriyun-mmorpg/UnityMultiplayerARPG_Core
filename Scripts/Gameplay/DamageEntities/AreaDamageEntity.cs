@@ -1,5 +1,5 @@
-﻿using LiteNetLibManager;
-using MultiplayerARPG.Updater;
+﻿using Insthync.ManagedUpdating;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;

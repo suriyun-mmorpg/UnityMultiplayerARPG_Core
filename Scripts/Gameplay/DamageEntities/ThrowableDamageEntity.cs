@@ -1,4 +1,4 @@
-﻿using MultiplayerARPG.Updater;
+﻿using Insthync.ManagedUpdating;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;

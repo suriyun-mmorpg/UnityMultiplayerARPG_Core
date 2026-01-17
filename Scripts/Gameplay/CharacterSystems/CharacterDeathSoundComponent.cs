@@ -1,5 +1,5 @@
 ﻿using Insthync.AudioManager;
-using MultiplayerARPG.Updater;
+using Insthync.ManagedUpdating;
 using UnityEngine;
 
 namespace MultiplayerARPG

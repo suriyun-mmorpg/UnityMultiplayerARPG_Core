@@ -1,5 +1,5 @@
 ﻿using Insthync.DevExtension;
-using MultiplayerARPG.Updater;
+using Insthync.ManagedUpdating;
 using UnityEngine;
 
 public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry, IManagedUpdate

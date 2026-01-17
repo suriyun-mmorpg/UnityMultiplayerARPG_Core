@@ -1,5 +1,5 @@
+using Insthync.ManagedUpdating;
 using UnityEngine;
-using MultiplayerARPG.Updater;
 
 namespace MultiplayerARPG
 {

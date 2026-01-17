@@ -1,6 +1,6 @@
+using Insthync.ManagedUpdating;
 using LiteNetLib;
 using LiteNetLibManager;
-using MultiplayerARPG.Updater;
 using UnityEngine;
 
 namespace MultiplayerARPG

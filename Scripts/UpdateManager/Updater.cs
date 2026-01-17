@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MultiplayerARPG.Updater
+namespace Insthync.ManagedUpdating
 {
     public sealed class Updater
     {

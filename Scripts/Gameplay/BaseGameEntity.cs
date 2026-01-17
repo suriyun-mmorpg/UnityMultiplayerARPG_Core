@@ -1,4 +1,5 @@
 ﻿using Insthync.DevExtension;
+using Insthync.ManagedUpdating;
 using Insthync.UnityEditorUtils;
 using LiteNetLib;
 using LiteNetLibManager;
@@ -6,7 +7,6 @@ using LiteNetLib.Utils;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
-using MultiplayerARPG.Updater;
 
 namespace MultiplayerARPG
 {

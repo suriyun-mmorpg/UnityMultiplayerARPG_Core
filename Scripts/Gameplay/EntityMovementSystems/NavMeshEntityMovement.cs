@@ -1,9 +1,9 @@
-﻿using System.Buffers;
-using System.Collections.Generic;
-using Cysharp.Threading.Tasks;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.ManagedUpdating;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using MultiplayerARPG.Updater;
+using System.Buffers;
+using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.AI;

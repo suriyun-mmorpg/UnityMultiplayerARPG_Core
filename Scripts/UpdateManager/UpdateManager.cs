@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MultiplayerARPG.Updater
+namespace Insthync.ManagedUpdating
 {
-    public class UpdateManager : MonoBehaviour
+    public sealed class UpdateManager : MonoBehaviour
     {
         private static readonly Updater _defaultUpdater = new Updater();
         private static readonly SortedList<int, Updater> _updaters = new SortedList<int, Updater>();
 
+        private static UpdateManager _instance;
         public static UpdateManager Instance => _instance != null ? _instance : (_instance = CreateInstance());
-        protected static UpdateManager _instance;
 
         private static UpdateManager CreateInstance()
         {

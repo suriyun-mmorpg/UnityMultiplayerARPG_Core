@@ -1,6 +1,6 @@
 ﻿using Insthync.AudioManager;
+using Insthync.ManagedUpdating;
 using LiteNetLibManager;
-using MultiplayerARPG.Updater;
 using UnityEngine;
 #if UNITY_EDITOR
 using UnityEditor;

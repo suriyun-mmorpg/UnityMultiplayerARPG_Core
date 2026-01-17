@@ -1,6 +1,6 @@
 using Cysharp.Text;
+using Insthync.ManagedUpdating;
 using Insthync.UnityEditorUtils;
-using MultiplayerARPG.Updater;
 using System.Collections.Generic;
 using UnityEngine;
 

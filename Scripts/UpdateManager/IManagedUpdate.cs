@@ -1,4 +1,4 @@
-namespace MultiplayerARPG.Updater
+namespace Insthync.ManagedUpdating
 {
     public interface IManagedUpdate : IManagedUpdateBase
     {
