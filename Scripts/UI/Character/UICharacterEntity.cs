@@ -123,9 +123,9 @@ namespace MultiplayerARPG
             UpdateTitle();
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
 
             if (Data == null)
             {

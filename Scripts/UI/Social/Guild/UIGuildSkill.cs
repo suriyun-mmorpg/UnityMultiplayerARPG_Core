@@ -114,9 +114,9 @@ namespace MultiplayerARPG
             _coolDownRemainsDuration = 0f;
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
 
             if (_coolDownRemainsDuration > 0f)
             {

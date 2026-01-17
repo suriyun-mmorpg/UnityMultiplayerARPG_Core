@@ -1,7 +1,8 @@
 ﻿using Insthync.DevExtension;
+using MultiplayerARPG.Updater;
 using UnityEngine;
 
-public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
+public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry, IManagedUpdate
 {
     [Header("UI Selection Elements")]
     public GameObject objectSelected;
@@ -55,24 +56,25 @@ public abstract class UISelectionEntry<T> : UIBase, IUISelectionEntry
     protected virtual void OnEnable()
     {
         UpdateUI();
+        UpdateManager.Register(this);
     }
 
     protected virtual void OnDisable()
     {
         _updateCountDown = 0f;
+        UpdateManager.Unregister(this);
     }
 
-    protected virtual void Update()
+    public virtual void ManagedUpdate()
     {
         _updateCountDown -= Time.deltaTime;
-        if (_updateCountDown <= 0f)
-        {
-            _updateCountDown = updateUIRepeatRate;
-            UpdateUI();
-            if (onUpdateUI != null)
-                onUpdateUI.Invoke();
-            this.InvokeInstanceDevExtMethods("UpdateUI");
-        }
+        if (_updateCountDown > 0f)
+            return;
+        _updateCountDown = updateUIRepeatRate;
+        UpdateUI();
+        if (onUpdateUI != null)
+            onUpdateUI.Invoke();
+        this.InvokeInstanceDevExtMethods("UpdateUI");
     }
 
     public void ForceUpdate()

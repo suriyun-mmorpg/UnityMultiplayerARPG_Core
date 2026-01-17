@@ -69,9 +69,9 @@ namespace MultiplayerARPG
             GameInstance.PlayingCharacterEntity.DuelingComponent.onEndDueling -= EndDueling;
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
 
             if (CountDown > 0f)
             {

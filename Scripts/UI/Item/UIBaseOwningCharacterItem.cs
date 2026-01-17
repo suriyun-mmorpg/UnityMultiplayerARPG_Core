@@ -86,9 +86,9 @@ namespace MultiplayerARPG
             OnUpdateCharacterItems();
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
             if (hasItemObjects != null && hasItemObjects.Length > 0)
             {
                 foreach (GameObject hasItemObject in hasItemObjects)

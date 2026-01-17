@@ -45,9 +45,9 @@ namespace MultiplayerARPG
             notTimeoutSigns.Nulling();
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
             float timeout = GameInstance.Singleton.SocialSystemSetting.GuildInvitationTimeout;
             float takenTime = Time.unscaledTime - _showedTime;
             bool alreadyTimedout = takenTime > timeout;

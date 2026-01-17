@@ -44,9 +44,9 @@ namespace MultiplayerARPG
             _craftRemainsDuration = 0f;
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
 
             if (_craftRemainsDuration > 0f)
             {

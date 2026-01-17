@@ -94,9 +94,9 @@ namespace MultiplayerARPG
             Data = data;
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
 
             if (placeHolders != null && placeHolders.Length > 0)
             {

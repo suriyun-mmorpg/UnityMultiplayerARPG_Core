@@ -435,12 +435,12 @@ namespace MultiplayerARPG
         }
 
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
             if (_forceUpdateUi)
                 _updateCountDown = 0f;
 
-            base.Update();
+            base.ManagedUpdate();
 
             float deltaTime = Time.deltaTime;
             UpdateLockRemainsDuration(deltaTime);

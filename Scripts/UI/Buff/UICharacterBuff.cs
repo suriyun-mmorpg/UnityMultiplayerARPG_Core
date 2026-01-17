@@ -47,9 +47,9 @@ namespace MultiplayerARPG
             _buffRemainsDuration = 0f;
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
 
             if (_buffRemainsDuration > 0f)
             {

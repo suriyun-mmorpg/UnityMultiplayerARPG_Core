@@ -226,9 +226,9 @@ namespace MultiplayerARPG
             Data = GameInstance.PlayingCharacter;
         }
 
-        protected override void Update()
+        public override void ManagedUpdate()
         {
-            base.Update();
+            base.ManagedUpdate();
             CharacterDataCache cache = Data.GetCaches();
             // Hp
             int currentHp = 0;
