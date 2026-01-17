@@ -1,9 +1,10 @@
 ﻿using Insthync.AudioManager;
+using Insthync.ManagedUpdating;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class GameEffect : PoolDescriptor
+    public partial class GameEffect : PoolDescriptor, IManagedUpdate
     {
         public enum PlayMode
         {
@@ -89,6 +90,16 @@ namespace MultiplayerARPG
             }
         }
 
+        protected virtual void OnEnable()
+        {
+            UpdateManager.Register(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
         protected override void PushBack()
         {
             OnPushBack();
@@ -98,7 +109,7 @@ namespace MultiplayerARPG
                 gameObject.SetActive(false);
         }
 
-        protected virtual void Update()
+        public virtual void ManagedUpdate()
         {
             if (_destroyTime >= 0 && _destroyTime - Time.time <= 0)
             {

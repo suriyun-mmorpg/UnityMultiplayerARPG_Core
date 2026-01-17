@@ -1,4 +1,5 @@
-﻿using LiteNetLibManager;
+﻿using Insthync.ManagedUpdating;
+using LiteNetLibManager;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
@@ -7,7 +8,7 @@ using UnityEngine.Events;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(LiteNetLibIdentity))]
-    public partial class AreaBuffEntity : BaseBuffEntity
+    public partial class AreaBuffEntity : BaseBuffEntity, IManagedUpdate
     {
         public UnityEvent onDestroy = new UnityEvent();
 
@@ -43,6 +44,17 @@ namespace MultiplayerARPG
             onDestroy = null;
         }
 
+        protected override void OnEnable()
+        {
+            base.OnEnable();
+            UpdateManager.Register(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
         /// <summary>
         /// Setup this component data
         /// </summary>
@@ -65,7 +77,7 @@ namespace MultiplayerARPG
             _lastAppliedTime = Time.unscaledTime;
         }
 
-        protected virtual void Update()
+        public virtual void ManagedUpdate()
         {
             if (Time.unscaledTime - _lastAppliedTime >= _applyDuration)
             {

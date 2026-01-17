@@ -1,9 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using Insthync.ManagedUpdating;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public class ProjectileEffect : PoolDescriptor
+    public class ProjectileEffect : PoolDescriptor, IManagedUpdate
     {
         public float speed;
         public float lifeTime = 1;
@@ -22,7 +23,19 @@ namespace MultiplayerARPG
         protected Vector3 _launchOrigin;
         protected readonly List<ImpactEffectPlayingData> _impacts = new List<ImpactEffectPlayingData>();
 
-        protected virtual void Update()
+        protected virtual void OnEnable()
+        {
+            if (_playFxOnEnable)
+                PlayFx();
+            UpdateManager.Register(this);
+        }
+
+        protected virtual void OnDisable()
+        {
+            UpdateManager.Unregister(this);
+        }
+
+        public virtual void ManagedUpdate()
         {
             transform.position += transform.forward * speed * Time.deltaTime;
             UpdateImpactEffects(false);
@@ -46,12 +59,6 @@ namespace MultiplayerARPG
                 _impactEffects.PlayEffect(_impacts[0].tag, _impacts[0].point, Quaternion.LookRotation(_impacts[0].normal));
                 _impacts.RemoveAt(0);
             }
-        }
-
-        protected virtual void OnEnable()
-        {
-            if (_playFxOnEnable)
-                PlayFx();
         }
 
         public virtual void Setup(float distance, float speed, ImpactEffects impactEffects, Vector3 launchOrigin, List<ImpactEffectPlayingData> impacts)
