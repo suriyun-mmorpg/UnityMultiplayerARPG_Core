@@ -100,6 +100,10 @@ namespace MultiplayerARPG
         protected bool _dirtyAbleToUse;
         protected bool _dirtyMaxedLevel;
         protected bool _forceUpdateUi = true;
+        protected Dictionary<Attribute, float> _tempRequireAttributes = new Dictionary<Attribute, float>();
+        protected Dictionary<BaseSkill, int> _tempRequireSkills = new Dictionary<BaseSkill, int>();
+        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
         {
@@ -148,6 +152,14 @@ namespace MultiplayerARPG
             onNotMaxedLevel?.RemoveAllListeners();
             onNotMaxedLevel = null;
             uiNextLevelSkill = null;
+            _tempRequireAttributes.Clear();
+            _tempRequireAttributes = null;
+            _tempRequireSkills.Clear();
+            _tempRequireSkills = null;
+            _tempRequireCurrencies.Clear();
+            _tempRequireCurrencies = null;
+            _tempRequireItems.Clear();
+            _tempRequireItems = null;
         }
 
         protected override void OnDisable()
@@ -416,15 +428,19 @@ namespace MultiplayerARPG
 
             if (uiRequirement != null)
             {
+                Skill.GetRequireAttributeAmounts(Level, _tempRequireAttributes);
+                Skill.GetRequireSkillLevels(Level, _tempRequireSkills);
+                Skill.GetRequireCurrencyAmounts(Level, _tempRequireCurrencies);
+                Skill.GetRequireItemAmounts(Level, _tempRequireItems);
                 if (Skill == null || Level <= 0 ||
                     (!Skill.IsDisallowToLevelUp(Level) &&
                     Skill.GetRequireCharacterLevel(Level) <= 0 &&
                     Skill.GetRequireCharacterSkillPoint(Level) <= 0 &&
                     Skill.GetRequireCharacterGold(Level) <= 0 &&
-                    Skill.GetRequireAttributeAmounts(Level).Count == 0 &&
-                    Skill.GetRequireSkillLevels(Level).Count == 0 &&
-                    Skill.GetRequireCurrencyAmounts(Level).Count == 0 &&
-                    Skill.GetRequireItemAmounts(Level).Count == 0))
+                    _tempRequireAttributes.Count == 0 &&
+                    _tempRequireSkills.Count == 0 &&
+                    _tempRequireCurrencies.Count == 0 &&
+                    _tempRequireItems.Count == 0))
                 {
                     uiRequirement.Hide();
                 }

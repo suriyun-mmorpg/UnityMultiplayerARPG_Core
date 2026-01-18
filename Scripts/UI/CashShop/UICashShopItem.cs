@@ -1,6 +1,7 @@
 ﻿using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.Serialization;
@@ -46,7 +47,6 @@ namespace MultiplayerARPG
         public GameObject[] cashObjects;
         [Tooltip("These objects will be activated while sell price gold currency is not 0.")]
         public GameObject[] goldObjects;
-
         public int BuyAmount
         {
             get
@@ -57,6 +57,10 @@ namespace MultiplayerARPG
                 return 1;
             }
         }
+
+        protected Dictionary<Currency, int> _tempReceiveCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempReceiveItems = new Dictionary<BaseItem, int>();
+
 
         protected override void OnDestroy()
         {
@@ -76,6 +80,10 @@ namespace MultiplayerARPG
             cashObjects.Nullify();
             goldObjects.Nullify();
             _data = null;
+            _tempReceiveCurrencies.Clear();
+            _tempReceiveCurrencies = null;
+            _tempReceiveItems.Clear();
+            _tempReceiveItems = null;
         }
 
         protected override void OnEnable()
@@ -180,12 +188,18 @@ namespace MultiplayerARPG
 
             if (uiReceiveCurrencies != null)
             {
-                uiReceiveCurrencies.Data = Data == null ? null : GameDataHelpers.CombineCurrencies(Data.ReceiveCurrencies, null, 1f);
+                _tempReceiveCurrencies.Clear();
+                if (Data != null)
+                    GameDataHelpers.CombineCurrencies(Data.ReceiveCurrencies, _tempReceiveCurrencies, 1f);
+                uiReceiveCurrencies.Data = _tempReceiveCurrencies;
             }
 
             if (uiReceiveItems != null)
             {
-                uiReceiveItems.Data = Data == null ? null : GameDataHelpers.CombineItems(Data.ReceiveItems, null);
+                _tempReceiveItems.Clear();
+                if (Data != null)
+                    GameDataHelpers.CombineItems(Data.ReceiveItems, _tempReceiveItems);
+                uiReceiveItems.Data = _tempReceiveItems;
             }
 
             if (cashObjects != null && cashObjects.Length > 0)

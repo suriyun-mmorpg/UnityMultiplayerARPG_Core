@@ -67,13 +67,16 @@ namespace MultiplayerARPG
         public ItemCraft itemCraft = new ItemCraft();
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> _cacheEffectivenessAttributes;
+        private Dictionary<Attribute, float> _cacheEffectivenessAttributes = null;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
         {
             get
             {
                 if (_cacheEffectivenessAttributes == null)
-                    _cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
+                {
+                    _cacheEffectivenessAttributes = new Dictionary<Attribute, float>();
+                    GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, _cacheEffectivenessAttributes);
+                }
                 return _cacheEffectivenessAttributes;
             }
         }
@@ -270,7 +273,8 @@ namespace MultiplayerARPG
         {
             if (IsAttack)
             {
-                result = GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, new Dictionary<DamageElement, float>(), skillLevel);
+                result = new Dictionary<DamageElement, float>();
+                GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, result, skillLevel);
                 return true;
             }
             return base.TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
@@ -290,7 +294,8 @@ namespace MultiplayerARPG
         {
             if (IsAttack)
             {
-                result = GameDataHelpers.CombineDamages(additionalDamageAmounts, new Dictionary<DamageElement, MinMaxFloat>(), skillLevel, 1f);
+                result = new Dictionary<DamageElement, MinMaxFloat>();
+                GameDataHelpers.CombineDamages(additionalDamageAmounts, result, skillLevel, 1f);
                 return true;
             }
             return base.TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);

@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,6 +21,12 @@ namespace MultiplayerARPG
         public UIAttributeAmounts uiAttributes;
         public UIResistanceAmounts uiResistances;
         public UISkillLevels uiSkills;
+        public UIStatusEffectResistances uiStatusEffectResistances;
+
+        protected Dictionary<Attribute, float> _tempAttributeAmounts = new Dictionary<Attribute, float>();
+        protected Dictionary<DamageElement, float> _tempResistanceAmounts = new Dictionary<DamageElement, float>();
+        protected Dictionary<BaseSkill, int> _tempSkillLevels = new Dictionary<BaseSkill, int>();
+        protected Dictionary<StatusEffect, float> _tempStatusEffectResistances = new Dictionary<StatusEffect, float>();
 
         protected override void OnDestroy()
         {
@@ -32,6 +39,14 @@ namespace MultiplayerARPG
             uiResistances = null;
             uiSkills = null;
             _data = null;
+            _tempAttributeAmounts.Clear();
+            _tempAttributeAmounts = null;
+            _tempResistanceAmounts.Clear();
+            _tempResistanceAmounts = null;
+            _tempSkillLevels.Clear();
+            _tempSkillLevels = null;
+            _tempStatusEffectResistances.Clear();
+            _tempStatusEffectResistances = null;
         }
 
         protected override void UpdateData()
@@ -63,20 +78,29 @@ namespace MultiplayerARPG
             {
                 uiAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
                 uiAttributes.isBonus = false;
-                uiAttributes.Data = Data.GetCharacterAttributes(1);
+                Data.GetCharacterAttributes(1, _tempAttributeAmounts);
+                uiAttributes.Data = _tempAttributeAmounts;
             }
 
             if (uiResistances != null)
             {
                 uiResistances.isBonus = false;
-                uiResistances.Data = Data.GetCharacterResistances(1);
+                Data.GetCharacterResistances(1, _tempResistanceAmounts);
+                uiResistances.Data = _tempResistanceAmounts;
             }
 
             if (uiSkills != null)
             {
                 uiSkills.displayType = UISkillLevels.DisplayType.Simple;
                 uiSkills.isBonus = false;
-                uiSkills.Data = Data.GetSkillLevels(1);
+                Data.GetSkillLevels(1, _tempSkillLevels);
+                uiSkills.Data = _tempSkillLevels;
+            }
+
+            if (uiStatusEffectResistances != null)
+            {
+                Data.GetCharacterStatusEffectResistances(1, _tempStatusEffectResistances);
+                uiStatusEffectResistances.UpdateData(_tempStatusEffectResistances);
             }
         }
     }

@@ -53,13 +53,16 @@ namespace MultiplayerARPG
         public AmmoType AmmoType { get { return ammoType; } }
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> _cacheEffectivenessAttributes;
+        private Dictionary<Attribute, float> _cacheEffectivenessAttributes = null;
         public Dictionary<Attribute, float> CacheEffectivenessAttributes
         {
             get
             {
                 if (_cacheEffectivenessAttributes == null)
-                    _cacheEffectivenessAttributes = GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, new Dictionary<Attribute, float>());
+                {
+                    _cacheEffectivenessAttributes = new Dictionary<Attribute, float>();
+                    GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, _cacheEffectivenessAttributes);
+                }
                 return _cacheEffectivenessAttributes;
             }
         }

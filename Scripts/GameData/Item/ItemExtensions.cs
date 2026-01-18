@@ -92,12 +92,11 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Extension
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this IAmmoItem ammoItem)
+        public static void GetIncreaseDamages(this IAmmoItem ammoItem, Dictionary<DamageElement, MinMaxFloat> result)
         {
-            Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
+            result.Clear();
             if (ammoItem != null && ammoItem.IsAmmo())
-                result = GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, result, 1, 1f);
-            return result;
+                GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, result, 1, 1f);
         }
         #endregion
 
@@ -118,94 +117,76 @@ namespace MultiplayerARPG
             return equipmentItem.IncreaseStatsRate.GetCharacterStats(level);
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributes<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result = null)
+        public static void GetIncreaseAttributes<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<Attribute, float>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributes, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributes, result, level, 1f);
         }
 
-        public static Dictionary<Attribute, float> GetIncreaseAttributesRate<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result = null)
+        public static void GetIncreaseAttributesRate<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<Attribute, float>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, result, level, 1f);
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseResistances<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result = null)
+        public static void GetIncreaseResistances<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<DamageElement, float>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineResistances(equipmentItem.IncreaseResistances, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineResistances(equipmentItem.IncreaseResistances, result, level, 1f);
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseArmors<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result = null)
+        public static void GetIncreaseArmors<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<DamageElement, float>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmors, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmors, result, level, 1f);
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseArmorsRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result = null)
+        public static void GetIncreaseArmorsRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<DamageElement, float>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmorsRate, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmorsRate, result, level, 1f);
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result = null)
+        public static void GetIncreaseDamages<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<DamageElement, MinMaxFloat>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, result, level, 1f);
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result = null)
+        public static void GetIncreaseDamagesRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<DamageElement, MinMaxFloat>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, result, level, 1f);
         }
 
-        public static Dictionary<BaseSkill, int> GetIncreaseSkills<T>(this T equipmentItem, int level, Dictionary<BaseSkill, int> result = null)
+        public static void GetIncreaseSkills<T>(this T equipmentItem, int level, Dictionary<BaseSkill, int> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<BaseSkill, int>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineSkills(equipmentItem.IncreaseSkills, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineSkills(equipmentItem.IncreaseSkills, result, level, 1f);
         }
 
-        public static Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances<T>(this T equipmentItem, int level, Dictionary<StatusEffect, float> result = null)
+        public static void GetIncreaseStatusEffectResistances<T>(this T equipmentItem, int level, Dictionary<StatusEffect, float> result)
             where T : IEquipmentItem
         {
-            if (result == null)
-                result = new Dictionary<StatusEffect, float>();
+            result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                result = GameDataHelpers.CombineStatusEffectResistances(equipmentItem.IncreaseStatusEffectResistances, result, level, 1f);
-            return result;
+                GameDataHelpers.CombineStatusEffectResistances(equipmentItem.IncreaseStatusEffectResistances, result, level, 1f);
         }
 
         public static void ApplySelfStatusEffectsWhenAttacking<T>(this T equipmentItem, int level, EntityInfo applier, CharacterItem weapon, BaseCharacterEntity target)

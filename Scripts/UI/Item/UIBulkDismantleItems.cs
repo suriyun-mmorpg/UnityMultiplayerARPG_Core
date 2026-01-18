@@ -17,6 +17,9 @@ namespace MultiplayerARPG
         public UICurrencyAmounts uiReturnCurrencies;
         public TextWrapper uiTextReturnGold;
 
+        protected Dictionary<Currency, int> _tempReturningCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempReturningItems = new Dictionary<BaseItem, int>();
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -24,6 +27,10 @@ namespace MultiplayerARPG
             uiReturnItems = null;
             uiReturnCurrencies = null;
             uiTextReturnGold = null;
+            _tempReturningCurrencies.Clear();
+            _tempReturningCurrencies = null;
+            _tempReturningItems.Clear();
+            _tempReturningItems = null;
         }
 
         private void OnEnable()
@@ -72,7 +79,9 @@ namespace MultiplayerARPG
                 {
                     uiReturnItems.displayType = UIItemAmounts.DisplayType.Simple;
                     uiReturnItems.Show();
-                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems, null);
+                    _tempReturningItems.Clear();
+                    GameDataHelpers.CombineItems(returningItems, _tempReturningItems);
+                    uiReturnItems.Data = _tempReturningItems;
                 }
             }
 
@@ -86,7 +95,9 @@ namespace MultiplayerARPG
                 {
                     uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
                     uiReturnCurrencies.Show();
-                    uiReturnCurrencies.Data = GameDataHelpers.CombineCurrencies(returningCurrencies, null, 1f);
+                    _tempReturningCurrencies.Clear();
+                    GameDataHelpers.CombineCurrencies(returningCurrencies, _tempReturningCurrencies, 1f);
+                    uiReturnCurrencies.Data = _tempReturningCurrencies;
                 }
             }
 

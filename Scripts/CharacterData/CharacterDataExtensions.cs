@@ -1,6 +1,7 @@
 ﻿using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -595,7 +596,13 @@ namespace MultiplayerARPG
                     else
                         tempDecresingAmount = amount;
                     if (tempDecresingAmount > 0 && !calculatingDamageAmounts.ContainsKey(tempAmmoItemData.DataId))
-                        calculatingDamageAmounts.Add(tempAmmoItemData.DataId, tempAmmoItemData.GetIncreaseDamages());
+                    {
+                        using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages))
+                        {
+                            tempAmmoItemData.GetIncreaseDamages(tempIncreaseDamages);
+                            calculatingDamageAmounts.Add(tempAmmoItemData.DataId, tempIncreaseDamages);
+                        }
+                    }
                     amount -= tempDecresingAmount;
                     decreasingItemIndexes.Add(i);
                     decreasingItemAmounts.Add(tempDecresingAmount);
@@ -611,7 +618,7 @@ namespace MultiplayerARPG
             float entryRate = 1f / calculatingDamageAmounts.Count;
             foreach (Dictionary<DamageElement, MinMaxFloat> damageAmounts in calculatingDamageAmounts.Values)
             {
-                increaseDamageAmounts = GameDataHelpers.CombineDamages(increaseDamageAmounts, damageAmounts, entryRate);
+                GameDataHelpers.CombineDamages(increaseDamageAmounts, damageAmounts, entryRate);
             }
 
             for (i = decreasingItemIndexes.Count - 1; i >= 0; --i)
@@ -651,8 +658,9 @@ namespace MultiplayerARPG
                 // Ammo capacity >= `amount` reduce loaded ammo
                 if (weapon.ammo >= amount)
                 {
+                    increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                     if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                        increaseDamages = tempAmmoItem.GetIncreaseDamages();
+                        tempAmmoItem.GetIncreaseDamages(increaseDamages);
                     weapon.ammo -= amount;
                     if (isLeftHand)
                         equipWeapons.leftHand = weapon;
@@ -685,8 +693,9 @@ namespace MultiplayerARPG
                     if (nonEquipItems.DecreaseItems(tempAmmoDataId, amount, isLimitSlot))
                     {
                         nonEquipItems.FillEmptySlots(isLimitSlot, slotLimit);
+                        increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                         if (tempItemData is IAmmoItem tempAmmoItem)
-                            increaseDamages = tempAmmoItem.GetIncreaseDamages();
+                            tempAmmoItem.GetIncreaseDamages(increaseDamages);
                         return true;
                     }
                 }
@@ -1418,12 +1427,15 @@ namespace MultiplayerARPG
         public static List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(this ICharacterData data, bool isLeftHand, Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts, int triggerCount, int ammoAmountEachTrigger, bool validIfNoRequireAmmoType = true)
         {
             List<Dictionary<DamageElement, MinMaxFloat>> result = new List<Dictionary<DamageElement, MinMaxFloat>>();
+            Dictionary<DamageElement, MinMaxFloat> tempCombinedDamageAmounts;
             Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamageAmounts;
             for (int i = 0; i < triggerCount; ++i)
             {
                 if (!DecreaseAmmos(data, isLeftHand, ammoAmountEachTrigger, out tempIncreaseDamageAmounts, validIfNoRequireAmmoType, false))
                     break;
-                result.Add(GameDataHelpers.CombineDamages(new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts), tempIncreaseDamageAmounts));
+                tempCombinedDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts);
+                GameDataHelpers.CombineDamages(tempCombinedDamageAmounts, tempIncreaseDamageAmounts);
+                result.Add(tempCombinedDamageAmounts);
             }
             return result;
         }

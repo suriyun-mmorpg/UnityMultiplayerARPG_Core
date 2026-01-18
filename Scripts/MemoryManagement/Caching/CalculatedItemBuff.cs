@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -10,47 +11,55 @@ namespace MultiplayerARPG
         private byte _version;
         private CharacterStats _cacheIncreaseStats = new CharacterStats();
         private CharacterStats _cacheIncreaseStatsRate = new CharacterStats();
-        private Dictionary<Attribute, float> _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
-        private Dictionary<Attribute, float> _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
-        private Dictionary<DamageElement, float> _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, float> _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, float> _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-        private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
-        private Dictionary<BaseSkill, int> _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
-        private Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
+        private readonly Dictionary<Attribute, float> _cacheIncreaseAttributes;
+        private readonly Dictionary<Attribute, float> _cacheIncreaseAttributesRate;
+        private readonly Dictionary<DamageElement, float> _cacheIncreaseResistances;
+        private readonly Dictionary<DamageElement, float> _cacheIncreaseArmors;
+        private readonly Dictionary<DamageElement, float> _cacheIncreaseArmorsRate;
+        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages;
+        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate;
+        private readonly Dictionary<BaseSkill, int> _cacheIncreaseSkills;
+        private readonly Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances;
         private CalculatedItemRandomBonus _cacheRandomBonus = new CalculatedItemRandomBonus();
 
         public CalculatedItemBuff()
         {
-
+            _cacheIncreaseAttributes = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            _cacheIncreaseAttributesRate = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            _cacheIncreaseResistances = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseArmors = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseArmorsRate = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            _cacheIncreaseDamagesRate = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            _cacheIncreaseSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
+            _cacheIncreaseStatusEffectResistances = CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get();
         }
 
         public CalculatedItemBuff(IEquipmentItem item, int level, int randomSeed, byte version)
         {
+            _cacheIncreaseAttributes = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            _cacheIncreaseAttributesRate = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            _cacheIncreaseResistances = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseArmors = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseArmorsRate = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            _cacheIncreaseDamagesRate = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            _cacheIncreaseSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
+            _cacheIncreaseStatusEffectResistances = CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get();
             Build(item, level, randomSeed, version);
         }
 
         ~CalculatedItemBuff()
         {
-            _cacheIncreaseAttributes.Clear();
-            _cacheIncreaseAttributes = null;
-            _cacheIncreaseAttributesRate.Clear();
-            _cacheIncreaseAttributesRate = null;
-            _cacheIncreaseResistances.Clear();
-            _cacheIncreaseResistances = null;
-            _cacheIncreaseArmors.Clear();
-            _cacheIncreaseArmors = null;
-            _cacheIncreaseArmorsRate.Clear();
-            _cacheIncreaseArmorsRate = null;
-            _cacheIncreaseDamages.Clear();
-            _cacheIncreaseDamages = null;
-            _cacheIncreaseDamagesRate.Clear();
-            _cacheIncreaseDamagesRate = null;
-            _cacheIncreaseSkills.Clear();
-            _cacheIncreaseSkills = null;
-            _cacheIncreaseStatusEffectResistances.Clear();
-            _cacheIncreaseStatusEffectResistances = null;
+            CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(_cacheIncreaseAttributes);
+            CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(_cacheIncreaseAttributesRate);
+            CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_cacheIncreaseResistances);
+            CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_cacheIncreaseArmors);
+            CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_cacheIncreaseArmorsRate);
+            CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_cacheIncreaseDamages);
+            CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_cacheIncreaseDamagesRate);
+            CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(_cacheIncreaseSkills);
+            CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Release(_cacheIncreaseStatusEffectResistances);
             _cacheRandomBonus = null;
         }
 
@@ -89,16 +98,24 @@ namespace MultiplayerARPG
 
             _cacheIncreaseStats = item.GetIncreaseStats(_level) + _cacheRandomBonus.GetIncreaseStats();
             _cacheIncreaseStatsRate = item.GetIncreaseStatsRate(_level) + _cacheRandomBonus.GetIncreaseStatsRate();
-            _cacheIncreaseAttributes = GameDataHelpers.CombineAttributes(item.GetIncreaseAttributes(_level, _cacheIncreaseAttributes), _cacheRandomBonus.GetIncreaseAttributes());
-            _cacheIncreaseAttributesRate = GameDataHelpers.CombineAttributes(item.GetIncreaseAttributesRate(_level, _cacheIncreaseAttributesRate), _cacheRandomBonus.GetIncreaseAttributesRate());
-            _cacheIncreaseResistances = GameDataHelpers.CombineResistances(item.GetIncreaseResistances(_level, _cacheIncreaseResistances), _cacheRandomBonus.GetIncreaseResistances());
-            _cacheIncreaseArmors = GameDataHelpers.CombineArmors(item.GetIncreaseArmors(_level, _cacheIncreaseArmors), _cacheRandomBonus.GetIncreaseArmors());
-            _cacheIncreaseArmorsRate = GameDataHelpers.CombineArmors(item.GetIncreaseArmorsRate(_level, _cacheIncreaseArmorsRate), _cacheRandomBonus.GetIncreaseArmorsRate());
-            _cacheIncreaseDamages = GameDataHelpers.CombineDamages(item.GetIncreaseDamages(_level, _cacheIncreaseDamages), _cacheRandomBonus.GetIncreaseDamages());
-            _cacheIncreaseDamagesRate = GameDataHelpers.CombineDamages(item.GetIncreaseDamagesRate(_level, _cacheIncreaseDamagesRate), _cacheRandomBonus.GetIncreaseDamagesRate());
-            _cacheIncreaseSkills = GameDataHelpers.CombineSkills(item.GetIncreaseSkills(_level, _cacheIncreaseSkills), _cacheRandomBonus.GetIncreaseSkills());
+            item.GetIncreaseAttributes(_level, _cacheIncreaseAttributes);
+            GameDataHelpers.CombineAttributes(_cacheIncreaseAttributes, _cacheRandomBonus.GetIncreaseAttributes());
+            item.GetIncreaseAttributesRate(_level, _cacheIncreaseAttributesRate);
+            GameDataHelpers.CombineAttributes(_cacheIncreaseAttributesRate, _cacheRandomBonus.GetIncreaseAttributesRate());
+            item.GetIncreaseResistances(_level, _cacheIncreaseResistances);
+            GameDataHelpers.CombineResistances(_cacheIncreaseResistances, _cacheRandomBonus.GetIncreaseResistances());
+            item.GetIncreaseArmors(_level, _cacheIncreaseArmors);
+            GameDataHelpers.CombineArmors(_cacheIncreaseArmors, _cacheRandomBonus.GetIncreaseArmors());
+            item.GetIncreaseArmorsRate(_level, _cacheIncreaseArmorsRate);
+            GameDataHelpers.CombineArmors(_cacheIncreaseArmorsRate, _cacheRandomBonus.GetIncreaseArmorsRate());
+            item.GetIncreaseDamages(_level, _cacheIncreaseDamages);
+            GameDataHelpers.CombineDamages(_cacheIncreaseDamages, _cacheRandomBonus.GetIncreaseDamages());
+            item.GetIncreaseDamagesRate(_level, _cacheIncreaseDamagesRate);
+            GameDataHelpers.CombineDamages(_cacheIncreaseDamagesRate, _cacheRandomBonus.GetIncreaseDamagesRate());
+            item.GetIncreaseSkills(_level, _cacheIncreaseSkills);
+            GameDataHelpers.CombineSkills(_cacheIncreaseSkills, _cacheRandomBonus.GetIncreaseSkills());
             // TODO: Implement random bonus for increase status effect resistances
-            _cacheIncreaseStatusEffectResistances = item.GetIncreaseStatusEffectResistances(_level, _cacheIncreaseStatusEffectResistances);
+            item.GetIncreaseStatusEffectResistances(_level, _cacheIncreaseStatusEffectResistances);
 
             if (GameExtensionInstance.onBuildCalculatedItemBuff != null)
                 GameExtensionInstance.onBuildCalculatedItemBuff(this);

@@ -18,9 +18,6 @@ namespace MultiplayerARPG
         public TextWrapper uiTextReturnGold;
         public TextWrapper uiTextDismantleAmount;
 
-        protected bool _activated;
-        protected string _activeItemId;
-
         private int _dismantleAmount;
         public int DismantleAmount
         {
@@ -33,6 +30,11 @@ namespace MultiplayerARPG
             }
         }
 
+        protected bool _activated;
+        protected string _activeItemId;
+        protected Dictionary<Currency, int> _tempReturningCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempReturningItems = new Dictionary<BaseItem, int>();
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -40,6 +42,10 @@ namespace MultiplayerARPG
             uiReturnCurrencies = null;
             uiTextReturnGold = null;
             uiTextDismantleAmount = null;
+            _tempReturningCurrencies.Clear();
+            _tempReturningCurrencies = null;
+            _tempReturningItems.Clear();
+            _tempReturningItems = null;
         }
 
         protected override void UpdateData()
@@ -91,7 +97,9 @@ namespace MultiplayerARPG
                 {
                     uiReturnItems.displayType = UIItemAmounts.DisplayType.Simple;
                     uiReturnItems.Show();
-                    uiReturnItems.Data = GameDataHelpers.CombineItems(returningItems, null);
+                    _tempReturningItems.Clear();
+                    GameDataHelpers.CombineItems(returningItems, _tempReturningItems);
+                    uiReturnItems.Data = _tempReturningItems;
                 }
             }
 
@@ -105,7 +113,9 @@ namespace MultiplayerARPG
                 {
                     uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
                     uiReturnCurrencies.Show();
-                    uiReturnCurrencies.Data = GameDataHelpers.CombineCurrencies(returningCurrencies, null, 1f);
+                    _tempReturningCurrencies.Clear();
+                    GameDataHelpers.CombineCurrencies(returningCurrencies, _tempReturningCurrencies, 1f);
+                    uiReturnCurrencies.Data = _tempReturningCurrencies;
                 }
             }
 

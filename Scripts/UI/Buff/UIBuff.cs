@@ -62,6 +62,8 @@ namespace MultiplayerARPG
         public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacking;
         public UIStatusEffectApplyings uiStatusEffectApplyingsSelfWhenAttacked;
         public UIStatusEffectApplyings uiStatusEffectApplyingsEnemyWhenAttacked;
+        public UISkillLevels uiIncreaseSkills;
+        public UISkillLevels uiOverrideSkills;
         public UIStatusEffectResistances uiStatusEffectResistances;
         public UIBuffRemovals uiBuffRemovals;
         [Header("Extras")]
@@ -103,6 +105,19 @@ namespace MultiplayerARPG
         public TextWrapper uiTextExtras;
         [Tooltip("Seperator for ailments")]
         public string extrasSeparator = ", ";
+
+        protected Dictionary<Attribute, float> _tempBuffAttributes = new Dictionary<Attribute, float>();
+        protected Dictionary<Attribute, float> _tempBuffAttributesRate = new Dictionary<Attribute, float>();
+        protected Dictionary<DamageElement, float> _tempBuffResistances = new Dictionary<DamageElement, float>();
+        protected Dictionary<DamageElement, float> _tempBuffArmors = new Dictionary<DamageElement, float>();
+        protected Dictionary<DamageElement, float> _tempBuffArmorsRate = new Dictionary<DamageElement, float>();
+        protected Dictionary<DamageElement, MinMaxFloat> _tempBuffDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        protected Dictionary<DamageElement, MinMaxFloat> _tempBuffDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
+        protected Dictionary<DamageElement, MinMaxFloat> _tempDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
+        protected Dictionary<BaseSkill, int> _tempIncreaseSkills = new Dictionary<BaseSkill, int>();
+        protected Dictionary<BaseSkill, int> _tempOverrideSkills = new Dictionary<BaseSkill, int>();
+        protected Dictionary<StatusEffect, float> _tempStatusEffectResistances = new Dictionary<StatusEffect, float>();
+        protected Dictionary<BuffRemoval, float> _tempBuffRemovals = new Dictionary<BuffRemoval, float>();
 
         protected override void OnDestroy()
         {
@@ -152,6 +167,30 @@ namespace MultiplayerARPG
             muteFootstepSoundObject = null;
             isExtendDurationObject = null;
             uiTextExtras = null;
+            _tempBuffAttributes.Clear();
+            _tempBuffAttributes = null;
+            _tempBuffAttributesRate.Clear();
+            _tempBuffAttributesRate = null;
+            _tempBuffResistances.Clear();
+            _tempBuffResistances = null;
+            _tempBuffArmors.Clear();
+            _tempBuffArmors = null;
+            _tempBuffArmorsRate.Clear();
+            _tempBuffArmorsRate = null;
+            _tempBuffDamages.Clear();
+            _tempBuffDamages = null;
+            _tempBuffDamagesRate.Clear();
+            _tempBuffDamagesRate = null;
+            _tempDamageOverTimes.Clear();
+            _tempDamageOverTimes = null;
+            _tempIncreaseSkills.Clear();
+            _tempIncreaseSkills = null;
+            _tempOverrideSkills.Clear();
+            _tempOverrideSkills = null;
+            _tempStatusEffectResistances.Clear();
+            _tempStatusEffectResistances = null;
+            _tempBuffRemovals.Clear();
+            _tempBuffRemovals = null;
         }
 
         protected override void UpdateData()
@@ -417,7 +456,9 @@ namespace MultiplayerARPG
                     uiBuffAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
                     uiBuffAttributes.isBonus = true;
                     uiBuffAttributes.Show();
-                    uiBuffAttributes.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributes, new Dictionary<Attribute, float>(), Level, 1f);
+                    _tempBuffAttributes.Clear();
+                    GameDataHelpers.CombineAttributes(Buff.increaseAttributes, _tempBuffAttributes, Level, 1f);
+                    uiBuffAttributes.Data = _tempBuffAttributes;
                 }
             }
 
@@ -432,7 +473,9 @@ namespace MultiplayerARPG
                     uiBuffAttributesRate.displayType = UIAttributeAmounts.DisplayType.Rate;
                     uiBuffAttributesRate.isBonus = true;
                     uiBuffAttributesRate.Show();
-                    uiBuffAttributesRate.Data = GameDataHelpers.CombineAttributes(Buff.increaseAttributesRate, new Dictionary<Attribute, float>(), Level, 1f);
+                    _tempBuffAttributesRate.Clear();
+                    GameDataHelpers.CombineAttributes(Buff.increaseAttributesRate, _tempBuffAttributesRate, Level, 1f);
+                    uiBuffAttributesRate.Data = _tempBuffAttributesRate;
                 }
             }
 
@@ -446,7 +489,9 @@ namespace MultiplayerARPG
                 {
                     uiBuffResistances.isBonus = true;
                     uiBuffResistances.Show();
-                    uiBuffResistances.Data = GameDataHelpers.CombineResistances(Buff.increaseResistances, new Dictionary<DamageElement, float>(), Level, 1f);
+                    _tempBuffResistances.Clear();
+                    GameDataHelpers.CombineResistances(Buff.increaseResistances, _tempBuffResistances, Level, 1f);
+                    uiBuffResistances.Data = _tempBuffResistances;
                 }
             }
 
@@ -461,7 +506,9 @@ namespace MultiplayerARPG
                     uiBuffArmors.displayType = UIArmorAmounts.DisplayType.Simple;
                     uiBuffArmors.isBonus = true;
                     uiBuffArmors.Show();
-                    uiBuffArmors.Data = GameDataHelpers.CombineArmors(Buff.increaseArmors, new Dictionary<DamageElement, float>(), Level, 1f);
+                    _tempBuffArmors.Clear();
+                    GameDataHelpers.CombineArmors(Buff.increaseArmors, _tempBuffArmors, Level, 1f);
+                    uiBuffArmors.Data = _tempBuffArmors;
                 }
             }
 
@@ -476,7 +523,9 @@ namespace MultiplayerARPG
                     uiBuffArmorsRate.displayType = UIArmorAmounts.DisplayType.Rate;
                     uiBuffArmorsRate.isBonus = true;
                     uiBuffArmorsRate.Show();
-                    uiBuffArmorsRate.Data = GameDataHelpers.CombineArmors(Buff.increaseArmorsRate, new Dictionary<DamageElement, float>(), Level, 1f);
+                    _tempBuffArmorsRate.Clear();
+                    GameDataHelpers.CombineArmors(Buff.increaseArmorsRate, _tempBuffArmorsRate, Level, 1f);
+                    uiBuffArmorsRate.Data = _tempBuffArmorsRate;
                 }
             }
 
@@ -491,7 +540,9 @@ namespace MultiplayerARPG
                     uiBuffDamages.displayType = UIDamageElementAmounts.DisplayType.Simple;
                     uiBuffDamages.isBonus = true;
                     uiBuffDamages.Show();
-                    uiBuffDamages.Data = GameDataHelpers.CombineDamages(Buff.increaseDamages, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+                    _tempBuffDamages.Clear();
+                    GameDataHelpers.CombineDamages(Buff.increaseDamages, _tempBuffDamages, Level, 1f);
+                    uiBuffDamages.Data = _tempBuffDamages;
                 }
             }
 
@@ -506,7 +557,9 @@ namespace MultiplayerARPG
                     uiBuffDamagesRate.displayType = UIDamageElementAmounts.DisplayType.Rate;
                     uiBuffDamagesRate.isBonus = true;
                     uiBuffDamagesRate.Show();
-                    uiBuffDamagesRate.Data = GameDataHelpers.CombineDamages(Buff.increaseDamagesRate, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+                    _tempBuffDamagesRate.Clear();
+                    GameDataHelpers.CombineDamages(Buff.increaseDamagesRate, _tempBuffDamagesRate, Level, 1f);
+                    uiBuffDamagesRate.Data = _tempBuffDamagesRate;
                 }
             }
 
@@ -520,7 +573,9 @@ namespace MultiplayerARPG
                 {
                     uiDamageOverTimes.isBonus = false;
                     uiDamageOverTimes.Show();
-                    uiDamageOverTimes.Data = GameDataHelpers.CombineDamages(Buff.damageOverTimes, new Dictionary<DamageElement, MinMaxFloat>(), Level, 1f);
+                    _tempDamageOverTimes.Clear();
+                    GameDataHelpers.CombineDamages(Buff.damageOverTimes, _tempDamageOverTimes, Level, 1f);
+                    uiDamageOverTimes.Data = _tempDamageOverTimes;
                 }
             }
 
@@ -576,6 +631,38 @@ namespace MultiplayerARPG
                 }
             }
 
+            if (uiIncreaseSkills != null)
+            {
+                if (Buff.increaseSkills == null || Buff.increaseSkills.Length == 0)
+                {
+                    uiIncreaseSkills.Hide();
+                }
+                else
+                {
+                    uiIncreaseSkills.isBonus = true;
+                    uiIncreaseSkills.Show();
+                    _tempIncreaseSkills.Clear();
+                    GameDataHelpers.CombineSkills(Buff.increaseSkills, _tempIncreaseSkills, Level, 1f);
+                    uiIncreaseSkills.Data = _tempIncreaseSkills;
+                }
+            }
+
+            if (uiOverrideSkills != null)
+            {
+                if (!Buff.isOverrideSkills || Buff.overrideSkills == null || Buff.overrideSkills.Length == 0)
+                {
+                    uiOverrideSkills.Hide();
+                }
+                else
+                {
+                    uiOverrideSkills.isBonus = true;
+                    uiOverrideSkills.Show();
+                    _tempOverrideSkills.Clear();
+                    GameDataHelpers.CombineSkills(Buff.overrideSkills, _tempOverrideSkills, Level, 1f);
+                    uiOverrideSkills.Data = _tempOverrideSkills;
+                }
+            }
+
             if (uiStatusEffectResistances != null)
             {
                 if (Buff.increaseStatusEffectResistances == null || Buff.increaseStatusEffectResistances.Length == 0)
@@ -586,7 +673,9 @@ namespace MultiplayerARPG
                 {
                     uiStatusEffectResistances.isBonus = true;
                     uiStatusEffectResistances.Show();
-                    uiStatusEffectResistances.UpdateData(GameDataHelpers.CombineStatusEffectResistances(Buff.increaseStatusEffectResistances, new Dictionary<StatusEffect, float>(), Level, 1f));
+                    _tempStatusEffectResistances.Clear();
+                    GameDataHelpers.CombineStatusEffectResistances(Buff.increaseStatusEffectResistances, _tempStatusEffectResistances, Level, 1f);
+                    uiStatusEffectResistances.UpdateData(_tempStatusEffectResistances);
                 }
             }
 
@@ -599,7 +688,9 @@ namespace MultiplayerARPG
                 else
                 {
                     uiBuffRemovals.Show();
-                    uiBuffRemovals.UpdateData(GameDataHelpers.CombineBuffRemovals(Buff.buffRemovals, new Dictionary<BuffRemoval, float>(), Level, 1f));
+                    _tempBuffRemovals.Clear();
+                    GameDataHelpers.CombineBuffRemovals(Buff.buffRemovals, _tempBuffRemovals, Level, 1f);
+                    uiBuffRemovals.UpdateData(_tempBuffRemovals);
                 }
             }
 

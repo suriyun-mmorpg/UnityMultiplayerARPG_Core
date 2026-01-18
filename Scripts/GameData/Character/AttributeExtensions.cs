@@ -1,5 +1,5 @@
 ﻿using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -40,80 +40,100 @@ namespace MultiplayerARPG
             return attribute.GetStats(attributeIncremental.amount.GetAmount(level));
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseResistances(this Dictionary<Attribute, float> entries)
+        public static void GetIncreaseResistances(this Dictionary<Attribute, float> entries, Dictionary<DamageElement, float> result)
         {
-            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+            result.Clear();
             if (entries == null || entries.Count == 0)
-                return result;
+                return;
             foreach (KeyValuePair<Attribute, float> entry in entries)
             {
-                result = GameDataHelpers.CombineResistances(result, entry.Key.GetIncreaseResistances(entry.Value));
+                if (entry.Key == null)
+                    continue;
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempData))
+                {
+                    entry.Key.GetIncreaseResistances(entry.Value, tempData);
+                    GameDataHelpers.CombineResistances(result, tempData);
+                }
             }
-            return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseResistances(this Attribute attribute, float amount)
+        public static void GetIncreaseResistances(this Attribute attribute, float amount, Dictionary<DamageElement, float> result)
         {
+            result.Clear();
             if (attribute != null)
-                return attribute.GetIncreaseResistancesByLevel(amount);
-            return new Dictionary<DamageElement, float>();
+                attribute.GetIncreaseResistancesByLevel(amount, result);
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseArmors(this Dictionary<Attribute, float> entries)
+        public static void GetIncreaseArmors(this Dictionary<Attribute, float> entries, Dictionary<DamageElement, float> result)
         {
-            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
+            result.Clear();
             if (entries == null || entries.Count == 0)
-                return result;
+                return;
             foreach (KeyValuePair<Attribute, float> entry in entries)
             {
-                result = GameDataHelpers.CombineArmors(result, entry.Key.GetIncreaseArmors(entry.Value));
+                if (entry.Key == null)
+                    continue;
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempData))
+                {
+                    entry.Key.GetIncreaseArmors(entry.Value, tempData);
+                    GameDataHelpers.CombineArmors(result, tempData);
+                }
             }
-            return result;
         }
 
-        public static Dictionary<DamageElement, float> GetIncreaseArmors(this Attribute attribute, float amount)
+        public static void GetIncreaseArmors(this Attribute attribute, float amount, Dictionary<DamageElement, float> result)
         {
+            result.Clear();
             if (attribute != null)
-                return attribute.GetIncreaseArmorsByLevel(amount);
-            return new Dictionary<DamageElement, float>();
+                attribute.GetIncreaseArmorsByLevel(amount, result);
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Dictionary<Attribute, float> entries)
+        public static void GetIncreaseDamages(this Dictionary<Attribute, float> entries, Dictionary<DamageElement, MinMaxFloat> result)
         {
-            Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
+            result.Clear();
             if (entries == null || entries.Count == 0)
-                return result;
+                return;
             foreach (KeyValuePair<Attribute, float> entry in entries)
             {
-                result = GameDataHelpers.CombineDamages(result, entry.Key.GetIncreaseDamages(entry.Value));
+                if (entry.Key == null)
+                    continue;
+                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempData))
+                {
+                    entry.Key.GetIncreaseDamages(entry.Value, tempData);
+                    GameDataHelpers.CombineDamages(result, tempData);
+                }
             }
-            return result;
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages(this Attribute attribute, float amount)
+        public static void GetIncreaseDamages(this Attribute attribute, float amount, Dictionary<DamageElement, MinMaxFloat> result)
         {
+            result.Clear();
             if (attribute != null)
-                return attribute.GetIncreaseDamagesByLevel(amount);
-            return new Dictionary<DamageElement, MinMaxFloat>();
+                attribute.GetIncreaseDamagesByLevel(amount, result);
         }
 
-        public static Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances(this Dictionary<Attribute, float> entries)
+        public static void GetIncreaseStatusEffectResistances(this Dictionary<Attribute, float> entries, Dictionary<StatusEffect, float> result)
         {
-            Dictionary<StatusEffect, float> result = new Dictionary<StatusEffect, float>();
+            result.Clear();
             if (entries == null || entries.Count == 0)
-                return result;
+                return;
             foreach (KeyValuePair<Attribute, float> entry in entries)
             {
-                result = GameDataHelpers.CombineStatusEffectResistances(result, entry.Key.GetIncreaseStatusEffectResistances(entry.Value));
+                if (entry.Key == null)
+                    continue;
+                using (CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get(out Dictionary<StatusEffect, float> tempData))
+                {
+                    entry.Key.GetIncreaseStatusEffectResistances(entry.Value, tempData);
+                    GameDataHelpers.CombineStatusEffectResistances(result, tempData);
+                }
             }
-            return result;
         }
 
-        public static Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistances(this Attribute attribute, float amount)
+        public static void GetIncreaseStatusEffectResistances(this Attribute attribute, float amount, Dictionary<StatusEffect, float> result)
         {
+            result.Clear();
             if (attribute != null)
-                return attribute.GetIncreaseStatusEffectResistancesByLevel(amount);
-            return new Dictionary<StatusEffect, float>();
+                attribute.GetIncreaseStatusEffectResistancesByLevel(amount, result);
         }
     }
 }

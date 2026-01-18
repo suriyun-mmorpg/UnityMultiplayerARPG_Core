@@ -2,6 +2,7 @@
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -61,12 +62,19 @@ namespace MultiplayerARPG
             int learnLevel = characterSkill.level - 1;
             float requireSkillPoint = skill.GetRequireCharacterSkillPoint(learnLevel);
             int requireGold = skill.GetRequireCharacterGold(learnLevel);
-            Dictionary<Currency, int> requireCurrencies = skill.GetRequireCurrencyAmounts(learnLevel);
-            Dictionary<BaseItem, int> requireItems = skill.GetRequireItemAmounts(learnLevel);
             playerCharacter.SkillPoint -= requireSkillPoint;
             playerCharacter.Gold -= requireGold;
-            playerCharacter.DecreaseCurrencies(requireCurrencies);
-            playerCharacter.DecreaseItems(requireItems);
+            using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> requireCurrencies))
+            {
+                skill.GetRequireCurrencyAmounts(learnLevel, requireCurrencies);
+                playerCharacter.DecreaseCurrencies(requireCurrencies);
+            }
+            using (CollectionPool<Dictionary<BaseItem, int>, KeyValuePair<BaseItem, int>>.Get(out Dictionary<BaseItem, int> requireItems))
+            {
+                skill.GetRequireItemAmounts(learnLevel, requireItems);
+                playerCharacter.DecreaseItems(requireItems);
+                playerCharacter.FillEmptySlots();
+            }
             result.InvokeSuccess(new ResponseIncreaseSkillLevelMessage());
             return default;
         }

@@ -32,7 +32,10 @@ namespace MultiplayerARPG
             get
             {
                 if (_cacheRequireAttributeAmounts == null)
-                    _cacheRequireAttributeAmounts = GameDataHelpers.CombineAttributes(requirement.attributeAmounts, new Dictionary<Attribute, float>(), 1f);
+                {
+                    _cacheRequireAttributeAmounts = new Dictionary<Attribute, float>();
+                    GameDataHelpers.CombineAttributes(requirement.attributeAmounts, _cacheRequireAttributeAmounts, 1f);
+                }
                 return _cacheRequireAttributeAmounts;
             }
         }

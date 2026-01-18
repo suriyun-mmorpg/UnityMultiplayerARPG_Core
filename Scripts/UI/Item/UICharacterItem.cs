@@ -236,6 +236,10 @@ namespace MultiplayerARPG
         public bool dontCalculateRandomBonus;
         public bool changeObjectNameByData = true;
 
+        public bool IsSetupAsEquipSlot { get; private set; }
+        public string EquipPosition { get; private set; }
+        public byte EquipSlotIndex { get; private set; }
+
         protected bool _isSellItemDialogAppeared;
         protected bool _isRefineItemDialogAppeared;
         protected bool _isDismantleItemDialogAppeared;
@@ -250,10 +254,15 @@ namespace MultiplayerARPG
         protected bool _dirtyIsCountDown;
         protected bool _forceUpdateUi = true;
         protected CalculatedItemRandomBonus _randomBonus = null;
-
-        public bool IsSetupAsEquipSlot { get; private set; }
-        public string EquipPosition { get; private set; }
-        public byte EquipSlotIndex { get; private set; }
+        protected Dictionary<Attribute, float> _tempAttributes = new Dictionary<Attribute, float>();
+        protected Dictionary<Attribute, float> _tempAttributesRate = new Dictionary<Attribute, float>();
+        protected Dictionary<DamageElement, float> _tempResistances = new Dictionary<DamageElement, float>();
+        protected Dictionary<DamageElement, float> _tempArmors = new Dictionary<DamageElement, float>();
+        protected Dictionary<DamageElement, float> _tempArmorsRate = new Dictionary<DamageElement, float>();
+        protected Dictionary<DamageElement, MinMaxFloat> _tempDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+        protected Dictionary<DamageElement, MinMaxFloat> _tempDamageAmountsRate = new Dictionary<DamageElement, MinMaxFloat>();
+        protected Dictionary<StatusEffect, float> _tempStatusEffectResistances = new Dictionary<StatusEffect, float>();
+        protected Dictionary<BaseSkill, int> tempSkillLevels = new Dictionary<BaseSkill, int>();
 
         protected override void OnDestroy()
         {
@@ -996,7 +1005,7 @@ namespace MultiplayerARPG
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    stats += SocketEnhancerItem.SocketEnhanceEffect.stats;
+                    stats += SocketEnhancerItem.SocketEnhanceEffect.Stats;
                 }
 
                 if (stats.IsEmpty())
@@ -1026,7 +1035,7 @@ namespace MultiplayerARPG
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    statsRate += SocketEnhancerItem.SocketEnhanceEffect.statsRate;
+                    statsRate += SocketEnhancerItem.SocketEnhanceEffect.StatsRate;
                 }
 
                 if (statsRate.IsEmpty())
@@ -1045,21 +1054,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseAttributes != null)
             {
-                Dictionary<Attribute, float> attributes = null;
+                _tempAttributes.Clear();
                 if (EquipmentItem != null)
                 {
-                    attributes = EquipmentItem.GetIncreaseAttributes(Level);
+                    EquipmentItem.GetIncreaseAttributes(Level, _tempAttributes);
                     if (!dontCalculateRandomBonus)
                     {
-                        attributes = GameDataHelpers.CombineAttributes(attributes, GetRandomBonus().GetIncreaseAttributes());
+                        GameDataHelpers.CombineAttributes(_tempAttributes, GetRandomBonus().GetIncreaseAttributes());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    attributes = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributes, attributes, 1f);
+                    GameDataHelpers.CombineAttributes(_tempAttributes, SocketEnhancerItem.SocketEnhanceEffect.Attributes);
                 }
 
-                if (attributes == null || attributes.Count == 0)
+                if (_tempAttributes == null || _tempAttributes.Count == 0)
                 {
                     // Hide ui if attributes is empty
                     uiIncreaseAttributes.Hide();
@@ -1069,27 +1078,27 @@ namespace MultiplayerARPG
                     uiIncreaseAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
                     uiIncreaseAttributes.isBonus = true;
                     uiIncreaseAttributes.Show();
-                    uiIncreaseAttributes.Data = attributes;
+                    uiIncreaseAttributes.Data = _tempAttributes;
                 }
             }
 
             if (uiIncreaseAttributesRate != null)
             {
-                Dictionary<Attribute, float> attributesRate = null;
+                _tempAttributesRate.Clear();
                 if (EquipmentItem != null)
                 {
-                    attributesRate = EquipmentItem.GetIncreaseAttributesRate(Level);
+                    EquipmentItem.GetIncreaseAttributesRate(Level, _tempAttributesRate);
                     if (!dontCalculateRandomBonus)
                     {
-                        attributesRate = GameDataHelpers.CombineAttributes(attributesRate, GetRandomBonus().GetIncreaseAttributesRate());
+                        GameDataHelpers.CombineAttributes(_tempAttributesRate, GetRandomBonus().GetIncreaseAttributesRate());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    attributesRate = GameDataHelpers.CombineAttributes(SocketEnhancerItem.SocketEnhanceEffect.attributesRate, attributesRate, 1f);
+                    GameDataHelpers.CombineAttributes(_tempAttributesRate, SocketEnhancerItem.SocketEnhanceEffect.AttributesRate);
                 }
 
-                if (attributesRate == null || attributesRate.Count == 0)
+                if (_tempAttributesRate == null || _tempAttributesRate.Count == 0)
                 {
                     // Hide ui if attributes is empty
                     uiIncreaseAttributesRate.Hide();
@@ -1099,27 +1108,27 @@ namespace MultiplayerARPG
                     uiIncreaseAttributesRate.displayType = UIAttributeAmounts.DisplayType.Rate;
                     uiIncreaseAttributesRate.isBonus = true;
                     uiIncreaseAttributesRate.Show();
-                    uiIncreaseAttributesRate.Data = attributesRate;
+                    uiIncreaseAttributesRate.Data = _tempAttributesRate;
                 }
             }
 
             if (uiIncreaseResistances != null)
             {
-                Dictionary<DamageElement, float> resistances = null;
+                _tempResistances.Clear();
                 if (EquipmentItem != null)
                 {
-                    resistances = EquipmentItem.GetIncreaseResistances(Level);
+                    EquipmentItem.GetIncreaseResistances(Level, _tempResistances);
                     if (!dontCalculateRandomBonus)
                     {
-                        resistances = GameDataHelpers.CombineResistances(resistances, GetRandomBonus().GetIncreaseResistances());
+                        GameDataHelpers.CombineResistances(_tempResistances, GetRandomBonus().GetIncreaseResistances());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    resistances = GameDataHelpers.CombineResistances(SocketEnhancerItem.SocketEnhanceEffect.resistances, resistances, 1f);
+                    GameDataHelpers.CombineResistances(_tempResistances, SocketEnhancerItem.SocketEnhanceEffect.Resistances);
                 }
 
-                if (resistances == null || resistances.Count == 0)
+                if (_tempResistances == null || _tempResistances.Count == 0)
                 {
                     // Hide ui if resistances is empty
                     uiIncreaseResistances.Hide();
@@ -1128,27 +1137,27 @@ namespace MultiplayerARPG
                 {
                     uiIncreaseResistances.isBonus = true;
                     uiIncreaseResistances.Show();
-                    uiIncreaseResistances.Data = resistances;
+                    uiIncreaseResistances.Data = _tempResistances;
                 }
             }
 
             if (uiIncreaseArmors != null)
             {
-                Dictionary<DamageElement, float> armors = null;
+                _tempArmors.Clear();
                 if (EquipmentItem != null)
                 {
-                    armors = EquipmentItem.GetIncreaseArmors(Level);
+                    EquipmentItem.GetIncreaseArmors(Level, _tempArmors);
                     if (!dontCalculateRandomBonus)
                     {
-                        armors = GameDataHelpers.CombineArmors(armors, GetRandomBonus().GetIncreaseArmors());
+                        GameDataHelpers.CombineArmors(_tempArmors, GetRandomBonus().GetIncreaseArmors());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    armors = GameDataHelpers.CombineArmors(SocketEnhancerItem.SocketEnhanceEffect.armors, armors, 1f);
+                    GameDataHelpers.CombineArmors(_tempArmors, SocketEnhancerItem.SocketEnhanceEffect.Armors);
                 }
 
-                if (armors == null || armors.Count == 0)
+                if (_tempArmors == null || _tempArmors.Count == 0)
                 {
                     // Hide ui if armors is empty
                     uiIncreaseArmors.Hide();
@@ -1158,27 +1167,27 @@ namespace MultiplayerARPG
                     uiIncreaseArmors.displayType = UIArmorAmounts.DisplayType.Simple;
                     uiIncreaseArmors.isBonus = true;
                     uiIncreaseArmors.Show();
-                    uiIncreaseArmors.Data = armors;
+                    uiIncreaseArmors.Data = _tempArmors;
                 }
             }
 
             if (uiIncreaseArmorsRate != null)
             {
-                Dictionary<DamageElement, float> armorsRate = null;
+                _tempArmorsRate.Clear();
                 if (EquipmentItem != null)
                 {
-                    armorsRate = EquipmentItem.GetIncreaseArmorsRate(Level);
+                    EquipmentItem.GetIncreaseArmorsRate(Level, _tempArmorsRate);
                     if (!dontCalculateRandomBonus)
                     {
-                        armorsRate = GameDataHelpers.CombineArmors(armorsRate, GetRandomBonus().GetIncreaseArmorsRate());
+                        GameDataHelpers.CombineArmors(_tempArmorsRate, GetRandomBonus().GetIncreaseArmorsRate());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    armorsRate = GameDataHelpers.CombineArmors(SocketEnhancerItem.SocketEnhanceEffect.armorsRate, armorsRate, 1f);
+                    GameDataHelpers.CombineArmors(_tempArmorsRate, SocketEnhancerItem.SocketEnhanceEffect.ArmorsRate);
                 }
 
-                if (armorsRate == null || armorsRate.Count == 0)
+                if (_tempArmorsRate == null || _tempArmorsRate.Count == 0)
                 {
                     // Hide ui if armors is empty
                     uiIncreaseArmorsRate.Hide();
@@ -1188,27 +1197,27 @@ namespace MultiplayerARPG
                     uiIncreaseArmorsRate.displayType = UIArmorAmounts.DisplayType.Rate;
                     uiIncreaseArmorsRate.isBonus = true;
                     uiIncreaseArmorsRate.Show();
-                    uiIncreaseArmorsRate.Data = armorsRate;
+                    uiIncreaseArmorsRate.Data = _tempArmorsRate;
                 }
             }
 
             if (uiIncreaseDamages != null)
             {
-                Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
+                _tempDamageAmounts.Clear();
                 if (EquipmentItem != null)
                 {
-                    damageAmounts = EquipmentItem.GetIncreaseDamages(Level);
+                    EquipmentItem.GetIncreaseDamages(Level, _tempDamageAmounts);
                     if (!dontCalculateRandomBonus)
                     {
-                        damageAmounts = GameDataHelpers.CombineDamages(damageAmounts, GetRandomBonus().GetIncreaseDamages());
+                        GameDataHelpers.CombineDamages(_tempDamageAmounts, GetRandomBonus().GetIncreaseDamages());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    damageAmounts = GameDataHelpers.CombineDamages(SocketEnhancerItem.SocketEnhanceEffect.damages, damageAmounts, 1f);
+                    GameDataHelpers.CombineDamages(_tempDamageAmounts, SocketEnhancerItem.SocketEnhanceEffect.Damages);
                 }
 
-                if (damageAmounts == null || damageAmounts.Count == 0)
+                if (_tempDamageAmounts == null || _tempDamageAmounts.Count == 0)
                 {
                     // Hide ui if damage amounts is empty
                     uiIncreaseDamages.Hide();
@@ -1218,27 +1227,27 @@ namespace MultiplayerARPG
                     uiIncreaseDamages.displayType = UIDamageElementAmounts.DisplayType.Simple;
                     uiIncreaseDamages.isBonus = true;
                     uiIncreaseDamages.Show();
-                    uiIncreaseDamages.Data = damageAmounts;
+                    uiIncreaseDamages.Data = _tempDamageAmounts;
                 }
             }
 
             if (uiIncreaseDamagesRate != null)
             {
-                Dictionary<DamageElement, MinMaxFloat> damageAmountsRate = null;
+                _tempDamageAmountsRate.Clear();
                 if (EquipmentItem != null)
                 {
-                    damageAmountsRate = EquipmentItem.GetIncreaseDamagesRate(Level);
+                    EquipmentItem.GetIncreaseDamagesRate(Level, _tempDamageAmountsRate);
                     if (!dontCalculateRandomBonus)
                     {
-                        damageAmountsRate = GameDataHelpers.CombineDamages(damageAmountsRate, GetRandomBonus().GetIncreaseDamagesRate());
+                        GameDataHelpers.CombineDamages(_tempDamageAmountsRate, GetRandomBonus().GetIncreaseDamagesRate());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    damageAmountsRate = GameDataHelpers.CombineDamages(SocketEnhancerItem.SocketEnhanceEffect.damagesRate, damageAmountsRate, 1f);
+                    GameDataHelpers.CombineDamages(_tempDamageAmountsRate, SocketEnhancerItem.SocketEnhanceEffect.DamagesRate);
                 }
 
-                if (damageAmountsRate == null || damageAmountsRate.Count == 0)
+                if (_tempDamageAmountsRate == null || _tempDamageAmountsRate.Count == 0)
                 {
                     // Hide ui if damage amounts is empty
                     uiIncreaseDamagesRate.Hide();
@@ -1248,23 +1257,23 @@ namespace MultiplayerARPG
                     uiIncreaseDamages.displayType = UIDamageElementAmounts.DisplayType.Rate;
                     uiIncreaseDamagesRate.isBonus = true;
                     uiIncreaseDamagesRate.Show();
-                    uiIncreaseDamagesRate.Data = damageAmountsRate;
+                    uiIncreaseDamagesRate.Data = _tempDamageAmountsRate;
                 }
             }
 
             if (uiStatusEffectResistances != null)
             {
-                Dictionary<StatusEffect, float> statusEffectResistances = null;
+                _tempStatusEffectResistances.Clear();
                 if (EquipmentItem != null)
                 {
-                    statusEffectResistances = EquipmentItem.GetIncreaseStatusEffectResistances(Level);
+                    EquipmentItem.GetIncreaseStatusEffectResistances(Level, _tempStatusEffectResistances);
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    statusEffectResistances = GameDataHelpers.CombineStatusEffectResistances(SocketEnhancerItem.SocketEnhanceEffect.statusEffectResistances, statusEffectResistances, 1f);
+                    GameDataHelpers.CombineStatusEffectResistances(_tempStatusEffectResistances, SocketEnhancerItem.SocketEnhanceEffect.StatusEffectResistances);
                 }
 
-                if (statusEffectResistances == null || statusEffectResistances.Count == 0)
+                if (_tempStatusEffectResistances == null || _tempStatusEffectResistances.Count == 0)
                 {
                     // Hide ui if armors is empty
                     uiStatusEffectResistances.Hide();
@@ -1273,27 +1282,27 @@ namespace MultiplayerARPG
                 {
                     uiStatusEffectResistances.isBonus = true;
                     uiStatusEffectResistances.Show();
-                    uiStatusEffectResistances.UpdateData(statusEffectResistances);
+                    uiStatusEffectResistances.UpdateData(_tempStatusEffectResistances);
                 }
             }
 
             if (uiIncreaseSkillLevels != null)
             {
-                Dictionary<BaseSkill, int> skillLevels = null;
+                tempSkillLevels.Clear();
                 if (EquipmentItem != null)
                 {
-                    skillLevels = EquipmentItem.GetIncreaseSkills(Level);
+                    EquipmentItem.GetIncreaseSkills(Level, tempSkillLevels);
                     if (!dontCalculateRandomBonus)
                     {
-                        skillLevels = GameDataHelpers.CombineSkills(skillLevels, GetRandomBonus().GetIncreaseSkills());
+                        GameDataHelpers.CombineSkills(tempSkillLevels, GetRandomBonus().GetIncreaseSkills());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    skillLevels = GameDataHelpers.CombineSkills(SocketEnhancerItem.SocketEnhanceEffect.skills, skillLevels, 1f);
+                    GameDataHelpers.CombineSkills(tempSkillLevels, SocketEnhancerItem.SocketEnhanceEffect.Skills);
                 }
 
-                if (skillLevels == null || skillLevels.Count == 0)
+                if (tempSkillLevels == null || tempSkillLevels.Count == 0)
                 {
                     // Hide ui if skill levels is empty
                     uiIncreaseSkillLevels.Hide();
@@ -1303,7 +1312,7 @@ namespace MultiplayerARPG
                     uiIncreaseSkillLevels.displayType = UISkillLevels.DisplayType.Simple;
                     uiIncreaseSkillLevels.isBonus = true;
                     uiIncreaseSkillLevels.Show();
-                    uiIncreaseSkillLevels.Data = skillLevels;
+                    uiIncreaseSkillLevels.Data = tempSkillLevels;
                 }
             }
 

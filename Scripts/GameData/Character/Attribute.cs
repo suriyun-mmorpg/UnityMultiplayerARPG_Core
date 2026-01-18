@@ -92,32 +92,28 @@ namespace MultiplayerARPG
             return StatsIncreaseEachLevel * level;
         }
 
-        public virtual Dictionary<DamageElement, float> GetIncreaseResistancesByLevel(float level)
+        public virtual void GetIncreaseResistancesByLevel(float level, Dictionary<DamageElement, float> result)
         {
-            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-            result = GameDataHelpers.CombineResistances(IncreaseResistances, result, Mathf.CeilToInt(level), 1f);
-            return result;
+            result.Clear();
+            GameDataHelpers.CombineResistances(IncreaseResistances, result, Mathf.CeilToInt(level), 1f);
         }
 
-        public virtual Dictionary<DamageElement, float> GetIncreaseArmorsByLevel(float level)
+        public virtual void GetIncreaseArmorsByLevel(float level, Dictionary<DamageElement, float> result)
         {
-            Dictionary<DamageElement, float> result = new Dictionary<DamageElement, float>();
-            result = GameDataHelpers.CombineArmors(IncreaseArmors, result, Mathf.CeilToInt(level), 1f);
-            return result;
+            result.Clear();
+            GameDataHelpers.CombineArmors(IncreaseArmors, result, Mathf.CeilToInt(level), 1f);
         }
 
-        public virtual Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesByLevel(float level)
+        public virtual void GetIncreaseDamagesByLevel(float level, Dictionary<DamageElement, MinMaxFloat> result)
         {
-            Dictionary<DamageElement, MinMaxFloat> result = new Dictionary<DamageElement, MinMaxFloat>();
-            result = GameDataHelpers.CombineDamages(IncreaseDamages, result, Mathf.CeilToInt(level), 1f);
-            return result;
+            result.Clear();
+            GameDataHelpers.CombineDamages(IncreaseDamages, result, Mathf.CeilToInt(level), 1f);
         }
 
-        public virtual Dictionary<StatusEffect, float> GetIncreaseStatusEffectResistancesByLevel(float level)
+        public virtual void GetIncreaseStatusEffectResistancesByLevel(float level, Dictionary<StatusEffect, float> result)
         {
-            Dictionary<StatusEffect, float> result = new Dictionary<StatusEffect, float>();
-            result = GameDataHelpers.CombineStatusEffectResistances(IncreaseStatusEffectResistances, result, Mathf.CeilToInt(level), 1f);
-            return result;
+            result.Clear();
+            GameDataHelpers.CombineStatusEffectResistances(IncreaseStatusEffectResistances, result, Mathf.CeilToInt(level), 1f);
         }
     }
 

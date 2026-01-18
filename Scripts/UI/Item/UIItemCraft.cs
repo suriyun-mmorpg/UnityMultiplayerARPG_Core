@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -27,6 +28,9 @@ namespace MultiplayerARPG
         public CrafterType CrafterType { get; private set; }
         public BaseGameEntity TargetEntity { get; private set; }
 
+        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -36,6 +40,10 @@ namespace MultiplayerARPG
             uiTextRequireGold = null;
             uiTextSimpleRequireGold = null;
             TargetEntity = null;
+            _tempRequireCurrencies.Clear();
+            _tempRequireCurrencies = null;
+            _tempRequireItems.Clear();
+            _tempRequireItems = null;
         }
 
         public void Setup(CrafterType crafterType, BaseGameEntity targetEntity, ItemCraft data)
@@ -69,7 +77,9 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(ItemCraft.RequireItems, null);
+                    _tempRequireItems.Clear();
+                    GameDataHelpers.CombineItems(ItemCraft.RequireItems, _tempRequireItems);
+                    uiRequireItemAmounts.Data = _tempRequireItems;
                 }
             }
 
@@ -83,7 +93,9 @@ namespace MultiplayerARPG
                 {
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.Show();
-                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(ItemCraft.RequireCurrencies, null, 1f);
+                    _tempRequireCurrencies.Clear();
+                    GameDataHelpers.CombineCurrencies(ItemCraft.RequireCurrencies, _tempRequireCurrencies, 1f);
+                    uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
                 }
             }
 

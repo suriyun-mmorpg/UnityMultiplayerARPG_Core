@@ -78,13 +78,16 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<Currency, int> _cacheRewardCurrencies;
+        private Dictionary<Currency, int> _cacheRewardCurrencies = null;
         public Dictionary<Currency, int> CacheRewardCurrencies
         {
             get
             {
                 if (_cacheRewardCurrencies == null)
-                    _cacheRewardCurrencies = GameDataHelpers.CombineCurrencies(rewardCurrencies, null, 1f);
+                {
+                    _cacheRewardCurrencies = new Dictionary<Currency, int>();
+                    GameDataHelpers.CombineCurrencies(rewardCurrencies, _cacheRewardCurrencies, 1f);
+                }
                 return _cacheRewardCurrencies;
             }
         }

@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -15,12 +16,19 @@ namespace MultiplayerARPG
         public UICurrencyAmounts uiRequireCurrencyAmounts;
         public UIItemAmounts uiRequireItemAmounts;
 
+        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
             uiTextRequireGold = null;
             uiRequireCurrencyAmounts = null;
             uiRequireItemAmounts = null;
+            _tempRequireCurrencies.Clear();
+            _tempRequireCurrencies = null;
+            _tempRequireItems.Clear();
+            _tempRequireItems = null;
         }
 
         protected override void UpdateData()
@@ -58,7 +66,9 @@ namespace MultiplayerARPG
                 uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                 uiRequireCurrencyAmounts.isBonus = false;
                 uiRequireCurrencyAmounts.Show();
-                uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(Data.currencyAmounts, null, 1f);
+                _tempRequireCurrencies.Clear();
+                GameDataHelpers.CombineCurrencies(Data.currencyAmounts, _tempRequireCurrencies, 1f);
+                uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
             }
 
             if (uiRequireItemAmounts != null)
@@ -66,7 +76,9 @@ namespace MultiplayerARPG
                 uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                 uiRequireItemAmounts.isBonus = false;
                 uiRequireItemAmounts.Show();
-                uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(Data.itemAmounts, null);
+                _tempRequireItems.Clear();
+                GameDataHelpers.CombineItems(Data.itemAmounts, _tempRequireItems);
+                uiRequireItemAmounts.Data = _tempRequireItems;
             }
         }
     }

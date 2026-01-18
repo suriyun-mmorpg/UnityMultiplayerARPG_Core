@@ -231,11 +231,11 @@ namespace MultiplayerARPG
             return _learnableSkillIds;
         }
 
-        public override Dictionary<BaseSkill, int> GetSkillLevels(int level)
+        public override void GetSkillLevels(int level, Dictionary<BaseSkill, int> result)
         {
-            if (level <= 0)
-                return new Dictionary<BaseSkill, int>();
-            return GameDataHelpers.CombineSkills(skills, new Dictionary<BaseSkill, int>(), level);
+            result.Clear();
+            if (level > 0)
+                GameDataHelpers.CombineSkills(skills, result, level);
         }
 
         public virtual bool RandomSkill(BaseMonsterCharacterEntity entity, out BaseSkill skill, out int level)

@@ -62,6 +62,8 @@ namespace MultiplayerARPG
 
         protected bool _activated;
         protected string _activeItemId;
+        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
         {
@@ -72,6 +74,10 @@ namespace MultiplayerARPG
             uiRequireCurrencyAmounts = null;
             uiTextRequireGold = null;
             uiTextSimpleRequireGold = null;
+            _tempRequireCurrencies.Clear();
+            _tempRequireCurrencies = null;
+            _tempRequireItems.Clear();
+            _tempRequireItems = null;
         }
 
         public override void ManagedUpdate()
@@ -88,7 +94,9 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(GameInstance.Singleton.enhancerRemoval.RequireItems, null);
+                    _tempRequireItems.Clear();
+                    GameDataHelpers.CombineItems(GameInstance.Singleton.enhancerRemoval.RequireItems, _tempRequireItems);
+                    uiRequireItemAmounts.Data = _tempRequireItems;
                 }
             }
 
@@ -102,7 +110,9 @@ namespace MultiplayerARPG
                 {
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.Show();
-                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, null, 1f);
+                    _tempRequireCurrencies.Clear();
+                    GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, _tempRequireCurrencies, 1f);
+                    uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
                 }
             }
 

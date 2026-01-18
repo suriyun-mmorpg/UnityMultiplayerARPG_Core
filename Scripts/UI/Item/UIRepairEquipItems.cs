@@ -20,6 +20,9 @@ namespace MultiplayerARPG
         public UICurrencyAmounts uiRequireCurrencyAmounts;
         public TextWrapper uiTextSimpleRequireGold;
 
+        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -27,6 +30,10 @@ namespace MultiplayerARPG
             uiRequireItemAmounts = null;
             uiRequireCurrencyAmounts = null;
             uiTextSimpleRequireGold = null;
+            _tempRequireCurrencies.Clear();
+            _tempRequireCurrencies = null;
+            _tempRequireItems.Clear();
+            _tempRequireItems = null;
         }
 
         private void LateUpdate()
@@ -77,7 +84,9 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(requireItems, null);
+                    _tempRequireItems.Clear();
+                    GameDataHelpers.CombineItems(requireItems, _tempRequireItems);
+                    uiRequireItemAmounts.Data = _tempRequireItems;
                 }
             }
 
@@ -91,7 +100,9 @@ namespace MultiplayerARPG
                 {
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.Show();
-                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(requireCurrencies, null, 1f);
+                    _tempRequireCurrencies.Clear();
+                    GameDataHelpers.CombineCurrencies(requireCurrencies, _tempRequireCurrencies, 1f);
+                    uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
                 }
             }
 

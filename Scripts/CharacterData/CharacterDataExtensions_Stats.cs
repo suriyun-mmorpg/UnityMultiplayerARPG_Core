@@ -1,20 +1,24 @@
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
     public static partial class CharacterDataExtensions
     {
-        private static Dictionary<Attribute, float> GetCharacterAttributes(this ICharacterData data)
+        private static Dictionary<Attribute, float> _tempAttributes = new Dictionary<Attribute, float>();
+        private static Dictionary<DamageElement, float> _tempResistances = new Dictionary<DamageElement, float>();
+        private static Dictionary<DamageElement, float> _tempArmors = new Dictionary<DamageElement, float>();
+        private static Dictionary<DamageElement, MinMaxFloat> _tempDamages = new Dictionary<DamageElement, MinMaxFloat>();
+        private static Dictionary<BaseSkill, int> _tempSkills = new Dictionary<BaseSkill, int>();
+        private static Dictionary<StatusEffect, float> _tempStatusEffectResistance = new Dictionary<StatusEffect, float>();
+
+        private static void GetCharacterAttributes(this ICharacterData data, Dictionary<Attribute, float> result)
         {
-            if (data == null)
-                return new Dictionary<Attribute, float>();
-            Dictionary<Attribute, float> result;
+            result.Clear();
             BaseCharacter database = data.GetDatabase();
             // Attributes from character database
-            if (database == null)
-                result = new Dictionary<Attribute, float>();
-            else
-                result = database.GetCharacterAttributes(data.Level);
+            if (database != null)
+                database.GetCharacterAttributes(data.Level, result);
             // Added attributes
             for (int i = 0; i < data.Attributes.Count; ++i)
             {
@@ -27,24 +31,15 @@ namespace MultiplayerARPG
                 else
                     result[attribute] += amount;
             }
-            return result;
         }
 
-        private static Dictionary<BaseSkill, int> GetCharacterSkills(this ICharacterData data)
+        private static void GetCharacterSkills(this ICharacterData data, Dictionary<BaseSkill, int> result)
         {
-            if (data == null)
-                return new Dictionary<BaseSkill, int>();
-            Dictionary<BaseSkill, int> result;
+            result.Clear();
             BaseCharacter database = data.GetDatabase();
             // Skills from character database
-            if (database == null)
-            {
-                result = new Dictionary<BaseSkill, int>();
-            }
-            else
-            {
-                result = database.GetSkillLevels(data.Level);
-            }
+            if (database != null)
+                database.GetSkillLevels(data.Level, result);
             // Combine with skills that character learnt
             for (int i = 0; i < data.Skills.Count; ++i)
             {
@@ -57,46 +52,30 @@ namespace MultiplayerARPG
                 else
                     result[skill] += level;
             }
-            return result;
         }
 
-        private static Dictionary<DamageElement, float> GetCharacterResistances(this ICharacterData data)
+        private static void GetCharacterResistances(this ICharacterData data, Dictionary<DamageElement, float> result)
         {
-            if (data == null)
-                return new Dictionary<DamageElement, float>();
-            Dictionary<DamageElement, float> result;
+            result.Clear();
             BaseCharacter database = data.GetDatabase();
-            if (database == null)
-                result = new Dictionary<DamageElement, float>();
-            else
-                result = new Dictionary<DamageElement, float>(database.GetCharacterResistances(data.Level));
-            return result;
+            if (database != null)
+                database.GetCharacterResistances(data.Level, result);
         }
 
-        private static Dictionary<DamageElement, float> GetCharacterArmors(this ICharacterData data)
+        private static void GetCharacterArmors(this ICharacterData data, Dictionary<DamageElement, float> result)
         {
-            if (data == null)
-                return new Dictionary<DamageElement, float>();
-            Dictionary<DamageElement, float> result;
+            result.Clear();
             BaseCharacter database = data.GetDatabase();
-            if (database == null)
-                result = new Dictionary<DamageElement, float>();
-            else
-                result = new Dictionary<DamageElement, float>(database.GetCharacterArmors(data.Level));
-            return result;
+            if (database != null)
+                database.GetCharacterArmors(data.Level, result);
         }
 
-        private static Dictionary<StatusEffect, float> GetCharacterStatusEffectResistances(this ICharacterData data)
+        private static void GetCharacterStatusEffectResistances(this ICharacterData data, Dictionary<StatusEffect, float> result)
         {
-            if (data == null)
-                return new Dictionary<StatusEffect, float>();
-            Dictionary<StatusEffect, float> result;
+            result.Clear();
             BaseCharacter database = data.GetDatabase();
-            if (database == null)
-                result = new Dictionary<StatusEffect, float>();
-            else
-                result = new Dictionary<StatusEffect, float>(database.GetCharacterStatusEffectResistances(data.Level));
-            return result;
+            if (database != null)
+                database.GetCharacterStatusEffectResistances(data.Level, result);
         }
 
         private static CharacterStats GetCharacterStats(this ICharacterData data)
@@ -121,32 +100,32 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (socketEnhancerItem == null)
                 return;
             if (onIncreasingStats != null)
-                onIncreasingStats.Invoke(socketEnhancerItem.SocketEnhanceEffect.stats);
+                onIncreasingStats.Invoke(socketEnhancerItem.SocketEnhanceEffect.Stats);
             if (onIncreasingStatsRate != null)
-                onIncreasingStatsRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.statsRate);
+                onIncreasingStatsRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.StatsRate);
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(GameDataHelpers.CombineAttributes(socketEnhancerItem.SocketEnhanceEffect.attributes, new Dictionary<Attribute, float>(), 1f));
+                onIncreasingAttributes.Invoke(socketEnhancerItem.SocketEnhanceEffect.Attributes);
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(GameDataHelpers.CombineAttributes(socketEnhancerItem.SocketEnhanceEffect.attributesRate, new Dictionary<Attribute, float>(), 1f));
+                onIncreasingAttributesRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.AttributesRate);
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(GameDataHelpers.CombineResistances(socketEnhancerItem.SocketEnhanceEffect.resistances, new Dictionary<DamageElement, float>(), 1f));
+                onIncreasingResistances.Invoke(socketEnhancerItem.SocketEnhanceEffect.Resistances);
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(GameDataHelpers.CombineArmors(socketEnhancerItem.SocketEnhanceEffect.armors, new Dictionary<DamageElement, float>(), 1f));
+                onIncreasingArmors.Invoke(socketEnhancerItem.SocketEnhanceEffect.Armors);
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(GameDataHelpers.CombineArmors(socketEnhancerItem.SocketEnhanceEffect.armorsRate, new Dictionary<DamageElement, float>(), 1f));
+                onIncreasingArmorsRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.ArmorsRate);
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(GameDataHelpers.CombineDamages(socketEnhancerItem.SocketEnhanceEffect.damages, new Dictionary<DamageElement, MinMaxFloat>(), 1f));
+                onIncreasingDamages.Invoke(socketEnhancerItem.SocketEnhanceEffect.Damages);
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(GameDataHelpers.CombineDamages(socketEnhancerItem.SocketEnhanceEffect.damagesRate, new Dictionary<DamageElement, MinMaxFloat>(), 1f));
+                onIncreasingDamagesRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.DamagesRate);
             if (onIncreasingSkills != null)
-                onIncreasingSkills.Invoke(GameDataHelpers.CombineSkills(socketEnhancerItem.SocketEnhanceEffect.skills, new Dictionary<BaseSkill, int>(), 1f));
+                onIncreasingSkills.Invoke(socketEnhancerItem.SocketEnhanceEffect.Skills);
             if (onIncreasingStatusEffectResistances != null)
-                onIncreasingStatusEffectResistances.Invoke(GameDataHelpers.CombineStatusEffectResistances(socketEnhancerItem.SocketEnhanceEffect.statusEffectResistances, new Dictionary<StatusEffect, float>(), 1f));
+                onIncreasingStatusEffectResistances.Invoke(socketEnhancerItem.SocketEnhanceEffect.StatusEffectResistances);
         }
 
         public static void GetBuffs(this CharacterItem item,
@@ -160,7 +139,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (item.IsEmptySlot())
                 return;
@@ -221,7 +200,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (equipmentSet == null)
                 return;
@@ -232,27 +211,27 @@ namespace MultiplayerARPG
                 if (i < effects.Length)
                 {
                     if (onIncreasingStats != null)
-                        onIncreasingStats.Invoke(effects[i].stats);
+                        onIncreasingStats.Invoke(effects[i].Stats);
                     if (onIncreasingStatsRate != null)
-                        onIncreasingStatsRate.Invoke(effects[i].statsRate);
+                        onIncreasingStatsRate.Invoke(effects[i].StatsRate);
                     if (onIncreasingAttributes != null)
-                        onIncreasingAttributes.Invoke(GameDataHelpers.CombineAttributes(effects[i].attributes, new Dictionary<Attribute, float>(), 1f));
+                        onIncreasingAttributes.Invoke(effects[i].Attributes);
                     if (onIncreasingAttributesRate != null)
-                        onIncreasingAttributesRate.Invoke(GameDataHelpers.CombineAttributes(effects[i].attributesRate, new Dictionary<Attribute, float>(), 1f));
+                        onIncreasingAttributesRate.Invoke(effects[i].AttributesRate);
                     if (onIncreasingResistances != null)
-                        onIncreasingResistances.Invoke(GameDataHelpers.CombineResistances(effects[i].resistances, new Dictionary<DamageElement, float>(), 1f));
+                        onIncreasingResistances.Invoke(effects[i].Resistances);
                     if (onIncreasingArmors != null)
-                        onIncreasingArmors.Invoke(GameDataHelpers.CombineArmors(effects[i].armors, new Dictionary<DamageElement, float>(), 1f));
+                        onIncreasingArmors.Invoke(effects[i].Armors);
                     if (onIncreasingArmorsRate != null)
-                        onIncreasingArmorsRate.Invoke(GameDataHelpers.CombineArmors(effects[i].armorsRate, new Dictionary<DamageElement, float>(), 1f));
+                        onIncreasingArmorsRate.Invoke(effects[i].ArmorsRate);
                     if (onIncreasingDamages != null)
-                        onIncreasingDamages.Invoke(GameDataHelpers.CombineDamages(effects[i].damages, new Dictionary<DamageElement, MinMaxFloat>(), 1f));
+                        onIncreasingDamages.Invoke(effects[i].Damages);
                     if (onIncreasingDamagesRate != null)
-                        onIncreasingDamagesRate.Invoke(GameDataHelpers.CombineDamages(effects[i].damagesRate, new Dictionary<DamageElement, MinMaxFloat>(), 1f));
+                        onIncreasingDamagesRate.Invoke(effects[i].DamagesRate);
                     if (onIncreasingSkills != null)
-                        onIncreasingSkills.Invoke(GameDataHelpers.CombineSkills(effects[i].skills, new Dictionary<BaseSkill, int>(), 1f));
+                        onIncreasingSkills.Invoke(effects[i].Skills);
                     if (onIncreasingStatusEffectResistances != null)
-                        onIncreasingStatusEffectResistances.Invoke(GameDataHelpers.CombineStatusEffectResistances(effects[i].statusEffectResistances, new Dictionary<StatusEffect, float>(), 1f));
+                        onIncreasingStatusEffectResistances.Invoke(effects[i].StatusEffectResistances);
                 }
                 else
                     break;
@@ -270,7 +249,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (buff.IsEmpty())
                 return;
@@ -309,7 +288,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (summon.IsEmpty())
                 return;
@@ -348,7 +327,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (vehicleEntity.IsNull())
                 return;
@@ -387,7 +366,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (title == null)
                 return;
@@ -426,7 +405,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (faction == null)
                 return;
@@ -465,7 +444,7 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (skill == null)
                 return;
@@ -480,23 +459,50 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(buff.GetIncreaseStatsRate(level));
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(buff.GetIncreaseAttributes(level));
+            {
+                buff.GetIncreaseAttributes(level, _tempAttributes);
+                onIncreasingAttributes.Invoke(_tempAttributes);
+            }
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(buff.GetIncreaseAttributesRate(level));
+            {
+                buff.GetIncreaseAttributesRate(level, _tempAttributes);
+                onIncreasingAttributesRate.Invoke(_tempAttributes);
+            }
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(buff.GetIncreaseResistances(level));
+            {
+                buff.GetIncreaseResistances(level, _tempResistances);
+                onIncreasingResistances.Invoke(_tempResistances);
+            }
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(buff.GetIncreaseArmors(level));
+            {
+                buff.GetIncreaseArmors(level, _tempArmors);
+                onIncreasingArmors.Invoke(_tempArmors);
+            }
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(buff.GetIncreaseArmorsRate(level));
+            {
+                buff.GetIncreaseArmorsRate(level, _tempArmors);
+                onIncreasingArmorsRate.Invoke(_tempArmors);
+            }
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(buff.GetIncreaseDamages(level));
+            {
+                buff.GetIncreaseDamages(level, _tempDamages);
+                onIncreasingDamages.Invoke(_tempDamages);
+            }
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(buff.GetIncreaseDamagesRate(level));
+            {
+                buff.GetIncreaseDamagesRate(level, _tempDamages);
+                onIncreasingDamagesRate.Invoke(_tempDamages);
+            }
             if (onIncreasingSkills != null)
-                onIncreasingSkills.Invoke(buff.GetIncreaseSkills(level));
+            {
+                buff.GetIncreaseSkills(level, _tempSkills);
+                onIncreasingSkills.Invoke(_tempSkills);
+            }
             if (onIncreasingStatusEffectResistances != null)
-                onIncreasingStatusEffectResistances.Invoke(buff.GetIncreaseStatusEffectResistances(level));
+            {
+                buff.GetIncreaseStatusEffectResistances(level, _tempStatusEffectResistance);
+                onIncreasingStatusEffectResistances.Invoke(_tempStatusEffectResistance);
+            }
         }
 
         public static void GetBuffs(this GuildSkill skill, int level,
@@ -509,7 +515,8 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
-            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
+            System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
             if (skill == null)
                 return;
@@ -523,21 +530,50 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(buff.GetIncreaseStatsRate(level));
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(buff.GetIncreaseAttributes(level));
+            {
+                buff.GetIncreaseAttributes(level, _tempAttributes);
+                onIncreasingAttributes.Invoke(_tempAttributes);
+            }
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(buff.GetIncreaseAttributesRate(level));
+            {
+                buff.GetIncreaseAttributesRate(level, _tempAttributes);
+                onIncreasingAttributesRate.Invoke(_tempAttributes);
+            }
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(buff.GetIncreaseResistances(level));
+            {
+                buff.GetIncreaseResistances(level, _tempResistances);
+                onIncreasingResistances.Invoke(_tempResistances);
+            }
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(buff.GetIncreaseArmors(level));
+            {
+                buff.GetIncreaseArmors(level, _tempArmors);
+                onIncreasingArmors.Invoke(_tempArmors);
+            }
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(buff.GetIncreaseArmorsRate(level));
+            {
+                buff.GetIncreaseArmorsRate(level, _tempArmors);
+                onIncreasingArmorsRate.Invoke(_tempArmors);
+            }
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(buff.GetIncreaseDamages(level));
+            {
+                buff.GetIncreaseDamages(level, _tempDamages);
+                onIncreasingDamages.Invoke(_tempDamages);
+            }
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(buff.GetIncreaseDamagesRate(level));
+            {
+                buff.GetIncreaseDamagesRate(level, _tempDamages);
+                onIncreasingDamagesRate.Invoke(_tempDamages);
+            }
+            if (onIncreasingSkills != null)
+            {
+                buff.GetIncreaseSkills(level, _tempSkills);
+                onIncreasingSkills.Invoke(_tempSkills);
+            }
             if (onIncreasingStatusEffectResistances != null)
-                onIncreasingStatusEffectResistances.Invoke(buff.GetIncreaseStatusEffectResistances(level));
+            {
+                buff.GetIncreaseStatusEffectResistances(level, _tempStatusEffectResistance);
+                onIncreasingStatusEffectResistances.Invoke(_tempStatusEffectResistance);
+            }
         }
 
         public static Dictionary<DamageElement, MinMaxFloat> GetWeaponDamages(CharacterItem characterItem, IWeaponItem weaponItem, KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount,
@@ -546,10 +582,19 @@ namespace MultiplayerARPG
             Dictionary<DamageElement, MinMaxFloat> resultDamages = new Dictionary<DamageElement, MinMaxFloat>();
             if (weaponItem != null)
                 weaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(weaponItem.WeaponType.CacheEffectivenessAttributes, attributes, weaponDamageAmount);
-            resultDamages = GameDataHelpers.CombineDamages(resultDamages, weaponDamageAmount);
-            resultDamages = GameDataHelpers.CombineDamages(resultDamages, attributes.GetIncreaseDamages());
-            resultDamages = GameDataHelpers.CombineDamages(resultDamages, buffDamages);
-            resultDamages = GameDataHelpers.CombineDamages(resultDamages, GameDataHelpers.MultiplyDamages(new Dictionary<DamageElement, MinMaxFloat>(resultDamages), buffDamagesRate));
+            GameDataHelpers.CombineDamages(resultDamages, weaponDamageAmount);
+            using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> increaseDamages))
+            {
+                attributes.GetIncreaseDamages(increaseDamages);
+                GameDataHelpers.CombineDamages(resultDamages, increaseDamages);
+            }
+            GameDataHelpers.CombineDamages(resultDamages, buffDamages);
+            using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> multiplyDamages))
+            {
+                GameDataHelpers.CombineDamages(multiplyDamages, resultDamages);
+                GameDataHelpers.MultiplyDamages(multiplyDamages, buffDamagesRate);
+                GameDataHelpers.CombineDamages(resultDamages, multiplyDamages);
+            }
             /*
             // Sum with ammo
             if (weaponItem != null)
@@ -559,13 +604,19 @@ namespace MultiplayerARPG
                 {
                     // Sum with ammo only when it have ammo in magazine
                     if (characterItem.ammo > 0 && GameInstance.Items.TryGetValue(characterItem.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                        resultDamages = GameDataHelpers.CombineDamages(resultDamages, tempAmmoItem.GetIncreaseDamages());
+                    {
+                        tempAmmoItem.GetIncreaseDamages(_tempDamages);
+                        GameDataHelpers.CombineDamages(resultDamages, _tempDamages);
+                    }
                 }
                 else
                 {
                     // No special condition, just sum with ammo
                     if (GameInstance.Items.TryGetValue(characterItem.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                        resultDamages = GameDataHelpers.CombineDamages(resultDamages, tempAmmoItem.GetIncreaseDamages());
+                    {
+                        tempAmmoItem.GetIncreaseDamages(_tempDamages);
+                        GameDataHelpers.CombineDamages(resultDamages, _tempDamages);
+                    }
                 }
             }
             */
@@ -609,13 +660,23 @@ namespace MultiplayerARPG
             // Prepare result stats, by using character's base stats
             // For weapons it will be based on equipped weapons
             CharacterStats resultStats = !isCalculateStats ? new CharacterStats() : data.GetCharacterStats();
-            Dictionary<Attribute, float> resultAttributes = !isCalculateAttributes ? new Dictionary<Attribute, float>() : data.GetCharacterAttributes();
-            Dictionary<DamageElement, float> resultResistances = !isCalculateResistances ? new Dictionary<DamageElement, float>() : data.GetCharacterResistances();
-            Dictionary<DamageElement, float> resultArmors = !isCalculateArmors ? new Dictionary<DamageElement, float>() : data.GetCharacterArmors();
-            Dictionary<StatusEffect, float> resultStatusEffectResistances = !isCalculateStatusEffectResistances ? new Dictionary<StatusEffect, float>() : data.GetCharacterStatusEffectResistances();
+            Dictionary<Attribute, float> resultAttributes = new Dictionary<Attribute, float>();
+            if (isCalculateAttributes)
+                data.GetCharacterAttributes(resultAttributes);
+            Dictionary<DamageElement, float> resultResistances = new Dictionary<DamageElement, float>();
+            if (isCalculateResistances)
+                data.GetCharacterResistances(resultResistances);
+            Dictionary<DamageElement, float> resultArmors = new Dictionary<DamageElement, float>();
+            if (isCalculateArmors)
+                data.GetCharacterArmors(resultArmors);
+            Dictionary<StatusEffect, float> resultStatusEffectResistances = new Dictionary<StatusEffect, float>();
+            if (isCalculateStatusEffectResistances)
+                data.GetCharacterStatusEffectResistances(resultStatusEffectResistances);
+            Dictionary<BaseSkill, int> resultSkills = new Dictionary<BaseSkill, int>();
+            if (isCalculateSkills)
+                data.GetCharacterSkills(resultSkills);
             Dictionary<DamageElement, MinMaxFloat> resultRightHandDamages = new Dictionary<DamageElement, MinMaxFloat>();
             Dictionary<DamageElement, MinMaxFloat> resultLeftHandDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            Dictionary<BaseSkill, int> resultSkills = !isCalculateSkills ? new Dictionary<BaseSkill, int>() : data.GetCharacterSkills();
             Dictionary<EquipmentSet, int> resultEquipmentSets = new Dictionary<EquipmentSet, int>();
 
             // Prepare buff stats
@@ -651,7 +712,7 @@ namespace MultiplayerARPG
                     tempEquipmentItem = data.EquipItems[i].GetEquipmentItem();
                     if (tempEquipmentItem == null)
                         continue;
-                    resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.EquipItems[i].GetArmorAmount());
+                    GameDataHelpers.CombineArmors(resultArmors, data.EquipItems[i].GetArmorAmount());
                     GetBuffs(data.EquipItems[i],
                         !isCalculateStats ? null : (stats) => buffStats += stats,
                         !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
@@ -682,7 +743,7 @@ namespace MultiplayerARPG
                         rightHandWeapon = data.EquipWeapons.rightHand.GetWeaponItem();
                         rightHandWeaponDamageAmount = data.EquipWeapons.rightHand.GetDamageAmount();
                     }
-                    resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.EquipWeapons.rightHand.GetArmorAmount());
+                    GameDataHelpers.CombineArmors(resultArmors, data.EquipWeapons.rightHand.GetArmorAmount());
                     GetBuffs(data.EquipWeapons.rightHand,
                         !isCalculateStats ? null : (stats) => buffStats += stats,
                         !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
@@ -713,7 +774,7 @@ namespace MultiplayerARPG
                         leftHandWeapon = data.EquipWeapons.leftHand.GetWeaponItem();
                         leftHandWeaponDamageAmount = data.EquipWeapons.leftHand.GetDamageAmount();
                     }
-                    resultArmors = GameDataHelpers.CombineArmors(resultArmors, data.EquipWeapons.leftHand.GetArmorAmount());
+                    GameDataHelpers.CombineArmors(resultArmors, data.EquipWeapons.leftHand.GetArmorAmount());
                     GetBuffs(data.EquipWeapons.leftHand,
                         !isCalculateStats ? null : (stats) => buffStats += stats,
                         !isCalculateStats ? null : (statsRate) => buffStatsRate += statsRate,
@@ -884,6 +945,7 @@ namespace MultiplayerARPG
                                 !isCalculateArmors ? null : (armorsRate) => GameDataHelpers.CombineArmors(buffArmorsRate, armorsRate),
                                 !isCalculateDamages ? null : (damages) => GameDataHelpers.CombineDamages(buffDamages, damages),
                                 !isCalculateDamages ? null : (damagesRate) => GameDataHelpers.CombineDamages(buffDamagesRate, damagesRate),
+                                !isCalculateSkills ? null : (skills) => GameDataHelpers.CombineSkills(buffSkills, skills),
                                 !isCalculateStatusEffectResistances ? null : (statusEffectResistances) => GameDataHelpers.CombineStatusEffectResistances(buffStatusEffectResistances, statusEffectResistances));
                         }
                     }
@@ -891,7 +953,7 @@ namespace MultiplayerARPG
             }
 
             // Sum skills from base and buffs
-            resultSkills = GameDataHelpers.CombineSkills(resultSkills, buffSkills);
+            GameDataHelpers.CombineSkills(resultSkills, buffSkills);
 
             if (sumWithSkills)
             {
@@ -915,8 +977,13 @@ namespace MultiplayerARPG
             // Calculate stats by buffs
             if (isCalculateAttributes)
             {
-                resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, buffAttributes);
-                resultAttributes = GameDataHelpers.CombineAttributes(resultAttributes, GameDataHelpers.MultiplyAttributes(new Dictionary<Attribute, float>(resultAttributes), buffAttributesRate));
+                GameDataHelpers.CombineAttributes(resultAttributes, buffAttributes);
+                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> multiplyAttributes))
+                {
+                    GameDataHelpers.CombineAttributes(multiplyAttributes, resultAttributes);
+                    GameDataHelpers.MultiplyAttributes(multiplyAttributes, buffAttributesRate);
+                    GameDataHelpers.CombineAttributes(resultAttributes, multiplyAttributes);
+                }
                 List<Attribute> keys = new List<Attribute>(resultAttributes.Keys);
                 for (i = 0; i < keys.Count; ++i)
                 {
@@ -930,8 +997,12 @@ namespace MultiplayerARPG
             }
             if (isCalculateResistances)
             {
-                resultResistances = GameDataHelpers.CombineResistances(resultResistances, resultAttributes.GetIncreaseResistances());
-                resultResistances = GameDataHelpers.CombineResistances(resultResistances, buffResistances);
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> increaseResistances))
+                {
+                    resultAttributes.GetIncreaseResistances(increaseResistances);
+                    GameDataHelpers.CombineResistances(resultResistances, increaseResistances);
+                }
+                GameDataHelpers.CombineResistances(resultResistances, buffResistances);
                 List<DamageElement> keys = new List<DamageElement>(resultResistances.Keys);
                 for (i = 0; i < keys.Count; ++i)
                 {
@@ -943,9 +1014,18 @@ namespace MultiplayerARPG
             }
             if (isCalculateArmors)
             {
-                resultArmors = GameDataHelpers.CombineArmors(resultArmors, resultAttributes.GetIncreaseArmors());
-                resultArmors = GameDataHelpers.CombineArmors(resultArmors, buffArmors);
-                resultArmors = GameDataHelpers.CombineArmors(resultArmors, GameDataHelpers.MultiplyArmors(new Dictionary<DamageElement, float>(resultArmors), buffArmorsRate));
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> increaseArmors))
+                {
+                    resultAttributes.GetIncreaseArmors(increaseArmors);
+                    GameDataHelpers.CombineArmors(resultArmors, increaseArmors);
+                }
+                GameDataHelpers.CombineArmors(resultArmors, buffArmors);
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> multiplyArmors))
+                {
+                    GameDataHelpers.CombineArmors(multiplyArmors, resultArmors);
+                    GameDataHelpers.MultiplyArmors(multiplyArmors, buffArmorsRate);
+                    GameDataHelpers.CombineArmors(resultArmors, multiplyArmors);
+                }
                 if (onGetArmors != null)
                     onGetArmors.Invoke(resultArmors);
             }
@@ -980,8 +1060,12 @@ namespace MultiplayerARPG
             }
             if (isCalculateStatusEffectResistances)
             {
-                resultStatusEffectResistances = GameDataHelpers.CombineStatusEffectResistances(resultStatusEffectResistances, resultAttributes.GetIncreaseStatusEffectResistances());
-                resultStatusEffectResistances = GameDataHelpers.CombineStatusEffectResistances(resultStatusEffectResistances, buffStatusEffectResistances);
+                using (CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get(out Dictionary<StatusEffect, float> increaseStatusEffectResistances))
+                {
+                    resultAttributes.GetIncreaseStatusEffectResistances(increaseStatusEffectResistances);
+                    GameDataHelpers.CombineStatusEffectResistances(resultStatusEffectResistances, increaseStatusEffectResistances);
+                }
+                GameDataHelpers.CombineStatusEffectResistances(resultStatusEffectResistances, buffStatusEffectResistances);
                 List<StatusEffect> keys = new List<StatusEffect>(resultStatusEffectResistances.Keys);
                 for (i = 0; i < keys.Count; ++i)
                 {

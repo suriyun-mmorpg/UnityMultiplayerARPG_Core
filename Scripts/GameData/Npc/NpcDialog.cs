@@ -3,6 +3,7 @@ using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -894,10 +895,18 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
-            if (!character.HasEnoughCurrencyAmounts(GameDataHelpers.CombineCurrencies(confirmRequirement.currencyAmounts, null, 1f), out gameMessage, out _))
-                return false;
-            if (!character.HasEnoughNonEquipItemAmounts(GameDataHelpers.CombineItems(confirmRequirement.itemAmounts, null), out gameMessage, out _))
-                return false;
+            using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> requireCurrencyAmounts))
+            {
+                GameDataHelpers.CombineCurrencies(confirmRequirement.currencyAmounts, requireCurrencyAmounts, 1f);
+                if (!character.HasEnoughCurrencyAmounts(requireCurrencyAmounts, out gameMessage, out _))
+                    return false;
+            }
+            using (CollectionPool<Dictionary<BaseItem, int>, KeyValuePair<BaseItem, int>>.Get(out Dictionary<BaseItem, int> requireItemAmounts))
+            {
+                GameDataHelpers.CombineItems(confirmRequirement.itemAmounts, requireItemAmounts);
+                if (!character.HasEnoughNonEquipItemAmounts(requireItemAmounts, out gameMessage, out _))
+                    return false;
+            }
             gameMessage = UITextKeys.NONE;
             character.Gold -= confirmRequirement.gold;
             character.DecreaseCurrencies(confirmRequirement.currencyAmounts);

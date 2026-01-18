@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -29,6 +30,11 @@ namespace MultiplayerARPG
         public UIItemAmounts uiRequireItemAmounts;
         public GameObject[] disallowStateObjects = new GameObject[0];
 
+        protected Dictionary<Attribute, float> _tempRequireAttributes = new Dictionary<Attribute, float>();
+        protected Dictionary<BaseSkill, int> _tempRequireSkills = new Dictionary<BaseSkill, int>();
+        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -40,6 +46,14 @@ namespace MultiplayerARPG
             uiRequireCurrencyAmounts = null;
             uiRequireItemAmounts = null;
             disallowStateObjects.Nullify();
+            _tempRequireAttributes.Clear();
+            _tempRequireAttributes = null;
+            _tempRequireSkills.Clear();
+            _tempRequireSkills = null;
+            _tempRequireCurrencies.Clear();
+            _tempRequireCurrencies = null;
+            _tempRequireItems.Clear();
+            _tempRequireItems = null;
         }
 
         protected override void UpdateData()
@@ -146,7 +160,9 @@ namespace MultiplayerARPG
                     uiRequireAttributeAmounts.includeSkillsForCurrentAmounts = true;
                     uiRequireAttributeAmounts.isBonus = false;
                     uiRequireAttributeAmounts.Show();
-                    uiRequireAttributeAmounts.Data = skill.GetRequireAttributeAmounts(level);
+                    _tempRequireAttributes.Clear();
+                    skill.GetRequireAttributeAmounts(level, _tempRequireAttributes);
+                    uiRequireAttributeAmounts.Data = _tempRequireAttributes;
                 }
             }
 
@@ -162,7 +178,9 @@ namespace MultiplayerARPG
                     uiRequireSkillLevels.includeEquipmentsForCurrentLevels = false;
                     uiRequireSkillLevels.isBonus = false;
                     uiRequireSkillLevels.Show();
-                    uiRequireSkillLevels.Data = skill.GetRequireSkillLevels(level);
+                    _tempRequireSkills.Clear();
+                    skill.GetRequireSkillLevels(level, _tempRequireSkills);
+                    uiRequireSkillLevels.Data = _tempRequireSkills;
                 }
             }
 
@@ -177,7 +195,9 @@ namespace MultiplayerARPG
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.isBonus = false;
                     uiRequireCurrencyAmounts.Show();
-                    uiRequireCurrencyAmounts.Data = skill.GetRequireCurrencyAmounts(level);
+                    _tempRequireCurrencies.Clear();
+                    skill.GetRequireCurrencyAmounts(level, _tempRequireCurrencies);
+                    uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
                 }
             }
 
@@ -192,7 +212,9 @@ namespace MultiplayerARPG
                     uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.isBonus = false;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = skill.GetRequireItemAmounts(level);
+                    _tempRequireItems.Clear();
+                    skill.GetRequireItemAmounts(level, _tempRequireItems);
+                    uiRequireItemAmounts.Data = _tempRequireItems;
                 }
             }
 

@@ -49,29 +49,33 @@ namespace MultiplayerARPG
             return Stats.GetCharacterStats(level);
         }
 
-        public Dictionary<Attribute, float> GetCharacterAttributes(int level)
+        public void GetCharacterAttributes(int level, Dictionary<Attribute, float> result)
         {
-            return GameDataHelpers.CombineAttributes(Attributes, new Dictionary<Attribute, float>(), level, 1f);
+            result.Clear();
+            GameDataHelpers.CombineAttributes(Attributes, result, level, 1f);
         }
 
-        public Dictionary<DamageElement, float> GetCharacterResistances(int level)
+        public void GetCharacterResistances(int level, Dictionary<DamageElement, float> result)
         {
-            return GameDataHelpers.CombineResistances(Resistances, new Dictionary<DamageElement, float>(), level, 1f);
+            result.Clear();
+            GameDataHelpers.CombineResistances(Resistances, result, level, 1f);
         }
 
-        public Dictionary<DamageElement, float> GetCharacterArmors(int level)
+        public void GetCharacterArmors(int level, Dictionary<DamageElement, float> result)
         {
-            return GameDataHelpers.CombineArmors(Armors, new Dictionary<DamageElement, float>(), level, 1f);
+            result.Clear();
+            GameDataHelpers.CombineArmors(Armors, result, level, 1f);
         }
 
-        public Dictionary<StatusEffect, float> GetCharacterStatusEffectResistances(int level)
+        public void GetCharacterStatusEffectResistances(int level, Dictionary<StatusEffect, float> result)
         {
-            return GameDataHelpers.CombineStatusEffectResistances(StatusEffectResistances, new Dictionary<StatusEffect, float>(), level, 1f);
+            result.Clear();
+            GameDataHelpers.CombineStatusEffectResistances(StatusEffectResistances, result, level, 1f);
         }
 
         public abstract HashSet<int> GetLearnableSkillDataIds();
 
-        public abstract Dictionary<BaseSkill, int> GetSkillLevels(int level);
+        public abstract void GetSkillLevels(int level, Dictionary<BaseSkill, int> result);
 
         public override void PrepareRelatesData()
         {

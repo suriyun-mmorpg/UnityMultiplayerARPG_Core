@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -22,6 +23,8 @@ namespace MultiplayerARPG
 
         public int IndexOfData { get; protected set; }
 
+        protected Dictionary<Currency, int> _tempPriceCurrencies = new Dictionary<Currency, int>();
+
         protected override void Awake()
         {
             base.Awake();
@@ -38,6 +41,8 @@ namespace MultiplayerARPG
             uiAmountInputDialog = null;
             if (uiAmountInputDialog != null && uiAmountInputDialog.uiInputField != null)
                 uiAmountInputDialog.uiInputField.onValueChanged.RemoveListener(OnBuyAmountChanged);
+            _tempPriceCurrencies.Clear();
+            _tempPriceCurrencies = null;
         }
 
         public void Setup(NpcSellItem data, int indexOfData)
@@ -85,7 +90,9 @@ namespace MultiplayerARPG
             {
                 uiSellPrices.displayType = UICurrencyAmounts.DisplayType.Simple;
                 uiSellPrices.isBonus = false;
-                uiSellPrices.Data = GameDataHelpers.CombineCurrencies(Data.sellPrices, null, sellPriceRate);
+                _tempPriceCurrencies.Clear();
+                GameDataHelpers.CombineCurrencies(Data.sellPrices, _tempPriceCurrencies, sellPriceRate);
+                uiSellPrices.Data = _tempPriceCurrencies;
             }
         }
 

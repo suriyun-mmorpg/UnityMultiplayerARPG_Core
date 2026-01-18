@@ -1,5 +1,7 @@
 using Cysharp.Threading.Tasks;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -16,11 +18,15 @@ namespace MultiplayerARPG
 
         public override UniTask<bool> IsPass(IPlayerCharacterData player)
         {
-            if (!player.HasEnoughNonEquipItemAmounts(GameDataHelpers.CombineItems(itemAmounts, null), out UITextKeys gameMessage, out _))
+            using (CollectionPool<Dictionary<BaseItem, int>, KeyValuePair<BaseItem, int>>.Get(out Dictionary<BaseItem, int> requireItemAmounts))
             {
-                if (player is PlayerCharacterEntity entity)
-                    GameInstance.ServerGameMessageHandlers.SendGameMessage(entity.ConnectionId, gameMessage);
-                return new UniTask<bool>(false);
+                GameDataHelpers.CombineItems(itemAmounts, requireItemAmounts);
+                if (!player.HasEnoughNonEquipItemAmounts(requireItemAmounts, out UITextKeys gameMessage, out _))
+                {
+                    if (player is PlayerCharacterEntity entity)
+                        GameInstance.ServerGameMessageHandlers.SendGameMessage(entity.ConnectionId, gameMessage);
+                    return new UniTask<bool>(false);
+                }
             }
             return new UniTask<bool>(true);
         }

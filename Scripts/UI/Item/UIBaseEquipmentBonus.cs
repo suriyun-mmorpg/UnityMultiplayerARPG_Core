@@ -1,5 +1,6 @@
 ﻿using Cysharp.Text;
 using Insthync.DevExtension;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -241,7 +242,7 @@ namespace MultiplayerARPG
                 // Rate stats
                 generateTextData = new CharacterStatsTextGenerateData()
                 {
-                    data = equipmentBonus.statsRate,
+                    data = equipmentBonus.StatsRate,
                     isRate = true,
                     isBonus = true,
                     hpStatsFormat = formatKeyHpRateStats,
@@ -294,7 +295,7 @@ namespace MultiplayerARPG
                 // Non-rate stats
                 generateTextData = new CharacterStatsTextGenerateData()
                 {
-                    data = equipmentBonus.stats,
+                    data = equipmentBonus.Stats,
                     isRate = false,
                     isBonus = true,
                     hpStatsFormat = formatKeyHpStats,
@@ -355,109 +356,103 @@ namespace MultiplayerARPG
                 }
 
                 // Attributes
-                foreach (AttributeAmount entry in equipmentBonus.attributes)
+                foreach (KeyValuePair<Attribute, float> entry in equipmentBonus.Attributes)
                 {
-                    if (entry.attribute == null || entry.amount == 0)
+                    if (entry.Key == null || entry.Value == 0)
                         continue;
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyAttributeAmount),
-                        entry.attribute.Title,
-                        entry.amount.ToBonusString("N0"));
+                        entry.Key.Title,
+                        entry.Value.ToBonusString("N0"));
                 }
-                foreach (AttributeAmount entry in equipmentBonus.attributesRate)
+                foreach (KeyValuePair<Attribute, float> entry in equipmentBonus.AttributesRate)
                 {
-                    if (entry.attribute == null || entry.amount == 0)
+                    if (entry.Key == null || entry.Value == 0)
                         continue;
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyAttributeAmountRate),
-                        entry.attribute.Title,
-                        (entry.amount * 100).ToBonusString("N2"));
+                        entry.Key.Title,
+                        (entry.Value * 100).ToBonusString("N2"));
                 }
 
-                DamageElement tempElement;
                 // Resistances
-                foreach (ResistanceAmount entry in equipmentBonus.resistances)
+                foreach (KeyValuePair<DamageElement, float> entry in equipmentBonus.Resistances)
                 {
-                    if (entry.amount == 0)
+                    if (entry.Key == null || entry.Value == 0)
                         continue;
                     if (result.Length > 0)
                         result.Append('\n');
-                    tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyResistanceAmount),
-                        tempElement.Title,
-                        (entry.amount * 100).ToBonusString("N2"));
+                        entry.Key.Title,
+                        (entry.Value * 100).ToBonusString("N2"));
                 }
 
                 // Damages
-                foreach (DamageAmount entry in equipmentBonus.damages)
+                foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in equipmentBonus.Damages)
                 {
-                    if (entry.amount.min == 0 && entry.amount.max == 0)
+                    if (entry.Key == null || (entry.Value.min == 0 && entry.Value.max == 0))
                         continue;
                     if (result.Length > 0)
                         result.Append('\n');
-                    tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyDamageAmount),
-                        tempElement.Title,
-                        entry.amount.min.ToBonusString("N0"),
-                        entry.amount.max.ToString("N0"));
+                        entry.Key.Title,
+                        entry.Value.min.ToBonusString("N0"),
+                        entry.Value.max.ToString("N0"));
                 }
-                foreach (DamageAmount entry in equipmentBonus.damagesRate)
+                foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in equipmentBonus.DamagesRate)
                 {
-                    if (entry.amount.min == 0 && entry.amount.max == 0)
+                    if (entry.Key == null || (entry.Value.min == 0 && entry.Value.max == 0))
                         continue;
                     if (result.Length > 0)
                         result.Append('\n');
-                    tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyDamageAmountRate),
-                        tempElement.Title,
-                        (entry.amount.min * 100).ToBonusString("N2"),
-                        (entry.amount.max * 100).ToString("N2"));
+                        entry.Key.Title,
+                        (entry.Value.min * 100).ToBonusString("N2"),
+                        (entry.Value.max * 100).ToString("N2"));
                 }
 
                 // Armors
-                foreach (ArmorAmount entry in equipmentBonus.armors)
+                foreach (KeyValuePair<DamageElement, float> entry in equipmentBonus.Armors)
                 {
-                    if (entry.amount == 0)
+                    if (entry.Value == 0)
                         continue;
                     if (result.Length > 0)
                         result.Append('\n');
-                    tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyArmorAmount),
-                        tempElement.Title,
-                        entry.amount.ToBonusString("N0"));
+                        entry.Key.Title,
+                        entry.Value.ToBonusString("N0"));
                 }
-                foreach (ArmorAmount entry in equipmentBonus.armorsRate)
+                foreach (KeyValuePair<DamageElement, float> entry in equipmentBonus.ArmorsRate)
                 {
-                    if (entry.amount == 0)
+                    if (entry.Value == 0)
                         continue;
                     if (result.Length > 0)
                         result.Append('\n');
-                    tempElement = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyArmorAmountRate),
-                        tempElement.Title,
-                        (entry.amount * 100).ToBonusString("N2"));
+                        entry.Key.Title,
+                        (entry.Value * 100).ToBonusString("N2"));
                 }
 
                 // Skills
-                foreach (SkillLevel entry in equipmentBonus.skills)
+                foreach (KeyValuePair<BaseSkill, int> entry in equipmentBonus.Skills)
                 {
-                    if (entry.skill == null || entry.level == 0)
+                    if (entry.Key == null || entry.Value == 0)
                         continue;
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeySkillLevel),
-                        entry.skill.Title,
-                        entry.level.ToBonusString("N0"));
+                        entry.Key.Title,
+                        entry.Value.ToBonusString("N0"));
                 }
 
                 return result.ToString();

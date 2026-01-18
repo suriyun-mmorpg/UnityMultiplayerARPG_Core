@@ -37,6 +37,12 @@ namespace MultiplayerARPG
         public UnityEvent onAbleToIncrease = new UnityEvent();
         public UnityEvent onUnableToIncrease = new UnityEvent();
 
+
+        protected Dictionary<DamageElement, float> _tempResistances = new Dictionary<DamageElement, float>();
+        protected Dictionary<DamageElement, float> _tempArmors = new Dictionary<DamageElement, float>();
+        protected Dictionary<DamageElement, MinMaxFloat> _tempDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+        protected Dictionary<StatusEffect, float> _tempStatusEffectResistances = new Dictionary<StatusEffect, float>();
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -51,6 +57,14 @@ namespace MultiplayerARPG
             uiStatusEffectResistances = null;
             onAbleToIncrease?.RemoveAllListeners();
             onUnableToIncrease?.RemoveAllListeners();
+            _tempResistances.Clear();
+            _tempResistances = null;
+            _tempArmors.Clear();
+            _tempArmors = null;
+            _tempDamageAmounts.Clear();
+            _tempDamageAmounts = null;
+            _tempStatusEffectResistances.Clear();
+            _tempStatusEffectResistances = null;
         }
 
         protected override void UpdateUI()
@@ -110,13 +124,8 @@ namespace MultiplayerARPG
 
             if (uiIncreaseResistances != null)
             {
-                Dictionary<DamageElement, float> resistances = null;
-                if (Attribute != null)
-                {
-                    resistances = Attribute.GetIncreaseResistances(Amount);
-                }
-
-                if (resistances == null || resistances.Count == 0)
+                Attribute.GetIncreaseResistances(Amount, _tempResistances);
+                if (_tempResistances.Count == 0)
                 {
                     // Hide ui if resistances is empty
                     uiIncreaseResistances.Hide();
@@ -125,19 +134,14 @@ namespace MultiplayerARPG
                 {
                     uiIncreaseResistances.isBonus = true;
                     uiIncreaseResistances.Show();
-                    uiIncreaseResistances.Data = resistances;
+                    uiIncreaseResistances.Data = _tempResistances;
                 }
             }
 
             if (uiIncreaseArmors != null)
             {
-                Dictionary<DamageElement, float> armors = null;
-                if (Attribute != null)
-                {
-                    armors = Attribute.GetIncreaseArmors(Amount);
-                }
-
-                if (armors == null || armors.Count == 0)
+                Attribute.GetIncreaseArmors(Amount, _tempArmors);
+                if (_tempArmors.Count == 0)
                 {
                     // Hide ui if armors is empty
                     uiIncreaseArmors.Hide();
@@ -147,19 +151,14 @@ namespace MultiplayerARPG
                     uiIncreaseArmors.displayType = UIArmorAmounts.DisplayType.Simple;
                     uiIncreaseArmors.isBonus = true;
                     uiIncreaseArmors.Show();
-                    uiIncreaseArmors.Data = armors;
+                    uiIncreaseArmors.Data = _tempArmors;
                 }
             }
 
             if (uiIncreaseDamages != null)
             {
-                Dictionary<DamageElement, MinMaxFloat> damageAmounts = null;
-                if (Attribute != null)
-                {
-                    damageAmounts = Attribute.GetIncreaseDamages(Amount);
-                }
-
-                if (damageAmounts == null || damageAmounts.Count == 0)
+                Attribute.GetIncreaseDamages(Amount, _tempDamageAmounts);
+                if (_tempDamageAmounts.Count == 0)
                 {
                     // Hide ui if damage amounts is empty
                     uiIncreaseDamages.Hide();
@@ -169,19 +168,14 @@ namespace MultiplayerARPG
                     uiIncreaseDamages.displayType = UIDamageElementAmounts.DisplayType.Simple;
                     uiIncreaseDamages.isBonus = true;
                     uiIncreaseDamages.Show();
-                    uiIncreaseDamages.Data = damageAmounts;
+                    uiIncreaseDamages.Data = _tempDamageAmounts;
                 }
             }
 
             if (uiStatusEffectResistances != null)
             {
-                Dictionary<StatusEffect, float> statusEffectResistances = null;
-                if (Attribute != null)
-                {
-                    statusEffectResistances = Attribute.GetIncreaseStatusEffectResistances(Amount);
-                }
-
-                if (statusEffectResistances == null || statusEffectResistances.Count == 0)
+                Attribute.GetIncreaseStatusEffectResistances(Amount, _tempStatusEffectResistances);
+                if (_tempStatusEffectResistances.Count == 0)
                 {
                     // Hide ui if armors is empty
                     uiStatusEffectResistances.Hide();
@@ -190,7 +184,7 @@ namespace MultiplayerARPG
                 {
                     uiStatusEffectResistances.isBonus = true;
                     uiStatusEffectResistances.Show();
-                    uiStatusEffectResistances.UpdateData(statusEffectResistances);
+                    uiStatusEffectResistances.UpdateData(_tempStatusEffectResistances);
                 }
             }
         }

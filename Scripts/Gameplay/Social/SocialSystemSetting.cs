@@ -82,25 +82,31 @@ namespace MultiplayerARPG
         public byte MaxShareExpPercentage { get { return maxShareExpPercentage; } }
 
         [System.NonSerialized]
-        private Dictionary<BaseItem, int> _createGuildRequireItems;
+        private Dictionary<BaseItem, int> _createGuildRequireItems = null;
         public Dictionary<BaseItem, int> CreateGuildRequireItems
         {
             get
             {
                 if (_createGuildRequireItems == null)
-                    _createGuildRequireItems = GameDataHelpers.CombineItems(createGuildRequireItems, new Dictionary<BaseItem, int>());
+                {
+                    _createGuildRequireItems = new Dictionary<BaseItem, int>();
+                    GameDataHelpers.CombineItems(createGuildRequireItems, _createGuildRequireItems);
+                }
                 return _createGuildRequireItems;
             }
         }
 
         [System.NonSerialized]
-        private Dictionary<Currency, int> _createGuildRequireCurrencies;
+        private Dictionary<Currency, int> _createGuildRequireCurrencies = null;
         public Dictionary<Currency, int> CreateGuildRequireCurrencies
         {
             get
             {
                 if (_createGuildRequireCurrencies == null)
-                    _createGuildRequireCurrencies = GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, null, 1f);
+                {
+                    _createGuildRequireCurrencies = new Dictionary<Currency, int>();
+                    GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, _createGuildRequireCurrencies, 1f);
+                }
                 return _createGuildRequireCurrencies;
             }
         }

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -14,18 +15,18 @@ namespace MultiplayerARPG
         private int _cacheRecoveryWater;
         private CharacterStats _cacheIncreaseStats;
         private CharacterStats _cacheIncreaseStatsRate;
-        private Dictionary<Attribute, float> _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
-        private Dictionary<Attribute, float> _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
-        private Dictionary<DamageElement, float> _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, float> _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, float> _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-        private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-        private Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
-        private Dictionary<BaseSkill, int> _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
-        private Dictionary<BaseSkill, int> _cacheOverrideSkills = new Dictionary<BaseSkill, int>();
-        private Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
-        private Dictionary<BuffRemoval, float> _cacheBuffRemovals = new Dictionary<BuffRemoval, float>();
-        private Dictionary<DamageElement, MinMaxFloat> _cacheDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
+        private readonly Dictionary<Attribute, float> _cacheIncreaseAttributes;
+        private readonly Dictionary<Attribute, float> _cacheIncreaseAttributesRate;
+        private readonly Dictionary<DamageElement, float> _cacheIncreaseResistances;
+        private readonly Dictionary<DamageElement, float> _cacheIncreaseArmors;
+        private readonly Dictionary<DamageElement, float> _cacheIncreaseArmorsRate;
+        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages;
+        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate;
+        private readonly Dictionary<BaseSkill, int> _cacheIncreaseSkills;
+        private readonly Dictionary<BaseSkill, int> _cacheOverrideSkills;
+        private readonly Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances;
+        private readonly Dictionary<BuffRemoval, float> _cacheBuffRemovals;
+        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheDamageOverTimes;
         private float _cacheRemoveBuffWhenAttackChance;
         private float _cacheRemoveBuffWhenAttackedChance;
         private float _cacheRemoveBuffWhenUseSkillChance;
@@ -37,57 +38,67 @@ namespace MultiplayerARPG
 
         public CalculatedBuff()
         {
-
+            _cacheIncreaseAttributes = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            _cacheIncreaseAttributesRate = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            _cacheIncreaseResistances = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseArmors = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseArmorsRate = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            _cacheIncreaseDamagesRate = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            _cacheIncreaseSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
+            _cacheOverrideSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
+            _cacheIncreaseStatusEffectResistances = CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get();
+            _cacheBuffRemovals = CollectionPool<Dictionary<BuffRemoval, float>, KeyValuePair<BuffRemoval, float>>.Get();
+            _cacheDamageOverTimes = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
         }
 
         public CalculatedBuff(Buff buff, int level)
         {
+            _cacheIncreaseAttributes = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            _cacheIncreaseAttributesRate = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            _cacheIncreaseResistances = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseArmors = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseArmorsRate = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            _cacheIncreaseDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            _cacheIncreaseDamagesRate = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            _cacheIncreaseSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
+            _cacheOverrideSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
+            _cacheIncreaseStatusEffectResistances = CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get();
+            _cacheBuffRemovals = CollectionPool<Dictionary<BuffRemoval, float>, KeyValuePair<BuffRemoval, float>>.Get();
+            _cacheDamageOverTimes = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
             Build(buff, level);
         }
 
         ~CalculatedBuff()
         {
-            _cacheIncreaseAttributes.Clear();
-            _cacheIncreaseAttributes = null;
-            _cacheIncreaseAttributesRate.Clear();
-            _cacheIncreaseAttributesRate = null;
-            _cacheIncreaseResistances.Clear();
-            _cacheIncreaseResistances = null;
-            _cacheIncreaseArmors.Clear();
-            _cacheIncreaseArmors = null;
-            _cacheIncreaseArmorsRate.Clear();
-            _cacheIncreaseArmorsRate = null;
-            _cacheIncreaseDamages.Clear();
-            _cacheIncreaseDamages = null;
-            _cacheIncreaseDamagesRate.Clear();
-            _cacheIncreaseDamagesRate = null;
-            _cacheIncreaseSkills.Clear();
-            _cacheIncreaseSkills = null;
-            _cacheOverrideSkills.Clear();
-            _cacheOverrideSkills = null;
-            _cacheIncreaseStatusEffectResistances.Clear();
-            _cacheIncreaseStatusEffectResistances = null;
-            _cacheBuffRemovals.Clear();
-            _cacheBuffRemovals = null;
-            _cacheDamageOverTimes.Clear();
-            _cacheDamageOverTimes = null;
-            _cacheMount = null;
+            CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(_cacheIncreaseAttributes);
+            CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(_cacheIncreaseAttributesRate);
+            CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_cacheIncreaseResistances);
+            CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_cacheIncreaseArmors);
+            CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_cacheIncreaseArmorsRate);
+            CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_cacheIncreaseDamages);
+            CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_cacheIncreaseDamagesRate);
+            CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(_cacheIncreaseSkills);
+            CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(_cacheOverrideSkills);
+            CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Release(_cacheIncreaseStatusEffectResistances);
+            CollectionPool<Dictionary<BuffRemoval, float>, KeyValuePair<BuffRemoval, float>>.Release(_cacheBuffRemovals);
+            CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_cacheDamageOverTimes);
         }
 
         public void Clear()
         {
-            _cacheIncreaseAttributes.Clear();
-            _cacheIncreaseAttributesRate.Clear();
-            _cacheIncreaseResistances.Clear();
-            _cacheIncreaseArmors.Clear();
-            _cacheIncreaseArmorsRate.Clear();
-            _cacheIncreaseDamages.Clear();
-            _cacheIncreaseDamagesRate.Clear();
-            _cacheIncreaseSkills.Clear();
-            _cacheOverrideSkills.Clear();
-            _cacheIncreaseStatusEffectResistances.Clear();
-            _cacheBuffRemovals.Clear();
-            _cacheDamageOverTimes.Clear();
+            _cacheIncreaseAttributes?.Clear();
+            _cacheIncreaseAttributesRate?.Clear();
+            _cacheIncreaseResistances?.Clear();
+            _cacheIncreaseArmors?.Clear();
+            _cacheIncreaseArmorsRate?.Clear();
+            _cacheIncreaseDamages?.Clear();
+            _cacheIncreaseDamagesRate?.Clear();
+            _cacheIncreaseSkills?.Clear();
+            _cacheOverrideSkills?.Clear();
+            _cacheIncreaseStatusEffectResistances?.Clear();
+            _cacheBuffRemovals?.Clear();
+            _cacheDamageOverTimes?.Clear();
             _cacheMount = null;
         }
 
@@ -108,19 +119,19 @@ namespace MultiplayerARPG
                 _cacheRecoveryWater = buff.GetRecoveryWater(level);
                 _cacheIncreaseStats = buff.GetIncreaseStats(level);
                 _cacheIncreaseStatsRate = buff.GetIncreaseStatsRate(level);
-                _cacheIncreaseAttributes = buff.GetIncreaseAttributes(level, _cacheIncreaseAttributes);
-                _cacheIncreaseAttributesRate = buff.GetIncreaseAttributesRate(level, _cacheIncreaseAttributesRate);
-                _cacheIncreaseResistances = buff.GetIncreaseResistances(level, _cacheIncreaseResistances);
-                _cacheIncreaseArmors = buff.GetIncreaseArmors(level, _cacheIncreaseArmors);
-                _cacheIncreaseArmorsRate = buff.GetIncreaseArmorsRate(level, _cacheIncreaseArmorsRate);
-                _cacheIncreaseDamages = buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
-                _cacheIncreaseDamagesRate = buff.GetIncreaseDamagesRate(level, _cacheIncreaseDamagesRate);
-                _cacheIncreaseSkills = buff.GetIncreaseSkills(level, _cacheIncreaseSkills);
+                buff.GetIncreaseAttributes(level, _cacheIncreaseAttributes);
+                buff.GetIncreaseAttributesRate(level, _cacheIncreaseAttributesRate);
+                buff.GetIncreaseResistances(level, _cacheIncreaseResistances);
+                buff.GetIncreaseArmors(level, _cacheIncreaseArmors);
+                buff.GetIncreaseArmorsRate(level, _cacheIncreaseArmorsRate);
+                buff.GetIncreaseDamages(level, _cacheIncreaseDamages);
+                buff.GetIncreaseDamagesRate(level, _cacheIncreaseDamagesRate);
+                buff.GetIncreaseSkills(level, _cacheIncreaseSkills);
                 if (buff.isOverrideSkills)
-                    _cacheOverrideSkills = buff.GetOverrideSkills(level, _cacheOverrideSkills);
-                _cacheIncreaseStatusEffectResistances = buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
-                _cacheBuffRemovals = buff.GetBuffRemovals(level, _cacheBuffRemovals);
-                _cacheDamageOverTimes = buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
+                    buff.GetOverrideSkills(level, _cacheOverrideSkills);
+                buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
+                buff.GetBuffRemovals(level, _cacheBuffRemovals);
+                buff.GetDamageOverTimes(level, _cacheDamageOverTimes);
                 _cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
                 _cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
                 _cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);

@@ -115,8 +115,12 @@ namespace MultiplayerARPG
         /// </summary>
         public void UpdateStats()
         {
-            Resistances = GameDataHelpers.CombineResistances(resistances, new Dictionary<DamageElement, float>(), Level, 1);
-            Armors = GameDataHelpers.CombineArmors(armors, new Dictionary<DamageElement, float>(), Level, 1);
+            if (Resistances == null)
+                Resistances = new Dictionary<DamageElement, float>();
+            GameDataHelpers.CombineResistances(resistances, Resistances, Level, 1);
+            if (Armors == null)
+                Armors = new Dictionary<DamageElement, float>();
+            GameDataHelpers.CombineArmors(armors, Armors, Level, 1);
         }
 
         protected override void SetupNetElements()

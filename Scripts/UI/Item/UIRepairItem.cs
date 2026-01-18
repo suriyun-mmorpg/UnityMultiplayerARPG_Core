@@ -1,4 +1,5 @@
 ﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -27,6 +28,8 @@ namespace MultiplayerARPG
 
         protected bool _activated;
         protected string _activeItemId;
+        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
         {
@@ -36,6 +39,10 @@ namespace MultiplayerARPG
             uiRequireCurrencyAmounts = null;
             uiTextSimpleRequireGold = null;
             uiTextDurability = null;
+            _tempRequireCurrencies.Clear();
+            _tempRequireCurrencies = null;
+            _tempRequireItems.Clear();
+            _tempRequireItems = null;
         }
 
         public override void OnUpdateCharacterItems()
@@ -83,7 +90,9 @@ namespace MultiplayerARPG
                 {
                     uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
                     uiRequireItemAmounts.Show();
-                    uiRequireItemAmounts.Data = GameDataHelpers.CombineItems(repairPrice.RequireItems, null);
+                    _tempRequireItems.Clear();
+                    GameDataHelpers.CombineItems(repairPrice.RequireItems, _tempRequireItems);
+                    uiRequireItemAmounts.Data = _tempRequireItems;
                 }
             }
 
@@ -97,7 +106,9 @@ namespace MultiplayerARPG
                 {
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.Show();
-                    uiRequireCurrencyAmounts.Data = GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, null, 1f);
+                    _tempRequireCurrencies.Clear();
+                    GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, _tempRequireCurrencies, 1f);
+                    uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
                 }
             }
 

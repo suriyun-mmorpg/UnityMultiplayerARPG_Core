@@ -18,14 +18,15 @@ namespace MultiplayerARPG
             {
                 foreach (EquipmentBonus effect in effects)
                 {
-                    GameInstance.AddAttributes(effect.attributes);
-                    GameInstance.AddAttributes(effect.attributesRate);
-                    GameInstance.AddDamageElements(effect.resistances);
-                    GameInstance.AddDamageElements(effect.resistances);
-                    GameInstance.AddDamageElements(effect.armors);
-                    GameInstance.AddDamageElements(effect.damages);
-                    GameInstance.AddSkills(effect.skills);
-                    GameInstance.AddStatusEffects(effect.statusEffectResistances);
+                    GameInstance.AddAttributes(effect.Attributes.Keys);
+                    GameInstance.AddAttributes(effect.AttributesRate.Keys);
+                    GameInstance.AddDamageElements(effect.Resistances.Keys);
+                    GameInstance.AddDamageElements(effect.Armors.Keys);
+                    GameInstance.AddDamageElements(effect.ArmorsRate.Keys);
+                    GameInstance.AddDamageElements(effect.Damages.Keys);
+                    GameInstance.AddDamageElements(effect.DamagesRate.Keys);
+                    GameInstance.AddSkills(effect.Skills.Keys);
+                    GameInstance.AddStatusEffects(effect.StatusEffectResistances.Keys);
                 }
             }
         }
