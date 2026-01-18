@@ -379,12 +379,21 @@ namespace MultiplayerARPG
                 CacheNavMeshAgent.path.corners.Length == 0)
                 return -1f;
 
-            float distance = 0.0f;
-            for (int i = 0; i < CacheNavMeshAgent.path.corners.Length - 1; ++i)
-            {
-                distance += Vector3.Distance(CacheNavMeshAgent.path.corners[i], CacheNavMeshAgent.path.corners[i + 1]);
-            }
+            return CacheNavMeshAgent.remainingDistance;
+        }
 
+        protected float GetPathRemainingDistanceByCorners()
+        {
+            if (CacheNavMeshAgent.pathPending ||
+                CacheNavMeshAgent.pathStatus == NavMeshPathStatus.PathInvalid)
+                return -1f;
+
+            Vector3[] corners = CacheNavMeshAgent.path.corners;
+            float distance = 0.0f;
+            for (int i = 0; i < corners.Length - 1; ++i)
+            {
+                distance += Vector3.Distance(corners[i], corners[i + 1]);
+            }
             return distance;
         }
 

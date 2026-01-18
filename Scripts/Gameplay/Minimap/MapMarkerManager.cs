@@ -5,7 +5,7 @@ namespace MultiplayerARPG
     public class MapMarkerManager
     {
         private static Dictionary<string, IMapMarker> s_allMarkers = new Dictionary<string, IMapMarker>();
-        public static IReadOnlyDictionary<string, IMapMarker> AllMarkers => s_allMarkers;
+        public static Dictionary<string, IMapMarker> AllMarkers => s_allMarkers;
         public static event System.Action<IMapMarker> OnAdded;
         public static event System.Action<IMapMarker> OnRemoved;
         

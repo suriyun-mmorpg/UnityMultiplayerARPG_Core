@@ -130,29 +130,8 @@ namespace MultiplayerARPG
         }
 #endif
 
-        [NonSerialized]
-        protected int? dataId;
-        public int DataId
-        {
-            get
-            {
-                if (!dataId.HasValue)
-                    dataId = MakeDataId(Id);
-                return dataId.Value;
-            }
-        }
-
-        [NonSerialized]
-        protected int? hashCode;
-        public int HashCode
-        {
-            get
-            {
-                if (!hashCode.HasValue)
-                    hashCode = $"{GetType().FullName}_{Id}".GetHashCode();
-                return hashCode.Value;
-            }
-        }
+        public int DataId { protected set; get; }
+        public int HashCode { protected set; get; }
 
         public readonly static Dictionary<int, string> IdMap = new Dictionary<int, string>();
         public readonly static Dictionary<string, int> DataIdMap = new Dictionary<string, int>();
@@ -169,6 +148,11 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
+            DataId = MakeDataId(Id);
+            unchecked
+            {
+                HashCode = (GetType().GetHashCode() * 397) ^ DataId;
+            }
             string key = this.GetPatchKey();
             if (PatchDataManager.PatchableData.TryAdd(key, this) &&
                 PatchDataManager.PatchingData.TryGetValue(key, out Dictionary<string, object> patch))
@@ -243,14 +227,13 @@ namespace MultiplayerARPG
 
         public override int GetHashCode()
         {
-            if (this == null)
-                return 0;
             return HashCode;
         }
 
         public override bool Equals(object obj)
         {
-            return GetHashCode() == obj.GetHashCode();
+            return obj is BaseGameData other
+                && other.HashCode == HashCode;
         }
 
         [ContextMenu("Test Export Data")]
