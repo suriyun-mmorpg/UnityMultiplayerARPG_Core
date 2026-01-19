@@ -1,63 +1,118 @@
 ﻿using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public static partial class CharacterRelatesDataExtensions
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterStats data)
         {
-            return data.Equals(CharacterStats.Empty);
+            return
+                data.hp == 0f &&
+                data.hpRecovery == 0f &&
+                data.hpLeechRate == 0f &&
+                data.mp == 0f &&
+                data.mpRecovery == 0f &&
+                data.mpLeechRate == 0f &&
+                data.stamina == 0f &&
+                data.staminaRecovery == 0f &&
+                data.staminaLeechRate == 0f &&
+                data.food == 0f &&
+                data.water == 0f &&
+                data.accuracy == 0f &&
+                data.evasion == 0f &&
+                data.criRate == 0f &&
+                data.criDmgRate == 0f &&
+                data.blockRate == 0f &&
+                data.blockDmgRate == 0f &&
+                data.moveSpeed == 0f &&
+                data.sprintSpeed == 0f &&
+                data.atkSpeed == 0f &&
+                data.weightLimit == 0f &&
+                data.slotLimit == 0f &&
+                data.goldRate == 0f &&
+                data.expRate == 0f &&
+                data.itemDropRate == 0f &&
+                data.jumpHeight == 0f &&
+                data.headDamageAbsorbs == 0f &&
+                data.bodyDamageAbsorbs == 0f &&
+                data.fallDamageAbsorbs == 0f &&
+                data.gravityRate == 0f &&
+                data.protectedSlotLimit == 0f &&
+                data.ammoCapacity == 0f &&
+                data.recoilModifier == 0f &&
+                data.recoilRate == 0f &&
+                data.rateOfFire == 0f &&
+                data.reloadDuration == 0f &&
+                data.fireSpreadRangeRate == 0f &&
+                data.fireSpread == 0f &&
+                data.decreaseFoodDecreation == 0f &&
+                data.decreaseWaterDecreation == 0f &&
+                data.decreaseStaminaDecreation == 0f &&
+                data.buyItemPriceRate == 0f &&
+                data.sellItemPriceRate == 0f;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterAttribute data)
         {
-            return data.Equals(CharacterAttribute.Empty);
+            return data.dataId == 0 || data.amount == 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterBuff data)
         {
-            return data.Equals(CharacterBuff.Empty);
+            return data.dataId == 0 || data.level <= 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterHotkey data)
         {
-            return data.Equals(CharacterHotkey.Empty);
+            return string.IsNullOrWhiteSpace(data.hotkeyId);
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterItem data)
         {
-            return data.Equals(CharacterItem.Empty);
+            return data.dataId == 0 || data.amount <= 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmptySlot(this CharacterItem data)
         {
-            return data.IsEmpty() || data.dataId == 0 || data.amount <= 0 || data.GetItem() == null;
+            return data.IsEmpty() || data.GetItem() == null;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NotEmptySlot(this CharacterItem data)
         {
             return !data.IsEmptySlot();
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterQuest data)
         {
-            return data.Equals(CharacterQuest.Empty);
+            return data.dataId == 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterSkill data)
         {
-            return data.Equals(CharacterSkill.Empty);
+            return data.dataId == 0 || data.level <= 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterSkillUsage data)
         {
-            return data.Equals(CharacterSkillUsage.Empty);
+            return data.dataId == 0;
         }
 
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterSummon data)
         {
-            return data.Equals(CharacterSummon.Empty);
+            return data.dataId == 0 || data.level <= 0;
         }
 
         public static bool IsDiffer(this CharacterItem data, CharacterItem anotherData,
