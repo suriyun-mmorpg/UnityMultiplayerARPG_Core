@@ -60,15 +60,23 @@ public static partial class GenericUtils
 
     public static void SetLayerRecursively(this GameObject gameObject, int layerIndex, bool includeInactive)
     {
-        if (gameObject == null)
-            return;
-        if (gameObject.layer != layerIndex)
-            gameObject.layer = layerIndex;
-        Transform[] childrenTransforms = gameObject.GetComponentsInChildren<Transform>(includeInactive);
-        foreach (Transform childTransform in childrenTransforms)
+        if (gameObject == null) return;
+        SetLayerInternal(gameObject.transform, layerIndex, includeInactive);
+    }
+
+    private static void SetLayerInternal(Transform root, int layerIndex, bool includeInactive)
+    {
+        GameObject go = root.gameObject;
+        if (go.layer != layerIndex)
+            go.layer = layerIndex;
+
+        int childCount = root.childCount;
+        for (int i = 0; i < childCount; i++)
         {
-            if (childTransform.gameObject.layer != layerIndex)
-                childTransform.gameObject.layer = layerIndex;
+            Transform child = root.GetChild(i);
+
+            if (includeInactive || child.gameObject.activeSelf)
+                SetLayerInternal(child, layerIndex, includeInactive);
         }
     }
 
