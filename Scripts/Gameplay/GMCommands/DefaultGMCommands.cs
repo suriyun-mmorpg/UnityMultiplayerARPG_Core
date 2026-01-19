@@ -1,6 +1,7 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
+using System;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -145,57 +146,57 @@ namespace MultiplayerARPG
             if (string.IsNullOrEmpty(command))
                 return false;
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (command.ToLower().Equals(Help.ToLower()))
+            if (string.Equals(command, Help, StringComparison.OrdinalIgnoreCase))
                 return true;
-            if (command.ToLower().Equals(Level.ToLower()) && dataLength == 2)
+            if (string.Equals(command, Level, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(StatPoint.ToLower()) && dataLength == 2)
+            if (string.Equals(command, StatPoint, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(SkillPoint.ToLower()) && dataLength == 2)
+            if (string.Equals(command, SkillPoint, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(Gold.ToLower()) && dataLength == 2)
+            if (string.Equals(command, Gold, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(AddItem.ToLower()) && dataLength == 3)
+            if (string.Equals(command, AddItem, StringComparison.OrdinalIgnoreCase) && dataLength == 3)
                 return true;
-            if (command.ToLower().Equals(GiveGold.ToLower()) && dataLength == 3)
+            if (string.Equals(command, GiveGold, StringComparison.OrdinalIgnoreCase) && dataLength == 3)
                 return true;
-            if (command.ToLower().Equals(GiveItem.ToLower()) && dataLength == 4)
+            if (string.Equals(command, GiveItem, StringComparison.OrdinalIgnoreCase) && dataLength == 4)
                 return true;
-            if (command.ToLower().Equals(GoldRate.ToLower()) && dataLength == 2)
+            if (string.Equals(command, GoldRate, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(ExpRate.ToLower()) && dataLength == 2)
+            if (string.Equals(command, ExpRate, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(Warp.ToLower()) && dataLength == 2)
+            if (string.Equals(command, Warp, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(WarpCharacter.ToLower()) && dataLength == 6)
+            if (string.Equals(command, WarpCharacter, StringComparison.OrdinalIgnoreCase) && dataLength == 6)
                 return true;
-            if (command.ToLower().Equals(WarpToCharacter.ToLower()) && dataLength == 2)
+            if (string.Equals(command, WarpToCharacter, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(Summon.ToLower()) && dataLength == 2)
+            if (string.Equals(command, Summon, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(Monster.ToLower()) && dataLength == 4)
+            if (string.Equals(command, Monster, StringComparison.OrdinalIgnoreCase) && dataLength == 4)
                 return true;
-            if (command.ToLower().Equals(Kill.ToLower()) && dataLength == 2)
+            if (string.Equals(command, Kill, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(Suicide.ToLower()))
+            if (string.Equals(command, Suicide, StringComparison.OrdinalIgnoreCase))
                 return true;
-            if (command.ToLower().Equals(Mute.ToLower()) && dataLength == 3)
+            if (string.Equals(command, Mute, StringComparison.OrdinalIgnoreCase) && dataLength == 3)
                 return true;
-            if (command.ToLower().Equals(Unmute.ToLower()) && dataLength == 2)
+            if (string.Equals(command, Unmute, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(Ban.ToLower()) && dataLength == 3)
+            if (string.Equals(command, Ban, StringComparison.OrdinalIgnoreCase) && dataLength == 3)
                 return true;
-            if (command.ToLower().Equals(Unban.ToLower()) && dataLength == 2)
+            if (string.Equals(command, Unban, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(Kick.ToLower()) && dataLength == 2)
+            if (string.Equals(command, Kick, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
-            if (command.ToLower().Equals(Visible.ToLower()))
+            if (string.Equals(command, Visible, StringComparison.OrdinalIgnoreCase))
                 return true;
-            if (command.ToLower().Equals(Invisible.ToLower()))
+            if (string.Equals(command, Invisible, StringComparison.OrdinalIgnoreCase))
                 return true;
-            if (command.ToLower().Equals(CloseServers.ToLower()))
+            if (string.Equals(command, CloseServers, StringComparison.OrdinalIgnoreCase))
                 return true;
-            if (command.ToLower().Equals(CloseServer.ToLower()) && dataLength == 2)
+            if (string.Equals(command, CloseServer, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
 #endif
             return false;
@@ -209,32 +210,32 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             string[] splited = chatMessage.Split(' ');
             command = splited[0];
-            if (command.ToLower().Equals(Help.ToLower()) ||
-                command.ToLower().Equals(Level.ToLower()) ||
-                command.ToLower().Equals(StatPoint.ToLower()) ||
-                command.ToLower().Equals(SkillPoint.ToLower()) ||
-                command.ToLower().Equals(Gold.ToLower()) ||
-                command.ToLower().Equals(AddItem.ToLower()) ||
-                command.ToLower().Equals(GiveGold.ToLower()) ||
-                command.ToLower().Equals(GiveItem.ToLower()) ||
-                command.ToLower().Equals(GoldRate.ToLower()) ||
-                command.ToLower().Equals(ExpRate.ToLower()) ||
-                command.ToLower().Equals(Warp.ToLower()) ||
-                command.ToLower().Equals(WarpCharacter.ToLower()) ||
-                command.ToLower().Equals(WarpToCharacter.ToLower()) ||
-                command.ToLower().Equals(Summon.ToLower()) ||
-                command.ToLower().Equals(Monster.ToLower()) ||
-                command.ToLower().Equals(Kill.ToLower()) ||
-                command.ToLower().Equals(Suicide.ToLower()) ||
-                command.ToLower().Equals(Mute.ToLower()) ||
-                command.ToLower().Equals(Unmute.ToLower()) ||
-                command.ToLower().Equals(Ban.ToLower()) ||
-                command.ToLower().Equals(Unban.ToLower()) ||
-                command.ToLower().Equals(Kick.ToLower()) ||
-                command.ToLower().Equals(Visible.ToLower()) ||
-                command.ToLower().Equals(Invisible.ToLower()) ||
-                command.ToLower().Equals(CloseServers.ToLower()) ||
-                command.ToLower().Equals(CloseServer.ToLower()))
+            if (string.Equals(command, Help, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Level, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, StatPoint, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, SkillPoint, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Gold, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, AddItem, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, GiveGold, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, GiveItem, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, GoldRate, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, ExpRate, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Warp, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, WarpCharacter, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, WarpToCharacter, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Summon, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Monster, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Kill, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Suicide, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Mute, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Unmute, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Ban, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Unban, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Kick, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Visible, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, Invisible, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, CloseServers, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, CloseServer, StringComparison.OrdinalIgnoreCase))
             {
                 return true;
             }
@@ -261,11 +262,11 @@ namespace MultiplayerARPG
             BasePlayerCharacterEntity targetCharacter;
             if (IsDataLengthValid(commandKey, data.Length))
             {
-                if (commandKey.ToLower().Equals(Help.ToLower()))
+                if (string.Equals(commandKey, Help, StringComparison.OrdinalIgnoreCase))
                 {
                     response = HelpResponse;
                 }
-                if (commandKey.ToLower().Equals(Level.ToLower()))
+                if (string.Equals(commandKey, Level, StringComparison.OrdinalIgnoreCase))
                 {
                     int amount;
                     if (!int.TryParse(data[1], out amount) || amount <= 0)
@@ -278,7 +279,7 @@ namespace MultiplayerARPG
                         response = $"Set character level to {amount}";
                     }
                 }
-                if (commandKey.ToLower().Equals(StatPoint.ToLower()))
+                if (string.Equals(commandKey, StatPoint, StringComparison.OrdinalIgnoreCase))
                 {
                     int amount;
                     if (!int.TryParse(data[1], out amount) || amount <= 0)
@@ -291,7 +292,7 @@ namespace MultiplayerARPG
                         response = $"Set character statpoint to {amount}";
                     }
                 }
-                if (commandKey.ToLower().Equals(SkillPoint.ToLower()))
+                if (string.Equals(commandKey, SkillPoint, StringComparison.OrdinalIgnoreCase))
                 {
                     int amount;
                     if (!int.TryParse(data[1], out amount) || amount <= 0)
@@ -304,7 +305,7 @@ namespace MultiplayerARPG
                         response = $"Set character skillpoint to {amount}";
                     }
                 }
-                if (commandKey.ToLower().Equals(Gold.ToLower()))
+                if (string.Equals(commandKey, Gold, StringComparison.OrdinalIgnoreCase))
                 {
                     int amount;
                     if (!int.TryParse(data[1], out amount) || amount <= 0)
@@ -317,7 +318,7 @@ namespace MultiplayerARPG
                         response = $"Set character gold to {amount}";
                     }
                 }
-                if (commandKey.ToLower().Equals(AddItem.ToLower()))
+                if (string.Equals(commandKey, AddItem, StringComparison.OrdinalIgnoreCase))
                 {
                     BaseItem targetItem = null;
                     foreach (BaseItem item in GameInstance.Items.Values)
@@ -354,7 +355,7 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                if (commandKey.ToLower().Equals(GiveGold.ToLower()))
+                if (string.Equals(commandKey, GiveGold, StringComparison.OrdinalIgnoreCase))
                 {
                     receiver = data[1];
                     int amount;
@@ -369,7 +370,7 @@ namespace MultiplayerARPG
                         response = $"Add gold for character: {receiver}";
                     }
                 }
-                if (commandKey.ToLower().Equals(GiveItem.ToLower()))
+                if (string.Equals(commandKey, GiveItem, StringComparison.OrdinalIgnoreCase))
                 {
                     receiver = data[1];
                     BaseItem targetItem = null;
@@ -407,7 +408,7 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                if (commandKey.ToLower().Equals(GoldRate.ToLower()))
+                if (string.Equals(commandKey, GoldRate, StringComparison.OrdinalIgnoreCase))
                 {
                     float amount;
                     if (!float.TryParse(data[1], out amount) || amount < 0f)
@@ -420,7 +421,7 @@ namespace MultiplayerARPG
                         response = $"Set gold rate to {amount}";
                     }
                 }
-                if (commandKey.ToLower().Equals(ExpRate.ToLower()))
+                if (string.Equals(commandKey, ExpRate, StringComparison.OrdinalIgnoreCase))
                 {
                     float amount;
                     if (!float.TryParse(data[1], out amount) || amount < 0f)
@@ -433,7 +434,7 @@ namespace MultiplayerARPG
                         response = $"Set exp rate to {amount}";
                     }
                 }
-                if (commandKey.ToLower().Equals(Warp.ToLower()))
+                if (string.Equals(commandKey, Warp, StringComparison.OrdinalIgnoreCase))
                 {
                     BaseMapInfo targetMapInfo = null;
                     foreach (BaseMapInfo mapInfo in GameInstance.MapInfos.Values)
@@ -458,7 +459,7 @@ namespace MultiplayerARPG
                         response = $"Warping to: {data[1]} {mapInfo.StartPosition}";
                     }
                 }
-                if (commandKey.ToLower().Equals(WarpCharacter.ToLower()))
+                if (string.Equals(commandKey, WarpCharacter, StringComparison.OrdinalIgnoreCase))
                 {
                     BaseMapInfo targetMapInfo = null;
                     foreach (BaseMapInfo mapInfo in GameInstance.MapInfos.Values)
@@ -488,7 +489,7 @@ namespace MultiplayerARPG
                         await BaseGameNetworkManager.Singleton.WarpCharacter(targetCharacter, data[2], new Vector3(x, y, z), false, Vector3.zero);
                     }
                 }
-                if (commandKey.ToLower().Equals(WarpToCharacter.ToLower()))
+                if (string.Equals(commandKey, WarpToCharacter, StringComparison.OrdinalIgnoreCase))
                 {
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
@@ -496,7 +497,7 @@ namespace MultiplayerARPG
                         BaseGameNetworkManager.Singleton.ServerSendLocalMessage(sender, resendCommand);
                     }
                 }
-                if (commandKey.ToLower().Equals(Summon.ToLower()))
+                if (string.Equals(commandKey, Summon, StringComparison.OrdinalIgnoreCase))
                 {
                     if (senderCharacter != null)
                     {
@@ -504,7 +505,7 @@ namespace MultiplayerARPG
                         BaseGameNetworkManager.Singleton.ServerSendLocalMessage(sender, resendCommand);
                     }
                 }
-                if (commandKey.ToLower().Equals(Monster.ToLower()))
+                if (string.Equals(commandKey, Monster, StringComparison.OrdinalIgnoreCase))
                 {
                     BaseMonsterCharacterEntity targetMonster = null;
                     foreach (AssetReferenceBaseMonsterCharacterEntity addressableMonster in GameInstance.AddressableMonsterCharacterEntities.Values)
@@ -561,7 +562,7 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                if (commandKey.ToLower().Equals(Kill.ToLower()))
+                if (string.Equals(commandKey, Kill, StringComparison.OrdinalIgnoreCase))
                 {
                     if (GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
@@ -577,7 +578,7 @@ namespace MultiplayerARPG
                         }
                     }
                 }
-                if (commandKey.ToLower().Equals(Suicide.ToLower()))
+                if (string.Equals(commandKey, Suicide, StringComparison.OrdinalIgnoreCase))
                 {
                     if (senderCharacter != null)
                     {
@@ -586,7 +587,7 @@ namespace MultiplayerARPG
                         response = "Suicided";
                     }
                 }
-                if (commandKey.ToLower().Equals(Mute.ToLower()))
+                if (string.Equals(commandKey, Mute, StringComparison.OrdinalIgnoreCase))
                 {
                     int amount;
                     if (!int.TryParse(data[2], out amount) || amount < 0)
@@ -599,12 +600,12 @@ namespace MultiplayerARPG
                         response = $"Mute character named: {data[1]}";
                     }
                 }
-                if (commandKey.ToLower().Equals(Unmute.ToLower()))
+                if (string.Equals(commandKey, Unmute, StringComparison.OrdinalIgnoreCase))
                 {
                     GameInstance.ServerUserHandlers.UnmuteCharacterByName(data[1]);
                     response = $"Unmute character named: {data[1]}";
                 }
-                if (commandKey.ToLower().Equals(Ban.ToLower()))
+                if (string.Equals(commandKey, Ban, StringComparison.OrdinalIgnoreCase))
                 {
                     int amount;
                     if (!int.TryParse(data[2], out amount) || amount < 0)
@@ -617,12 +618,12 @@ namespace MultiplayerARPG
                         response = $"Ban user's who own character named: {data[1]}";
                     }
                 }
-                if (commandKey.ToLower().Equals(Unban.ToLower()))
+                if (string.Equals(commandKey, Unban, StringComparison.OrdinalIgnoreCase))
                 {
                     GameInstance.ServerUserHandlers.UnbanUserByCharacterName(data[1]);
                     response = $"Unban user's who own character named: {data[1]}";
                 }
-                if (commandKey.ToLower().Equals(Kick.ToLower()))
+                if (string.Equals(commandKey, Kick, StringComparison.OrdinalIgnoreCase))
                 {
                     if (!GameInstance.ServerUserHandlers.TryGetPlayerCharacterByName(data[1], out targetCharacter))
                     {
@@ -634,19 +635,19 @@ namespace MultiplayerARPG
                         response = $"Kick character: {data[1]}";
                     }
                 }
-                if (commandKey.ToLower().Equals(Visible.ToLower()))
+                if (string.Equals(commandKey, Visible, StringComparison.OrdinalIgnoreCase))
                 {
                     if (senderCharacter != null)
                         senderCharacter.ForceHide = false;
                     response = "Your character is shown to other players";
                 }
-                if (commandKey.ToLower().Equals(Invisible.ToLower()))
+                if (string.Equals(commandKey, Invisible, StringComparison.OrdinalIgnoreCase))
                 {
                     if (senderCharacter != null)
                         senderCharacter.ForceHide = true;
                     response = "Your character is hidden from other players";
                 }
-                if (commandKey.ToLower().Equals(CloseServers.ToLower()))
+                if (string.Equals(commandKey, CloseServers, StringComparison.OrdinalIgnoreCase))
                 {
                     var players = BaseGameNetworkManager.Singleton.GetPlayers();
                     foreach (var player in players)
@@ -656,9 +657,9 @@ namespace MultiplayerARPG
                     BaseGameNetworkManager.Singleton.IsTemporarilyClose = true;
                     response = "Server closing";
                 }
-                if (commandKey.ToLower().Equals(CloseServer.ToLower()))
+                if (string.Equals(commandKey, CloseServer, StringComparison.OrdinalIgnoreCase))
                 {
-                    if (string.Equals(data[1].ToLower(), BaseGameNetworkManager.Singleton.ChannelId.ToLower()))
+                    if (string.Equals(data[1], BaseGameNetworkManager.Singleton.ChannelId, StringComparison.OrdinalIgnoreCase))
                     {
                         var players = BaseGameNetworkManager.Singleton.GetPlayers();
                         foreach (var player in players)
