@@ -921,7 +921,7 @@ namespace MultiplayerARPG
             using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> requireAttributeAmounts))
             {
                 GetRequireAttributeAmounts(level, requireAttributeAmounts);
-                if (!character.HasEnoughAttributeAmounts(requireAttributeAmounts, false, out gameMessage, out _))
+                if (!character.HasEnoughAttributeAmounts(requireAttributeAmounts, false, out gameMessage, out _, willReleaseAttributes: true))
                     return false;
             }
 
@@ -929,7 +929,7 @@ namespace MultiplayerARPG
             using (CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get(out Dictionary<BaseSkill, int> requireSkillLevels))
             {
                 GetRequireSkillLevels(level, requireSkillLevels);
-                if (!character.HasEnoughSkillLevels(requireSkillLevels, false, out gameMessage, out _))
+                if (!character.HasEnoughSkillLevels(requireSkillLevels, false, out gameMessage, out _, willReleaseSkills: true))
                     return false;
             }
 

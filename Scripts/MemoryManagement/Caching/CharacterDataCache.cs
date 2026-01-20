@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -93,16 +94,6 @@ namespace MultiplayerARPG
 
         public CharacterDataCache()
         {
-            Attributes = new Dictionary<Attribute, float>();
-            Resistances = new Dictionary<DamageElement, float>();
-            Armors = new Dictionary<DamageElement, float>();
-            RightHandDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            LeftHandDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            IncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            IncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
-            Skills = new Dictionary<BaseSkill, int>();
-            StatusEffectResistances = new Dictionary<StatusEffect, float>();
-            EquipmentSets = new Dictionary<EquipmentSet, int>();
             RightHandWeaponAbilities = new List<BaseWeaponAbility>();
             RightHandWeaponAbilityIndexes = new Dictionary<string, int>();
             LeftHandWeaponAbilities = new List<BaseWeaponAbility>();
@@ -111,30 +102,7 @@ namespace MultiplayerARPG
 
         ~CharacterDataCache()
         {
-            Attributes.Clear();
-            Attributes = null;
-            Resistances.Clear();
-            Resistances = null;
-            Armors.Clear();
-            Armors = null;
-            RightHandDamages.Clear();
-            RightHandDamages = null;
-            RightHandWeaponDamage = null;
-            RightHandDamageInfo = null;
-            LeftHandDamages.Clear();
-            LeftHandDamages = null;
-            LeftHandWeaponDamage = null;
-            LeftHandDamageInfo = null;
-            IncreaseDamages.Clear();
-            IncreaseDamages = null;
-            IncreaseDamagesRate.Clear();
-            IncreaseDamagesRate = null;
-            Skills.Clear();
-            Skills = null;
-            StatusEffectResistances.Clear();
-            StatusEffectResistances = null;
-            EquipmentSets.Clear();
-            EquipmentSets = null;
+            CleanCacheData();
             RightHandWeaponAbilities.Clear();
             RightHandWeaponAbilities = null;
             RightHandWeaponAbilityIndexes.Clear();
@@ -143,6 +111,63 @@ namespace MultiplayerARPG
             LeftHandWeaponAbilities = null;
             LeftHandWeaponAbilityIndexes.Clear();
             LeftHandWeaponAbilityIndexes = null;
+        }
+
+        private void CleanCacheData()
+        {
+            // Release buffs
+            if (IncreaseDamages != null)
+            {
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(IncreaseDamages);
+                IncreaseDamages = null;
+            }
+            if (IncreaseDamagesRate != null)
+            {
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(IncreaseDamagesRate);
+                IncreaseDamagesRate = null;
+            }
+
+            // Release results            
+            if (Attributes != null)
+            {
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(Attributes);
+                Attributes = null;
+            }
+            if (Resistances != null)
+            {
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(Resistances);
+                Resistances = null;
+            }
+            if (Armors != null)
+            {
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(Armors);
+                Armors = null;
+            }
+            if (StatusEffectResistances != null)
+            {
+                CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Release(StatusEffectResistances);
+                StatusEffectResistances = null;
+            }
+            if (Skills != null)
+            {
+                CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(Skills);
+                Skills = null;
+            }
+            if (RightHandDamages != null)
+            {
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(RightHandDamages);
+                RightHandDamages = null;
+            }
+            if (LeftHandDamages != null)
+            {
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(LeftHandDamages);
+                LeftHandDamages = null;
+            }
+            if (EquipmentSets != null)
+            {
+                CollectionPool<Dictionary<EquipmentSet, int>, KeyValuePair<EquipmentSet, int>>.Release(EquipmentSets);
+                EquipmentSets = null;
+            }
         }
 
         public CharacterDataCache MarkToMakeCaches()
@@ -158,73 +183,61 @@ namespace MultiplayerARPG
 
         private void SetAttributes(Dictionary<Attribute, float> attributes)
         {
-            Attributes = null;
             Attributes = attributes;
         }
 
         private void SetResistances(Dictionary<DamageElement, float> resistances)
         {
-            Resistances = null;
             Resistances = resistances;
         }
 
         private void SetArmors(Dictionary<DamageElement, float> armors)
         {
-            Armors = null;
             Armors = armors;
         }
 
         private void SetRightHandDamages(Dictionary<DamageElement, MinMaxFloat> rightHandDamages)
         {
-            RightHandDamages = null;
             RightHandDamages = rightHandDamages;
         }
 
         private void SetRightHandWeaponDamage(KeyValuePair<DamageElement, MinMaxFloat> rightHandDamage)
         {
-            RightHandWeaponDamage = null;
             RightHandWeaponDamage = rightHandDamage;
         }
 
         private void SetLeftHandDamages(Dictionary<DamageElement, MinMaxFloat> leftHandDamages)
         {
-            LeftHandDamages = null;
             LeftHandDamages = leftHandDamages;
         }
 
         private void SetLeftHandWeaponDamage(KeyValuePair<DamageElement, MinMaxFloat> leftHandDamage)
         {
-            LeftHandWeaponDamage = null;
             LeftHandWeaponDamage = leftHandDamage;
         }
 
         private void SetIncreaseDamages(Dictionary<DamageElement, MinMaxFloat> increaseDamages)
         {
-            IncreaseDamages = null;
             IncreaseDamages = increaseDamages;
         }
 
         private void SetIncreaseDamagesRate(Dictionary<DamageElement, MinMaxFloat> increaseDamagesRate)
         {
-            IncreaseDamagesRate = null;
             IncreaseDamagesRate = increaseDamagesRate;
         }
 
         private void SetSkills(Dictionary<BaseSkill, int> skills)
         {
-            Skills = null;
             Skills = skills;
         }
 
         private void SetStatusEffectResistances(Dictionary<StatusEffect, float> statusEffectResistances)
         {
-            StatusEffectResistances = null;
             StatusEffectResistances = statusEffectResistances;
         }
 
         private void SetEquipmentSets(Dictionary<EquipmentSet, int> equipmentSets)
         {
-            EquipmentSets = null;
             EquipmentSets = equipmentSets;
         }
 
@@ -237,16 +250,7 @@ namespace MultiplayerARPG
                     return this;
 
                 IsRecaching = false;
-                Attributes.Clear();
-                Resistances.Clear();
-                Armors.Clear();
-                RightHandDamages.Clear();
-                LeftHandDamages.Clear();
-                IncreaseDamages.Clear();
-                IncreaseDamagesRate.Clear();
-                Skills.Clear();
-                StatusEffectResistances.Clear();
-                EquipmentSets.Clear();
+                CleanCacheData();
                 RightHandWeaponAbilities.Clear();
                 RightHandWeaponAbilityIndexes.Clear();
                 LeftHandWeaponAbilities.Clear();
@@ -269,8 +273,8 @@ namespace MultiplayerARPG
                     if (!isOverrideSkills && tempCalculatedBuff.IsOverrideSkills())
                     {
                         isOverrideSkills = true;
-                        Skills = null;
-                        Skills = new Dictionary<BaseSkill, int>(tempCalculatedBuff.GetOverrideSkills());
+                        Skills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
+                        GameDataHelpers.CombineSkills(Skills, tempCalculatedBuff.GetOverrideSkills());
                     }
                     if (isOverrideDamageInfo && isOverrideSkills)
                         break;
@@ -289,7 +293,17 @@ namespace MultiplayerARPG
                     SetStatusEffectResistances,
                     SetEquipmentSets,
                     onGetIncreasingDamages: SetIncreaseDamages,
-                    onGetIncreasingDamagesRate: SetIncreaseDamagesRate);
+                    onGetIncreasingDamagesRate: SetIncreaseDamagesRate,
+                    willReleaseAttributes: false,
+                    willReleaseResistances: false,
+                    willReleaseArmors: false,
+                    willReleaseRightHandDamages: false,
+                    willReleaseLeftHandDamages: false,
+                    willReleaseSkills: isOverrideSkills,
+                    willReleaseStatusEffectResistances: false,
+                    willReleaseEquipmentSets: false,
+                    willReleaseBuffDamages: false,
+                    willReleaseBuffDamagesRate: false);
 
                 if (characterData.GetDatabase() != null)
                     BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;

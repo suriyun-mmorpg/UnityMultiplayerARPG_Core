@@ -1006,11 +1006,13 @@ namespace MultiplayerARPG
             return -1;
         }
 
-        public static bool HasEnoughAttributeAmounts(this ICharacterData data, Dictionary<Attribute, float> requiredAttributeAmounts, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1)
+        public static bool HasEnoughAttributeAmounts(this ICharacterData data, Dictionary<Attribute, float> requiredAttributeAmounts, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1, bool willReleaseAttributes = false)
         {
             gameMessage = UITextKeys.NONE;
-            Dictionary<Attribute, float> tempAttributeAmounts = new Dictionary<Attribute, float>();
-            data.GetAllStats(sumWithEquipments, false, true, onGetAttributes: attributeAmounts => tempAttributeAmounts = attributeAmounts);
+            Dictionary<Attribute, float> tempAttributeAmounts = null;
+            data.GetAllStats(sumWithEquipments, false, true,
+                onGetAttributes: attributeAmounts => tempAttributeAmounts = attributeAmounts,
+                willReleaseAttributes: false);
             currentAttributeAmounts = tempAttributeAmounts;
             foreach (Attribute requireAttribute in requiredAttributeAmounts.Keys)
             {
@@ -1018,17 +1020,23 @@ namespace MultiplayerARPG
                     currentAttributeAmounts[requireAttribute] < Mathf.CeilToInt(requiredAttributeAmounts[requireAttribute] * multiplier))
                 {
                     gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                    if (willReleaseAttributes)
+                        CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(currentAttributeAmounts);
                     return false;
                 }
             }
+            if (willReleaseAttributes)
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(currentAttributeAmounts);
             return true;
         }
 
-        public static bool HasEnoughSkillLevels(this ICharacterData data, Dictionary<BaseSkill, int> requiredSkillLevels, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<BaseSkill, int> currentSkillLevels, float multiplier = 1)
+        public static bool HasEnoughSkillLevels(this ICharacterData data, Dictionary<BaseSkill, int> requiredSkillLevels, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<BaseSkill, int> currentSkillLevels, float multiplier = 1, bool willReleaseSkills = false)
         {
             gameMessage = UITextKeys.NONE;
-            Dictionary<BaseSkill, int> tempSkillLevels = new Dictionary<BaseSkill, int>();
-            data.GetAllStats(sumWithEquipments, false, true, onGetSkills: skillLevels => tempSkillLevels = skillLevels);
+            Dictionary<BaseSkill, int> tempSkillLevels = null;
+            data.GetAllStats(sumWithEquipments, false, true,
+                onGetSkills: skillLevels => tempSkillLevels = skillLevels,
+                willReleaseSkills: false);
             currentSkillLevels = tempSkillLevels;
             foreach (BaseSkill requireSkill in requiredSkillLevels.Keys)
             {
@@ -1036,9 +1044,13 @@ namespace MultiplayerARPG
                     currentSkillLevels[requireSkill] < Mathf.CeilToInt(requiredSkillLevels[requireSkill] * multiplier))
                 {
                     gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_SKILL_LEVELS;
+                    if (willReleaseSkills)
+                        CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(currentSkillLevels);
                     return false;
                 }
             }
+            if (willReleaseSkills)
+                CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(currentSkillLevels);
             return true;
         }
 
@@ -1378,7 +1390,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!character.HasEnoughAttributeAmounts(usableItem.RequireAttributeAmounts, true, out gameMessage, out _))
+            if (!character.HasEnoughAttributeAmounts(usableItem.RequireAttributeAmounts, true, out gameMessage, out _, willReleaseAttributes: true))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
                 return false;

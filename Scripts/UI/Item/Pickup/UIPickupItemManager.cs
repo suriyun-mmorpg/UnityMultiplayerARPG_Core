@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Cysharp.Text;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -48,7 +49,11 @@ namespace MultiplayerARPG
             CharacterItem tempCharacterItem;
             foreach (ItemDropEntity entity in ItemDropEntityDetector.itemDrops)
             {
-                tempEntryId = entity.ObjectId.ToString();
+                using (Utf16ValueStringBuilder strBuilder = ZString.CreateStringBuilder(true))
+                {
+                    strBuilder.Append(entity.ObjectId);
+                    tempEntryId = strBuilder.ToString();
+                }
                 tempCharacterItem = entity.ItemDropData.characterItem;
                 tempCharacterItem.id = tempEntryId;
                 droppedItems.Add(tempCharacterItem);
@@ -57,7 +62,11 @@ namespace MultiplayerARPG
             {
                 if (entity.RepresentItem == null)
                     continue;
-                tempEntryId = entity.ObjectId.ToString();
+                using (Utf16ValueStringBuilder strBuilder = ZString.CreateStringBuilder(true))
+                {
+                    strBuilder.Append(entity.ObjectId);
+                    tempEntryId = strBuilder.ToString();
+                }
                 tempCharacterItem = CharacterItem.Create(entity.RepresentItem, 1, entity.Amount);
                 tempCharacterItem.id = tempEntryId;
                 droppedItems.Add(tempCharacterItem);

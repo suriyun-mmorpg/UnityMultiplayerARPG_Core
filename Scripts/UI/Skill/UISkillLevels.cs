@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Text;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -53,18 +54,33 @@ namespace MultiplayerARPG
                 return _cacheTextLevels;
             }
         }
-        
+
+        protected Dictionary<BaseSkill, int> _tempSkills;
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
             uiTextAllLevels = null;
             textLevels = null;
             _cacheTextLevels?.Clear();
+            _cacheTextLevels = null;
             _data?.Clear();
+            _data = null;
+            CleanTempData();
+        }
+
+        protected void CleanTempData()
+        {
+            if (_tempSkills != null)
+            {
+                CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(_tempSkills);
+                _tempSkills = null;
+            }
         }
 
         protected override void UpdateData()
         {
+            CleanTempData();
             // Reset number
             foreach (UISkillTextPair entry in CacheTextLevels.Values)
             {
@@ -80,9 +96,10 @@ namespace MultiplayerARPG
             {
                 // Prepare attribute data
                 IPlayerCharacterData character = GameInstance.PlayingCharacter;
-                Dictionary<BaseSkill, int> currentSkillLevels = new Dictionary<BaseSkill, int>();
                 if (character != null)
-                    character.GetAllStats(includeEquipmentsForCurrentLevels, false, false, onGetSkills: skills => currentSkillLevels = skills);
+                    character.GetAllStats(includeEquipmentsForCurrentLevels, false, false, 
+                        onGetSkills: skills => _tempSkills = skills,
+                        willReleaseSkills: false);
 
                 // In-loop temp data
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
@@ -105,7 +122,7 @@ namespace MultiplayerARPG
                         tempTargetLevel = dataEntry.Value;
                         tempCurrentLevel = 0;
                         // Get skill level from character
-                        currentSkillLevels.TryGetValue(tempData, out tempCurrentLevel);
+                        _tempSkills.TryGetValue(tempData, out tempCurrentLevel);
                         // Use difference format by option
                         switch (displayType)
                         {

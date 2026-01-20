@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Text;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -78,7 +79,9 @@ namespace MultiplayerARPG
                 return _cacheList;
             }
         }
-        
+
+        protected Dictionary<Attribute, float> _tempAttributes;
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -87,12 +90,25 @@ namespace MultiplayerARPG
             uiEntryPrefab = null;
             uiListContainer = null;
             _cacheTextAmounts?.Clear();
+            _cacheTextAmounts = null;
             _cacheList = null;
             _data?.Clear();
+            _data = null;
+            CleanTempData();
+        }
+
+        protected void CleanTempData()
+        {
+            if (_tempAttributes != null)
+            {
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(_tempAttributes);
+                _tempAttributes = null;
+            }
         }
 
         protected override void UpdateData()
         {
+            CleanTempData();
             // Reset number
             foreach (UIAttributeTextPair entry in CacheTextAmounts.Values)
             {
@@ -108,9 +124,10 @@ namespace MultiplayerARPG
             {
                 // Prepare attribute data
                 IPlayerCharacterData character = GameInstance.PlayingCharacter;
-                Dictionary<Attribute, float> currentAttributeAmounts = new Dictionary<Attribute, float>();
                 if (character != null)
-                    character.GetAllStats(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts, onGetAttributes: attributes => currentAttributeAmounts = attributes);
+                    character.GetAllStats(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts, 
+                        onGetAttributes: attributes => _tempAttributes = attributes,
+                        willReleaseAttributes: false);
                 // In-loop temp data
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
@@ -132,7 +149,7 @@ namespace MultiplayerARPG
                         tempTargetAmount = dataEntry.Value;
                         tempCurrentAmount = 0;
                         // Get attribute amount
-                        currentAttributeAmounts.TryGetValue(tempData, out tempCurrentAmount);
+                        _tempAttributes.TryGetValue(tempData, out tempCurrentAmount);
                         // Use difference format by option
                         switch (displayType)
                         {

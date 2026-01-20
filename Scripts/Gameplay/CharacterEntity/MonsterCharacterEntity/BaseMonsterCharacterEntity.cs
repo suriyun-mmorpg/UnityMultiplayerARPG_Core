@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using LiteNetLib;
@@ -180,10 +181,16 @@ namespace MultiplayerARPG
 
         public override EntityInfo GetInfo()
         {
+            string id;
+            using (Utf16ValueStringBuilder strBuilder = ZString.CreateStringBuilder(true))
+            {
+                strBuilder.Append(ObjectId);
+                id = strBuilder.ToString();
+            }
             return new EntityInfo(
                 EntityTypes.Monster,
                 ObjectId,
-                ObjectId.ToString(),
+                id,
                 SubChannelId,
                 DataId,
                 FactionId,

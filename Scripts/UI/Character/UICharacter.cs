@@ -3,6 +3,7 @@ using System.Linq;
 using Cysharp.Text;
 using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.Pool;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -82,13 +83,13 @@ namespace MultiplayerARPG
         public bool showDamageWithBuffs;
 
         // Improve garbage collector
-        private CharacterStats _cacheStats;
-        private Dictionary<Attribute, float> _cacheAttributes;
-        private Dictionary<DamageElement, float> _cacheResistances;
-        private Dictionary<DamageElement, float> _cacheArmors;
-        private Dictionary<StatusEffect, float> _cacheStatusEffects;
-        private Dictionary<DamageElement, MinMaxFloat> _cacheRightHandDamages;
-        private Dictionary<DamageElement, MinMaxFloat> _cacheLeftHandDamages;
+        protected CharacterStats _tempStats;
+        protected Dictionary<Attribute, float> _tempAttributes = null;
+        protected Dictionary<DamageElement, float> _tempResistances = null;
+        protected Dictionary<DamageElement, float> _tempArmors = null;
+        protected Dictionary<StatusEffect, float> _tempStatusEffectResistances = null;
+        protected Dictionary<DamageElement, MinMaxFloat> _tempRightHandDamages = null;
+        protected Dictionary<DamageElement, MinMaxFloat> _tempLeftHandDamages = null;
 
         public bool NotForOwningCharacter
         {
@@ -172,15 +173,42 @@ namespace MultiplayerARPG
             uiPlayerBackground = null;
             uiPlayerTitle = null;
             uiFaction = null;
-            _cacheAttributes?.Clear();
-            _cacheResistances?.Clear();
-            _cacheArmors?.Clear();
-            _cacheStatusEffects?.Clear();
-            _cacheRightHandDamages?.Clear();
-            _cacheLeftHandDamages?.Clear();
             _cacheUICharacterAttributes?.Clear();
+            _cacheUICharacterAttributes = null;
             _cacheUICharacterCurrencies?.Clear();
+            _cacheUICharacterCurrencies = null;
             _data = null;
+            CleanTempData();
+        }
+
+        protected void CleanTempData()
+        {
+            _tempStats = new CharacterStats();
+            if (_tempAttributes != null)
+            {
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(_tempAttributes);
+                _tempAttributes = null;
+            }
+            if (_tempResistances != null)
+            {
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_tempResistances);
+                _tempResistances = null;
+            }
+            if (_tempArmors != null)
+            {
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_tempArmors);
+                _tempArmors = null;
+            }
+            if (_tempRightHandDamages != null)
+            {
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_tempRightHandDamages);
+                _tempRightHandDamages = null;
+            }
+            if (_tempLeftHandDamages != null)
+            {
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_tempLeftHandDamages);
+                _tempLeftHandDamages = null;
+            }
         }
 
         protected override void OnEnable()
@@ -396,20 +424,26 @@ namespace MultiplayerARPG
         {
             IPlayerCharacterData playerCharacter = Data as IPlayerCharacterData;
 
-            _cacheStats = new CharacterStats();
-            _cacheAttributes = null;
-            _cacheResistances = null;
-            _cacheArmors = null;
-            _cacheStatusEffects = null;
-            _cacheRightHandDamages = null;
-            _cacheLeftHandDamages = null;
-
-            Data.GetAllStats(true, showStatsWithBuffs, true, onGetStats: stats => _cacheStats = stats);
-            Data.GetAllStats(true, showAttributeWithBuffs, true, onGetAttributes: stats => _cacheAttributes = stats);
-            Data.GetAllStats(true, showResistanceWithBuffs, true, onGetResistances: stats => _cacheResistances = stats);
-            Data.GetAllStats(true, showArmorWithBuffs, true, onGetArmors: stats => _cacheArmors = stats);
-            Data.GetAllStats(true, showStatusEffectResistanceWithBuffs, true, onGetStatusEffectResistances: stats => _cacheStatusEffects = stats);
-            Data.GetAllStats(true, showDamageWithBuffs, true, onGetRightHandDamages: stats => _cacheRightHandDamages = stats, onGetLeftHandDamages: stats => _cacheLeftHandDamages = stats);
+            CleanTempData();
+            Data.GetAllStats(true, showStatsWithBuffs, true,
+                onGetStats: stats => _tempStats = stats);
+            Data.GetAllStats(true, showAttributeWithBuffs, true,
+                onGetAttributes: stats => _tempAttributes = stats,
+                willReleaseAttributes: false);
+            Data.GetAllStats(true, showResistanceWithBuffs, true,
+                onGetResistances: stats => _tempResistances = stats,
+                willReleaseResistances: false);
+            Data.GetAllStats(true, showArmorWithBuffs, true,
+                onGetArmors: stats => _tempArmors = stats,
+                willReleaseArmors: false);
+            Data.GetAllStats(true, showStatusEffectResistanceWithBuffs, true,
+                onGetStatusEffectResistances: stats => _tempStatusEffectResistances = stats,
+                willReleaseStatusEffectResistances: false);
+            Data.GetAllStats(true, showDamageWithBuffs, true,
+                onGetRightHandDamages: stats => _tempRightHandDamages = stats,
+                onGetLeftHandDamages: stats => _tempLeftHandDamages = stats,
+                willReleaseRightHandDamages: false,
+                willReleaseLeftHandDamages: false);
 
             if (uiTextWeightLimit != null)
             {
@@ -431,9 +465,9 @@ namespace MultiplayerARPG
             {
                 using (Utf16ValueStringBuilder textDamages = ZString.CreateStringBuilder(false))
                 {
-                    if (_cacheRightHandDamages != null)
+                    if (_tempRightHandDamages != null)
                     {
-                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(_cacheRightHandDamages);
+                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(_tempRightHandDamages);
                         if (textDamages.Length > 0)
                             textDamages.Append('\n');
                         textDamages.AppendFormat(
@@ -441,9 +475,9 @@ namespace MultiplayerARPG
                             sumDamages.min.ToString("N0"),
                             sumDamages.max.ToString("N0"));
                     }
-                    if (_cacheLeftHandDamages != null)
+                    if (_tempLeftHandDamages != null)
                     {
-                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(_cacheLeftHandDamages);
+                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(_tempLeftHandDamages);
                         if (textDamages.Length > 0)
                             textDamages.Append('\n');
                         textDamages.AppendFormat(
@@ -457,7 +491,7 @@ namespace MultiplayerARPG
 
             if (uiRightHandDamages != null)
             {
-                if (_cacheRightHandDamages == null)
+                if (_tempRightHandDamages == null)
                 {
                     uiRightHandDamages.Hide();
                 }
@@ -465,13 +499,13 @@ namespace MultiplayerARPG
                 {
                     uiRightHandDamages.isBonus = false;
                     uiRightHandDamages.Show();
-                    uiRightHandDamages.Data = _cacheRightHandDamages;
+                    uiRightHandDamages.Data = _tempRightHandDamages;
                 }
             }
 
             if (uiLeftHandDamages != null)
             {
-                if (_cacheLeftHandDamages == null)
+                if (_tempLeftHandDamages == null)
                 {
                     uiLeftHandDamages.Hide();
                 }
@@ -479,7 +513,7 @@ namespace MultiplayerARPG
                 {
                     uiLeftHandDamages.isBonus = false;
                     uiLeftHandDamages.Show();
-                    uiLeftHandDamages.Data = _cacheLeftHandDamages;
+                    uiLeftHandDamages.Data = _tempLeftHandDamages;
                 }
             }
 
@@ -487,25 +521,25 @@ namespace MultiplayerARPG
             {
                 uiCharacterStats.displayType = UICharacterStats.DisplayType.Simple;
                 uiCharacterStats.isBonus = false;
-                uiCharacterStats.Data = _cacheStats;
+                uiCharacterStats.Data = _tempStats;
             }
 
             if (uiCharacterResistances != null)
             {
                 uiCharacterResistances.isBonus = false;
-                uiCharacterResistances.Data = _cacheResistances;
+                uiCharacterResistances.Data = _tempResistances;
             }
 
             if (uiCharacterArmors != null)
             {
                 uiCharacterArmors.isBonus = false;
-                uiCharacterArmors.Data = _cacheArmors;
+                uiCharacterArmors.Data = _tempArmors;
             }
 
             if (uiCharacterStatusEffectResistances != null)
             {
                 uiCharacterStatusEffectResistances.isBonus = false;
-                uiCharacterStatusEffectResistances.UpdateData(_cacheStatusEffects);
+                uiCharacterStatusEffectResistances.UpdateData(_tempStatusEffectResistances);
             }
 
             if (CacheUICharacterAttributes.Count > 0 && Data != null)
@@ -518,8 +552,8 @@ namespace MultiplayerARPG
                     tempIndexOfAttribute = Data.IndexOfAttribute(attribute.DataId);
                     tempCharacterAttribute = tempIndexOfAttribute >= 0 ? Data.Attributes[tempIndexOfAttribute] : CharacterAttribute.Create(attribute, 0);
                     tempAmount = 0;
-                    if (_cacheAttributes.ContainsKey(attribute))
-                        tempAmount = _cacheAttributes[attribute];
+                    if (_tempAttributes.ContainsKey(attribute))
+                        tempAmount = _tempAttributes[attribute];
                     CacheUICharacterAttributes[attribute].Setup(new UICharacterAttributeData(tempCharacterAttribute, tempAmount), Data, tempIndexOfAttribute);
                     CacheUICharacterAttributes[attribute].Show();
                 }

@@ -5,13 +5,6 @@ namespace MultiplayerARPG
 {
     public static partial class CharacterDataExtensions
     {
-        private static Dictionary<Attribute, float> _tempAttributes = new Dictionary<Attribute, float>();
-        private static Dictionary<DamageElement, float> _tempResistances = new Dictionary<DamageElement, float>();
-        private static Dictionary<DamageElement, float> _tempArmors = new Dictionary<DamageElement, float>();
-        private static Dictionary<DamageElement, MinMaxFloat> _tempDamages = new Dictionary<DamageElement, MinMaxFloat>();
-        private static Dictionary<BaseSkill, int> _tempSkills = new Dictionary<BaseSkill, int>();
-        private static Dictionary<StatusEffect, float> _tempStatusEffectResistance = new Dictionary<StatusEffect, float>();
-
         private static void GetCharacterAttributes(this ICharacterData data, Dictionary<Attribute, float> result)
         {
             result.Clear();
@@ -460,48 +453,75 @@ namespace MultiplayerARPG
                 onIncreasingStatsRate.Invoke(buff.GetIncreaseStatsRate(level));
             if (onIncreasingAttributes != null)
             {
-                buff.GetIncreaseAttributes(level, _tempAttributes);
-                onIncreasingAttributes.Invoke(_tempAttributes);
+                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> tempAttributes))
+                {
+                    buff.GetIncreaseAttributes(level, tempAttributes);
+                    onIncreasingAttributes.Invoke(tempAttributes);
+                }
             }
             if (onIncreasingAttributesRate != null)
             {
-                buff.GetIncreaseAttributesRate(level, _tempAttributes);
-                onIncreasingAttributesRate.Invoke(_tempAttributes);
+                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> tempAttributes))
+                {
+                    buff.GetIncreaseAttributesRate(level, tempAttributes);
+                    onIncreasingAttributesRate.Invoke(tempAttributes);
+                }
             }
             if (onIncreasingResistances != null)
             {
-                buff.GetIncreaseResistances(level, _tempResistances);
-                onIncreasingResistances.Invoke(_tempResistances);
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempResistances))
+                {
+                    buff.GetIncreaseResistances(level, tempResistances);
+                    onIncreasingResistances.Invoke(tempResistances);
+                }
             }
             if (onIncreasingArmors != null)
             {
-                buff.GetIncreaseArmors(level, _tempArmors);
-                onIncreasingArmors.Invoke(_tempArmors);
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempArmors))
+                {
+                    buff.GetIncreaseArmors(level, tempArmors);
+                    onIncreasingArmors.Invoke(tempArmors);
+                }
             }
             if (onIncreasingArmorsRate != null)
             {
-                buff.GetIncreaseArmorsRate(level, _tempArmors);
-                onIncreasingArmorsRate.Invoke(_tempArmors);
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempArmors))
+                {
+                    buff.GetIncreaseArmorsRate(level, tempArmors);
+                    onIncreasingArmorsRate.Invoke(tempArmors);
+                }
             }
             if (onIncreasingDamages != null)
             {
-                buff.GetIncreaseDamages(level, _tempDamages);
-                onIncreasingDamages.Invoke(_tempDamages);
+                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
+                {
+                    buff.GetIncreaseDamages(level, tempDamages);
+                    onIncreasingDamages.Invoke(tempDamages);
+                }
             }
             if (onIncreasingDamagesRate != null)
             {
-                buff.GetIncreaseDamagesRate(level, _tempDamages);
-                onIncreasingDamagesRate.Invoke(_tempDamages);
+                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
+                {
+                    buff.GetIncreaseDamagesRate(level, tempDamages);
+                    onIncreasingDamagesRate.Invoke(tempDamages);
+                }
             }
             if (onIncreasingSkills != null)
             {
-                buff.GetIncreaseSkills(level, _tempSkills);
-                onIncreasingSkills.Invoke(_tempSkills);
+                using (CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get(out Dictionary<BaseSkill, int> tempSkills))
+                {
+                    buff.GetIncreaseSkills(level, tempSkills);
+                    onIncreasingSkills.Invoke(tempSkills);
+                }
             }
             if (onIncreasingStatusEffectResistances != null)
             {
-                buff.GetIncreaseStatusEffectResistances(level, _tempStatusEffectResistance);
-                onIncreasingStatusEffectResistances.Invoke(_tempStatusEffectResistance);
+                using (CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get(out Dictionary<StatusEffect, float> tempStatusEffectResistance))
+                {
+                    buff.GetIncreaseStatusEffectResistances(level, tempStatusEffectResistance);
+                    onIncreasingStatusEffectResistances.Invoke(tempStatusEffectResistance);
+                }
             }
         }
 
@@ -531,55 +551,82 @@ namespace MultiplayerARPG
                 onIncreasingStatsRate.Invoke(buff.GetIncreaseStatsRate(level));
             if (onIncreasingAttributes != null)
             {
-                buff.GetIncreaseAttributes(level, _tempAttributes);
-                onIncreasingAttributes.Invoke(_tempAttributes);
+                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> tempAttributes))
+                {
+                    buff.GetIncreaseAttributes(level, tempAttributes);
+                    onIncreasingAttributes.Invoke(tempAttributes);
+                }
             }
             if (onIncreasingAttributesRate != null)
             {
-                buff.GetIncreaseAttributesRate(level, _tempAttributes);
-                onIncreasingAttributesRate.Invoke(_tempAttributes);
+                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> tempAttributes))
+                {
+                    buff.GetIncreaseAttributesRate(level, tempAttributes);
+                    onIncreasingAttributesRate.Invoke(tempAttributes);
+                }
             }
             if (onIncreasingResistances != null)
             {
-                buff.GetIncreaseResistances(level, _tempResistances);
-                onIncreasingResistances.Invoke(_tempResistances);
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempResistances))
+                {
+                    buff.GetIncreaseResistances(level, tempResistances);
+                    onIncreasingResistances.Invoke(tempResistances);
+                }
             }
             if (onIncreasingArmors != null)
             {
-                buff.GetIncreaseArmors(level, _tempArmors);
-                onIncreasingArmors.Invoke(_tempArmors);
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempArmors))
+                {
+                    buff.GetIncreaseArmors(level, tempArmors);
+                    onIncreasingArmors.Invoke(tempArmors);
+                }
             }
             if (onIncreasingArmorsRate != null)
             {
-                buff.GetIncreaseArmorsRate(level, _tempArmors);
-                onIncreasingArmorsRate.Invoke(_tempArmors);
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempArmors))
+                {
+                    buff.GetIncreaseArmorsRate(level, tempArmors);
+                    onIncreasingArmorsRate.Invoke(tempArmors);
+                }
             }
             if (onIncreasingDamages != null)
             {
-                buff.GetIncreaseDamages(level, _tempDamages);
-                onIncreasingDamages.Invoke(_tempDamages);
+                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
+                {
+                    buff.GetIncreaseDamages(level, tempDamages);
+                    onIncreasingDamages.Invoke(tempDamages);
+                }
             }
             if (onIncreasingDamagesRate != null)
             {
-                buff.GetIncreaseDamagesRate(level, _tempDamages);
-                onIncreasingDamagesRate.Invoke(_tempDamages);
+                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
+                {
+                    buff.GetIncreaseDamagesRate(level, tempDamages);
+                    onIncreasingDamagesRate.Invoke(tempDamages);
+                }
             }
             if (onIncreasingSkills != null)
             {
-                buff.GetIncreaseSkills(level, _tempSkills);
-                onIncreasingSkills.Invoke(_tempSkills);
+                using (CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get(out Dictionary<BaseSkill, int> tempSkills))
+                {
+                    buff.GetIncreaseSkills(level, tempSkills);
+                    onIncreasingSkills.Invoke(tempSkills);
+                }
             }
             if (onIncreasingStatusEffectResistances != null)
             {
-                buff.GetIncreaseStatusEffectResistances(level, _tempStatusEffectResistance);
-                onIncreasingStatusEffectResistances.Invoke(_tempStatusEffectResistance);
+                using (CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get(out Dictionary<StatusEffect, float> tempStatusEffectResistance))
+                {
+                    buff.GetIncreaseStatusEffectResistances(level, tempStatusEffectResistance);
+                    onIncreasingStatusEffectResistances.Invoke(tempStatusEffectResistance);
+                }
             }
         }
 
-        public static Dictionary<DamageElement, MinMaxFloat> GetWeaponDamages(CharacterItem characterItem, IWeaponItem weaponItem, KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount,
-            Dictionary<Attribute, float> attributes, Dictionary<DamageElement, MinMaxFloat> buffDamages, Dictionary<DamageElement, MinMaxFloat> buffDamagesRate)
+        public static void GetWeaponDamages(CharacterItem characterItem, IWeaponItem weaponItem, KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount,
+            Dictionary<Attribute, float> attributes, Dictionary<DamageElement, MinMaxFloat> buffDamages, Dictionary<DamageElement, MinMaxFloat> buffDamagesRate, Dictionary<DamageElement, MinMaxFloat> resultDamages)
         {
-            Dictionary<DamageElement, MinMaxFloat> resultDamages = new Dictionary<DamageElement, MinMaxFloat>();
+            resultDamages.Clear();
             if (weaponItem != null)
                 weaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(weaponItem.WeaponType.CacheEffectivenessAttributes, attributes, weaponDamageAmount);
             GameDataHelpers.CombineDamages(resultDamages, weaponDamageAmount);
@@ -605,8 +652,11 @@ namespace MultiplayerARPG
                     // Sum with ammo only when it have ammo in magazine
                     if (characterItem.ammo > 0 && GameInstance.Items.TryGetValue(characterItem.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
                     {
-                        tempAmmoItem.GetIncreaseDamages(_tempDamages);
-                        GameDataHelpers.CombineDamages(resultDamages, _tempDamages);
+                        using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
+                        {
+                            tempAmmoItem.GetIncreaseDamages(tempDamages);
+                            GameDataHelpers.CombineDamages(resultDamages, tempDamages);
+                        }
                     }
                 }
                 else
@@ -614,13 +664,15 @@ namespace MultiplayerARPG
                     // No special condition, just sum with ammo
                     if (GameInstance.Items.TryGetValue(characterItem.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
                     {
-                        tempAmmoItem.GetIncreaseDamages(_tempDamages);
-                        GameDataHelpers.CombineDamages(resultDamages, _tempDamages);
+                        using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
+                        {
+                            tempAmmoItem.GetIncreaseDamages(tempDamages);
+                            GameDataHelpers.CombineDamages(resultDamages, tempDamages);
+                        }
                     }
                 }
             }
             */
-            return resultDamages;
         }
 
         public static void GetAllStats(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, bool sumWithSkills,
@@ -645,7 +697,24 @@ namespace MultiplayerARPG
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onGetIncreasingDamages = null,
             System.Action<Dictionary<DamageElement, MinMaxFloat>> onGetIncreasingDamagesRate = null,
             System.Action<Dictionary<BaseSkill, int>> onGetIncreasingSkills = null,
-            System.Action<Dictionary<StatusEffect, float>> onGetIncreasingStatusEffectResistances = null)
+            System.Action<Dictionary<StatusEffect, float>> onGetIncreasingStatusEffectResistances = null,
+            bool willReleaseAttributes = true,
+            bool willReleaseResistances = true,
+            bool willReleaseArmors = true,
+            bool willReleaseStatusEffectResistances = true,
+            bool willReleaseSkills = true,
+            bool willReleaseRightHandDamages = true,
+            bool willReleaseLeftHandDamages = true,
+            bool willReleaseEquipmentSets = true,
+            bool willReleaseBuffAttributes = true,
+            bool willReleaseBuffAttributesRate = true,
+            bool willReleaseBuffResistances = true,
+            bool willReleaseBuffArmors = true,
+            bool willReleaseBuffArmorsRate = true,
+            bool willReleaseBuffStatusEffectResistances = true,
+            bool willReleaseBuffSkills = true,
+            bool willReleaseBuffDamages = true,
+            bool willReleaseBuffDamagesRate = true)
         {
             bool isCalculateRightHandWeaponDamages = onGetRightHandDamages != null || onGetRightHandWeaponDamage != null;
             bool isCalculateLeftHandWeaponDamages = onGetLeftHandDamages != null || onGetLeftHandWeaponDamage != null;
@@ -660,37 +729,37 @@ namespace MultiplayerARPG
             // Prepare result stats, by using character's base stats
             // For weapons it will be based on equipped weapons
             CharacterStats resultStats = !isCalculateStats ? new CharacterStats() : data.GetCharacterStats();
-            Dictionary<Attribute, float> resultAttributes = new Dictionary<Attribute, float>();
+            Dictionary<Attribute, float> resultAttributes = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
             if (isCalculateAttributes)
                 data.GetCharacterAttributes(resultAttributes);
-            Dictionary<DamageElement, float> resultResistances = new Dictionary<DamageElement, float>();
+            Dictionary<DamageElement, float> resultResistances = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
             if (isCalculateResistances)
                 data.GetCharacterResistances(resultResistances);
-            Dictionary<DamageElement, float> resultArmors = new Dictionary<DamageElement, float>();
+            Dictionary<DamageElement, float> resultArmors = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
             if (isCalculateArmors)
                 data.GetCharacterArmors(resultArmors);
-            Dictionary<StatusEffect, float> resultStatusEffectResistances = new Dictionary<StatusEffect, float>();
+            Dictionary<StatusEffect, float> resultStatusEffectResistances = CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get();
             if (isCalculateStatusEffectResistances)
                 data.GetCharacterStatusEffectResistances(resultStatusEffectResistances);
-            Dictionary<BaseSkill, int> resultSkills = new Dictionary<BaseSkill, int>();
+            Dictionary<BaseSkill, int> resultSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
             if (isCalculateSkills)
                 data.GetCharacterSkills(resultSkills);
-            Dictionary<DamageElement, MinMaxFloat> resultRightHandDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            Dictionary<DamageElement, MinMaxFloat> resultLeftHandDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            Dictionary<EquipmentSet, int> resultEquipmentSets = new Dictionary<EquipmentSet, int>();
+            Dictionary<DamageElement, MinMaxFloat> resultRightHandDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            Dictionary<DamageElement, MinMaxFloat> resultLeftHandDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            Dictionary<EquipmentSet, int> resultEquipmentSets = CollectionPool<Dictionary<EquipmentSet, int>, KeyValuePair<EquipmentSet, int>>.Get();
 
             // Prepare buff stats
             CharacterStats buffStats = new CharacterStats();
             CharacterStats buffStatsRate = new CharacterStats();
-            Dictionary<Attribute, float> buffAttributes = new Dictionary<Attribute, float>();
-            Dictionary<Attribute, float> buffAttributesRate = new Dictionary<Attribute, float>();
-            Dictionary<DamageElement, float> buffResistances = new Dictionary<DamageElement, float>();
-            Dictionary<DamageElement, float> buffArmors = new Dictionary<DamageElement, float>();
-            Dictionary<DamageElement, float> buffArmorsRate = new Dictionary<DamageElement, float>();
-            Dictionary<DamageElement, MinMaxFloat> buffDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            Dictionary<DamageElement, MinMaxFloat> buffDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
-            Dictionary<BaseSkill, int> buffSkills = new Dictionary<BaseSkill, int>();
-            Dictionary<StatusEffect, float> buffStatusEffectResistances = new Dictionary<StatusEffect, float>();
+            Dictionary<Attribute, float> buffAttributes = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            Dictionary<Attribute, float> buffAttributesRate = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+            Dictionary<DamageElement, float> buffResistances = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            Dictionary<DamageElement, float> buffArmors = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            Dictionary<DamageElement, float> buffArmorsRate = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+            Dictionary<StatusEffect, float> buffStatusEffectResistances = CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get();
+            Dictionary<DamageElement, MinMaxFloat> buffDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            Dictionary<DamageElement, MinMaxFloat> buffDamagesRate = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+            Dictionary<BaseSkill, int> buffSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
 
             // If not found equipped weapon, it will use default weapon which set in game instance as equipped weapon
             bool foundEquippedRightHandWeapon = false;
@@ -1029,21 +1098,27 @@ namespace MultiplayerARPG
                 if (onGetArmors != null)
                     onGetArmors.Invoke(resultArmors);
             }
-            if (isCalculateRightHandWeaponDamages && foundEquippedRightHandWeapon)
+            if (isCalculateRightHandWeaponDamages)
             {
-                resultRightHandDamages = GetWeaponDamages(data.EquipWeapons.rightHand, rightHandWeapon, rightHandWeaponDamageAmount, resultAttributes, buffDamages, buffDamagesRate);
+                if (foundEquippedRightHandWeapon)
+                {
+                    GetWeaponDamages(data.EquipWeapons.rightHand, rightHandWeapon, rightHandWeaponDamageAmount, resultAttributes, buffDamages, buffDamagesRate, resultRightHandDamages);
+                    if (onGetRightHandWeaponDamage != null)
+                        onGetRightHandWeaponDamage.Invoke(rightHandWeaponDamageAmount);
+                }
                 if (onGetRightHandDamages != null)
                     onGetRightHandDamages.Invoke(resultRightHandDamages);
-                if (onGetRightHandWeaponDamage != null)
-                    onGetRightHandWeaponDamage.Invoke(rightHandWeaponDamageAmount);
             }
-            if (isCalculateLeftHandWeaponDamages && foundEquippedLeftHandWeapon)
+            if (isCalculateLeftHandWeaponDamages)
             {
-                resultLeftHandDamages = GetWeaponDamages(data.EquipWeapons.leftHand, leftHandWeapon, leftHandWeaponDamageAmount, resultAttributes, buffDamages, buffDamagesRate);
+                if (foundEquippedLeftHandWeapon)
+                {
+                    GetWeaponDamages(data.EquipWeapons.leftHand, leftHandWeapon, leftHandWeaponDamageAmount, resultAttributes, buffDamages, buffDamagesRate, resultLeftHandDamages);
+                    if (onGetLeftHandWeaponDamage != null)
+                        onGetLeftHandWeaponDamage.Invoke(leftHandWeaponDamageAmount);
+                }
                 if (onGetLeftHandDamages != null)
                     onGetLeftHandDamages.Invoke(resultLeftHandDamages);
-                if (onGetLeftHandWeaponDamage != null)
-                    onGetLeftHandWeaponDamage.Invoke(leftHandWeaponDamageAmount);
             }
             if (isCalculateStats)
             {
@@ -1102,6 +1177,44 @@ namespace MultiplayerARPG
                 onGetIncreasingSkills.Invoke(buffSkills);
             if (onGetIncreasingStatusEffectResistances != null)
                 onGetIncreasingStatusEffectResistances.Invoke(buffStatusEffectResistances);
+
+            // Release buffs
+            if (willReleaseBuffAttributes)
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(buffAttributes);
+            if (willReleaseBuffAttributesRate)
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(buffAttributesRate);
+            if (willReleaseBuffResistances)
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(buffResistances);
+            if (willReleaseBuffArmors)
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(buffArmors);
+            if (willReleaseBuffArmorsRate)
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(buffArmorsRate);
+            if (willReleaseBuffStatusEffectResistances)
+                CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Release(buffStatusEffectResistances);
+            if (willReleaseBuffSkills)
+                CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(buffSkills);
+            if (willReleaseBuffDamages)
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(buffDamages);
+            if (willReleaseBuffDamagesRate)
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(buffDamagesRate);
+
+            // Release results
+            if (willReleaseAttributes)
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(resultAttributes);
+            if (willReleaseResistances)
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(resultResistances);
+            if (willReleaseArmors)
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(resultArmors);
+            if (willReleaseStatusEffectResistances)
+                CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Release(resultStatusEffectResistances);
+            if (willReleaseSkills)
+                CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(resultSkills);
+            if (willReleaseRightHandDamages)
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(resultRightHandDamages);
+            if (willReleaseLeftHandDamages)
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(resultLeftHandDamages);
+            if (willReleaseEquipmentSets)
+                CollectionPool<Dictionary<EquipmentSet, int>, KeyValuePair<EquipmentSet, int>>.Release(resultEquipmentSets);
         }
     }
 }
