@@ -131,8 +131,9 @@ namespace MultiplayerARPG
             ApplyModelAndColorBySavedData();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             ClearEvents();
             if (_models != null && _models.Length > 0)
             {

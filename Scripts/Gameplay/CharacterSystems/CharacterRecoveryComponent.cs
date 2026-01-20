@@ -20,8 +20,9 @@ namespace MultiplayerARPG
             _recoveryData = new CharacterRecoveryData(Entity);
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             UpdateManager.Unregister(this);
         }
 

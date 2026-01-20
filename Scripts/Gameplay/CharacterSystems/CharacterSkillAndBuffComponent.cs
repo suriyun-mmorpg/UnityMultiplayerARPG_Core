@@ -24,8 +24,9 @@ namespace MultiplayerARPG
             _recoveryBuffs = new Dictionary<string, CharacterRecoveryData>();
         }
 
-        private void OnDestroy()
+        protected override void OnDestroy()
         {
+            base.OnDestroy();
             UpdateManager.Unregister(this);
         }
 
