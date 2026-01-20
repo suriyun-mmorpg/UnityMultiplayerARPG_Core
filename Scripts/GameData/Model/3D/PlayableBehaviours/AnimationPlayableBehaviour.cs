@@ -752,6 +752,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
             s_caches[characterModel.Id] = cache;
         }
 
+        public void ForcePlay()
+        {
+            _baseStateUpdateData.ForcePlay = true;
+            _leftHandWieldingStateUpdateData.ForcePlay = true;
+        }
+
         public void Desetup(PlayableCharacterModel characterModel)
         {
             if (!s_caches.TryGetValue(characterModel.Id, out CacheData cache))
