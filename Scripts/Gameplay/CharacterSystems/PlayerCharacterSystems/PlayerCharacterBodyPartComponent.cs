@@ -133,7 +133,6 @@ namespace MultiplayerARPG
 
         protected override void OnDestroy()
         {
-            base.OnDestroy();
             ClearEvents();
             if (_models != null && _models.Length > 0)
             {
@@ -142,6 +141,7 @@ namespace MultiplayerARPG
                     _models[i] = null;
                 }
             }
+            base.OnDestroy();
         }
 
         public void SetupEvents()
