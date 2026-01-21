@@ -91,13 +91,13 @@ namespace MultiplayerARPG
         private void Awake()
         {
             Entity.onDead.AddListener(OnDead);
-            Entity.onDestroy += Entity_onDestroy;
         }
 
-        private void Entity_onDestroy()
+        protected override void OnDestroy()
         {
-            Entity.onDestroy -= Entity_onDestroy;
-            Entity.onDead.RemoveListener(OnDead);
+            if (Entity != null)
+                Entity.onDead.RemoveListener(OnDead);
+            base.OnDestroy();
         }
 
         protected void OnDead()
