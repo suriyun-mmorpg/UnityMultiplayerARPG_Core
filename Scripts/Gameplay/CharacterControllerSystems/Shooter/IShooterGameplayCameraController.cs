@@ -1,4 +1,6 @@
-﻿namespace MultiplayerARPG
+﻿using UnityEngine;
+
+namespace MultiplayerARPG
 {
     public interface IShooterGameplayCameraController : IGameplayCameraController
     {
@@ -16,6 +18,7 @@
         float CameraRotationSpeedScale { get; set; }
         bool IsLeftViewSide { get; set; }
         bool IsZoomAimming { get; set; }
+        Transform LookForwardTransform { get; }
         void Recoil(float pitch, float yaw, float roll);
     }
 }

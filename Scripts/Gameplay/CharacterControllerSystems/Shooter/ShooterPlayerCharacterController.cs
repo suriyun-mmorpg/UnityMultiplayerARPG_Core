@@ -475,6 +475,20 @@ namespace MultiplayerARPG
             }
         }
         public byte PauseFireInputFrames { get; set; }
+        public Vector3 MoveDirection
+        {
+            get
+            {
+                if (_moveDirection.magnitude > 0f)
+                {
+                    if (mode == ControllerMode.Adventure && !_isAimming)
+                    {
+                        return Vector3.forward;
+                    }
+                }
+                return _moveDirection;
+            }
+        }
 
         // Input data
         protected InputStateManager _activateInput;
@@ -1128,6 +1142,14 @@ namespace MultiplayerARPG
             _exitVehicleInput.OnLateUpdate();
             _switchEquipWeaponSetInput.OnLateUpdate();
 
+            UpdateLookRotation();
+        }
+
+        public virtual void UpdateLookRotation()
+        {
+            _cameraForward = CacheGameplayCameraController.LookForwardTransform.forward;
+            _cameraForward.y = 0f;
+            _cameraForward.Normalize();
             if (ActiveViewMode == ShooterControllerViewMode.Fps || Mode == ControllerMode.Combat)
                 _targetLookDirection = _moveLookDirection = _cameraForward;
             PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection), true);

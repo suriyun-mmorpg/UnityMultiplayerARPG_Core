@@ -19,6 +19,7 @@ namespace MultiplayerARPG
         public float CameraRotationSpeedScale { get { return CameraControls.rotationSpeedScale; } set { CameraControls.rotationSpeedScale = value; } }
         public bool IsLeftViewSide { get; set; }
         public bool IsZoomAimming { get; set; }
+        public Transform LookForwardTransform { get => CameraTransform; }
 
         public override void Init()
         {
