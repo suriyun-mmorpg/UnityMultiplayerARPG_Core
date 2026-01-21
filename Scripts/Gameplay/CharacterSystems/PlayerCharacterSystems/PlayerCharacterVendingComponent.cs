@@ -37,8 +37,6 @@ namespace MultiplayerARPG
         protected override void OnDestroy()
         {
             data.onChange -= OnDataChange;
-            if (Entity != null)
-                Entity.onDead.RemoveListener(OnDead);
             base.OnDestroy();
         }
 

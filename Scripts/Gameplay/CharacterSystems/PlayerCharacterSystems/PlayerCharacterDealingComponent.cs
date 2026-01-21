@@ -93,13 +93,6 @@ namespace MultiplayerARPG
             Entity.onDead.AddListener(OnDead);
         }
 
-        protected override void OnDestroy()
-        {
-            if (Entity != null)
-                Entity.onDead.RemoveListener(OnDead);
-            base.OnDestroy();
-        }
-
         protected void OnDead()
         {
             if (!IsServer)

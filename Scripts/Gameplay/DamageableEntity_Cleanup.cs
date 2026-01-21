@@ -19,7 +19,8 @@ namespace MultiplayerARPG
             onReceiveDamage = null;
             onReceivedDamage = null;
             SafeArea = null;
-            HitBoxes.Nullify();
+            HitBoxes?.Nullify();
+            HitBoxes = null;
         }
     }
 }

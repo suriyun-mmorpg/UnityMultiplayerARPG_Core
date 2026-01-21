@@ -32,8 +32,11 @@
             // Buff Functions
             _restrictBuffTags?.Clear();
             // Events
+            onDead?.RemoveAllListeners();
             onDead = null;
+            onRespawn?.RemoveAllListeners();
             onRespawn = null;
+            onLevelUp?.RemoveAllListeners();
             onLevelUp = null;
             onRecached = null;
             onIdChange = null;
