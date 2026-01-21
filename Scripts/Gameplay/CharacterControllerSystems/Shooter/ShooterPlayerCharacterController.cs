@@ -41,8 +41,6 @@ namespace MultiplayerARPG
         [SerializeField]
         protected ControllerMode mode;
         [SerializeField]
-        protected bool alwaysTurnForwardWhileCombat;
-        [SerializeField]
         protected EmptyAmmoAutoReload emptyAmmoAutoReload;
         [SerializeField]
         protected bool canSwitchViewMode;
@@ -1130,7 +1128,7 @@ namespace MultiplayerARPG
             _exitVehicleInput.OnLateUpdate();
             _switchEquipWeaponSetInput.OnLateUpdate();
 
-            if (ActiveViewMode == ShooterControllerViewMode.Fps || (Mode == ControllerMode.Combat && alwaysTurnForwardWhileCombat))
+            if (ActiveViewMode == ShooterControllerViewMode.Fps || Mode == ControllerMode.Combat)
                 _targetLookDirection = _moveLookDirection = _cameraForward;
             PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection), true);
         }
