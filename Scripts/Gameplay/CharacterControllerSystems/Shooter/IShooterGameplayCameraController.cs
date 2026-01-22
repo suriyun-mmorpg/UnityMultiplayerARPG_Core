@@ -4,6 +4,7 @@ namespace MultiplayerARPG
 {
     public interface IShooterGameplayCameraController : IGameplayCameraController
     {
+        ShooterControllerViewMode ActiveViewMode { get; set; }
         bool EnableAimAssist { get; set; }
         bool EnableAimAssistX { get; set; }
         bool EnableAimAssistY { get; set; }

@@ -5,6 +5,7 @@ namespace MultiplayerARPG
 {
     public class ShooterGameplayCameraController : DefaultGameplayCameraController, IShooterGameplayCameraController, IAimAssistAvoidanceListener
     {
+        public ShooterControllerViewMode ActiveViewMode { get; set; }
         public bool EnableAimAssist { get { return CameraControls.enableAimAssist; } set { CameraControls.enableAimAssist = value; } }
         public bool EnableAimAssistX { get { return CameraControls.enableAimAssistX; } set { CameraControls.enableAimAssistX = value; } }
         public bool EnableAimAssistY { get { return CameraControls.enableAimAssistY; } set { CameraControls.enableAimAssistY = value; } }

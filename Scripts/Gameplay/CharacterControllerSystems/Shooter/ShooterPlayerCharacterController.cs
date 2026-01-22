@@ -78,6 +78,8 @@ namespace MultiplayerARPG
         protected float sprintDelayAfterActions = 1f;
         [SerializeField]
         protected float walkDelayAfterActions = 1f;
+        [SerializeField]
+        protected bool disableAttackInSafeArea = false;
 
         [Header("TPS Settings")]
         [SerializeField]
@@ -92,8 +94,6 @@ namespace MultiplayerARPG
         protected Vector3 tpsTargetOffsetWhileCrouching = new Vector3(0.75f, 0.75f, 0f);
         [SerializeField]
         protected Vector3 tpsTargetOffsetWhileCrawling = new Vector3(0.75f, 0.5f, 0f);
-        [SerializeField]
-        protected float tpsTargetOffsetDamping = 10f;
         [SerializeField]
         protected float tpsFov = 60f;
         [SerializeField]
@@ -249,6 +249,7 @@ namespace MultiplayerARPG
         public BaseWeaponAbility WeaponAbility { get; protected set; }
         public WeaponAbilityState WeaponAbilityState { get; set; }
 
+        public ControllerMode? ForceControllerMode { get; set; }
         public ControllerMode Mode
         {
             get
@@ -258,6 +259,8 @@ namespace MultiplayerARPG
                     // If view mode is fps, controls type must be combat
                     return ControllerMode.Combat;
                 }
+                if (ForceControllerMode.HasValue)
+                    return ForceControllerMode.Value;
                 return mode;
             }
         }
@@ -475,18 +478,22 @@ namespace MultiplayerARPG
             }
         }
         public byte PauseFireInputFrames { get; set; }
-        public Vector3 MoveDirection
+        public bool IsAimming
         {
             get
             {
-                if (_moveDirection.magnitude > 0f)
+                return Time.unscaledTime - _lastAimmingTime < durationBeforeStopAimming;
+            }
+        }
+        public Vector2 MoveInput
+        {
+            get
+            {
+                if (_moveInput.magnitude > 0f && Mode == ControllerMode.Adventure && !IsAimming)
                 {
-                    if (mode == ControllerMode.Adventure && !_isAimming)
-                    {
-                        return Vector3.forward;
-                    }
+                    return Vector2.up;
                 }
-                return _moveDirection;
+                return _moveInput;
             }
         }
 
@@ -515,7 +522,7 @@ namespace MultiplayerARPG
         protected Vector3 _cameraEulerAngles;
         protected float _inputV;
         protected float _inputH;
-        protected Vector2 _normalizedInput;
+        protected Vector2 _moveInput;
         protected Vector3 _moveLookDirection;
         protected Vector3 _targetLookDirection;
         protected bool _tempPressAttackRight;
@@ -538,7 +545,6 @@ namespace MultiplayerARPG
         protected ExtraMovementState _extraMovementState;
         protected ShooterControllerViewMode? _viewModeBeforeForcedToSwitch;
         protected bool _mustReleaseFireKey;
-        protected bool _isAimming;
         protected bool _isCharging;
         protected float _lastActionTime;
 
@@ -693,10 +699,8 @@ namespace MultiplayerARPG
             CacheMinimapCameraController.FollowingEntityTransform = CameraTargetTransform;
             CacheMinimapCameraController.FollowingGameplayCameraTransform = CacheGameplayCameraController.CameraTransform;
 
-            if (tpsTargetOffsetDamping <= 0f)
-                CacheGameplayCameraController.TargetOffset = CacheGameplayCameraController.TargetOffset;
-            else
-                CacheGameplayCameraController.TargetOffset = Vector3.Lerp(CacheGameplayCameraController.TargetOffset, CameraTargetOffset, Time.deltaTime * tpsTargetOffsetDamping);
+            CacheGameplayCameraController.ActiveViewMode = ActiveViewMode;
+            CacheGameplayCameraController.TargetOffset = CameraTargetOffset;
             CacheGameplayCameraController.EnableWallHitSpring = ActiveViewMode == ShooterControllerViewMode.Tps || ActiveViewMode == ShooterControllerViewMode.Shoulder;
             CacheGameplayCameraController.FollowingEntityTransform = ActiveViewMode == ShooterControllerViewMode.Fps ? PlayingCharacterEntity.FpsCameraTargetTransform : PlayingCharacterEntity.CameraTargetTransform;
 
@@ -960,7 +964,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            _isAimming = false;
             // Update input, aimming state will be updated in `UpdateInputs` functions
             if (!_updatingInputs)
             {
@@ -972,10 +975,10 @@ namespace MultiplayerARPG
 
             if (_moveDirection.magnitude > 0f)
             {
-                switch (mode)
+                switch (Mode)
                 {
                     case ControllerMode.Adventure:
-                        if (_isAimming)
+                        if (IsAimming)
                             _movementState |= GameplayUtils.GetMovementStateByDirection(_moveDirection, MovementTransform.forward);
                         else
                             _movementState |= MovementState.Forward;
@@ -1150,7 +1153,7 @@ namespace MultiplayerARPG
             _cameraForward = CacheGameplayCameraController.LookForwardTransform.forward;
             _cameraForward.y = 0f;
             _cameraForward.Normalize();
-            if (ActiveViewMode == ShooterControllerViewMode.Fps || Mode == ControllerMode.Combat)
+            if (IsAimming || ActiveViewMode == ShooterControllerViewMode.Fps || Mode == ControllerMode.Combat)
                 _targetLookDirection = _moveLookDirection = _cameraForward;
             PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection), true);
         }
@@ -1196,6 +1199,12 @@ namespace MultiplayerARPG
                 {
                     // Use weapon ability if it can
                     _tempPressWeaponAbility = !isBlockController && GetSecondaryAttackButtonDown();
+                }
+
+                if (disableAttackInSafeArea && PlayingCharacterEntity.IsInSafeArea)
+                {
+                    _tempPressAttackRight = false;
+                    _tempPressAttackLeft = false;
                 }
 
                 attacking = _tempPressAttackRight || _tempPressAttackLeft;
@@ -1368,7 +1377,7 @@ namespace MultiplayerARPG
             _moveDirection = Vector3.zero;
             _inputV = InputManager.GetAxis("Vertical", raw);
             _inputH = InputManager.GetAxis("Horizontal", raw);
-            _normalizedInput = new Vector2(_inputV, _inputH).normalized;
+            _moveInput = new Vector2(_inputH, _inputV).normalized;
             _moveDirection += _cameraForward * _inputV;
             _moveDirection += _cameraRight * _inputH;
 
@@ -1634,9 +1643,9 @@ namespace MultiplayerARPG
             if (!anyKeyPressed)
             {
                 // Update look direction while moving without doing any action
-                if (Time.unscaledTime - _lastAimmingTime < durationBeforeStopAimming)
+                if (IsAimming)
                 {
-                    await Aimming();
+                    await Aimming(false);
                 }
                 else
                 {
@@ -1671,15 +1680,25 @@ namespace MultiplayerARPG
         /// <summary>
         /// Turning forwarding and wait character ready to do actions before doing an actions
         /// </summary>
+        /// <param name="isAction"></param>
         /// <returns></returns>
-        protected virtual async UniTask Aimming()
+        protected virtual async UniTask Aimming(bool isAction = true)
         {
-            _isAimming = true;
-            while (!SetTargetLookDirectionWhileDoingAction())
+            if (SetTargetLookDirectionWhileDoingAction())
+            {
+                if (isAction)
+                {
+                    // This is aimming due to action, not just updating look direction
+                    _lastAimmingTime = Time.unscaledTime;
+                }
+                return;
+            }
+            do
             {
                 _lastAimmingTime = Time.unscaledTime;
                 await UniTask.Yield();
-            }
+            } while (!SetTargetLookDirectionWhileDoingAction());
+            _lastAimmingTime = Time.unscaledTime;
         }
 
         /// <summary>
@@ -1692,7 +1711,7 @@ namespace MultiplayerARPG
             {
                 case ShooterControllerViewMode.Fps:
                     // It is look forwarding already, so it can do next action
-                    return PlayingCharacterEntity.CanDoNextAction();
+                    return true;
                 default:
                     // Just look at camera forward while character playing action animation while `turnForwardWhileDoingAction` is `true`
                     Vector3 doActionLookDirection = turnForwardWhileDoingAction ? _cameraForward : (_moveLookDirection.sqrMagnitude > 0f ? _moveLookDirection : _targetLookDirection);
@@ -1702,13 +1721,13 @@ namespace MultiplayerARPG
                         Quaternion targetRot = Quaternion.LookRotation(doActionLookDirection);
                         currentRot = Quaternion.Slerp(currentRot, targetRot, turnSpeedWhileDoingAction * Time.deltaTime);
                         _targetLookDirection = currentRot * Vector3.forward;
-                        return Quaternion.Angle(currentRot, targetRot) <= 15f && PlayingCharacterEntity.CanDoNextAction();
+                        return Quaternion.Angle(currentRot, targetRot) <= 15f;
                     }
                     else
                     {
                         // Turn immediately because turn speed <= 0
                         _targetLookDirection = doActionLookDirection;
-                        return PlayingCharacterEntity.CanDoNextAction();
+                        return true;
                     }
             }
         }
@@ -1999,6 +2018,12 @@ namespace MultiplayerARPG
         {
             // Check using hotkey for PC only
             return !InputManager.IsUseMobileInput() && UICharacterHotkeys.UsingHotkey != null;
+        }
+
+        public void ForceStandUp()
+        {
+            _toggleCrouchOn = false;
+            _toggleCrawlOn = false;
         }
 
         public virtual bool GetPrimaryAttackButton()
