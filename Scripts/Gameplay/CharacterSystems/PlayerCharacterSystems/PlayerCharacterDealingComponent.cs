@@ -100,9 +100,14 @@ namespace MultiplayerARPG
             StopDealing();
         }
 
+        public int GetDealingFee()
+        {
+            return GameInstance.Singleton.GameplayRule.GetDealingFee(DealingItems, DealingGold);
+        }
+
         public int GetRequiredGold()
         {
-            return GameInstance.Singleton.GameplayRule.GetDealingFee(DealingItems, DealingGold) + DealingGold;
+            return GetDealingFee() + DealingGold;
         }
 
         public bool HaveEnoughGold()
@@ -241,12 +246,12 @@ namespace MultiplayerARPG
 
         public bool CallOwnerReceiveDealingRequest(uint objectId)
         {
-            RPC(TargetReceiveDealingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, ConnectionId, objectId);
+            RPC(TargetRpcReceiveDealingRequest, Identity.DefaultRpcChannelId, DeliveryMethod.ReliableUnordered, ConnectionId, objectId);
             return true;
         }
 
         [TargetRpc]
-        protected void TargetReceiveDealingRequest(uint objectId)
+        protected void TargetRpcReceiveDealingRequest(uint objectId)
         {
             BasePlayerCharacterEntity playerCharacterEntity;
             if (!Manager.TryGetEntityByObjectId(objectId, out playerCharacterEntity))
