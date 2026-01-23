@@ -1,9 +1,6 @@
 ﻿using Cysharp.Text;
-using Cysharp.Threading.Tasks;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
 
@@ -47,6 +44,7 @@ namespace MultiplayerARPG
         public GameObject[] cashObjects;
         [Tooltip("These objects will be activated while sell price gold currency is not 0.")]
         public GameObject[] goldObjects;
+
         public int BuyAmount
         {
             get
@@ -60,7 +58,6 @@ namespace MultiplayerARPG
 
         protected Dictionary<Currency, int> _tempReceiveCurrencies = new Dictionary<Currency, int>();
         protected Dictionary<BaseItem, int> _tempReceiveItems = new Dictionary<BaseItem, int>();
-
 
         protected override void OnDestroy()
         {

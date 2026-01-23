@@ -64,7 +64,8 @@ namespace MultiplayerARPG
             uiTextRefiningLevel = null;
             uiRefineEnhancerItems = null;
             uiAppliedRefineEnhancerItems = null;
-            _enhancerDataIds?.Clear();
+            _enhancerDataIds.Clear();
+            _enhancerDataIds = null;
             _tempRequireCurrencies.Clear();
             _tempRequireCurrencies = null;
             _tempRequireItems.Clear();

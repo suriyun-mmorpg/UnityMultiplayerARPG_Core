@@ -262,7 +262,7 @@ namespace MultiplayerARPG
         protected Dictionary<DamageElement, MinMaxFloat> _tempDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
         protected Dictionary<DamageElement, MinMaxFloat> _tempDamageAmountsRate = new Dictionary<DamageElement, MinMaxFloat>();
         protected Dictionary<StatusEffect, float> _tempStatusEffectResistances = new Dictionary<StatusEffect, float>();
-        protected Dictionary<BaseSkill, int> tempSkillLevels = new Dictionary<BaseSkill, int>();
+        protected Dictionary<BaseSkill, int> _tempSkillLevels = new Dictionary<BaseSkill, int>();
 
         protected override void OnDestroy()
         {
@@ -390,6 +390,24 @@ namespace MultiplayerARPG
             uiNextLevelItem = null;
             uiComparingEquipments.Nullify();
             _randomBonus = null;
+            _tempAttributes.Clear();
+            _tempAttributes = null;
+            _tempAttributesRate.Clear();
+            _tempAttributesRate = null;
+            _tempResistances.Clear();
+            _tempResistances = null;
+            _tempArmors.Clear();
+            _tempArmors = null;
+            _tempArmorsRate.Clear();
+            _tempArmorsRate = null;
+            _tempDamageAmounts.Clear();
+            _tempDamageAmounts = null;
+            _tempDamageAmountsRate.Clear();
+            _tempDamageAmountsRate = null;
+            _tempStatusEffectResistances.Clear();
+            _tempStatusEffectResistances = null;
+            _tempSkillLevels.Clear();
+            _tempSkillLevels = null;
         }
 
         public void SetupAsEquipSlot(string equipPosition, byte equipSlotIndex)
@@ -1288,21 +1306,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseSkillLevels != null)
             {
-                tempSkillLevels.Clear();
+                _tempSkillLevels.Clear();
                 if (EquipmentItem != null)
                 {
-                    EquipmentItem.GetIncreaseSkills(Level, tempSkillLevels);
+                    EquipmentItem.GetIncreaseSkills(Level, _tempSkillLevels);
                     if (!dontCalculateRandomBonus)
                     {
-                        GameDataHelpers.CombineSkills(tempSkillLevels, GetRandomBonus().GetIncreaseSkills());
+                        GameDataHelpers.CombineSkills(_tempSkillLevels, GetRandomBonus().GetIncreaseSkills());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    GameDataHelpers.CombineSkills(tempSkillLevels, SocketEnhancerItem.SocketEnhanceEffect.Skills);
+                    GameDataHelpers.CombineSkills(_tempSkillLevels, SocketEnhancerItem.SocketEnhanceEffect.Skills);
                 }
 
-                if (tempSkillLevels == null || tempSkillLevels.Count == 0)
+                if (_tempSkillLevels == null || _tempSkillLevels.Count == 0)
                 {
                     // Hide ui if skill levels is empty
                     uiIncreaseSkillLevels.Hide();
@@ -1312,7 +1330,7 @@ namespace MultiplayerARPG
                     uiIncreaseSkillLevels.displayType = UISkillLevels.DisplayType.Simple;
                     uiIncreaseSkillLevels.isBonus = true;
                     uiIncreaseSkillLevels.Show();
-                    uiIncreaseSkillLevels.Data = tempSkillLevels;
+                    uiIncreaseSkillLevels.Data = _tempSkillLevels;
                 }
             }
 

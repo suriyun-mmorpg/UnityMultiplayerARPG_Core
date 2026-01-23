@@ -46,6 +46,7 @@ namespace MultiplayerARPG
             uiRequireCurrencyAmounts = null;
             uiRequireItemAmounts = null;
             disallowStateObjects.Nullify();
+            disallowStateObjects = null;
             _tempRequireAttributes.Clear();
             _tempRequireAttributes = null;
             _tempRequireSkills.Clear();

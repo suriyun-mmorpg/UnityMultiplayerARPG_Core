@@ -255,7 +255,7 @@ namespace MultiplayerARPG
         /// Combine status effect resistance amounts dictionary
         /// </summary>
         /// <param name="resultDictionary"></param>
-        /// <param name="newEntry"></param>
+        /// <param name="combineDictionary"></param>
         /// <returns></returns>
         public static void CombineStatusEffectResistances(Dictionary<StatusEffect, float> resultDictionary, Dictionary<StatusEffect, float> combineDictionary)
         {
@@ -277,7 +277,7 @@ namespace MultiplayerARPG
         /// Combine item amounts dictionary
         /// </summary>
         /// <param name="resultDictionary"></param>
-        /// <param name="newEntry"></param>
+        /// <param name="combineDictionary"></param>
         /// <returns></returns>
         public static void CombineItems(Dictionary<BaseItem, int> resultDictionary, Dictionary<BaseItem, int> combineDictionary)
         {

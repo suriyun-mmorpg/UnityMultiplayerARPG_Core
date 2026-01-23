@@ -37,7 +37,6 @@ namespace MultiplayerARPG
         public UnityEvent onAbleToIncrease = new UnityEvent();
         public UnityEvent onUnableToIncrease = new UnityEvent();
 
-
         protected Dictionary<DamageElement, float> _tempResistances = new Dictionary<DamageElement, float>();
         protected Dictionary<DamageElement, float> _tempArmors = new Dictionary<DamageElement, float>();
         protected Dictionary<DamageElement, MinMaxFloat> _tempDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
