@@ -4,10 +4,10 @@ using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Pool;
+using XNode;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
-using XNode;
 
 namespace MultiplayerARPG
 {
