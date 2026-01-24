@@ -20,6 +20,7 @@ namespace MultiplayerARPG
         public TextWrapper textValue;
         public Image imageGage;
         public Slider sliderGage;
+        public float changedStep = 1f;
         [Tooltip("Enable smooth transitions for the gauge.")]
         public bool smoothTransition = false;
         [BoolShowConditional("smoothTransition", true)]
@@ -37,6 +38,8 @@ namespace MultiplayerARPG
         private float _targetRate;
         private Coroutine _smoothingCoroutineForImage;
         private Coroutine _smoothingCoroutineForSlider;
+        private float _prevCurrent = -1f;
+        private float _prevMax = -1f;
 
         public void SetVisible(bool isVisible)
         {
@@ -57,20 +60,27 @@ namespace MultiplayerARPG
         {
             _targetRate = max == 0 ? 1 : current / max;
 
-            if (textValue != null)
+            if (Mathf.Abs(_prevCurrent - current) >= changedStep ||
+                Mathf.Abs(_prevMax - max) >= changedStep)
             {
-                if (displayType == DisplayType.CurrentByMax)
+                _prevCurrent = current;
+                _prevMax = max;
+                if (textValue != null)
                 {
-                    textValue.text = ZString.Format(
-                        LanguageManager.GetText(formatCurrentByMax),
-                        current.ToString(formatCurrentAmount),
-                        max.ToString(formatMaxAmount));
-                }
-                else
-                {
-                    textValue.text = ZString.Format(
-                        LanguageManager.GetText(formatPercentage),
-                        (_targetRate * 100f).ToString(formatPercentageAmount));
+                    switch (displayType)
+                    {
+                        case DisplayType.Percentage:
+                            textValue.text = ZString.Format(
+                                LanguageManager.GetText(formatPercentage),
+                                (_targetRate * 100f).ToString(formatPercentageAmount));
+                            break;
+                        default:
+                            textValue.text = ZString.Format(
+                                LanguageManager.GetText(formatCurrentByMax),
+                                current.ToString(formatCurrentAmount),
+                                max.ToString(formatMaxAmount));
+                            break;
+                    }
                 }
             }
 

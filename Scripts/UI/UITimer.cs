@@ -1,3 +1,4 @@
+using Cysharp.Text;
 using UnityEngine;
 
 public class UITimer : MonoBehaviour
@@ -8,6 +9,8 @@ public class UITimer : MonoBehaviour
     public TextWrapper textMilliseconds;
     public TextWrapper textAll;
     public string allFormat = "{0}:{1}:{2}.{3}";
+    public float changedStep = 1f;
+    protected float _prevSeconds = -1f;
 
     private void OnEnable()
     {
@@ -47,6 +50,10 @@ public class UITimer : MonoBehaviour
 
     public void UpdateTime(float seconds)
     {
+        if (Mathf.Abs(_prevSeconds - seconds) < changedStep)
+            return;
+        _prevSeconds = seconds;
+
         float hrs = Mathf.FloorToInt(seconds / 60f / 60f);
         float remainsSecFromHrs = seconds - (hrs * 60f * 60f);
         float min = Mathf.FloorToInt(remainsSecFromHrs / 60f);
@@ -55,18 +62,18 @@ public class UITimer : MonoBehaviour
         float milli = (secWithMilli - sec) * 100;
 
         if (textHours != null)
-            textHours.text = string.Format("{0:00}", hrs);
+            textHours.text = ZString.Format("{0:00}", hrs);
 
         if (textMinutes != null)
-            textMinutes.text = string.Format("{0:00}", min);
+            textMinutes.text = ZString.Format("{0:00}", min);
 
         if (textSeconds != null)
-            textSeconds.text = string.Format("{0:00}", sec);
+            textSeconds.text = ZString.Format("{0:00}", sec);
 
         if (textMilliseconds != null)
-            textMilliseconds.text = string.Format("{0:00}", milli);
+            textMilliseconds.text = ZString.Format("{0:00}", milli);
 
         if (textAll != null)
-            textAll.text = string.Format(allFormat, string.Format("{0:00}", hrs), string.Format("{0:00}", min), string.Format("{0:00}", sec), string.Format("{0:00}", milli));
+            textAll.text = ZString.Format(allFormat, ZString.Format("{0:00}", hrs), ZString.Format("{0:00}", min), ZString.Format("{0:00}", sec), ZString.Format("{0:00}", milli));
     }
 }
