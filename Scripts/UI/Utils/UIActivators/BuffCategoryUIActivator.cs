@@ -5,7 +5,13 @@ namespace MultiplayerARPG
     public class BuffCategoryUIActivator : MonoBehaviour
     {
         public string buffCategory;
-        public GameObject[] appliedSignObjects;
+        public GameObject[] appliedSignObjects = new GameObject[0];
+
+        private void OnDestroy()
+        {
+            appliedSignObjects?.Nullify();
+            appliedSignObjects = null;
+        }
 
         private void LateUpdate()
         {
@@ -15,8 +21,9 @@ namespace MultiplayerARPG
             BaseGameData tempData;
             if (GameInstance.PlayingCharacter != null)
             {
-                foreach (CharacterBuff buff in GameInstance.PlayingCharacter.Buffs)
+                for (int i = 0; i < GameInstance.PlayingCharacter.Buffs.Count; ++i)
                 {
+                    CharacterBuff buff = GameInstance.PlayingCharacter.Buffs[i];
                     tempData = null;
                     switch (buff.type)
                     {
