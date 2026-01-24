@@ -359,7 +359,7 @@ namespace MultiplayerARPG
         protected void InstantiateMapMarkers()
         {
             // Add all added markers
-            foreach (IMapMarker marker in MapMarkerManager.AllMarkers.Values)
+            foreach (IMapMarker marker in MapMarkerManager.MarkerValues)
             {
                 if (string.IsNullOrWhiteSpace(marker.MapMarkerType))
                     continue;
