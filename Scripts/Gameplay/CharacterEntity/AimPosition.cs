@@ -56,5 +56,9 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class SyncFieldAimPosition : LiteNetLibSyncField<AimPosition>
     {
+        protected override bool IsValueChanged(AimPosition oldValue, AimPosition newValue)
+        {
+            return true;
+        }
     }
 }

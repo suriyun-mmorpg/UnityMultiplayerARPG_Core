@@ -25,5 +25,9 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class SyncFieldItemDropData : LiteNetLibSyncField<ItemDropData>
     {
+        protected override bool IsValueChanged(ItemDropData oldValue, ItemDropData newValue)
+        {
+            return true;
+        }
     }
 }

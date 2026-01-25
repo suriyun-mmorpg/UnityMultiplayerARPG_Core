@@ -27,5 +27,10 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class SyncFieldVendingData : LiteNetLibSyncField<VendingData>
     {
+        protected override bool IsValueChanged(VendingData oldValue, VendingData newValue)
+        {
+            return oldValue.isStarted != newValue.isStarted ||
+                !string.Equals(oldValue.title, newValue.title);
+        }
     }
 }

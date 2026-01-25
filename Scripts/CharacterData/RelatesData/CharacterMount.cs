@@ -84,6 +84,10 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class SyncFieldCharacterMount : LiteNetLibSyncField<CharacterMount>
     {
+        protected override bool IsValueChanged(CharacterMount oldValue, CharacterMount newValue)
+        {
+            return true;
+        }
     }
 
 
