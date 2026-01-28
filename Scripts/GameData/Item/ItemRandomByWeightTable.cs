@@ -1,6 +1,8 @@
 using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -14,6 +16,11 @@ namespace MultiplayerARPG
         [ArrayElementTitle("item")]
         public ItemRandomByWeight[] randomItems = new ItemRandomByWeight[0];
         public float noDropWeight = 0f;
+
+        [Header("Drop Test Tool")]
+        public int dropTestRound = 100;
+        [InspectorButton(nameof(ProceedDropTest), "Proceed Drop Test")]
+        public bool btnProceedDropTest;
 
         [System.NonSerialized]
         private List<WeightedRandomizerItem<ItemRandomByWeight>> _cacheRandomItems;
@@ -39,24 +46,30 @@ namespace MultiplayerARPG
             }
         }
 
+        public virtual void PrepareRelatesData()
+        {
+            GameInstance.AddItems(randomItems);
+        }
+
         public void RandomItem(OnDropItemDelegate onRandomItem, int seed = 0, HashSet<int> excludeItemDataIds = null, System.Action onFailed = null)
         {
             ItemRandomByWeight randomedItem;
             if (CacheRandomItems.Count > 1 && excludeItemDataIds != null && excludeItemDataIds.Count > 0)
             {
-                List<WeightedRandomizerItem<ItemRandomByWeight>> randomItems = new List<WeightedRandomizerItem<ItemRandomByWeight>>();
-                foreach (var kv in CacheRandomItems)
+                using (CollectionPool<List<WeightedRandomizerItem<ItemRandomByWeight>>, WeightedRandomizerItem<ItemRandomByWeight>>.Get(out List<WeightedRandomizerItem<ItemRandomByWeight>> randomItems))
                 {
-                    if (!kv.item.item || excludeItemDataIds.Contains(kv.item.item.DataId))
-                        continue;
-                    randomItems.Add(new WeightedRandomizerItem<ItemRandomByWeight>()
+                    foreach (var kv in CacheRandomItems)
                     {
-                        item = kv.item,
-                        weight = kv.weight,
-                    });
+                    	if (!kv.item.item || excludeItemDataIds.Contains(kv.item.item.DataId))
+                        	continue;
+                        randomItems.Add(new WeightedRandomizerItem<ItemRandomByWeight>()
+                        {
+                            item = kv.item,
+                            weight = kv.weight,
+                        });
+                    }
+                    randomedItem = WeightedRandomizer.From(randomItems, noDropWeight).TakeOne(seed);
                 }
-                randomedItem = WeightedRandomizer.From(randomItems, noDropWeight).TakeOne(seed);
-                randomItems.Clear();
             }
             else
             {
@@ -68,6 +81,36 @@ namespace MultiplayerARPG
                 return;
             }
             onRandomItem?.Invoke(randomedItem.item, randomedItem.GetRandomedLevel(), randomedItem.GetRandomedAmount());
+        }
+
+        public void ProceedDropTest()
+        {
+            ProceedDropTestBySpecificRounds(dropTestRound);
+        }
+
+        public void ProceedDropTestBySpecificRounds(int dropTestRound)
+        {
+            _cacheRandomItems = null;
+            Dictionary<BaseItem, int> itemAmounts = new Dictionary<BaseItem, int>();
+            Debug.Log("== Start Drop Test == ");
+            for (int i = 0; i < dropTestRound; ++i)
+            {
+                Debug.Log($"=== Drop Test Round {i + 1} ===");
+                int j = 0;
+                RandomItem((BaseItem item, int level, int amount) =>
+                {
+                    Debug.Log($"==== Drop #{j} - {item}, Lv.{level}, Amt.{amount} ====");
+                    if (!itemAmounts.ContainsKey(item))
+                        itemAmounts[item] = 0;
+                    itemAmounts[item] += amount;
+                });
+            }
+            Debug.Log("== End Drop Test, Summary ==");
+            foreach (KeyValuePair<BaseItem, int> itemAmount in itemAmounts)
+            {
+                Debug.Log($"=== Total Drop {itemAmount.Key}, Amt.{itemAmount.Value} ===");
+            }
+            itemAmounts.Clear();
         }
 
 #if UNITY_EDITOR
@@ -87,6 +130,18 @@ namespace MultiplayerARPG
                 }
             }
             EditorUtility.SetDirty(this);
+        }
+
+        [ContextMenu("Show Total Weight")]
+        public void ShowTotalWeight()
+        {
+            float totalWeight = 0;
+            foreach (var item in randomItems)
+            {
+                totalWeight += item.randomWeight;
+            }
+            totalWeight += noDropWeight;
+            Debug.Log($"Total Weight: {totalWeight}");
         }
 #endif
     }
