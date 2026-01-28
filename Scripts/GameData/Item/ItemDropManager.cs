@@ -1,6 +1,7 @@
 ﻿using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -11,8 +12,15 @@ namespace MultiplayerARPG
         public ItemDrop[] randomItems = new ItemDrop[0];
         public ItemDropTable[] itemDropTables = new ItemDropTable[0];
         public ItemRandomByWeightTable[] itemRandomByWeightTables = new ItemRandomByWeightTable[0];
+        public ItemRandomByWeightTable[] certainItemRandomByWeightTables = new ItemRandomByWeightTable[0];
+        [Tooltip("Min kind of items that will be dropped in ground")]
+        [Min(0)]
+        public byte minDropItems = 1;
         [Tooltip("Max kind of items that will be dropped in ground")]
+        [Min(1)]
         public byte maxDropItems = 5;
+        [Tooltip("If true, certain drop items will be limited by random drop items (Randomed by `minDropItems` and `maxDropItems`)")]
+        public bool certainDropLimitedByRandomDropItems = false;
 
         [System.NonSerialized]
         private List<ItemRandomByWeightTable> _cacheItemRandomByWeightTables = null;
@@ -84,6 +92,8 @@ namespace MultiplayerARPG
                     _uncertainDropItems.Clear();
                     for (i = 0; i < _cacheRandomItems.Count; ++i)
                     {
+                        if (_cacheRandomItems[i].item == null)
+                            continue;
                         if (_cacheRandomItems[i].dropRate >= 1f)
                             _certainDropItems.Add(_cacheRandomItems[i]);
                         else
@@ -110,44 +120,89 @@ namespace MultiplayerARPG
 
         public virtual void RandomItems(OnDropItemDelegate onRandomItem, float rate = 1f)
         {
-            if (CacheRandomItems.Count == 0 && CacheItemRandomByWeightTables.Count <= 0)
+            if (CacheRandomItems.Count == 0 && CacheItemRandomByWeightTables.Count == 0)
                 return;
-            int randomDropCount = 0;
-            int i;
-            // Drop certain drop rate items
-            _certainDropItems.Shuffle();
-            for (i = 0; i < _certainDropItems.Count && randomDropCount < maxDropItems; ++i)
+            using (CollectionPool<HashSet<int>, int>.Get(out HashSet<int> excludeItemDataIds))
             {
-                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(_certainDropItems[i].item))
-                    continue;
-                onRandomItem.Invoke(_certainDropItems[i].item, _certainDropItems[i].GetRandomedLevel(), _certainDropItems[i].GetRandomedAmount());
-                ++randomDropCount;
+                int randomDropCount = 0;
+                int targetRandomDropCount = Random.Range(minDropItems, maxDropItems + 1);
+                int i;
+                // Drop certain drop rate items
+                for (i = 0; i < certainItemRandomByWeightTables.Length && (!certainDropLimitedByRandomDropItems || randomDropCount < targetRandomDropCount); ++i)
+                {
+                    certainItemRandomByWeightTables[i].RandomItem((BaseItem item, int level, int amount) =>
+                    {
+                        onRandomItem?.Invoke(item, level, amount);
+                        ++randomDropCount;
+                    }, 0, excludeItemDataIds);
+                }
+                _certainDropItems.Shuffle();
+                for (i = 0; i < _certainDropItems.Count && (!certainDropLimitedByRandomDropItems || randomDropCount < targetRandomDropCount); ++i)
+                {
+                    onRandomItem?.Invoke(_certainDropItems[i].item, _certainDropItems[i].GetRandomedLevel(), _certainDropItems[i].GetRandomedAmount());
+                    ++randomDropCount;
+                }
+                // Reached max drop items?
+                if (randomDropCount >= targetRandomDropCount)
+                    return;
+                // Randoming
+                if (_uncertainDropItems.Count == 0 && CacheItemRandomByWeightTables.Count == 0)
+                    return;
+                do
+                {
+                    // Drop uncertain drop rate items
+                    _uncertainDropItems.Shuffle();
+                    for (i = 0; i < _uncertainDropItems.Count && randomDropCount < targetRandomDropCount; ++i)
+                    {
+                        BaseItem dropItem = _uncertainDropItems[i].item;
+                        float dropRate = _uncertainDropItems[i].dropRate * rate;
+                        if (Random.value > dropRate)
+                            continue;
+                        if (BaseGameNetworkManager.CurrentMapInfo != null && BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(dropItem))
+                            continue;
+                        onRandomItem.Invoke(dropItem, _uncertainDropItems[i].GetRandomedLevel(), _uncertainDropItems[i].GetRandomedAmount());
+                        ++randomDropCount;
+                    }
+                    // Reached max drop items?
+                    if (randomDropCount >= targetRandomDropCount)
+                        return;
+                    // Drop items by weighted tables
+                    CacheItemRandomByWeightTables.Shuffle();
+                    for (i = 0; i < CacheItemRandomByWeightTables.Count && randomDropCount < targetRandomDropCount; ++i)
+                    {
+                        CacheItemRandomByWeightTables[i].RandomItem((BaseItem item, int level, int amount) =>
+                        {
+                            onRandomItem?.Invoke(item, level, amount);
+                            ++randomDropCount;
+                        }, 0, excludeItemDataIds);
+                    }
+                } while (randomDropCount < targetRandomDropCount);
             }
-            // Reached max drop items?
-            if (randomDropCount >= maxDropItems)
-                return;
-            // Drop uncertain drop rate items
-            _uncertainDropItems.Shuffle();
-            for (i = 0; i < _uncertainDropItems.Count && randomDropCount < maxDropItems; ++i)
+        }
+
+        public void ProceedDropTest(int dropTestRound)
+        {
+            _cacheRandomItems = null;
+            Dictionary<BaseItem, int> itemAmounts = new Dictionary<BaseItem, int>();
+            Debug.Log("== Start Drop Test == ");
+            for (int i = 0; i < dropTestRound; ++i)
             {
-                BaseItem dropItem = _uncertainDropItems[i].item;
-                float dropRate = _uncertainDropItems[i].dropRate * rate;
-                if (Random.value > dropRate)
-                    continue;
-                if (BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(dropItem))
-                    continue;
-                onRandomItem.Invoke(dropItem, _uncertainDropItems[i].GetRandomedLevel(), _uncertainDropItems[i].GetRandomedAmount());
-                ++randomDropCount;
+                Debug.Log($"=== Drop Test Round {i + 1} ===");
+                int j = 0;
+                RandomItems((BaseItem item, int level, int amount) =>
+                {
+                    Debug.Log($"==== Drop #{j} - {item}, Lv.{level}, Amt.{amount} ====");
+                    if (!itemAmounts.ContainsKey(item))
+                        itemAmounts[item] = 0;
+                    itemAmounts[item] += amount;
+                });
             }
-            // Reached max drop items?
-            if (randomDropCount >= maxDropItems)
-                return;
-            // Drop items by weighted tables
-            CacheItemRandomByWeightTables.Shuffle();
-            for (i = 0; i < CacheItemRandomByWeightTables.Count && randomDropCount < maxDropItems; ++i)
+            Debug.Log("== End Drop Test, Summary ==");
+            foreach (KeyValuePair<BaseItem, int> itemAmount in itemAmounts)
             {
-                CacheItemRandomByWeightTables[i].RandomItem(onRandomItem);
+                Debug.Log($"=== Total Drop {itemAmount.Key}, Amt.{itemAmount.Value} ===");
             }
+            itemAmounts.Clear();
         }
     }
 }
