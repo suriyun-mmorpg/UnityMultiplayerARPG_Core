@@ -847,11 +847,11 @@ namespace MultiplayerARPG
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             // Get activate animation type which defined at character model
             SkillActivateAnimationType useSkillActivateAnimationType = ActionModel.UseSkillActivateAnimationType(skill);
+            if (skill.TryGetDamageInfo(this, isLeftHand, out DamageInfo skillDamageInfo))
+                damageInfo = skillDamageInfo;
             // Prepare animation
             if (useSkillActivateAnimationType == SkillActivateAnimationType.UseAttackAnimation && skill.IsAttack)
             {
-                if (skill.TryGetDamageInfo(this, isLeftHand, out DamageInfo skillDamageInfo))
-                    damageInfo = skillDamageInfo;
                 // Assign data id
                 animationDataId = weaponItem.WeaponType.DataId;
                 // Assign animation action type
