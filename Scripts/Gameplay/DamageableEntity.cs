@@ -272,15 +272,19 @@ namespace MultiplayerARPG
                         case HitEffectsSourceType.DamageElement:
                             if (GameInstance.DamageElements.TryGetValue(hitEffectsSourceDataId, out DamageElement damageElement))
                             {
-                                effects = damageElement.DamageHitEffects;
-                                addressableEffects = damageElement.AddressableDamageHitEffects;
+                                if (damageElement.DamageHitEffects != null && damageElement.DamageHitEffects.Length > 0)
+                                    effects = damageElement.DamageHitEffects;
+                                if (damageElement.AddressableDamageHitEffects != null && damageElement.AddressableDamageHitEffects.Length > 0)
+                                    addressableEffects = damageElement.AddressableDamageHitEffects;
                             }
                             break;
                         case HitEffectsSourceType.Skill:
                             if (GameInstance.Skills.TryGetValue(hitEffectsSourceDataId, out BaseSkill skill))
                             {
-                                effects = skill.DamageHitEffects;
-                                addressableEffects = skill.AddressableDamageHitEffects;
+                                if (skill.DamageHitEffects != null && skill.DamageHitEffects.Length > 0)
+                                    effects = skill.DamageHitEffects;
+                                if (skill.AddressableDamageHitEffects != null && skill.AddressableDamageHitEffects.Length > 0)
+                                    addressableEffects = skill.AddressableDamageHitEffects;
                             }
                             break;
                     }
