@@ -2,6 +2,7 @@
 using Insthync.ManagedUpdating;
 using LiteNetLibManager;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
@@ -16,10 +17,12 @@ namespace MultiplayerARPG
 
         public enum TargetActionType
         {
+            None,
             ClickActivate,
             Attack,
             UseSkill,
             HoldClickActivate,
+            ActionRequested,
         }
 
         public const float DETECT_MOUSE_DRAG_DISTANCE_SQUARED = 100f;
@@ -39,7 +42,8 @@ namespace MultiplayerARPG
         protected bool wasdLockAttackTarget;
         [Tooltip("This will be used to find nearby enemy while `Controller Mode` is `Point Click` or when `Wasd Lock Attack Target` is `TRUE`")]
         [SerializeField]
-        protected float lockAttackTargetDistance = 10f;
+        [FormerlySerializedAs("lockAttackTargetDistance")]
+        protected float distanceToLockActionTarget = 10f;
         [Tooltip("This will be used to clear selected target when character move with WASD keys and far from target")]
         [SerializeField]
         protected float wasdClearTargetDistance = 15f;
@@ -120,6 +124,7 @@ namespace MultiplayerARPG
         protected Vector3? _destination;
         protected TargetActionType _previousTargetActionType;
         protected TargetActionType _targetActionType;
+        protected TargetActionType _turnToTargetActionType;
         protected IPhysicFunctions _physicFunctions;
         protected bool _isLeftHandAttacking;
         protected bool _isFollowingTarget;
@@ -244,11 +249,16 @@ namespace MultiplayerARPG
             if (CacheTargetObject != null)
                 CacheTargetObject.gameObject.SetActive(_destination.HasValue);
 
-            if (PlayingCharacterEntity.IsDead())
+            if (PlayingCharacterEntity.IsDead() ||
+                PlayingCharacterEntity.IsDealing ||
+                PlayingCharacterEntity.IsVendingStarted)
             {
                 ClearQueueUsingSkill();
                 _destination = null;
                 _isFollowingTarget = false;
+                _previousTargetActionType = TargetActionType.None;
+                _targetActionType = TargetActionType.None;
+                _turnToTargetActionType = TargetActionType.None;
                 CancelBuild();
                 UISceneGameplay.SetTargetEntity(null);
             }
@@ -402,7 +412,7 @@ namespace MultiplayerARPG
             return moveDirection;
         }
 
-        public void RequestAttack()
+        public bool RequestAttack()
         {
             // Switching right/left/right/left...
             WeaponHandlingState weaponHandlingState = GetWeaponHandlingState(_isLeftHandAttacking);
@@ -410,31 +420,27 @@ namespace MultiplayerARPG
             {
                 _isLeftHandAttacking = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
                 _isLeftHandAttacking = !_isLeftHandAttacking;
+                return true;
             }
+            return false;
         }
 
-        public void RequestUsePendingSkill()
+        public bool RequestUsePendingSkill()
         {
-            if (PlayingCharacterEntity.IsDead() ||
-                PlayingCharacterEntity.IsDealing ||
-                PlayingCharacterEntity.IsVendingStarted)
-            {
-                ClearQueueUsingSkill();
-                return;
-            }
-
             if (_queueUsingSkill.skill != null &&
                 !PlayingCharacterEntity.IsPlayingActionAnimation() &&
                 !PlayingCharacterEntity.IsAttacking &&
                 !PlayingCharacterEntity.IsUsingSkill)
             {
                 WeaponHandlingState weaponHandlingState = GetWeaponHandlingState(_isLeftHandAttacking);
+                bool requested = false;
                 if (_queueUsingSkill.itemIndex >= 0)
                 {
                     if (PlayingCharacterEntity.UseSkillItem(_queueUsingSkill.itemIndex, weaponHandlingState, SelectedGameEntityObjectId, _queueUsingSkill.aimPosition))
                     {
                         _isLeftHandAttacking = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
                         _isLeftHandAttacking = !_isLeftHandAttacking;
+                        requested = true;
                     }
                 }
                 else
@@ -443,10 +449,14 @@ namespace MultiplayerARPG
                     {
                         _isLeftHandAttacking = weaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
                         _isLeftHandAttacking = !_isLeftHandAttacking;
+                        requested = true;
                     }
                 }
                 ClearQueueUsingSkill();
+                return requested;
             }
+
+            return false;
         }
 
         public override bool ShouldShowActivateButtons()
