@@ -592,7 +592,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             _isDoingAction = true;
             // Waits by skill cast duration
-            yield return new WaitForSecondsRealtime(Behaviour.PlayAction(castState, 1f, duration));
+            yield return new WaitForSecondsRealtime(Behaviour.PlayAction(castState, 1f, 0f, loop: true));
             _isDoingAction = false;
         }
 
