@@ -584,6 +584,12 @@ namespace MultiplayerARPG
                     {
                         // Set target, then use skill later when moved nearby target
                         SelectedEntity = targetEntity;
+                        if (!skill.CanUse(PlayingCharacterEntity, skillLevel, false, SelectedGameEntityObjectId, out UITextKeys gameMessage))
+                        {
+                            ClientGenericActions.ClientReceiveGameMessage(gameMessage);
+                            ClearQueueUsingSkill();
+                            return;
+                        }
                         SetTarget(targetEntity, TargetActionType.UseSkill, false);
                         _isFollowingTarget = true;
                     }
@@ -630,6 +636,12 @@ namespace MultiplayerARPG
                         // Set target, then use skill later when moved nearby target
                         if (SelectedGameEntity is BaseCharacterEntity)
                         {
+                            if (!skill.CanUse(PlayingCharacterEntity, skillLevel, false, SelectedGameEntityObjectId, out UITextKeys gameMessage))
+                            {
+                                ClientGenericActions.ClientReceiveGameMessage(gameMessage);
+                                ClearQueueUsingSkill();
+                                return;
+                            }
                             SetTarget(SelectedGameEntity, TargetActionType.UseSkill, false);
                             _isFollowingTarget = true;
                         }
