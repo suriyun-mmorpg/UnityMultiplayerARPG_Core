@@ -1,4 +1,3 @@
-using Cysharp.Text;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using UnityEngine;
@@ -253,7 +252,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
             }
 
-            private MovementState _movementState;
+            private MovementState _movementState = MovementState.IsGrounded;
             public MovementState MovementState
             {
                 get { return _movementState; }
@@ -266,7 +265,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
             }
 
-            private ExtraMovementState _extraMovementState;
+            private ExtraMovementState _extraMovementState = ExtraMovementState.None;
             public ExtraMovementState ExtraMovementState
             {
                 get { return _extraMovementState; }
@@ -279,7 +278,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
             }
 
-            private MovementState _previousMovementState;
+            private MovementState _previousMovementState = MovementState.IsGrounded;
             public MovementState PreviousMovementState
             {
                 get { return _previousMovementState; }
@@ -292,7 +291,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
             }
 
-            private ExtraMovementState _previousExtraMovementState;
+            private ExtraMovementState _previousExtraMovementState = ExtraMovementState.None;
             public ExtraMovementState PreviousExtraMovementState
             {
                 get { return _previousExtraMovementState; }
