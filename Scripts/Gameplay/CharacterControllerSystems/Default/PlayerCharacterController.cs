@@ -345,7 +345,7 @@ namespace MultiplayerARPG
             if (TargetEntity == null)
                 return false;
             entity = TargetEntity as T;
-            if (entity == null)
+            if (entity.IsNull())
                 return false;
             if (PlayingCharacterEntity.IsServer)
             {
