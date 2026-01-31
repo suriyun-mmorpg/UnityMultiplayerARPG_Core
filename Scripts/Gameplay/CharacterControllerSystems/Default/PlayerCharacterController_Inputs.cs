@@ -584,7 +584,7 @@ namespace MultiplayerARPG
                     {
                         // Set target, then use skill later when moved nearby target
                         SelectedEntity = targetEntity;
-                        if (!skill.CanUse(PlayingCharacterEntity, skillLevel, false, SelectedGameEntityObjectId, out UITextKeys gameMessage))
+                        if (!skill.CanUse(PlayingCharacterEntity, skillLevel, false, SelectedGameEntityObjectId, out UITextKeys gameMessage, _queueUsingSkill.itemIndex >= 0))
                         {
                             ClientGenericActions.ClientReceiveGameMessage(gameMessage);
                             ClearQueueUsingSkill();
@@ -636,7 +636,7 @@ namespace MultiplayerARPG
                         // Set target, then use skill later when moved nearby target
                         if (SelectedGameEntity is BaseCharacterEntity)
                         {
-                            if (!skill.CanUse(PlayingCharacterEntity, skillLevel, false, SelectedGameEntityObjectId, out UITextKeys gameMessage))
+                            if (!skill.CanUse(PlayingCharacterEntity, skillLevel, false, SelectedGameEntityObjectId, out UITextKeys gameMessage, _queueUsingSkill.itemIndex >= 0))
                             {
                                 ClientGenericActions.ClientReceiveGameMessage(gameMessage);
                                 ClearQueueUsingSkill();
