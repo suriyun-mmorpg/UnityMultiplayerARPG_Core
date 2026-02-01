@@ -152,7 +152,8 @@ namespace MultiplayerARPG
 
         protected override void UpdateData()
         {
-            Data.ForceMakeCaches();
+            if (Data != null)
+                Data.ForceMakeCaches();
             base.UpdateData();
             UpdateLevel();
             UpdateMp();
