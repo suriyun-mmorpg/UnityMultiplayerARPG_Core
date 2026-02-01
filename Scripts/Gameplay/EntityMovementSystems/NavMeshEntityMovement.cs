@@ -1,56 +1,34 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using System.Collections.Generic;
+using Cysharp.Threading.Tasks;
 using Insthync.ManagedUpdating;
 using LiteNetLib.Utils;
 using LiteNetLibManager;
-using System.Buffers;
-using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
-    /// <summary>
-    /// If `movementSecure` is `NotSecure`
-    /// - Owner client will simulate movement (stored in `_inputBuffers`, storing in `KeyMovement` and `PointClickMovement` functions)
-    /// - Owner client will sync transform to server (stored in `_syncBuffers`, storing in `LogicUpdater_OnTick` function)
-    /// - Server will sync transform to clients
-    /// - Server and other clients will interpolate transform by synced buffers (stored in `_syncBuffers`)
-    /// If `movementSecure` is `ServerAuthoritative`
-    /// - Owner client will simulate movement (stored in `_inputBuffers`, storing in `KeyMovement` and `PointClickMovement` functions)
-    /// - Owner client will send inputs to server
-    /// - Server will simulate movement (stored in `_inputBuffers`)
-    /// - Server will sync transform to clients
-    /// - Other clients will interpolate transform by synced buffers (stored in `_syncBuffers`)
-    /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IManagedUpdate
     {
-        protected const int TICK_COUNT_FOR_INTERPOLATION = 1;
-        protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
-        protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
-        protected const float MIN_DISTANCE_TO_TELEPORT = 0.1f;
+        protected static readonly float s_minMagnitudeToDetermineMoving = 0.01f;
+        protected static readonly float s_minDistanceToSimulateMovement = 0.01f;
+        protected static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
         protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("NavMeshEntityMovement - Update");
-
-        [Header("Networking Settings")]
-        public MovementSecure movementSecure = MovementSecure.NotSecure;
-        [Tooltip("If distance between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
-        [Min(0.01f)]
-        public float positionThreshold = 0.01f;
-        [Tooltip("If angle between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
-        [Min(0.01f)]
-        public float eulerAnglesThreshold = 1f;
-        [Tooltip("Keep alive ticks before it is stop syncing (after has no changes)")]
-        public int keepAliveTicks = 10;
 
         [Header("Movement Settings")]
         public ObstacleAvoidanceType obstacleAvoidanceWhileMoving = ObstacleAvoidanceType.MedQualityObstacleAvoidance;
         public ObstacleAvoidanceType obstacleAvoidanceWhileStationary = ObstacleAvoidanceType.NoObstacleAvoidance;
+        public MovementSecure movementSecure = MovementSecure.NotSecure;
 
         [Header("Dashing")]
         public EntityMovementForceApplierData dashingForceApplier = EntityMovementForceApplierData.CreateDefault();
 
-        public NavMeshAgent CacheNavMeshAgent { get; protected set; }
+        [Header("Networking Settings")]
+        public float snapThreshold = 5.0f;
+
+        public NavMeshAgent CacheNavMeshAgent { get; private set; }
         public IEntityTeleportPreparer TeleportPreparer { get; protected set; }
         public bool IsPreparingToTeleport { get { return TeleportPreparer != null && TeleportPreparer.IsPreparingToTeleport; } }
         public float StoppingDistance
@@ -62,41 +40,50 @@ namespace MultiplayerARPG
         public DirectionVector2 Direction2D { get { return Vector2.down; } set { } }
         public float CurrentMoveSpeed { get { return CacheNavMeshAgent.isStopped ? 0f : CacheNavMeshAgent.speed; } }
 
-        // Inputs
-        protected MovementInputData3D _currentInput;
-        protected bool _willResetInput = false;
-        protected SortedList<uint, MovementInputData3D> _inputBuffers = new SortedList<uint, MovementInputData3D>();
-        protected SortedList<uint, MovementSyncData3D> _syncBuffers = new SortedList<uint, MovementSyncData3D>();
-        protected SortedList<uint, MovementSyncData3D> _interpBuffers = new SortedList<uint, MovementSyncData3D>();
-        protected LogicUpdater _logicUpdater = null;
-        protected uint _simTick = 0;
-        protected uint _interpTick = 0;
-        public uint RenderTick => _interpTick - TICK_COUNT_FOR_INTERPOLATION;
-
-        // Syncing/Interpolating
-        protected MovementSyncData3D _prevSyncData;
-        protected MovementSyncData3D _interpFromData;
-        protected MovementSyncData3D _interpToData;
-        protected uint _prevInterpFromTick;
-        protected float _startInterpTime;
-        protected float _endInterpTime;
-
-        // Teleportation
-        protected MovementTeleportState _serverTeleportState;
-        protected uint _teleportRespondedTick;
-        protected MovementTeleportState _clientTeleportState;
+        // Input codes
+        protected bool _isDashing;
+        protected Vector3 _inputDirection;
+        protected ExtraMovementState _tempExtraMovementState;
+        protected bool _moveByDestination;
 
         // Move simulate codes
-        protected Vector3? _prevPointClickPosition = null;
-
-        // Force simulation
         protected readonly List<EntityMovementForceApplier> _movementForceAppliers = new List<EntityMovementForceApplier>();
         protected IEntityMovementForceUpdateListener[] _forceUpdateListeners;
+
+        // Client state codes
+        protected EntityMovementInput _oldInput;
+        protected EntityMovementInput _currentInput;
+        protected bool _sendingDash;
+
+        // State simulate codes
+        protected float? _lagMoveSpeedRate;
 
         // Turn simulate codes
         protected bool _lookRotationApplied;
         protected float _yAngle;
+        protected float _targetYAngle;
         protected float _yTurnSpeed;
+        private float? _remoteTargetYAngle;
+
+        // Teleport codes
+        protected bool _isTeleporting;
+        protected bool _stillMoveAfterTeleport;
+
+        // Peers accept codes
+        protected bool _acceptedDash;
+        protected long _acceptedPositionTimestamp;
+        protected MovementState _acceptedMovementStateBeforeStopped;
+        protected ExtraMovementState _acceptedExtraMovementStateBeforeStopped;
+
+        // Server validate codes
+        private Vector3? _acceptedPosition = null;
+        private float _accumulateDeltaTime = 0f;
+        private float _accumulateDiffMoveDist = 0f;
+        protected bool _isServerWaitingTeleportConfirm;
+
+        // Client confirm codes
+        protected bool _isClientConfirmingTeleport;
+        protected bool _isStarted;
 
         protected virtual void Awake()
         {
@@ -104,6 +91,7 @@ namespace MultiplayerARPG
             CacheNavMeshAgent = gameObject.GetOrAddComponent<NavMeshAgent>();
             TeleportPreparer = gameObject.GetComponent<IEntityTeleportPreparer>();
             _forceUpdateListeners = gameObject.GetComponents<IEntityMovementForceUpdateListener>();
+
             // Disable unused component
             LiteNetLibTransform disablingComp = gameObject.GetComponent<LiteNetLibTransform>();
             if (disablingComp != null)
@@ -111,49 +99,22 @@ namespace MultiplayerARPG
                 Logging.LogWarning(nameof(NavMeshEntityMovement), "You can remove `LiteNetLibTransform` component from game entity, it's not being used anymore [" + name + "]");
                 disablingComp.enabled = false;
             }
-            // Setup
             Rigidbody rigidBody = gameObject.GetComponent<Rigidbody>();
             if (rigidBody != null)
             {
                 rigidBody.useGravity = false;
                 rigidBody.isKinematic = true;
             }
-            _currentInput = new MovementInputData3D();
-            StopMoveFunction();
-            _clientTeleportState = MovementTeleportState.Responding;
-            Entity.onIdentityInitialize += EntityOnIdentityInitialize;
-        }
-
-        private void EntityOnIdentityInitialize()
-        {
-            Entity.onIdentityInitialize -= EntityOnIdentityInitialize;
-            if (_logicUpdater == null)
-            {
-                _logicUpdater = Manager.LogicUpdater;
-                _logicUpdater.OnTick += LogicUpdater_OnTick;
-            }
-            _interpFromData = _interpToData = new MovementSyncData3D()
-            {
-                Position = EntityTransform.position,
-                Rotation = EntityTransform.eulerAngles.y,
-                MovementState = MovementState,
-                ExtraMovementState = ExtraMovementState,
-            };
-            ResetBuffersAndStates();
-        }
-
-        public override void OnSetOwnerClient(bool isOwnerClient)
-        {
-            CacheNavMeshAgent.enabled = CanSimulateMovement();
-            ResetBuffersAndStates();
-            // Force setup sim tick
-            if (IsOwnerClientOrOwnedByServer)
-                _simTick = Manager.LocalTick;
+            // Setup
+            _yAngle = _targetYAngle = EntityTransform.eulerAngles.y;
+            _lookRotationApplied = true;
+            _isClientConfirmingTeleport = true;
+            _isStarted = true;
         }
 
         private void OnEnable()
         {
-            CacheNavMeshAgent.enabled = CanSimulateMovement();
+            CacheNavMeshAgent.enabled = true;
             UpdateManager.Register(this);
         }
 
@@ -163,127 +124,128 @@ namespace MultiplayerARPG
             UpdateManager.Unregister(this);
         }
 
-        protected void ResetBuffersAndStates()
+        public void KeyMovement(Vector3 moveDirection, MovementState movementState)
         {
-            _inputBuffers.Clear();
-            _syncBuffers.Clear();
-            _interpBuffers.Clear();
-            ClearInterpolationTick();
-            ClearSimulationTick();
-            // Setup data for syncing determining
-            _prevSyncData = new MovementSyncData3D()
+            if (!Entity.CanMove())
+                return;
+            if (CanPredictMovement())
             {
-                Tick = Manager.LocalTick,
-                Position = EntityTransform.position,
-                MovementState = MovementState,
-                ExtraMovementState = ExtraMovementState,
-                Rotation = EntityTransform.eulerAngles.y,
-            };
-            _yAngle = EntityTransform.eulerAngles.y;
-            _lookRotationApplied = true;
-        }
-
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            if (_logicUpdater != null)
-                _logicUpdater.OnTick -= LogicUpdater_OnTick;
-        }
-
-        protected void LogicUpdater_OnTick(LogicUpdater updater)
-        {
-            // Tick count for interpolation
-            _simTick++;
-            _interpTick++;
-
-            // Storing sync buffers, server will send to other clients, owner client will send to server
-            bool willSync = false;
-            switch (movementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    if (IsServer)
-                        willSync = true;
-                    break;
-                default:
-                    if (IsServer || IsOwnerClient)
-                        willSync = true;
-                    break;
-            }
-            if (willSync)
-            {
-                float rotation = EntityTransform.eulerAngles.y;
-                MovementSyncData3D syncData = _prevSyncData;
-                bool changed =
-                    Vector3.Distance(EntityTransform.position, syncData.Position) > positionThreshold ||
-                    MovementState != syncData.MovementState || ExtraMovementState != syncData.ExtraMovementState ||
-                    Mathf.Abs(rotation - syncData.Rotation) > eulerAnglesThreshold;
-                bool keepAlive = updater.LocalTick - syncData.Tick <= keepAliveTicks;
-
-                if (!changed && !keepAlive)
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                _inputDirection = moveDirection;
+                if (_inputDirection.sqrMagnitude > 0)
                 {
-                    // No changes, not going to keep alive, clear sync buffers
-                    _syncBuffers.Clear();
-                    return;
+                    _moveByDestination = false;
+                    CacheNavMeshAgent.updatePosition = true;
+                    CacheNavMeshAgent.updateRotation = false;
+                    if (CacheNavMeshAgent.isOnNavMesh)
+                        CacheNavMeshAgent.isStopped = true;
                 }
-
-                if (changed)
-                {
-                    syncData.Tick = updater.LocalTick;
-                    syncData.Position = EntityTransform.position;
-                    syncData.MovementState = MovementState;
-                    syncData.ExtraMovementState = ExtraMovementState;
-                    syncData.Rotation = rotation;
-                }
-                _prevSyncData = syncData;
-
-                syncData.Tick = updater.LocalTick;
-                // Stored buffers will be send later
-                StoreSyncBuffer(syncData, 3);
+                if (!_isDashing)
+                    _isDashing = movementState.Has(MovementState.IsDash);
             }
+        }
 
-            if (!IsServer && IsOwnerClient)
+        public void PointClickMovement(Vector3 position)
+        {
+            if (!Entity.CanMove())
+                return;
+            if (CanPredictMovement())
             {
-                _currentInput.Tick = _simTick - 1;
-                StoreInputBuffer(_currentInput, 3);
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                SetMovePaths(position);
             }
-            _willResetInput = true;
         }
 
-        public bool CanSimulateMovement()
+        public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
-            switch (movementSecure)
+            if (!Entity.CanMove())
+                return;
+            if (CanPredictMovement())
             {
-                case MovementSecure.ServerAuthoritative:
-                    return Entity.IsServer || Entity.IsOwnerClientOrOwnedByServer;
-                default:
-                    return Entity.IsOwnerClientOrOwnedByServer;
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                _tempExtraMovementState = extraMovementState;
             }
         }
 
-        protected void SetupSimulationTick(uint simTick)
+        public void StopMove()
         {
-            if (_simTick > simTick && _simTick - simTick > 2)
-                _simTick = simTick;
-            if (simTick > _simTick && simTick - _simTick > 2)
-                _simTick = simTick;
+            if (movementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Send movement input to server, then server will apply movement and sync transform to clients
+                _currentInput = Entity.SetInputStop(_currentInput);
+            }
+            StopMoveFunction();
         }
 
-        protected void ClearSimulationTick()
+        private void StopMoveFunction()
         {
-            _simTick = 0;
+            _inputDirection = Vector3.zero;
+            _moveByDestination = false;
+            CacheNavMeshAgent.updatePosition = false;
+            CacheNavMeshAgent.updateRotation = false;
+            if (CacheNavMeshAgent.isOnNavMesh)
+                CacheNavMeshAgent.isStopped = true;
         }
 
-        protected void SetupInterpolationTick(uint interpTick)
+        public void SetLookRotation(Quaternion rotation, bool immediately)
         {
-            if (_interpTick > interpTick && _interpTick - interpTick > 2)
-                _interpTick = interpTick;
-            if (interpTick > _interpTick && interpTick - _interpTick > 2)
-                _interpTick = interpTick;
+            if (!Entity.CanMove() || !Entity.CanTurn())
+                return;
+            if (CanPredictMovement())
+            {
+                // Always apply movement to owner client (it's client prediction for server auth movement)
+                _targetYAngle = rotation.eulerAngles.y;
+                _lookRotationApplied = false;
+                if (immediately)
+                    TurnImmediately(_targetYAngle);
+            }
         }
 
-        protected void ClearInterpolationTick()
+        public Quaternion GetLookRotation()
         {
-            _interpTick = 0;
+            return Quaternion.Euler(0f, EntityTransform.eulerAngles.y, 0f);
+        }
+
+        public void SetSmoothTurnSpeed(float turnDuration)
+        {
+            _yTurnSpeed = turnDuration;
+        }
+
+        public float GetSmoothTurnSpeed()
+        {
+            return _yTurnSpeed;
+        }
+
+        public async void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
+        {
+            if (!IsServer)
+            {
+                Logging.LogWarning(nameof(NavMeshEntityMovement), "Teleport function shouldn't be called at client [" + name + "]");
+                return;
+            }
+            if (IsPreparingToTeleport)
+                return;
+            _acceptedPosition = position;
+            _isTeleporting = true;
+            _stillMoveAfterTeleport = stillMoveAfterTeleport;
+            if (TeleportPreparer != null)
+                await TeleportPreparer.PrepareToTeleport(position, rotation);
+            OnTeleport(position, rotation.eulerAngles.y, stillMoveAfterTeleport);
+        }
+
+        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
+        {
+            result = fromPosition;
+            float findDist = 1f;
+            NavMeshHit navHit;
+            while (!NavMesh.SamplePosition(fromPosition, out navHit, findDist, NavMesh.AllAreas))
+            {
+                findDist += 1f;
+                if (findDist > findDistance)
+                    return false;
+            }
+            result = navHit.position;
+            return true;
         }
 
         public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
@@ -311,222 +273,6 @@ namespace MultiplayerARPG
             _movementForceAppliers.Clear();
         }
 
-        public bool FindGroundedPosition(Vector3 fromPosition, float findDistance, out Vector3 result)
-        {
-            result = fromPosition;
-            float findDist = 1f;
-            NavMeshHit navHit;
-            while (!NavMesh.SamplePosition(fromPosition, out navHit, findDist, NavMesh.AllAreas))
-            {
-                findDist += 1f;
-                if (findDist > findDistance)
-                    return false;
-            }
-            result = navHit.position;
-            return true;
-        }
-
-        public Bounds GetMovementBounds()
-        {
-            Vector3 agentPosition = transform.position;
-            Vector3 lossyScale = transform.lossyScale;
-
-            // Calculate the scaled extents using lossy scale
-            float scaledRadius = CacheNavMeshAgent.radius * Mathf.Max(lossyScale.x, lossyScale.z);
-            float scaledHeight = CacheNavMeshAgent.height * lossyScale.y;
-            float baseOffset = CacheNavMeshAgent.baseOffset * lossyScale.y;
-
-            // Adjust the center to include the baseOffset and scale
-            Vector3 center = new Vector3(agentPosition.x, agentPosition.y + baseOffset + (scaledHeight * 0.5f), agentPosition.z);
-            Vector3 size = new Vector3(scaledRadius * 2, scaledHeight, scaledRadius * 2);
-            return new Bounds(center, size);
-        }
-
-        protected void SetMovePaths(Vector3 position)
-        {
-            if (!Entity.CanMove())
-                return;
-            CacheNavMeshAgent.updatePosition = true;
-            CacheNavMeshAgent.updateRotation = false;
-            if (CacheNavMeshAgent.isOnNavMesh)
-            {
-                CacheNavMeshAgent.isStopped = false;
-                NavMeshPath path = new NavMeshPath();
-                NavMesh.CalculatePath(EntityTransform.position, position, CacheNavMeshAgent.areaMask, path);
-                CacheNavMeshAgent.SetPath(path);
-            }
-        }
-
-        public void SetSmoothTurnSpeed(float turnDuration)
-        {
-            _yTurnSpeed = turnDuration;
-        }
-
-        public float GetSmoothTurnSpeed()
-        {
-            return _yTurnSpeed;
-        }
-
-        public void KeyMovement(Vector3 moveDirection, MovementState movementState)
-        {
-            if (!Entity.IsOwnerClientOrOwnedByServer)
-                return;
-
-            if (moveDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
-                _currentInput.IsPointClick = false;
-            bool hasIsJump = movementState.Has(MovementState.IsJump);
-            bool hasIsDash = movementState.Has(MovementState.IsDash);
-            bool prevHasIsJump = _currentInput.MovementState.Has(MovementState.IsJump);
-            bool prevHasIsDash = _currentInput.MovementState.Has(MovementState.IsDash);
-            if (!_currentInput.MovementState.HasDirectionMovement())
-                _currentInput.MovementState = movementState;
-            if (hasIsJump || prevHasIsJump)
-                _currentInput.MovementState |= MovementState.IsJump;
-            if (hasIsDash || prevHasIsDash)
-                _currentInput.MovementState |= MovementState.IsDash;
-            if (_currentInput.MoveDirection.ToVector3().sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
-                _currentInput.MoveDirection = moveDirection;
-            if (_currentInput.LookDirection.ToVector3().sqrMagnitude <= MIN_DIRECTION_SQR_MAGNITUDE)
-                _currentInput.LookDirection = moveDirection;
-        }
-
-        public virtual void PointClickMovement(Vector3 position)
-        {
-            if (!Entity.IsOwnerClientOrOwnedByServer)
-                return;
-            _currentInput.IsPointClick = true;
-            _currentInput.Position = position;
-            _currentInput.MoveDirection = Vector3.zero;
-            _currentInput.LookDirection = Vector3.zero;
-        }
-
-        public void SetExtraMovementState(ExtraMovementState extraMovementState)
-        {
-            if (!Entity.IsOwnerClientOrOwnedByServer)
-                return;
-            if (_currentInput.ExtraMovementState == ExtraMovementState.None)
-                _currentInput.ExtraMovementState = extraMovementState;
-        }
-
-        public void SetLookRotation(Quaternion rotation, bool immediately)
-        {
-            if (!Entity.IsOwnerClientOrOwnedByServer)
-                return;
-            Vector3 lookDirection = rotation * Vector3.forward;
-            _currentInput.LookDirection = lookDirection;
-            _lookRotationApplied = false;
-            if (immediately && Entity.CanTurn())
-                TurnImmediately(rotation.eulerAngles.y);
-        }
-
-        public Quaternion GetLookRotation()
-        {
-            return Quaternion.Euler(0f, EntityTransform.eulerAngles.y, 0f);
-        }
-
-        public void StopMove()
-        {
-            if (Entity.IsOwnerClientOrOwnedByServer)
-            {
-                // Send movement input to server, then server will apply movement and sync transform to clients
-                uint tick = Manager.LocalTick;
-                _inputBuffers[tick] = new MovementInputData3D()
-                {
-                    Tick = tick,
-                    IsStopped = true,
-                    IsPointClick = false,
-                };
-            }
-            StopMoveFunction();
-        }
-
-        protected void StopMoveFunction()
-        {
-            CacheNavMeshAgent.updatePosition = false;
-            CacheNavMeshAgent.updateRotation = false;
-            if (CacheNavMeshAgent.isOnNavMesh)
-                CacheNavMeshAgent.isStopped = true;
-            MovementState movementState = MovementState;
-            movementState &= ~MovementState.Forward;
-            movementState &= ~MovementState.Backward;
-            movementState &= ~MovementState.Right;
-            movementState &= ~MovementState.Left;
-            movementState &= ~MovementState.Up;
-            movementState &= ~MovementState.Down;
-            MovementState = movementState;
-        }
-
-        public async void Teleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
-        {
-            if (!IsServer)
-            {
-                Logging.LogWarning(nameof(NavMeshEntityMovement), $"Teleport function shouldn't be called at client {name}");
-                return;
-            }
-            if (_serverTeleportState != MovementTeleportState.None)
-            {
-                // Still waiting for teleport responding
-                return;
-            }
-            await OnTeleport(position, rotation, stillMoveAfterTeleport);
-        }
-
-        protected virtual async UniTask OnTeleport(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
-        {
-            if (Vector3.Distance(position, EntityTransform.position) <= MIN_DISTANCE_TO_TELEPORT)
-            {
-                // Too close to teleport
-                return;
-            }
-            // Prepare before move
-            if (IsServer && !IsOwnerClientOrOwnedByServer)
-            {
-                _serverTeleportState = MovementTeleportState.WaitingForResponse;
-            }
-            if (TeleportPreparer != null)
-            {
-                await TeleportPreparer.PrepareToTeleport(position, rotation);
-            }
-            // Move character to target position
-            Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
-            CacheNavMeshAgent.Warp(position);
-            if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
-            {
-                CacheNavMeshAgent.isStopped = true;
-            }
-            if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
-            {
-                CacheNavMeshAgent.SetDestination(beforeWarpDest);
-            }
-            TurnImmediately(rotation.eulerAngles.y);
-            // Prepare teleporation states
-            if (IsServer && !IsOwnerClient)
-            {
-                _serverTeleportState = MovementTeleportState.Requesting;
-                if (stillMoveAfterTeleport)
-                    _serverTeleportState |= MovementTeleportState.StillMoveAfterTeleport;
-                if (!IsOwnedByServer)
-                    _serverTeleportState |= MovementTeleportState.WaitingForResponse;
-            }
-            if (!IsServer && IsOwnerClient)
-            {
-                _clientTeleportState = MovementTeleportState.Responding;
-            }
-        }
-
-        public async UniTask WaitClientTeleportConfirm()
-        {
-            while (this != null && _serverTeleportState != MovementTeleportState.None)
-            {
-                await UniTask.Delay(100);
-            }
-        }
-
-        public bool IsWaitingClientTeleportConfirm()
-        {
-            return _serverTeleportState != MovementTeleportState.None;
-        }
-
         protected float GetPathRemainingDistance()
         {
             if (CacheNavMeshAgent.pathPending ||
@@ -551,247 +297,32 @@ namespace MultiplayerARPG
             return distance;
         }
 
-        public void ManagedUpdate()
+        public virtual void ManagedUpdate()
         {
-            // Simulate movement by inputs if it can predict movement
-            if (CanSimulateMovement())
+            using (s_UpdateProfilerMarker.Auto())
             {
-                SimulateMovementFromInput(Time.deltaTime);
-                if (_willResetInput)
-                {
-                    _willResetInput = false;
-                    _currentInput = new MovementInputData3D()
-                    {
-                        IsPointClick = _currentInput.IsPointClick,
-                        Position = _currentInput.Position,
-                    };
-                }
-            }
-            else
-            {
-                InterpolateTransform();
+                float deltaTime = Time.deltaTime;
+                UpdateMovement(deltaTime);
+                UpdateRotation(deltaTime);
+                _isDashing = false;
+                _acceptedDash = false;
             }
         }
 
-        protected void SimulateMovementFromInput(float deltaTime)
-        {
-            if (IsServer && _serverTeleportState != MovementTeleportState.None)
-            {
-                // Waiting for client teleport confirmation
-                return;
-            }
-
-            MovementInputData3D inputData;
-            if (IsOwnerClientOrOwnedByServer)
-            {
-                inputData = _currentInput;
-            }
-            else if (!TryGetInputBuffer(out inputData))
-            {
-                inputData = new MovementInputData3D()
-                {
-                    Tick = 0,
-                    IsStopped = false,
-                    IsPointClick = false,
-                    Position = Vector3.zero,
-                    MovementState = MovementState.None,
-                    ExtraMovementState = ExtraMovementState,
-                    MoveDirection = Vector3.zero,
-                    LookDirection = EntityTransform.forward,
-                };
-                if (_prevPointClickPosition.HasValue)
-                {
-                    inputData.IsPointClick = true;
-                    inputData.Position = _prevPointClickPosition.Value;
-                }
-            }
-
-            UpdateMovement(deltaTime, ref inputData);
-            UpdateRotation(deltaTime, ref inputData);
-        }
-
-        protected void InterpolateTransform()
-        {
-            if (IsServer && _serverTeleportState != MovementTeleportState.None)
-            {
-                // Waiting for client teleport confirmation
-                return;
-            }
-
-            if (_interpBuffers.Count < 2)
-            {
-                // Not ready for interpolation
-                _prevInterpFromTick = 0;
-                return;
-            }
-
-            float currentTime = Time.time;
-            uint renderTick = RenderTick;
-
-            // Find two ticks around renderTick
-            uint interpFromTick = 0;
-            uint interpToTick = 0;
-
-            for (int i = 0; i < _interpBuffers.Count - 1; ++i)
-            {
-                uint tick1 = _interpBuffers.Keys[i];
-                uint tick2 = _interpBuffers.Keys[i + 1];
-                MovementSyncData3D data1 = _interpBuffers[tick1];
-                MovementSyncData3D data2 = _interpBuffers[tick2];
-
-                if (tick1 <= renderTick && renderTick <= tick2)
-                {
-                    // TODO: Speed hack checking here
-                    interpFromTick = tick1;
-                    interpToTick = tick2;
-                    _interpFromData = data1;
-                    _interpToData = data2;
-                    if (_prevInterpFromTick != interpFromTick)
-                    {
-                        _startInterpTime = currentTime;
-                        _endInterpTime = currentTime + (_logicUpdater.DeltaTimeF * (tick2 - tick1));
-                        _prevInterpFromTick = interpFromTick;
-                    }
-                    break;
-                }
-            }
-
-            if (_interpToData.Tick < 2)
-                return;
-
-            float t = Mathf.InverseLerp(_startInterpTime, _endInterpTime, currentTime);
-            Vector3 position = Vector3.Lerp(_interpFromData.Position, _interpToData.Position, t);
-            EntityTransform.position = position;
-            float rotation = Mathf.LerpAngle(_interpFromData.Rotation, _interpToData.Rotation, t);
-            EntityTransform.rotation = Quaternion.Euler(0f, rotation, 0f);
-            MovementState = t < 0.75f ? _interpFromData.MovementState : _interpToData.MovementState;
-            ExtraMovementState = t < 0.75f ? _interpFromData.ExtraMovementState : _interpToData.ExtraMovementState;
-        }
-
-        protected bool TryGetInputBuffer(out MovementInputData3D inputData, byte maxLookback = 2)
-        {
-            for (byte i = 0; i <= maxLookback; ++i)
-            {
-                if (_simTick > 0 && _simTick <= i)
-                {
-                    // Not able to look back
-                    break;
-                }
-                if (_inputBuffers.TryGetValue(_simTick - i, out inputData))
-                    return true;
-            }
-            inputData = default;
-            return false;
-        }
-
-        protected void StoreInputBuffer(MovementInputData3D entry, int maxBuffers)
-        {
-            if (!_inputBuffers.ContainsKey(entry.Tick))
-            {
-                _inputBuffers.Add(entry.Tick, entry);
-            }
-            // Prune old ticks (keep last N)
-            while (_inputBuffers.Count > maxBuffers)
-            {
-                _inputBuffers.RemoveAt(0);
-            }
-        }
-
-        protected void StoreInputBuffers(MovementInputData3D[] data, int size, uint acceptTick, int maxBuffers)
-        {
-            for (int i = 0; i < size; ++i)
-            {
-                MovementInputData3D entry = data[i];
-                if (entry.Tick < acceptTick)
-                {
-                    // Don't accept this tick
-                    continue;
-                }
-                if (_inputBuffers.ContainsKey(entry.Tick))
-                {
-                    // This tick is already stored
-                    continue;
-                }
-                _inputBuffers.Add(entry.Tick, entry);
-            }
-            // Prune old ticks (keep last N)
-            while (_inputBuffers.Count > maxBuffers)
-            {
-                _inputBuffers.RemoveAt(0);
-            }
-        }
-
-        protected void StoreSyncBuffer(MovementSyncData3D entry, int maxBuffers)
-        {
-            if (!_syncBuffers.ContainsKey(entry.Tick))
-            {
-                _syncBuffers.Add(entry.Tick, entry);
-            }
-            // Prune old ticks (keep last N)
-            while (_syncBuffers.Count > maxBuffers)
-            {
-                _syncBuffers.RemoveAt(0);
-            }
-        }
-
-        protected void StoreInterpolateBuffers(MovementSyncData3D[] data, int size, uint acceptTick, int maxBuffers)
-        {
-            for (int i = 0; i < size; ++i)
-            {
-                MovementSyncData3D entry = data[i];
-                if (entry.Tick < acceptTick)
-                {
-                    // Don't accept this tick
-                    continue;
-                }
-                if (_interpBuffers.ContainsKey(entry.Tick))
-                {
-                    // This tick is already stored
-                    continue;
-                }
-                _interpBuffers.Add(entry.Tick, entry);
-            }
-            // Prune old ticks (keep last N)
-            while (_interpBuffers.Count > maxBuffers)
-            {
-                _interpBuffers.RemoveAt(0);
-            }
-        }
-
-        public void UpdateMovement(float deltaTime, ref MovementInputData3D inputData)
+        public void UpdateMovement(float deltaTime)
         {
             if (IsPreparingToTeleport)
                 return;
 
-            if (inputData.IsStopped)
-            {
-                StopMoveFunction();
-                return;
-            }
-
-            bool isDashing = inputData.MovementState.Has(MovementState.IsDash);
-            Vector3 tempInputDirection = Vector3.zero;
-
-            if (!inputData.IsPointClick)
-            {
-                tempInputDirection = inputData.MoveDirection;
-            }
-
-            if (inputData.IsPointClick && (!_prevPointClickPosition.HasValue || Vector3.Distance(_prevPointClickPosition.Value, inputData.Position) > 0.01f))
-            {
-                _prevPointClickPosition = inputData.Position;
-                SetMovePaths(inputData.Position);
-            }
-
-            MovementState = inputData.MovementState;
-            ExtraMovementState = this.ValidateExtraMovementState(MovementState, inputData.ExtraMovementState);
-            isDashing = inputData.MovementState.Has(MovementState.IsDash);
+            // Prepare speed
+            CacheNavMeshAgent.speed = Entity.GetMoveSpeed();
 
             ApplyMovementForceMode replaceMovementForceApplierMode = ApplyMovementForceMode.Default;
             // Update force applying
             // Dashing
-            if (isDashing)
+            if (_acceptedDash || _isDashing)
             {
+                _sendingDash = true;
                 // Can have only one replace movement force applier, so remove stored ones
                 _movementForceAppliers.RemoveReplaceMovementForces();
                 _movementForceAppliers.Add(new EntityMovementForceApplier().Apply(
@@ -811,7 +342,7 @@ namespace MultiplayerARPG
                 // Still dashing to add dash to movement state
                 replaceMovementForceApplierMode = replaceMovementForceApplier.Mode;
                 // Force turn to dashed direction
-                inputData.LookDirection = replaceMovementForceApplier.Direction;
+                _targetYAngle = Quaternion.LookRotation(replaceMovementForceApplier.Direction).eulerAngles.y;
                 // Change move speed to dash force
                 if (CacheNavMeshAgent.hasPath)
                 {
@@ -823,250 +354,419 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (forceMotion.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE && CacheNavMeshAgent.isOnNavMesh)
+            if (forceMotion.magnitude > 0 && CacheNavMeshAgent.isOnNavMesh)
             {
                 CacheNavMeshAgent.Move(forceMotion * deltaTime);
             }
 
             bool isStationary = !CacheNavMeshAgent.isOnNavMesh || CacheNavMeshAgent.isStopped || GetPathRemainingDistance() <= CacheNavMeshAgent.stoppingDistance;
-
-            CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
-            MovementState = MovementState.IsGrounded;
+            if (CanPredictMovement())
+            {
+                CacheNavMeshAgent.obstacleAvoidanceType = isStationary ? obstacleAvoidanceWhileStationary : obstacleAvoidanceWhileMoving;
+                MovementState = MovementState.IsGrounded;
+                if (!replaceMovementForceApplierMode.IsReplaceMovement())
+                {
+                    if (_inputDirection.sqrMagnitude > 0f)
+                    {
+                        // Moving by WASD keys
+                        CacheNavMeshAgent.Move(_inputDirection * CacheNavMeshAgent.speed * deltaTime);
+                        MovementState |= MovementState.Forward;
+                        // Turn character to destination
+                        if (_lookRotationApplied && Entity.CanTurn())
+                            _targetYAngle = Quaternion.LookRotation(_inputDirection).eulerAngles.y;
+                    }
+                    else
+                    {
+                        // Moving by clicked position
+                        MovementState |= CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving ? MovementState.Forward : MovementState.None;
+                        // Turn character to destination
+                        if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
+                            _targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
+                    }
+                }
+                // Update extra movement state
+                ExtraMovementState = this.ValidateExtraMovementState(MovementState, _tempExtraMovementState);
+                // Set current input
+                _currentInput = Entity.SetInputMovementState(_currentInput, MovementState);
+                _currentInput = Entity.SetInputExtraMovementState(_currentInput, ExtraMovementState);
+                if (_inputDirection.sqrMagnitude > 0f)
+                {
+                    _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
+                    _currentInput = Entity.SetInputPosition(_currentInput, EntityTransform.position);
+                }
+                else if (_moveByDestination)
+                {
+                    _currentInput = Entity.SetInputIsKeyMovement(_currentInput, false);
+                    _currentInput = Entity.SetInputPosition(_currentInput, CacheNavMeshAgent.destination);
+                }
+            }
+            else
+            {
+                // Disable obstacle avoidance because it won't predict movement, it is just moving to destination without obstacle avoidance
+                CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
+                if (CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
+                {
+                    MovementState = _acceptedMovementStateBeforeStopped;
+                    ExtraMovementState = _acceptedExtraMovementStateBeforeStopped;
+                }
+                else
+                {
+                    MovementState = MovementState.IsGrounded;
+                    ExtraMovementState = ExtraMovementState.None;
+                }
+            }
 
             if (replaceMovementForceApplierMode == ApplyMovementForceMode.Dash)
                 MovementState |= MovementState.IsDash;
 
-            if (!replaceMovementForceApplierMode.IsReplaceMovement())
-            {
-                if (tempInputDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
-                {
-                    // Moving by WASD keys
-                    MovementState |= MovementState.Forward;
-                    ExtraMovementState = this.ValidateExtraMovementState(MovementState, inputData.ExtraMovementState);
-                    CacheNavMeshAgent.speed = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
-                    CacheNavMeshAgent.updatePosition = true;
-                    CacheNavMeshAgent.updateRotation = false;
-                    if (CacheNavMeshAgent.isOnNavMesh)
-                        CacheNavMeshAgent.isStopped = true;
-                    CacheNavMeshAgent.Move(tempInputDirection * CacheNavMeshAgent.speed * deltaTime);
-                    // Turn character to destination
-                    if (_lookRotationApplied && Entity.CanTurn())
-                        inputData.LookDirection = tempInputDirection;
-                }
-                else
-                {
-                    // Moving by clicked position
-                    bool isMoving = CacheNavMeshAgent.velocity.magnitude > MIN_MAGNITUDE_TO_DETERMINE_MOVING;
-                    MovementState |= isMoving ? MovementState.Forward : MovementState.None;
-                    ExtraMovementState = this.ValidateExtraMovementState(MovementState, inputData.ExtraMovementState);
-                    CacheNavMeshAgent.speed = Entity.GetMoveSpeed(MovementState, ExtraMovementState);
-                    // Turn character to destination
-                    if (isMoving && _lookRotationApplied && Entity.CanTurn())
-                        inputData.LookDirection = CacheNavMeshAgent.velocity.normalized;
-                }
-            }
+            _currentInput = Entity.SetInputYAngle(_currentInput, EntityTransform.eulerAngles.y);
         }
 
-        public void UpdateRotation(float deltaTime, ref MovementInputData3D inputData)
+        public void UpdateRotation(float deltaTime)
         {
-            if (!Entity.CanTurn())
-                return;
-
-            Vector3 lookDirection = inputData.LookDirection;
-
-            // Ignore zero direction to avoid errors
-            if (lookDirection.sqrMagnitude > MIN_DIRECTION_SQR_MAGNITUDE)
-            {
-                // Get yaw from the look direction
-                float targetYAngle = Quaternion.LookRotation(lookDirection, Vector3.up).eulerAngles.y;
-
-                if (_yTurnSpeed <= 0f)
-                {
-                    _yAngle = targetYAngle;
-                }
-                else if (Mathf.Abs(Mathf.DeltaAngle(_yAngle, targetYAngle)) > 1f)
-                {
-                    // Smooth rotation towards target angle
-                    _yAngle = Mathf.LerpAngle(_yAngle, targetYAngle, _yTurnSpeed * deltaTime);
-                }
-            }
-
+            if (_yTurnSpeed <= 0f)
+                _yAngle = _targetYAngle;
+            else if (Mathf.Abs(_yAngle - _targetYAngle) > 1f)
+                _yAngle = Mathf.LerpAngle(_yAngle, _targetYAngle, _yTurnSpeed * deltaTime);
             _lookRotationApplied = true;
             RotateY();
         }
 
-        protected void RotateY()
+        public Bounds GetMovementBounds()
         {
-            EntityTransform.rotation = Quaternion.Euler(0f, _yAngle, 0f);
+            Vector3 agentPosition = transform.position;
+            Vector3 lossyScale = transform.lossyScale;
+
+            // Calculate the scaled extents using lossy scale
+            float scaledRadius = CacheNavMeshAgent.radius * Mathf.Max(lossyScale.x, lossyScale.z);
+            float scaledHeight = CacheNavMeshAgent.height * lossyScale.y;
+            float baseOffset = CacheNavMeshAgent.baseOffset * lossyScale.y;
+
+            // Adjust the center to include the baseOffset and scale
+            Vector3 center = new Vector3(agentPosition.x, agentPosition.y + baseOffset + (scaledHeight * 0.5f), agentPosition.z);
+            Vector3 size = new Vector3(scaledRadius * 2, scaledHeight, scaledRadius * 2);
+            return new Bounds(center, size);
         }
 
-        public bool WriteClientState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
+        private void RotateY()
         {
-            if (_clientTeleportState.Has(MovementTeleportState.Responding))
+            EntityTransform.eulerAngles = new Vector3(0f, _yAngle, 0f);
+        }
+
+        private void SetMovePaths(Vector3 position)
+        {
+            if (!Entity.CanMove())
+                return;
+            _inputDirection = Vector3.zero;
+            _moveByDestination = true;
+            CacheNavMeshAgent.updatePosition = true;
+            CacheNavMeshAgent.updateRotation = false;
+            if (CacheNavMeshAgent.isOnNavMesh)
             {
-                shouldSendReliably = true;
-                writer.Put((byte)_clientTeleportState);
-                _clientTeleportState = MovementTeleportState.None;
-                return true;
-            }
-            shouldSendReliably = false;
-            switch (movementSecure)
-            {
-                case MovementSecure.ServerAuthoritative:
-                    if (_inputBuffers.Count == 0 && _clientTeleportState == MovementTeleportState.None)
-                        return false;
-                    writer.Put((byte)_clientTeleportState);
-                    writer.Put((byte)_inputBuffers.Count);
-                    for (int i = 0; i < _inputBuffers.Count; ++i)
-                    {
-                        writer.Put(_inputBuffers.Values[i]);
-                    }
-                    return true;
-                default:
-                    if (_syncBuffers.Count == 0 && _clientTeleportState == MovementTeleportState.None)
-                        return false;
-                    writer.Put((byte)_clientTeleportState);
-                    writer.Put((byte)_syncBuffers.Count);
-                    for (int i = 0; i < _syncBuffers.Count; ++i)
-                    {
-                        writer.Put(_syncBuffers.Values[i]);
-                    }
-                    return true;
+                CacheNavMeshAgent.isStopped = false;
+
+                NavMeshPath path = new NavMeshPath();
+                NavMesh.CalculatePath(transform.position, position, CacheNavMeshAgent.areaMask, path);
+                CacheNavMeshAgent.SetPath(path);
             }
         }
 
-        public bool WriteServerState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
-            if (_serverTeleportState.Has(MovementTeleportState.Requesting))
-            {
-                _syncBuffers.Clear();
-                shouldSendReliably = true;
-                writer.Put((byte)_serverTeleportState);
-                writer.Put(EntityTransform.position.x);
-                writer.Put(EntityTransform.position.y);
-                writer.Put(EntityTransform.position.z);
-                writer.PutPackedUShort(Mathf.FloatToHalf(EntityTransform.eulerAngles.y));
-                if (!IsOwnerClientOrOwnedByServer)
-                    _serverTeleportState = MovementTeleportState.WaitingForResponse;
-                else
-                    _serverTeleportState = MovementTeleportState.None;
-                return true;
-            }
             shouldSendReliably = false;
-            if (_syncBuffers.Count == 0 && _serverTeleportState == MovementTeleportState.None)
+            if (!_isStarted)
                 return false;
-            writer.Put((byte)_serverTeleportState);
-            writer.Put((byte)_syncBuffers.Count);
-            for (int i = 0; i < _syncBuffers.Count; ++i)
+            if (movementSecure == MovementSecure.NotSecure && IsOwnerClient && !IsServer)
             {
-                writer.Put(_syncBuffers.Values[i]);
+                // Sync transform from owner client to server (except it's both owner client and server)
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsDash;
+                }
+                else
+                {
+                    MovementState &= ~MovementState.IsDash;
+                }
+                if (_isClientConfirmingTeleport)
+                {
+                    shouldSendReliably = true;
+                    MovementState |= MovementState.IsTeleport;
+                }
+                this.ClientWriteSyncTransform3D(writer);
+                _sendingDash = false;
+                _isClientConfirmingTeleport = false;
+                return true;
             }
+            if (movementSecure == MovementSecure.ServerAuthoritative && IsOwnerClient && !IsServer)
+            {
+                _currentInput = Entity.SetInputExtraMovementState(_currentInput, _tempExtraMovementState);
+                if (_sendingDash)
+                {
+                    shouldSendReliably = true;
+                    _currentInput = Entity.SetInputDash(_currentInput);
+                }
+                else
+                {
+                    _currentInput = Entity.ClearInputDash(_currentInput);
+                }
+                if (_isClientConfirmingTeleport)
+                {
+                    shouldSendReliably = true;
+                    _currentInput.MovementState |= MovementState.IsTeleport;
+                }
+                if (Entity.DifferInputEnoughToSend(_oldInput, _currentInput, out EntityMovementInputState inputState))
+                {
+                    if (!_currentInput.IsKeyMovement)
+                    {
+                        // Point click should be reliably
+                        shouldSendReliably = true;
+                    }
+                    this.ClientWriteMovementInput3D(writer, inputState, _currentInput);
+                    _sendingDash = false;
+                    _isClientConfirmingTeleport = false;
+                    _oldInput = _currentInput;
+                    _currentInput = null;
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
+        {
+            shouldSendReliably = false;
+            if (!_isStarted)
+                return false;
+            if (_sendingDash)
+            {
+                shouldSendReliably = true;
+                MovementState |= MovementState.IsDash;
+            }
+            else
+            {
+                MovementState &= ~MovementState.IsDash;
+            }
+            if (_isTeleporting)
+            {
+                shouldSendReliably = true;
+                if (_stillMoveAfterTeleport)
+                    MovementState |= MovementState.IsTeleport;
+                else
+                    MovementState = MovementState.IsTeleport;
+            }
+            else
+            {
+                MovementState &= ~MovementState.IsTeleport;
+            }
+            // Sync transform from server to all clients (include owner client)
+            this.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
+            _isTeleporting = false;
+            _stillMoveAfterTeleport = false;
             return true;
         }
 
-        public void ReadClientStateAtServer(uint peerTick, NetDataReader reader)
+        public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
-            MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
-            if (movementTeleportState.Has(MovementTeleportState.Responding))
-            {
-                _teleportRespondedTick = peerTick;
-                _serverTeleportState = MovementTeleportState.Responded;
-                return;
-            }
-            if (_serverTeleportState.Has(MovementTeleportState.WaitingForResponse))
-            {
-                // Wait for teleportation confirmation
-                return;
-            }
-            if (_serverTeleportState == MovementTeleportState.Responded)
-                ResetBuffersAndStates();
-            byte size;
-            int maxBuffers;
             switch (movementSecure)
             {
-                case MovementSecure.ServerAuthoritative:
-                    size = reader.GetByte();
-                    if (size == 0)
-                    {
-                        _serverTeleportState = MovementTeleportState.None;
-                        return;
-                    }
-                    MovementInputData3D[] inputBuffers = ArrayPool<MovementInputData3D>.Shared.Rent(size);
-                    for (byte i = 0; i < size; ++i)
-                    {
-                        inputBuffers[i] = reader.Get<MovementInputData3D>();
-                    }
-                    if (!IsOwnerClient)
-                    {
-                        maxBuffers = _serverTeleportState == MovementTeleportState.Responded ? 1 : 30;
-                        StoreInputBuffers(inputBuffers, size, _teleportRespondedTick, maxBuffers);
-                        uint simTick = _inputBuffers.Keys[_inputBuffers.Count - 1];
-                        if (Entity.Player != null)
-                            simTick += LogicUpdater.TimeToTick(Entity.Player.Rtt / 2, _logicUpdater.DeltaTime);
-                        SetupSimulationTick(simTick);
-                    }
-                    ArrayPool<MovementInputData3D>.Shared.Return(inputBuffers);
-                    _serverTeleportState = MovementTeleportState.None;
+                case MovementSecure.NotSecure:
+                    ReadSyncTransformAtServer(peerTimestamp, reader);
                     break;
-                default:
-                    size = reader.GetByte();
-                    if (size == 0)
-                    {
-                        _serverTeleportState = MovementTeleportState.None;
-                        return;
-                    }
-                    MovementSyncData3D[] interpoationBuffers = ArrayPool<MovementSyncData3D>.Shared.Rent(size);
-                    for (byte i = 0; i < size; ++i)
-                    {
-                        interpoationBuffers[i] = reader.Get<MovementSyncData3D>();
-                        StoreSyncBuffer(interpoationBuffers[i], 3);
-                    }
-                    maxBuffers = _serverTeleportState == MovementTeleportState.Responded ? 1 : 30;
-                    StoreInterpolateBuffers(interpoationBuffers, size, _teleportRespondedTick, maxBuffers);
-                    uint interpTick = _interpBuffers.Keys[_interpBuffers.Count - 1];
-                    if (Entity.Player != null)
-                        interpTick += LogicUpdater.TimeToTick(Entity.Player.Rtt / 2, _logicUpdater.DeltaTime);
-                    SetupInterpolationTick(interpTick);
-                    ArrayPool<MovementSyncData3D>.Shared.Return(interpoationBuffers);
-                    _serverTeleportState = MovementTeleportState.None;
-                    // Broadcast to other clients immediately
-                    Entity.SendServerState(_logicUpdater.LocalTick);
+                case MovementSecure.ServerAuthoritative:
+                    ReadMovementInputAtServer(peerTimestamp, reader);
                     break;
             }
         }
 
-        public async void ReadServerStateAtClient(uint peerTick, NetDataReader reader)
+        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
-            MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
-            if (movementTeleportState.Has(MovementTeleportState.Requesting))
+            if (IsServer)
             {
-                Vector3 position = new Vector3(
-                    reader.GetFloat(),
-                    reader.GetFloat(),
-                    reader.GetFloat());
-                float rotation = Mathf.HalfToFloat(reader.GetPackedUShort());
-                bool stillMoveAfterTeleport = movementTeleportState.Has(MovementTeleportState.StillMoveAfterTeleport);
-                if (!IsServer)
+                // Don't read and apply transform, because it was done at server
+                return;
+            }
+            if (IsPreparingToTeleport)
+            {
+                // Not ready to apply transform
+                return;
+            }
+            reader.ClientReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers);
+            _movementForceAppliers.Clear();
+            _movementForceAppliers.AddRange(movementForceAppliers);
+            if (movementState.Has(MovementState.IsTeleport))
+            {
+                // Server requested to teleport
+                if (TeleportPreparer != null)
+                    await TeleportPreparer.PrepareToTeleport(position, Quaternion.Euler(0f, yAngle, 0f));
+                OnTeleport(position, yAngle, movementState != MovementState.IsTeleport);
+            }
+            else if (_acceptedPositionTimestamp <= peerTimestamp)
+            {
+                // Prepare time
+                long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+                float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+                if (Vector3.Distance(position, EntityTransform.position) >= snapThreshold)
                 {
-                    _interpBuffers.Clear();
-                    await OnTeleport(position, Quaternion.Euler(0f, rotation, 0f), stillMoveAfterTeleport);
+                    // Snap character to the position if character is too far from the position
+                    if (movementSecure == MovementSecure.ServerAuthoritative || !IsOwnerClient)
+                    {
+                        EntityTransform.eulerAngles = new Vector3(0, yAngle, 0);
+                        CacheNavMeshAgent.Warp(position);
+                    }
                 }
+                else if (!IsOwnerClient)
+                {
+                    RemoteTurnSimulation(yAngle, unityDeltaTime);
+                    SetMovePaths(position);
+                }
+                if (movementState.HasDirectionMovement())
+                {
+                    _acceptedMovementStateBeforeStopped = movementState;
+                    _acceptedExtraMovementStateBeforeStopped = extraMovementState;
+                }
+                _acceptedPositionTimestamp = peerTimestamp;
+            }
+            if (!IsOwnerClient && movementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+                TurnImmediately(yAngle);
+            }
+        }
+
+        public void ReadMovementInputAtServer(long peerTimestamp, NetDataReader reader)
+        {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply inputs, because it was done (this is both owner client and server)
                 return;
             }
-            byte size = reader.GetByte();
-            if (size == 0)
+            if (movementSecure == MovementSecure.NotSecure)
+            {
+                // Movement handling at client, so don't read movement inputs from client (but have to read transform)
                 return;
-            MovementSyncData3D[] interpoationBuffers = ArrayPool<MovementSyncData3D>.Shared.Rent(size);
-            for (byte i = 0; i < size; ++i)
-            {
-                interpoationBuffers[i] = reader.Get<MovementSyncData3D>();
             }
-            if (!IsServer)
+            reader.ReadMovementInputMessage3D(out EntityMovementInputState inputState, out EntityMovementInput entityMovementInput);
+            if (entityMovementInput.MovementState.Has(MovementState.IsTeleport))
             {
-                StoreInterpolateBuffers(interpoationBuffers, size, 0, 30);
-                SetupInterpolationTick(_interpBuffers.Keys[_interpBuffers.Count - 1]);
+                // Teleport confirming from client
+                _isServerWaitingTeleportConfirm = false;
             }
-            ArrayPool<MovementSyncData3D>.Shared.Return(interpoationBuffers);
+            if (_isServerWaitingTeleportConfirm)
+            {
+                // Waiting for teleport confirming
+                return;
+            }
+            if (!Entity.CanMove())
+            {
+                // It can't move, so don't move
+                return;
+            }
+            if (_acceptedPositionTimestamp > peerTimestamp)
+            {
+                // Invalid timestamp
+                return;
+            }
+            // Prepare time
+            long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            _tempExtraMovementState = entityMovementInput.ExtraMovementState;
+            if (inputState.Has(EntityMovementInputState.PositionChanged))
+            {
+                SetMovePaths(entityMovementInput.Position);
+            }
+            if (inputState.Has(EntityMovementInputState.RotationChanged))
+            {
+                RemoteTurnSimulation(entityMovementInput.YAngle, unityDeltaTime);
+            }
+            if (entityMovementInput.MovementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+                if (_remoteTargetYAngle.HasValue)
+                    TurnImmediately(_remoteTargetYAngle.Value);
+                else
+                    TurnImmediately(_targetYAngle);
+            }
+            if (inputState.Has(EntityMovementInputState.IsStopped))
+            {
+                StopMoveFunction();
+            }
+            _acceptedPositionTimestamp = peerTimestamp;
+        }
+
+        public void ReadSyncTransformAtServer(long peerTimestamp, NetDataReader reader)
+        {
+            if (IsOwnerClient)
+            {
+                // Don't read and apply transform, because it was done (this is both owner client and server)
+                return;
+            }
+            if (movementSecure == MovementSecure.ServerAuthoritative)
+            {
+                // Movement handling at server, so don't read sync transform from client
+                return;
+            }
+            reader.ServerReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            if (movementState.Has(MovementState.IsTeleport))
+            {
+                // Teleport confirming from client
+                _isServerWaitingTeleportConfirm = false;
+            }
+            if (_isServerWaitingTeleportConfirm)
+            {
+                // Waiting for teleport confirming
+                return;
+            }
+            if (_acceptedPositionTimestamp > peerTimestamp)
+            {
+                // Invalid timestamp
+                return;
+            }
+            // Prepare time
+            long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
+            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            // Prepare movement state
+            MovementState = movementState;
+            ExtraMovementState = extraMovementState;
+            // Prepare data for validation
+            Vector3 oldPos = _acceptedPosition.HasValue ? _acceptedPosition.Value : EntityTransform.position;
+            Vector3 newPos = position;
+            // Calculate moveable distance
+            float moveSpd = Entity.GetMoveSpeed(movementState, extraMovementState);
+            float moveableDist = moveSpd * unityDeltaTime;
+            if (moveableDist < 0.001f)
+                moveableDist = 0.001f;
+            // Movement validating, if it is valid, set the position follow the client, if not set position to proper one and tell client to teleport
+            float clientMoveDist = Vector3.Distance(oldPos.GetXY(), newPos.GetXY());
+            // Increase accumulate data to detect hacking
+            float moveDistDiff = clientMoveDist > moveableDist ? (clientMoveDist - moveableDist) : 0f;
+            _accumulateDeltaTime += unityDeltaTime;
+            _accumulateDiffMoveDist += moveDistDiff;
+            if (!IsClient)
+            {
+                // If it is not a client, don't have to simulate movement, just set the position (but still simulate gravity)
+                _acceptedPosition = newPos;
+                EntityTransform.position = newPos;
+                CurrentGameManager.ShouldPhysicSyncTransforms = true;
+                // Update character rotation
+                RemoteTurnSimulation(yAngle, unityDeltaTime);
+            }
+            else
+            {
+                // It's both server and client, simulate movement
+                if (Vector3.Distance(position, EntityTransform.position) > s_minDistanceToSimulateMovement)
+                {
+                    _acceptedPosition = newPos;
+                    SetMovePaths(position);
+                }
+                RemoteTurnSimulation(yAngle, unityDeltaTime);
+            }
+            if (movementState.Has(MovementState.IsDash))
+            {
+                _acceptedDash = true;
+                TurnImmediately(yAngle);
+            }
+            _acceptedPositionTimestamp = peerTimestamp;
         }
 
         protected virtual Vector3 GetMoveablePosition(Vector3 oldPos, Vector3 newPos, float clientMoveDist, float moveableDist)
@@ -1076,10 +776,54 @@ namespace MultiplayerARPG
             return oldPos + deltaMove;
         }
 
+        protected virtual void OnTeleport(Vector3 position, float yAngle, bool stillMoveAfterTeleport)
+        {
+            _inputDirection = Vector3.zero;
+            _moveByDestination = false;
+            Vector3 beforeWarpDest = CacheNavMeshAgent.destination;
+            CacheNavMeshAgent.Warp(position);
+            if (!stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
+                CacheNavMeshAgent.isStopped = true;
+            if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
+                CacheNavMeshAgent.SetDestination(beforeWarpDest);
+            TurnImmediately(yAngle);
+            if (IsServer && !IsOwnedByServer)
+                _isServerWaitingTeleportConfirm = true;
+            if (!IsServer && IsOwnerClient)
+                _isClientConfirmingTeleport = true;
+        }
+
+        public bool CanPredictMovement()
+        {
+            return Entity.IsOwnerClient || (Entity.IsOwnerClientOrOwnedByServer && movementSecure == MovementSecure.NotSecure) || (Entity.IsServer && movementSecure == MovementSecure.ServerAuthoritative);
+        }
+
+        public void RemoteTurnSimulation(float yAngle, float deltaTime)
+        {
+            if (!IsClient)
+            {
+                // Turn to target immediately
+                TurnImmediately(yAngle);
+                return;
+            }
+            // Will turn smoothly later
+            _targetYAngle = yAngle;
+            _yTurnSpeed = 1f / deltaTime;
+        }
+
         public void TurnImmediately(float yAngle)
         {
-            _yAngle = yAngle;
+            _yAngle = _targetYAngle = yAngle;
             RotateY();
+        }
+
+        public void ApplyRemoteTurnAngle()
+        {
+            if (_remoteTargetYAngle.HasValue)
+            {
+                _targetYAngle = _remoteTargetYAngle.Value;
+                _remoteTargetYAngle = null;
+            }
         }
 
         public bool AllowToJump()
@@ -1105,6 +849,19 @@ namespace MultiplayerARPG
         public bool AllowToStand()
         {
             return true;
+        }
+
+        public async UniTask WaitClientTeleportConfirm()
+        {
+            while (this != null && _isServerWaitingTeleportConfirm)
+            {
+                await UniTask.Delay(1000);
+            }
+        }
+
+        public bool IsWaitingClientTeleportConfirm()
+        {
+            return _isServerWaitingTeleportConfirm;
         }
     }
 }

@@ -16,23 +16,10 @@ namespace MultiplayerARPG
         /// </summary>
         private const float ABOVE_GROUND_OFFSETS = 0.25f;
 
-        [Header("Network Settings")]
-        public MovementSecure movementSecure = MovementSecure.NotSecure;
-        [Tooltip("If distance between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
-        [Min(0.01f)]
-        public float positionThreshold = 0.01f;
-        [Tooltip("If angle between current frame and previous frame is greater than this value, then it will determine that changes occurs and will sync transform later")]
-        [Min(0.01f)]
-        public float eulerAnglesThreshold = 1f;
-        [Tooltip("Keep alive ticks before it is stop syncing (after has no changes)")]
-        public int keepAliveTicks = 10;
-        [Tooltip("If distance between two interpolating positions more than this value, it will change position to target position immediately")]
-        [Min(0.01f)]
-        public float interpSnapThreshold = 2f;
-
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
         public float stoppingDistance = 0.1f;
+        public MovementSecure movementSecure = MovementSecure.NotSecure;
 
         [Header("Movement Settings")]
         public float jumpHeight = 2f;
@@ -173,7 +160,7 @@ namespace MultiplayerARPG
         protected int _allowToJumpOrDashCheckFrame = 0;
         protected bool _isAllowToJumpOrDash = true;
 
-        private void Awake()
+        protected virtual void Awake()
         {
             // Prepare animator component
             CacheAnimator = GetComponent<Animator>();
@@ -198,12 +185,8 @@ namespace MultiplayerARPG
             // Setup
             Functions = new BuiltInEntityMovementFunctions3D(Entity, CacheAnimator, this)
             {
-                movementSecure = movementSecure,
-                positionThreshold = positionThreshold,
-                eulerAnglesThreshold = eulerAnglesThreshold,
-                keepAliveTicks = keepAliveTicks,
-                interpSnapThreshold = interpSnapThreshold,
                 stoppingDistance = stoppingDistance,
+                movementSecure = movementSecure,
                 jumpHeight = jumpHeight,
                 applyJumpForceMode = applyJumpForceMode,
 
@@ -251,15 +234,10 @@ namespace MultiplayerARPG
                 useRootMotionUnderWater = useRootMotionUnderWater,
                 useRootMotionClimbing = useRootMotionClimbing,
                 rootMotionGroundedVerticalVelocity = rootMotionGroundedVerticalVelocity,
+                
+            	snapThreshold = snapThreshold,
             };
             Functions.StopMoveFunction();
-            Entity.onIdentityInitialize += EntityOnIdentityInitialize;
-        }
-
-        private void EntityOnIdentityInitialize()
-        {
-            Entity.onIdentityInitialize -= EntityOnIdentityInitialize;
-            Functions.EntityOnIdentityInitialize();
         }
 
         private void Start()
@@ -285,12 +263,6 @@ namespace MultiplayerARPG
             Functions.OnSetOwnerClient(isOwnerClient);
         }
 
-        protected override void OnDestroy()
-        {
-            base.OnDestroy();
-            Functions.EntityOnDestroy();
-        }
-
         private void OnAnimatorMove()
         {
             Functions.OnAnimatorMove();
@@ -314,12 +286,8 @@ namespace MultiplayerARPG
         public void ManagedUpdate()
         {
 #if UNITY_EDITOR
-            Functions.movementSecure = movementSecure;
-            Functions.positionThreshold = positionThreshold;
-            Functions.eulerAnglesThreshold = eulerAnglesThreshold;
-            Functions.keepAliveTicks = keepAliveTicks;
-            Functions.interpSnapThreshold = interpSnapThreshold;
             Functions.stoppingDistance = stoppingDistance;
+            Functions.movementSecure = movementSecure;
             Functions.jumpHeight = jumpHeight;
             Functions.applyJumpForceMode = applyJumpForceMode;
             Functions.applyJumpForceFixedDuration = applyJumpForceFixedDuration;
@@ -365,9 +333,14 @@ namespace MultiplayerARPG
             Functions.useRootMotionForJump = useRootMotionForJump;
             Functions.useRootMotionForFall = useRootMotionForFall;
             Functions.useRootMotionUnderWater = useRootMotionUnderWater;
+            Functions.rootMotionGroundedVerticalVelocity = rootMotionGroundedVerticalVelocity;
+            
+            Functions.snapThreshold = snapThreshold;
 #endif
             float deltaTime = Time.deltaTime;
-            Functions.EntityUpdate(deltaTime);
+            Functions.UpdateMovement(deltaTime);
+            Functions.UpdateRotation(deltaTime);
+            Functions.AfterMovementUpdate(deltaTime);
             if (_forceUngroundCountdown > 0f)
                 _forceUngroundCountdown -= deltaTime;
         }
@@ -487,24 +460,24 @@ namespace MultiplayerARPG
             _forceUngroundCountdown = forceUngroundAfterJumpDuration;
         }
 
-        public bool WriteClientState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
-            return Functions.WriteClientState(writeTick, writer, out shouldSendReliably);
+            return Functions.WriteClientState(writeTimestamp, writer, out shouldSendReliably);
         }
 
-        public bool WriteServerState(uint writeTick, NetDataWriter writer, out bool shouldSendReliably)
+        public bool WriteServerState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
         {
-            return Functions.WriteServerState(writeTick, writer, out shouldSendReliably);
+            return Functions.WriteServerState(writeTimestamp, writer, out shouldSendReliably);
         }
 
-        public void ReadClientStateAtServer(uint peerTick, NetDataReader reader)
+        public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
-            Functions.ReadClientStateAtServer(peerTick, reader);
+            Functions.ReadClientStateAtServer(peerTimestamp, reader);
         }
 
-        public void ReadServerStateAtClient(uint peerTick, NetDataReader reader)
+        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
-            Functions.ReadServerStateAtClient(peerTick, reader);
+            Functions.ReadServerStateAtClient(peerTimestamp, reader);
         }
 
         public void StopMove()

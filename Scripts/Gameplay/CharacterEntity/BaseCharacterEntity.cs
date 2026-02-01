@@ -355,42 +355,42 @@ namespace MultiplayerARPG
             }
         }
 
-        public override void SendClientState(uint writeTick)
+        public override void SendClientState(long writeTimestamp)
         {
             s_EntityStateDataWriter.Reset();
-            if (!Movement.IsNull() && Movement.enabled && Movement.WriteClientState(writeTick, s_EntityStateDataWriter, out bool shouldSendReliably))
+            if (!Movement.IsNull() && Movement.enabled && Movement.WriteClientState(writeTimestamp, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                s_EntityStateMessageWriter.PutPackedUInt(writeTick);
+                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ClientSendMessage(MOVEMENT_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
-        public override void SendServerState(uint writeTick)
+        public override void SendServerState(long writeTimestamp)
         {
             s_EntityStateDataWriter.Reset();
-            if (!Movement.IsNull() && Movement.enabled && Movement.WriteServerState(writeTick, s_EntityStateDataWriter, out bool shouldSendReliably))
+            if (!Movement.IsNull() && Movement.enabled && Movement.WriteServerState(writeTimestamp, s_EntityStateDataWriter, out bool shouldSendReliably))
             {
                 TransportHandler.WritePacket(s_EntityStateMessageWriter, GameNetworkingConsts.EntityState);
                 s_EntityStateMessageWriter.PutPackedUInt(ObjectId);
-                s_EntityStateMessageWriter.PutPackedUInt(writeTick);
+                s_EntityStateMessageWriter.PutPackedLong(writeTimestamp);
                 s_EntityStateMessageWriter.Put(s_EntityStateDataWriter.Data, 0, s_EntityStateDataWriter.Length);
                 ServerSendMessageToSubscribers(MOVEMENT_DATA_CHANNEL, shouldSendReliably ? DeliveryMethod.ReliableOrdered : DeliveryMethod.Sequenced, s_EntityStateMessageWriter);
             }
         }
 
-        public override void ReadClientStateAtServer(uint peerTick, NetDataReader reader)
+        public override void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
         {
             if (Movement != null)
-                Movement.ReadClientStateAtServer(peerTick, reader);
+                Movement.ReadClientStateAtServer(peerTimestamp, reader);
         }
 
-        public override void ReadServerStateAtClient(uint peerTick, NetDataReader reader)
+        public override void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             if (Movement != null)
-                Movement.ReadServerStateAtClient(peerTick, reader);
+                Movement.ReadServerStateAtClient(peerTimestamp, reader);
         }
 
         public override void PlayJumpAnimation()
