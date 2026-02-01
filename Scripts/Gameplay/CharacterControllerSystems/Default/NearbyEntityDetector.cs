@@ -43,7 +43,7 @@ namespace MultiplayerARPG
         public readonly List<IPickupActivatableEntity> pickupActivatableEntities = new List<IPickupActivatableEntity>();
         private readonly HashSet<Collider> _excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> _excludeCollider2Ds = new HashSet<Collider2D>();
-        private float _latestDetectTime = -1f;
+        private static float s_latestDetectTime = -1f;
 
         public System.Action onUpdateList;
 
@@ -99,9 +99,9 @@ namespace MultiplayerARPG
                 return;
 
             float currentTime = Time.unscaledTime;
-            if (currentTime - _latestDetectTime > delay)
+            if (currentTime - s_latestDetectTime > delay)
             {
-                _latestDetectTime = currentTime;
+                s_latestDetectTime = currentTime;
                 int tempHitCount;
                 ClearDetection();
                 switch (GameInstance.Singleton.DimensionType)
