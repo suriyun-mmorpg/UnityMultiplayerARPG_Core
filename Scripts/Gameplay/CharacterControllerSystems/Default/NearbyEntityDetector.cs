@@ -9,7 +9,6 @@ namespace MultiplayerARPG
     {
         public float detectingRadius;
         public int resultAllocSize = 128;
-        public float delay = 1f;
         public bool findPlayer;
         public bool findOnlyAlivePlayers;
         public bool findPlayerToAttack;
@@ -43,13 +42,13 @@ namespace MultiplayerARPG
         public readonly List<IPickupActivatableEntity> pickupActivatableEntities = new List<IPickupActivatableEntity>();
         private readonly HashSet<Collider> _excludeColliders = new HashSet<Collider>();
         private readonly HashSet<Collider2D> _excludeCollider2Ds = new HashSet<Collider2D>();
-        private static float s_latestDetectTime = -1f;
 
         public System.Action onUpdateList;
 
         private void Awake()
         {
             gameObject.layer = PhysicLayers.IgnoreRaycast;
+            NearbyEntityDetectorManager.Register(this);
         }
 
         private void OnDestroy()
@@ -93,51 +92,45 @@ namespace MultiplayerARPG
             _excludeCollider2Ds.Clear();
         }
 
-        private void Update()
+        internal void DetectEntities()
         {
-            if (GameInstance.PlayingCharacterEntity == null)
-                return;
-
-            float currentTime = Time.unscaledTime;
-            if (currentTime - s_latestDetectTime > delay)
+            int tempHitCount;
+            ClearDetection();
+            switch (GameInstance.Singleton.DimensionType)
             {
-                s_latestDetectTime = currentTime;
-                int tempHitCount;
-                ClearDetection();
-                switch (GameInstance.Singleton.DimensionType)
-                {
-                    case DimensionType.Dimension2D:
-                        Collider2D[] collider2Ds = ArrayPool<Collider2D>.Shared.Rent(resultAllocSize);
-                        tempHitCount = Physics2D.OverlapCircleNonAlloc(GameInstance.PlayingCharacterEntity.EntityTransform.position, detectingRadius, collider2Ds);
-                        for (int i = 0; i < tempHitCount; ++i)
-                        {
-                            Collider2D other = collider2Ds[i];
-                            if (other == null || _excludeCollider2Ds.Contains(other))
-                                continue;
-                            AddEntity(other.gameObject);
-                        }
-                        ArrayPool<Collider2D>.Shared.Return(collider2Ds);
-                        if (onUpdateList != null)
-                            onUpdateList.Invoke();
-                        break;
-                    default:
-                        Collider[] colliders = ArrayPool<Collider>.Shared.Rent(resultAllocSize);
-                        tempHitCount = Physics.OverlapSphereNonAlloc(GameInstance.PlayingCharacterEntity.EntityTransform.position, detectingRadius, colliders);
-                        for (int i = 0; i < tempHitCount; ++i)
-                        {
-                            Collider other = colliders[i];
-                            if (other == null || _excludeColliders.Contains(other))
-                                continue;
-                            AddEntity(other.gameObject);
-                        }
-                        ArrayPool<Collider>.Shared.Return(colliders);
-                        if (onUpdateList != null)
-                            onUpdateList.Invoke();
-                        break;
-                }
+                case DimensionType.Dimension2D:
+                    Collider2D[] collider2Ds = ArrayPool<Collider2D>.Shared.Rent(resultAllocSize);
+                    tempHitCount = Physics2D.OverlapCircleNonAlloc(GameInstance.PlayingCharacterEntity.EntityTransform.position, detectingRadius, collider2Ds);
+                    for (int i = 0; i < tempHitCount; ++i)
+                    {
+                        Collider2D other = collider2Ds[i];
+                        if (other == null || _excludeCollider2Ds.Contains(other))
+                            continue;
+                        AddEntity(other.gameObject);
+                    }
+                    ArrayPool<Collider2D>.Shared.Return(collider2Ds);
+                    if (onUpdateList != null)
+                        onUpdateList.Invoke();
+                    break;
+                default:
+                    Collider[] colliders = ArrayPool<Collider>.Shared.Rent(resultAllocSize);
+                    tempHitCount = Physics.OverlapSphereNonAlloc(GameInstance.PlayingCharacterEntity.EntityTransform.position, detectingRadius, colliders);
+                    for (int i = 0; i < tempHitCount; ++i)
+                    {
+                        Collider other = colliders[i];
+                        if (other == null || _excludeColliders.Contains(other))
+                            continue;
+                        AddEntity(other.gameObject);
+                    }
+                    ArrayPool<Collider>.Shared.Return(colliders);
+                    if (onUpdateList != null)
+                        onUpdateList.Invoke();
+                    break;
             }
+        }
 
-            // Find nearby entities
+        internal void RemoveInactiveAndSortNearestAllEntity()
+        {
             RemoveInactiveAndSortNearestEntity(characters);
             RemoveInactiveAndSortNearestEntity(players);
             RemoveInactiveAndSortNearestEntity(monsters);
