@@ -824,10 +824,15 @@ namespace MultiplayerARPG
             }
         }
 
-        protected virtual bool OverlappedEntity(ITargetableEntity entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
+        protected virtual bool TargetIsInActivateDistance(Vector3 sourcePosition, Vector3 targetPosition, float distance)
         {
             distance -= activateDistanceBuffer;
-            if (Vector3.Distance(sourcePosition, targetPosition) <= distance)
+            return Vector3.Distance(sourcePosition, targetPosition) <= distance;
+        }
+
+        protected virtual bool OverlappedEntity(ITargetableEntity entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
+        {
+            if (TargetIsInActivateDistance(sourcePosition, targetPosition, distance))
                 return true;
             // Target is far from controlling entity, try overlap the entity
             if (entity == null)
@@ -838,8 +843,7 @@ namespace MultiplayerARPG
         protected virtual bool OverlappedEntityHitBox<T>(T entity, Vector3 sourcePosition, Vector3 targetPosition, float distance)
             where T : BaseGameEntity
         {
-            distance -= activateDistanceBuffer;
-            if (Vector3.Distance(sourcePosition, targetPosition) <= distance)
+            if (TargetIsInActivateDistance(sourcePosition, targetPosition, distance))
                 return true;
             // Target is far from controlling entity, try overlap the entity
             if (entity == null)
@@ -853,7 +857,7 @@ namespace MultiplayerARPG
                 return;
             Vector3 sourcePosition = EntityTransform.position;
             Vector3 targetPosition = entity.EntityTransform.position;
-            if (OverlappedEntity(entity, sourcePosition, targetPosition, distance))
+            if (TargetIsInActivateDistance(sourcePosition, targetPosition, distance))
             {
                 // Stop movement to do action
                 PlayingCharacterEntity.StopMove();
@@ -879,7 +883,7 @@ namespace MultiplayerARPG
             Transform damageTransform = PlayingCharacterEntity.GetAvailableWeaponDamageInfo(ref _isLeftHandAttacking).GetDamageTransform(PlayingCharacterEntity, _isLeftHandAttacking);
             Vector3 sourcePosition = damageTransform.position;
             Vector3 targetPosition = entity.OpponentAimTransform.position;
-            if (OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
+            if (TargetIsInActivateDistance(sourcePosition, targetPosition, distance))
             {
                 // Stop movement to attack
                 PlayingCharacterEntity.StopMove();
@@ -906,7 +910,7 @@ namespace MultiplayerARPG
                 Vector3 sourcePosition = applyTransform.position;
                 Vector3 targetPosition = entity.OpponentAimTransform.position;
                 if (entity.GetObjectId() == PlayingCharacterEntity.ObjectId /* Applying skill to user? */ ||
-                    OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
+                    TargetIsInActivateDistance(sourcePosition, targetPosition, distance))
                 {
                     // Set next frame target action type
                     _targetActionType = _queueUsingSkill.skill.IsAttack ? TargetActionType.Attack : _previousTargetActionType;
@@ -938,7 +942,10 @@ namespace MultiplayerARPG
         protected virtual void UpdateTargetEntityPosition(Vector3 sourcePosition, Vector3 targetPosition, float distance)
         {
             Vector3 direction = (targetPosition - sourcePosition).normalized;
-            Vector3 position = targetPosition - (direction * (distance - StoppingDistance));
+            float activateDistance = distance - StoppingDistance - activateDistanceBuffer;
+            if (activateDistance <= 0f)
+                activateDistance = StoppingDistance * 0.5f;
+            Vector3 position = targetPosition - (direction * activateDistance);
             if (Vector3.Distance(MovementTransform.position, position) > MIN_START_MOVE_DISTANCE &&
                 Vector3.Distance(_previousPointClickPosition, position) > MIN_START_MOVE_DISTANCE)
             {
