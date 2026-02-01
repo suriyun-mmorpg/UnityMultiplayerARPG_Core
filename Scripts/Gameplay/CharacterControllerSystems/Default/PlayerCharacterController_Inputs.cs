@@ -428,6 +428,8 @@ namespace MultiplayerARPG
             bool raw = !GameInstance.IsMobileTestInEditor() && !Application.isMobilePlatform && !GameInstance.IsConsoleTestInEditor() && !Application.isConsolePlatform;
             _moveDirection = GetMoveDirection(InputManager.GetAxis("Horizontal", raw), InputManager.GetAxis("Vertical", raw)).normalized;
 
+            // Set movement state to be forward only when it is having moving direction
+            MovementState movementState = MovementState.None;
             // Move
             if (_moveDirection.sqrMagnitude > 0f)
             {
@@ -441,14 +443,9 @@ namespace MultiplayerARPG
                 }
                 if (_turnToTargetActionType == TargetActionType.None && !PlayingCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
                     PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_moveDirection), false);
-            }
-
-            // Set movement state to be forward only when it is having moving direction
-            MovementState movementState = MovementState.None;
-            if (_moveDirection.sqrMagnitude > 0)
-            {
                 movementState = MovementState.Forward;
             }
+
             if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
             {
                 if (InputManager.GetButton("SwimUp"))
@@ -857,7 +854,7 @@ namespace MultiplayerARPG
                 return;
             Vector3 sourcePosition = EntityTransform.position;
             Vector3 targetPosition = entity.EntityTransform.position;
-            if (TargetIsInActivateDistance(sourcePosition, targetPosition, distance))
+            if (OverlappedEntity(entity, sourcePosition, targetPosition, distance))
             {
                 // Stop movement to do action
                 PlayingCharacterEntity.StopMove();
@@ -883,7 +880,7 @@ namespace MultiplayerARPG
             Transform damageTransform = PlayingCharacterEntity.GetAvailableWeaponDamageInfo(ref _isLeftHandAttacking).GetDamageTransform(PlayingCharacterEntity, _isLeftHandAttacking);
             Vector3 sourcePosition = damageTransform.position;
             Vector3 targetPosition = entity.OpponentAimTransform.position;
-            if (TargetIsInActivateDistance(sourcePosition, targetPosition, distance))
+            if (OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
             {
                 // Stop movement to attack
                 PlayingCharacterEntity.StopMove();
@@ -910,7 +907,7 @@ namespace MultiplayerARPG
                 Vector3 sourcePosition = applyTransform.position;
                 Vector3 targetPosition = entity.OpponentAimTransform.position;
                 if (entity.GetObjectId() == PlayingCharacterEntity.ObjectId /* Applying skill to user? */ ||
-                    TargetIsInActivateDistance(sourcePosition, targetPosition, distance))
+                    OverlappedEntityHitBox(entity.Entity, sourcePosition, targetPosition, distance))
                 {
                     // Set next frame target action type
                     _targetActionType = _queueUsingSkill.skill.IsAttack ? TargetActionType.Attack : _previousTargetActionType;
@@ -952,6 +949,7 @@ namespace MultiplayerARPG
                 PlayingCharacterEntity.PointClickMovement(position);
                 _previousPointClickPosition = position;
             }
+            _turnToTargetActionType = TargetActionType.None;
         }
 
         protected void TurnCharacterToEntity(BaseGameEntity entity)
