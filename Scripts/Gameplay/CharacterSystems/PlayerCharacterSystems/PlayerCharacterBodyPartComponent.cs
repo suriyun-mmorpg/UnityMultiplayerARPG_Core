@@ -112,7 +112,7 @@ namespace MultiplayerARPG
         public int MaxColorOptions { get => options[_currentModelIndex].colors.Length; }
 
         private BaseCharacterModel[] _models;
-        private bool _alreadySetup = false;
+        private bool _isInitialized = false;
 
         private void Awake()
         {
@@ -127,9 +127,9 @@ namespace MultiplayerARPG
 
         private void OnEnable()
         {
-            if (!_alreadySetup)
+            if (!_isInitialized)
             {
-                _alreadySetup = true;
+                _isInitialized = true;
                 _models = GetComponentsInChildren<BaseCharacterModel>(true);
                 SetupEvents();
                 ApplyModelAndColorBySavedData();
