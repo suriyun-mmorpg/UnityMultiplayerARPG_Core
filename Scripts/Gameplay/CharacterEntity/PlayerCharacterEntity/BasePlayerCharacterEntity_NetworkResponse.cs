@@ -81,6 +81,7 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out WarpPortalEntity warpPortalEntity))
             {
                 // Can't find the entity
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
                 return;
             }
 
@@ -108,6 +109,10 @@ namespace MultiplayerARPG
                 if (!source.AppendCraftingQueueItem(this, dataId, amount, out errorMessage))
                     GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, errorMessage);
             }
+            else
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
+            }
         }
 
         [ServerRpc]
@@ -121,6 +126,10 @@ namespace MultiplayerARPG
             {
                 source.ChangeCraftingQueueItem(this, indexOfData, amount);
             }
+            else
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
+            }
         }
 
         [ServerRpc]
@@ -133,6 +142,10 @@ namespace MultiplayerARPG
             else if (CurrentGameManager.TryGetEntityByObjectId(sourceObjectId, out ICraftingQueueSource source))
             {
                 source.CancelCraftingQueueItem(this, indexOfData);
+            }
+            else
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
             }
         }
 

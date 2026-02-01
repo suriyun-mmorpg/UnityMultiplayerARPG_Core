@@ -20,6 +20,7 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out IPickupActivatableEntity itemDropEntity))
             {
                 // Can't find the entity
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
                 return;
             }
 
@@ -55,6 +56,7 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out ItemsContainerEntity itemsContainerEntity))
             {
                 // Can't find the entity
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
                 return;
             }
 
@@ -71,7 +73,10 @@ namespace MultiplayerARPG
             }
 
             if (itemsContainerIndex < 0 || itemsContainerIndex >= itemsContainerEntity.Items.Count)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
                 return;
+            }
 
             CharacterItem pickingItem = itemsContainerEntity.Items[itemsContainerIndex].Clone();
             if (amount < 0)
@@ -104,6 +109,7 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out ItemsContainerEntity itemsContainerEntity))
             {
                 // Can't find the entity
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_DATA);
                 return;
             }
 
