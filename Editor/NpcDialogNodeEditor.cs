@@ -19,14 +19,18 @@ namespace MultiplayerARPG
             EditorGUILayout.PropertyField(serializedObject.FindProperty("titles"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty("description"));
             EditorGUILayout.PropertyField(serializedObject.FindProperty("descriptions"), true);
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             EditorGUILayout.PropertyField(serializedObject.FindProperty("icon"));
 #endif
+#if !DISABLE_ADDRESSABLES
             EditorGUILayout.PropertyField(serializedObject.FindProperty("addressableIcon"));
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             EditorGUILayout.PropertyField(serializedObject.FindProperty("voice"));
 #endif
+#if !DISABLE_ADDRESSABLES
             EditorGUILayout.PropertyField(serializedObject.FindProperty("addressableVoice"));
+#endif
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.type)));
             switch (node.type)
             {

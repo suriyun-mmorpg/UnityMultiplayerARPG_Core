@@ -1,8 +1,10 @@
 using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
+#if !DISABLE_ADDRESSABLES
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Settings;
+#endif
 using UnityEditor.Build.Pipeline.Utilities;
 using UnityEditor.Build.Reporting;
 using UnityEngine;
@@ -127,6 +129,7 @@ namespace MultiplayerARPG
                 scenes = scenes.ToArray(),
             };
 #endif
+#if !DISABLE_ADDRESSABLES
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
             string profileId = settings.profileSettings.GetProfileId(addressableProfileName);
             settings.activeProfileId = profileId;
@@ -141,6 +144,7 @@ namespace MultiplayerARPG
                 GenerateMapServerDockerfile(outputPath, exeName, mapServerPortInDockerfile);
             Debug.Log($"Build {target}, {subTarget}, v.{bundleVersion}({versionCode}), aa profile: {addressableProfileName}\nResult: {report.summary.result}");
             settings.BuildAddressablesWithPlayerBuild = preChangeBuildOption;
+#endif
             EditorApplication.Exit(0);
         }
 
@@ -166,8 +170,10 @@ namespace MultiplayerARPG
 
         public static void CleanAddressablePlayerContent()
         {
+#if !DISABLE_ADDRESSABLES
             AddressableAssetSettings.CleanPlayerContent();
             Debug.Log("Cleaned previous Addressables build output.");
+#endif
         }
 
         public static void PurgeBuildCache()

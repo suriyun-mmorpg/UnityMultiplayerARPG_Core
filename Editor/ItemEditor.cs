@@ -131,12 +131,16 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Ammo), nameof(item.ammoType));
             // Building
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Building), nameof(item.buildingEntity));
+#if !DISABLE_ADDRESSABLES
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Building), nameof(item.addressableBuildingEntity));
+#endif
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Building), nameof(item.useItemCooldown));
             // Pet
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.requirement));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.petEntity));
+#if !DISABLE_ADDRESSABLES
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.addressablePetEntity));
+#endif
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.summonDuration));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.noSummonDuration));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Pet), nameof(item.useItemCooldown));
@@ -152,7 +156,9 @@ namespace MultiplayerARPG
             // Mount
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.requirement));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.mountEntity));
+#if !DISABLE_ADDRESSABLES
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.addressableMountEntity));
+#endif
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.mountDuration));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.noMountDuration));
             ShowOnEnum(nameof(item.itemType), nameof(Item.LegacyItemType.Mount), nameof(item.useItemCooldown));

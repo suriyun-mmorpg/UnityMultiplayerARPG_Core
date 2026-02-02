@@ -9,6 +9,10 @@ namespace MultiplayerARPG
         public const int BUILD_SETUP_MMO_ORDER = 1;
         public const string BUILD_SETUP_MMO_SERVER_INCLUDE_MENU = "MMORPG KIT/Setup For MMO with Server Codes Build";
         public const int BUILD_SETUP_MMO_SERVER_INCLUDE_ORDER = 2;
+        public const string BUILD_SETUP_DISABLE_ADDRESSABLES_MENU = "MMORPG KIT/Addressables/Disable Addressables";
+        public const int BUILD_SETUP_DISABLE_ADDRESSABLES_ORDER = 8;
+        public const string BUILD_SETUP_ENABLE_ADDRESSABLES_MENU = "MMORPG KIT/Addressables/Enable Addressables";
+        public const int BUILD_SETUP_ENABLE_ADDRESSABLES_ORDER = 9;
         public const string BUILD_SETUP_EXCLUDE_PREFAB_REFS_MENU = "MMORPG KIT/Addressables/Exclude Prefab Refs";
         public const int BUILD_SETUP_EXCLUDE_PREFAB_REFS_ORDER = 10;
         public const string BUILD_SETUP_INCLUDE_PREFAB_REFS_MENU = "MMORPG KIT/Addressables/Include Prefab Refs";

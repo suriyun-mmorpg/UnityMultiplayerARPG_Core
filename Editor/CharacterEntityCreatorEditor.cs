@@ -296,7 +296,7 @@ namespace MultiplayerARPG
                 {
                     GameObject savedObject = AssetDatabase.LoadAssetAtPath<GameObject>(savePath);
                     BaseCharacterEntity savedEntity = savedObject.GetComponent<BaseCharacterEntity>();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                     if (savedEntity is BasePlayerCharacterEntity)
                     {
                         List<BasePlayerCharacterEntity> list = new List<BasePlayerCharacterEntity>(gameDatabase.playerCharacterEntities);

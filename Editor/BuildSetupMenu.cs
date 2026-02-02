@@ -45,6 +45,20 @@ namespace MultiplayerARPG
             EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for prefab refs including is done, you will have wait a bit for compiling", "Ok");
         }
 
+        [MenuItem(EditorMenuConsts.BUILD_SETUP_DISABLE_ADDRESSABLES_MENU, false, EditorMenuConsts.BUILD_SETUP_DISABLE_ADDRESSABLES_ORDER)]
+        public static void BuildSetupDisableAddressables()
+        {
+            AddToDefines("DISABLE_ADDRESSABLES");
+            EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for addressables disabling is done, you will have wait a bit for compiling", "Ok");
+        }
+
+        [MenuItem(EditorMenuConsts.BUILD_SETUP_ENABLE_ADDRESSABLES_MENU, false, EditorMenuConsts.BUILD_SETUP_ENABLE_ADDRESSABLES_ORDER)]
+        public static void BuildSetupEnaableAddressables()
+        {
+            RemoveFromDefines("DISABLE_ADDRESSABLES");
+            EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for addressables enabling is done, you will have wait a bit for compiling", "Ok");
+        }
+
         private static void AddToDefines(string symbol)
         {
             string previousProjectDefines = GetCurrentProjectDefines(out BuildTargetGroup buildTargetGroup);

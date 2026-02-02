@@ -1,3 +1,4 @@
+#if !DISABLE_ADDRESSABLES
 using UnityEditor;
 using UnityEditor.AddressableAssets;
 using UnityEditor.AddressableAssets.Build;
@@ -39,3 +40,4 @@ namespace MultiplayerARPG
         }
     }
 }
+#endif
