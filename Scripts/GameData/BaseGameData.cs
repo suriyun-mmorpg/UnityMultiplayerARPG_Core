@@ -140,8 +140,39 @@ namespace MultiplayerARPG
         }
 #endif
 
-        public int DataId { protected set; get; }
-        public int HashCode { protected set; get; }
+        [NonSerialized]
+        private bool isDataIdSet = false;
+        [NonSerialized]
+        private int dataId;
+        public int DataId
+        {
+            get
+            {
+                if (!isDataIdSet)
+                {
+                    dataId = MakeDataId(Id);
+                    isDataIdSet = true;
+                }
+                return dataId;
+            }
+        }
+
+        [NonSerialized]
+        private bool isHashCodeSet = false;
+        [NonSerialized]
+        private int hashCode;
+        public int HashCode
+        {
+            get
+            {
+                if (!isHashCodeSet)
+                {
+                    hashCode = (GetType().GetHashCode() * 397) ^ DataId;
+                    isHashCodeSet = true;
+                }
+                return hashCode;
+            }
+        }
 
         public readonly static Dictionary<int, string> IdMap = new Dictionary<int, string>();
         public readonly static Dictionary<string, int> DataIdMap = new Dictionary<string, int>();
@@ -158,11 +189,6 @@ namespace MultiplayerARPG
 
         protected virtual void OnEnable()
         {
-            DataId = MakeDataId(Id);
-            unchecked
-            {
-                HashCode = (GetType().GetHashCode() * 397) ^ DataId;
-            }
             string key = this.GetPatchKey();
             if (PatchDataManager.PatchableData.TryAdd(key, this) &&
                 PatchDataManager.PatchingData.TryGetValue(key, out Dictionary<string, object> patch))
