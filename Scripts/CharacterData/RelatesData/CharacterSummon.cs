@@ -24,13 +24,21 @@ namespace MultiplayerARPG
         public void Summon(BaseCharacterEntity summoner, int summonLevel, float duration)
         {
             LiteNetLibIdentity spawnObj;
-            if (GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
+            if (GetPrefab(out BaseMonsterCharacterEntity prefab
+#if !DISABLE_ADDRESSABLES
+                , out AssetReferenceBaseMonsterCharacterEntity addressablePrefab
+#endif
+                ))
             {
+#if !DISABLE_ADDRESSABLES
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     addressablePrefab.HashAssetId,
                     GameInstance.Singleton.GameplayRule.GetSummonPosition(summoner),
                     GameInstance.Singleton.GameplayRule.GetSummonRotation(summoner));
                 CacheEntity = spawnObj.GetComponent<BaseMonsterCharacterEntity>();
+#else
+                spawnObj = null;
+#endif
             }
             else if (prefab != null)
             {
@@ -109,9 +117,17 @@ namespace MultiplayerARPG
         /// <param name="prefab"></param>
         /// <param name="addressablePrefab"></param>
         /// <returns></returns>
-        public bool GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab)
+        public bool GetPrefab(out BaseMonsterCharacterEntity prefab
+#if !DISABLE_ADDRESSABLES
+            , out AssetReferenceBaseMonsterCharacterEntity addressablePrefab
+#endif
+            )
         {
-            return MemoryManager.CharacterSummons.GetPrefab(in this, out prefab, out addressablePrefab);
+            return MemoryManager.CharacterSummons.GetPrefab(in this, out prefab
+#if !DISABLE_ADDRESSABLES
+                , out addressablePrefab
+#endif
+                );
         }
 
         public CalculatedBuff GetBuff()

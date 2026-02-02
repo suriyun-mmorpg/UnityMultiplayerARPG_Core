@@ -37,19 +37,23 @@ namespace MultiplayerARPG
         public float missileDistance;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile), nameof(DamageType.Raycast) })]
         public float missileSpeed;
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile) })]
         public MissileDamageEntity missileDamageEntity;
 #endif
+#if !DISABLE_ADDRESSABLES
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Missile) })]
         public AssetReferenceMissileDamageEntity addressableMissileDamageEntity;
+#endif
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public ProjectileEffect projectileEffect;
 #endif
+#if !DISABLE_ADDRESSABLES
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public AssetReferenceProjectileEffect addressableProjectEffect;
+#endif
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Raycast) })]
         public byte pierceThroughEntities;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Melee), nameof(DamageType.Raycast) })]
@@ -59,12 +63,14 @@ namespace MultiplayerARPG
         public float throwForce;
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
         public float throwableLifeTime;
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
         public ThrowableDamageEntity throwableDamageEntity;
 #endif
+#if !DISABLE_ADDRESSABLES
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Throwable) })]
         public AssetReferenceThrowableDamageEntity addressableThrowableDamageEntity;
+#endif
 
         [StringShowConditional(nameof(damageType), new string[] { nameof(DamageType.Custom) })]
         public BaseCustomDamageInfo customDamageInfo;
@@ -89,10 +95,12 @@ namespace MultiplayerARPG
                         ThrowableDamageInfo tempThrowableDamageInfo = ScriptableObject.CreateInstance<ThrowableDamageInfo>();
                         tempThrowableDamageInfo.throwForce = throwForce;
                         tempThrowableDamageInfo.throwableLifeTime = throwableLifeTime;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                         tempThrowableDamageInfo.throwableDamageEntity = throwableDamageEntity;
 #endif
+#if !DISABLE_ADDRESSABLES
                         tempThrowableDamageInfo.addressableThrowableDamageEntity = addressableThrowableDamageEntity;
+#endif
                         _builtInDamageInfo = tempThrowableDamageInfo;
                     }
                     break;
@@ -102,10 +110,12 @@ namespace MultiplayerARPG
                         RaycastDamageInfo tempRaycastDamageInfo = ScriptableObject.CreateInstance<RaycastDamageInfo>();
                         tempRaycastDamageInfo.missileDistance = missileDistance;
                         tempRaycastDamageInfo.missileSpeed = missileSpeed;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                         tempRaycastDamageInfo.projectileEffect = projectileEffect;
 #endif
+#if !DISABLE_ADDRESSABLES
                         tempRaycastDamageInfo.addressableProjectEffect = addressableProjectEffect;
+#endif
                         tempRaycastDamageInfo.pierceThroughEntities = pierceThroughEntities;
                         tempRaycastDamageInfo.impactEffects = impactEffects;
                         _builtInDamageInfo = tempRaycastDamageInfo;
@@ -118,10 +128,12 @@ namespace MultiplayerARPG
                         tempMissileDamageInfo.hitOnlySelectedTarget = hitOnlySelectedTarget;
                         tempMissileDamageInfo.missileDistance = missileDistance;
                         tempMissileDamageInfo.missileSpeed = missileSpeed;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                         tempMissileDamageInfo.missileDamageEntity = missileDamageEntity;
 #endif
+#if !DISABLE_ADDRESSABLES
                         tempMissileDamageInfo.addressableMissileDamageEntity = addressableMissileDamageEntity;
+#endif
                         _builtInDamageInfo = tempMissileDamageInfo;
                     }
                     break;
@@ -226,7 +238,7 @@ namespace MultiplayerARPG
 
         public void ProceedAddressableAssetConversion(string groupName)
         {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !DISABLE_ADDRESSABLES
             AddressableEditorUtils.ConvertObjectRefToAddressable(ref missileDamageEntity, ref addressableMissileDamageEntity, groupName);
             AddressableEditorUtils.ConvertObjectRefToAddressable(ref projectileEffect, ref addressableProjectEffect, groupName);
             AddressableEditorUtils.ConvertObjectRefToAddressable(ref throwableDamageEntity, ref addressableThrowableDamageEntity, groupName);

@@ -2,7 +2,9 @@
 using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -38,13 +40,17 @@ namespace MultiplayerARPG
 
 #if UNITY_EDITOR || !UNITY_SERVER
         [Category(10, "In-Scene Objects/Appearance")]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableDropModel))]
+#endif
         protected GameObject dropModel = null;
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceGameObject addressableDropModel;
+#endif
 #endif
 
         [Category(50, "Dismantle Settings")]
@@ -124,18 +130,22 @@ namespace MultiplayerARPG
         public int ExpireDuration { get => expireDuration; set => expireDuration = value; }
 
 #if UNITY_EDITOR || !UNITY_SERVER
-        public async UniTask<GameObject> GetDropModel()
+        public UniTask<GameObject> GetDropModel()
         {
             GameObject dropModel = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             dropModel = this.dropModel;
 #endif
-            return await addressableDropModel.GetOrLoadAssetAsyncOrUsePrefab(dropModel);
+#if !DISABLE_ADDRESSABLES
+            return addressableDropModel.GetOrLoadAssetAsyncOrUsePrefab(dropModel);
+#else
+            return UniTask.FromResult(dropModel);
+#endif
         }
 
         public IItem SetDropModel(GameObject dropModel)
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             this.dropModel = dropModel;
 #endif
             return this;

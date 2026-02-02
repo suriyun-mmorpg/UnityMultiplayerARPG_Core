@@ -19,7 +19,7 @@ namespace MultiplayerARPG
                 {
                     foreach (GameEffectPoolContainer container in poolingGameEffects)
                     {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                         effects.Add(container.prefab);
 #endif
                     }

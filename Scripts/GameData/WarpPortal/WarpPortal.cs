@@ -5,12 +5,14 @@ namespace MultiplayerARPG
     [System.Serializable]
     public struct WarpPortal
     {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Tooltip("The `WarpPortalEntity` prefab which will instantiates on the map scene. If this is not set, it will use the one which set to `GameInstance` → `warpPortalEntityPrefab`")]
         public WarpPortalEntity entityPrefab;
 #endif
+#if !DISABLE_ADDRESSABLES
         [Tooltip("The `WarpPortalEntity` prefab which will instantiates on the map scene. If this is not set, it will use the one which set to `GameInstance` → `addressableWarpPortalEntityPrefab`")]
         public AssetReferenceWarpPortalEntity addressableEntityPrefab;
+#endif
         [Tooltip("Position for the warp portal which will be placed on the map scene")]
         public Vector3 position;
         [Tooltip("Rotation for the warp portal which will be placed on the map scene")]

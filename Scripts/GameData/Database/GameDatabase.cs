@@ -21,19 +21,20 @@ namespace MultiplayerARPG
         public UnityHelpBox entityHelpBox = new UnityHelpBox("Game database will load referring game data from an entities when game instance initializing");
 #endif
         [Header("Entity")]
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public BasePlayerCharacterEntity[] playerCharacterEntities;
         public BaseMonsterCharacterEntity[] monsterCharacterEntities;
         [FormerlySerializedAs("mountEntities")]
         public VehicleEntity[] vehicleEntities;
         public LiteNetLibIdentity[] otherNetworkObjects;
 #endif
-
+#if !DISABLE_ADDRESSABLES
         [Header("Addressable Entity")]
         public AssetReferenceBasePlayerCharacterEntity[] addressablePlayerCharacterEntities;
         public AssetReferenceBaseMonsterCharacterEntity[] addressableMonsterCharacterEntities;
         public AssetReferenceVehicleEntity[] addressableVehicleEntities;
         public AssetReferenceLiteNetLibIdentity[] addressableOtherNetworkObjects;
+#endif
 
         [Header("Game Data")]
         public Attribute[] attributes;
@@ -63,22 +64,30 @@ namespace MultiplayerARPG
 
         protected override UniTask LoadDataImplement(GameInstance gameInstance)
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddPlayerCharacterEntities(playerCharacterEntities);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferencePlayerCharacterEntities(addressablePlayerCharacterEntities);
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddMonsterCharacterEntities(monsterCharacterEntities);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceMonsterCharacterEntities(addressableMonsterCharacterEntities);
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddVehicleEntities(vehicleEntities);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceVehicleEntities(addressableVehicleEntities);
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddOtherNetworkObjects(otherNetworkObjects);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceOtherNetworkObjects(addressableOtherNetworkObjects);
+#endif
             GameInstance.AddAttributes(attributes);
             GameInstance.AddCurrencies(currencies);
             GameInstance.AddDamageElements(damageElements);
@@ -134,18 +143,24 @@ namespace MultiplayerARPG
             GameInstance.AddQuests(quests);
             GameInstance.AddFactions(factions);
             GameInstance.AddGachas(gachas);
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddPlayerCharacterEntities(playerCharacterEntities);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferencePlayerCharacterEntities(addressablePlayerCharacterEntities);
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddMonsterCharacterEntities(monsterCharacterEntities);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceMonsterCharacterEntities(addressableMonsterCharacterEntities);
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddVehicleEntities(vehicleEntities);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceVehicleEntities(addressableVehicleEntities);
+#endif
 
             List<Attribute> tempAttributes = new List<Attribute>(GameInstance.Attributes.Values);
             tempAttributes.Sort();

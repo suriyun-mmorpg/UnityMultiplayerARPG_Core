@@ -2,7 +2,9 @@
 using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -30,34 +32,42 @@ namespace MultiplayerARPG
         
 #if UNITY_EDITOR || !UNITY_SERVER
         [Category(3, "In-Scene Objects/Appearance")]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableEquipModel))]
+#endif
         protected GameObject equipModel;
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceGameObject addressableEquipModel = null;
 #endif
+#endif
 
 #if UNITY_EDITOR || !UNITY_SERVER
-        public async UniTask<GameObject> GetAmmoAttachModel()
+        public UniTask<GameObject> GetAmmoAttachModel()
         {
             GameObject equipModel = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             equipModel = this.equipModel;
 #endif
-            return await addressableEquipModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+#if !DISABLE_ADDRESSABLES
+            return addressableEquipModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+#else
+            return UniTask.FromResult(equipModel);
+#endif
         }
 
         public IItem SetAmmoAttachModel(GameObject equipModel)
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             this.equipModel = equipModel;
 #endif
             return this;
         }
 #endif
-
+        
         [SerializeField]
         [Tooltip("Increasing damages stats while attacking by weapon which put this item")]
         private DamageIncremental[] increaseDamages = new DamageIncremental[0];

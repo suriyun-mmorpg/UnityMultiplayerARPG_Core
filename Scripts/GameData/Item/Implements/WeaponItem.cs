@@ -258,7 +258,7 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [HideInInspector]
         [SerializeField]
         private AudioClip reloadClip = null;
@@ -452,7 +452,7 @@ namespace MultiplayerARPG
                 }.ToArray();
                 hasChanges = true;
             }
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             if (MigrateAudioClips(ref launchClip, ref launchClips, ref launchClipSettings))
                 hasChanges = true;
             if (MigrateAudioClips(ref reloadClip, ref reloadClips, ref reloadClipSettings))
@@ -465,7 +465,7 @@ namespace MultiplayerARPG
             return hasChanges || base.Validate();
         }
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         private bool MigrateAudioClips(ref AudioClip singleClip, ref AudioClip[] multipleClips, ref AudioClipWithVolumeSettings[] destinationSettings)
         {
             if (singleClip == null && (multipleClips == null || multipleClips.Length == 0))
@@ -532,7 +532,9 @@ namespace MultiplayerARPG
             weaponType.LanguageSpecificDescriptions = LanguageSpecificDescriptions;
             weaponType.Category = Category;
             weaponType.Icon = Icon;
+#if !DISABLE_ADDRESSABLES
             weaponType.AddressableIcon = AddressableIcon;
+#endif
 
             path = path.Substring(path.IndexOf("Assets"));
             AssetDatabase.DeleteAsset(path);
@@ -542,5 +544,5 @@ namespace MultiplayerARPG
             EditorUtility.SetDirty(this);
         }
 #endif
+        }
     }
-}

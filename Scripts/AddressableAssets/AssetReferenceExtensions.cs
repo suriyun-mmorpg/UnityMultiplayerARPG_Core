@@ -12,10 +12,17 @@ namespace MultiplayerARPG
         /// <param name="prefab"></param>
         /// <param name="addressablePrefab"></param>
         /// <returns></returns>
-        public static bool GetPrefab(this SummonType summonType, int dataId, out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab)
+        public static bool GetPrefab(this SummonType summonType, int dataId
+            , out BaseMonsterCharacterEntity prefab
+#if !DISABLE_ADDRESSABLES
+            , out AssetReferenceBaseMonsterCharacterEntity addressablePrefab
+#endif
+            )
         {
             prefab = null;
+#if !DISABLE_ADDRESSABLES
             addressablePrefab = null;
+#endif
             switch (summonType)
             {
                 case SummonType.Skill:
@@ -27,11 +34,13 @@ namespace MultiplayerARPG
                             prefab = skillSummon.MonsterCharacterEntity;
                             return false;
                         }
+#if !DISABLE_ADDRESSABLES
                         else if (skillSummon.AddressableMonsterCharacterEntity.IsDataValid())
                         {
                             addressablePrefab = skillSummon.AddressableMonsterCharacterEntity;
                             return true;
                         }
+#endif
                     }
                     break;
                 case SummonType.PetItem:
@@ -43,25 +52,39 @@ namespace MultiplayerARPG
                             prefab = petItem.MonsterCharacterEntity;
                             return false;
                         }
+#if !DISABLE_ADDRESSABLES
                         else if (petItem.AddressableMonsterCharacterEntity.IsDataValid())
                         {
                             addressablePrefab = petItem.AddressableMonsterCharacterEntity;
                             return true;
                         }
+#endif
                     }
                     break;
                 case SummonType.Custom:
-                    return GameInstance.CustomSummonManager.GetPrefab(out prefab, out addressablePrefab);
+                    return GameInstance.CustomSummonManager.GetPrefab(
+                        out prefab
+#if !DISABLE_ADDRESSABLES
+                        , out addressablePrefab
+#endif
+                        );
             }
             return false;
         }
 
         public static int GetPrefabEntityId(this SummonType summonType, int dataId)
         {
-            if (summonType.GetPrefab(dataId, out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab))
+            if (summonType.GetPrefab(dataId
+                , out BaseMonsterCharacterEntity prefab
+#if !DISABLE_ADDRESSABLES
+                , out AssetReferenceBaseMonsterCharacterEntity addressablePrefab
+#endif
+                ))
             {
+#if !DISABLE_ADDRESSABLES
                 if (addressablePrefab.IsDataValid())
                     return addressablePrefab.HashAssetId;
+#endif
                 return 0;
             }
             else
@@ -72,11 +95,17 @@ namespace MultiplayerARPG
             }
         }
 
-        public static bool GetPrefab(this MountType mountType, ICharacterData characterData, string sourceId,
-            out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab)
+        public static bool GetPrefab(this MountType mountType, ICharacterData characterData, string sourceId
+            , out VehicleEntity prefab
+#if !DISABLE_ADDRESSABLES
+            , out AssetReferenceVehicleEntity addressablePrefab
+#endif
+            )
         {
             prefab = null;
+#if !DISABLE_ADDRESSABLES
             addressablePrefab = null;
+#endif
             int tempIndexOfData;
             BaseItem tempItem;
             BaseSkill tempSkill;
@@ -93,11 +122,13 @@ namespace MultiplayerARPG
                             prefab = skillMount.MountEntity;
                             return false;
                         }
+#if !DISABLE_ADDRESSABLES
                         else if (skillMount.AddressableMountEntity.IsDataValid())
                         {
                             addressablePrefab = skillMount.AddressableMountEntity;
                             return true;
                         }
+#endif
                     }
                     break;
                 case MountType.MountItem:
@@ -112,11 +143,13 @@ namespace MultiplayerARPG
                             prefab = mountItem.VehicleEntity;
                             return false;
                         }
+#if !DISABLE_ADDRESSABLES
                         else if (mountItem.AddressableVehicleEntity.IsDataValid())
                         {
                             addressablePrefab = mountItem.AddressableVehicleEntity;
                             return true;
                         }
+#endif
                     }
                     break;
                 case MountType.Buff:
@@ -131,11 +164,13 @@ namespace MultiplayerARPG
                             prefab = tempBuffMount.MountEntity;
                             return false;
                         }
+#if !DISABLE_ADDRESSABLES
                         else if (tempBuffMount.AddressableMountEntity.IsDataValid())
                         {
                             addressablePrefab = tempBuffMount.AddressableMountEntity;
                             return true;
                         }
+#endif
                     }
                     break;
                 case MountType.Custom:
@@ -147,10 +182,17 @@ namespace MultiplayerARPG
 
         public static int GetPrefabEntityId(this MountType mountType, ICharacterData characterData, string sourceId)
         {
-            if (mountType.GetPrefab(characterData, sourceId, out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab))
+            if (mountType.GetPrefab(characterData, sourceId
+                , out VehicleEntity prefab
+#if !DISABLE_ADDRESSABLES
+                , out AssetReferenceVehicleEntity addressablePrefab
+#endif
+                ))
             {
+#if !DISABLE_ADDRESSABLES
                 if (addressablePrefab.IsDataValid())
                     return addressablePrefab.HashAssetId;
+#endif
                 return 0;
             }
             else

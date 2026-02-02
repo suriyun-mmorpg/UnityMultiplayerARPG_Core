@@ -9,17 +9,19 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_FILE, menuName = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_MENU, order = GameDataMenuConsts.SIMPLE_AREA_BUFF_SKILL_ORDER)]
     public partial class SimpleAreaBuffSkill : BaseAreaSkill
     {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Category("Area Settings")]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableAreaBuffEntity))]
+#endif
         private AreaBuffEntity areaBuffEntity;
 #endif
         public AreaBuffEntity AreaBuffEntity
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return areaBuffEntity;
 #else
                 return null;
@@ -27,12 +29,14 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceAreaBuffEntity addressableAreaBuffEntity;
         public AssetReferenceAreaBuffEntity AddressableAreaBuffEntity
         {
             get { return addressableAreaBuffEntity; }
         }
+#endif
 
         [Category(3, "Buff")]
         public Buff buff;
@@ -61,8 +65,10 @@ namespace MultiplayerARPG
                 int hashAssetId = 0;
                 if (AreaBuffEntity != null)
                     hashAssetId = AreaBuffEntity.Identity.HashAssetId;
+#if !DISABLE_ADDRESSABLES
                 else if (AddressableAreaBuffEntity.IsDataValid())
                     hashAssetId = AddressableAreaBuffEntity.HashAssetId;
+#endif
                 if (hashAssetId == 0)
                 {
                     Logging.LogError("SimpleAreaBuffSkill", $"Unable to spawn area buff entity, skill ID: {Id}");
@@ -84,7 +90,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             areaBuffEntity.InitPrefab();
             GameInstance.AddOtherNetworkObjects(areaBuffEntity.Identity);
 #endif

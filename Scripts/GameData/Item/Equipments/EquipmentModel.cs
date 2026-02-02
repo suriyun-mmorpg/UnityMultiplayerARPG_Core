@@ -2,7 +2,9 @@
 using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -18,7 +20,7 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("useInstantiatedObject")]
         public bool useInstantiatedObject;
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [BoolShowConditional(nameof(useInstantiatedObject), false)]
         [SerializeField]
         [FormerlySerializedAs("model")]
@@ -28,7 +30,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return meshPrefab;
 #else
                 return null;
@@ -36,6 +38,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [BoolShowConditional(nameof(useInstantiatedObject), false)]
         [SerializeField]
         protected AssetReferenceGameObject addressableMeshPrefab = null;
@@ -43,6 +46,7 @@ namespace MultiplayerARPG
         {
             get { return addressableMeshPrefab; }
         }
+#endif
 
         [BoolShowConditional(nameof(useInstantiatedObject), true)]
         public int instantiatedObjectIndex;
@@ -79,14 +83,18 @@ namespace MultiplayerARPG
         public EquipmentModelDelegate onInstantiated;
         #endregion
 
-        public async UniTask<GameObject> GetMeshPrefab()
+        public UniTask<GameObject> GetMeshPrefab()
         {
-            return await AddressableMeshPrefab.GetOrLoadAssetAsyncOrUsePrefab(MeshPrefab);
+#if !DISABLE_ADDRESSABLES
+            return AddressableMeshPrefab.GetOrLoadAssetAsyncOrUsePrefab(MeshPrefab);
+#else
+            return UniTask.FromResult(MeshPrefab);
+#endif
         }
 
         public EquipmentModel SetMeshPrefab(GameObject meshPrefab)
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             this.meshPrefab = meshPrefab;
 #endif
             return this;
@@ -100,10 +108,12 @@ namespace MultiplayerARPG
                 equipSocket = equipSocket,
                 // Prefab Settings
                 useInstantiatedObject = useInstantiatedObject,
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 meshPrefab = meshPrefab,
 #endif
+#if !DISABLE_ADDRESSABLES
                 addressableMeshPrefab = addressableMeshPrefab,
+#endif
                 instantiatedObjectIndex = instantiatedObjectIndex,
                 priority = priority,
                 // Skinned Mesh Settings
@@ -133,7 +143,7 @@ namespace MultiplayerARPG
 
         public void ProceedAddressableAssetConversion(string groupName)
         {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !DISABLE_ADDRESSABLES
             AddressableEditorUtils.ConvertObjectRefToAddressable(ref meshPrefab, ref addressableMeshPrefab, groupName);
 #endif
         }

@@ -90,10 +90,12 @@ namespace MultiplayerARPG
             languageSpecificDescriptions = descriptionLanguageDataList.ToArray();
             category = item.Category;
 #if UNITY_EDITOR || !UNITY_SERVER
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             icon = item.Icon;
 #endif
+#if !DISABLE_ADDRESSABLES
             addressableIcon = item.AddressableIcon;
+#endif
 #endif
             sellPriceCash = generatingData.sellPriceCash;
             sellPriceGold = generatingData.sellPriceGold;

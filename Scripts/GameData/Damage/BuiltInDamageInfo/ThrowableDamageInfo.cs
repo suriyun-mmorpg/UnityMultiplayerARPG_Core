@@ -9,27 +9,30 @@ namespace MultiplayerARPG
     {
         public float throwForce;
         public float throwableLifeTime;
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableThrowableDamageEntity))]
+#endif
         public ThrowableDamageEntity throwableDamageEntity;
 #endif
         public ThrowableDamageEntity ThrowableDamageEntity
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return throwableDamageEntity;
 #else
                 return null;
 #endif
             }
         }
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceThrowableDamageEntity addressableThrowableDamageEntity;
         public AssetReferenceThrowableDamageEntity AddressableThrowableDamageEntity
         {
             get => addressableThrowableDamageEntity;
         }
-
+#endif
         public override Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
             Transform transform = null;
@@ -75,8 +78,13 @@ namespace MultiplayerARPG
 
         public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
-            ThrowableDamageEntity loadedDamageEntity = await AddressableThrowableDamageEntity
+            ThrowableDamageEntity loadedDamageEntity;
+#if !DISABLE_ADDRESSABLES
+            loadedDamageEntity = await AddressableThrowableDamageEntity
                 .GetOrLoadAssetAsyncOrUsePrefab(ThrowableDamageEntity);
+#else
+            loadedDamageEntity = ThrowableDamageEntity;
+#endif
 
             if (loadedDamageEntity == null)
                 return;
@@ -101,7 +109,9 @@ namespace MultiplayerARPG
             // TODO: May predict and move missile ahead of time based on client's RTT
             float throwForce = this.throwForce;
             float throwableLifeTime = this.throwableLifeTime;
-            PoolSystem.GetInstance(loadedDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], skill, skillLevel, hitRegData, throwForce, throwableLifeTime);
+            PoolSystem.GetInstance(loadedDamageEntity, damagePosition, damageRotation)
+                .Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], skill, skillLevel, hitRegData, throwForce, throwableLifeTime);
+            await UniTask.Yield();
         }
     }
 }

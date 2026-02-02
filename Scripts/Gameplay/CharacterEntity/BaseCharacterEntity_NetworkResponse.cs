@@ -306,7 +306,9 @@ namespace MultiplayerARPG
         protected virtual void PlayLevelUpEffects()
         {
             CharacterModel.InstantiateEffect(CurrentGameInstance.LevelUpEffects);
+#if !DISABLE_ADDRESSABLES
             CharacterModel.InstantiateEffect(CurrentGameInstance.AddressableLevelUpEffects).Forget();
+#endif
         }
 
         [ServerRpc]

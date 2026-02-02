@@ -49,11 +49,6 @@ namespace MultiplayerARPG
         public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
-        [AddressableAssetConversion(nameof(addressableDamageHitEffects))]
-        public GameEffect[] damageHitEffects = new GameEffect[0];
-#endif
-        public AssetReferenceGameEffect[] addressableDamageHitEffects = new AssetReferenceGameEffect[0];
 
         [Category(4, "Buff")]
         public SkillBuffType skillBuffType;
@@ -81,11 +76,17 @@ namespace MultiplayerARPG
             }
         }
 
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
+        [AddressableAssetConversion(nameof(addressableDamageHitEffects))]
+#endif
+        public GameEffect[] damageHitEffects = new GameEffect[0];
+#endif
         public override GameEffect[] DamageHitEffects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return damageHitEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -93,6 +94,8 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
+        public AssetReferenceGameEffect[] addressableDamageHitEffects = new AssetReferenceGameEffect[0];
         public override AssetReferenceGameEffect[] AddressableDamageHitEffects
         {
             get
@@ -100,6 +103,7 @@ namespace MultiplayerARPG
                 return addressableDamageHitEffects;
             }
         }
+#endif
 
         protected override async void ApplySkillImplement(
             BaseCharacterEntity skillUser,
@@ -333,11 +337,13 @@ namespace MultiplayerARPG
                 summon = this.summon;
                 return true;
             }
+#if !DISABLE_ADDRESSABLES
             else if (this.summon.AddressableMonsterCharacterEntity.IsDataValid())
             {
                 summon = this.summon;
                 return true;
             }
+#endif
             return base.TryGetSummon(out summon);
         }
 
@@ -348,11 +354,13 @@ namespace MultiplayerARPG
                 mount = this.mount;
                 return true;
             }
+#if !DISABLE_ADDRESSABLES
             else if (this.mount.AddressableMountEntity.IsDataValid())
             {
                 mount = this.mount;
                 return true;
             }
+#endif
             return base.TryGetMount(out mount);
         }
 

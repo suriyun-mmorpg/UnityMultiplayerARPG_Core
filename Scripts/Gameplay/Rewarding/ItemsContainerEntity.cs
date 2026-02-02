@@ -50,11 +50,15 @@ namespace MultiplayerARPG
                 {
                     return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), DropperTitle.Value);
                 }
+#if !DISABLE_ADDRESSABLES
                 if (GameInstance.AddressableMonsterCharacterEntities.TryGetValue(_dropperEntityId.Value, out AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity> addressablePrefab))
                 {
                     return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), addressablePrefab.GetOrLoadAsset<BaseCharacterEntity>().EntityTitle);
                 }
-#if !EXCLUDE_PREFAB_REFS
+#else
+                if (false) { }
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 else if (GameInstance.MonsterCharacterEntities.TryGetValue(_dropperEntityId.Value, out BaseMonsterCharacterEntity prefab))
                 {
                     return ZString.Format(LanguageManager.GetText(formatKeyCorpseTitle), prefab.EntityTitle);

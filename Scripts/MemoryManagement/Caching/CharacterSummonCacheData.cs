@@ -52,9 +52,17 @@ namespace MultiplayerARPG
         /// <param name="prefab"></param>
         /// <param name="addressablePrefab"></param>
         /// <returns></returns>
-        public bool GetPrefab(out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab)
+        public bool GetPrefab(out BaseMonsterCharacterEntity prefab
+#if !DISABLE_ADDRESSABLES
+            , out AssetReferenceBaseMonsterCharacterEntity addressablePrefab
+#endif
+            )
         {
-            return _type.GetPrefab(_dataId, out prefab, out addressablePrefab);
+            return _type.GetPrefab(_dataId, out prefab
+#if !DISABLE_ADDRESSABLES
+                , out addressablePrefab
+#endif
+                );
         }
 
         public CalculatedBuff GetBuff()

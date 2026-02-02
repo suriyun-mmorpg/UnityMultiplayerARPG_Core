@@ -3,7 +3,9 @@ using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 using XNode;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -34,17 +36,19 @@ namespace MultiplayerARPG
         protected LanguageData[] descriptions = new LanguageData[0];
 
 #if UNITY_EDITOR || !UNITY_SERVER
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [PreviewSprite(50)]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableIcon))]
+#endif
         protected Sprite icon;
 #endif
         public Sprite Icon
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return icon;
 #else
                 return null;
@@ -52,12 +56,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 icon = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceSprite addressableIcon;
         public AssetReferenceSprite AddressableIcon
@@ -71,24 +76,31 @@ namespace MultiplayerARPG
                 addressableIcon = value;
             }
         }
+#endif
 
-        public async UniTask<Sprite> GetIcon()
+        public UniTask<Sprite> GetIcon()
         {
-            return await AddressableIcon.GetOrLoadObjectAsyncOrUseAsset(Icon);
+#if !DISABLE_ADDRESSABLES
+            return AddressableIcon.GetOrLoadObjectAsyncOrUseAsset(Icon);
+#else
+            return UniTask.FromResult(Icon);
+#endif
         }
 #endif
 
 #if UNITY_EDITOR || !UNITY_SERVER
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableVoice))]
+#endif
         protected AudioClip voice;
 #endif
         public AudioClip Voice
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return voice;
 #else
                 return null;
@@ -96,12 +108,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 voice = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceAudioClip addressableVoice;
         public AssetReferenceAudioClip AddressableVoice
@@ -115,14 +128,19 @@ namespace MultiplayerARPG
                 addressableVoice = value;
             }
         }
+#endif
 
-        public async UniTask<AudioClip> GetVoice()
+        public UniTask<AudioClip> GetVoice()
         {
-            return await AddressableVoice.GetOrLoadObjectAsyncOrUseAsset(Voice);
+#if !DISABLE_ADDRESSABLES
+            return AddressableVoice.GetOrLoadObjectAsyncOrUseAsset(Voice);
+#else
+            return UniTask.FromResult(Voice);
+#endif
         }
 #endif
 
-        [HideInInspector]
+            [HideInInspector]
         public BaseNpcDialogAction enterDialogActionOnClient;
         public List<BaseNpcDialogAction> enterDialogActionsOnClient = new List<BaseNpcDialogAction>();
 

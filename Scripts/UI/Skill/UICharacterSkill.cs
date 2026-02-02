@@ -456,9 +456,13 @@ namespace MultiplayerARPG
                 uiTextSummon.SetGameObjectActive(false);
                 if (Skill != null && Skill.TryGetSummon(out SkillSummon skillSummon))
                 {
-                    BaseMonsterCharacterEntity tempMonsterEntity = 
-                        await skillSummon.AddressableMonsterCharacterEntity
+                    BaseMonsterCharacterEntity tempMonsterEntity;
+#if !DISABLE_ADDRESSABLES
+                    tempMonsterEntity = await skillSummon.AddressableMonsterCharacterEntity
                             .GetOrLoadAssetAsyncOrUsePrefab(skillSummon.MonsterCharacterEntity);
+#else
+                    tempMonsterEntity = skillSummon.MonsterCharacterEntity;
+#endif
                     if (tempMonsterEntity != null)
                     {
                         uiTextSummon.SetGameObjectActive(true);
@@ -478,9 +482,13 @@ namespace MultiplayerARPG
                 uiTextMount.SetGameObjectActive(false);
                 if (Skill != null && Skill.TryGetMount(out SkillMount skillMount))
                 {
-                    VehicleEntity tempMountEntity = 
-                        await skillMount.AddressableMountEntity
+                    VehicleEntity tempMountEntity;
+#if !DISABLE_ADDRESSABLES
+                    tempMountEntity = await skillMount.AddressableMountEntity
                             .GetOrLoadAssetAsyncOrUsePrefab(skillMount.MountEntity);
+#else
+                    tempMountEntity = skillMount.MountEntity;
+#endif
                     if (tempMountEntity != null)
                     {
                         uiTextMount.SetGameObjectActive(true);

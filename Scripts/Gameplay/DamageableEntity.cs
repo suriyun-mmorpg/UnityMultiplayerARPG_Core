@@ -266,7 +266,9 @@ namespace MultiplayerARPG
                 {
                     // Find effects to instantiate
                     GameEffect[] effects = CurrentGameInstance.DefaultDamageHitEffects;
+#if !DISABLE_ADDRESSABLES
                     AssetReferenceGameEffect[] addressableEffects = CurrentGameInstance.AddressableDefaultDamageHitEffects;
+#endif
                     switch (hitEffectsSourceType)
                     {
                         case HitEffectsSourceType.DamageElement:
@@ -274,8 +276,10 @@ namespace MultiplayerARPG
                             {
                                 if (damageElement.DamageHitEffects != null && damageElement.DamageHitEffects.Length > 0)
                                     effects = damageElement.DamageHitEffects;
+#if !DISABLE_ADDRESSABLES
                                 if (damageElement.AddressableDamageHitEffects != null && damageElement.AddressableDamageHitEffects.Length > 0)
                                     addressableEffects = damageElement.AddressableDamageHitEffects;
+#endif
                             }
                             break;
                         case HitEffectsSourceType.Skill:
@@ -283,8 +287,10 @@ namespace MultiplayerARPG
                             {
                                 if (skill.DamageHitEffects != null && skill.DamageHitEffects.Length > 0)
                                     effects = skill.DamageHitEffects;
+#if !DISABLE_ADDRESSABLES
                                 if (skill.AddressableDamageHitEffects != null && skill.AddressableDamageHitEffects.Length > 0)
                                     addressableEffects = skill.AddressableDamageHitEffects;
+#endif
                             }
                             break;
                     }
@@ -292,7 +298,9 @@ namespace MultiplayerARPG
                     if (hitEffectsSourceType != HitEffectsSourceType.None)
                         PlayHitAnimation();
                     Model.InstantiateEffect(effects);
+#if !DISABLE_ADDRESSABLES
                     Model.InstantiateEffect(addressableEffects).Forget();
+#endif
                 }
             }
         }

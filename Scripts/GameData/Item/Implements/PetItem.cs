@@ -41,17 +41,19 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Category(3, "Pet Settings")]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressablePetEntity))]
+#endif
         private BaseMonsterCharacterEntity petEntity = null;
 #endif
         public BaseMonsterCharacterEntity MonsterCharacterEntity
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return petEntity;
 #else
                 return null;
@@ -59,12 +61,14 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceBaseMonsterCharacterEntity addressablePetEntity = null;
         public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
         {
             get { return addressablePetEntity; }
         }
+#endif
 
         [SerializeField]
         private IncrementalFloat summonDuration = default;
@@ -130,10 +134,12 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddMonsterCharacterEntities(MonsterCharacterEntity);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceMonsterCharacterEntities(AddressableMonsterCharacterEntity);
+#endif
         }
     }
 }

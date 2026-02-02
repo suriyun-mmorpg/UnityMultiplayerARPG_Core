@@ -1,3 +1,4 @@
+#if !DISABLE_ADDRESSABLES
 using Insthync.AddressableAssetTools;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -179,3 +180,4 @@ namespace MultiplayerARPG
         }
     }
 }
+#endif

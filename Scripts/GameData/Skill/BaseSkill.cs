@@ -35,24 +35,32 @@ namespace MultiplayerARPG
 
         [Category(2, "Skill Casting")]
         [Header("Casting Effects")]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableSkillCastEffects))]
+#endif
         private GameEffect[] skillCastEffects = new GameEffect[0];
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceGameEffect[] addressableSkillCastEffects = new AssetReferenceGameEffect[0];
+#endif
         public IncrementalFloat castDuration = new IncrementalFloat();
         public bool canBeInterruptedWhileCasting;
 
         [Header("Casted Effects")]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableSkillActivateEffects))]
+#endif
         private GameEffect[] skillActivateEffects = new GameEffect[0];
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceGameEffect[] addressableSkillActivateEffects = new AssetReferenceGameEffect[0];
+#endif
 
         [Category(11, "Requirement")]
         [Header("Requirements to Levelup (Tools)")]
@@ -272,15 +280,19 @@ namespace MultiplayerARPG
             }
             if (TryGetSummon(out SkillSummon summon))
             {
+#if !DISABLE_ADDRESSABLES
                 GameInstance.AddAssetReferenceMonsterCharacterEntities(summon.AddressableMonsterCharacterEntity);
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 GameInstance.AddMonsterCharacterEntities(summon.MonsterCharacterEntity);
 #endif
             }
             if (TryGetMount(out SkillMount mount))
             {
+#if !DISABLE_ADDRESSABLES
                 GameInstance.AddAssetReferenceVehicleEntities(mount.AddressableMountEntity);
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 GameInstance.AddVehicleEntities(mount.MountEntity);
 #endif
             }
@@ -304,7 +316,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return skillCastEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -312,10 +324,12 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceGameEffect[] AddressableSkillCastEffects
         {
             get { return addressableSkillCastEffects; }
         }
+#endif
 
         public float GetCastDuration(int level)
         {
@@ -326,7 +340,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return skillActivateEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -334,20 +348,24 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceGameEffect[] AddressableSkillActivateEffects
         {
             get { return addressableSkillActivateEffects; }
         }
+#endif
 
         public virtual GameEffect[] DamageHitEffects
         {
             get { return null; }
         }
 
+#if !DISABLE_ADDRESSABLES
         public virtual AssetReferenceGameEffect[] AddressableDamageHitEffects
         {
             get { return null; }
         }
+#endif
 
         public int GetConsumeHp(int level)
         {

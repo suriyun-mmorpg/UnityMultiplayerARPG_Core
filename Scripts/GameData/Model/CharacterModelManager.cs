@@ -22,17 +22,19 @@ namespace MultiplayerARPG
         private BaseCharacterModel mainTpsModel = null;
         public BaseCharacterModel MainTpsModel { get { return mainTpsModel; } set { mainTpsModel = value; } }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Header("FPS Model Settings")]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableFpsModelPrefab))]
+#endif
         protected BaseCharacterModel fpsModelPrefab;
 #endif
         public BaseCharacterModel FpsModelPrefab
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData) && metaData.OverrideFpsModel)
                     return metaData.FpsModelPrefab;
                 return fpsModelPrefab;
@@ -42,12 +44,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 fpsModelPrefab = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceBaseCharacterModel addressableFpsModelPrefab;
         public AssetReferenceBaseCharacterModel AddressableFpsModelPrefab
@@ -60,6 +63,7 @@ namespace MultiplayerARPG
             }
             set { addressableFpsModelPrefab = value; }
         }
+#endif
 
         [SerializeField]
         [FormerlySerializedAs("fpsModelOffsets")]
@@ -132,10 +136,12 @@ namespace MultiplayerARPG
             base.OnDestroy();
 
             mainTpsModel = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             fpsModelPrefab = null;
 #endif
+#if !DISABLE_ADDRESSABLES
             addressableFpsModelPrefab = null;
+#endif
             ActiveTpsModel = null;
             ActiveFpsModel = null;
             MainFpsModel = null;
@@ -178,7 +184,13 @@ namespace MultiplayerARPG
 
         public async UniTask<BaseCharacterModel> InstantiateFpsModel(Transform container)
         {
-            BaseCharacterModel loadedPrefab = await AddressableFpsModelPrefab.GetOrLoadAssetAsyncOrUsePrefab(FpsModelPrefab);
+            BaseCharacterModel loadedPrefab;
+#if !DISABLE_ADDRESSABLES
+            loadedPrefab = await AddressableFpsModelPrefab.GetOrLoadAssetAsyncOrUsePrefab(FpsModelPrefab);
+#else
+            await UniTask.Yield();
+            loadedPrefab = FpsModelPrefab;
+#endif
             if (loadedPrefab == null)
                 return null;
             MainFpsModel = Instantiate(loadedPrefab, container);
@@ -186,7 +198,7 @@ namespace MultiplayerARPG
             MainFpsModel.transform.localEulerAngles = FpsModelRotationOffsets;
             InitFpsModel(MainFpsModel);
             MainFpsModel.SetEquipItems(MainTpsModel.EquipItems, MainTpsModel.SelectableWeaponSets, MainTpsModel.EquipWeaponSet, MainTpsModel.IsWeaponsSheathed);
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !DISABLE_ADDRESSABLES
             IComponentWithPrefabRef[] refs = MainFpsModel.GetComponents<IComponentWithPrefabRef>();
             for (int i = 0; i < refs.Length; ++i)
             {

@@ -3,7 +3,9 @@ using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -106,25 +108,25 @@ namespace MultiplayerARPG
             addSpreadWhileAttackAndMoving = 20f,
         };
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [HideInInspector]
         public AudioClip launchClip;
 #endif
         public AudioClipWithVolumeSettings[] launchClipSettings = new AudioClipWithVolumeSettings[0];
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [HideInInspector]
         public AudioClip reloadClip;
 #endif
         public AudioClipWithVolumeSettings[] reloadClipSettings = new AudioClipWithVolumeSettings[0];
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [HideInInspector]
         public AudioClip reloadedClip;
 #endif
         public AudioClipWithVolumeSettings[] reloadedClipSettings = new AudioClipWithVolumeSettings[0];
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [HideInInspector]
         public AudioClip emptyClip;
 #endif
@@ -179,27 +181,39 @@ namespace MultiplayerARPG
         public AmmoType ammoType;
 
         [Category(2, "Building Settings")]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableBuildingEntity))]
+#endif
         public BuildingEntity buildingEntity;
 #endif
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceBuildingEntity addressableBuildingEntity;
+#endif
 
         [Category(2, "Pet Settings")]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressablePetEntity))]
+#endif
         public BaseMonsterCharacterEntity petEntity;
 #endif
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceBaseMonsterCharacterEntity addressablePetEntity;
+#endif
         public IncrementalFloat summonDuration;
         public bool noSummonDuration = true;
 
         [Category(2, "Mount Settings")]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableMountEntity))]
+#endif
         public VehicleEntity mountEntity;
 #endif
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceVehicleEntity addressableMountEntity;
+#endif
         public IncrementalFloat mountDuration;
         public bool noMountDuration = true;
 
@@ -321,28 +335,36 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR || !UNITY_SERVER
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableAmmoModel))]
+#endif
         protected GameObject ammoModel;
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceGameObject addressableAmmoModel = null;
 #endif
+#endif
 
 #if UNITY_EDITOR || !UNITY_SERVER
-        public async UniTask<GameObject> GetAmmoAttachModel()
+        public UniTask<GameObject> GetAmmoAttachModel()
         {
             GameObject equipModel = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             equipModel = ammoModel;
 #endif
-            return await addressableAmmoModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+#if !DISABLE_ADDRESSABLES
+            return addressableAmmoModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+#else
+            return UniTask.FromResult(equipModel);
+#endif
         }
 #endif
-        #endregion
+#endregion
 
-        #region Implement IEquipmentItem
+            #region Implement IEquipmentItem
         public ItemRequirement Requirement
         {
             get { return requirement; }
@@ -753,7 +775,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 if (itemType == LegacyItemType.Building)
                     return buildingEntity;
 #endif
@@ -761,6 +783,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceBuildingEntity AddressableBuildingEntity
         {
             get
@@ -770,12 +793,13 @@ namespace MultiplayerARPG
                 return null;
             }
         }
+#endif
 
         public BaseMonsterCharacterEntity MonsterCharacterEntity
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 if (itemType == LegacyItemType.Pet)
                     return petEntity;
 #endif
@@ -783,6 +807,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
         {
             get
@@ -792,6 +817,7 @@ namespace MultiplayerARPG
                 return null;
             }
         }
+#endif
 
         public IncrementalFloat SummonDuration
         {
@@ -807,7 +833,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 if (itemType == LegacyItemType.Mount)
                     return mountEntity;
 #endif
@@ -815,6 +841,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceVehicleEntity AddressableVehicleEntity
         {
             get
@@ -824,6 +851,7 @@ namespace MultiplayerARPG
                 return null;
             }
         }
+#endif
 
         public IncrementalFloat MountDuration
         {
@@ -874,7 +902,7 @@ namespace MultiplayerARPG
                 return 0;
             }
         }
-        #endregion
+#endregion
 
         #region Implement ISocketEnhancerItem
         public SocketEnhancerType SocketEnhancerType
@@ -888,26 +916,34 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR || !UNITY_SERVER
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableSocketEnhancerModel))]
+#endif
         protected GameObject socketEnhancerModel;
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceGameObject addressableSocketEnhancerModel = null;
 #endif
+#endif
 
 #if UNITY_EDITOR || !UNITY_SERVER
-        public async UniTask<GameObject> GetSocketEnhancerAttachModel()
+        public UniTask<GameObject> GetSocketEnhancerAttachModel()
         {
             GameObject equipModel = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             equipModel = socketEnhancerModel;
 #endif
-            return await addressableSocketEnhancerModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+#if !DISABLE_ADDRESSABLES
+            return addressableSocketEnhancerModel.GetOrLoadAssetAsyncOrUsePrefab(equipModel);
+#else
+            return UniTask.FromResult(equipModel);
+#endif
         }
 #endif
-        #endregion
+#endregion
 
         public override bool Validate()
         {
@@ -920,7 +956,7 @@ namespace MultiplayerARPG
                 }.ToArray();
                 hasChanges = true;
             }
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             if (MigrateAudioClips(ref launchClip, ref launchClipSettings))
                 hasChanges = true;
             if (MigrateAudioClips(ref reloadClip, ref reloadClipSettings))
@@ -989,7 +1025,7 @@ namespace MultiplayerARPG
             {
                 clipSettings.Add(new AudioClipWithVolumeSettings()
                 {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                     audioClip = clips[i],
 #endif
                     minRandomVolume = 1f,
@@ -1003,14 +1039,16 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddBuildingEntities(buildingEntity);
             GameInstance.AddMonsterCharacterEntities(petEntity);
             GameInstance.AddVehicleEntities(mountEntity);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceBuildingEntities(addressableBuildingEntity);
             GameInstance.AddAssetReferenceMonsterCharacterEntities(addressablePetEntity);
             GameInstance.AddAssetReferenceVehicleEntities(addressableMountEntity);
+#endif
             GameInstance.AddAttributes(increaseAttributes);
             GameInstance.AddAttributes(increaseAttributesRate);
             GameInstance.AddDamageElements(increaseResistances);
@@ -1196,7 +1234,11 @@ namespace MultiplayerARPG
                 case LegacyItemType.Potion:
                     return default;
                 case LegacyItemType.Building:
+#if !DISABLE_ADDRESSABLES
                     BuildingEntity tempBuildingEntity = AddressableBuildingEntity.GetOrLoadAssetOrUsePrefab(BuildingEntity);
+#else
+                    BuildingEntity tempBuildingEntity = BuildingEntity;
+#endif
                     if (tempBuildingEntity != null)
                         return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, tempBuildingEntity);
                     return default;

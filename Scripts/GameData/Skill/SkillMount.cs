@@ -6,7 +6,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial class SkillMount : IAddressableAssetConversable
     {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Tooltip("Leave `Mount Entity` to NULL to not summon mount entity")]
         [SerializeField]
         private VehicleEntity mountEntity;
@@ -15,7 +15,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return mountEntity;
 #else
                 return null;
@@ -23,6 +23,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceVehicleEntity addressableMountEntity;
         public AssetReferenceVehicleEntity AddressableMountEntity
@@ -32,6 +33,7 @@ namespace MultiplayerARPG
                 return addressableMountEntity;
             }
         }
+#endif
 
         [SerializeField]
         private IncrementalFloat duration;
@@ -47,7 +49,7 @@ namespace MultiplayerARPG
 
         public void ProceedAddressableAssetConversion(string groupName)
         {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !DISABLE_ADDRESSABLES
             AddressableEditorUtils.ConvertObjectRefToAddressable(ref mountEntity, ref addressableMountEntity, groupName);
 #endif
         }

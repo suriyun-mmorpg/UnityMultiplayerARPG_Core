@@ -5,7 +5,9 @@ using LiteNetLib.Utils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
@@ -18,9 +20,11 @@ namespace MultiplayerARPG
         private SceneField scene = default;
         public virtual SceneField Scene { get { return scene; } }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceScene addressableScene;
         public virtual AssetReferenceScene AddressableScene { get { return addressableScene; } }
+#endif
 
         [Tooltip("This will be used when new character has been created to set its position, and this map data is the start map")]
         [SerializeField]
@@ -50,7 +54,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private bool disableDueling = false;
         public virtual bool DisableDueling { get { return disableDueling; } }
-        #endregion
+#endregion
 
         #region Character Death Rules
         [Category("Character Death Rules")]
@@ -159,18 +163,20 @@ namespace MultiplayerARPG
         #endregion
 
         #region Minimap Settings
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Category("Minimap Settings")]
         [PreviewSprite(50)]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableMinimapSprite))]
+#endif
         private Sprite minimapSprite;
 #endif
         public Sprite MinimapSprite
         {
             private get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return minimapSprite;
 #else
                 return null;
@@ -178,12 +184,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 minimapSprite = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceSprite addressableMinimapSprite;
         public AssetReferenceSprite AddressableMinimapSprite
@@ -197,23 +204,30 @@ namespace MultiplayerARPG
                 addressableMinimapSprite = value;
             }
         }
+#endif
 
-        public async UniTask<Sprite> GetMinimapSprite()
+        public UniTask<Sprite> GetMinimapSprite()
         {
-            return await AddressableMinimapSprite.GetOrLoadObjectAsyncOrUseAsset(MinimapSprite);
+#if !DISABLE_ADDRESSABLES
+            return AddressableMinimapSprite.GetOrLoadObjectAsyncOrUseAsset(MinimapSprite);
+#else
+            return UniTask.FromResult(MinimapSprite);
+#endif
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [PreviewSprite(50)]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableMinimapSprite2))]
+#endif
         private Sprite minimapSprite2;
 #endif
         public Sprite MinimapSprite2
         {
             private get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return minimapSprite2;
 #else
                 return null;
@@ -221,12 +235,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 minimapSprite2 = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceSprite addressableMinimapSprite2;
         public AssetReferenceSprite AddressableMinimapSprite2
@@ -240,10 +255,15 @@ namespace MultiplayerARPG
                 addressableMinimapSprite2 = value;
             }
         }
+#endif
 
-        public async UniTask<Sprite> GetMinimapSprite2()
+        public UniTask<Sprite> GetMinimapSprite2()
         {
-            return await AddressableMinimapSprite2.GetOrLoadObjectAsyncOrUseAsset(MinimapSprite2);
+#if !DISABLE_ADDRESSABLES
+            return AddressableMinimapSprite2.GetOrLoadObjectAsyncOrUseAsset(MinimapSprite2);
+#else
+            return UniTask.FromResult(MinimapSprite2);
+#endif
         }
 
         [SerializeField]
@@ -263,7 +283,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private float minimapOrthographicSize;
         public float MinimapOrthographicSize { get { return minimapOrthographicSize; } set { minimapOrthographicSize = value; } }
-        #endregion
+#endregion
 
         public virtual bool AutoRespawnWhenDead { get { return false; } }
         public virtual bool SaveCurrentMapPosition { get { return true; } }

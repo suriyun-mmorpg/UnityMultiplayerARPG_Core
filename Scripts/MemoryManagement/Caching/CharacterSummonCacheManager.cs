@@ -36,13 +36,26 @@ namespace MultiplayerARPG
         /// <param name="prefab"></param>
         /// <param name="addressablePrefab"></param>
         /// <returns></returns>
-        public bool GetPrefab(in CharacterSummon data, out BaseMonsterCharacterEntity prefab, out AssetReferenceBaseMonsterCharacterEntity addressablePrefab)
+        public bool GetPrefab(in CharacterSummon data
+            , out BaseMonsterCharacterEntity prefab
+#if !DISABLE_ADDRESSABLES
+            , out AssetReferenceBaseMonsterCharacterEntity addressablePrefab
+#endif
+            )
         {
             prefab = null;
+#if !DISABLE_ADDRESSABLES
             addressablePrefab = null;
+#endif
             CharacterSummonCacheData cachedData = GetOrMakeCache(data.id, in data);
             if (cachedData != null)
-                return cachedData.GetPrefab(out prefab, out addressablePrefab);
+            {
+                return cachedData.GetPrefab(out prefab
+#if !DISABLE_ADDRESSABLES
+                    , out addressablePrefab
+#endif
+                    );
+            }
             return false;
         }
 

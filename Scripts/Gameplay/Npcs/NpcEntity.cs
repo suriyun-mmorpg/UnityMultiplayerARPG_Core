@@ -126,10 +126,26 @@ namespace MultiplayerARPG
         {
             if (!IsClient)
                 return;
+#if !DISABLE_ADDRESSABLES
             // Instantiates npc objects
             await CurrentGameInstance.AddressableNpcObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NpcObjects, EntityTransform);
+#else
+            foreach (var prefab in CurrentGameInstance.NpcObjects)
+            {
+                if (prefab == null) continue;
+                Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform);
+            }
+#endif
+#if !DISABLE_ADDRESSABLES
             // Instantiates npc minimap objects
             await CurrentGameInstance.AddressableNpcMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NpcMiniMapObjects, EntityTransform);
+#else
+            foreach (var prefab in CurrentGameInstance.NpcMiniMapObjects)
+            {
+                if (prefab == null) continue;
+                Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform);
+            }
+#endif
             // Instantiates npc UI
             InstantiateUI(await CurrentGameInstance.GetLoadedNpcUIPrefab());
             // Instantiates npc quest indicator

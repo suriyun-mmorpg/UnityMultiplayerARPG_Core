@@ -7,8 +7,10 @@ using System.IO;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -661,7 +663,7 @@ namespace MultiplayerARPG
                     return prefab != null;
                 }
             }
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             return GameInstance.PlayerCharacterEntities.TryGetValue(hashAssetId, out prefab);
 #else
             prefab = null;
@@ -669,6 +671,7 @@ namespace MultiplayerARPG
 #endif
         }
 
+#if !DISABLE_ADDRESSABLES
         public static bool TryGetEntityAddressablePrefab(this IPlayerCharacterData data, out AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity> assetRef, out int metaDataId)
         {
             int hashAssetId = GameInstance.GetPlayerCharacterEntityHashAssetId(data.EntityId, out metaDataId);
@@ -682,11 +685,13 @@ namespace MultiplayerARPG
             }
             return GameInstance.AddressablePlayerCharacterEntities.TryGetValue(hashAssetId, out assetRef);
         }
+#endif
 
         public static BaseCharacterModel InstantiateModel(this IPlayerCharacterData data, Transform parent)
         {
             BaseCharacterEntity result;
             int metaDataId;
+#if !DISABLE_ADDRESSABLES
             if (data.TryGetEntityAddressablePrefab(out var assetRef, out metaDataId))
             {
                 AsyncOperationHandle<GameObject> handler = Addressables.LoadAssetAsync<GameObject>(assetRef.RuntimeKey);
@@ -695,6 +700,9 @@ namespace MultiplayerARPG
                 result.gameObject.AddComponent<AssetReferenceReleaser>();
                 Addressables.Release(handler);
             }
+#else
+            if (false) { }
+#endif
             else if (data.TryGetEntityPrefab(out var prefab, out metaDataId))
             {
                 result = Object.Instantiate(prefab);

@@ -66,8 +66,10 @@ namespace MultiplayerARPG
             {
                 case GameStartType.Host:
                     SetMapInfo(selectedCharacter.CurrentMapName);
+#if !DISABLE_ADDRESSABLES
                     Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                     Assets.onlineScene = CurrentMapInfo.Scene;
 #endif
                     networkPort = gameServiceConnection.networkPort;
@@ -87,8 +89,10 @@ namespace MultiplayerARPG
                     break;
                 case GameStartType.SinglePlayer:
                     SetMapInfo(selectedCharacter.CurrentMapName);
+#if !DISABLE_ADDRESSABLES
                     Assets.addressableOnlineScene = CurrentMapInfo.AddressableScene;
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                     Assets.onlineScene = CurrentMapInfo.Scene;
 #endif
                     StartHost(true);
@@ -248,7 +252,11 @@ namespace MultiplayerARPG
         private void SpawnPlayerCharacter(long connectionId, PlayerCharacterData playerCharacterData, List<CharacterBuff> summonBuffs)
         {
             // If it is not allow this character data, disconnect user
-            if (!playerCharacterData.TryGetEntityAddressablePrefab(out _, out _) && !playerCharacterData.TryGetEntityPrefab(out _, out _))
+            if (!playerCharacterData.TryGetEntityPrefab(out _, out _)
+#if !DISABLE_ADDRESSABLES
+                && !playerCharacterData.TryGetEntityAddressablePrefab(out _, out _)
+#endif
+                )
             {
                 Logging.LogError(LogTag, "Cannot find player character with entity Id: " + playerCharacterData.EntityId);
                 return;

@@ -6,7 +6,9 @@ using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 using UnityEngine.Rendering;
 using UnityEngine.Serialization;
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
@@ -172,10 +174,10 @@ namespace MultiplayerARPG
         private BaseItem goldDropRepresentItem = null;
         [SerializeField]
         private CurrencyItemPair[] currencyDropRepresentItems = new CurrencyItemPair[0];
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS && !DISABLE_ADDRESSABLES
         public UnityHelpBox entityHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
         private ItemDropEntity itemDropEntityPrefab = null;
         [SerializeField]
@@ -202,6 +204,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private BasePlayerCharacterController defaultControllerPrefab = null;
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceItemDropEntity addressableItemDropEntityPrefab = null;
         [SerializeField]
@@ -227,15 +230,16 @@ namespace MultiplayerARPG
         [Tooltip("Default controller prefab will be used when controller prefab at player character entity is null")]
         [SerializeField]
         private AssetReferenceBasePlayerCharacterController addressableDefaultControllerPrefab = null;
+#endif
 
         [Tooltip("This is camera controller when start game as server (not start with client as host)")]
         public ServerCharacter serverCharacterPrefab = null;
 
         [Header("Character Objects")]
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS && !DISABLE_ADDRESSABLES
         public UnityHelpBox effectHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Tooltip("These objects will be instantiate as owning character's children")]
         [SerializeField]
         private GameObject[] owningCharacterObjects = new GameObject[0];
@@ -261,6 +265,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private GameObject[] npcMiniMapObjects = new GameObject[0];
 #endif
+#if !DISABLE_ADDRESSABLES
         [Tooltip("These objects will be instantiate as owning character's children")]
         [SerializeField]
         private AssetReference[] addressableOwningCharacterObjects = new AssetReference[0];
@@ -285,12 +290,13 @@ namespace MultiplayerARPG
         [Tooltip("These objects will be instantiate as npc's children to show in minimap")]
         [SerializeField]
         private AssetReference[] addressableNpcMiniMapObjects = new AssetReference[0];
+#endif
 
         [Header("Character UIs")]
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS && !DISABLE_ADDRESSABLES
         public UnityHelpBox effectHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
         [SerializeField]
         private UICharacterEntity owningCharacterUI = null;
@@ -307,6 +313,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private NpcQuestIndicator npcQuestIndicator = null;
 #endif
+#if !DISABLE_ADDRESSABLES
         [Tooltip("This UI will be instaniate as owning character's child to show character name / HP / MP / Food / Water")]
         [SerializeField]
         private AssetReferenceUICharacterEntity addressableOwningCharacterUI = null;
@@ -322,12 +329,13 @@ namespace MultiplayerARPG
         [Tooltip("This UI will be instaniate as NPC's child to show quest indecator")]
         [SerializeField]
         private AssetReferenceNpcQuestIndicator addressableNpcQuestIndicator = null;
+#endif
 
         [Header("Gameplay Effects")]
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS && !DISABLE_ADDRESSABLES
         public UnityHelpBox effectHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
         [HideInInspector]
         // TODO: Deprecated, use `levelUpEffects` instead.
@@ -341,6 +349,7 @@ namespace MultiplayerARPG
         [SerializeField]
         private GameEffect[] freezeEffects = new GameEffect[0];
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceGameEffect[] addressableLevelUpEffects = new AssetReferenceGameEffect[0];
         [SerializeField]
@@ -349,6 +358,7 @@ namespace MultiplayerARPG
         private AssetReferenceGameEffect[] addressableMuteEffects = new AssetReferenceGameEffect[0];
         [SerializeField]
         private AssetReferenceGameEffect[] addressableFreezeEffects = new AssetReferenceGameEffect[0];
+#endif
 
         [Header("Gameplay Database and Default Data")]
         [Tooltip("Exp tree for both player character, monster character and item, this may be deprecated in the future, you should setup `Exp Table` instead.")]
@@ -377,15 +387,17 @@ namespace MultiplayerARPG
         [SerializeField]
         private DamageElement defaultDamageElement = null;
         [Tooltip("Default hit effects, will be used when attack to enemies or receive damages from enemies")]
-#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR && EXCLUDE_PREFAB_REFS && !DISABLE_ADDRESSABLES
         public UnityHelpBox damageHitEffectHelpBox = new UnityHelpBox("`EXCLUDE_PREFAB_REFS` is set, you have to use only addressable assets!", UnityHelpBox.Type.Warning);
 #endif
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
         private GameEffect[] defaultDamageHitEffects = new GameEffect[0];
 #endif
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceGameEffect[] addressableDefaultDamageHitEffects = new AssetReferenceGameEffect[0];
+#endif
 
         [Header("Object Tags and Layers")]
         [Tooltip("Tag for player character entities, this tag will set to player character entities game object when instantiated")]
@@ -576,7 +588,9 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR
         [Header("Playing In Editor")]
         public TestInEditorMode testInEditorMode = TestInEditorMode.Standalone;
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceLanRpgNetworkManager networkManagerForOfflineTesting;
+#endif
 #endif
 
         // Static events
@@ -662,7 +676,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 if ((Application.isMobilePlatform || IsMobileTestInEditor()) && uiSceneGameplayMobilePrefab != null)
                     return uiSceneGameplayMobilePrefab;
                 if ((Application.isConsolePlatform || IsConsoleTestInEditor()) && uiSceneGameplayConsolePrefab != null)
@@ -674,6 +688,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceBaseUISceneGameplay AddressableUISceneGameplayPrefab
         {
             get
@@ -685,6 +700,7 @@ namespace MultiplayerARPG
                 return addressableUiSceneGameplayPrefab;
             }
         }
+#endif
 
         public ExpTable ExpTable
         {
@@ -705,7 +721,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return itemDropEntityPrefab;
 #else
                 return null;
@@ -717,7 +733,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return expDropEntityPrefab;
 #else
                 return null;
@@ -729,7 +745,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return goldDropEntityPrefab;
 #else
                 return null;
@@ -741,7 +757,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return currencyDropEntityPrefab;
 #else
                 return null;
@@ -753,7 +769,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return warpPortalEntityPrefab;
 #else
                 return null;
@@ -765,7 +781,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return playerCorpsePrefab;
 #else
                 return null;
@@ -777,7 +793,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return monsterCorpsePrefab;
 #else
                 return null;
@@ -789,8 +805,8 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
-            return uiSceneGameplayPrefab;
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+                return uiSceneGameplayPrefab;
 #else
                 return null;
 #endif
@@ -801,7 +817,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return uiSceneGameplayMobilePrefab;
 #else
                 return null;
@@ -813,7 +829,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return uiSceneGameplayConsolePrefab;
 #else
                 return null;
@@ -825,7 +841,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return defaultControllerPrefab;
 #else
                 return null;
@@ -833,6 +849,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceItemDropEntity AddressableItemDropEntityPrefab
         {
             get { return addressableItemDropEntityPrefab; }
@@ -887,67 +904,123 @@ namespace MultiplayerARPG
         {
             get { return addressableDefaultControllerPrefab; }
         }
+#endif
 
         public async UniTask<ItemDropEntity> GetLoadedItemDropEntityPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableItemDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(ItemDropEntityPrefab);
+#else
+            await UniTask.Yield();
+            return ItemDropEntityPrefab;
+#endif
         }
 
         public async UniTask<ExpDropEntity> GetLoadedExpDropEntityPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableExpDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(ExpDropEntityPrefab);
+#else
+            await UniTask.Yield();
+            return ExpDropEntityPrefab;
+#endif
         }
 
         public async UniTask<GoldDropEntity> GetLoadedGoldDropEntityPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableGoldDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(GoldDropEntityPrefab);
+#else
+            await UniTask.Yield();
+            return GoldDropEntityPrefab;
+#endif
         }
 
         public async UniTask<CurrencyDropEntity> GetLoadedCurrencyDropEntityPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableCurrencyDropEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(CurrencyDropEntityPrefab);
+#else
+            await UniTask.Yield();
+            return CurrencyDropEntityPrefab;
+#endif
         }
 
         public async UniTask<WarpPortalEntity> GetLoadedWarpPortalEntityPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableWarpPortalEntityPrefab.GetOrLoadAssetAsyncOrUsePrefab(WarpPortalEntityPrefab);
+#else
+            await UniTask.Yield();
+            return WarpPortalEntityPrefab;
+#endif
         }
 
         public async UniTask<ItemsContainerEntity> GetLoadedPlayerCorpsePrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressablePlayerCorpsePrefab.GetOrLoadAssetAsyncOrUsePrefab(PlayerCorpsePrefab);
+#else
+            await UniTask.Yield();
+            return PlayerCorpsePrefab;
+#endif
         }
 
         public async UniTask<ItemsContainerEntity> GetLoadedMonsterCorpsePrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableMonsterCorpsePrefab.GetOrLoadAssetAsyncOrUsePrefab(MonsterCorpsePrefab);
+#else
+            await UniTask.Yield();
+            return MonsterCorpsePrefab;
+#endif
         }
 
         public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableUiSceneGameplayPrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayPrefab);
+#else
+            await UniTask.Yield();
+            return UiSceneGameplayPrefab;
+#endif
         }
 
         public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayMobilePrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableUiSceneGameplayMobilePrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayMobilePrefab);
+#else
+            await UniTask.Yield();
+            return UiSceneGameplayMobilePrefab;
+#endif
         }
 
         public async UniTask<BaseUISceneGameplay> GetLoadedUiSceneGameplayConsolePrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableUiSceneGameplayConsolePrefab.GetOrLoadAssetAsyncOrUsePrefab(UiSceneGameplayConsolePrefab);
+#else
+            await UniTask.Yield();
+            return UiSceneGameplayConsolePrefab;
+#endif
         }
 
         public async UniTask<BasePlayerCharacterController> GetLoadedDefaultControllerPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableDefaultControllerPrefab.GetOrLoadAssetAsyncOrUsePrefab(DefaultControllerPrefab);
+#else
+            await UniTask.Yield();
+            return DefaultControllerPrefab;
+#endif
         }
 
         public GameObject[] OwningCharacterObjects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return owningCharacterObjects;
 #else
                 return System.Array.Empty<GameObject>();
@@ -955,16 +1028,18 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReference[] AddressableOwningCharacterObjects
         {
             get { return addressableOwningCharacterObjects; }
         }
+#endif
 
         public GameObject[] OwningCharacterMiniMapObjects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return owningCharacterMiniMapObjects;
 #else
                 return System.Array.Empty<GameObject>();
@@ -972,16 +1047,18 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReference[] AddressableOwningCharacterMiniMapObjects
         {
             get { return addressableOwningCharacterMiniMapObjects; }
         }
+#endif
 
         public GameObject[] NonOwningCharacterObjects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return nonOwningCharacterObjects;
 #else
                 return System.Array.Empty<GameObject>();
@@ -989,16 +1066,18 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReference[] AddressableNonOwningCharacterObjects
         {
             get { return addressableNonOwningCharacterObjects; }
         }
+#endif
 
         public GameObject[] NonOwningCharacterMiniMapObjects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return nonOwningCharacterMiniMapObjects;
 #else
                 return System.Array.Empty<GameObject>();
@@ -1006,16 +1085,18 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReference[] AddressableNonOwningCharacterMiniMapObjects
         {
             get { return addressableNonOwningCharacterMiniMapObjects; }
         }
+#endif
 
         public GameObject[] MonsterCharacterObjects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return monsterCharacterObjects;
 #else
                 return System.Array.Empty<GameObject>();
@@ -1023,16 +1104,18 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReference[] AddressableMonsterCharacterObjects
         {
             get { return addressableMonsterCharacterObjects; }
         }
+#endif
 
         public GameObject[] MonsterCharacterMiniMapObjects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return monsterCharacterMiniMapObjects;
 #else
                 return System.Array.Empty<GameObject>();
@@ -1040,16 +1123,18 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReference[] AddressableMonsterCharacterMiniMapObjects
         {
             get { return addressableMonsterCharacterMiniMapObjects; }
         }
+#endif
 
         public GameObject[] NpcObjects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return npcObjects;
 #else
                 return System.Array.Empty<GameObject>();
@@ -1057,16 +1142,18 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReference[] AddressableNpcObjects
         {
             get { return addressableNpcObjects; }
         }
+#endif
 
         public GameObject[] NpcMiniMapObjects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return npcMiniMapObjects;
 #else
                 return System.Array.Empty<GameObject>();
@@ -1074,16 +1161,18 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReference[] AddressableNpcMiniMapObjects
         {
             get { return addressableNpcMiniMapObjects; }
         }
+#endif
 
         public UICharacterEntity OwningCharacterUI
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return owningCharacterUI;
 #else
                 return null;
@@ -1095,7 +1184,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return nonOwningCharacterUI;
 #else
                 return null;
@@ -1107,7 +1196,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return monsterCharacterUI;
 #else
                 return null;
@@ -1119,7 +1208,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return npcUI;
 #else
                 return null;
@@ -1131,7 +1220,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return npcQuestIndicator;
 #else
                 return null;
@@ -1139,6 +1228,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceUICharacterEntity AddressableOwningCharacterUI
         {
             get { return addressableOwningCharacterUI; }
@@ -1163,37 +1253,63 @@ namespace MultiplayerARPG
         {
             get { return addressableNpcQuestIndicator; }
         }
+#endif
 
         public async UniTask<UICharacterEntity> GetLoadedOwningCharacterUIPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableOwningCharacterUI.GetOrLoadAssetAsyncOrUsePrefab(OwningCharacterUI);
+#else
+            await UniTask.Yield();
+            return OwningCharacterUI;
+#endif
         }
 
         public async UniTask<UICharacterEntity> GetLoadedNonOwningCharacterUIPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableNonOwningCharacterUI.GetOrLoadAssetAsyncOrUsePrefab(NonOwningCharacterUI);
+#else
+            await UniTask.Yield();
+            return NonOwningCharacterUI;
+#endif
         }
 
         public async UniTask<UICharacterEntity> GetLoadedMonsterCharacterUIPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableMonsterCharacterUI.GetOrLoadAssetAsyncOrUsePrefab(MonsterCharacterUI);
+#else
+            await UniTask.Yield();
+            return MonsterCharacterUI;
+#endif
         }
 
         public async UniTask<UINpcEntity> GetLoadedNpcUIPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableNpcUI.GetOrLoadAssetAsyncOrUsePrefab(NpcUI);
+#else
+            await UniTask.Yield();
+            return NpcUI;
+#endif
         }
 
         public async UniTask<NpcQuestIndicator> GetLoadedNpcQuestIndicatorPrefab()
         {
+#if !DISABLE_ADDRESSABLES
             return await AddressableNpcQuestIndicator.GetOrLoadAssetAsyncOrUsePrefab(NpcQuestIndicator);
+#else
+            await UniTask.Yield();
+            return NpcQuestIndicator;
+#endif
         }
 
         public GameEffect[] LevelUpEffects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return levelUpEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -1205,7 +1321,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return stunEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -1217,7 +1333,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return muteEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -1229,7 +1345,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return freezeEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -1237,6 +1353,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceGameEffect[] AddressableLevelUpEffects
         {
             get { return addressableLevelUpEffects; }
@@ -1256,6 +1373,7 @@ namespace MultiplayerARPG
         {
             get { return addressableFreezeEffects; }
         }
+#endif
 
         public ArmorType DefaultArmorType
         {
@@ -1286,7 +1404,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return defaultDamageHitEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -1294,10 +1412,12 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceGameEffect[] AddressableDefaultDamageHitEffects
         {
             get { return addressableDefaultDamageHitEffects; }
         }
+#endif
 
         public NewCharacterSetting NewCharacterSetting
         {
@@ -1389,7 +1509,11 @@ namespace MultiplayerARPG
             if (defaultDamageElement == null)
             {
                 defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>()
-                    .GenerateDefaultDamageElement(DefaultDamageHitEffects, AddressableDefaultDamageHitEffects);
+                    .GenerateDefaultDamageElement(DefaultDamageHitEffects
+#if !DISABLE_ADDRESSABLES
+                    , AddressableDefaultDamageHitEffects
+#endif
+                    );
             }
 
             // Setup string formatter if not existed
@@ -1456,10 +1580,12 @@ namespace MultiplayerARPG
             }
 
             // Setup default home scenes
+#if !DISABLE_ADDRESSABLES
             if (!addressableHomeMobileScene.IsDataValid())
                 addressableHomeMobileScene = addressableHomeScene;
             if (!addressableHomeConsoleScene.IsDataValid())
                 addressableHomeConsoleScene = addressableHomeScene;
+#endif
             if (!homeMobileScene.IsDataValid())
                 homeMobileScene = homeScene;
             if (!homeConsoleScene.IsDataValid())
@@ -1508,7 +1634,7 @@ namespace MultiplayerARPG
             StatusEffects.Clear();
             DamageElements.Clear();
             EquipmentSets.Clear();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             BuildingEntities.Clear();
             PlayerCharacterEntities.Clear();
             MonsterCharacterEntities.Clear();
@@ -1518,6 +1644,7 @@ namespace MultiplayerARPG
             WarpPortalEntities.Clear();
             NpcEntities.Clear();
 #endif
+#if !DISABLE_ADDRESSABLES
             AddressableBuildingEntities.Clear();
             AddressablePlayerCharacterEntities.Clear();
             AddressableMonsterCharacterEntities.Clear();
@@ -1526,14 +1653,17 @@ namespace MultiplayerARPG
             AddressableVehicleEntities.Clear();
             AddressableWarpPortalEntities.Clear();
             AddressableNpcEntities.Clear();
+#endif
             MapWarpPortals.Clear();
             MapNpcs.Clear();
             MapInfos.Clear();
             Factions.Clear();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             OtherNetworkObjectPrefabs.Clear();
 #endif
+#if !DISABLE_ADDRESSABLES
             AddressableOtherNetworkObjectPrefabs.Clear();
+#endif
         }
 
         public static bool UseMobileInput()

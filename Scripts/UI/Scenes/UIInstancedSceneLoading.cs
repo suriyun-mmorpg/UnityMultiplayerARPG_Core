@@ -55,10 +55,13 @@ namespace MultiplayerARPG
             await UniTask.Delay(Mathf.CeilToInt(finishedDelay * 1000));
             if (rootObject != null)
                 rootObject.SetActive(false);
+#if !DISABLE_ADDRESSABLES
             AddressableAssetsManager.ReleaseAll();
+#endif
             await Resources.UnloadUnusedAssets();
         }
 
+#if !DISABLE_ADDRESSABLES
         public virtual async UniTask LoadScene(AssetReferenceScene sceneRef)
         {
             if (SceneManager.GetActiveScene().name.Equals(sceneRef.SceneName))
@@ -96,5 +99,6 @@ namespace MultiplayerARPG
             AddressableAssetsManager.ReleaseAll();
             await Resources.UnloadUnusedAssets();
         }
+#endif
     }
 }

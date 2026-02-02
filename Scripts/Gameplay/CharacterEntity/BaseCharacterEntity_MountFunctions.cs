@@ -30,9 +30,15 @@ namespace MultiplayerARPG
             }
 
             // Instantiate new mount entity
-            LiteNetLibIdentity spawnObj;
-            if (mountType.GetPrefab(this, sourceId, out VehicleEntity prefab, out AssetReferenceVehicleEntity addressablePrefab))
+            LiteNetLibIdentity spawnObj = null;
+            if (mountType.GetPrefab(this, sourceId
+                , out VehicleEntity prefab
+#if !DISABLE_ADDRESSABLES
+                , out AssetReferenceVehicleEntity addressablePrefab
+#endif
+                ))
             {
+#if !DISABLE_ADDRESSABLES
                 // Update mount data
                 Mount = new CharacterMount()
                 {
@@ -45,6 +51,7 @@ namespace MultiplayerARPG
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
                     addressablePrefab.HashAssetId, enterPosition,
                     Quaternion.Euler(0, EntityTransform.eulerAngles.y, 0));
+#endif
             }
             else if (prefab != null)
             {

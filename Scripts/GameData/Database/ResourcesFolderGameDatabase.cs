@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             GameInstance.AddMapInfos(mapInfos);
             GameInstance.AddFactions(factions);
             GameInstance.AddGachas(gachas);
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddPlayerCharacterEntities(playerCharacterEntities);
             GameInstance.AddMonsterCharacterEntities(monsterCharacterEntities);
             GameInstance.AddVehicleEntities(vehicleEntities);

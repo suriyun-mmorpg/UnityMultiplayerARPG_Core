@@ -573,22 +573,30 @@ namespace MultiplayerARPG
 
         public virtual void InitPrefabs()
         {
+#if !DISABLE_ADDRESSABLES
             Assets.addressableOfflineScene = null;
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             Assets.offlineScene = default;
 #endif
-            if (CurrentGameInstance.GetHomeScene(out SceneField scene, out AssetReferenceScene addressableScene))
+            if (CurrentGameInstance.GetHomeScene(out SceneField scene
+#if !DISABLE_ADDRESSABLES
+                , out AssetReferenceScene addressableScene
+#endif
+                ))
             {
+#if !DISABLE_ADDRESSABLES
                 Assets.addressableOfflineScene = addressableScene;
+#endif
             }
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             else
             {
                 Assets.offlineScene = scene;
             }
 #endif
             // Prepare networking prefabs
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             Assets.playerPrefab = null;
             HashSet<LiteNetLibIdentity> spawnablePrefabs = new HashSet<LiteNetLibIdentity>(Assets.spawnablePrefabs);
             if (CurrentGameInstance.ItemDropEntityPrefab != null)
@@ -642,6 +650,7 @@ namespace MultiplayerARPG
             spawnablePrefabs.CopyTo(Assets.spawnablePrefabs);
 #endif
 
+#if !DISABLE_ADDRESSABLES
             Assets.addressablePlayerPrefab = null;
             HashSet<AssetReferenceLiteNetLibIdentity> addressableSpawnablePrefabs = new HashSet<AssetReferenceLiteNetLibIdentity>(Assets.addressableSpawnablePrefabs);
             if (CurrentGameInstance.AddressableItemDropEntityPrefab.IsDataValid())
@@ -693,6 +702,7 @@ namespace MultiplayerARPG
             }
             Assets.addressableSpawnablePrefabs = new AssetReferenceLiteNetLibIdentity[addressableSpawnablePrefabs.Count];
             addressableSpawnablePrefabs.CopyTo(Assets.addressableSpawnablePrefabs);
+#endif
 
             this.InvokeInstanceDevExtMethods("InitPrefabs");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
@@ -727,7 +737,7 @@ namespace MultiplayerARPG
             }
 
             // Register scene entities
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddMonsterCharacterEntities(FindObjectsOfType<BaseMonsterCharacterEntity>());
             GameInstance.AddHarvestableEntities(FindObjectsOfType<HarvestableEntity>());
             GameInstance.AddItemDropEntities(FindObjectsOfType<ItemDropEntity>());
@@ -826,17 +836,21 @@ namespace MultiplayerARPG
                 {
                     WarpPortal warpPortal;
                     WarpPortalEntity warpPortalPrefab;
+#if !DISABLE_ADDRESSABLES
                     AssetReferenceWarpPortalEntity addressableWarpPortalPrefab;
+#endif
                     WarpPortalEntity warpPortalEntity;
                     for (i = 0; i < mapWarpPortals.Count; ++i)
                     {
                         warpPortal = mapWarpPortals[i];
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                         warpPortalPrefab = warpPortal.entityPrefab != null ? warpPortal.entityPrefab : CurrentGameInstance.WarpPortalEntityPrefab;
 #else
                         warpPortalPrefab = null;
 #endif
+#if !DISABLE_ADDRESSABLES
                         addressableWarpPortalPrefab = warpPortal.addressableEntityPrefab.IsDataValid() ? warpPortal.addressableEntityPrefab : CurrentGameInstance.AddressableWarpPortalEntityPrefab;
+#endif
                         spawnObj = null;
                         if (warpPortalPrefab != null)
                         {
@@ -844,12 +858,14 @@ namespace MultiplayerARPG
                                 warpPortalPrefab.Identity.HashAssetId, warpPortal.position,
                                 Quaternion.Euler(warpPortal.rotation));
                         }
+#if !DISABLE_ADDRESSABLES
                         else if (addressableWarpPortalPrefab.IsDataValid())
                         {
                             spawnObj = Assets.GetObjectInstance(
                                 addressableWarpPortalPrefab.HashAssetId, warpPortal.position,
                                 Quaternion.Euler(warpPortal.rotation));
                         }
+#endif
                         if (spawnObj != null)
                         {
                             warpPortalEntity = spawnObj.GetComponent<WarpPortalEntity>();
@@ -879,17 +895,21 @@ namespace MultiplayerARPG
                 {
                     Npc npc;
                     NpcEntity npcPrefab;
+#if !DISABLE_ADDRESSABLES
                     AssetReferenceNpcEntity addressableNpcPrefab;
+#endif
                     NpcEntity npcEntity;
                     for (i = 0; i < mapNpcs.Count; ++i)
                     {
                         npc = mapNpcs[i];
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                         npcPrefab = npc.entityPrefab;
 #else
                         npcPrefab = null;
 #endif
+#if !DISABLE_ADDRESSABLES
                         addressableNpcPrefab = npc.addressableEntityPrefab;
+#endif
                         spawnObj = null;
                         if (npcPrefab != null)
                         {
@@ -897,12 +917,14 @@ namespace MultiplayerARPG
                                 npcPrefab.Identity.HashAssetId, npc.position,
                                 Quaternion.Euler(npc.rotation));
                         }
+#if !DISABLE_ADDRESSABLES
                         else if (addressableNpcPrefab.IsDataValid())
                         {
                             spawnObj = Assets.GetObjectInstance(
                                 addressableNpcPrefab.HashAssetId, npc.position,
                                 Quaternion.Euler(npc.rotation));
                         }
+#endif
                         if (spawnObj != null)
                         {
                             npcEntity = spawnObj.GetComponent<NpcEntity>();
@@ -1082,13 +1104,17 @@ namespace MultiplayerARPG
         {
             await UniTask.Yield();
             LiteNetLibIdentity spawnObj;
+#if !DISABLE_ADDRESSABLES
             if (GameInstance.AddressableBuildingEntities.TryGetValue(saveData.EntityId, out AssetReferenceLiteNetLibBehaviour<BuildingEntity> addressablePrefab))
             {
                 spawnObj = Assets.GetObjectInstance(
                     addressablePrefab.HashAssetId,
                     saveData.Position, Quaternion.Euler(saveData.Rotation));
             }
-#if !EXCLUDE_PREFAB_REFS
+#else
+            if (false) { }
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             else if (GameInstance.BuildingEntities.TryGetValue(saveData.EntityId, out BuildingEntity prefab))
             {
                 spawnObj = Assets.GetObjectInstance(

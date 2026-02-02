@@ -137,11 +137,18 @@ namespace MultiplayerARPG
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
             BaseUISceneGameplay tempPrefab = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             tempPrefab = CurrentGameInstance.UISceneGameplayPrefab;
 #endif
+#if !DISABLE_ADDRESSABLES
             AssetReferenceBaseUISceneGameplay tempAddressablePrefab = CurrentGameInstance.AddressableUISceneGameplayPrefab;
-            BaseUISceneGameplay loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
+#endif
+            BaseUISceneGameplay loadedPrefab;
+#if !DISABLE_ADDRESSABLES
+            loadedPrefab = tempAddressablePrefab.GetOrLoadAssetOrUsePrefab(tempPrefab);
+#else
+            loadedPrefab = tempPrefab;
+#endif
             if (loadedPrefab != null)
                 UISceneGameplay = Instantiate(loadedPrefab);
             if (UISceneGameplay != null)

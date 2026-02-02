@@ -7,7 +7,9 @@ using System.Collections.Generic;
 using System.IO;
 using UnityEditor;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -115,12 +117,16 @@ namespace MultiplayerARPG
             if (defaultDamageElement == null)
             {
                 defaultDamageElement = ScriptableObject.CreateInstance<DamageElement>()
-                    .GenerateDefaultDamageElement(DefaultDamageHitEffects, AddressableDefaultDamageHitEffects);
+                    .GenerateDefaultDamageElement(DefaultDamageHitEffects
+#if !DISABLE_ADDRESSABLES
+                    , AddressableDefaultDamageHitEffects
+#endif
+                    );
                 haveToClearDefaultDamageElement = true;
             }
 
             CharacterCreationData data = new CharacterCreationData();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             foreach (var kv in PlayerCharacterEntities)
             {
                 if (kv.Value.CharacterDatabases == null || kv.Value.CharacterDatabases.Length == 0)
@@ -133,7 +139,7 @@ namespace MultiplayerARPG
                 }
             }
 #endif
-
+#if !DISABLE_ADDRESSABLES
             foreach (var kv in AddressablePlayerCharacterEntities)
             {
                 if (!kv.Value.IsDataValid())
@@ -158,7 +164,7 @@ namespace MultiplayerARPG
                 Addressables.Release(op);
                 DestroyImmediate(op.Result);
             }
-
+#endif
             foreach (var kv in Factions)
             {
                 if (!kv.Value.IsLocked)

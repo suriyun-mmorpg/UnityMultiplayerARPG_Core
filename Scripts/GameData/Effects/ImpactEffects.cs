@@ -11,7 +11,7 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.IMPACT_EFFECTS_FILE, menuName = GameDataMenuConsts.IMPACT_EFFECTS_MENU, order = GameDataMenuConsts.IMPACT_EFFECTS_ORDER)]
     public class ImpactEffects : ScriptableObject
     {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [HideInInspector]
         public GameEffect defaultEffect;
 #endif
@@ -36,10 +36,14 @@ namespace MultiplayerARPG
                         foreach (ImpactEffect effect in impactEffects)
                         {
                             GameEffect gameEffect = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                             gameEffect = effect.effect;
 #endif
-                            if (gameEffect == null && !effect.addressableEffect.IsDataValid())
+                            if (gameEffect == null
+#if !DISABLE_ADDRESSABLES
+                                && !effect.addressableEffect.IsDataValid()
+#endif
+                                )
                                 continue;
                             if (_cacheEffects.ContainsKey(effect.tag))
                                 continue;
@@ -57,10 +61,14 @@ namespace MultiplayerARPG
             if (Effects.TryGetValue(tag, out effect))
                 return true;
             GameEffect gameEffect = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             gameEffect = defaultImpactEffect.effect;
 #endif
-            if (gameEffect == null && !defaultImpactEffect.addressableEffect.IsDataValid())
+            if (gameEffect == null
+#if !DISABLE_ADDRESSABLES
+                && !defaultImpactEffect.addressableEffect.IsDataValid()
+#endif
+                )
             {
                 effect = default;
                 return false;
@@ -91,7 +99,7 @@ namespace MultiplayerARPG
 
         private bool Migrate()
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             if (defaultEffect != null && defaultImpactEffect.effect == null)
             {
                 ImpactEffect impactEffect = defaultImpactEffect;

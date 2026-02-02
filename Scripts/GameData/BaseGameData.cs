@@ -7,7 +7,9 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 using UnityEngine.Serialization;
 #if UNITY_EDITOR
 using UnityEditor;
@@ -86,17 +88,19 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR || !UNITY_SERVER
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [PreviewSprite(50)]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableIcon))]
+#endif
         protected Sprite icon;
 #endif
         public Sprite Icon
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return icon;
 #else
                 return null;
@@ -104,12 +108,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 icon = value;
 #endif
             }
         }
-        
+
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceSprite addressableIcon;
         public AssetReferenceSprite AddressableIcon
@@ -123,10 +128,15 @@ namespace MultiplayerARPG
                 addressableIcon = value;
             }
         }
+#endif
 
-        public async UniTask<Sprite> GetIcon()
+        public UniTask<Sprite> GetIcon()
         {
-            return await AddressableIcon.GetOrLoadObjectAsyncOrUseAsset(Icon);
+#if !DISABLE_ADDRESSABLES
+            return AddressableIcon.GetOrLoadObjectAsyncOrUseAsset(Icon);
+#else
+            return UniTask.FromResult(Icon);
+#endif
         }
 #endif
 
@@ -184,7 +194,7 @@ namespace MultiplayerARPG
         public virtual bool ValidateHashAssetID()
         {
             bool hasChanges = false;
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !DISABLE_ADDRESSABLES
             List<FieldSourceInfo> fieldSourceInfos = this.FindFieldsOfType<AssetReferenceLiteNetLibIdentity>();
             for (int i = 0; i < fieldSourceInfos.Count; ++i)
             {

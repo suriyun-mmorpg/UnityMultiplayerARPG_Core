@@ -27,7 +27,7 @@ namespace MultiplayerARPG
             set { characterDatabases = value; }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected BasePlayerCharacterController controllerPrefab;
@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 if (TryGetMetaData(out PlayerCharacterEntityMetaData metaData))
                     return metaData.ControllerPrefab;
                 return controllerPrefab;
@@ -46,12 +46,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 controllerPrefab = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected AssetReferenceBasePlayerCharacterController addressableControllerPrefab;
@@ -65,6 +66,7 @@ namespace MultiplayerARPG
             }
             set { addressableControllerPrefab = value; }
         }
+#endif
 
         public PlayerCharacterItemLockAndExpireComponent ItemLockAndExpireComponent
         {

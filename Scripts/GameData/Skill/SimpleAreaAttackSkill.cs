@@ -14,17 +14,19 @@ namespace MultiplayerARPG
             Normal,
             BasedOnWeapon,
         }
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Category("Area Settings")]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableAreaDamageEntity))]
+#endif
         private AreaDamageEntity areaDamageEntity;
 #endif
         public AreaDamageEntity AreaDamageEntity
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return areaDamageEntity;
 #else
                 return null;
@@ -32,12 +34,14 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceAreaDamageEntity addressableAreaDamageEntity;
         public AssetReferenceAreaDamageEntity AddressableAreaDamageEntity
         {
             get { return addressableAreaDamageEntity; }
         }
+#endif
 
         [Category(3, "Attacking")]
         public SkillAttackType skillAttackType;
@@ -52,11 +56,15 @@ namespace MultiplayerARPG
         public StatusEffectApplying[] attackStatusEffects;
         public HarvestType harvestType;
         public IncrementalMinMaxFloat harvestDamageAmount;
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableDamageHitEffects))]
+#endif
         public GameEffect[] damageHitEffects = new GameEffect[0];
 #endif
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceGameEffect[] addressableDamageHitEffects = new AssetReferenceGameEffect[0];
+#endif
 
         [Category(4, "Warp Settings")]
         public bool isWarpToAimPosition;
@@ -80,7 +88,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return damageHitEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -88,6 +96,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         public override AssetReferenceGameEffect[] AddressableDamageHitEffects
         {
             get
@@ -95,6 +104,7 @@ namespace MultiplayerARPG
                 return addressableDamageHitEffects;
             }
         }
+#endif
 
         protected override void ApplySkillImplement(
             BaseCharacterEntity skillUser,
@@ -126,8 +136,10 @@ namespace MultiplayerARPG
                 int hashAssetId = 0;
                 if (AreaDamageEntity != null)
                     hashAssetId = AreaDamageEntity.Identity.HashAssetId;
+#if !DISABLE_ADDRESSABLES
                 else if (AddressableAreaDamageEntity.IsDataValid())
                     hashAssetId = AddressableAreaDamageEntity.HashAssetId;
+#endif
                 if (hashAssetId == 0)
                 {
                     Logging.LogError("SimpleAreaDamageSkill", $"Unable to spawn area damage entity, skill ID: {Id}");
@@ -220,7 +232,7 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             areaDamageEntity.InitPrefab();
             GameInstance.AddOtherNetworkObjects(areaDamageEntity.Identity);
 #endif

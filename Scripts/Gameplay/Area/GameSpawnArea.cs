@@ -96,6 +96,7 @@ namespace MultiplayerARPG
 
     public abstract class GameSpawnArea<T> : GameSpawnArea where T : LiteNetLibBehaviour
     {
+#if !DISABLE_ADDRESSABLES
         [System.Serializable]
         public class AddressablePrefab : AssetReferenceLiteNetLibBehaviour<T>
         {
@@ -109,14 +110,17 @@ namespace MultiplayerARPG
             }
 #endif
         }
+#endif
 
         [System.Serializable]
         public class SpawnPrefabData
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             public T prefab;
 #endif
+#if !DISABLE_ADDRESSABLES
             public AddressablePrefab addressablePrefab;
+#endif
             [FormerlySerializedAs("level")]
             [Min(1)]
             public int minLevel = 1;
@@ -146,21 +150,25 @@ namespace MultiplayerARPG
         [System.Serializable]
         public class SpawnPendingData
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             public T prefab;
 #endif
+#if !DISABLE_ADDRESSABLES
             public AddressablePrefab addressablePrefab;
+#endif
             public int level;
             public float countdown;
             public float destroyRespawnDelay;
         }
 
         [Header("Spawning Prefab Data")]
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [FormerlySerializedAs("asset")]
         public T prefab;
 #endif
+#if !DISABLE_ADDRESSABLES
         public AddressablePrefab addressablePrefab;
+#endif
 
         [Header("Multiple Spawning Data")]
         public List<SpawnPrefabData> spawningPrefabs = new List<SpawnPrefabData>();
@@ -237,28 +245,42 @@ namespace MultiplayerARPG
         public virtual async void RegisterPrefabs()
         {
             T prefab;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             prefab = this.prefab;
 #else
             prefab = null;
 #endif
             if (prefab != null)
+            {
                 BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
+            }
+#if !DISABLE_ADDRESSABLES
             else if (addressablePrefab.IsDataValid())
+            {
                 await BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefabAsync(addressablePrefab);
+            }
+#endif
 
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 prefab = spawningPrefab.prefab;
 #else
                 prefab = null;
 #endif
                 if (prefab != null)
+                {
                     BaseGameNetworkManager.Singleton.Assets.RegisterPrefab(prefab.Identity);
+                }
+#if !DISABLE_ADDRESSABLES
                 else if (spawningPrefab.addressablePrefab.IsDataValid())
+                {
                     await BaseGameNetworkManager.Singleton.Assets.RegisterAddressablePrefabAsync(spawningPrefab.addressablePrefab);
+                }
+#endif
             }
+
+            await UniTask.Yield();
         }
 
         public override void OnDestroyBySubscribeHandler(GameSpawnAreaEntityHandler handler)
@@ -274,50 +296,88 @@ namespace MultiplayerARPG
         public override void SpawnAll()
         {
             T prefab = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             prefab = this.prefab;
 #endif
+#if !DISABLE_ADDRESSABLES
             AddressablePrefab addressablePrefab = this.addressablePrefab;
-            if (prefab != null || addressablePrefab.IsDataValid())
+#endif
+            if (prefab != null
+#if !DISABLE_ADDRESSABLES
+                || addressablePrefab.IsDataValid()
+#endif
+                )
             {
-                SpawnByAmount(prefab, addressablePrefab, GetRandomedSpawnLevel(), GetRandomedSpawnAmount(), destroyRespawnDelay);
+                SpawnByAmount(prefab
+#if !DISABLE_ADDRESSABLES
+                    , addressablePrefab
+#endif
+                    , GetRandomedSpawnLevel(), GetRandomedSpawnAmount(), destroyRespawnDelay);
             }
             foreach (SpawnPrefabData spawningPrefab in spawningPrefabs)
             {
                 prefab = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 prefab = spawningPrefab.prefab;
 #endif
+#if !DISABLE_ADDRESSABLES
                 addressablePrefab = spawningPrefab.addressablePrefab;
+#endif
                 float destroyRespawnDelay = spawningPrefab.destroyRespawnDelay;
                 if (destroyRespawnDelay <= 0f)
                     destroyRespawnDelay = this.destroyRespawnDelay;
-                SpawnByAmount(prefab, addressablePrefab, spawningPrefab.GetRandomedSpawnLevel(), spawningPrefab.GetRandomedSpawnAmount(), destroyRespawnDelay);
+                SpawnByAmount(prefab
+#if !DISABLE_ADDRESSABLES
+                    , addressablePrefab
+#endif
+                    , spawningPrefab.GetRandomedSpawnLevel(), spawningPrefab.GetRandomedSpawnAmount(), destroyRespawnDelay);
             }
         }
 
-        public virtual void SpawnByAmount(T prefab, AddressablePrefab addressablePrefab, int level, int amount, float destroyRespawnDelay)
+        public virtual void SpawnByAmount(T prefab
+#if !DISABLE_ADDRESSABLES
+            , AddressablePrefab addressablePrefab
+#endif
+            , int level, int amount, float destroyRespawnDelay)
         {
-            if (prefab == null && !addressablePrefab.IsDataValid())
+            if (prefab == null
+#if !DISABLE_ADDRESSABLES
+                && !addressablePrefab.IsDataValid()
+#endif
+                )
                 return;
 
             for (int i = 0; i < amount; ++i)
             {
-                Spawn(prefab, addressablePrefab, level, 0, destroyRespawnDelay);
+                Spawn(prefab
+#if !DISABLE_ADDRESSABLES
+                    , addressablePrefab
+#endif
+                    , level, 0, destroyRespawnDelay);
             }
         }
 
-        public virtual void Spawn(T prefab, AddressablePrefab addressablePrefab, int level, float delay, float destroyRespawnDelay)
+        public virtual void Spawn(T prefab
+#if !DISABLE_ADDRESSABLES
+            , AddressablePrefab addressablePrefab
+#endif
+            , int level, float delay, float destroyRespawnDelay)
         {
-            if (prefab == null && !addressablePrefab.IsDataValid())
+            if (prefab == null
+#if !DISABLE_ADDRESSABLES
+                && !addressablePrefab.IsDataValid()
+#endif
+                )
                 return;
 
             AddPending(new SpawnPendingData()
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 prefab = prefab,
 #endif
+#if !DISABLE_ADDRESSABLES
                 addressablePrefab = addressablePrefab,
+#endif
                 level = level,
                 countdown = delay,
                 destroyRespawnDelay = destroyRespawnDelay,
@@ -335,17 +395,23 @@ namespace MultiplayerARPG
             _pending.RemoveAt(pendingIndex);
 
             T prefab = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             prefab = pendingEntry.prefab;
 #endif
+#if !DISABLE_ADDRESSABLES
             AddressablePrefab addressablePrefab = pendingEntry.addressablePrefab;
+#endif
 
             int level = pendingEntry.level <= 0 ? 1 : pendingEntry.level;
             float destroyRespawnDelay = pendingEntry.destroyRespawnDelay;
             if (destroyRespawnDelay <= 0f)
                 destroyRespawnDelay = this.destroyRespawnDelay;
 
-            T newEntity = SpawnInternal(prefab, addressablePrefab, level, destroyRespawnDelay);
+            T newEntity = SpawnInternal(prefab
+#if !DISABLE_ADDRESSABLES
+                , addressablePrefab
+#endif
+                , level, destroyRespawnDelay);
             if (newEntity != null)
             {
                 // Store to entities collection, so the spawner can manage them later
@@ -359,7 +425,11 @@ namespace MultiplayerARPG
             }
         }
 
-        protected abstract T SpawnInternal(T prefab, AddressablePrefab addressablePrefab, int level, float destroyRespawnDelay);
+        protected abstract T SpawnInternal(T prefab
+#if !DISABLE_ADDRESSABLES
+            , AddressablePrefab addressablePrefab
+#endif
+            , int level, float destroyRespawnDelay);
 
         protected virtual void AddPending(SpawnPendingData data)
         {

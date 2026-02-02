@@ -1,7 +1,9 @@
 ﻿using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -40,16 +42,18 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableTargetObjectPrefab))]
+#endif
         private GameObject targetObjectPrefab;
 #endif
         public GameObject TargetObjectPrefab
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return targetObjectPrefab;
 #else
                 return null;
@@ -57,12 +61,14 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceGameObject addressableTargetObjectPrefab;
         public AssetReferenceGameObject AddressableTargetObjectPrefab
         {
             get { return addressableTargetObjectPrefab; }
         }
+#endif
 
         public override SkillType SkillType
         {

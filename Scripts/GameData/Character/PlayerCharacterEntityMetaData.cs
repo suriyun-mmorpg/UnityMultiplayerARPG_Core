@@ -7,17 +7,19 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_FILE, menuName = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_MENU, order = GameDataMenuConsts.PLAYER_CHARACTER_ENTITY_METADATA_ORDER)]
     public partial class PlayerCharacterEntityMetaData : BaseGameData
     {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Header("Character Prefabs And Data")]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableEntityPrefab))]
+#endif
         protected BasePlayerCharacterEntity entityPrefab;
 #endif
         public BasePlayerCharacterEntity EntityPrefab
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return entityPrefab;
 #else
                 return null;
@@ -25,12 +27,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 entityPrefab = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceBasePlayerCharacterEntity addressableEntityPrefab;
         public AssetReferenceBasePlayerCharacterEntity AddressableEntityPrefab
@@ -38,6 +41,7 @@ namespace MultiplayerARPG
             get { return addressableEntityPrefab; }
             set { addressableEntityPrefab = value; }
         }
+#endif
 
         [Tooltip("This is list which used as choice of character classes when create character")]
         [SerializeField]
@@ -48,7 +52,7 @@ namespace MultiplayerARPG
             set { characterDatabases = value; }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected BasePlayerCharacterController controllerPrefab;
@@ -57,7 +61,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return controllerPrefab;
 #else
                 return null;
@@ -65,12 +69,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 controllerPrefab = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [Tooltip("Leave this empty to use GameInstance's controller prefab")]
         [SerializeField]
         protected AssetReferenceBasePlayerCharacterController addressableControllerPrefab;
@@ -79,6 +84,7 @@ namespace MultiplayerARPG
             get { return addressableControllerPrefab; }
             set { addressableControllerPrefab = value; }
         }
+#endif
 
         [SerializeField]
         protected CharacterRace race;
@@ -97,16 +103,18 @@ namespace MultiplayerARPG
             set { overrideFpsModel = value; }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableFpsModelPrefab))]
+#endif
         protected BaseCharacterModel fpsModelPrefab;
 #endif
         public BaseCharacterModel FpsModelPrefab
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return fpsModelPrefab;
 #else
                 return null;
@@ -114,12 +122,13 @@ namespace MultiplayerARPG
             }
             set
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 fpsModelPrefab = value;
 #endif
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         protected AssetReferenceBaseCharacterModel addressableFpsModelPrefab;
         public AssetReferenceBaseCharacterModel AddressableFpsModelPrefab
@@ -127,6 +136,7 @@ namespace MultiplayerARPG
             get { return addressableFpsModelPrefab; }
             set { addressableFpsModelPrefab = value; }
         }
+#endif
 
         [SerializeField]
         [Tooltip("Position offsets from fps model container (Camera's transform)")]
@@ -148,10 +158,12 @@ namespace MultiplayerARPG
 
         public int GetPlayerCharacterEntityHashAssetId()
         {
-            if (AddressableEntityPrefab.IsDataValid())
-                return AddressableEntityPrefab.HashAssetId;
             if (EntityPrefab != null)
                 return EntityPrefab.HashAssetId;
+#if !DISABLE_ADDRESSABLES
+            if (AddressableEntityPrefab.IsDataValid())
+                return AddressableEntityPrefab.HashAssetId;
+#endif
             return 0;
         }
 

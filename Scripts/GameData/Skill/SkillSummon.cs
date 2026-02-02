@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     [System.Serializable]
     public partial class SkillSummon : IAddressableAssetConversable
     {
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Tooltip("Leave `Monster Entity` to NULL to not summon monster entity")]
         [SerializeField]
         [FormerlySerializedAs("monsterEntity")]
@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return monsterCharacterEntity;
 #else
                 return null;
@@ -25,6 +25,7 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceBaseMonsterCharacterEntity addressableMonsterCharacterEntity;
         public AssetReferenceBaseMonsterCharacterEntity AddressableMonsterCharacterEntity
@@ -34,6 +35,7 @@ namespace MultiplayerARPG
                 return addressableMonsterCharacterEntity;
             }
         }
+#endif
 
         [SerializeField]
         private IncrementalFloat duration;
@@ -57,7 +59,7 @@ namespace MultiplayerARPG
 
         public void ProceedAddressableAssetConversion(string groupName)
         {
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !DISABLE_ADDRESSABLES
             AddressableEditorUtils.ConvertObjectRefToAddressable(ref monsterCharacterEntity, ref addressableMonsterCharacterEntity, groupName);
 #endif
         }

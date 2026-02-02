@@ -1447,8 +1447,12 @@ namespace MultiplayerARPG
             BaseMonsterCharacterEntity tempMonsterEntity = null;
             if (ItemWithMonsterEntity != null)
             {
+#if !DISABLE_ADDRESSABLES
                 tempMonsterEntity = await ItemWithMonsterEntity.AddressableMonsterCharacterEntity
                     .GetOrLoadAssetAsyncOrUsePrefab(ItemWithMonsterEntity.MonsterCharacterEntity);
+#else
+                tempMonsterEntity = ItemWithMonsterEntity.MonsterCharacterEntity;
+#endif
             }
             if (tempMonsterEntity == null)
             {
@@ -1495,8 +1499,12 @@ namespace MultiplayerARPG
             BuildingEntity tempBuildingEntity = null;
             if (ItemWithBuildingEntity != null)
             {
+#if !DISABLE_ADDRESSABLES
                 tempBuildingEntity = await ItemWithBuildingEntity.AddressableBuildingEntity
                     .GetOrLoadAssetAsyncOrUsePrefab(ItemWithBuildingEntity.BuildingEntity);
+#else
+                tempBuildingEntity = ItemWithBuildingEntity.BuildingEntity;
+#endif
             }
             if (tempBuildingEntity == null)
             {
@@ -1517,8 +1525,12 @@ namespace MultiplayerARPG
             VehicleEntity tempVehicleEntity = null;
             if (ItemWithVehicleEntity != null)
             {
+#if !DISABLE_ADDRESSABLES
                 tempVehicleEntity = await ItemWithVehicleEntity.AddressableVehicleEntity
                         .GetOrLoadAssetAsyncOrUsePrefab(ItemWithVehicleEntity.VehicleEntity);
+#else
+                tempVehicleEntity = ItemWithVehicleEntity.VehicleEntity;
+#endif
             }
             if (tempVehicleEntity == null)
             {

@@ -38,16 +38,18 @@ namespace MultiplayerARPG
             get { return maxResistanceAmount; }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableDamageHitEffects))]
+#endif
         private GameEffect[] damageHitEffects = new GameEffect[0];
 #endif
         public GameEffect[] DamageHitEffects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return damageHitEffects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -55,27 +57,35 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceGameEffect[] addressableDamageHitEffects = new AssetReferenceGameEffect[0];
         public AssetReferenceGameEffect[] AddressableDamageHitEffects
         {
             get { return addressableDamageHitEffects; }
         }
+#endif
 
         public float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount)
         {
             return GameInstance.Singleton.GameplayRule.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, this);
         }
 
-        public DamageElement GenerateDefaultDamageElement(GameEffect[] defaultDamageHitEffects, AssetReferenceGameEffect[] addressableDefaultDamageHitEffects)
+        public DamageElement GenerateDefaultDamageElement(GameEffect[] defaultDamageHitEffects
+#if !DISABLE_ADDRESSABLES
+            , AssetReferenceGameEffect[] addressableDefaultDamageHitEffects
+#endif
+            )
         {
             name = GameDataConst.DEFAULT_DAMAGE_ID;
             defaultTitle = GameDataConst.DEFAULT_DAMAGE_TITLE;
             maxResistanceAmount = 1f;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             damageHitEffects = defaultDamageHitEffects;
 #endif
+#if !DISABLE_ADDRESSABLES
             addressableDamageHitEffects = addressableDefaultDamageHitEffects;
+#endif
             return this;
         }
     }

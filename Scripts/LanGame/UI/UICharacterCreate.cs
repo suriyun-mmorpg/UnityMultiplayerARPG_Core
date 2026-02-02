@@ -1,12 +1,16 @@
-﻿using Insthync.AddressableAssetTools;
+﻿using Cysharp.Threading.Tasks;
+using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
-using System.Threading.Tasks;
+
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.AddressableAssets;
+#endif
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -261,7 +265,7 @@ namespace MultiplayerARPG
         protected virtual async Task<List<PlayerCharacterData>> GetCreatableCharacters()
         {
             List<PlayerCharacterData> result = new List<PlayerCharacterData>();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             if (GameInstance.PlayerCharacterEntities.Count > 0)
             {
                 foreach (BasePlayerCharacterEntity prefab in GameInstance.PlayerCharacterEntities.Values)
@@ -275,6 +279,7 @@ namespace MultiplayerARPG
                 }
             }
 #endif
+#if !DISABLE_ADDRESSABLES
             if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
             {
                 List<AsyncOperationHandle<GameObject>> asyncOps = new List<AsyncOperationHandle<GameObject>>();
@@ -307,15 +312,19 @@ namespace MultiplayerARPG
                         Addressables.Release(asyncOps[i]);
                 }
             }
+#endif
             if (GameInstance.PlayerCharacterEntityMetaDataList.Count > 0)
             {
+#if !DISABLE_ADDRESSABLES
                 List<AsyncOperationHandle<GameObject>> asyncOps = new List<AsyncOperationHandle<GameObject>>();
                 List<Task<GameObject>> loadTasks = new List<Task<GameObject>>();
+#endif
                 List<PlayerCharacterEntityMetaData> loadMetaDataList = new List<PlayerCharacterEntityMetaData>();
                 foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
                 {
                     if (RaceToggles.Count > 0 && entry.Race != null && !SelectedRaces.Contains(entry.Race))
                         continue;
+#if !DISABLE_ADDRESSABLES
                     if (entry.AddressableEntityPrefab.IsDataValid())
                     {
                         AsyncOperationHandle<GameObject> asyncOp = Addressables.LoadAssetAsync<GameObject>(entry.AddressableEntityPrefab.RuntimeKey);
@@ -323,6 +332,9 @@ namespace MultiplayerARPG
                         loadTasks.Add(asyncOp.Task);
                         loadMetaDataList.Add(entry);
                     }
+#else
+                    if (false) { }
+#endif
                     else if (entry.EntityPrefab != null)
                     {
                         BasePlayerCharacterEntity prefab = entry.EntityPrefab;
@@ -333,6 +345,7 @@ namespace MultiplayerARPG
                     }
                     _playerCharactersByEntityId[entry.DataId] = new List<PlayerCharacter>(entry.CharacterDatabases);
                 }
+#if !DISABLE_ADDRESSABLES
                 await Task.WhenAll(loadTasks);
                 for (int i = 0; i < loadTasks.Count; ++i)
                 {
@@ -348,7 +361,9 @@ namespace MultiplayerARPG
                     result.Add(data);
                     Addressables.Release(asyncOps[i]);
                 }
+#endif
             }
+            await UniTask.Yield();
             return result;
         }
 

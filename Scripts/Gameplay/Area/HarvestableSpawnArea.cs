@@ -29,7 +29,7 @@ namespace MultiplayerARPG
 
         private void MigrateAsset()
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             if (prefab == null && harvestableEntity != null)
             {
                 prefab = harvestableEntity;
@@ -51,13 +51,19 @@ namespace MultiplayerARPG
         public override void RegisterPrefabs()
         {
             base.RegisterPrefabs();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddHarvestableEntities(prefab);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceHarvestableEntities(addressablePrefab);
+#endif
         }
 
-        protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab, AddressablePrefab addressablePrefab, int level, float destroyRespawnDelay)
+        protected override HarvestableEntity SpawnInternal(HarvestableEntity prefab
+#if !DISABLE_ADDRESSABLES
+            , AddressablePrefab addressablePrefab
+#endif
+            , int level, float destroyRespawnDelay)
         {
             if (!GetRandomPosition(out Vector3 spawnPosition))
             {
@@ -83,6 +89,7 @@ namespace MultiplayerARPG
                 if (destroyRespawnDelay > 0f)
                     entity.DestroyRespawnDelay = destroyRespawnDelay;
             }
+#if !DISABLE_ADDRESSABLES
             else if (addressablePrefab.IsDataValid())
             {
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
@@ -96,6 +103,7 @@ namespace MultiplayerARPG
                 if (destroyRespawnDelay > 0f)
                     entity.DestroyRespawnDelay = destroyRespawnDelay;
             }
+#endif
 
             if (entity == null)
             {

@@ -81,8 +81,15 @@ namespace MultiplayerARPG
             }
 
             BuildingEntity tempPrefab = buildingItem.BuildingEntity;
+#if !DISABLE_ADDRESSABLES
             AssetReferenceBuildingEntity tempAddressablePrefab = buildingItem.AddressableBuildingEntity;
-            BuildingEntity loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+#endif
+            BuildingEntity loadedPrefab;
+#if !DISABLE_ADDRESSABLES
+            loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+#else
+            loadedPrefab = tempPrefab;
+#endif
 
             if (loadedPrefab == null)
             {

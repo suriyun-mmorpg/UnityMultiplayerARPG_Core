@@ -1,8 +1,10 @@
 ﻿using Insthync.AddressableAssetTools;
 using System.Collections.Generic;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+#endif
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -18,7 +20,7 @@ namespace MultiplayerARPG
 
         private void MigrateLevelUpEffect()
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             if (levelUpEffect != null)
             {
                 if (levelUpEffects == null || levelUpEffects.Length == 0)
@@ -45,7 +47,7 @@ namespace MultiplayerARPG
                 meshPrefab = equipmentModel.MeshPrefab;
                 if (meshPrefab != null && meshPrefab.TryGetComponent(out entity))
                     entity.MigrateMaterials();
-
+#if !DISABLE_ADDRESSABLES
                 if (equipmentModel.AddressableMeshPrefab.IsDataValid())
                 {
                     AsyncOperationHandle<GameObject> loadOp = Addressables.LoadAssetAsync<GameObject>(equipmentModel.AddressableMeshPrefab.RuntimeKey);
@@ -64,8 +66,9 @@ namespace MultiplayerARPG
                         Addressables.Release(loadOp);
                     }
                 }
+#endif
             }
 #endif
+            }
         }
-    }
 }

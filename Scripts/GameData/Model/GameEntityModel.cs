@@ -289,12 +289,14 @@ namespace MultiplayerARPG
             return tempAddingEffects;
         }
 
+#if !DISABLE_ADDRESSABLES
         public async UniTask<List<GameEffect>> InstantiateEffect(IEnumerable<AssetReferenceGameEffect> effects)
         {
             if (effects == null)
                 return null;
             return InstantiateEffect(await effects.GetOrLoadAssetsAsync<GameEffect>());
         }
+#endif
         
         public virtual void AddingNewEffect(GameEffect newEffect) { }
     }

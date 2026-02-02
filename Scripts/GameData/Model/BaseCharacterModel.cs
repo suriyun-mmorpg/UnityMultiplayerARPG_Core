@@ -666,7 +666,7 @@ namespace MultiplayerARPG
                     if (tempEquipmentEntity != null)
                     {
                         tempEquipmentEntity.Setup(this, equipSocket, tempEquipmentModel.equipPosition, tempEquipmentModel.item);
-#if UNITY_EDITOR
+#if UNITY_EDITOR && !DISABLE_ADDRESSABLES
                         GameObject editorAsset = null;
                         if (tempEquipmentModel.AddressableMeshPrefab.IsDataValid())
                             editorAsset = tempEquipmentModel.AddressableMeshPrefab.editorAsset;
@@ -821,10 +821,12 @@ namespace MultiplayerARPG
                     if (!_tempCachedKeys.Contains(tempKey))
                     {
                         // If old buffs not contains this buff, add this buff effect
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                         InstantiateBuffEffect(tempKey, buffData.Effects);
 #endif
+#if !DISABLE_ADDRESSABLES
                         InstantiateBuffEffect(tempKey, buffData.AddressableEffects).Forget();
+#endif
                         _tempCachedKeys.Add(tempKey);
                     }
                     _tempAddingKeys.Add(tempKey);
@@ -835,10 +837,12 @@ namespace MultiplayerARPG
                             tempKey = nameof(AilmentPresets.Stun);
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.StunEffects);
 #endif
+#if !DISABLE_ADDRESSABLES
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableStunEffects).Forget();
+#endif
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -847,10 +851,12 @@ namespace MultiplayerARPG
                             tempKey = nameof(AilmentPresets.Mute);
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.MuteEffects);
 #endif
+#if !DISABLE_ADDRESSABLES
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableMuteEffects).Forget();
+#endif
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -859,10 +865,12 @@ namespace MultiplayerARPG
                             tempKey = nameof(AilmentPresets.Freeze);
                             if (!_tempCachedKeys.Contains(tempKey))
                             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.FreezeEffects);
 #endif
+#if !DISABLE_ADDRESSABLES
                                 InstantiateBuffEffect(tempKey, GameInstance.Singleton.AddressableFreezeEffects).Forget();
+#endif
                                 _tempCachedKeys.Add(tempKey);
                             }
                             _tempAddingKeys.Add(tempKey);
@@ -889,12 +897,14 @@ namespace MultiplayerARPG
             CreateCacheEffect(buffId, InstantiateEffect(buffEffects));
         }
 
+#if !DISABLE_ADDRESSABLES
         public async UniTaskVoid InstantiateBuffEffect(string buffId, AssetReferenceGameEffect[] buffEffects)
         {
             if (buffEffects == null || buffEffects.Length == 0)
                 return;
             CreateCacheEffect(buffId, await InstantiateEffect(buffEffects));
         }
+#endif
 
         public bool GetRandomRightHandAttackAnimation(
             WeaponType weaponType,

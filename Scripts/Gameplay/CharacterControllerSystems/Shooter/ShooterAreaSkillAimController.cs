@@ -1,3 +1,4 @@
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using Insthync.CameraAndInput;
 using UnityEngine;
@@ -19,7 +20,13 @@ namespace MultiplayerARPG
         {
             if (_targetObject != null)
                 Destroy(_targetObject);
-            GameObject prefab = await skill.AddressableTargetObjectPrefab.GetOrLoadAssetAsyncOrUsePrefab(skill.TargetObjectPrefab);
+            GameObject prefab;
+#if !DISABLE_ADDRESSABLES
+            prefab = await skill.AddressableTargetObjectPrefab.GetOrLoadAssetAsyncOrUsePrefab(skill.TargetObjectPrefab);
+#else
+            await UniTask.Yield();
+            prefab = skill.TargetObjectPrefab;
+#endif
             if (prefab != null)
             {
                 _targetObject = Instantiate(prefab);

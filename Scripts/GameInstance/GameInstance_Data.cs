@@ -3,8 +3,10 @@ using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -37,7 +39,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, StatusEffect> StatusEffects = new Dictionary<int, StatusEffect>();
         public static readonly Dictionary<int, DamageElement> DamageElements = new Dictionary<int, DamageElement>();
         public static readonly Dictionary<int, EquipmentSet> EquipmentSets = new Dictionary<int, EquipmentSet>();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static readonly Dictionary<int, BuildingEntity> BuildingEntities = new Dictionary<int, BuildingEntity>();
         public static readonly Dictionary<int, BasePlayerCharacterEntity> PlayerCharacterEntities = new Dictionary<int, BasePlayerCharacterEntity>();
         public static readonly Dictionary<int, BaseMonsterCharacterEntity> MonsterCharacterEntities = new Dictionary<int, BaseMonsterCharacterEntity>();
@@ -47,6 +49,7 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, WarpPortalEntity> WarpPortalEntities = new Dictionary<int, WarpPortalEntity>();
         public static readonly Dictionary<int, NpcEntity> NpcEntities = new Dictionary<int, NpcEntity>();
 #endif
+#if !DISABLE_ADDRESSABLES
         public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<BuildingEntity>> AddressableBuildingEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<BuildingEntity>>();
         public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>> AddressablePlayerCharacterEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>>();
         public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity>> AddressableMonsterCharacterEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<BaseMonsterCharacterEntity>>();
@@ -55,14 +58,17 @@ namespace MultiplayerARPG
         public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<VehicleEntity>> AddressableVehicleEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<VehicleEntity>>();
         public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>> AddressableWarpPortalEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>>();
         public static readonly Dictionary<int, AssetReferenceLiteNetLibBehaviour<NpcEntity>> AddressableNpcEntities = new Dictionary<int, AssetReferenceLiteNetLibBehaviour<NpcEntity>>();
+#endif
         public static readonly Dictionary<string, List<WarpPortal>> MapWarpPortals = new Dictionary<string, List<WarpPortal>>();
         public static readonly Dictionary<string, List<Npc>> MapNpcs = new Dictionary<string, List<Npc>>();
         public static readonly Dictionary<string, BaseMapInfo> MapInfos = new Dictionary<string, BaseMapInfo>();
         public static readonly Dictionary<int, Faction> Factions = new Dictionary<int, Faction>();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static readonly Dictionary<int, LiteNetLibIdentity> OtherNetworkObjectPrefabs = new Dictionary<int, LiteNetLibIdentity>();
 #endif
+#if !DISABLE_ADDRESSABLES
         public static readonly Dictionary<int, AssetReferenceLiteNetLibIdentity> AddressableOtherNetworkObjectPrefabs = new Dictionary<int, AssetReferenceLiteNetLibIdentity>();
+#endif
         public static readonly Dictionary<int, MonsterCharacter> MonsterEntitiesData = new Dictionary<int, MonsterCharacter>();
 
         #region Add game data functions
@@ -553,12 +559,15 @@ namespace MultiplayerARPG
                     MapWarpPortals[mapWarpPortal.mapInfo.Id] = new List<WarpPortal>(mapWarpPortal.warpPortals);
                 foreach (WarpPortal warpPortal in mapWarpPortal.warpPortals)
                 {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                     AddGameEntity(WarpPortalEntities, warpPortal.entityPrefab);
 #endif
+#if !DISABLE_ADDRESSABLES
                     await AddAssetReference<AssetReferenceLiteNetLibBehaviour<WarpPortalEntity>, WarpPortalEntity>(AddressableWarpPortalEntities, warpPortal.addressableEntityPrefab);
+#endif
                 }
             }
+            await UniTask.Yield();
         }
 
         public static void AddMapNpcs(params Npcs[] mapNpcs)
@@ -580,16 +589,19 @@ namespace MultiplayerARPG
                     MapNpcs[mapNpc.mapInfo.Id] = new List<Npc>(mapNpc.npcs);
                 foreach (Npc npc in mapNpc.npcs)
                 {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                     AddGameEntity(NpcEntities, npc.entityPrefab);
 #endif
+#if !DISABLE_ADDRESSABLES
                     await AddAssetReference<AssetReferenceLiteNetLibBehaviour<NpcEntity>, NpcEntity>(AddressableNpcEntities, npc.addressableEntityPrefab);
+#endif
                     if (npc.startDialog != null)
                         AddGameData(NpcDialogs, npc.startDialog);
                     if (npc.graph != null)
                         AddNpcDialogs(npc.graph.GetDialogs());
                 }
             }
+            await UniTask.Yield();
         }
 
         public static void AddMapInfos(params BaseMapInfo[] mapInfos)
@@ -781,7 +793,7 @@ namespace MultiplayerARPG
         #endregion
 
         #region Add game entity functions
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddPlayerCharacterEntities(params BasePlayerCharacterEntity[] playerCharacterEntities)
         {
             AddPlayerCharacterEntities((IEnumerable<BasePlayerCharacterEntity>)playerCharacterEntities);
@@ -793,7 +805,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddMonsterCharacterEntities(params BaseMonsterCharacterEntity[] monsterCharacterEntities)
         {
             AddMonsterCharacterEntities((IEnumerable<BaseMonsterCharacterEntity>)monsterCharacterEntities);
@@ -805,7 +817,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddItemDropEntities(params ItemDropEntity[] itemDropEntities)
         {
             AddItemDropEntities((IEnumerable<ItemDropEntity>)itemDropEntities);
@@ -817,7 +829,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddHarvestableEntities(params HarvestableEntity[] harvestableEntities)
         {
             AddHarvestableEntities((IEnumerable<HarvestableEntity>)harvestableEntities);
@@ -829,7 +841,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddVehicleEntities(params VehicleEntity[] vehicleEntities)
         {
             AddVehicleEntities((IEnumerable<VehicleEntity>)vehicleEntities);
@@ -841,7 +853,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddBuildingEntities(params BuildingEntity[] buildingEntities)
         {
             AddBuildingEntities((IEnumerable<BuildingEntity>)buildingEntities);
@@ -853,7 +865,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddWarpPortalEntities(params WarpPortalEntity[] warpPortalEntities)
         {
             AddWarpPortalEntities((IEnumerable<WarpPortalEntity>)warpPortalEntities);
@@ -865,7 +877,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddNpcEntities(params NpcEntity[] npcEntities)
         {
             AddNpcEntities((IEnumerable<NpcEntity>)npcEntities);
@@ -878,6 +890,7 @@ namespace MultiplayerARPG
 #endif
         #endregion
 
+#if !DISABLE_ADDRESSABLES
         #region Add asset reference functions
         public static void AddAssetReferencePlayerCharacterEntities(params AssetReferenceLiteNetLibBehaviour<BasePlayerCharacterEntity>[] playerCharacterEntities)
         {
@@ -959,8 +972,9 @@ namespace MultiplayerARPG
             AddManyAssetReference<AssetReferenceLiteNetLibBehaviour<NpcEntity>, NpcEntity>(AddressableNpcEntities, npcEntities);
         }
         #endregion
+#endif
 
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public static void AddOtherNetworkObjects(params LiteNetLibIdentity[] networkObjects)
         {
             AddOtherNetworkObjects((IEnumerable<LiteNetLibIdentity>)networkObjects);
@@ -979,6 +993,7 @@ namespace MultiplayerARPG
         }
 #endif
 
+#if !DISABLE_ADDRESSABLES
         public static void AddAssetReferenceOtherNetworkObjects(params AssetReferenceLiteNetLibIdentity[] networkObjects)
         {
             AddAssetReferenceOtherNetworkObjects((IEnumerable<AssetReferenceLiteNetLibIdentity>)networkObjects);
@@ -995,6 +1010,7 @@ namespace MultiplayerARPG
                 AddressableOtherNetworkObjectPrefabs.Add(networkObject.HashAssetId, networkObject);
             }
         }
+#endif
 
         private static void AddManyGameData<T>(Dictionary<int, T> dict, IEnumerable<T> list)
             where T : IGameData
@@ -1050,6 +1066,7 @@ namespace MultiplayerARPG
             return true;
         }
 
+#if !DISABLE_ADDRESSABLES
         private static async void AddManyAssetReference<TBehaviour, TType>(Dictionary<int, TBehaviour> dict, IEnumerable<TBehaviour> list)
             where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
             where TType : BaseGameEntity
@@ -1096,6 +1113,7 @@ namespace MultiplayerARPG
             }
             return true;
         }
+#endif
 
         public static IUnlockableGameData GetUnlockableGameData(UnlockableContentType type, int dataId)
         {
@@ -1199,12 +1217,14 @@ namespace MultiplayerARPG
                 metaDataId = metaData.DataId;
                 return metaData.GetPlayerCharacterEntityHashAssetId();
             }
-            else if (AddressablePlayerCharacterEntities.ContainsKey(entityId))
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+            else if (PlayerCharacterEntities.ContainsKey(entityId))
             {
                 return entityId;
             }
-#if !EXCLUDE_PREFAB_REFS
-            else if (PlayerCharacterEntities.ContainsKey(entityId))
+#endif
+#if !DISABLE_ADDRESSABLES
+            else if (AddressablePlayerCharacterEntities.ContainsKey(entityId))
             {
                 return entityId;
             }

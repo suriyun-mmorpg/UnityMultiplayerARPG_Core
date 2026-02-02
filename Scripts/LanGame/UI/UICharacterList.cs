@@ -121,10 +121,12 @@ namespace MultiplayerARPG
                     continue;
                 }
                 if (
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                     !GameInstance.PlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) &&
 #endif
+#if !DISABLE_ADDRESSABLES
                     !GameInstance.AddressablePlayerCharacterEntities.ContainsKey(selectableCharacter.EntityId) &&
+#endif
                     !GameInstance.PlayerCharacterEntityMetaDataList.ContainsKey(selectableCharacter.EntityId))
                 {
                     // Invalid entity data

@@ -1,3 +1,4 @@
+#if !DISABLE_ADDRESSABLES
 using LiteNetLibManager;
 
 namespace MultiplayerARPG
@@ -10,3 +11,4 @@ namespace MultiplayerARPG
         }
     }
 }
+#endif

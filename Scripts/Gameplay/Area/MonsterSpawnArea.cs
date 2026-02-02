@@ -30,7 +30,7 @@ namespace MultiplayerARPG
 
         private void MigrateAsset()
         {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             if (prefab == null && monsterCharacterEntity != null)
             {
                 prefab = monsterCharacterEntity;
@@ -52,13 +52,19 @@ namespace MultiplayerARPG
         public override void RegisterPrefabs()
         {
             base.RegisterPrefabs();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddMonsterCharacterEntities(prefab);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceMonsterCharacterEntities(addressablePrefab);
+#endif
         }
 
-        protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab, AddressablePrefab addressablePrefab, int level, float destroyRespawnDelay)
+        protected override BaseMonsterCharacterEntity SpawnInternal(BaseMonsterCharacterEntity prefab
+#if !DISABLE_ADDRESSABLES
+            , AddressablePrefab addressablePrefab
+#endif
+            , int level, float destroyRespawnDelay)
         {
             if (!GetRandomPosition(out Vector3 spawnPosition))
             {
@@ -84,6 +90,7 @@ namespace MultiplayerARPG
                 if (destroyRespawnDelay > 0f)
                     entity.DestroyRespawnDelay = destroyRespawnDelay;
             }
+#if !DISABLE_ADDRESSABLES
             else if (addressablePrefab.IsDataValid())
             {
                 spawnObj = BaseGameNetworkManager.Singleton.Assets.GetObjectInstance(
@@ -97,6 +104,7 @@ namespace MultiplayerARPG
                 if (destroyRespawnDelay > 0f)
                     entity.DestroyRespawnDelay = destroyRespawnDelay;
             }
+#endif
 
             if (entity == null)
             {

@@ -4,7 +4,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
 using UnityEngine;
+#if !DISABLE_ADDRESSABLES
 using UnityEngine.AddressableAssets;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -88,6 +90,7 @@ namespace MultiplayerARPG
                             result[field.Name] = dicts;
                             continue;
                         }
+#if !DISABLE_ADDRESSABLES
                         if (elementType.IsSubclassOf(typeof(AssetReference)))
                         {
                             for (int i = 0; i < arr.Count; ++i)
@@ -97,6 +100,7 @@ namespace MultiplayerARPG
                             result[field.Name] = dicts;
                             continue;
                         }
+#endif
                         if (elementType.IsSubclassOf(typeof(UnityEngine.Object)) ||
                             elementType.IsSubclassOf(typeof(Delegate)))
                         {
@@ -139,11 +143,13 @@ namespace MultiplayerARPG
                         StoreGameDataPatchData(result, field.Name, field.GetValue(target) as IGameData);
                         continue;
                     }
+#if !DISABLE_ADDRESSABLES
                     if (fieldType.IsSubclassOf(typeof(AssetReference)))
                     {
                         StoreAddressablePatchData(result, field.Name, field.GetValue(target) as AssetReference);
                         continue;
                     }
+#endif
                     if (fieldType.IsSubclassOf(typeof(UnityEngine.Object)) ||
                         fieldType.IsSubclassOf(typeof(Delegate)))
                     {
@@ -171,12 +177,14 @@ namespace MultiplayerARPG
             list.Add(GetGameDataPatchData(gameData));
         }
 
+#if !DISABLE_ADDRESSABLES
         private static void StoreAddressablePatchData(List<Dictionary<string, object>> list, AssetReference aa)
         {
             if (!aa.IsDataValid())
                 return;
             list.Add(GetAddressablePatchData(aa));
         }
+#endif
 
         private static void StoreGameDataPatchData(Dictionary<string, object> result, string fieldName, IGameData gameData)
         {
@@ -185,12 +193,14 @@ namespace MultiplayerARPG
             result[fieldName] = GetGameDataPatchData(gameData);
         }
 
+#if !DISABLE_ADDRESSABLES
         private static void StoreAddressablePatchData(Dictionary<string, object> result, string fieldName, AssetReference aa)
         {
             if (!aa.IsDataValid())
                 return;
             result[fieldName] = GetAddressablePatchData(aa);
         }
+#endif
 
         private static Dictionary<string, object> GetGameDataPatchData(IGameData gameData)
         {
@@ -203,6 +213,7 @@ namespace MultiplayerARPG
             };
         }
 
+#if !DISABLE_ADDRESSABLES
         private static Dictionary<string, object> GetAddressablePatchData(AssetReference aa)
         {
             if (!aa.IsDataValid())
@@ -213,6 +224,7 @@ namespace MultiplayerARPG
                 { KEY_KEY, aa.RuntimeKey },
             };
         }
+#endif
 
         public static object ApplyPatch(this object target, Dictionary<string, object> patchingData)
         {
@@ -255,6 +267,7 @@ namespace MultiplayerARPG
                             ApplyListOrArrayField(dataArray, field, target);
                             continue;
                         }
+#if !DISABLE_ADDRESSABLES
                         if (elementType.IsSubclassOf(typeof(AssetReference)))
                         {
                             Array dataArray = Array.CreateInstance(elementType, patchDataList.Count);
@@ -268,6 +281,7 @@ namespace MultiplayerARPG
                             ApplyListOrArrayField(dataArray, field, target);
                             continue;
                         }
+#endif
                         if (elementType.IsSubclassOf(typeof(UnityEngine.Object)) ||
                             elementType.IsSubclassOf(typeof(Delegate)))
                         {
@@ -301,11 +315,13 @@ namespace MultiplayerARPG
                         ApplyGameDataPatchData(field, target, entry.Value as Dictionary<string, object>);
                         continue;
                     }
+#if !DISABLE_ADDRESSABLES
                     if (fieldType.IsSubclassOf(typeof(AssetReference)))
                     {
                         ApplyAddressablePatchData(field, target, entry.Value as Dictionary<string, object>);
                         continue;
                     }
+#endif
                     if (fieldType.IsSubclassOf(typeof(UnityEngine.Object)) ||
                         fieldType.IsSubclassOf(typeof(Delegate)))
                     {
@@ -363,6 +379,7 @@ namespace MultiplayerARPG
             field.SetValue(target, foundData);
         }
 
+#if !DISABLE_ADDRESSABLES
         private static void ApplyAddressablePatchData(FieldInfo field, object target, Dictionary<string, object> patchData)
         {
             AssetReference aa = field.GetValue(target) as AssetReference;
@@ -372,11 +389,14 @@ namespace MultiplayerARPG
                 return;
             ApplyAddressablePatchData(aa, aaKey);
         }
+#endif
 
+#if !DISABLE_ADDRESSABLES
         private static void ApplyAddressablePatchData(AssetReference aa, object guid)
         {
             FieldInfo guidField = aa.GetType().GetField("m_AssetGUID", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
             guidField.SetValue(aa, guid);
         }
+#endif
     }
 }

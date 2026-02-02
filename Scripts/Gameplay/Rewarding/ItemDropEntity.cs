@@ -69,7 +69,9 @@ namespace MultiplayerARPG
 
         public ItemDropEntity SpawnPrefab { get; protected set; }
 
+#if !DISABLE_ADDRESSABLES
         public GameSpawnArea<ItemDropEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+#endif
 
         public int SpawnLevel { get; protected set; }
 
@@ -240,11 +242,14 @@ namespace MultiplayerARPG
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;
+#if !DISABLE_ADDRESSABLES
             SpawnAddressablePrefab = null;
+#endif
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
 
+#if !DISABLE_ADDRESSABLES
         public virtual void SetSpawnArea(GameSpawnArea<ItemDropEntity> spawnArea, GameSpawnArea<ItemDropEntity>.AddressablePrefab spawnAddressablePrefab, int spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
@@ -253,6 +258,7 @@ namespace MultiplayerARPG
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
+#endif
 
         public void CallRpcOnSpawned()
         {
@@ -337,9 +343,17 @@ namespace MultiplayerARPG
             NetworkDestroy(DestroyDelay);
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
+            {
+                SpawnArea.Spawn(SpawnPrefab
+#if !DISABLE_ADDRESSABLES
+                    , SpawnAddressablePrefab
+#endif
+                    , SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
+            }
             else if (Identity.IsSceneObject)
+            {
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
+            }
         }
 
         /// <summary>

@@ -1,6 +1,7 @@
 ﻿using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -41,17 +42,19 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Category(3, "Building Settings")]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableBuildingEntity))]
+#endif
         private BuildingEntity buildingEntity = null;
 #endif
         public BuildingEntity BuildingEntity
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return buildingEntity;
 #else
                 return null;
@@ -59,12 +62,14 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceBuildingEntity addressableBuildingEntity = null;
         public AssetReferenceBuildingEntity AddressableBuildingEntity
         {
             get { return addressableBuildingEntity; }
         }
+#endif
 
         [SerializeField]
         private float useItemCooldown = 0f;
@@ -86,7 +91,12 @@ namespace MultiplayerARPG
 
         public AimPosition UpdateAimControls(Vector2 aimAxes, params object[] data)
         {
-            BuildingEntity tempBuildingEntity = AddressableBuildingEntity.GetOrLoadAssetOrUsePrefab(BuildingEntity);
+            BuildingEntity tempBuildingEntity;
+#if !DISABLE_ADDRESSABLES
+            tempBuildingEntity = AddressableBuildingEntity.GetOrLoadAssetOrUsePrefab(BuildingEntity);
+#else
+            tempBuildingEntity = BuildingEntity;
+#endif
             if (tempBuildingEntity != null)
                 return BasePlayerCharacterController.Singleton.BuildAimController.UpdateAimControls(aimAxes, tempBuildingEntity);
             return default;
@@ -105,10 +115,12 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddBuildingEntities(BuildingEntity);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceBuildingEntities(AddressableBuildingEntity);
+#endif
         }
     }
 }

@@ -121,27 +121,32 @@ namespace MultiplayerARPG.GameData.Model.Playables
         [Tooltip("This will be in use with attacking/skill animations, This is duration after action animation clip played to add some delay before next animation")]
         public float extendDuration;
         [Tooltip("This will be in use with attacking/skill animations, These audio clips will be played randomly while play this animation (not loop). PS. You actually can use animation event instead :P")]
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public AudioClip[] audioClips = new AudioClip[0];
 #endif
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceAudioClip[] addressableAudioClips = new AssetReferenceAudioClip[0];
+#endif
 
         public async UniTask<AudioClip> GetRandomAudioClip()
         {
 #if !UNITY_SERVER
             AudioClip[] tempAudioClips = null;
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             tempAudioClips = audioClips;
 #endif
             if (tempAudioClips != null && tempAudioClips.Length > 0)
             {
+                await UniTask.Yield();
                 return tempAudioClips[Random.Range(0, tempAudioClips.Length)];
             }
+#if !DISABLE_ADDRESSABLES
             else if (addressableAudioClips != null && addressableAudioClips.Length > 0)
             {
                 AssetReferenceAudioClip clip = addressableAudioClips.GetRandomObjectInArray(out int index);
                 return await clip.GetOrLoadObjectAsync<AudioClip>();
             }
+#endif
 #endif
             return null;
         }

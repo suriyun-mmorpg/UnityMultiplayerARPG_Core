@@ -11,26 +11,30 @@ namespace MultiplayerARPG
         public float missileDistance;
         public float missileSpeed;
         public bool isHeadshotInstantDeath;
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableProjectEffect))]
+#endif
         public ProjectileEffect projectileEffect;
 #endif
         public ProjectileEffect ProjectileEffect
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return projectileEffect;
 #else
                 return null;
 #endif
             }
         }
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceProjectileEffect addressableProjectEffect;
         public AssetReferenceProjectileEffect AddressableProjectEffect
         {
             get => addressableProjectEffect;
         }
+#endif
         public byte pierceThroughEntities;
         public ImpactEffects impactEffects;
 
@@ -301,14 +305,20 @@ namespace MultiplayerARPG
 #if !UNITY_SERVER
         private async void PlayProjectileEffect(Vector3 damagePosition, Quaternion damageRotation, float projectileDistance, List<ImpactEffectPlayingData> impactEffectsData)
         {
-            ProjectileEffect loadedProjectileEffect = await AddressableProjectEffect
+            ProjectileEffect loadedProjectileEffect;
+#if !DISABLE_ADDRESSABLES
+            loadedProjectileEffect = await AddressableProjectEffect
                 .GetOrLoadAssetAsyncOrUsePrefab(ProjectileEffect);
+#else
+            loadedProjectileEffect = ProjectileEffect;
+#endif
 
             if (loadedProjectileEffect == null)
                 return;
 
             PoolSystem.GetInstance(loadedProjectileEffect, damagePosition, damageRotation)
                 .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
+            await UniTask.Yield();
         }
 #endif
 

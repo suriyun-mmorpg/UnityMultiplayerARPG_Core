@@ -15,7 +15,9 @@ namespace MultiplayerARPG
             Looters?.Clear();
             SpawnArea = null;
             SpawnPrefab = null;
+#if !DISABLE_ADDRESSABLES
             SpawnAddressablePrefab = null;
+#endif
             _allActivatingObjects.Nullify();
             _allActivatingObjects?.Clear();
             _allActivatingObjects = null;

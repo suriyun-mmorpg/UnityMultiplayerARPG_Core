@@ -41,17 +41,19 @@ namespace MultiplayerARPG
             }
         }
 
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Category(3, "Mount Settings")]
         [SerializeField]
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableMountEntity))]
+#endif
         private VehicleEntity mountEntity = null;
 #endif
         public VehicleEntity VehicleEntity
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return mountEntity;
 #else
                 return null;
@@ -59,12 +61,14 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
         [SerializeField]
         private AssetReferenceVehicleEntity addressableMountEntity = null;
         public AssetReferenceVehicleEntity AddressableVehicleEntity
         {
             get { return addressableMountEntity; }
         }
+#endif
 
         [SerializeField]
         private IncrementalFloat mountDuration;
@@ -113,10 +117,12 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddVehicleEntities(VehicleEntity);
 #endif
+#if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceVehicleEntities(AddressableVehicleEntity);
+#endif
         }
     }
 }

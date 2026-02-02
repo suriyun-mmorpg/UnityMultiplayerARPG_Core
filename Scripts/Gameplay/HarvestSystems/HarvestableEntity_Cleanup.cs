@@ -10,7 +10,9 @@ namespace MultiplayerARPG
             onHarvestableDestroy = null;
             SpawnArea = null;
             SpawnPrefab = null;
+#if !DISABLE_ADDRESSABLES
             SpawnAddressablePrefab = null;
+#endif
         }
     }
 }

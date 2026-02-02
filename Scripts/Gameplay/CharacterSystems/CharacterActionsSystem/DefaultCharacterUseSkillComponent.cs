@@ -228,18 +228,24 @@ namespace MultiplayerARPG
                         if (tpsModelAvailable)
                         {
                             tpsModel.InstantiateEffect(skill.SkillCastEffects);
+#if !DISABLE_ADDRESSABLES
                             tpsModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
+#endif
                         }
                         if (fpsModelAvailable)
                         {
                             fpsModel.InstantiateEffect(skill.SkillCastEffects);
+#if !DISABLE_ADDRESSABLES
                             fpsModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
+#endif
                         }
                     }
                     else if (vehicleModelAvailable)
                     {
                         vehicleModel.InstantiateEffect(skill.SkillCastEffects);
+#if !DISABLE_ADDRESSABLES
                         vehicleModel.InstantiateEffect(skill.AddressableSkillCastEffects).Forget();
+#endif
                     }
                 }
 
@@ -268,19 +274,25 @@ namespace MultiplayerARPG
                     if (vehicleModelAvailable)
                     {
                         vehicleModel.InstantiateEffect(skill.SkillActivateEffects);
+#if !DISABLE_ADDRESSABLES
                         vehicleModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+#endif
                     }
                     if (!overridePassengerActionAnimations)
                     {
                         if (tpsModelAvailable)
                         {
                             tpsModel.InstantiateEffect(skill.SkillActivateEffects);
+#if !DISABLE_ADDRESSABLES
                             tpsModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+#endif
                         }
                         if (fpsModelAvailable)
                         {
                             fpsModel.InstantiateEffect(skill.SkillActivateEffects);
+#if !DISABLE_ADDRESSABLES
                             fpsModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+#endif
                         }
                     }
                 }

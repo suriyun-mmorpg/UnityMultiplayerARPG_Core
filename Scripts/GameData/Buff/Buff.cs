@@ -131,17 +131,17 @@ namespace MultiplayerARPG
         [Tooltip("Max stack to applies buff, it won't be used while `isExtendDuration` is `TRUE`")]
         public IncrementalInt maxStack = new IncrementalInt();
         [Tooltip("Game effects which appearing on character while applied. This won't be applied to monster's summoner.")]
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableEffects))]
+#endif
         public GameEffect[] effects = new GameEffect[0];
 #endif
-        public AssetReferenceGameEffect[] addressableEffects = new AssetReferenceGameEffect[0];
-
         public GameEffect[] Effects
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return effects;
 #else
                 return System.Array.Empty<GameEffect>();
@@ -149,10 +149,13 @@ namespace MultiplayerARPG
             }
         }
 
+#if !DISABLE_ADDRESSABLES
+        public AssetReferenceGameEffect[] addressableEffects = new AssetReferenceGameEffect[0];
         public AssetReferenceGameEffect[] AddressableEffects
         {
             get { return addressableEffects; }
         }
+#endif
 
         public virtual bool TryGetMount(out BuffMount mount)
         {
@@ -161,11 +164,13 @@ namespace MultiplayerARPG
                 mount = this.mount;
                 return true;
             }
+#if !DISABLE_ADDRESSABLES
             else if (this.mount.AddressableMountEntity.IsDataValid())
             {
                 mount = this.mount;
                 return true;
             }
+#endif
             mount = null;
             return false;
         }
@@ -185,9 +190,11 @@ namespace MultiplayerARPG
             GameInstance.AddStatusEffects(enemyStatusEffectsWhenAttacked);
             if (TryGetMount(out BuffMount mount))
             {
-                GameInstance.AddAssetReferenceVehicleEntities(mount.AddressableMountEntity);
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 GameInstance.AddVehicleEntities(mount.MountEntity);
+#endif
+#if !DISABLE_ADDRESSABLES
+                GameInstance.AddAssetReferenceVehicleEntities(mount.AddressableMountEntity);
 #endif
             }
         }

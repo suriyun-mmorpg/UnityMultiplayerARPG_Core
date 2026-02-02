@@ -12,26 +12,30 @@ namespace MultiplayerARPG
         public float missileDistance;
         public float missileSpeed;
         public bool isHeadshotInstantDeath;
-#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+#if !DISABLE_ADDRESSABLES
         [AddressableAssetConversion(nameof(addressableMissileDamageEntity))]
+#endif
         public MissileDamageEntity missileDamageEntity;
 #endif
         public MissileDamageEntity MissileDamageEntity
         {
             get
             {
-#if !EXCLUDE_PREFAB_REFS
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                 return missileDamageEntity;
 #else
                 return null;
 #endif
             }
         }
+#if !DISABLE_ADDRESSABLES
         public AssetReferenceMissileDamageEntity addressableMissileDamageEntity;
         public AssetReferenceMissileDamageEntity AddressableMissileDamageEntity
         {
             get => addressableMissileDamageEntity;
         }
+#endif
         private MissileDamageEntity.HitDetectionMode _hitDetectionMode;
         private float _sphereCastRadius;
         private Vector3 _boxCastSize;
@@ -39,11 +43,19 @@ namespace MultiplayerARPG
 
         public override async void PrepareRelatesData()
         {
-            MissileDamageEntity loadedDamageEntity = await AddressableMissileDamageEntity
+            MissileDamageEntity loadedDamageEntity;
+#if !DISABLE_ADDRESSABLES
+            loadedDamageEntity = await AddressableMissileDamageEntity
                 .GetOrLoadAssetAsyncOrUsePrefab(MissileDamageEntity);
+#else
+            loadedDamageEntity = MissileDamageEntity;
+#endif
             PrepareHitValidationData(loadedDamageEntity);
+#if !DISABLE_ADDRESSABLES
             if (AddressableMissileDamageEntity.IsDataValid())
                 AddressableAssetsManager.Release(AddressableMissileDamageEntity.RuntimeKey);
+#endif
+            await UniTask.Yield();
         }
 
         protected void PrepareHitValidationData(MissileDamageEntity damageEntity)
@@ -159,8 +171,13 @@ namespace MultiplayerARPG
 
         public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
-            MissileDamageEntity loadedDamageEntity = await AddressableMissileDamageEntity
+            MissileDamageEntity loadedDamageEntity;
+#if !DISABLE_ADDRESSABLES
+            loadedDamageEntity = await AddressableMissileDamageEntity
                 .GetOrLoadAssetAsyncOrUsePrefab(MissileDamageEntity);
+#else
+            loadedDamageEntity = MissileDamageEntity;
+#endif
 
             // Spawn missile damage entity, it will move to target then apply damage when hit
             // Instantiates on both client and server (damage applies at server)
@@ -195,7 +212,9 @@ namespace MultiplayerARPG
             // Instantiate missile damage entity
             float missileDistance = this.missileDistance;
             float missileSpeed = this.missileSpeed;
-            PoolSystem.GetInstance(loadedDamageEntity, damagePosition, damageRotation).Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], skill, skillLevel, hitRegData, missileDistance, missileSpeed, lockingTarget);
+            PoolSystem.GetInstance(loadedDamageEntity, damagePosition, damageRotation)
+                .Setup(instigator, weapon, simulateSeed, triggerIndex, spreadIndex, damageAmounts[triggerIndex], skill, skillLevel, hitRegData, missileDistance, missileSpeed, lockingTarget);
+            await UniTask.Yield();
         }
     }
 }

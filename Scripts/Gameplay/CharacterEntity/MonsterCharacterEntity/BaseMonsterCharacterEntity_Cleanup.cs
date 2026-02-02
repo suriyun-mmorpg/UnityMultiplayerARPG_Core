@@ -10,7 +10,9 @@ namespace MultiplayerARPG
             summoner = null;
             SpawnArea = null;
             SpawnPrefab = null;
+#if !DISABLE_ADDRESSABLES
             SpawnAddressablePrefab = null;
+#endif
             _looters?.Clear();
             _droppingItems?.Clear();
         }

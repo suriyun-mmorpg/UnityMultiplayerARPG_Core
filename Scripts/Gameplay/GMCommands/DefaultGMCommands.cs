@@ -508,6 +508,7 @@ namespace MultiplayerARPG
                 if (string.Equals(commandKey, Monster, StringComparison.OrdinalIgnoreCase))
                 {
                     BaseMonsterCharacterEntity targetMonster = null;
+#if !DISABLE_ADDRESSABLES
                     foreach (AssetReferenceBaseMonsterCharacterEntity addressableMonster in GameInstance.AddressableMonsterCharacterEntities.Values)
                     {
                         BaseMonsterCharacterEntity monster = await addressableMonster.GetOrLoadAssetAsync<BaseMonsterCharacterEntity>();
@@ -521,7 +522,8 @@ namespace MultiplayerARPG
                             break;
                         }
                     }
-#if !EXCLUDE_PREFAB_REFS
+#endif
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
                     if (targetMonster == null)
                     {
                         foreach (BaseMonsterCharacterEntity monster in GameInstance.MonsterCharacterEntities.Values)
@@ -672,7 +674,7 @@ namespace MultiplayerARPG
                 }
             }
 #endif
-            return response;
+                    return response;
         }
     }
 }

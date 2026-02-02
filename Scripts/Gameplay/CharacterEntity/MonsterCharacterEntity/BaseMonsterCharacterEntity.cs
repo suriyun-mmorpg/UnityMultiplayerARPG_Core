@@ -96,7 +96,9 @@ namespace MultiplayerARPG
 
         public BaseMonsterCharacterEntity SpawnPrefab { get; protected set; }
 
+#if !DISABLE_ADDRESSABLES
         public GameSpawnArea<BaseMonsterCharacterEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+#endif
 
         public int SpawnLevel { get; protected set; }
 
@@ -290,23 +292,43 @@ namespace MultiplayerARPG
         {
             if (!IsClient)
                 return;
+#if !DISABLE_ADDRESSABLES
             // Instantiates monster objects
             await CurrentGameInstance.AddressableMonsterCharacterObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.MonsterCharacterObjects, EntityTransform);
+#else
+            foreach (var prefab in CurrentGameInstance.MonsterCharacterObjects)
+            {
+                if (prefab == null) continue;
+                Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform);
+            }
+#endif
+#if !DISABLE_ADDRESSABLES
             // Instantiates monster minimap objects
             await CurrentGameInstance.AddressableMonsterCharacterMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.MonsterCharacterMiniMapObjects, EntityTransform);
+#else
+            foreach (var prefab in CurrentGameInstance.MonsterCharacterMiniMapObjects)
+            {
+                if (prefab == null) continue;
+                Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform);
+            }
+#endif
             // Instantiates monster character UI
             InstantiateUI(await CurrentGameInstance.GetLoadedMonsterCharacterUIPrefab());
+            await UniTask.Yield();
         }
 
         public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
             SpawnPrefab = spawnPrefab;
+#if !DISABLE_ADDRESSABLES
             SpawnAddressablePrefab = null;
+#endif
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
 
+#if !DISABLE_ADDRESSABLES
         public virtual void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, GameSpawnArea<BaseMonsterCharacterEntity>.AddressablePrefab spawnAddressablePrefab, int spawnLevel, Vector3 spawnPosition)
         {
             SpawnArea = spawnArea;
@@ -315,6 +337,7 @@ namespace MultiplayerARPG
             SpawnLevel = spawnLevel;
             SpawnPosition = spawnPosition;
         }
+#endif
 
         public void CallRpcOnSpawned()
         {
@@ -776,9 +799,17 @@ namespace MultiplayerARPG
             NetworkDestroy(DestroyDelay);
             // Respawning later
             if (SpawnArea != null)
-                SpawnArea.Spawn(SpawnPrefab, SpawnAddressablePrefab, SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
+            {
+                SpawnArea.Spawn(SpawnPrefab
+#if !DISABLE_ADDRESSABLES
+                    , SpawnAddressablePrefab
+#endif
+                    , SpawnLevel, DestroyDelay + DestroyRespawnDelay, DestroyRespawnDelay);
+            }
             else if (Identity.IsSceneObject)
+            {
                 RespawnRoutine(DestroyDelay + DestroyRespawnDelay).Forget();
+            }
         }
 
         /// <summary>

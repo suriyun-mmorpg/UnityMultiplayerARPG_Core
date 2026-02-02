@@ -1,3 +1,4 @@
+#if !DISABLE_ADDRESSABLES
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -20,3 +21,4 @@ namespace MultiplayerARPG
         }
     }
 }
+#endif
