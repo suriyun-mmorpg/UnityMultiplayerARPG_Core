@@ -130,11 +130,12 @@ namespace MultiplayerARPG
             }
 
             // Update UIs
-            float coolDownDuration = GuildSkill.GetCoolDownDuration(Level);
+            bool isSkillActive = GuildSkill != null && GuildSkill.IsActive;
+            float coolDownDuration = isSkillActive ? GuildSkill.GetCoolDownDuration(Level) : 0f;
 
             if (uiTextCoolDownDuration != null)
             {
-                uiTextCoolDownDuration.SetGameObjectActive(GuildSkill.IsActive && coolDownDuration > 0f);
+                uiTextCoolDownDuration.SetGameObjectActive(isSkillActive && coolDownDuration > 0f);
                 uiTextCoolDownDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownDuration),
                     coolDownDuration.ToString("N0"));
@@ -142,7 +143,7 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.SetGameObjectActive(GuildSkill.IsActive && _coolDownRemainsDuration > 0);
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(isSkillActive && _coolDownRemainsDuration > 0);
                 uiTextCoolDownRemainsDuration.text = ZString.Format(
                     LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
                     _coolDownRemainsDuration.ToString("N0"));
