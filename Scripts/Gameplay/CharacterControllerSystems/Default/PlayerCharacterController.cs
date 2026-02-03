@@ -125,6 +125,7 @@ namespace MultiplayerARPG
         protected TargetActionType _previousTargetActionType;
         protected TargetActionType _targetActionType;
         protected TargetActionType _turnToTargetActionType;
+        protected Vector3? _turnToTargetPosition = null;
         protected IPhysicFunctions _physicFunctions;
         protected bool _isLeftHandAttacking;
         protected bool _isFollowingTarget;

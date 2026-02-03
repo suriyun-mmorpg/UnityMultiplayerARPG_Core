@@ -563,7 +563,7 @@ namespace MultiplayerARPG
             if (skill.HasCustomAimControls() && _queueUsingSkill.aimPosition.type == AimPositionType.Position)
             {
                 // Target not required, use skill immediately
-                TurnCharacterToPosition(_queueUsingSkill.aimPosition.position);
+                TurnCharacterToPositionToUsePendingSkill(_queueUsingSkill.aimPosition.position);
                 _isFollowingTarget = false;
                 return;
             }
@@ -787,14 +787,15 @@ namespace MultiplayerARPG
 
         protected void UpdateTurnToTargetToDoAction()
         {
-            if (TargetGameEntity == null)
+            if (TargetGameEntity == null && !_turnToTargetPosition.HasValue)
             {
                 _turnToTargetActionType = TargetActionType.None;
                 return;
             }
             if (_turnToTargetActionType != TargetActionType.None)
             {
-                Vector3 lookAtDir = (TargetGameEntity.EntityTransform.position - EntityTransform.position).normalized;
+                Vector3 targetPosition = _turnToTargetPosition.HasValue ? _turnToTargetPosition.Value : TargetGameEntity.EntityTransform.position;
+                Vector3 lookAtDir = (targetPosition - EntityTransform.position).normalized;
                 Quaternion lookAtRot = Quaternion.LookRotation(lookAtDir);
                 PlayingCharacterEntity.SetLookRotation(lookAtRot, false);
                 float currentAngle = Quaternion.Angle(Quaternion.LookRotation(PlayingCharacterEntity.EntityTransform.forward), lookAtRot);
@@ -814,7 +815,10 @@ namespace MultiplayerARPG
                             break;
                         case TargetActionType.ActionRequested:
                             if (!PlayingCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
+                            {
                                 _turnToTargetActionType = TargetActionType.None;
+                                _turnToTargetPosition = null;
+                            }
                             break;
                     }
                 }
@@ -950,6 +954,7 @@ namespace MultiplayerARPG
                 _previousPointClickPosition = position;
             }
             _turnToTargetActionType = TargetActionType.None;
+            _turnToTargetPosition = null;
         }
 
         protected void TurnCharacterToEntity(BaseGameEntity entity)
@@ -969,13 +974,27 @@ namespace MultiplayerARPG
         protected void TurnCharacterToEntityToAttack(BaseGameEntity entity)
         {
             _turnToTargetActionType = TargetActionType.Attack;
+            _turnToTargetPosition = null;
             SelectedEntity = entity;
+        }
+
+        protected void TurnCharacterToPositionToAttack(Vector3 position)
+        {
+            _turnToTargetActionType = TargetActionType.Attack;
+            _turnToTargetPosition = position;
         }
 
         protected void TurnCharacterToEntityToUsePendingSkill(BaseGameEntity entity)
         {
             _turnToTargetActionType = TargetActionType.UseSkill;
+            _turnToTargetPosition = null;
             SelectedEntity = entity;
+        }
+
+        protected void TurnCharacterToPositionToUsePendingSkill(Vector3 position)
+        {
+            _turnToTargetActionType = TargetActionType.UseSkill;
+            _turnToTargetPosition = position;
         }
 
         public override bool UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition)
