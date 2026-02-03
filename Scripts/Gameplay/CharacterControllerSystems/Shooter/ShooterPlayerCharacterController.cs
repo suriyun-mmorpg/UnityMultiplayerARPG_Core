@@ -1385,8 +1385,15 @@ namespace MultiplayerARPG
             switch (Mode)
             {
                 case ControllerMode.Adventure:
-                    _moveLookDirection = _moveDirection;
-                    _moveLookDirection.y = 0f;
+                    if (_moveDirection.sqrMagnitude > 0)
+                    {
+                        _moveLookDirection = _moveDirection;
+                        _moveLookDirection.y = 0f;
+                    }
+                    else
+                    {
+                        _moveLookDirection = _cameraForward;
+                    }
                     break;
                 case ControllerMode.Combat:
                     _moveLookDirection = _cameraForward;
