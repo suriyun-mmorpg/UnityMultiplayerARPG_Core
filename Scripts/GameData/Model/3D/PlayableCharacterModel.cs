@@ -137,6 +137,8 @@ namespace MultiplayerARPG.GameData.Model.Playables
         {
             if (Graph.IsValid())
                 Graph.Stop();
+            if (Behaviour != null)
+                Behaviour.ResetAnimations();
         }
 
         internal override void OnSwitchingToThisModel()

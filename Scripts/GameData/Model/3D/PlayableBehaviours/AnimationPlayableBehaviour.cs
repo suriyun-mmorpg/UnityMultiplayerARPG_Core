@@ -214,19 +214,19 @@ namespace MultiplayerARPG.GameData.Model.Playables
 
         private class StateUpdateData
         {
-            public int playingStateId;
+            public int playingStateId = 0;
             public int inputPort = 0;
             public float transitionDuration = 0f;
             public float playElapsed = 0f;
             public float clipSpeed = 0f;
             public float clipLength = 0f;
             public bool isMoving = false;
-            public AnimationClip previousClip;
+            public AnimationClip previousClip = null;
 
             public bool HasChanges { get; set; } = true;
             public bool ForcePlay { get; set; } = false;
 
-            private string _weaponTypeId;
+            private string _weaponTypeId = string.Empty;
             public string WeaponTypeId
             {
                 get { return _weaponTypeId; }
@@ -239,7 +239,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 }
             }
 
-            private bool _isDead;
+            private bool _isDead = false;
             public bool IsDead
             {
                 get { return _isDead; }
@@ -332,6 +332,27 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 PreviousMovementState = MovementState;
                 PreviousExtraMovementState = ExtraMovementState;
+            }
+
+            public void Reset()
+            {
+                playingStateId = 0;
+                inputPort = 0;
+                transitionDuration = 0f;
+                playElapsed = 0f;
+                clipSpeed = 0f;
+                clipLength = 0f;
+                isMoving = false;
+                previousClip = null;
+                HasChanges = false;
+                ForcePlay = false;
+                _weaponTypeId = string.Empty;
+                _isDead = false;
+                _movementState = MovementState.IsGrounded;
+                _extraMovementState = ExtraMovementState.None;
+                _previousMovementState = MovementState.IsGrounded;
+                _previousExtraMovementState = ExtraMovementState.None;
+                _playingSpecialMoveState = PlayingSpecialMoveState.None;
             }
         }
 
@@ -619,12 +640,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 SetLeftHandWieldingState(StateHash.Generate(CLIP_SWIM_IDLE, weaponTypeId), weaponAnimations.swimIdleState);
                 SetLeftHandWieldingMoveStates(weaponTypeId, MOVE_TYPE_SWIM, weaponAnimations.swimMoveStates);
                 SetLeftHandWieldingState(StateHash.Generate(CLIP_JUMP, weaponTypeId), weaponAnimations.jumpState);
-                SetLeftHandWieldingState(StateHash.Generate(CLIP_FALL,weaponTypeId), weaponAnimations.fallState);
-                SetLeftHandWieldingState(StateHash.Generate(CLIP_LANDED,weaponTypeId), weaponAnimations.landedState);
-                SetLeftHandWieldingState(StateHash.Generate(CLIP_DEAD,weaponTypeId), weaponAnimations.deadState);
-                SetLeftHandWieldingState(StateHash.Generate(CLIP_DASH_START,weaponTypeId), weaponAnimations.dashStartState);
-                SetLeftHandWieldingState(StateHash.Generate(CLIP_DASH_LOOP,weaponTypeId), weaponAnimations.dashLoopState);
-                SetLeftHandWieldingState(StateHash.Generate(CLIP_DASH_END,weaponTypeId), weaponAnimations.dashEndState);
+                SetLeftHandWieldingState(StateHash.Generate(CLIP_FALL, weaponTypeId), weaponAnimations.fallState);
+                SetLeftHandWieldingState(StateHash.Generate(CLIP_LANDED, weaponTypeId), weaponAnimations.landedState);
+                SetLeftHandWieldingState(StateHash.Generate(CLIP_DEAD, weaponTypeId), weaponAnimations.deadState);
+                SetLeftHandWieldingState(StateHash.Generate(CLIP_DASH_START, weaponTypeId), weaponAnimations.dashStartState);
+                SetLeftHandWieldingState(StateHash.Generate(CLIP_DASH_LOOP, weaponTypeId), weaponAnimations.dashLoopState);
+                SetLeftHandWieldingState(StateHash.Generate(CLIP_DASH_END, weaponTypeId), weaponAnimations.dashEndState);
             }
 
             private void SetMoveStates(string weaponTypeId, string moveType, MoveStates moveStates)
@@ -1286,6 +1307,14 @@ namespace MultiplayerARPG.GameData.Model.Playables
             {
                 actionStatePlaying.StopAction();
             }
+        }
+
+        public void ResetAnimations()
+        {
+            StopAction();
+            _actionStatePlayings.Clear();
+            _baseStateUpdateData.Reset();
+            _leftHandWieldingStateUpdateData.Reset();
         }
     }
 }
