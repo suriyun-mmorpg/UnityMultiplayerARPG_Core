@@ -745,7 +745,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected override async void UpdateData()
+        protected override void UpdateData()
         {
             if (changeObjectNameByData)
                 name = $"(UICharacterItem){(Item == null ? string.Empty : Item.Id)}";
