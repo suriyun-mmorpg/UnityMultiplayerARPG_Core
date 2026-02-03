@@ -12,12 +12,8 @@ namespace MultiplayerARPG
 
         private void Awake()
         {
-            UpdateManager.Register(this);
-        }
-
-        private void Start()
-        {
             _recoveryData = new CharacterRecoveryData(Entity);
+            UpdateManager.Register(this);
         }
 
         protected override void OnDestroy()
