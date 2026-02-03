@@ -344,7 +344,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 clipLength = 0f;
                 isMoving = false;
                 previousClip = null;
-                HasChanges = false;
+                HasChanges = true;
                 ForcePlay = false;
                 _weaponTypeId = string.Empty;
                 _isDead = false;
@@ -408,8 +408,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 if (weight <= 0f)
                 {
                     _playingActionState = PlayingActionState.None;
-                    if (ActionLayerMixer.IsValid())
-                        ActionLayerMixer.Destroy();
+                    RemoveFromMixer();
                     return;
                 }
 
@@ -521,6 +520,12 @@ namespace MultiplayerARPG.GameData.Model.Playables
                 if (_playingActionState == PlayingActionState.Playing ||
                     _playingActionState == PlayingActionState.Looping)
                     _playingActionState = PlayingActionState.Stopping;
+            }
+
+            public void RemoveFromMixer()
+            {
+                if (ActionLayerMixer.IsValid())
+                    ActionLayerMixer.Destroy();
             }
         }
 
@@ -1042,6 +1047,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (stateUpdateData.playingStateId != playingStateId || stateUpdateData.ForcePlay)
             {
                 stateUpdateData.playingStateId = playingStateId;
+                stateUpdateData.HasChanges = false;
                 stateUpdateData.ForcePlay = false;
 
                 // Play new state
@@ -1110,6 +1116,7 @@ namespace MultiplayerARPG.GameData.Model.Playables
             if (CharacterModel.IsDead && Time.unscaledTime - CharacterModel.SwitchedTime < 1f)
             {
                 // Play dead animation at end frame immediately
+                stateUpdateData.playElapsed = stateUpdateData.clipLength;
                 mixer.GetInput(stateUpdateData.inputPort).SetTime(stateUpdateData.clipLength);
                 for (int i = 0; i < inputCount; ++i)
                 {
@@ -1309,12 +1316,44 @@ namespace MultiplayerARPG.GameData.Model.Playables
             }
         }
 
+        public void ClearActionsFromMixer()
+        {
+            foreach (ActionStatePlayingData actionStatePlaying in _actionStatePlayings.Values)
+            {
+                actionStatePlaying.RemoveFromMixer();
+            }
+            _actionStatePlayings.Clear();
+        }
+
+        private void ResetMixerInputs(AnimationMixerPlayable mixer)
+        {
+            int inputCount = mixer.GetInputCount();
+            for (int i = 0; i < inputCount; ++i)
+            {
+                mixer.GetInput(i).SetTime(0f);
+            }
+        }
+
+        private void DisconnectAndDestroyMixerInputs(AnimationMixerPlayable mixer)
+        {
+            int inputCount = mixer.GetInputCount();
+            Playable tempPlayable;
+            for (int i = 0; i < inputCount; ++i)
+            {
+                tempPlayable = mixer.GetInput(i);
+                Graph.Disconnect(mixer, i);
+                if (tempPlayable.IsValid())
+                    tempPlayable.Destroy();
+            }
+        }
+
         public void ResetAnimations()
         {
-            StopAction();
-            _actionStatePlayings.Clear();
+            ClearActionsFromMixer();
             _baseStateUpdateData.Reset();
             _leftHandWieldingStateUpdateData.Reset();
+            ResetMixerInputs(BaseLayerMixer);
+            ResetMixerInputs(LeftHandWieldingLayerMixer);
         }
     }
 }
