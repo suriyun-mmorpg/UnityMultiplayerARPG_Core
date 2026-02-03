@@ -70,7 +70,7 @@ namespace MultiplayerARPG
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmpty(this CharacterHotkey data)
         {
-            return string.IsNullOrWhiteSpace(data.hotkeyId);
+            return data.type == HotkeyType.None;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
