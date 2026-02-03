@@ -225,6 +225,8 @@ namespace MultiplayerARPG
             }
             if (IsPreparingToTeleport)
                 return;
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
+                _isServerWaitingTeleportConfirm = true;
             _acceptedPosition = position;
             _isTeleporting = true;
             _stillMoveAfterTeleport = stillMoveAfterTeleport;
@@ -787,8 +789,6 @@ namespace MultiplayerARPG
             if (stillMoveAfterTeleport && CacheNavMeshAgent.isOnNavMesh)
                 CacheNavMeshAgent.SetDestination(beforeWarpDest);
             TurnImmediately(yAngle);
-            if (IsServer && !IsOwnedByServer)
-                _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
                 _isClientConfirmingTeleport = true;
         }
@@ -855,7 +855,7 @@ namespace MultiplayerARPG
         {
             while (this != null && _isServerWaitingTeleportConfirm)
             {
-                await UniTask.Delay(1000);
+                await UniTask.Yield();
             }
         }
 

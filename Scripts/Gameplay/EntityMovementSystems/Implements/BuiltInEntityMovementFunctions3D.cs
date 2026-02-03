@@ -338,7 +338,7 @@ namespace MultiplayerARPG
             }
             if (IsPreparingToTeleport)
                 return;
-            if (IsServer && !IsOwnedByServer)
+            if (IsServer && !IsOwnerClientOrOwnedByServer)
                 _isServerWaitingTeleportConfirm = true;
             _acceptedPosition = position;
             _isTeleporting = true;
@@ -1514,8 +1514,6 @@ namespace MultiplayerARPG
             EntityMovement.SetPosition(position);
             CurrentGameManager.ShouldPhysicSyncTransforms = true;
             TurnImmediately(yAngle);
-            if (IsServer && !IsOwnedByServer)
-                _isServerWaitingTeleportConfirm = true;
             if (!IsServer && IsOwnerClient)
                 _isClientConfirmingTeleport = true;
             _lastTeleportFrame = Time.frameCount;
@@ -1579,7 +1577,7 @@ namespace MultiplayerARPG
         {
             while (this != null && _isServerWaitingTeleportConfirm)
             {
-                await UniTask.Delay(1000);
+                await UniTask.Yield();
             }
         }
 
