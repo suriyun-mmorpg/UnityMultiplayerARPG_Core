@@ -44,20 +44,21 @@ namespace MultiplayerARPG
         public ExtraMovementState stateWhileWander = ExtraMovementState.IsWalking;
 
         protected readonly List<DamageableEntity> _enemies = new List<DamageableEntity>();
-        protected float _findEnemyCountDown;
-        protected float _randomedWanderCountDown;
-        protected float _randomedWanderDelay;
-        protected float _followEnemyElasped;
-        protected Vector3 _lastPosition;
-        protected BaseSkill _queueSkill;
-        protected int _queueSkillLevel;
-        protected bool _alreadySetActionState;
-        protected bool _isLeftHandAttacking;
-        protected float _lastSetDestinationTime;
-        protected bool _reachedSpawnPoint;
-        protected bool _enemyExisted;
-        protected float _pauseCountdown;
-        protected float _lastSwitchTargetTime;
+        protected float _findEnemyCountDown = 0f;
+        protected float _randomedWanderCountDown = 0f;
+        protected float _randomedWanderDelay = 0f;
+        protected float _followEnemyElasped = 0f;
+        protected Vector3 _lastPosition = Vector3.zero;
+        protected BaseSkill _queueSkill = null;
+        protected int _queueSkillLevel = 0;
+        protected float _currentSkillCastDistance = 0f;
+        protected bool _alreadySetActionState = false;
+        protected bool _isLeftHandAttacking = false;
+        protected float _lastSetDestinationTime = 0f;
+        protected bool _reachedSpawnPoint = false;
+        protected bool _enemyExisted = false;
+        protected float _pauseCountdown = 0f;
+        protected float _lastSwitchTargetTime = 0f;
 
         protected virtual void Awake()
         {
@@ -268,8 +269,9 @@ namespace MultiplayerARPG
                 return false;
             }
 
+            bool isPlayingActionAnimation = Entity.IsPlayingActionAnimation();
             // If it has target then go to target
-            if (targetEnemy != null && !Entity.IsPlayingActionAnimation() && !_alreadySetActionState)
+            if (targetEnemy != null && !isPlayingActionAnimation && !_alreadySetActionState)
             {
                 // Random action state to do next time
                 if (CharacterDatabase.RandomSkill(Entity, out _queueSkill, out _queueSkillLevel) && _queueSkill != null)
@@ -288,6 +290,10 @@ namespace MultiplayerARPG
 
             Vector3 targetPosition = targetEnemy.GetTransform().position;
             float attackDistance = GetAttackDistance();
+            if (!isPlayingActionAnimation)
+                _currentSkillCastDistance = 0f;
+            if (attackDistance < _currentSkillCastDistance)
+                attackDistance = _currentSkillCastDistance;
             if (OverlappedEntity(targetEnemy.Entity, GetDamageTransform().position, targetPosition, attackDistance))
             {
                 // Reset follow time, because it is not following
@@ -306,13 +312,13 @@ namespace MultiplayerARPG
                         lookRotationEuler.x = 0;
                         lookRotationEuler.z = 0;
                         currentLookAtRotation = Quaternion.RotateTowards(currentLookAtRotation, Quaternion.Euler(lookRotationEuler), turnToEnemySpeed * Time.deltaTime);
-                        Entity.SetLookRotation(currentLookAtRotation, false);
+                        Entity.SetLookRotation(currentLookAtRotation, true);
                         turnedToEnemy = Mathf.Abs(currentLookAtRotation.eulerAngles.y - lookRotationEuler.y) < 15f;
                     }
                     else
                     {
                         // Update 2D direction
-                        Entity.SetLookRotation(Quaternion.LookRotation(lookAtDirection), false);
+                        Entity.SetLookRotation(Quaternion.LookRotation(lookAtDirection), true);
                         turnedToEnemy = true;
                     }
                 }
@@ -321,17 +327,19 @@ namespace MultiplayerARPG
                     return true;
 
                 Entity.AimPosition = Entity.GetAttackAimPosition(ref _isLeftHandAttacking);
-                if (Entity.IsPlayingActionAnimation())
+                if (isPlayingActionAnimation)
                     return true;
 
                 if (_queueSkill != null && Entity.IndexOfSkillUsage(SkillUsageType.Skill, _queueSkill.DataId) < 0)
                 {
                     // Use skill when there is queue skill or randomed skill that can be used
-                    Entity.UseSkill(_queueSkill.DataId, WeaponHandlingState.None, 0, new AimPosition()
+                    _currentSkillCastDistance = attackDistance;
+                    AimPosition skillAimPosition = new AimPosition()
                     {
                         type = AimPositionType.Position,
                         position = _queueSkill.GetDefaultAttackAimPosition(Entity, _queueSkillLevel, _isLeftHandAttacking, targetEnemy),
-                    });
+                    };
+                    Entity.UseSkill(_queueSkill.DataId, WeaponHandlingState.None, 0, skillAimPosition);
                 }
                 else
                 {
@@ -362,7 +370,10 @@ namespace MultiplayerARPG
                 return;
             _lastSetDestinationTime = time;
             Vector3 direction = (destination - Entity.MovementTransform.position).normalized;
-            Vector3 position = destination - (direction * (distance - Entity.StoppingDistance));
+            float activateDistance = distance - Entity.StoppingDistance;
+            if (activateDistance <= 0f)
+                activateDistance = Entity.StoppingDistance * 0.5f;
+            Vector3 position = destination - (direction * activateDistance);
             Entity.SetExtraMovementState(stateWhileAggressive);
             Entity.PointClickMovement(position);
         }
