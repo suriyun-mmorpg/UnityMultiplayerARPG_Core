@@ -15,37 +15,37 @@ public class UITimer : MonoBehaviour
     private void OnEnable()
     {
         if (textHours != null)
-            textHours.gameObject.SetActive(true);
+            textHours.enabled = true;
 
         if (textMinutes != null)
-            textMinutes.gameObject.SetActive(true);
+            textMinutes.enabled = true;
 
         if (textSeconds != null)
-            textSeconds.gameObject.SetActive(true);
+            textSeconds.enabled = true;
 
         if (textMilliseconds != null)
-            textMilliseconds.gameObject.SetActive(true);
+            textMilliseconds.enabled = true;
 
         if (textAll != null)
-            textAll.gameObject.SetActive(true);
+            textAll.enabled = true;
     }
 
     private void OnDisable()
     {
         if (textHours != null)
-            textHours.gameObject.SetActive(false);
+            textHours.enabled = false;
 
         if (textMinutes != null)
-            textMinutes.gameObject.SetActive(false);
+            textMinutes.enabled = false;
 
         if (textSeconds != null)
-            textSeconds.gameObject.SetActive(false);
+            textSeconds.enabled = false;
 
         if (textMilliseconds != null)
-            textMilliseconds.gameObject.SetActive(false);
+            textMilliseconds.enabled = false;
 
         if (textAll != null)
-            textAll.gameObject.SetActive(false);
+            textAll.enabled = false;
     }
 
     public void UpdateTime(float seconds)
