@@ -22,11 +22,15 @@ namespace MultiplayerARPG
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.skillBuffType));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.moveSpeedRateWhileUsingSkill));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), "skillCastEffects");
+#if !DISABLE_ADDRESSABLES
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), "addressableSkillCastEffects");
+#endif
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.castDuration));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.canBeInterruptedWhileCasting));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), "skillActivateEffects");
+#if !DISABLE_ADDRESSABLES
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), "addressableSkillActivateEffects");
+#endif
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.requireShield));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableWeapons));
             ShowOnEnum(nameof(skill.skillType), nameof(SkillType.Active), nameof(skill.availableArmors));
