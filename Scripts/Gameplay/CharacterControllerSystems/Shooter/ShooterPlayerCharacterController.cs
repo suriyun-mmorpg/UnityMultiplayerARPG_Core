@@ -71,6 +71,12 @@ namespace MultiplayerARPG
         [SerializeField]
         protected RectTransform crosshairRect;
         [SerializeField]
+        protected bool hideCrosshair = false;
+        [SerializeField]
+        protected bool disableAttackInSafeArea = false;
+        [SerializeField]
+        protected bool enableWallHitSpring = true;
+        [SerializeField]
         protected string thirdPersonCameraRotationSpeedScaleSaveKey = "3RD_PERSON_CAMERA_SCALE";
         [SerializeField]
         protected string firstPersonCameraRotationSpeedScaleSaveKey = "1ST_PERSON_CAMERA_SCALE";
@@ -78,8 +84,6 @@ namespace MultiplayerARPG
         protected float sprintDelayAfterActions = 1f;
         [SerializeField]
         protected float walkDelayAfterActions = 1f;
-        [SerializeField]
-        protected bool disableAttackInSafeArea = false;
 
         [Header("TPS Settings")]
         [SerializeField]
@@ -228,8 +232,10 @@ namespace MultiplayerARPG
         public IShooterGameplayCameraController CacheGameplayCameraController { get; protected set; }
         public IMinimapCameraController CacheMinimapCameraController { get; protected set; }
         public BaseCharacterModel CacheFpsModel { get; protected set; }
-        public RectTransform CrosshairRect => crosshairRect;
-        public bool HideCrosshair { get; set; }
+        public RectTransform CrosshairRect { get => crosshairRect; set => crosshairRect = value; }
+        public bool HideCrosshair { get => hideCrosshair; set => hideCrosshair = value; }
+        public bool DisableAttackInSafeArea { get => disableAttackInSafeArea; set => disableAttackInSafeArea = value; }
+        public bool EnableWallHitSpring { get => enableWallHitSpring; set => enableWallHitSpring = value; }
         public bool IsForceFpsViewMode
         {
             get
@@ -701,7 +707,7 @@ namespace MultiplayerARPG
 
             CacheGameplayCameraController.ActiveViewMode = ActiveViewMode;
             CacheGameplayCameraController.TargetOffset = CameraTargetOffset;
-            CacheGameplayCameraController.EnableWallHitSpring = ActiveViewMode == ShooterControllerViewMode.Tps || ActiveViewMode == ShooterControllerViewMode.Shoulder;
+            CacheGameplayCameraController.EnableWallHitSpring = EnableWallHitSpring && (ActiveViewMode == ShooterControllerViewMode.Tps || ActiveViewMode == ShooterControllerViewMode.Shoulder);
             CacheGameplayCameraController.FollowingEntityTransform = ActiveViewMode == ShooterControllerViewMode.Fps ? PlayingCharacterEntity.FpsCameraTargetTransform : PlayingCharacterEntity.CameraTargetTransform;
 
             // Set temp data
