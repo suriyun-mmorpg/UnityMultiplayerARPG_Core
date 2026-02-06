@@ -1972,11 +1972,12 @@ namespace MultiplayerARPG
         /// All layers except `playerLayer`, `playingLayer`, `monsterLayer`, `npcLayer`, `vehicleLayer`, `itemDropLayer, `TransparentFX`, `IgnoreRaycast`, `Water` and non-target layers will be used for raycasting
         /// </summary>
         /// <returns></returns>
-        public int GetGameEntityGroundDetectionLayerMask()
+        public int GetGameEntityGroundDetectionLayerMask(bool excludeWater = true)
         {
             int layerMask = 0;
             layerMask = layerMask | 1 << PhysicLayers.TransparentFX;
-            layerMask = layerMask | 1 << PhysicLayers.Water;
+            if (excludeWater)
+                layerMask = layerMask | 1 << PhysicLayers.Water;
             layerMask = layerMask | playerLayer.Mask;
             layerMask = layerMask | playingLayer.Mask;
             layerMask = layerMask | monsterLayer.Mask;
