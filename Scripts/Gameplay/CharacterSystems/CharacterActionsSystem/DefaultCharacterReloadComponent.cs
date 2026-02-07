@@ -175,7 +175,7 @@ namespace MultiplayerARPG
                     // Wait until triggger before reload ammo
                     float tempTriggerDuration = triggerDurations[triggerIndex] / animSpeedRate;
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
+                    await GenericUtils.FrameBasedDelay(tempTriggerDuration, reloadCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient)
@@ -207,7 +207,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, reloadCancellationTokenSource.Token);
+                    await GenericUtils.FrameBasedDelay(remainsDuration, reloadCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)

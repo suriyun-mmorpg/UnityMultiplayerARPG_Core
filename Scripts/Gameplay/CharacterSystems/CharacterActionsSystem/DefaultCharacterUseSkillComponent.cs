@@ -264,7 +264,7 @@ namespace MultiplayerARPG
                     }
                     // Wait until end of cast duration
                     OnCastSkillStart?.Invoke();
-                    await UniTask.Delay((int)(CastingSkillDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
+                    await GenericUtils.FrameBasedDelay(CastingSkillDuration, skillCancellationTokenSource.Token);
                     OnCastSkillEnd?.Invoke();
                 }
 
@@ -330,7 +330,7 @@ namespace MultiplayerARPG
                     // Play special effects after trigger duration
                     float tempTriggerDuration = triggerDurations[triggerIndex] / animSpeedRate;
                     remainsDuration -= tempTriggerDuration;
-                    await UniTask.Delay((int)(tempTriggerDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
+                    await GenericUtils.FrameBasedDelay(tempTriggerDuration, skillCancellationTokenSource.Token);
 
                     // Special effects will plays on clients only
                     if (IsClient && (AnimActionType == AnimActionType.AttackRightHand || AnimActionType == AnimActionType.AttackLeftHand))
@@ -397,7 +397,7 @@ namespace MultiplayerARPG
                 if (remainsDuration > 0f)
                 {
                     // Wait until animation ends to stop actions
-                    await UniTask.Delay((int)(remainsDuration * 1000f), true, PlayerLoopTiming.FixedUpdate, skillCancellationTokenSource.Token);
+                    await GenericUtils.FrameBasedDelay(remainsDuration, skillCancellationTokenSource.Token);
                 }
             }
             catch (System.OperationCanceledException)
