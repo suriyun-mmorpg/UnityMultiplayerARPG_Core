@@ -97,10 +97,6 @@ namespace MultiplayerARPG
             else
                 simulateSeed = simulateState.SimulateSeed;
 
-            // Prepare time
-            float time = Time.unscaledTime;
-            float deltaTime = Time.unscaledDeltaTime;
-
             // Prepare required data and get weapon data
             Entity.GetAttackingData(
                 ref isLeftHand,
@@ -111,7 +107,7 @@ namespace MultiplayerARPG
 
             // Get playing animation index
             int randomMax = Entity.GetRandomMaxAnimationData(animActionType, animActionDataId);
-            if (time - LastAttackEndTime > animationResetDelay || _lastAttackDataId != animActionDataId)
+            if (Time.unscaledTime - LastAttackEndTime > animationResetDelay || _lastAttackDataId != animActionDataId)
                 _lastAttackAnimationIndex = 0;
             int animationIndex = _lastAttackAnimationIndex++;
             if (!doNotRandomAnimation)
