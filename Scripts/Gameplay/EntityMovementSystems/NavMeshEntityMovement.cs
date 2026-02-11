@@ -12,9 +12,10 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(NavMeshAgent))]
     public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IManagedUpdate
     {
-        protected static readonly float s_minMagnitudeToDetermineMoving = 0.01f;
-        protected static readonly float s_minDistanceToSimulateMovement = 0.01f;
-        protected static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
+        protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
+        protected const float MIN_DISTANCE_TO_SIMULATE_MOVEMENT = 0.01f;
+        protected const float TIMESTAMP_TO_UNITY_TIME_MULTIPLIER = 0.001f;
+        protected const float MIN_REMOTE_SIMULATION_DELTA_TIME = 0.05f;
         protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("NavMeshEntityMovement - Update");
 
         [Header("Movement Settings")]
@@ -380,9 +381,9 @@ namespace MultiplayerARPG
                     else
                     {
                         // Moving by clicked position
-                        MovementState |= CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving ? MovementState.Forward : MovementState.None;
+                        MovementState |= CacheNavMeshAgent.velocity.magnitude > MIN_MAGNITUDE_TO_DETERMINE_MOVING ? MovementState.Forward : MovementState.None;
                         // Turn character to destination
-                        if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
+                        if (_lookRotationApplied && Entity.CanTurn() && CacheNavMeshAgent.velocity.magnitude > MIN_MAGNITUDE_TO_DETERMINE_MOVING)
                             _targetYAngle = Quaternion.LookRotation(CacheNavMeshAgent.velocity.normalized).eulerAngles.y;
                     }
                 }
@@ -406,7 +407,7 @@ namespace MultiplayerARPG
             {
                 // Disable obstacle avoidance because it won't predict movement, it is just moving to destination without obstacle avoidance
                 CacheNavMeshAgent.obstacleAvoidanceType = ObstacleAvoidanceType.NoObstacleAvoidance;
-                if (CacheNavMeshAgent.velocity.magnitude > s_minMagnitudeToDetermineMoving)
+                if (CacheNavMeshAgent.velocity.magnitude > MIN_MAGNITUDE_TO_DETERMINE_MOVING)
                 {
                     MovementState = _acceptedMovementStateBeforeStopped;
                     ExtraMovementState = _acceptedExtraMovementStateBeforeStopped;
@@ -607,7 +608,7 @@ namespace MultiplayerARPG
             {
                 // Prepare time
                 long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
-                float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+                float unityDeltaTime = (float)(deltaTime * TIMESTAMP_TO_UNITY_TIME_MULTIPLIER);
                 if (Vector3.Distance(position, EntityTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
@@ -671,7 +672,7 @@ namespace MultiplayerARPG
             }
             // Prepare time
             long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
-            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            float unityDeltaTime = (float)(deltaTime * TIMESTAMP_TO_UNITY_TIME_MULTIPLIER);
             _tempExtraMovementState = entityMovementInput.ExtraMovementState;
             if (inputState.Has(EntityMovementInputState.PositionChanged))
             {
@@ -726,7 +727,7 @@ namespace MultiplayerARPG
             }
             // Prepare time
             long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
-            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            float unityDeltaTime = (float)(deltaTime * TIMESTAMP_TO_UNITY_TIME_MULTIPLIER);
             // Prepare movement state
             MovementState = movementState;
             ExtraMovementState = extraMovementState;
@@ -756,7 +757,7 @@ namespace MultiplayerARPG
             else
             {
                 // It's both server and client, simulate movement
-                if (Vector3.Distance(position, EntityTransform.position) > s_minDistanceToSimulateMovement)
+                if (Vector3.Distance(position, EntityTransform.position) > MIN_DISTANCE_TO_SIMULATE_MOVEMENT)
                 {
                     _acceptedPosition = newPos;
                     SetMovePaths(position);
@@ -808,6 +809,8 @@ namespace MultiplayerARPG
             }
             // Will turn smoothly later
             _targetYAngle = yAngle;
+            if (deltaTime < MIN_REMOTE_SIMULATION_DELTA_TIME)
+                deltaTime = MIN_REMOTE_SIMULATION_DELTA_TIME;
             _yTurnSpeed = 1f / deltaTime;
         }
 

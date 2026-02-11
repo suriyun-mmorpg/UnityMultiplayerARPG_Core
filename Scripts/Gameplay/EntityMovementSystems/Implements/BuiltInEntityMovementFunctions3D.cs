@@ -9,9 +9,10 @@ namespace MultiplayerARPG
 {
     public partial class BuiltInEntityMovementFunctions3D
     {
-        private static readonly int s_forceGroundedFramesAfterTeleport = 3;
-        private static readonly float s_minDistanceToSimulateMovement = 0.01f;
-        private static readonly float s_timestampToUnityTimeMultiplier = 0.001f;
+        private const int FORCE_GROUNDED_FRAMES_AFTER_TELEPORT = 3;
+        private const float MIN_DISTANCE_TO_SIMULATE_MOVEMENT = 0.01f;
+        private const float TIMESTAMP_TO_UNITY_TIME_MULTIPLIER = 0.001f;
+        private const float MIN_REMOTE_SIMULATION_DELTA_TIME = 0.05f;
 
         [Header("Movement AI")]
         [Range(0.01f, 1f)]
@@ -541,7 +542,7 @@ namespace MultiplayerARPG
                 tempTargetPosition = NavPaths.Peek();
                 _moveDirection = (tempTargetPosition - tempCurrentPosition).normalized;
                 tempTargetDistance = Vector3.Distance(tempTargetPosition.GetXZ(), tempCurrentPosition.GetXZ());
-                float stoppingDistance = _simulatingKeyMovement ? s_minDistanceToSimulateMovement : StoppingDistance;
+                float stoppingDistance = _simulatingKeyMovement ? MIN_DISTANCE_TO_SIMULATE_MOVEMENT : StoppingDistance;
                 bool shouldStop = tempTargetDistance < stoppingDistance;
                 if (shouldStop)
                 {
@@ -992,7 +993,7 @@ namespace MultiplayerARPG
                 _tempMovementState = _moveDirection.sqrMagnitude > 0f ? _tempMovementState : MovementState.None;
                 if (IsUnderWater)
                     _tempMovementState |= MovementState.IsUnderWater;
-                if (IsGrounded || !IsAirborne || Time.frameCount - _lastTeleportFrame < s_forceGroundedFramesAfterTeleport)
+                if (IsGrounded || !IsAirborne || Time.frameCount - _lastTeleportFrame < FORCE_GROUNDED_FRAMES_AFTER_TELEPORT)
                     _tempMovementState |= MovementState.IsGrounded;
                 if (_isJumping)
                     _tempMovementState |= MovementState.IsJump;
@@ -1031,7 +1032,7 @@ namespace MultiplayerARPG
             // Adjust speed by rtt
             if (!IsServer && IsOwnerClient && movementSecure == MovementSecure.ServerAuthoritative)
             {
-                float rtt = s_timestampToUnityTimeMultiplier * Entity.Manager.Rtt;
+                float rtt = TIMESTAMP_TO_UNITY_TIME_MULTIPLIER * Entity.Manager.Rtt;
                 float acc = 1f / rtt * deltaTime * 0.5f;
                 if (!_lagMoveSpeedRate.HasValue)
                     _lagMoveSpeedRate = 0f;
@@ -1290,7 +1291,7 @@ namespace MultiplayerARPG
             {
                 // Prepare time
                 long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
-                float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+                float unityDeltaTime = (float)(deltaTime * TIMESTAMP_TO_UNITY_TIME_MULTIPLIER);
                 if (Vector3.Distance(position, CacheTransform.position) >= snapThreshold)
                 {
                     // Snap character to the position if character is too far from the position
@@ -1307,7 +1308,7 @@ namespace MultiplayerARPG
                 {
                     RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                     _simulatingKeyMovement = true;
-                    if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > s_minDistanceToSimulateMovement)
+                    if (Vector3.Distance(position.GetXZ(), CacheTransform.position.GetXZ()) > MIN_DISTANCE_TO_SIMULATE_MOVEMENT)
                         SetMovePaths(position, false);
                     else
                         NavPaths = null;
@@ -1362,7 +1363,7 @@ namespace MultiplayerARPG
             }
             // Prepare time
             long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
-            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            float unityDeltaTime = (float)(deltaTime * TIMESTAMP_TO_UNITY_TIME_MULTIPLIER);
             _tempMovementState = entityMovementInput.MovementState;
             _tempExtraMovementState = entityMovementInput.ExtraMovementState;
             _simulatingKeyMovement = inputState.Has(EntityMovementInputState.IsKeyMovement);
@@ -1437,7 +1438,7 @@ namespace MultiplayerARPG
             }
             // Prepare time
             long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
-            float unityDeltaTime = (float)(deltaTime * s_timestampToUnityTimeMultiplier);
+            float unityDeltaTime = (float)(deltaTime * TIMESTAMP_TO_UNITY_TIME_MULTIPLIER);
             // Prepare movement state
             MovementState = _tempMovementState = movementState;
             ExtraMovementState = _tempExtraMovementState = extraMovementState;
@@ -1479,7 +1480,7 @@ namespace MultiplayerARPG
             else
             {
                 // It's both server and client, simulate movement
-                if (Vector3.Distance(position, oldPos) > s_minDistanceToSimulateMovement)
+                if (Vector3.Distance(position, oldPos) > MIN_DISTANCE_TO_SIMULATE_MOVEMENT)
                 {
                     _acceptedPosition = newPos;
                     _simulatingKeyMovement = true;
@@ -1555,6 +1556,8 @@ namespace MultiplayerARPG
             }
             // Will turn smoothly later
             _targetYAngle = yAngle;
+            if (deltaTime < MIN_REMOTE_SIMULATION_DELTA_TIME)
+                deltaTime = MIN_REMOTE_SIMULATION_DELTA_TIME;
             _yTurnSpeed = 1f / deltaTime;
         }
 
