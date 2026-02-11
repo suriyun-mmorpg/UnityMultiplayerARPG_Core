@@ -11,9 +11,17 @@ namespace MultiplayerARPG
             base.RegisterPrefabs();
 #if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddItemDropEntities(prefab);
+            foreach (SpawnPrefabData spawnData in spawningPrefabs)
+            {
+                GameInstance.AddItemDropEntities(spawnData.prefab);
+            }
 #endif
 #if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceItemDropEntities(addressablePrefab);
+            foreach (SpawnPrefabData spawnData in spawningPrefabs)
+            {
+                GameInstance.AddAssetReferenceItemDropEntities(spawnData.addressablePrefab);
+            }
 #endif
         }
 

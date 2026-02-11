@@ -54,9 +54,17 @@ namespace MultiplayerARPG
             base.RegisterPrefabs();
 #if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddMonsterCharacterEntities(prefab);
+            foreach (SpawnPrefabData spawnData in spawningPrefabs)
+            {
+                GameInstance.AddMonsterCharacterEntities(spawnData.prefab);
+            }
 #endif
 #if !DISABLE_ADDRESSABLES
             GameInstance.AddAssetReferenceMonsterCharacterEntities(addressablePrefab);
+            foreach (SpawnPrefabData spawnData in spawningPrefabs)
+            {
+                GameInstance.AddAssetReferenceMonsterCharacterEntities(spawnData.addressablePrefab);
+            }
 #endif
         }
 
