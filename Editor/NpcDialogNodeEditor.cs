@@ -31,6 +31,8 @@ namespace MultiplayerARPG
 #if !DISABLE_ADDRESSABLES
             EditorGUILayout.PropertyField(serializedObject.FindProperty("addressableVoice"));
 #endif
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("enterDialogActionsOnClient"), true);
+            EditorGUILayout.PropertyField(serializedObject.FindProperty("enterDialogActionsOnServer"), true);
             EditorGUILayout.PropertyField(serializedObject.FindProperty(nameof(node.type)));
             switch (node.type)
             {
