@@ -1,7 +1,9 @@
 ﻿using Cysharp.Text;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.Networking;
@@ -728,5 +730,14 @@ public static partial class GenericUtils
             adjustedMinSize,
             adjustedMaxSize,
             SizeSuffixes[mag]);
+    }
+
+    public static async UniTask FrameBasedDelay(float duration, CancellationToken cancellationToken)
+    {
+        while (duration > 0f)
+        {
+            await UniTask.Yield(cancellationToken);
+            duration -= Time.unscaledDeltaTime;
+        }
     }
 }
