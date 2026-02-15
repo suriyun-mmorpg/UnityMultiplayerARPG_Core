@@ -29,7 +29,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
+        public override float GetMoveSpeed_Implementation(MovementState movementState, ExtraMovementState extraMovementState)
         {
             float moveSpeed = CachedData.MoveSpeed;
             float time = Time.unscaledTime;
@@ -83,12 +83,12 @@ namespace MultiplayerARPG
             return moveSpeed;
         }
 
-        public override float GetJumpHeight(MovementState movementState, ExtraMovementState extraMovementState)
+        public override float GetJumpHeight_Implementation(MovementState movementState, ExtraMovementState extraMovementState)
         {
             return CachedData.JumpHeight;
         }
 
-        public override float GetGravityRate(MovementState movementState, ExtraMovementState extraMovementState)
+        public override float GetGravityRate_Implementation(MovementState movementState, ExtraMovementState extraMovementState)
         {
             return 1f + CachedData.GravityRate;
         }

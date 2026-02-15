@@ -98,12 +98,49 @@ namespace MultiplayerARPG
             get { return false; }
         }
 
+        [Category("Sync Fields")]
+        [SerializeField]
+        protected SyncFieldOverrideEntityMovementInput syncOverrideInput = new SyncFieldOverrideEntityMovementInput();
+        public OverrideEntityMovementInput OverrideInput
+        {
+            get { return syncOverrideInput.Value; }
+            set { syncOverrideInput.Value = value; }
+        }
+        [SerializeField]
+        protected SyncFieldFloat syncOverrideMoveSpeed = new SyncFieldFloat();
+        public float OverrideMoveSpeed
+        {
+            get { return syncOverrideMoveSpeed.Value; }
+            set { syncOverrideMoveSpeed.Value = value; }
+        }
+        [SerializeField]
+        protected SyncFieldFloat syncOverrideJumpHeight = new SyncFieldFloat();
+        public float OverrideJumpHeight
+        {
+            get { return syncOverrideJumpHeight.Value; }
+            set { syncOverrideJumpHeight.Value = value; }
+        }
+        [SerializeField]
+        protected SyncFieldFloat syncOverrideGravityRate = new SyncFieldFloat();
+        public float OverrideGravityRate
+        {
+            get { return syncOverrideGravityRate.Value; }
+            set { syncOverrideGravityRate.Value = value; }
+        }
+
         public float GetMoveSpeed()
         {
             return GetMoveSpeed(MovementState, ExtraMovementState);
         }
 
-        public virtual float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
+        public float GetMoveSpeed(MovementState movementState, ExtraMovementState extraMovementState)
+        {
+            if (OverrideMoveSpeed >= 0f)
+                return OverrideMoveSpeed;
+            return GetMoveSpeed_Implementation(movementState, extraMovementState);
+        }
+
+        public virtual float GetMoveSpeed_Implementation(MovementState movementState, ExtraMovementState extraMovementState)
         {
             return 0f;
         }
@@ -113,7 +150,14 @@ namespace MultiplayerARPG
             return GetJumpHeight(MovementState, ExtraMovementState);
         }
 
-        public virtual float GetJumpHeight(MovementState movementState, ExtraMovementState extraMovementState)
+        public float GetJumpHeight(MovementState movementState, ExtraMovementState extraMovementState)
+        {
+            if (OverrideJumpHeight >= 0f)
+                return OverrideJumpHeight;
+            return GetJumpHeight_Implementation(movementState, extraMovementState);
+        }
+
+        public virtual float GetJumpHeight_Implementation(MovementState movementState, ExtraMovementState extraMovementState)
         {
             return 0f;
         }
@@ -123,7 +167,14 @@ namespace MultiplayerARPG
             return GetGravityRate(MovementState, ExtraMovementState);
         }
 
-        public virtual float GetGravityRate(MovementState movementState, ExtraMovementState extraMovementState)
+        public float GetGravityRate(MovementState movementState, ExtraMovementState extraMovementState)
+        {
+            if (OverrideGravityRate >= 0f)
+                return OverrideGravityRate;
+            return GetGravityRate_Implementation(movementState, extraMovementState);
+        }
+
+        public virtual float GetGravityRate_Implementation(MovementState movementState, ExtraMovementState extraMovementState)
         {
             return 1f;
         }
@@ -234,30 +285,40 @@ namespace MultiplayerARPG
 
         public void StopMove()
         {
+            if (OverrideInput.IsEnabled && OverrideInput.IsStopped)
+                return;
             if (!ActiveMovement.IsNull())
                 ActiveMovement.StopMove();
         }
 
         public void KeyMovement(Vector3 moveDirection, MovementState moveState)
         {
+            if (OverrideInput.IsEnabled && OverrideInput.IsKeyMovement)
+                return;
             if (!ActiveMovement.IsNull())
                 ActiveMovement.KeyMovement(moveDirection, moveState);
         }
 
         public void PointClickMovement(Vector3 position)
         {
+            if (OverrideInput.IsEnabled && OverrideInput.IsPointClick)
+                return;
             if (!ActiveMovement.IsNull())
                 ActiveMovement.PointClickMovement(position);
         }
 
         public void SetExtraMovementState(ExtraMovementState extraMovementState)
         {
+            if (OverrideInput.IsEnabled && OverrideInput.IsSetExtraMovementState)
+                return;
             if (!ActiveMovement.IsNull())
                 ActiveMovement.SetExtraMovementState(extraMovementState);
         }
 
         public void SetLookRotation(Quaternion rotation, bool immediately)
         {
+            if (OverrideInput.IsEnabled && OverrideInput.IsSetLookRotation)
+                return;
             if (!ActiveMovement.IsNull())
                 ActiveMovement.SetLookRotation(rotation, immediately);
         }
@@ -271,6 +332,8 @@ namespace MultiplayerARPG
 
         public void SetSmoothTurnSpeed(float speed)
         {
+            if (OverrideInput.IsEnabled && OverrideInput.IsSetSmoothTurnSpeed)
+                return;
             if (!ActiveMovement.IsNull())
                 ActiveMovement.SetSmoothTurnSpeed(speed);
         }
