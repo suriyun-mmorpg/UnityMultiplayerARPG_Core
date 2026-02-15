@@ -4,6 +4,7 @@ using Insthync.UnityEditorUtils;
 using LiteNetLib;
 using LiteNetLibManager;
 using LiteNetLib.Utils;
+using System.Collections.Generic;
 using Unity.Profiling;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -188,6 +189,9 @@ namespace MultiplayerARPG
         {
             get { return gameObject; }
         }
+
+        public readonly HashSet<object> MovementDisablers = new HashSet<object>();
+        public bool DisableMovement => MovementDisablers.Count > 0;
 
         protected virtual bool IsUpdateEntityComponents
         {
@@ -382,7 +386,7 @@ namespace MultiplayerARPG
         {
             if (!Movement.IsNull())
             {
-                bool tempEnableMovement = PassengingVehicleEntity.IsNull();
+                bool tempEnableMovement = PassengingVehicleEntity.IsNull() && !DisableMovement;
                 // Enable movement or not
                 if (Movement.enabled != tempEnableMovement)
                 {

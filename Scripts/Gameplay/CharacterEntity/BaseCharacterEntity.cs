@@ -291,7 +291,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            bool tempEnableMovement = PassengingVehicleEntity.IsNull();
+            bool tempEnableMovement = PassengingVehicleEntity.IsNull() && !DisableMovement;
             if (RespawnGroundedCheckCountDown > 0f)
             {
                 // Character won't receive fall damage

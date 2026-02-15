@@ -503,6 +503,10 @@ namespace MultiplayerARPG
             }
         }
 
+        public readonly HashSet<object> ControllerBlockers = new HashSet<object>();
+        public readonly HashSet<object> ActionControllerBlockers = new HashSet<object>();
+        public readonly HashSet<object> FollowCameraTurners = new HashSet<object>();
+
         // Input data
         protected InputStateManager _activateInput;
         protected InputStateManager _pickupItemInput;
@@ -746,6 +750,9 @@ namespace MultiplayerARPG
                 CacheGameplayCameraController.UpdateZoom = !isBlockController;
             }
             isBlockController |= GenericUtils.IsFocusInputField();
+            isBlockController |= ControllerBlockers.Count > 0;
+            isBlockActionController |= ControllerBlockers.Count > 0;
+            isBlockActionController |= ActionControllerBlockers.Count > 0;
 
             // Clear selected entity
             SelectedEntity = null;
@@ -1156,10 +1163,30 @@ namespace MultiplayerARPG
 
         public virtual void UpdateLookRotation()
         {
+            if (PlayingCharacterEntity.DisableMovement)
+                return;
+
             _cameraForward = CacheGameplayCameraController.LookForwardTransform.forward;
             _cameraForward.y = 0f;
             _cameraForward.Normalize();
-            if (IsAimming || ActiveViewMode == ShooterControllerViewMode.Fps || Mode == ControllerMode.Combat)
+
+            bool isBlockAction = UISceneGameplay.IsBlockActionController();
+            isBlockAction |= ActionControllerBlockers.Count > 0;
+            bool isFps = ActiveViewMode == ShooterControllerViewMode.Fps;
+            bool isShoulder = ActiveViewMode == ShooterControllerViewMode.Shoulder;
+            bool isCombat = Mode == ControllerMode.Combat;
+            bool isAdventure = Mode == ControllerMode.Adventure;
+            bool isLockLookRotation = IsAimming || isFps || isShoulder;
+
+            if (isBlockAction && isAdventure && !isLockLookRotation)
+            {
+                _targetLookDirection = _moveLookDirection;
+            }
+            else if (!isBlockAction && (isLockLookRotation || isCombat))
+            {
+                _targetLookDirection = _moveLookDirection = _cameraForward;
+            }
+            if (FollowCameraTurners.Count > 0)
                 _targetLookDirection = _moveLookDirection = _cameraForward;
             PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection), true);
         }
@@ -1207,7 +1234,7 @@ namespace MultiplayerARPG
                     _tempPressWeaponAbility = !isBlockController && GetSecondaryAttackButtonDown();
                 }
 
-                if (disableAttackInSafeArea && PlayingCharacterEntity.IsInSafeArea)
+                if (DisableAttackInSafeArea && PlayingCharacterEntity.IsInSafeArea)
                 {
                     _tempPressAttackRight = false;
                     _tempPressAttackLeft = false;
@@ -1870,6 +1897,9 @@ namespace MultiplayerARPG
                 else
                 {
                     // Build when click
+                    // If unable to build, return false
+                    if (ConstructingBuildingEntity == null || !ConstructingBuildingEntity.CanBuild())
+                        return false;
                     ConfirmBuild();
                 }
                 _mustReleaseFireKey = true;
