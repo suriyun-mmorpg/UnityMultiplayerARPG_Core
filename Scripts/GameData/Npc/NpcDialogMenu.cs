@@ -6,14 +6,67 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct NpcDialogMenu
+    public class NpcDialogMenu
     {
         [Tooltip("Default title")]
         public string title;
         [Tooltip("Titles by language keys")]
-        public LanguageData[] titles;
-        public Sprite icon;
-        public NpcDialogCondition[] showConditions;
+        public LanguageData[] titles = new LanguageData[0];
+
+#if UNITY_EDITOR || !UNITY_SERVER
+#if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+        [PreviewSprite(50)]
+        [SerializeField]
+#if !DISABLE_ADDRESSABLES
+        [AddressableAssetConversion(nameof(addressableIcon))]
+#endif
+        protected Sprite icon;
+#endif
+        public Sprite Icon
+        {
+            get
+            {
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+                return icon;
+#else
+                return null;
+#endif
+            }
+            set
+            {
+#if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
+                icon = value;
+#endif
+            }
+        }
+
+#if !DISABLE_ADDRESSABLES
+        [SerializeField]
+        protected AssetReferenceSprite addressableIcon;
+        public AssetReferenceSprite AddressableIcon
+        {
+            get
+            {
+                return addressableIcon;
+            }
+            set
+            {
+                addressableIcon = value;
+            }
+        }
+#endif
+
+        public UniTask<Sprite> GetIcon()
+        {
+#if !DISABLE_ADDRESSABLES
+            return AddressableIcon.GetOrLoadObjectAsyncOrUseAsset(Icon);
+#else
+            return UniTask.FromResult(Icon);
+#endif
+        }
+#endif
+
+        public NpcDialogCondition[] showConditions = new NpcDialogCondition[0];
         public bool isCloseMenu;
         [BoolShowConditional(nameof(isCloseMenu), false)]
         public BaseNpcDialog dialog;
