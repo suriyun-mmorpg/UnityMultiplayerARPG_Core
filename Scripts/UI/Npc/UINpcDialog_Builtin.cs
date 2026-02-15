@@ -7,6 +7,8 @@ namespace MultiplayerARPG
     public partial class UINpcDialog
     {
         [Header("Built-in UIs")]
+        public GameObject uiDialogRoot;
+
         [Header("Menu")]
         public UINpcDialogMenu uiMenuPrefab;
         public Transform uiMenuContainer;
