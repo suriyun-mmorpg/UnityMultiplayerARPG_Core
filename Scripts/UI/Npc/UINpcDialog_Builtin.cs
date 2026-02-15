@@ -84,6 +84,7 @@ namespace MultiplayerARPG
         public Sprite craftCancelIcon;
 
         [Header("Save Respawn Point Confirm Menu Title")]
+        public bool enableSaveRespawnPointConfirmation = true;
         public string messageSaveRespawnPointConfirm = "Confirm";
         public LanguageData[] messageSaveRespawnPointConfirmTitles;
         public string MessageSaveRespawnPointConfirm
@@ -102,6 +103,7 @@ namespace MultiplayerARPG
         public Sprite saveRespawnPointCancelIcon;
 
         [Header("Warp Confirm Menu Title")]
+        public bool enableWarpConfirmation = true;
         public string messageWarpConfirm = "Confirm";
         public LanguageData[] messageWarpConfirmTitles;
         public string MessageWarpConfirm
@@ -120,6 +122,7 @@ namespace MultiplayerARPG
         public Sprite warpCancelIcon;
 
         [Header("Refine Item Confirm Menu Title")]
+        public bool enableRefineItemConfirmation = false;
         public string messageRefineItemConfirm = "Refine Item";
         public LanguageData[] messageRefineItemConfirmTitles;
         public string MessageRefineItemConfirm
@@ -138,6 +141,7 @@ namespace MultiplayerARPG
         public Sprite refineItemCancelIcon;
 
         [Header("Dismantle Item Confirm Menu Title")]
+        public bool enableDismantleItemConfirmation = false;
         public string messageDismantleItemConfirm = "Dismantle Item";
         public LanguageData[] messageDismantleItemConfirmTitles;
         public string MessageDismantleItemConfirm
@@ -156,6 +160,7 @@ namespace MultiplayerARPG
         public Sprite dismantleItemCancelIcon;
 
         [Header("Open Player Storage Confirm Menu Title")]
+        public bool enablePlayerStorageConfirmation = false;
         public string messagePlayerStorageConfirm = "Open Storage";
         public LanguageData[] messagePlayerStorageConfirmTitles;
         public string MessagePlayerStorageConfirm
@@ -174,6 +179,7 @@ namespace MultiplayerARPG
         public Sprite playerStorageCancelIcon;
 
         [Header("Open Guild Storage Confirm Menu Title")]
+        public bool enableGuildStorageConfirmation = false;
         public string messageGuildStorageConfirm = "Open Storage";
         public LanguageData[] messageGuildStorageConfirmTitles;
         public string MessageGuildStorageConfirm
@@ -192,6 +198,7 @@ namespace MultiplayerARPG
         public Sprite guildStorageCancelIcon;
 
         [Header("Repair Item Confirm Menu Title")]
+        public bool enableRepairItemConfirmation = false;
         public string messageRepairItemConfirm = "Repair Item";
         public LanguageData[] messageRepairItemConfirmTitles;
         public string MessageRepairItemConfirm

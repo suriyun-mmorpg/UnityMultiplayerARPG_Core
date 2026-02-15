@@ -338,7 +338,7 @@ namespace MultiplayerARPG
                 uiNpcDialog.uiConfirmRequirement.Show();
             }
 
-            if (uiNpcDialog.uiMenuPrefab == null)
+            if (!uiNpcDialog.enableSaveRespawnPointConfirmation || uiNpcDialog.uiMenuPrefab == null)
             {
                 GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdSelectNpcDialogMenu(CONFIRM_MENU_INDEX);
                 return;
@@ -373,7 +373,7 @@ namespace MultiplayerARPG
                 uiNpcDialog.uiConfirmRequirement.Show();
             }
 
-            if (uiNpcDialog.uiMenuPrefab == null)
+            if (!uiNpcDialog.enableWarpConfirmation || uiNpcDialog.uiMenuPrefab == null)
             {
                 GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdSelectNpcDialogMenu(CONFIRM_MENU_INDEX);
                 return;
@@ -402,7 +402,7 @@ namespace MultiplayerARPG
             if (uiNpcDialog.uiDialogRoot != null)
                 uiNpcDialog.uiDialogRoot.SetActive(true);
 
-            if (uiNpcDialog.uiMenuPrefab == null)
+            if (!uiNpcDialog.enableRefineItemConfirmation || uiNpcDialog.uiMenuPrefab == null)
             {
                 GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdSelectNpcDialogMenu(CONFIRM_MENU_INDEX);
                 return;
@@ -431,7 +431,7 @@ namespace MultiplayerARPG
             if (uiNpcDialog.uiDialogRoot != null)
                 uiNpcDialog.uiDialogRoot.SetActive(true);
 
-            if (uiNpcDialog.uiMenuPrefab == null)
+            if (!uiNpcDialog.enablePlayerStorageConfirmation || uiNpcDialog.uiMenuPrefab == null)
             {
                 GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdSelectNpcDialogMenu(CONFIRM_MENU_INDEX);
                 return;
@@ -460,7 +460,7 @@ namespace MultiplayerARPG
             if (uiNpcDialog.uiDialogRoot != null)
                 uiNpcDialog.uiDialogRoot.SetActive(true);
 
-            if (uiNpcDialog.uiMenuPrefab == null)
+            if (!uiNpcDialog.enableGuildStorageConfirmation || uiNpcDialog.uiMenuPrefab == null)
             {
                 GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdSelectNpcDialogMenu(CONFIRM_MENU_INDEX);
                 return;
@@ -489,7 +489,7 @@ namespace MultiplayerARPG
             if (uiNpcDialog.uiDialogRoot != null)
                 uiNpcDialog.uiDialogRoot.SetActive(true);
 
-            if (uiNpcDialog.uiMenuPrefab == null)
+            if (!uiNpcDialog.enableDismantleItemConfirmation || uiNpcDialog.uiMenuPrefab == null)
             {
                 GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdSelectNpcDialogMenu(CONFIRM_MENU_INDEX);
                 return;
@@ -518,7 +518,7 @@ namespace MultiplayerARPG
             if (uiNpcDialog.uiDialogRoot != null)
                 uiNpcDialog.uiDialogRoot.SetActive(true);
 
-            if (uiNpcDialog.uiMenuPrefab == null)
+            if (!uiNpcDialog.enableRepairItemConfirmation || uiNpcDialog.uiMenuPrefab == null)
             {
                 GameInstance.PlayingCharacterEntity.NpcActionComponent.CallCmdSelectNpcDialogMenu(CONFIRM_MENU_INDEX);
                 return;
