@@ -736,7 +736,7 @@ namespace MultiplayerARPG
             result.transform.SetParent(parent);
             result.transform.localPosition = Vector3.zero;
             result.transform.localEulerAngles = Vector3.zero;
-            result.CharacterModel.DisableIKs = true;
+            result.CharacterModel.IKsDisablers.Add(BaseCharacterModel.DefaultIKDisabler);
             return result.CharacterModel;
         }
 
