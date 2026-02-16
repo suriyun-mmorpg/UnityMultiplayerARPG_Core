@@ -1298,8 +1298,8 @@ namespace MultiplayerARPG
                     break;
                 }
 
-                if (tempHitBox.IsHideFrom(PlayingCharacterEntity) ||
-                    tempHitBox.GetObjectId() == PlayingCharacterEntity.ObjectId)
+                bool isHideFromHost = PlayingCharacterEntity.Identity.IsServer && tempHitBox.Identity.IsHideFrom(PlayingCharacterEntity.Identity);
+                if (isHideFromHost || tempHitBox.GetObjectId() == PlayingCharacterEntity.ObjectId)
                 {
                     // Skip empty game entity / hidding entity / controlling player's entity
                     continue;
@@ -1341,8 +1341,8 @@ namespace MultiplayerARPG
                     tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
                     if (!tempGameEntity.IsNull())
                     {
-                        if (tempGameEntity.IsHideFrom(PlayingCharacterEntity) ||
-                            tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
+                        bool isHideFromHost = PlayingCharacterEntity.Identity.IsServer && tempGameEntity.Identity.IsHideFrom(PlayingCharacterEntity.Identity);
+                        if (isHideFromHost || tempGameEntity.GetObjectId() == PlayingCharacterEntity.ObjectId)
                         {
                             // Skip hiddeing entity / controlling player's entity
                             continue;
