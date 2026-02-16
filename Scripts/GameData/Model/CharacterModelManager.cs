@@ -171,6 +171,7 @@ namespace MultiplayerARPG
 
         internal void InitFpsModel(BaseCharacterModel model)
         {
+            model.Manager = this;
             model.Entity = Entity;
             model.MainModel = MainFpsModel;
             model.IsTpsModel = false;

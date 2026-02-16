@@ -16,13 +16,17 @@ namespace MultiplayerARPG
 {
     public abstract partial class BaseCharacterModel : GameEntityModel, IMoveableModel, IHittableModel, IJumppableModel, IPickupableModel, IDeadableModel
     {
+        public static readonly object DefaultIKDisabler = new object();
+
         public int Id { get; protected set; }
+        public CharacterModelManager Manager { get; set; }
         public BaseCharacterModel MainModel { get; set; }
         public bool IsMainModel { get { return MainModel == this; } }
         public bool IsActiveModel { get; protected set; } = false;
         public bool IsTpsModel { get; internal set; }
         public bool IsFpsModel { get; internal set; }
-        public bool DisableIKs { get; set; }
+        public readonly HashSet<object> IKsDisablers = new HashSet<object>();
+        public bool DisableIKs => IKsDisablers.Count > 0;
         public bool UpdateEquipmentImmediately { get; set; }
 
         [Header("Model Switching Settings")]
@@ -85,7 +89,6 @@ namespace MultiplayerARPG
         public bool activateInstantiatedObject = false;
 #endif
 
-        public CharacterModelManager Manager { get; protected set; }
 
         protected Dictionary<string, EquipmentModel> _equippedModels = new Dictionary<string, EquipmentModel>();
         /// <summary>

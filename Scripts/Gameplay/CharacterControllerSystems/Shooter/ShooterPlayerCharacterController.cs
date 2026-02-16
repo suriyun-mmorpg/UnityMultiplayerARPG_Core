@@ -678,8 +678,6 @@ namespace MultiplayerARPG
                 updateFpsModelContainerActivating = false;
             }
             CacheFpsModel = await characterEntity.ModelManager.InstantiateFpsModel(fpsModelContainer);
-            CacheFpsModel.Entity = characterEntity;
-            CacheFpsModel.Manager = characterEntity.ModelManager;
             await UniTask.NextFrame();
             characterEntity.ModelManager.SetIsFps(ActiveViewMode == ShooterControllerViewMode.Fps);
             UpdateViewMode();
