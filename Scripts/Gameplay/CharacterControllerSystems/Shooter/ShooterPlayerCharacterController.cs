@@ -36,6 +36,10 @@ namespace MultiplayerARPG
         protected FollowCameraControls gameplayCameraPrefab;
         [SerializeField]
         protected FollowCameraControls minimapCameraPrefab;
+        [SerializeField]
+        protected Transform fpsModelContainer;
+        [SerializeField]
+        protected bool updateFpsModelContainerActivating = true;
 
         [Header("Controller Settings")]
         [SerializeField]
@@ -46,6 +50,10 @@ namespace MultiplayerARPG
         protected bool canSwitchViewMode;
         [SerializeField]
         protected ShooterControllerViewMode viewMode;
+        [SerializeField]
+        protected GameObject[] tpsObjects = new GameObject[0];
+        [SerializeField]
+        protected GameObject[] fpsObjects = new GameObject[0];
         [SerializeField]
         protected ExtraMoveActiveMode sprintActiveMode;
         [SerializeField]
@@ -236,10 +244,25 @@ namespace MultiplayerARPG
         public bool HideCrosshair { get => hideCrosshair; set => hideCrosshair = value; }
         public bool DisableAttackInSafeArea { get => disableAttackInSafeArea; set => disableAttackInSafeArea = value; }
         public bool EnableWallHitSpring { get => enableWallHitSpring; set => enableWallHitSpring = value; }
+        public bool IsForceTpsViewMode
+        {
+            get
+            {
+                if (TpsViewers.Count > 0)
+                {
+                    return true;
+                }
+                return false;
+            }
+        }
         public bool IsForceFpsViewMode
         {
             get
             {
+                if (FpsViewers.Count > 0)
+                {
+                    return true;
+                }
                 if (WeaponAbility is ZoomWeaponAbility zoomWeaponAbility && zoomWeaponAbility != null &&
                     (WeaponAbilityState == WeaponAbilityState.Activating || WeaponAbilityState == WeaponAbilityState.Activated))
                 {
@@ -281,9 +304,11 @@ namespace MultiplayerARPG
         {
             get
             {
+                if (IsForceTpsViewMode)
+                    return ShooterControllerViewMode.Tps;
                 if (IsForceFpsViewMode)
                     return ShooterControllerViewMode.Fps;
-                return viewMode;
+                return ViewMode;
             }
         }
 
@@ -506,6 +531,8 @@ namespace MultiplayerARPG
         public readonly HashSet<object> ControllerBlockers = new HashSet<object>();
         public readonly HashSet<object> ActionControllerBlockers = new HashSet<object>();
         public readonly HashSet<object> FollowCameraTurners = new HashSet<object>();
+        public readonly HashSet<object> FpsViewers = new HashSet<object>();
+        public readonly HashSet<object> TpsViewers = new HashSet<object>();
 
         // Input data
         protected InputStateManager _activateInput;
@@ -645,7 +672,14 @@ namespace MultiplayerARPG
             characterEntity.onLaunchDamageEntity += OnLaunchDamageEntity;
             if (CacheFpsModel != null)
                 Destroy(CacheFpsModel.gameObject);
-            CacheFpsModel = await characterEntity.ModelManager.InstantiateFpsModel(CacheGameplayCameraController.CameraTransform);
+            if (fpsModelContainer == null)
+            {
+                fpsModelContainer = CacheGameplayCameraController.CameraTransform;
+                updateFpsModelContainerActivating = false;
+            }
+            CacheFpsModel = await characterEntity.ModelManager.InstantiateFpsModel(fpsModelContainer);
+            CacheFpsModel.Entity = characterEntity;
+            CacheFpsModel.Manager = characterEntity.ModelManager;
             await UniTask.NextFrame();
             characterEntity.ModelManager.SetIsFps(ActiveViewMode == ShooterControllerViewMode.Fps);
             UpdateViewMode();
@@ -700,6 +734,9 @@ namespace MultiplayerARPG
 
         public override void ManagedUpdate()
         {
+            // Reset input states
+            _moveInput = Vector2.zero;
+
             if (PauseFireInputFrames > 0)
                 --PauseFireInputFrames;
 
@@ -749,10 +786,11 @@ namespace MultiplayerARPG
                 CacheGameplayCameraController.UpdateRotation = false;
                 CacheGameplayCameraController.UpdateZoom = !isBlockController;
             }
-            isBlockController |= GenericUtils.IsFocusInputField();
             isBlockController |= ControllerBlockers.Count > 0;
             isBlockActionController |= ControllerBlockers.Count > 0;
             isBlockActionController |= ActionControllerBlockers.Count > 0;
+            if (InputManager.IsUseNonMobileInput())
+                isBlockController |= GenericUtils.IsFocusInputField();
 
             // Clear selected entity
             SelectedEntity = null;
@@ -2113,7 +2151,28 @@ namespace MultiplayerARPG
             CurrentCameraNearClipPlane = CameraNearClipPlane;
             CurrentCameraFarClipPlane = CameraFarClipPlane;
             if (PlayingCharacterEntity != null && PlayingCharacterEntity.ModelManager != null)
-                PlayingCharacterEntity.ModelManager.SetIsFps(ActiveViewMode == ShooterControllerViewMode.Fps);
+            {
+                bool isFps = ActiveViewMode == ShooterControllerViewMode.Fps;
+                PlayingCharacterEntity.ModelManager.SetIsFps(isFps);
+                if (updateFpsModelContainerActivating && fpsModelContainer.gameObject.activeSelf != isFps)
+                    fpsModelContainer.gameObject.SetActive(isFps);
+                int i;
+                GameObject tempObject;
+                for (i = 0; i < tpsObjects.Length; ++i)
+                {
+                    tempObject = tpsObjects[i];
+                    if (tempObject == null || tempObject.activeSelf == !isFps)
+                        continue;
+                    tempObject.SetActive(!isFps);
+                }
+                for (i = 0; i < fpsObjects.Length; ++i)
+                {
+                    tempObject = fpsObjects[i];
+                    if (tempObject == null || tempObject.activeSelf == isFps)
+                        continue;
+                    tempObject.SetActive(isFps);
+                }
+            }
         }
 
         public virtual bool IsInFront(Vector3 target)
