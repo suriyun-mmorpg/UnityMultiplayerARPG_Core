@@ -291,7 +291,6 @@ namespace MultiplayerARPG
                 }
             }
 
-            bool tempEnableMovement = PassengingVehicleEntity.IsNull() && !DisableMovement;
             if (RespawnGroundedCheckCountDown > 0f)
             {
                 // Character won't receive fall damage
@@ -324,18 +323,8 @@ namespace MultiplayerARPG
                 ExitVehicleAndForget();
             }
 
-            // Enable movement or not
-            if (!Movement.IsNull())
-            {
-                if (Movement.enabled != tempEnableMovement)
-                {
-                    if (!tempEnableMovement)
-                        Movement.StopMove();
-                    // Enable movement while not passenging any vehicle
-                    Movement.enabled = tempEnableMovement;
-                }
-            }
-
+            UpdateMovementEnabling();
+            UpdateOverrideInput();
             UpdateModelManager(deltaTime);
             UpdateCharacterModel(deltaTime);
             UpdateFpsModel(deltaTime);

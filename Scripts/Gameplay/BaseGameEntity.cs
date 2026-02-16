@@ -384,6 +384,24 @@ namespace MultiplayerARPG
 
         protected virtual void EntityUpdate()
         {
+            UpdateMovementEnabling();
+            UpdateOverrideInput();
+
+            if (Model != null && (IsClient || GameInstance.Singleton.updateAnimationAtServer))
+            {
+                if (Model is IMoveableModel moveableModel)
+                {
+                    // Update move speed multiplier
+                    moveableModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
+                    // Update movement state
+                    moveableModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, false);
+                }
+                Model.UpdateAnimation(Time.unscaledDeltaTime);
+            }
+        }
+
+        protected virtual void UpdateMovementEnabling()
+        {
             if (!Movement.IsNull())
             {
                 bool tempEnableMovement = PassengingVehicleEntity.IsNull() && !DisableMovement;
@@ -396,17 +414,24 @@ namespace MultiplayerARPG
                     Movement.enabled = tempEnableMovement;
                 }
             }
+        }
 
-            if (Model != null && (IsClient || GameInstance.Singleton.updateAnimationAtServer))
+        protected virtual void UpdateOverrideInput()
+        {
+            if (!ActiveMovement.IsNull() && OverrideInput.IsEnabled)
             {
-                if (Model is IMoveableModel moveableModel)
-                {
-                    // Update move speed multiplier
-                    moveableModel.SetMoveAnimationSpeedMultiplier(MoveAnimationSpeedMultiplier);
-                    // Update movement state
-                    moveableModel.SetMovementState(MovementState, ExtraMovementState, Direction2D, false);
-                }
-                Model.UpdateAnimation(Time.unscaledDeltaTime);
+                if (OverrideInput.IsStopped)
+                    ActiveMovement.StopMove();
+                if (OverrideInput.IsPointClick)
+                    ActiveMovement.PointClickMovement(OverrideInput.Position);
+                if (OverrideInput.IsKeyMovement)
+                    ActiveMovement.KeyMovement(OverrideInput.MoveDirection, OverrideInput.MovementState);
+                if (OverrideInput.IsSetExtraMovementState)
+                    ActiveMovement.SetExtraMovementState(OverrideInput.ExtraMovementState);
+                if (OverrideInput.IsSetLookRotation)
+                    ActiveMovement.SetLookRotation(OverrideInput.LookRotation, OverrideInput.TurnImmediately);
+                if (OverrideInput.IsSetSmoothTurnSpeed)
+                    ActiveMovement.SetSmoothTurnSpeed(OverrideInput.SmoothTurnSpeed);
             }
         }
 
@@ -533,6 +558,18 @@ namespace MultiplayerARPG
                 onSetupNetElements.Invoke();
             syncMetaDataId.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             syncTitle.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            syncOverrideInput.syncMode = LiteNetLibSyncFieldMode.ServerToOwnerClient;
+            syncOverrideMoveSpeed.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            syncOverrideJumpHeight.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            syncOverrideGravityRate.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+        }
+
+        public override void OnStartServer()
+        {
+            OverrideInput = new OverrideEntityMovementInput();
+            OverrideMoveSpeed = -1f;
+            OverrideJumpHeight = -1f;
+            OverrideGravityRate = -1f;
         }
 
         public override void OnNetworkDestroy(byte reasons)
