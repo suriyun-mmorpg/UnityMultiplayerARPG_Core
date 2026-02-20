@@ -461,8 +461,8 @@ namespace MultiplayerARPG
             long timestamp = Manager.ServerTimestamp;
             if (!IsServer && IsOwnerClient)
             {
-                ProceedAttack(timestamp, weaponHandlingState);
                 RPC(CmdAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, timestamp, weaponHandlingState);
+                ProceedAttack(timestamp, weaponHandlingState);
             }
             else if (IsOwnerClientOrOwnedByServer)
             {
@@ -478,8 +478,8 @@ namespace MultiplayerARPG
 
         protected void PreceedCmdAttack(long peerTimestamp, WeaponHandlingState weaponHandlingState)
         {
-            ProceedAttack(peerTimestamp, weaponHandlingState);
             RPC(RpcAttack, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, weaponHandlingState);
+            ProceedAttack(peerTimestamp, weaponHandlingState);
         }
 
         [AllRpc]
