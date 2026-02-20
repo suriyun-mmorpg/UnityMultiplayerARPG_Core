@@ -975,6 +975,8 @@ namespace MultiplayerARPG
 
         public Transform GetRightHandMissileDamageTransform()
         {
+            if (Manager != null && Manager.IsFps && BasePlayerCharacterController.Singleton is ShooterPlayerCharacterController shooterController)
+                return shooterController.CacheGameplayCameraController.CameraTransform;
             if (CacheRightHandEquipmentEntity != null)
                 return CacheRightHandEquipmentEntity.missileDamageTransform;
             return null;
@@ -982,6 +984,8 @@ namespace MultiplayerARPG
 
         public Transform GetLeftHandMissileDamageTransform()
         {
+            if (Manager != null && Manager.IsFps && BasePlayerCharacterController.Singleton is ShooterPlayerCharacterController shooterController)
+                return shooterController.CacheGameplayCameraController.CameraTransform;
             if (CacheLeftHandEquipmentEntity != null)
                 return CacheLeftHandEquipmentEntity.missileDamageTransform;
             return null;
