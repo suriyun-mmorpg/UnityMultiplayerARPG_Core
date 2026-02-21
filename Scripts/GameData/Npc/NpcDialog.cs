@@ -203,7 +203,9 @@ namespace MultiplayerARPG
                 {
                     UINpcDialogMenuAction menuAction = new UINpcDialogMenuAction();
                     menuAction.title = menu.Title;
+#if UNITY_EDITOR || !UNITY_SERVER
                     menuAction.icon = await menu.GetIcon();
+#endif
                     menuAction.menuIndex = i;
                     menuActions.Add(menuAction);
                 }
