@@ -547,10 +547,12 @@ namespace MultiplayerARPG
 
         public Vector3 GetSnapToGroundMotion(Vector3 motion, Vector3 platformMotion, Vector3 forceMotion)
         {
-            if (!Functions.IsUnderWater && Functions.IsGrounded && Physics.Raycast(EntityTransform.position, Vector3.down, out RaycastHit hit, groundSnapDistance) && hit.transform.gameObject.layer != PhysicLayers.Water)
-            {
-                return Vector3.down * (hit.distance - CacheCharacterController.skinWidth);
-            }
+            if (Functions.IsUnderWater || _forceUngroundCountdown > 0f || motion.y > 0f)
+                return Vector3.zero;
+
+            if (Physics.Raycast(EntityTransform.position + (Vector3.down * CacheCharacterController.skinWidth), Vector3.down, out RaycastHit hit, groundSnapDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), QueryTriggerInteraction.Ignore) && hit.normal != Vector3.up)
+                return Vector3.down * hit.distance;
+
             return Vector3.zero;
         }
 
