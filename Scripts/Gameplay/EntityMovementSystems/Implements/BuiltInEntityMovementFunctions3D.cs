@@ -699,6 +699,33 @@ namespace MultiplayerARPG
                 tempMaxMoveSpeed = replaceMovementForceApplier.CurrentSpeed;
             }
 
+            // Pause movement updating
+            if (IsOwnerClientOrOwnedByServer)
+            {
+                if (IsGrounded && _previouslyAirborne)
+                {
+                    _pauseMovementCountDown = landedPauseMovementDuration;
+                }
+                else if (_previouslyExtraMovementState != ExtraMovementState.IsCrawling && _tempExtraMovementState == ExtraMovementState.IsCrawling)
+                {
+                    _pauseMovementCountDown = beforeCrawlingPauseMovementDuration;
+                }
+                else if (_previouslyExtraMovementState == ExtraMovementState.IsCrawling && _tempExtraMovementState != ExtraMovementState.IsCrawling)
+                {
+                    _pauseMovementCountDown = afterCrawlingPauseMovementDuration;
+                }
+                else
+                {
+                    if (_pauseMovementCountDown > 0f)
+                        _pauseMovementCountDown -= deltaTime;
+                }
+                if (_pauseMovementCountDown > 0f)
+                {
+                    // Remove movement from movestate while pausing movement
+                    _tempMovementState &= ~(MovementState.Forward | MovementState.Backward | MovementState.Left | MovementState.Right);
+                }
+            }
+
             // Movement updating
             if (_pauseMovementCountDown <= 0f && _moveDirection.sqrMagnitude > 0f && (!IsAirborne || !doNotChangeVelocityWhileAirborne || !IsOwnerClientOrOwnedByServer))
             {
@@ -858,33 +885,6 @@ namespace MultiplayerARPG
                 {
                     _currentInput = Entity.SetInputPosition(_currentInput, tempPredictPosition);
                     _currentInput = Entity.SetInputIsKeyMovement(_currentInput, true);
-                }
-            }
-
-            // Pause movement updating
-            if (IsOwnerClientOrOwnedByServer)
-            {
-                if (IsGrounded && _previouslyAirborne)
-                {
-                    _pauseMovementCountDown = landedPauseMovementDuration;
-                }
-                else if (IsGrounded && _previouslyExtraMovementState != ExtraMovementState.IsCrawling && _tempExtraMovementState == ExtraMovementState.IsCrawling)
-                {
-                    _pauseMovementCountDown = beforeCrawlingPauseMovementDuration;
-                }
-                else if (IsGrounded && _previouslyExtraMovementState == ExtraMovementState.IsCrawling && _tempExtraMovementState != ExtraMovementState.IsCrawling)
-                {
-                    _pauseMovementCountDown = afterCrawlingPauseMovementDuration;
-                }
-                else
-                {
-                    if (_pauseMovementCountDown > 0f)
-                        _pauseMovementCountDown -= deltaTime;
-                }
-                if (_pauseMovementCountDown > 0f)
-                {
-                    // Remove movement from movestate while pausing movement
-                    _tempMovementState &= ~(MovementState.Forward | MovementState.Backward | MovementState.Left | MovementState.Right);
                 }
             }
 
