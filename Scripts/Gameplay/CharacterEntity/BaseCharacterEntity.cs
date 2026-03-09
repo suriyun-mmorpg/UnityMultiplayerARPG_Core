@@ -149,7 +149,7 @@ namespace MultiplayerARPG
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
         public IPhysicFunctions FindPhysicFunctions { get; protected set; }
 
-        public override bool IsImmune { get { return base.IsImmune || RespawnInvincibleCountDown > 0f; } set { base.IsImmune = value; } }
+        public override bool IsInvincible { get { return base.IsInvincible || RespawnInvincibleCountDown > 0f; } set { base.IsInvincible = value; } }
         public override int MaxHp { get { return CachedData.MaxHp; } }
         public int MaxMp { get { return CachedData.MaxMp; } }
         public int MaxStamina { get { return CachedData.MaxStamina; } }

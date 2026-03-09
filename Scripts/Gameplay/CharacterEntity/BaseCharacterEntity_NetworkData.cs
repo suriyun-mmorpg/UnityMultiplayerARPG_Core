@@ -259,7 +259,7 @@ namespace MultiplayerARPG
             id.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             level.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             exp.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
-            isImmune.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            isInvincible.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             currentHp.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             currentMp.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             currentStamina.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
@@ -290,7 +290,7 @@ namespace MultiplayerARPG
             syncTitle.onChange += OnCharacterNameChange;
             level.onChange += OnLevelChange;
             exp.onChange += OnExpChange;
-            isImmune.onChange += OnIsImmuneChange;
+            isInvincible.onChange += OnIsInvincibleChange;
             currentMp.onChange += OnCurrentMpChange;
             currentStamina.onChange += OnCurrentStaminaChange;
             currentFood.onChange += OnCurrentFoodChange;
@@ -321,7 +321,7 @@ namespace MultiplayerARPG
             syncTitle.onChange -= OnCharacterNameChange;
             level.onChange -= OnLevelChange;
             exp.onChange -= OnExpChange;
-            isImmune.onChange -= OnIsImmuneChange;
+            isInvincible.onChange -= OnIsInvincibleChange;
             currentMp.onChange -= OnCurrentMpChange;
             currentStamina.onChange -= OnCurrentStaminaChange;
             currentFood.onChange -= OnCurrentFoodChange;
@@ -374,10 +374,10 @@ namespace MultiplayerARPG
                 onExpChange.Invoke(exp);
         }
 
-        private void OnIsImmuneChange(bool isInitial, bool oldIsImmune, bool isImmune)
+        private void OnIsInvincibleChange(bool isInitial, bool oldIsInvincible, bool isInvincible)
         {
-            if (onIsImmuneChange != null)
-                onIsImmuneChange.Invoke(isImmune);
+            if (onIsInvincibleChange != null)
+                onIsInvincibleChange.Invoke(isInvincible);
         }
 
         private void OnCurrentMpChange(bool isInitial, int oldCurrentMp, int currentMp)

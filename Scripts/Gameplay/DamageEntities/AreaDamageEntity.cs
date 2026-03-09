@@ -113,7 +113,7 @@ namespace MultiplayerARPG
 
         public override void ApplyDamageTo(DamageableHitBox target)
         {
-            if (target == null || target.IsDead() || target.IsImmune || target.IsInSafeArea)
+            if (target == null || target.IsDead() || target.IsInvincible || target.IsInSafeArea)
                 return;
 
             if (target.GetObjectId() == _instigator.ObjectId)

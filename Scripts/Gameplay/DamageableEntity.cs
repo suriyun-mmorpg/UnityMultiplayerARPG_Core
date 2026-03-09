@@ -47,11 +47,13 @@ namespace MultiplayerARPG
 
         [Category("Sync Fields")]
         [SerializeField]
-        protected SyncFieldBool isImmune = new SyncFieldBool();
+        protected SyncFieldBool isInvincible = new SyncFieldBool();
         [SerializeField]
         protected SyncFieldInt currentHp = new SyncFieldInt();
 
-        public virtual bool IsImmune { get { return isImmune.Value || IsInSafeArea; } set { isImmune.Value = value; } }
+        public virtual bool IsInvincible { get { return isInvincible.Value || IsInSafeArea; } set { isInvincible.Value = value; } }
+        [System.Obsolete("Use `IsInvincible` instead.")]
+        public bool IsImmune { get { return IsInvincible; } set { IsInvincible = value; } }
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
         public SafeArea SafeArea { get; set; }
         public bool IsInSafeArea { get { return SafeArea != null; } }
@@ -326,7 +328,7 @@ namespace MultiplayerARPG
             ReceivingDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel);
             CombatAmountType combatAmountType = CombatAmountType.Immune;
             int totalDamage = 0;
-            if (!IsImmune)
+            if (!IsInvincible)
                 ApplyReceiveDamage(position, fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed, out combatAmountType, out totalDamage);
             ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, CharacterBuff.Empty);
         }

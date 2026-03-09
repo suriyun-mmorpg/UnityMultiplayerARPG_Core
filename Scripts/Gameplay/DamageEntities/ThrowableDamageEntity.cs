@@ -186,7 +186,7 @@ namespace MultiplayerARPG
 
             target = other.GetComponent<DamageableHitBox>();
 
-            if (target == null || target.IsDead() || target.IsImmune || target.IsInSafeArea)
+            if (target == null || target.IsDead() || target.IsInvincible || target.IsInSafeArea)
             {
                 target = null;
                 return false;

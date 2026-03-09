@@ -74,7 +74,7 @@ namespace MultiplayerARPG
         public virtual bool HasDriver { get { return _passengers.ContainsKey(0); } }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
-        public override bool IsImmune { get { return base.IsImmune || !canBeAttacked; } set { base.IsImmune = value; } }
+        public override bool IsInvincible { get { return base.IsInvincible || !canBeAttacked; } set { base.IsInvincible = value; } }
         public override int MaxHp { get { return canBeAttacked ? hp.GetAmount(Level) : 1; } }
         public Vector3 SpawnPosition { get; protected set; }
         public float DestroyDelay { get { return destroyDelay; } }
@@ -127,7 +127,7 @@ namespace MultiplayerARPG
         {
             base.SetupNetElements();
             level.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
-            isImmune.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
+            isInvincible.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             currentHp.syncMode = LiteNetLibSyncFieldMode.ServerToClients;
             passengerIds.forOwnerOnly = false;
         }

@@ -43,7 +43,7 @@
             onCharacterNameChange = null;
             onLevelChange = null;
             onExpChange = null;
-            onIsImmuneChange = null;
+            onIsInvincibleChange = null;
             onCurrentMpChange = null;
             onCurrentStaminaChange = null;
             onCurrentFoodChange = null;

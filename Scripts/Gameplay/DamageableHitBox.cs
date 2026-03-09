@@ -98,11 +98,11 @@ namespace MultiplayerARPG
                 return DamageableEntity == null ? null : DamageableEntity as IHoldActivatableEntity;
             }
         }
-        public bool IsImmune
+        public bool IsInvincible
         {
             get
             {
-                return DamageableEntity == null ? false : DamageableEntity.IsImmune;
+                return DamageableEntity == null ? false : DamageableEntity.IsInvincible;
             }
         }
         public int CurrentHp

@@ -108,7 +108,7 @@ namespace MultiplayerARPG
         public List<string> BuildingTypes { get { return buildingTypes; } }
         public float BuildDistance { get { return buildDistance; } }
         public float BuildYRotation { get; set; }
-        public override bool IsImmune { get { return base.IsImmune || !canBeAttacked; } set { base.IsImmune = value; } }
+        public override bool IsInvincible { get { return base.IsInvincible || !canBeAttacked; } set { base.IsInvincible = value; } }
         public override int MaxHp { get { return maxHp; } }
         public float LifeTime { get { return lifeTime; } }
         public int BuildLimit { get { return buildLimit; } }

@@ -4,7 +4,7 @@ namespace MultiplayerARPG
 {
     public interface IDamageableEntity : IGameEntity
     {
-        bool IsImmune { get; }
+        bool IsInvincible { get; }
         int CurrentHp { get; set; }
         Transform OpponentAimTransform { get; }
         SafeArea SafeArea { get; set; }
