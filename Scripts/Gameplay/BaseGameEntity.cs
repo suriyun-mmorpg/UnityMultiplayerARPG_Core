@@ -234,13 +234,14 @@ namespace MultiplayerARPG
         {
         }
 
+        protected EntityInfo _info = new EntityInfo();
         /// <summary>
         /// Override this function to set instigator when attacks other entities
         /// </summary>
         /// <returns></returns>
         public virtual EntityInfo GetInfo()
         {
-            return EntityInfo.Empty;
+            return _info;
         }
 
         private void Awake()

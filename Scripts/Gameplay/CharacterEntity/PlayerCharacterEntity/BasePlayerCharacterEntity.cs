@@ -145,7 +145,7 @@ namespace MultiplayerARPG
 
         public override EntityInfo GetInfo()
         {
-            return new EntityInfo(
+            return _info.SetEntityInfo(
                 EntityTypes.Player,
                 ObjectId,
                 Id,

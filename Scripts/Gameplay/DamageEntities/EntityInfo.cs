@@ -1,8 +1,8 @@
 ﻿namespace MultiplayerARPG
 {
-    public partial struct EntityInfo
+    public partial class EntityInfo
     {
-        public static readonly EntityInfo Empty = new EntityInfo(0, 0, string.Empty, string.Empty, 0, 0, 0, 0, false);
+        public static readonly EntityInfo Empty = new EntityInfo();
 
         /// <summary>
         /// If `Type` = `0`, determine that it is `NULL`, so if `Summoner Type` is `0`, determine that it has no summoner
@@ -16,37 +16,24 @@
         public int PartyId { get; private set; }
         public int GuildId { get; private set; }
         public bool IsInSafeArea { get; private set; }
+        public EntityInfo Summoner { get; private set; }
+        public bool HasSummoner => Summoner != null && Summoner.Type > 0;
 
-        public byte SummonerType { get; private set; }
-        public uint SummonerObjectId { get; private set; }
-        public string SummonerId { get; private set; }
-        public string SummonerSubChannelId { get; private set; }
-        public int SummonerDataId { get; private set; }
-        public int SummonerFactionId { get; private set; }
-        public int SummonerPartyId { get; private set; }
-        public int SummonerGuildId { get; private set; }
-        public bool SummonerIsInSafeArea { get; private set; }
-
-        public bool HasSummoner => SummonerType > 0;
-
-        public EntityInfo Summoner
+        public EntityInfo()
         {
-            get
-            {
-                return new EntityInfo(
-                  SummonerType,
-                  SummonerObjectId,
-                  SummonerId,
-                  SummonerSubChannelId,
-                  SummonerDataId,
-                  SummonerFactionId,
-                  SummonerPartyId,
-                  SummonerGuildId,
-                  SummonerIsInSafeArea);
-            }
+            Type = 0;
+            ObjectId = 0;
+            Id = string.Empty;
+            SubChannelId = string.Empty;
+            DataId = 0;
+            FactionId = 0;
+            PartyId = 0;
+            GuildId = 0;
+            IsInSafeArea = false;
+            Summoner = null;
         }
 
-        public EntityInfo(
+        public EntityInfo SetEntityInfo(
             byte type,
             uint objectId,
             string id,
@@ -55,7 +42,8 @@
             int factionId,
             int partyId,
             int guildId,
-            bool isInSafeArea)
+            bool isInSafeArea,
+            BaseCharacterEntity summonerEntity = null)
         {
             Type = type;
             ObjectId = objectId;
@@ -66,53 +54,10 @@
             PartyId = partyId;
             GuildId = guildId;
             IsInSafeArea = isInSafeArea;
-
-            SummonerType = 0;
-            SummonerObjectId = 0;
-            SummonerId = string.Empty;
-            SummonerSubChannelId = string.Empty;
-            SummonerDataId = 0;
-            SummonerFactionId = 0;
-            SummonerPartyId = 0;
-            SummonerGuildId = 0;
-            SummonerIsInSafeArea = false;
-        }
-
-        public EntityInfo(
-            byte type,
-            uint objectId,
-            string id,
-            string subChannelId,
-            int dataId,
-            int factionId,
-            int partyId,
-            int guildId,
-            bool isInSafeArea,
-            BaseCharacterEntity summonerEntity)
-            : this(
-                  type,
-                  objectId,
-                  id,
-                  subChannelId,
-                  dataId,
-                  factionId,
-                  partyId,
-                  guildId,
-                  isInSafeArea)
-        {
+            Summoner = null;
             if (summonerEntity != null)
-            {
-                EntityInfo summonerInfo = summonerEntity.GetInfo();
-                SummonerType = summonerInfo.Type;
-                SummonerObjectId = summonerInfo.ObjectId;
-                SummonerId = summonerInfo.Id;
-                SummonerSubChannelId = summonerInfo.SubChannelId;
-                SummonerDataId = summonerInfo.DataId;
-                SummonerFactionId = summonerInfo.FactionId;
-                SummonerPartyId = summonerInfo.PartyId;
-                SummonerGuildId = summonerInfo.GuildId;
-                SummonerIsInSafeArea = summonerInfo.IsInSafeArea;
-            }
+                Summoner = summonerEntity.GetInfo();
+            return this;
         }
 
         public bool TryGetEntity<T>(out T entity)

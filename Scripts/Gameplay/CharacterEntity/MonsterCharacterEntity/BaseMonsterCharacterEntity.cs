@@ -189,7 +189,7 @@ namespace MultiplayerARPG
                 strBuilder.Append(ObjectId);
                 id = strBuilder.ToString();
             }
-            return new EntityInfo(
+            return _info.SetEntityInfo(
                 EntityTypes.Monster,
                 ObjectId,
                 id,
