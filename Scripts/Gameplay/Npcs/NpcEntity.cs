@@ -119,7 +119,7 @@ namespace MultiplayerARPG
 
         private async void InstantiateNpcObjects()
         {
-            if (!IsClient)
+            if (IsServer)
                 return;
 #if !DISABLE_ADDRESSABLES
             // Instantiates npc objects
