@@ -6,9 +6,6 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-
-        protected float _lastMountTime;
-
         public virtual async void SpawnMount(MountType mountType, string sourceId, float duration, int level = 1, int currentHp = 0)
         {
             if (!IsServer)
@@ -17,10 +14,8 @@ namespace MultiplayerARPG
             if (mountType == MountType.None)
                 return;
 
-            if (Time.unscaledTime - _lastMountTime < CurrentGameInstance.mountDelay)
+            if (!UpdateLastActionTime(ref _lastMountActionTime, CurrentGameInstance.mountDelay))
                 return;
-
-            _lastMountTime = Time.unscaledTime;
 
             Vector3 enterPosition = EntityTransform.position;
             if (PassengingVehicleEntity != null)

@@ -519,6 +519,20 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public bool UpdateLastActionTime(ref float lastActionTime, float delay)
+        {
+            float time = Time.unscaledTime;
+            if (time - lastActionTime < delay)
+                return false;
+            lastActionTime = time;
+            return true;
+        }
+
+        public bool CanDoNextAction(ref float lastActionTime, float delay)
+        {
+            return Time.unscaledTime - lastActionTime >= delay;
+        }
+
         public virtual void CallCmdPerformHitRegValidation(HitRegisterData hitData)
         {
             RPC(CmdPerformHitRegValidation, ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, hitData);

@@ -7,7 +7,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseGameEntity
     {
-        public const float VEHICLE_ACTION_COOLDOWN = 0.5f;
+        protected float _lastMountActionTime;
+        public float LastMountActionTime { get { return _lastMountActionTime; } set { _lastMountActionTime = value; } }
         public byte PassengingVehicleSeatIndex { get; private set; }
 
         private IVehicleEntity _passengingVehicleEntity = null;
@@ -57,7 +58,20 @@ namespace MultiplayerARPG
 
         private CancellationTokenSource _enterVehicleCancellation = null;
         private CancellationTokenSource _exitVehicleCancellation = null;
-        private float _latestVehicleActionTime;
+
+        public bool UpdateLastMountActionTime()
+        {
+            float time = Time.unscaledTime;
+            if (time - LastMountActionTime < CurrentGameInstance.mountDelay)
+                return false;
+            LastMountActionTime = time;
+            return true;
+        }
+
+        public bool CanDoNextMountAction()
+        {
+            return Time.unscaledTime - LastMountActionTime >= CurrentGameInstance.mountDelay;
+        }
 
         public void CancelEnterVehicleAwaiting()
         {
@@ -213,10 +227,8 @@ namespace MultiplayerARPG
         }
         public void CallCmdEnterVehicle(uint objectId, byte seatIndex)
         {
-            float currentTime = Time.unscaledTime;
-            if (currentTime - _latestVehicleActionTime < VEHICLE_ACTION_COOLDOWN)
+            if (!IsServer && !UpdateLastActionTime(ref _lastMountActionTime, CurrentGameInstance.mountDelay))
                 return;
-            _latestVehicleActionTime = currentTime;
             RPC(CmdEnterVehicle, objectId, seatIndex);
         }
 
@@ -240,6 +252,8 @@ namespace MultiplayerARPG
         protected void CmdEnterVehicle(uint objectId, byte seatIndex)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!UpdateLastActionTime(ref _lastMountActionTime, CurrentGameInstance.mountDelay))
+                return;
             if (!Manager.Assets.TryGetSpawnedObject(objectId, out LiteNetLibIdentity identity))
                 return;
             IVehicleEntity vehicleEntity = identity.GetComponent<IVehicleEntity>();
@@ -254,10 +268,8 @@ namespace MultiplayerARPG
 
         public void CallCmdExitVehicle()
         {
-            float currentTime = Time.unscaledTime;
-            if (currentTime - _latestVehicleActionTime < VEHICLE_ACTION_COOLDOWN)
+            if (!IsServer && !UpdateLastActionTime(ref _lastMountActionTime, CurrentGameInstance.mountDelay))
                 return;
-            _latestVehicleActionTime = currentTime;
             RPC(CmdExitVehicle);
         }
 
@@ -265,6 +277,8 @@ namespace MultiplayerARPG
         protected void CmdExitVehicle()
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!UpdateLastActionTime(ref _lastMountActionTime, CurrentGameInstance.mountDelay))
+                return;
             if (!PlayerCanExitVehicle())
                 return;
             ExitVehicleAndForget();

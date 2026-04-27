@@ -14,7 +14,6 @@ namespace MultiplayerARPG
     [RequireComponent(typeof(CharacterSkillAndBuffComponent))]
     public abstract partial class BaseCharacterEntity : DamageableEntity, ICharacterData
     {
-        public const float ACTION_DELAY = 0.1f;
         public const float RESPAWN_GROUNDED_CHECK_DURATION = 1f;
         public const float RESPAWN_INVINCIBLE_DURATION = 1f;
         public const float FIND_ENTITY_DISTANCE_BUFFER = 1f;
@@ -136,11 +135,13 @@ namespace MultiplayerARPG
         public MovementRestriction MovementRestrictionWhileCharging { get { return ChargeComponent.MovementRestrictionWhileCharging; } }
         public float RespawnGroundedCheckCountDown { get; protected set; }
         public float RespawnInvincibleCountDown { get; protected set; }
-        public float LastUseItemTime { get; set; }
+        protected float _lastUseItemTime;
+        public float LastUseItemTime { get { return _lastUseItemTime; } set { _lastUseItemTime = value; } }
         public float LastActionEndTime => Mathf.Max(LastAttackEndTime, LastUseSkillEndTime, LastReloadEndTime);
 
         protected int _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         protected float _lastActionTime;
+        public float LastActionTime { get { return _lastActionTime; } set { _lastActionTime = value; } }
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -439,7 +440,7 @@ namespace MultiplayerARPG
             if (!CanAttack())
                 return false;
 
-            if (!UpdateLastActionTime())
+            if (!UpdateLastActionTime(ref _lastActionTime, CurrentGameInstance.globalActionDelay))
                 return false;
 
             characterItem = this.GetAvailableWeapon(ref isLeftHand);
@@ -482,7 +483,7 @@ namespace MultiplayerARPG
             if (!CanUseSkill())
                 return false;
 
-            if (!UpdateLastActionTime())
+            if (!UpdateLastActionTime(ref _lastActionTime, CurrentGameInstance.globalActionDelay))
                 return false;
 
             if (!this.ValidateSkillToUse(dataId, isLeftHand, targetObjectId, out BaseSkill skill, out _, out UITextKeys gameMessage))
@@ -521,7 +522,7 @@ namespace MultiplayerARPG
             if (!CanUseSkillItem())
                 return false;
 
-            if (!UpdateLastActionTime())
+            if (!UpdateLastActionTime(ref _lastActionTime, CurrentGameInstance.globalActionDelay))
                 return false;
 
             if (!this.ValidateSkillItemToUse(index, isLeftHand, targetObjectId, out _, out BaseSkill skill, out _, out UITextKeys gameMessage))
@@ -680,20 +681,6 @@ namespace MultiplayerARPG
                 return true;
             }
             return false;
-        }
-
-        public bool UpdateLastActionTime()
-        {
-            float time = Time.unscaledTime;
-            if (time - _lastActionTime < ACTION_DELAY)
-                return false;
-            _lastActionTime = time;
-            return true;
-        }
-
-        public bool CanDoNextAction()
-        {
-            return Time.unscaledTime - _lastActionTime >= ACTION_DELAY;
         }
 
         public void ClearActionStates()

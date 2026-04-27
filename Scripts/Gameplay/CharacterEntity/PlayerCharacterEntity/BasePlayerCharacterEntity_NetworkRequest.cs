@@ -10,12 +10,10 @@ namespace MultiplayerARPG
             if (!CanUseItem())
                 return false;
 
-            if (!UpdateLastActionTime())
+            if (!UpdateLastActionTime(ref _lastActionTime, CurrentGameInstance.globalActionDelay))
                 return false;
 
-            float time = Time.unscaledTime;
-
-            if (!nonEquipItems.Get(itemIndex).IsRewardingItem() && time - LastUseItemTime < CurrentGameInstance.useItemDelay)
+            if (!nonEquipItems.Get(itemIndex).IsRewardingItem() && !UpdateLastActionTime(ref _lastUseItemTime, CurrentGameInstance.useItemDelay))
                 return false;
 
             if (!this.ValidateUsableItemToUse(itemIndex, out _, out UITextKeys gameMessage))
@@ -24,7 +22,6 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            LastUseItemTime = time;
             return true;
         }
 

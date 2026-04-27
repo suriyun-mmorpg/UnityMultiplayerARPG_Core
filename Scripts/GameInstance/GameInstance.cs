@@ -510,6 +510,8 @@ namespace MultiplayerARPG
         public float mountDelay = 1f;
         [Tooltip("Delay before use item again")]
         public float useItemDelay = 0.25f;
+        [Tooltip("Delay for global generic actions")]
+        public float globalActionDelay = 0.1f;
         [Tooltip("If this is `TRUE`, it will clear skills cooldown when character dead")]
         public bool clearSkillCooldownOnDead = true;
         [Tooltip("How the gold stored and being used, If this is `UserGoldOnly`, it won't have character's gold, all gold will being used from user's gold")]
