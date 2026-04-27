@@ -25,8 +25,7 @@ namespace MultiplayerARPG
         public bool IsActiveModel { get; protected set; } = false;
         public bool IsTpsModel { get; internal set; }
         public bool IsFpsModel { get; internal set; }
-        public readonly HashSet<object> IKsDisablers = new HashSet<object>();
-        public bool DisableIKs => IKsDisablers.Count > 0;
+        public readonly StateFlag IKsDisableState = new StateFlag();
         public bool UpdateEquipmentImmediately { get; set; }
 
         [Header("Model Switching Settings")]

@@ -187,8 +187,7 @@ namespace MultiplayerARPG
             get { return gameObject; }
         }
 
-        public readonly HashSet<object> MovementDisablers = new HashSet<object>();
-        public bool DisableMovement => MovementDisablers.Count > 0;
+        public readonly StateFlag MovementDisableState = new StateFlag();
 
         public virtual bool IsUpdateEntityComponents
         {
@@ -374,7 +373,7 @@ namespace MultiplayerARPG
         {
             if (!Movement.IsNull())
             {
-                bool tempEnableMovement = PassengingVehicleEntity.IsNull() && !DisableMovement;
+                bool tempEnableMovement = PassengingVehicleEntity.IsNull() && !MovementDisableState.IsActive;
                 // Enable movement or not
                 if (Movement.enabled != tempEnableMovement)
                 {

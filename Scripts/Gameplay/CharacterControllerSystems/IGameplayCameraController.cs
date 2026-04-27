@@ -20,6 +20,8 @@ namespace MultiplayerARPG
         bool UpdateRotationX { get; set; }
         bool UpdateRotationY { get; set; }
         bool UpdateZoom { get; set; }
+        ValueOverride<float> OverrideCameraZoom { get; }
+        ValueOverride<GameplayCameraRotationData> OverrideCameraRotation { get; }
         void Init();
         void Setup(BasePlayerCharacterEntity characterEntity);
         void Desetup(BasePlayerCharacterEntity characterEntity);

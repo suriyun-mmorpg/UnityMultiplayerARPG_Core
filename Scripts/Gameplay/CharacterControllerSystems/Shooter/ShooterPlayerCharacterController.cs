@@ -248,7 +248,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (TpsViewers.Count > 0)
+                if (TpsViewState.IsActive)
                 {
                     return true;
                 }
@@ -259,7 +259,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (FpsViewers.Count > 0)
+                if (FpsViewState.IsActive)
                 {
                     return true;
                 }
@@ -528,11 +528,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public readonly HashSet<object> ControllerBlockers = new HashSet<object>();
-        public readonly HashSet<object> ActionControllerBlockers = new HashSet<object>();
-        public readonly HashSet<object> FollowCameraTurners = new HashSet<object>();
-        public readonly HashSet<object> FpsViewers = new HashSet<object>();
-        public readonly HashSet<object> TpsViewers = new HashSet<object>();
+        public readonly StateFlag ControllerBlockState = new StateFlag();
+        public readonly StateFlag ActionControllerBlockState = new StateFlag();
+        public readonly StateFlag FollowCameraTurnState = new StateFlag();
+        public readonly StateFlag FpsViewState = new StateFlag();
+        public readonly StateFlag TpsViewState = new StateFlag();
 
         // Input data
         protected InputStateManager _activateInput;
@@ -784,9 +784,9 @@ namespace MultiplayerARPG
                 CacheGameplayCameraController.UpdateRotation = false;
                 CacheGameplayCameraController.UpdateZoom = !isBlockController;
             }
-            isBlockController |= ControllerBlockers.Count > 0;
-            isBlockActionController |= ControllerBlockers.Count > 0;
-            isBlockActionController |= ActionControllerBlockers.Count > 0;
+            isBlockController |= ControllerBlockState.IsActive;
+            isBlockActionController |= ControllerBlockState.IsActive;
+            isBlockActionController |= ActionControllerBlockState.IsActive;
             if (InputManager.IsUseNonMobileInput())
                 isBlockController |= GenericUtils.IsFocusInputField();
 
@@ -1199,7 +1199,7 @@ namespace MultiplayerARPG
 
         public virtual void UpdateLookRotation()
         {
-            if (PlayingCharacterEntity.DisableMovement)
+            if (PlayingCharacterEntity.MovementDisableState.IsActive)
                 return;
 
             _cameraForward = CacheGameplayCameraController.LookForwardTransform.forward;
@@ -1207,7 +1207,7 @@ namespace MultiplayerARPG
             _cameraForward.Normalize();
 
             bool isBlockAction = UISceneGameplay.IsBlockActionController();
-            isBlockAction |= ActionControllerBlockers.Count > 0;
+            isBlockAction |= ActionControllerBlockState.IsActive;
             bool isFps = ActiveViewMode == ShooterControllerViewMode.Fps;
             bool isShoulder = ActiveViewMode == ShooterControllerViewMode.Shoulder;
             bool isCombat = Mode == ControllerMode.Combat;
@@ -1222,7 +1222,7 @@ namespace MultiplayerARPG
             {
                 _targetLookDirection = _moveLookDirection = _cameraForward;
             }
-            if (FollowCameraTurners.Count > 0)
+            if (FollowCameraTurnState.IsActive)
                 _targetLookDirection = _moveLookDirection = _cameraForward;
             PlayingCharacterEntity.SetLookRotation(Quaternion.LookRotation(_targetLookDirection), true);
         }

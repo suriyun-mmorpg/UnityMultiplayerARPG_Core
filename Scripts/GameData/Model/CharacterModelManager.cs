@@ -103,24 +103,10 @@ namespace MultiplayerARPG
         // Vehicle models setup will be moved to `BaseCharacterModel`
         private VehicleCharacterModel[] vehicleModels = new VehicleCharacterModel[0];
 
-        public bool IsHide
-        {
-            get
-            {
-                foreach (bool hideState in _hideStates.Values)
-                {
-                    if (hideState)
-                        return true;
-                }
-                return false;
-            }
-        }
+        public bool IsHide { get => HideState.IsActive; }
         public bool IsFps { get; private set; }
 
-        /// <summary>
-        /// Dictionary of hide setter (who is ordering to hide) and hidding state value
-        /// </summary>
-        private readonly Dictionary<byte, bool> _hideStates = new Dictionary<byte, bool>();
+        private readonly StateFlag HideState = new StateFlag();
         private int _dirtyVehicleDataId;
         private byte _dirtySeatIndex;
         private byte _modelIdCounter = 0;
@@ -309,7 +295,10 @@ namespace MultiplayerARPG
 
         public void SetIsHide(byte setter, bool isHide)
         {
-            _hideStates[setter] = isHide;
+            if (isHide)
+                HideState.Add(setter);
+            else
+                HideState.Remove(setter);
             UpdateVisibleState();
         }
 

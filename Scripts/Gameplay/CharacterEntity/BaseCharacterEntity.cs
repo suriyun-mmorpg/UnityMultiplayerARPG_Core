@@ -140,8 +140,7 @@ namespace MultiplayerARPG
         public float LastActionEndTime => Mathf.Max(LastAttackEndTime, LastUseSkillEndTime, LastReloadEndTime);
         protected float _lastActionTime;
         public float LastActionTime { get { return _lastActionTime; } set { _lastActionTime = value; } }
-        public readonly HashSet<object> FallDamageDisablers = new HashSet<object>();
-        public bool DisableFallDamage => FallDamageDisablers.Count > 0;
+        public readonly StateFlag FallDamageDisableState = new StateFlag();
         protected int _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         #endregion
 
@@ -282,7 +281,7 @@ namespace MultiplayerARPG
                     CurrentGameplayRule.ApplyFallDamage(this, _lastGroundedPosition);
                 }
                 // Set last grounded state, it will be used next frame to find
-                _lastGrounded = isGrounded || DisableFallDamage;
+                _lastGrounded = isGrounded || FallDamageDisableState.IsActive;
                 if (_lastGrounded)
                 {
                     // Set last grounded position, it will be used to calculate fall damage
