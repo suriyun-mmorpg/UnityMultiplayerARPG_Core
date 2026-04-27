@@ -278,7 +278,7 @@ namespace MultiplayerARPG
         public BaseWeaponAbility WeaponAbility { get; protected set; }
         public WeaponAbilityState WeaponAbilityState { get; set; }
 
-        public ControllerMode? ForceControllerMode { get; set; }
+        public ValueOverride<ControllerMode> ForceControllerMode { get; private set; } = new ValueOverride<ControllerMode>();
         public ControllerMode Mode
         {
             get
@@ -288,8 +288,8 @@ namespace MultiplayerARPG
                     // If view mode is fps, controls type must be combat
                     return ControllerMode.Combat;
                 }
-                if (ForceControllerMode.HasValue)
-                    return ForceControllerMode.Value;
+                if (ForceControllerMode.TryGetValue(out ControllerMode overrideMode))
+                    return overrideMode;
                 return mode;
             }
         }
@@ -488,10 +488,13 @@ namespace MultiplayerARPG
             set { CacheGameplayCameraController.IsZoomAimming = value; }
         }
 
+        public ValueOverride<float> OverrideTurnSpeed { get; private set; } = new ValueOverride<float>();
         public float CurrentTurnSpeed
         {
             get
             {
+                if (OverrideTurnSpeed.TryGetValue(out float overrideTurnSpeed))
+                    return overrideTurnSpeed;
                 if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
                     return turnSpeedWhileSwimming;
                 switch (PlayingCharacterEntity.ExtraMovementState)
@@ -526,6 +529,12 @@ namespace MultiplayerARPG
                 }
                 return _moveInput;
             }
+        }
+        public ValueOverride<float> OverrideCameraZoom => CacheGameplayCameraController.OverrideCameraZoom;
+        public ValueOverride<GameplayCameraRotationData> OverrideCameraRotation => CacheGameplayCameraController.OverrideCameraRotation;
+        public Transform LookForwardTransform
+        {
+            get { return CacheGameplayCameraController.LookForwardTransform; }
         }
 
         public readonly StateFlag ControllerBlockState = new StateFlag();
@@ -1202,7 +1211,7 @@ namespace MultiplayerARPG
             if (PlayingCharacterEntity.MovementDisableState.IsActive)
                 return;
 
-            _cameraForward = CacheGameplayCameraController.LookForwardTransform.forward;
+            _cameraForward = LookForwardTransform.forward;
             _cameraForward.y = 0f;
             _cameraForward.Normalize();
 
