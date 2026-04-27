@@ -138,10 +138,11 @@ namespace MultiplayerARPG
         protected float _lastUseItemTime;
         public float LastUseItemTime { get { return _lastUseItemTime; } set { _lastUseItemTime = value; } }
         public float LastActionEndTime => Mathf.Max(LastAttackEndTime, LastUseSkillEndTime, LastReloadEndTime);
-
-        protected int _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         protected float _lastActionTime;
         public float LastActionTime { get { return _lastActionTime; } set { _lastActionTime = value; } }
+        public readonly HashSet<object> FallDamageDisablers = new HashSet<object>();
+        public bool DisableFallDamage => FallDamageDisablers.Count > 0;
+        protected int _countDownToUpdateAppearances = FRAMES_BEFORE_UPDATE_APPEARANCES;
         #endregion
 
         public IPhysicFunctions AttackPhysicFunctions { get; protected set; }
@@ -281,7 +282,7 @@ namespace MultiplayerARPG
                     CurrentGameplayRule.ApplyFallDamage(this, _lastGroundedPosition);
                 }
                 // Set last grounded state, it will be used next frame to find
-                _lastGrounded = isGrounded;
+                _lastGrounded = isGrounded || DisableFallDamage;
                 if (_lastGrounded)
                 {
                     // Set last grounded position, it will be used to calculate fall damage
