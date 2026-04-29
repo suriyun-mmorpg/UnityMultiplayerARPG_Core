@@ -50,6 +50,10 @@ namespace MultiplayerARPG
         /// </summary>
         public const string ExpRate = "/exp_rate";
         /// <summary>
+        /// Set item drop rate (0.1 = 1%, 1 = 100%)
+        /// </summary>
+        public const string ItemDropRate = "/item_drop_rate";
+        /// <summary>
         /// Warp to specific map
         /// </summary>
         public const string Warp = "/warp";
@@ -123,6 +127,7 @@ namespace MultiplayerARPG
             "/give_item {name} {item_id} {amount} = Add item which its ID is {item_id} (if item ID have spaces, use _ for spaces) x {amount} to character which its name is {name}.\n" +
             "/gold_rate {rate} = Set server's gold drop rate to {rate}.\n" +
             "/exp_rate {rate} = Set server's exp rewarding rate to {rate}.\n" +
+            "/item_drop_rate {rate} = Set server's item drop rate to {rate}.\n" +
             "/warp {map_id} = Warp to specific map (if map ID have spaces, use _ for spaces).\n" +
             "/warp_character {name} {map_id} {x} {y} {z} = Warp to specific character to specific map and position (if map ID have spaces, use _ for spaces).\n" +
             "/warp_to_character {name} = Warp to character which its name is {name}.\n" +
@@ -165,6 +170,8 @@ namespace MultiplayerARPG
             if (string.Equals(command, GoldRate, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
             if (string.Equals(command, ExpRate, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
+                return true;
+            if (string.Equals(command, ItemDropRate, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
             if (string.Equals(command, Warp, StringComparison.OrdinalIgnoreCase) && dataLength == 2)
                 return true;
@@ -220,6 +227,7 @@ namespace MultiplayerARPG
                 string.Equals(command, GiveItem, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(command, GoldRate, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(command, ExpRate, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(command, ItemDropRate, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(command, Warp, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(command, WarpCharacter, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(command, WarpToCharacter, StringComparison.OrdinalIgnoreCase) ||
@@ -453,6 +461,19 @@ namespace MultiplayerARPG
                     {
                         GameInstance.Singleton.GameplayRule.ExpRate = amount;
                         response = $"Set exp rate to {amount}";
+                    }
+                }
+                if (string.Equals(commandKey, ItemDropRate, StringComparison.OrdinalIgnoreCase))
+                {
+                    float amount;
+                    if (!float.TryParse(data[1], out amount) || amount < 0f)
+                    {
+                        response = "Wrong input data";
+                    }
+                    else
+                    {
+                        GameInstance.Singleton.GameplayRule.ItemDropRate = amount;
+                        response = $"Set item drop rate to {amount}";
                     }
                 }
                 if (string.Equals(commandKey, Warp, StringComparison.OrdinalIgnoreCase))

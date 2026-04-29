@@ -1533,6 +1533,7 @@ namespace MultiplayerARPG
             // Reset gold and exp rate
             gameplayRule.GoldRate = 1f;
             gameplayRule.ExpRate = 1f;
+            gameplayRule.ItemDropRate = 1f;
 
             // Setup inventory manager
             if (inventoryManager == null)

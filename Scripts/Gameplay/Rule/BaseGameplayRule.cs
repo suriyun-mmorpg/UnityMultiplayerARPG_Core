@@ -8,6 +8,7 @@ namespace MultiplayerARPG
     {
         public float GoldRate { get; set; } = 1f;
         public float ExpRate { get; set; } = 1f;
+        public float ItemDropRate { get; set; } = 1f;
 
         /// <summary>
         /// This function will be called when applying damage to a character, implement it to calculate character's stats to find if it should hit a character or not, return `TRUE` if it hit

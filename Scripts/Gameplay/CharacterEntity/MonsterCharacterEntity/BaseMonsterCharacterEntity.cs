@@ -506,7 +506,7 @@ namespace MultiplayerARPG
                             // Make this player character to be able to pick up item because it made most damage
                             _looters.Add(tempPlayerCharacterEntity.Id);
                             // And also change item drop rate
-                            itemDropRate = 1f + tempPlayerCharacterEntity.CachedData.Stats.itemDropRate;
+                            itemDropRate = GameInstance.Singleton.GameplayRule.ItemDropRate + tempPlayerCharacterEntity.CachedData.Stats.itemDropRate;
                         }
                         GivingRewardToGuild(tempPlayerCharacterEntity, reward, rewardRate, out float shareGuildExpRate);
                         GivingRewardToParty(tempPlayerCharacterEntity, isLastAttacker, reward, rewardRate, shareGuildExpRate, makeMostDamage, out givenRewardExp, out givenRewardGold, out givenRewardCurrencies);
