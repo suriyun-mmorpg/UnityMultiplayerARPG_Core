@@ -15,9 +15,6 @@ namespace MultiplayerARPG
 
         public PredefinedBone[] predefinedBones = new PredefinedBone[0];
 
-        private List<Transform> _srcTransforms = new List<Transform>();
-        private List<Transform> _dstTransforms = new List<Transform>();
-
         private Dictionary<HumanBodyBones, Transform> _predefinedBonesDict;
         public Dictionary<HumanBodyBones, Transform> PredefinedBonesDict
         {
@@ -41,45 +38,29 @@ namespace MultiplayerARPG
             if (src == null || dst == null)
                 return;
 
-            _srcTransforms.Clear();
-            _dstTransforms.Clear();
+            if (dst.avatar == null || !dst.avatar.isHuman)
+                return;
 
-            for (int i = 0; i < (int)HumanBodyBones.LastBone; ++i)
+            AnimatorHandle srcAnimatorHandle = src.gameObject.GetOrAddComponent<AnimatorHandle>();
+            AnimatorHandle dstAnimatorHandle = dst.gameObject.GetOrAddComponent<AnimatorHandle>();
+
+            List<Transform> srcTransforms = new List<Transform>();
+            List<Transform> dstTransforms = new List<Transform>();
+
+            for (HumanBodyBones i = 0; i < HumanBodyBones.LastBone; ++i)
             {
-                Transform srcTransform = src.GetBoneTransform((HumanBodyBones)i);
-                if (srcTransform == null)
-                    continue;
+                // Add all bones althrough it is null
+                Transform srcTransform = src.GetBoneTransform(i);
+                srcTransforms.Add(srcTransform);
 
-                Transform dstTransform = null;
-                try
-                {
-                    dstTransform = dst.GetBoneTransform((HumanBodyBones)i);
-                }
-                catch { }
-
-                if (dstTransform != null ||
-                    PredefinedBonesDict.TryGetValue((HumanBodyBones)i, out dstTransform))
-                {
-                    _srcTransforms.Add(srcTransform);
-                    _dstTransforms.Add(dstTransform);
-                }
+                // Priority: predefined bones > bones from dst animator
+                Transform dstTransform;
+                if (!PredefinedBonesDict.TryGetValue(i, out dstTransform))
+                    dstTransform = dst.GetBoneTransform(i);
+                dstTransforms.Add(dstTransform);
             }
-#endif
-        }
 
-        private void LateUpdate()
-        {
-#if !UNITY_SERVER
-            // Register instead of scheduling job
-            EquipmentModelBonesSetupByHumanBodyBonesUpdateManager.Instance.Register(_srcTransforms, _dstTransforms);
-#endif
-        }
-
-        private void OnDestroy()
-        {
-#if !UNITY_SERVER
-            _srcTransforms.Clear();
-            _dstTransforms.Clear();
+            EquipmentModelBonesSetupByHumanBodyBonesUpdateManager.Instance.Register(srcAnimatorHandle, srcTransforms, dstAnimatorHandle, dstTransforms);
 #endif
         }
     }

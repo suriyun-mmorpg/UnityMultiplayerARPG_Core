@@ -5,6 +5,8 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_HUMAN_BODY_BONES_MANAGER_FILE, menuName = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_HUMAN_BODY_BONES_MANAGER_MENU, order = GameDataMenuConsts.EQUIPMENT_MODEL_BONES_SETUP_BY_HUMAN_BODY_BONES_MANAGER_ORDER)]
     public class EquipmentModelBonesSetupByHumanBodyBonesManager : BaseEquipmentModelBonesSetupManager
     {
+        public bool destroyAnimatorAfterPreparation = true;
+
         public override void Setup(BaseCharacterModel characterModel, EquipmentModel equipmentModel, GameObject instantiatedObject, BaseEquipmentEntity instantiatedEntity, EquipmentInstantiatedObjectGroup instantiatedObjectGroup, EquipmentContainer equipmentContainer)
         {
             if (GameInstance.Singleton.DimensionType != DimensionType.Dimension3D)
@@ -32,10 +34,13 @@ namespace MultiplayerARPG
             }
 
             EquipmentModelBonesSetupByHumanBodyBonesUpdater updater = instantiatedObject.GetOrAddComponent<EquipmentModelBonesSetupByHumanBodyBonesUpdater>();
+            Animator dstAnimator = instantiatedObject.GetComponentInChildren<Animator>();
             if (equipmentContainer.defaultModel != null)
-                updater.PrepareTransforms(equipmentContainer.defaultModel.GetComponentInChildren<Animator>(), instantiatedObject.GetComponentInChildren<Animator>());
+                updater.PrepareTransforms(equipmentContainer.defaultModel.GetComponentInChildren<Animator>(), dstAnimator);
             else
-                updater.PrepareTransforms(animatorSrc.Animator, instantiatedObject.GetComponentInChildren<Animator>());
+                updater.PrepareTransforms(animatorSrc.Animator, dstAnimator);
+            if (destroyAnimatorAfterPreparation)
+                DestroyImmediate(dstAnimator);
         }
     }
 }
