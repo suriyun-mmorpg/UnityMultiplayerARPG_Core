@@ -356,10 +356,16 @@ namespace MultiplayerARPG
                         switch (PlayingCharacterEntity.ExtraMovementState)
                         {
                             case ExtraMovementState.IsCrouching:
+                                fpsTargetOffsetWhileCrouching.x = 0f;
+                                fpsTargetOffsetWhileCrouching.z = 0f;
                                 return fpsTargetOffsetWhileCrouching;
                             case ExtraMovementState.IsCrawling:
+                                fpsTargetOffsetWhileCrawling.x = 0f;
+                                fpsTargetOffsetWhileCrawling.z = 0f;
                                 return fpsTargetOffsetWhileCrawling;
                             default:
+                                fpsTargetOffset.x = 0f;
+                                fpsTargetOffset.z = 0f;
                                 return fpsTargetOffset;
                         }
                     case ShooterControllerViewMode.Shoulder:
