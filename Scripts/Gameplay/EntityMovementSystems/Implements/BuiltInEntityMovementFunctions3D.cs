@@ -458,6 +458,27 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public void UpdateInterpolate(float deltaTime)
+        {
+            if (_acceptedJump)
+            {
+                _sendingJump = true;
+                Entity.PlayJumpAnimation();
+            }
+
+            if (_acceptedDash)
+            {
+                _sendingDash = true;
+            }
+
+            if (_acceptedPositionTimestamp > 0)
+            {
+                _interpElapsedTime += deltaTime;
+                Vector3 newPosition = Vector3.Lerp(_startInterpPosition, _endInterpPosition, _interpElapsedTime / Entity.Manager.LogicUpdater.DeltaTimeF);
+                EntityMovement.SetPosition(newPosition);
+            }
+        }
+
         public void UpdateMovement(float deltaTime)
         {
             _moveDirection = Vector3.zero;
@@ -996,14 +1017,7 @@ namespace MultiplayerARPG
                 }
             }
             Vector3 snapToGroundMotion = EntityMovement.GetSnapToGroundMotion(tempMoveVelocity, platformMotion, forceMotion);
-            Vector3 newMovement = ((tempMoveVelocity + platformMotion + forceMotion) * deltaTime) + snapToGroundMotion;
-            if (!CanSimulateMovement() && _acceptedPositionTimestamp > 0)
-            {
-                _interpElapsedTime += deltaTime;
-                float newYPosition = Mathf.Lerp(_startInterpPosition.y, _endInterpPosition.y, _interpElapsedTime / Entity.Manager.LogicUpdater.DeltaTimeF);
-                newMovement.y = newYPosition - EntityTransform.position.y;
-            }
-            _previousMovement = newMovement;
+            _previousMovement = ((tempMoveVelocity + platformMotion + forceMotion) * deltaTime) + snapToGroundMotion;
             if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent &&
                 LadderComponent.TriggeredLadderEntry && !LadderComponent.ClimbingLadder &&
                 LadderComponent.EnterExitState == EnterExitState.None &&

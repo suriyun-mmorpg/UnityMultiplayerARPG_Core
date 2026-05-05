@@ -353,7 +353,10 @@ namespace MultiplayerARPG
             Functions.snapThreshold = snapThreshold;
 #endif
             float deltaTime = Time.deltaTime;
-            Functions.UpdateMovement(deltaTime);
+            if (!Functions.CanSimulateMovement())
+                Functions.UpdateInterpolate(deltaTime);
+            else
+                Functions.UpdateMovement(deltaTime);
             Functions.UpdateRotation(deltaTime);
             Functions.AfterMovementUpdate(deltaTime);
             if (_forceUngroundCountdown > 0f)
@@ -456,9 +459,9 @@ namespace MultiplayerARPG
         {
             if (Functions.CanSimulateMovement())
             {
-                CacheCharacterController.enabled = false;
-                EntityTransform.position = position;
-                CacheCharacterController.enabled = true;
+                CacheCharacterController.detectCollisions = false;
+                CacheCharacterController.Move(position - EntityTransform.position);
+                CacheCharacterController.detectCollisions = true;
             }
             else
             {
