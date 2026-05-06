@@ -422,6 +422,8 @@ namespace MultiplayerARPG
 
         public bool IsDisallowToLevelUp(int level)
         {
+            if (level < 0 || requirementEachLevels.Count == 0)
+                return false;
             if (level >= requirementEachLevels.Count)
                 return requirementEachLevels[requirementEachLevels.Count - 1].disallow;
             return requirementEachLevels[level].disallow;
@@ -429,6 +431,8 @@ namespace MultiplayerARPG
 
         public int GetRequireCharacterLevel(int level)
         {
+            if (level < 0 || requirementEachLevels.Count == 0)
+                return 0;
             if (level >= requirementEachLevels.Count)
                 return requirementEachLevels[requirementEachLevels.Count - 1].characterLevel;
             return requirementEachLevels[level].characterLevel;
@@ -436,6 +440,8 @@ namespace MultiplayerARPG
 
         public float GetRequireCharacterSkillPoint(int level)
         {
+            if (level < 0 || requirementEachLevels.Count == 0)
+                return 0;
             if (level >= requirementEachLevels.Count)
                 return requirementEachLevels[requirementEachLevels.Count - 1].skillPoint;
             return requirementEachLevels[level].skillPoint;
@@ -443,6 +449,8 @@ namespace MultiplayerARPG
 
         public int GetRequireCharacterGold(int level)
         {
+            if (level < 0 || requirementEachLevels.Count == 0)
+                return 0;
             if (level >= requirementEachLevels.Count)
                 return requirementEachLevels[requirementEachLevels.Count - 1].gold;
             return requirementEachLevels[level].gold;
@@ -451,6 +459,8 @@ namespace MultiplayerARPG
         public void GetRequireAttributeAmounts(int level, Dictionary<Attribute, float> result)
         {
             result.Clear();
+            if (level < 0 || requirementEachLevels.Count == 0)
+                return;
             if (level >= requirementEachLevels.Count)
                 GameDataHelpers.CombineAttributes(requirementEachLevels[requirementEachLevels.Count - 1].attributeAmounts, result, 1f);
             GameDataHelpers.CombineAttributes(requirementEachLevels[level].attributeAmounts, result, 1f);
@@ -458,6 +468,8 @@ namespace MultiplayerARPG
 
         public void GetRequireSkillLevels(int level, Dictionary<BaseSkill, int> result)
         {
+            if (level < 0 || requirementEachLevels.Count == 0)
+                return;
             result.Clear();
             if (level >= requirementEachLevels.Count)
                 GameDataHelpers.CombineSkills(requirementEachLevels[requirementEachLevels.Count - 1].skillLevels, result, 1f);
@@ -466,6 +478,8 @@ namespace MultiplayerARPG
 
         public void GetRequireCurrencyAmounts(int level, Dictionary<Currency, int> result)
         {
+            if (level < 0 || requirementEachLevels.Count == 0)
+                return;
             result.Clear();
             if (level >= requirementEachLevels.Count)
                 GameDataHelpers.CombineCurrencies(requirementEachLevels[requirementEachLevels.Count - 1].currencyAmounts, result, 1f);
@@ -474,6 +488,8 @@ namespace MultiplayerARPG
 
         public void GetRequireItemAmounts(int level, Dictionary<BaseItem, int> result)
         {
+            if (level < 0 || requirementEachLevels.Count == 0)
+                return;
             result.Clear();
             if (level >= requirementEachLevels.Count)
                 GameDataHelpers.CombineItems(requirementEachLevels[requirementEachLevels.Count - 1].itemAmounts, result);
@@ -983,7 +999,7 @@ namespace MultiplayerARPG
             if (character == null)
                 return false;
 
-            if (level <= 0)
+            if (level < 0 || requirementEachLevels.Count == 0)
             {
                 gameMessage = UITextKeys.UI_ERROR_SKILL_LEVEL_IS_ZERO;
                 return false;
