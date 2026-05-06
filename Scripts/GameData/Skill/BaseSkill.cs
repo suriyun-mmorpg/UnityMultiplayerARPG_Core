@@ -538,6 +538,11 @@ namespace MultiplayerARPG
             get { return SkillType == SkillType.Passive; }
         }
 
+        public virtual bool TurnToTargetWhileCasting
+        {
+            get { return true; }
+        }
+
         public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, int skillLevel, bool isLeftHand)
         {
             Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();

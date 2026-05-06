@@ -60,6 +60,7 @@ namespace MultiplayerARPG
         {
             get { return SkillType.Active; }
         }
+        public override bool TurnToTargetWhileCasting => false;
 
         public override float GetCastDistance(BaseCharacterEntity skillUser, int skillLevel, bool isLeftHand)
         {

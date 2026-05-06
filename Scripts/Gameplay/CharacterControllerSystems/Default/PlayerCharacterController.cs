@@ -23,6 +23,7 @@ namespace MultiplayerARPG
             UseSkill,
             HoldClickActivate,
             ActionRequested,
+            ActionRequestedWithoutAnimationAwaiting,
         }
 
         [Header("Camera Controls Prefabs")]

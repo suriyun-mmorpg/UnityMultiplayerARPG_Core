@@ -841,9 +841,11 @@ namespace MultiplayerARPG
                             _turnToTargetActionType = TargetActionType.ActionRequested;
                             break;
                         case TargetActionType.UseSkill:
+                            // TODO: May add skill option to turn to target while playing animation or not
+                            bool turnToTargetWhileActivating = _queueUsingSkill.skill != null && _queueUsingSkill.skill.TurnToTargetWhileCasting;
                             RequestUsePendingSkill();
                             OnUseSkillOnEntity();
-                            _turnToTargetActionType = TargetActionType.ActionRequested;
+                            _turnToTargetActionType = turnToTargetWhileActivating ? TargetActionType.ActionRequested : TargetActionType.ActionRequestedWithoutAnimationAwaiting;
                             break;
                         case TargetActionType.ActionRequested:
                             if (!PlayingCharacterEntity.IsPlayingAttackOrUseSkillAnimation())
@@ -851,6 +853,10 @@ namespace MultiplayerARPG
                                 _turnToTargetActionType = TargetActionType.None;
                                 _turnToTargetPosition = null;
                             }
+                            break;
+                        case TargetActionType.ActionRequestedWithoutAnimationAwaiting:
+                            _turnToTargetActionType = TargetActionType.None;
+                            _turnToTargetPosition = null;
                             break;
                     }
                 }
