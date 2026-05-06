@@ -462,13 +462,20 @@ namespace MultiplayerARPG
         {
             if (_acceptedJump)
             {
-                _sendingJump = true;
+                if (IsServer)
+                    _sendingJump = true;
                 Entity.PlayJumpAnimation();
             }
 
             if (_acceptedDash)
             {
-                _sendingDash = true;
+                if (IsServer)
+                    _sendingDash = true;
+            }
+
+            if (IsServer && _isServerWaitingTeleportConfirm)
+            {
+                return;
             }
 
             if (_acceptedPositionTimestamp > 0)
@@ -1362,6 +1369,8 @@ namespace MultiplayerARPG
                     }
                     MovementState = _tempMovementState = movementState;
                     ExtraMovementState = _tempExtraMovementState = extraMovementState;
+                    _startInterpPosition = position;
+                    _endInterpPosition = position;
                 }
                 else if (!IsOwnerClient)
                 {
@@ -1373,10 +1382,10 @@ namespace MultiplayerARPG
                         NavPaths = null;
                     MovementState = _tempMovementState = movementState;
                     ExtraMovementState = _tempExtraMovementState = extraMovementState;
+                    _startInterpPosition = EntityTransform.position;
+                    _endInterpPosition = position;
                 }
                 _acceptedPositionTimestamp = peerTimestamp;
-                _startInterpPosition = EntityTransform.position;
-                _endInterpPosition = position;
                 _interpElapsedTime = 0f;
             }
             if (!IsOwnerClient && movementState.Has(MovementState.IsJump))
