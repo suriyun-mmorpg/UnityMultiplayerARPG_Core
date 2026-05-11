@@ -136,7 +136,7 @@ namespace MultiplayerARPG
                 IncreaseDamagesRate = null;
             }
 
-            // Release results            
+            // Release results
             if (Attributes != null)
             {
                 CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(Attributes);
