@@ -106,7 +106,8 @@ namespace MultiplayerARPG
             {
                 case DimensionType.Dimension2D:
                     Collider2D[] collider2Ds = ArrayPool<Collider2D>.Shared.Rent(resultAllocSize);
-                    tempHitCount = Physics2D.OverlapCircleNonAlloc(GameInstance.PlayingCharacterEntity.EntityTransform.position, detectingRadius, collider2Ds);
+                    ContactFilter2D contactFilter2D = new ContactFilter2D();
+                    tempHitCount = Physics2D.OverlapCircle(GameInstance.PlayingCharacterEntity.EntityTransform.position, detectingRadius, contactFilter2D, collider2Ds);
                     for (int i = 0; i < tempHitCount; ++i)
                     {
                         Collider2D other = collider2Ds[i];

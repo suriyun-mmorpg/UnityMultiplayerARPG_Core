@@ -175,16 +175,27 @@ namespace MultiplayerARPG
             {
                 case HitDetectionMode.Raycast:
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                        hitCount = Physics2D.RaycastNonAlloc(_previousPosition.Value, dir, _hits2D, dist, layerMask);
+                    {
+                        ContactFilter2D contactFilter2D = new ContactFilter2D()
+                        {
+                            useLayerMask = true,
+                            layerMask = layerMask,
+                        };
+                        hitCount = Physics2D.Raycast(_previousPosition.Value, dir, contactFilter2D, _hits2D, dist);
+                    }
                     else
+                    {
                         hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, layerMask);
+                    }
                     break;
                 case HitDetectionMode.SphereCast:
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                     {
-                        ContactFilter2D contactFilter2D = new ContactFilter2D();
-                        contactFilter2D.useLayerMask = true;
-                        contactFilter2D.layerMask = layerMask;
+                        ContactFilter2D contactFilter2D = new ContactFilter2D()
+                        {
+                            useLayerMask = true,
+                            layerMask = layerMask,
+                        };
                         hitCount = Physics2D.CircleCast(_previousPosition.Value, sphereCastRadius, dir, contactFilter2D, _hits2D, dist);
                     }
                     else
