@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public static class PoolSystem
     {
-        private static Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>> pooledObjects = new Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>>();
+        private static readonly Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>> pooledObjects = new Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>>();
 #if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
         private static Transform poolingTransform;
         private static Transform PoolingTransform

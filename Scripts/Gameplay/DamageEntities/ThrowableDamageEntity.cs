@@ -235,7 +235,8 @@ namespace MultiplayerARPG
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
                 _alreadyHitObjects.Clear();
-                int hitCount = Physics2D.OverlapCircleNonAlloc(CacheTransform.position, explodeDistance, _overlaps2D);
+                ContactFilter2D contactFilter2D = new ContactFilter2D();
+                int hitCount = Physics2D.OverlapCircle(CacheTransform.position, explodeDistance, contactFilter2D, _overlaps2D);
                 for (int i = 0; i < hitCount; ++i)
                 {
                     FindAndApplyDamage(_overlaps2D[i].gameObject, _alreadyHitObjects);

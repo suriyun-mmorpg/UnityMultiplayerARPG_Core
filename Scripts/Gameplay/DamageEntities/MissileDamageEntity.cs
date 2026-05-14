@@ -181,15 +181,29 @@ namespace MultiplayerARPG
                     break;
                 case HitDetectionMode.SphereCast:
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                        hitCount = Physics2D.CircleCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits2D, dist, layerMask);
+                    {
+                        ContactFilter2D contactFilter2D = new ContactFilter2D();
+                        contactFilter2D.useLayerMask = true;
+                        contactFilter2D.layerMask = layerMask;
+                        hitCount = Physics2D.CircleCast(_previousPosition.Value, sphereCastRadius, dir, contactFilter2D, _hits2D, dist);
+                    }
                     else
+                    {
                         hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, layerMask);
+                    }
                     break;
                 case HitDetectionMode.BoxCast:
                     if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
-                        hitCount = Physics2D.BoxCastNonAlloc(_previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, _hits2D, dist, layerMask);
+                    {
+                        ContactFilter2D contactFilter2D = new ContactFilter2D();
+                        contactFilter2D.useLayerMask = true;
+                        contactFilter2D.layerMask = layerMask;
+                        hitCount = Physics2D.BoxCast(_previousPosition.Value, new Vector2(boxCastSize.x, boxCastSize.y), Vector2.SignedAngle(Vector2.zero, dir), dir, contactFilter2D, _hits2D, dist);
+                    }
                     else
+                    {
                         hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, layerMask);
+                    }
                     break;
             }
             Physics.queriesHitBackfaces = queriesHitBackfaces;
@@ -338,7 +352,8 @@ namespace MultiplayerARPG
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
-                int hitCount = Physics2D.OverlapCircleNonAlloc(CacheTransform.position, explodeDistance, _overlaps2D);
+                ContactFilter2D contactFilter2D = new ContactFilter2D();
+                int hitCount = Physics2D.OverlapCircle(CacheTransform.position, explodeDistance, contactFilter2D, _overlaps2D);
                 for (int i = 0; i < hitCount; ++i)
                 {
                     FindAndApplyDamage(_overlaps2D[i].gameObject, false, _alreadyHitObjects);

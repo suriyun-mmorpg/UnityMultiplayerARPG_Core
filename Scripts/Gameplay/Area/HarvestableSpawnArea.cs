@@ -142,7 +142,8 @@ namespace MultiplayerARPG
         {
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
             {
-                int hitCount = Physics2D.OverlapCircleNonAlloc(position, entity.ColliderDetectionRadius, _overlaps2D);
+                ContactFilter2D contactFilter2D = new ContactFilter2D();
+                int hitCount = Physics2D.OverlapCircle(position, entity.ColliderDetectionRadius, contactFilter2D, _overlaps2D);
                 for (int i = 0; i < hitCount; ++i)
                 {
                     Collider2D overlap = _overlaps2D[i];
