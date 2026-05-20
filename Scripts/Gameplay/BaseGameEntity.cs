@@ -129,6 +129,8 @@ namespace MultiplayerARPG
         {
             get
             {
+                if (OverrideCameraTargetTransform.TryGetValue(out Transform camTransform))
+                    return camTransform;
                 if (!PassengingVehicleEntity.IsNull())
                 {
                     if (PassengingVehicleSeat.cameraTarget == VehicleSeatCameraTarget.Vehicle)
@@ -138,6 +140,8 @@ namespace MultiplayerARPG
             }
             set { cameraTargetTransform = value; }
         }
+
+        public ValueOverride<Transform> OverrideCameraTargetTransform { get; } = new ValueOverride<Transform>();
 
         [Tooltip("Transform for position which camera will look at and follow while playing in FPS view mode")]
         [SerializeField]
