@@ -20,6 +20,7 @@ namespace MultiplayerARPG
             string bundleVersion = PlayerSettings.bundleVersion;
             string addressableProfileName = "Default";
             bool developmentMode = false;
+            bool enableDeepProfilingSupport = false;
 
             string versionCode = "";
             string keystoreName = PlayerSettings.Android.keystoreName;
@@ -76,6 +77,8 @@ namespace MultiplayerARPG
                     generateMapServerDockerfile = bool.Parse(args[i + 1]);
                 if (args[i].ToLower().Equals("-mapserverportindockerfile") && i + 1 < args.Length)
                     mapServerPortInDockerfile = int.Parse(args[i + 1]);
+                if (args[i].ToLower().Equals("-enabledeepprofilingsupport") && i + 1 < args.Length)
+                    enableDeepProfilingSupport = bool.Parse(args[i + 1]);
             }
 
             if (string.IsNullOrEmpty(outputPath))
@@ -120,6 +123,9 @@ namespace MultiplayerARPG
                 locationPathName = Path.Combine(outputPath, exeName),
                 scenes = scenes.ToArray(),
             };
+
+            if (enableDeepProfilingSupport && developmentMode)
+                options.options |= BuildOptions.EnableDeepProfilingSupport;
 #else
             BuildPlayerOptions options = new BuildPlayerOptions
             {
@@ -129,6 +135,7 @@ namespace MultiplayerARPG
                 scenes = scenes.ToArray(),
             };
 #endif
+            AssetEditorMenu.ValidateGameDataAndPrefabs();
 #if !DISABLE_ADDRESSABLES
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
             string profileId = settings.profileSettings.GetProfileId(addressableProfileName);
@@ -207,7 +214,7 @@ done
 
             string dockerFilePath = Path.Combine(buildPath, "Dockerfile");
             string dockerFileContent = $@"# Use a lightweight base image with the necessary dependencies
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 # Set environment variables
 ENV DEBIAN_FRONTEND=noninteractive

@@ -371,6 +371,14 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public override bool Validate()
+        {
+            bool hasChanges = base.Validate();
+            if (scene != null)
+                hasChanges |= scene.Validate();
+            return hasChanges;
+        }
+
         /// <summary>
         /// It will write map info data by `BaseGameNetworkManager` at server in `SendMapInfo`, send only data which affect client's controlling
         /// </summary>

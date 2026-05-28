@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct WarpPortal
+    public class WarpPortal
     {
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [Tooltip("The `WarpPortalEntity` prefab which will instantiates on the map scene. If this is not set, it will use the one which set to `GameInstance` → `warpPortalEntityPrefab`")]
@@ -27,5 +28,16 @@ namespace MultiplayerARPG
         [Tooltip("This will be used if `warpOverrideRotation` is `TRUE` to change character's rotation when warp")]
         public Vector3 warpToRotation;
         public WarpPointByCondition[] warpPointsByCondition;
-    }
+
+#if UNITY_EDITOR
+        public bool ValidateAddressableHashAssetID()
+        {
+#if !DISABLE_ADDRESSABLES
+            return AssetReferenceLiteNetLibIdentity.ValidateHashAssetID(addressableEntityPrefab);
+#else
+            return false;
+#endif
+        }
+#endif
+        }
 }

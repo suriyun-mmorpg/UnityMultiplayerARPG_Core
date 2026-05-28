@@ -19,6 +19,10 @@ namespace MultiplayerARPG
         public const int BUILD_SETUP_INCLUDE_PREFAB_REFS_ORDER = 11;
         public const string PREPARE_ADDRESSABLE_ASSETS_MENU = "MMORPG KIT/Addressables/Prepare Addressable Assets";
         public const int PREPARE_ADDRESSABLE_ASSETS_ORDER = 12;
+        public const string VALIDATE_GAME_DATA_AND_PREFABS_MENU = "MMORPG KIT/Asset Tools/Validate Game Data And Prefabs";
+        public const int VALIDATE_GAME_DATA_AND_PREFABS_ORDER = 13;
+        public const string VALIDATE_OPENED_SCENES_MENU = "MMORPG KIT/Asset Tools/Validate Opened Scenes";
+        public const int VALIDATE_OPENED_SCENES_ORDER = 14;
         public const string BAKE_SERVER_SCENE_MENU = "MMORPG KIT/Scenes/Bake Server Scene";
         public const int BAKE_SERVER_SCENE_ORDER = 20;
         #endregion

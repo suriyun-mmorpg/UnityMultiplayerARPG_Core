@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using LiteNetLibManager;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct Npc
+    public class Npc
     {
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         public NpcEntity entityPrefab;
@@ -18,5 +19,16 @@ namespace MultiplayerARPG
         public BaseNpcDialog startDialog;
         [Tooltip("It will use `graph` start dialog if this is not empty")]
         public NpcDialogGraph graph;
+
+#if UNITY_EDITOR
+        public bool ValidateAddressableHashAssetID()
+        {
+#if !DISABLE_ADDRESSABLES
+            return AssetReferenceLiteNetLibIdentity.ValidateHashAssetID(addressableEntityPrefab);
+#else
+            return false;
+#endif
+        }
+#endif
     }
 }

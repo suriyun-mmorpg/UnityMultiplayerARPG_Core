@@ -3,7 +3,13 @@ using Insthync.AddressableAssetTools;
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -49,6 +55,9 @@ namespace MultiplayerARPG
             SpatialObjectContainer.Remove(_subscribeHandler);
             _subscribeHandler?.Clean();
             _subscribeHandler = null;
+#if UNITY_EDITOR
+            EditorApplication.delayCall -= DelayedMarkDirty;
+#endif
         }
 
         protected virtual void LateUpdate()
@@ -60,6 +69,63 @@ namespace MultiplayerARPG
             if (_subscribeHandler.SpatialObjectEnabled)
                 _subscribeHandler.Update(Time.deltaTime, noPlayerNearbyDestroyDelay);
         }
+
+        public virtual bool Validate()
+        {
+            return false;
+        }
+
+#if UNITY_EDITOR
+        protected virtual void OnValidate()
+        {
+            if (Validate())
+            {
+                MarkDirty();
+                Debug.Log($"Has changes on validate game spawn area {name}", this);
+            }
+        }
+
+        private bool _queuedDirty;
+        private void MarkDirty()
+        {
+            if (_queuedDirty)
+                return;
+            _queuedDirty = true;
+            EditorApplication.delayCall += DelayedMarkDirty;
+        }
+
+        private void DelayedMarkDirty()
+        {
+            _queuedDirty = false;
+            if (this == null)
+                return;
+            EditorApplication.delayCall -= DelayedMarkDirty;
+            EditorUtility.SetDirty(this);
+            if (gameObject.scene.IsValid())
+                EditorSceneManager.MarkSceneDirty(gameObject.scene);
+            PrefabStage prefabstage = PrefabStageUtility.GetCurrentPrefabStage();
+            if (prefabstage != null)
+                EditorSceneManager.MarkSceneDirty(prefabstage.scene);
+        }
+
+        public static void s_ValidateAllGameSpawnAreas()
+        {
+            for (int i = 0; i < SceneManager.loadedSceneCount; ++i)
+            {
+                Scene loadedScene = SceneManager.GetSceneAt(i);
+                GameObject[] rootObjects = loadedScene.GetRootGameObjects();
+                for (int j = 0; j < rootObjects.Length; ++j)
+                {
+                    GameSpawnArea[] area = rootObjects[j].GetComponentsInChildren<GameSpawnArea>(true);
+                    for (int k = 0; k < area.Length; ++k)
+                    {
+                        area[k].OnValidate();
+                    }
+                }
+                rootObjects = null;
+            }
+        }
+#endif
 
         public int GetRandomedSpawnLevel()
         {
@@ -176,6 +242,50 @@ namespace MultiplayerARPG
         protected float secondsCounter = 0f;
         protected List<SpawnPendingData> _pending = new List<SpawnPendingData>();
         protected List<SpawnPendingData> _unableToSpawns = new List<SpawnPendingData>();
+
+        public override bool Validate()
+        {
+            bool hasChanges = false;
+#if UNITY_EDITOR
+            hasChanges |= ValidateAddressableHashAssetIDs();
+#endif
+            return hasChanges;
+        }
+
+#if UNITY_EDITOR
+        public bool ValidateAddressableHashAssetIDs()
+        {
+            bool hasChanges = false;
+#if !DISABLE_ADDRESSABLES
+            AddressablePrefab tempRef;
+            if (addressablePrefab != null)
+            {
+                tempRef = addressablePrefab;
+                if (tempRef.ValidateHashAssetID())
+                {
+                    addressablePrefab = tempRef;
+                    hasChanges |= true;
+                }
+            }
+
+            if (spawningPrefabs != null && spawningPrefabs.Count > 0)
+            {
+                for (int i = 0; i < spawningPrefabs.Count; ++i)
+                {
+                    SpawnPrefabData data = spawningPrefabs[i];
+                    tempRef = data.addressablePrefab;
+                    if (tempRef.ValidateHashAssetID())
+                    {
+                        data.addressablePrefab = tempRef;
+                        spawningPrefabs[i] = data;
+                        hasChanges |= true;
+                    }
+                }
+            }
+#endif
+            return hasChanges;
+        }
+#endif
 
         protected override void OnDestroy()
         {

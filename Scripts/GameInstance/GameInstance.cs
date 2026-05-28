@@ -11,6 +11,11 @@ using UnityEngine.AddressableAssets;
 #endif
 using UnityEngine.Rendering;
 using UnityEngine.Serialization;
+
+#if UNITY_EDITOR
+using UnityEditor;
+using UnityEditor.SceneManagement;
+#endif
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
 using UnityEngine.Purchasing;
 #endif
@@ -20,7 +25,7 @@ namespace MultiplayerARPG
     public enum InventorySystem
     {
         Simple,
-        LimitSlots,
+        LimitSlots,e
     }
 
     public enum CurrentPositionSaveMode
@@ -1603,8 +1608,68 @@ namespace MultiplayerARPG
             GameDatabase.LoadData(this).Forget();
         }
 
+#if UNITY_EDITOR
+        [ContextMenu("Force Validate")]
+        public virtual bool Validate()
+        {
+            bool hasChanges = false;
+#if !DISABLE_ADDRESSABLES
+            hasChanges |= AssetReferenceLiteNetLibIdentity.ValidateHashAssetID(addressableItemDropEntityPrefab);
+            hasChanges |= AssetReferenceLiteNetLibIdentity.ValidateHashAssetID(addressableExpDropEntityPrefab);
+            hasChanges |= AssetReferenceLiteNetLibIdentity.ValidateHashAssetID(addressableGoldDropEntityPrefab);
+            hasChanges |= AssetReferenceLiteNetLibIdentity.ValidateHashAssetID(addressableWarpPortalEntityPrefab);
+            hasChanges |= AssetReferenceLiteNetLibIdentity.ValidateHashAssetID(addressablePlayerCorpsePrefab);
+            hasChanges |= AssetReferenceLiteNetLibIdentity.ValidateHashAssetID(addressableMonsterCorpsePrefab);
+#endif
+            if (npcDatabase != null)
+                hasChanges |= npcDatabase.ValidateAddressableHashAssetIDs();
+            if (warpPortalDatabase != null)
+                hasChanges |= warpPortalDatabase.ValidateAddressableHashAssetIDs();
+            if (homeScene != null)
+                hasChanges |= homeScene.Validate();
+            if (homeMobileScene != null)
+                hasChanges |= homeMobileScene.Validate();
+            if (homeConsoleScene != null)
+                hasChanges |= homeConsoleScene.Validate();
+            return hasChanges;
+        }
+
+        private void OnValidate()
+        {
+            MigrateLevelUpEffect();
+            if (Validate())
+                MarkDirty();
+        }
+
+        private bool _queuedDirty;
+        private void MarkDirty()
+        {
+            if (_queuedDirty)
+                return;
+            _queuedDirty = true;
+            EditorApplication.delayCall += DelayedMarkDirty;
+        }
+
+        private void DelayedMarkDirty()
+        {
+            _queuedDirty = false;
+            if (this == null)
+                return;
+            EditorApplication.delayCall -= DelayedMarkDirty;
+            EditorUtility.SetDirty(this);
+            if (gameObject.scene.IsValid())
+                EditorSceneManager.MarkSceneDirty(gameObject.scene);
+            PrefabStage prefabstage = PrefabStageUtility.GetCurrentPrefabStage();
+            if (prefabstage != null)
+                EditorSceneManager.MarkSceneDirty(prefabstage.scene);
+        }
+#endif
+
         protected virtual void OnDestroy()
         {
+#if UNITY_EDITOR
+            EditorApplication.delayCall -= DelayedMarkDirty;
+#endif
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 

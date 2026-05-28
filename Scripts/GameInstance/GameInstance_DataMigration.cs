@@ -13,11 +13,6 @@ namespace MultiplayerARPG
 {
     public partial class GameInstance
     {
-        private void OnValidate()
-        {
-            MigrateLevelUpEffect();
-        }
-
         private void MigrateLevelUpEffect()
         {
 #if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES

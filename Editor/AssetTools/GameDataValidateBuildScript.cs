@@ -22,7 +22,7 @@ namespace MultiplayerARPG
             AddressableAssetSettings settings = AddressableAssetSettingsDefaultObject.Settings;
             if (settings != null)
             {
-                Debug.Log("Validating game data's hash asset ID from addressable assets");
+                Debug.Log("Validating game data before building Addressables...");
                 foreach (AddressableAssetGroup group in settings.groups)
                 {
                     foreach (AddressableAssetEntry entry in group.entries)
@@ -32,8 +32,19 @@ namespace MultiplayerARPG
                             if (gameData.ValidateHashAssetID())
                                 EditorUtility.SetDirty(gameData);
                         }
+                        if (entry.MainAsset is BaseGameDatabase gameDatabase)
+                        {
+                            if (gameDatabase.Validate())
+                                EditorUtility.SetDirty(gameDatabase);
+                        }
+                        if (entry.MainAsset is GameObject gameObject)
+                        {
+                            if (AssetEditorMenu.ValidatePrefab(gameObject))
+                                EditorUtility.SetDirty(gameObject);
+                        }
                     }
                 }
+                Debug.Log("Game data validation completed.");
             }
             // Continue with the normal build process
             return base.BuildDataImplementation<TResult>(builderInput);
