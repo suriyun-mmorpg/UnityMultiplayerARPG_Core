@@ -24,9 +24,10 @@ namespace MultiplayerARPG
         }
 
 #if UNITY_EDITOR
-        private void OnValidate()
+        protected override void OnValidate()
         {
             MigrateAsset();
+            base.OnValidate();
         }
 #endif
 
