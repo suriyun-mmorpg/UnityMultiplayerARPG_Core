@@ -32,10 +32,12 @@ namespace MultiplayerARPG
         public CashShopDatabase cashShopDatabase;
         public static readonly Dictionary<int, CashShopItem> CashShopItems = new Dictionary<int, CashShopItem>();
         public static readonly Dictionary<int, CashPackage> CashPackages = new Dictionary<int, CashPackage>();
+#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
         public static readonly Dictionary<string, PendingOrder> PendingOrders = new Dictionary<string, PendingOrder>();
         public static List<ProductDefinition> ProductDefinitions { get; private set; } = null;
         public static List<Product> FetchedProducts { get; private set; } = null;
         public static Orders FetchedOrders { get; private set; } = null;
+#endif
         private bool _productFetched = false;
         private bool _purchaseFetched = false;
 
@@ -130,7 +132,7 @@ namespace MultiplayerARPG
         {
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             // Only say we are initialized if both the Purchasing references are set.
-            return StoreController != null && CatalogProvider != null;
+            return StoreController != null && CatalogProvider != null && _productFetched && _purchaseFetched;
 #else
             return false;
 #endif
@@ -278,7 +280,7 @@ namespace MultiplayerARPG
             PurchaseResult(false, errorMessage);
         }
 #endif
-        #endregion
+		#endregion
 
         #region IAP Actions
         public void Purchase(string productId)
