@@ -23,6 +23,10 @@ namespace MultiplayerARPG
         public const int VALIDATE_GAME_DATA_AND_PREFABS_ORDER = 13;
         public const string VALIDATE_OPENED_SCENES_MENU = "MMORPG KIT/Asset Tools/Validate Opened Scenes";
         public const int VALIDATE_OPENED_SCENES_ORDER = 14;
+        public const string BUILD_SETUP_DISABLE_IAP_MENU = "MMORPG KIT/IAP/Disable IAP";
+        public const int BUILD_SETUP_DISABLE_IAP_ORDER = 15;
+        public const string BUILD_SETUP_ENABLE_IAP_MENU = "MMORPG KIT/IAP/Enable IAP";
+        public const int BUILD_SETUP_ENABLE_IAP_ORDER = 16;
         public const string BAKE_SERVER_SCENE_MENU = "MMORPG KIT/Scenes/Bake Server Scene";
         public const int BAKE_SERVER_SCENE_ORDER = 20;
         #endregion

@@ -83,7 +83,7 @@ namespace MultiplayerARPG
                     Logging.Log(LogTag, "[" + TAG_INIT + "]: Adding product " + productCatalogItem.id + " type " + productCatalogItem.type.ToString());
                     if (productCatalogItem.allStoreIDs.Count > 0)
                     {
-                        var ids = new IDs();
+                        var ids = new StoreSpecificIds();
                         foreach (var storeID in productCatalogItem.allStoreIDs)
                         {
                             ids.Add(storeID.id, storeID.store);

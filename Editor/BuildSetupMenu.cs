@@ -53,10 +53,24 @@ namespace MultiplayerARPG
         }
 
         [MenuItem(EditorMenuConsts.BUILD_SETUP_ENABLE_ADDRESSABLES_MENU, false, EditorMenuConsts.BUILD_SETUP_ENABLE_ADDRESSABLES_ORDER)]
-        public static void BuildSetupEnaableAddressables()
+        public static void BuildSetupEnableAddressables()
         {
             RemoveFromDefines("DISABLE_ADDRESSABLES");
             EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for addressables enabling is done, you will have wait a bit for compiling", "Ok");
+        }
+
+        [MenuItem(EditorMenuConsts.BUILD_SETUP_DISABLE_IAP_MENU, false, EditorMenuConsts.BUILD_SETUP_DISABLE_IAP_ORDER)]
+        public static void BuildSetupDisableIAP()
+        {
+            RemoveFromDefines("ENABLE_PURCHASING");
+            EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for IAP disabling is done, you will have wait a bit for compiling", "Ok");
+        }
+
+        [MenuItem(EditorMenuConsts.BUILD_SETUP_ENABLE_IAP_MENU, false, EditorMenuConsts.BUILD_SETUP_ENABLE_IAP_ORDER)]
+        public static void BuildSetupEnableIAP()
+        {
+            AddToDefines("ENABLE_PURCHASING");
+            EditorUtility.DisplayDialog("Scripting Define Symbols Setup", "Scripting Define Symbols setup for IAP enabling is done, you will have wait a bit for compiling", "Ok");
         }
 
         private static void AddToDefines(string symbol)
