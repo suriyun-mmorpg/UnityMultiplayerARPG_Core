@@ -1,11 +1,13 @@
 ﻿using LiteNetLib.Utils;
+using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
     public struct ResponseCashPackageBuyValidationMessage : INetSerializable
     {
         public UITextKeys message;
-        public int dataId;
+        public List<CashPackageItemInfo> items;
+        public string transactionID;
         public int cash;
 
         public void Deserialize(NetDataReader reader)
@@ -13,7 +15,8 @@ namespace MultiplayerARPG
             message = (UITextKeys)reader.GetPackedUShort();
             if (!message.IsError())
             {
-                dataId = reader.GetPackedInt();
+                items = reader.GetList<CashPackageItemInfo>();
+                transactionID = reader.GetString();
                 cash = reader.GetPackedInt();
             }
         }
@@ -23,7 +26,8 @@ namespace MultiplayerARPG
             writer.PutPackedUShort((ushort)message);
             if (!message.IsError())
             {
-                writer.PutPackedInt(dataId);
+                writer.PutList(items);
+                writer.Put(transactionID);
                 writer.PutPackedInt(cash);
             }
         }

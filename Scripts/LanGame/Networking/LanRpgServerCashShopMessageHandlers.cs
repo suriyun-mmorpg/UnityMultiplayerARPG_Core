@@ -202,19 +202,18 @@ namespace MultiplayerARPG
                 });
                 return default;
             }
-            if (!GameInstance.CashPackages.TryGetValue(request.dataId, out CashPackage cashPackage))
+            foreach (var item in request.items)
             {
-                result.InvokeError(new ResponseCashPackageBuyValidationMessage()
-                {
-                    message = UITextKeys.UI_ERROR_CASH_PACKAGE_NOT_FOUND,
-                });
-                return default;
+                if (!GameInstance.CashPackages.TryGetValue(item.dataId, out CashPackage cashPackage))
+                    continue;
+                Logging.LogError($"Unable to get cash package {item.dataId}, (quantity: {item.quantity}) while IAP validation");
+                playerCharacter.UserCash = playerCharacter.UserCash.Increase(cashPackage.CashAmount * item.quantity);
             }
-            playerCharacter.UserCash = playerCharacter.UserCash.Increase(cashPackage.CashAmount);
 
             result.InvokeSuccess(new ResponseCashPackageBuyValidationMessage()
             {
-                dataId = request.dataId,
+                items = request.items,
+                transactionID = request.transactionID,
                 cash = playerCharacter.UserCash,
             });
             return default;

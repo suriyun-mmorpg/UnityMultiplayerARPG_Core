@@ -16,9 +16,6 @@ using UnityEngine.Serialization;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 #endif
-#if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
-using UnityEngine.Purchasing;
-#endif
 
 namespace MultiplayerARPG
 {

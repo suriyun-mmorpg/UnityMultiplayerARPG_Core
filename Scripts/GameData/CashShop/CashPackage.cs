@@ -45,9 +45,9 @@ namespace MultiplayerARPG
         {
             get
             {
-                if (GameInstance.StoreController == null || GameInstance.StoreController.products == null)
+                if (GameInstance.FetchedProducts == null)
                     return null;
-                return GameInstance.StoreController.products.WithID(productId);
+                return GameInstance.StoreController.GetProductById(productId);
             }
         }
 
