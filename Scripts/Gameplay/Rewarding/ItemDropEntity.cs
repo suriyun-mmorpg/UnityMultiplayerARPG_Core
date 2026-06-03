@@ -7,7 +7,6 @@ using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
-using Unity.Entities;
 
 #if UNITY_EDITOR
 using UnityEditor;
