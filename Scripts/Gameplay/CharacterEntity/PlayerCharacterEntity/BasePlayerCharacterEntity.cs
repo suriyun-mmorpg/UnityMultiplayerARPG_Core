@@ -144,33 +144,36 @@ namespace MultiplayerARPG
             // Setup relates elements
             if (isOwnerClient)
             {
-                BasePlayerCharacterController controllerPrefab = null;
+                if (BasePlayerCharacterController.Singleton == null)
+                {
+                    BasePlayerCharacterController controllerPrefab = null;
 #if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
-                if (CurrentGameInstance.DefaultControllerPrefab != null)
-                {
-                    controllerPrefab = CurrentGameInstance.DefaultControllerPrefab;
-                }
+                    if (CurrentGameInstance.DefaultControllerPrefab != null)
+                    {
+                        controllerPrefab = CurrentGameInstance.DefaultControllerPrefab;
+                    }
 #endif
-                if (controllerPrefab != null)
-                {
-                    // Do nothing, just have it to make it able to compile properly (it have compile condition above)
-                }
+                    if (controllerPrefab != null)
+                    {
+                        // Do nothing, just have it to make it able to compile properly (it have compile condition above)
+                    }
 #if !DISABLE_ADDRESSABLES
-                else if (CurrentGameInstance.AddressableDefaultControllerPrefab.IsDataValid())
-                {
-                    controllerPrefab = await CurrentGameInstance.AddressableDefaultControllerPrefab.GetOrLoadAssetAsync<BasePlayerCharacterController>();
-                }
+                    else if (CurrentGameInstance.AddressableDefaultControllerPrefab.IsDataValid())
+                    {
+                        controllerPrefab = await CurrentGameInstance.AddressableDefaultControllerPrefab.GetOrLoadAssetAsync<BasePlayerCharacterController>();
+                    }
 #endif
-                else
-                {
-                    Logging.LogWarning(ToString(), "`Controller Prefab` is empty so it cannot be instantiated");
-                    controllerPrefab = null;
-                }
-                if (controllerPrefab != null)
-                {
-                    BasePlayerCharacterController controller = Instantiate(controllerPrefab);
-                    controller.PlayingCharacterEntity = this;
-                    InstantiatedObjects.Add(controller.gameObject);
+                    else
+                    {
+                        Logging.LogWarning(ToString(), "`Controller Prefab` is empty so it cannot be instantiated");
+                        controllerPrefab = null;
+                    }
+                    if (controllerPrefab != null)
+                    {
+                        BasePlayerCharacterController controller = Instantiate(controllerPrefab);
+                        controller.PlayingCharacterEntity = this;
+                        InstantiatedObjects.Add(controller.gameObject);
+                    }
                 }
 #if !DISABLE_ADDRESSABLES
                 // Instantiates owning objects
