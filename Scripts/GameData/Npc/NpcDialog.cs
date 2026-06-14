@@ -25,7 +25,7 @@ namespace MultiplayerARPG
         [Output(dynamicPortList = true, connectionType = ConnectionType.Override)]
         public NpcDialogMenu[] menus;
         [Tooltip("Requirement for `SaveRespawnPoint` and `Warp` dialog confirmation")]
-        public NpcDialogConfirmRequirement confirmRequirement;
+        public NpcDialogConfirmRequirement confirmRequirement = new NpcDialogConfirmRequirement();
 
         // Quest
         public Quest quest;

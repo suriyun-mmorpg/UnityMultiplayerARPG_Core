@@ -5,7 +5,7 @@ using UnityEngine.Serialization;
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct NpcDialogCondition
+    public class NpcDialogCondition
     {
         public NpcDialogConditionType conditionType;
         [StringShowConditional(nameof(conditionType), new string[] { nameof(NpcDialogConditionType.PlayerCharacterIs) })]

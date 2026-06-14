@@ -3,13 +3,13 @@
 namespace MultiplayerARPG
 {
     [System.Serializable]
-    public struct NpcDialogConfirmRequirement
+    public class NpcDialogConfirmRequirement
     {
-        public int gold;
+        public int gold = 0;
         [ArrayElementTitle("currency")]
-        public CurrencyAmount[] currencyAmounts;
+        public CurrencyAmount[] currencyAmounts = new CurrencyAmount[0];
         [ArrayElementTitle("item")]
-        public ItemAmount[] itemAmounts;
+        public ItemAmount[] itemAmounts = new ItemAmount[0];
 
         public bool HasConfirmConditions()
         {
