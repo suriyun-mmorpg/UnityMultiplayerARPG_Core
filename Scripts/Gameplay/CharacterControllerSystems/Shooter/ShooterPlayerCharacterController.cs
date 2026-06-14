@@ -301,7 +301,7 @@ namespace MultiplayerARPG
         public BaseWeaponAbility WeaponAbility { get; protected set; }
         public WeaponAbilityState WeaponAbilityState { get; set; }
 
-        public ValueOverride<ControllerMode> ForceControllerMode { get; private set; } = new ValueOverride<ControllerMode>();
+        public ValueOverride<ControllerMode> OverrideControllerMode { get; private set; } = new ValueOverride<ControllerMode>();
         public ControllerMode Mode
         {
             get
@@ -311,7 +311,7 @@ namespace MultiplayerARPG
                     // If view mode is fps, controls type must be combat
                     return ControllerMode.Combat;
                 }
-                if (ForceControllerMode.TryGetValue(out ControllerMode overrideMode))
+                if (OverrideControllerMode.TryGetValue(out ControllerMode overrideMode))
                     return overrideMode;
                 return mode;
             }
