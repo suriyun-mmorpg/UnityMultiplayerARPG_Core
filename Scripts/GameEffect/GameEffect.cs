@@ -102,7 +102,6 @@ namespace MultiplayerARPG
 
         public override void PushBack()
         {
-            CacheTransform.SetParent(null);
             if (ObjectPrefab != null)
             {
                 PoolSystem.PushBack(this);
