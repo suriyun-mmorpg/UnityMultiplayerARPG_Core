@@ -159,6 +159,7 @@ namespace MultiplayerARPG
                 return AssignedCameraRotationSpeedScale;
             }
         }
+
         public ValueOverride<bool> OverrideEnableWallHitSpring { get; } = new ValueOverride<bool>();
         public abstract bool AssignedEnableWallHitSpring { get; set; }
         public bool EnableWallHitSpring
