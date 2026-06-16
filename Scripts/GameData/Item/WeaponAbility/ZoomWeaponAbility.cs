@@ -16,7 +16,6 @@ namespace MultiplayerARPG
         [FormerlySerializedAs("rotationSpeedScaleWhileZooming")]
         public float cameraRotationSpeedScaleWhileZooming = 0.5f;
         public string cameraRotationSpeedScaleSaveKey = string.Empty;
-        public string gyroscopeCameraRotationSpeedScaleSaveKey = string.Empty;
         public Sprite zoomCrosshair;
         public bool hideCrosshairWhileZooming;
         public bool shouldDeactivateOnReload;
