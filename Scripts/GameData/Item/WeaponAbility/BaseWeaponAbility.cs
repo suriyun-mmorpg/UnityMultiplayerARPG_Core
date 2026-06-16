@@ -20,7 +20,7 @@
         public virtual void Desetup() { }
         public virtual void ForceDeactivated() { }
         public abstract void OnPreActivate();
-        public abstract WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime);
+        public abstract WeaponAbilityState UpdateActivation(WeaponAbilityState state, bool isBlockController, float deltaTime);
         public abstract void OnPreDeactivate();
     }
 }

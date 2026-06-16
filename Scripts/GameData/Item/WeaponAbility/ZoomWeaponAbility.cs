@@ -29,8 +29,6 @@ namespace MultiplayerARPG
         private float _currentZoomFov;
         [System.NonSerialized]
         private IZoomWeaponAbilityController _zoomWeaponAbilityController;
-        [System.NonSerialized]
-        private bool _shouldActivateAfterSprint = false;
 
         public override bool ShouldDeactivateOnReload { get => shouldDeactivateOnReload; }
 
@@ -61,7 +59,6 @@ namespace MultiplayerARPG
 
         public override void OnPreActivate()
         {
-            _shouldActivateAfterSprint = false;
             if (zoomCrosshair)
             {
                 _zoomWeaponAbilityController.SetZoomCrosshairSprite(zoomCrosshair);
@@ -75,7 +72,6 @@ namespace MultiplayerARPG
 
         public override void OnPreDeactivate()
         {
-            _shouldActivateAfterSprint = false;
             _currentZoomInterpTime = 0f;
             _zoomWeaponAbilityController.OverrideCameraFov.Remove(this);
             _zoomWeaponAbilityController.OverrideIsZoomAimming.Remove(this);
@@ -83,26 +79,18 @@ namespace MultiplayerARPG
             OnDeactivateZoomAbility?.Invoke();
         }
 
-        public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime)
+        public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, bool isBlockController, float deltaTime)
         {
-            bool isSprinting = _controller.PlayingCharacterEntity.ExtraMovementState == ExtraMovementState.IsSprinting;
             switch (state)
             {
                 case WeaponAbilityState.Deactivated:
-                    // Deactivated, do nothing
-                    if (!isSprinting && _shouldActivateAfterSprint)
-                    {
-                        OnPreActivate();
-                        state = WeaponAbilityState.Activating;
-                    }
                     return state;
                 case WeaponAbilityState.Activated:
                     _zoomWeaponAbilityController.OverrideCameraRotationSpeedScale.Set(this, CameraRotationSpeedScale, 0);
-                    if (isSprinting)
+                    if (isBlockController || GameInstance.PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
                     {
                         OnPreDeactivate();
-                        _shouldActivateAfterSprint = true;
-                        return WeaponAbilityState.Deactivating;
+                        state = WeaponAbilityState.Deactivating;
                     }
                     return state;
                 case WeaponAbilityState.Deactivating:
@@ -126,12 +114,6 @@ namespace MultiplayerARPG
                         // Zooming updated, change state to activated
                         _currentZoomInterpTime = 0;
                         state = WeaponAbilityState.Activated;
-                    }
-                    if (isSprinting)
-                    {
-                        OnPreDeactivate();
-                        _shouldActivateAfterSprint = true;
-                        state = WeaponAbilityState.Deactivating;
                     }
                     break;
             }

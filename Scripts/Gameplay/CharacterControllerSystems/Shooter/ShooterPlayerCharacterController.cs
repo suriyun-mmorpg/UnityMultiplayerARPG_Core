@@ -90,6 +90,8 @@ namespace MultiplayerARPG
         protected string firstPersonCameraRotationSpeedScaleSaveKey = "1ST_PERSON_CAMERA_SCALE";
         [SerializeField]
         protected float sprintDelayAfterActions = 1f;
+        [SerializeField]
+        protected bool forceTpsWhenUnderWater = true;
 
         [Header("TPS Settings")]
         [SerializeField]
@@ -273,6 +275,10 @@ namespace MultiplayerARPG
                 {
                     return true;
                 }
+                if (forceTpsWhenUnderWater && PlayingCharacterEntity != null && PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
+                {
+                    return true;
+                }
                 return false;
             }
         }
@@ -284,8 +290,8 @@ namespace MultiplayerARPG
                 {
                     return true;
                 }
-                if (WeaponAbility is ZoomWeaponAbility zoomWeaponAbility && zoomWeaponAbility != null &&
-                    (WeaponAbilityState == WeaponAbilityState.Activating || WeaponAbilityState == WeaponAbilityState.Activated))
+                if (WeaponAbilityState.IsActivate() &&
+                    WeaponAbility is ZoomWeaponAbility)
                 {
                     return true;
                 }
@@ -844,7 +850,6 @@ namespace MultiplayerARPG
             {
                 // Clear movement inputs
                 _moveDirection = Vector3.zero;
-                DeactivateWeaponAbility();
             }
             else
             {
@@ -1071,7 +1076,7 @@ namespace MultiplayerARPG
                             ViewMode = ShooterControllerViewMode.Tps;
                             break;
                     }
-                    DisableZoomAbility();
+                    DeactivateZoomAbility();
                 }
                 if (InputManager.GetButtonDown("SwitchViewModeTpsFps"))
                 {
@@ -1085,14 +1090,14 @@ namespace MultiplayerARPG
                             ViewMode = ShooterControllerViewMode.Tps;
                             break;
                     }
-                    DisableZoomAbility();
+                    DeactivateZoomAbility();
                 }
                 if (InputManager.GetButtonDown("SwitchViewModeTps"))
                 {
                     if (ViewMode != ShooterControllerViewMode.Tps)
                     {
                         ViewMode = ShooterControllerViewMode.Tps;
-                        DisableZoomAbility();
+                        DeactivateZoomAbility();
                     }
                 }
                 if (InputManager.GetButtonDown("SwitchViewModeShoulder"))
@@ -1105,14 +1110,14 @@ namespace MultiplayerARPG
                     {
                         ViewMode = ShooterControllerViewMode.Tps;
                     }
-                    DisableZoomAbility();
+                    DeactivateZoomAbility();
                 }
                 if (InputManager.GetButtonDown("SwitchViewModeFps"))
                 {
                     if (ViewMode != ShooterControllerViewMode.Fps)
                     {
                         ViewMode = ShooterControllerViewMode.Fps;
-                        DisableZoomAbility();
+                        DeactivateZoomAbility();
                     }
                 }
             }
@@ -1169,16 +1174,26 @@ namespace MultiplayerARPG
             }
 
             // Update weapon ability here to make sure it able to make changes to view mode before apply it
-            UpdateWeaponAbilityActivation(tempDeltaTime);
+            UpdateWeaponAbilityActivation(isBlockController, tempDeltaTime);
 
             // Apply view mode updating
             if (_dirtyViewMode != ActiveViewMode)
+            {
+                if (ActiveViewMode != ShooterControllerViewMode.Fps)
+                    DeactivateZoomAbility();
                 UpdateViewMode();
+            }
+            else
+            {
+                if (IsForceTpsViewMode)
+                    DeactivateZoomAbility();
+            }
         }
 
-        protected virtual void DisableZoomAbility()
+        protected virtual void DeactivateZoomAbility()
         {
-            if (WeaponAbility is ZoomWeaponAbility)
+            if (WeaponAbilityState.IsActivate() &&
+                WeaponAbility is ZoomWeaponAbility)
             {
                 WeaponAbility.ForceDeactivated();
                 WeaponAbilityState = WeaponAbilityState.Deactivated;
@@ -2027,20 +2042,19 @@ namespace MultiplayerARPG
             if (WeaponAbility == null)
                 return;
 
-            if (WeaponAbilityState == WeaponAbilityState.Activated ||
-                WeaponAbilityState == WeaponAbilityState.Activating)
+            if (WeaponAbilityState.IsActivate())
                 return;
 
             WeaponAbility.OnPreActivate();
             WeaponAbilityState = WeaponAbilityState.Activating;
         }
 
-        protected virtual void UpdateWeaponAbilityActivation(float deltaTime)
+        protected virtual void UpdateWeaponAbilityActivation(bool isBlockController, float deltaTime)
         {
             if (WeaponAbility == null)
                 return;
 
-            WeaponAbilityState = WeaponAbility.UpdateActivation(WeaponAbilityState, deltaTime);
+            WeaponAbilityState = WeaponAbility.UpdateActivation(WeaponAbilityState, isBlockController, deltaTime);
         }
 
         protected virtual void DeactivateWeaponAbility()
@@ -2048,8 +2062,7 @@ namespace MultiplayerARPG
             if (WeaponAbility == null)
                 return;
 
-            if (WeaponAbilityState == WeaponAbilityState.Deactivated ||
-                WeaponAbilityState == WeaponAbilityState.Deactivating)
+            if (WeaponAbilityState.IsDeactivate())
                 return;
 
             WeaponAbility.OnPreDeactivate();
