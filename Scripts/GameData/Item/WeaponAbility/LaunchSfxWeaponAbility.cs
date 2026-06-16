@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
         }
 
-        public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, float deltaTime)
+        public override WeaponAbilityState UpdateActivation(WeaponAbilityState state, bool isBlockController, float deltaTime)
         {
             return WeaponAbilityState.Deactivated;
         }
