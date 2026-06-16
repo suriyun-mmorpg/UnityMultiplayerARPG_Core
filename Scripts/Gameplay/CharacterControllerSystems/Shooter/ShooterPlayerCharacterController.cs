@@ -90,8 +90,6 @@ namespace MultiplayerARPG
         protected string firstPersonCameraRotationSpeedScaleSaveKey = "1ST_PERSON_CAMERA_SCALE";
         [SerializeField]
         protected float sprintDelayAfterActions = 1f;
-        [SerializeField]
-        protected float walkDelayAfterActions = 1f;
 
         [Header("TPS Settings")]
         [SerializeField]
@@ -955,49 +953,33 @@ namespace MultiplayerARPG
                         ClientGenericActions.ClientReceiveGameMessage(UITextKeys.UI_ERROR_UNABLE_TO_STAND);
                     }
                 }
-                // Sprinting
-                if (PlayingCharacterEntity.MovementState.HasDirectionMovement() &&
-                    Time.unscaledTime - _lastActionTime > sprintDelayAfterActions)
+                if (_extraMovementState.IsStanding())
                 {
-                    if ((_extraMovementState == ExtraMovementState.None ||
-                        _extraMovementState == ExtraMovementState.IsWalking) &&
-                        DetectExtraActive("Sprint", sprintActiveMode, isBlockController, ref _toggleSprintOn))
+                    if (PlayingCharacterEntity.MovementState.HasDirectionMovement())
                     {
-                        _extraMovementState = ExtraMovementState.IsSprinting;
+                        if (DetectExtraActive("Sprint", sprintActiveMode, isBlockController, ref _toggleSprintOn))
+                        {
+                            _extraMovementState = ExtraMovementState.IsSprinting;
+                            _toggleWalkOn = false;
+                            _toggleCrouchOn = false;
+                            _toggleCrawlOn = false;
+                        }
+                        else if (DetectExtraActive("Walk", walkActiveMode, isBlockController, ref _toggleWalkOn))
+                        {
+                            _extraMovementState = ExtraMovementState.IsWalking;
+                            _toggleSprintOn = false;
+                            _toggleCrouchOn = false;
+                            _toggleCrawlOn = false;
+                        }
+                    }
+                    else
+                    {
+                        _extraMovementState = ExtraMovementState.None;
+                        _toggleSprintOn = false;
                         _toggleWalkOn = false;
                         _toggleCrouchOn = false;
                         _toggleCrawlOn = false;
                     }
-                }
-                else if (_extraMovementState == ExtraMovementState.IsSprinting)
-                {
-                    _extraMovementState = ExtraMovementState.None;
-                    _toggleSprintOn = false;
-                    _toggleWalkOn = false;
-                    _toggleCrouchOn = false;
-                    _toggleCrawlOn = false;
-                }
-                // Walking
-                if (PlayingCharacterEntity.MovementState.HasDirectionMovement() &&
-                    Time.unscaledTime - _lastActionTime > walkDelayAfterActions)
-                {
-                    if ((_extraMovementState == ExtraMovementState.None ||
-                        _extraMovementState == ExtraMovementState.IsWalking) &&
-                        DetectExtraActive("Walk", walkActiveMode, isBlockController, ref _toggleWalkOn))
-                    {
-                        _extraMovementState = ExtraMovementState.IsWalking;
-                        _toggleSprintOn = false;
-                        _toggleCrouchOn = false;
-                        _toggleCrawlOn = false;
-                    }
-                }
-                else if (_extraMovementState == ExtraMovementState.IsWalking)
-                {
-                    _extraMovementState = ExtraMovementState.None;
-                    _toggleSprintOn = false;
-                    _toggleWalkOn = false;
-                    _toggleCrouchOn = false;
-                    _toggleCrawlOn = false;
                 }
             }
             else
@@ -1061,7 +1043,15 @@ namespace MultiplayerARPG
             }
 
             PlayingCharacterEntity.KeyMovement(_moveDirection, _movementState);
-            PlayingCharacterEntity.SetExtraMovementState(_extraMovementState);
+            ExtraMovementState validatedExtraMovementState = _extraMovementState;
+            switch (validatedExtraMovementState)
+            {
+                case ExtraMovementState.IsSprinting:
+                    if (Time.unscaledTime - _lastActionTime <= sprintDelayAfterActions || IsZoomAimming)
+                        validatedExtraMovementState = ExtraMovementState.None;
+                    break;
+            }
+            PlayingCharacterEntity.SetExtraMovementState(validatedExtraMovementState);
             PlayingCharacterEntity.SetSmoothTurnSpeed(0f);
 
             // View mode switching
