@@ -192,7 +192,7 @@ namespace MultiplayerARPG
 #if !UNITY_SERVER
                 // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
                 if (isClient)
-                    PlayProjectileEffect(damagePosition, damageRotation, projectileDistance, impactEffectsData);
+                    PlayProjectileEffectAtEffectTransform(attacker, isLeftHand, damagePosition, damageDirection, damageRotation, projectileDistance, impactEffectsData);
 #endif
                 return default;
             }
@@ -304,19 +304,24 @@ namespace MultiplayerARPG
 #if !UNITY_SERVER
             // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
             if (isClient)
-            {
-                if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
-                {
-                    Vector3 targetPosition = damagePosition + (damageDirection * projectileDistance);
-                    Transform effectTransform = GetDamageEffectTransform(attacker, isLeftHand);
-                    damagePosition = effectTransform.position;
-                    damageRotation = Quaternion.Euler(Quaternion.LookRotation(targetPosition - damagePosition).eulerAngles);
-                }
-                PlayProjectileEffect(damagePosition, damageRotation, projectileDistance, impactEffectsData);
-            }
+                PlayProjectileEffectAtEffectTransform(attacker, isLeftHand, damagePosition, damageDirection, damageRotation, projectileDistance, impactEffectsData);
 #endif
             return default;
         }
+
+#if !UNITY_SERVER
+        private void PlayProjectileEffectAtEffectTransform(BaseCharacterEntity attacker, bool isLeftHand, Vector3 damagePosition, Vector3 damageDirection, Quaternion damageRotation, float projectileDistance, List<ImpactEffectPlayingData> impactEffectsData)
+        {
+            if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
+            {
+                Vector3 targetPosition = damagePosition + (damageDirection * projectileDistance);
+                Transform effectTransform = GetDamageEffectTransform(attacker, isLeftHand);
+                damagePosition = effectTransform.position;
+                damageRotation = Quaternion.Euler(Quaternion.LookRotation(targetPosition - damagePosition).eulerAngles);
+            }
+            PlayProjectileEffect(damagePosition, damageRotation, projectileDistance, impactEffectsData);
+        }
+#endif
 
 #if !UNITY_SERVER
         private async void PlayProjectileEffect(Vector3 damagePosition, Quaternion damageRotation, float projectileDistance, List<ImpactEffectPlayingData> impactEffectsData)
