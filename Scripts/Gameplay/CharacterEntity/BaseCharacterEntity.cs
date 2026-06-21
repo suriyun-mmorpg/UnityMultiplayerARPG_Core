@@ -698,7 +698,12 @@ namespace MultiplayerARPG
 
         public AimPosition GetAttackAimPosition(ref bool isLeftHand, Vector3 targetPosition)
         {
-            return GetAttackAimPosition(this.GetAvailableWeaponDamageInfo(ref isLeftHand), isLeftHand, targetPosition);
+            return GetAttackAimPosition(ref isLeftHand, targetPosition, out _);
+        }
+
+        public AimPosition GetAttackAimPosition(ref bool isLeftHand, Vector3 targetPosition, out Transform damageTransform)
+        {
+            return GetAttackAimPosition(this.GetAvailableWeaponDamageInfo(ref isLeftHand), isLeftHand, targetPosition, out damageTransform);
         }
 
         public AimPosition GetAttackAimPositionByDirection(ref bool isLeftHand, Vector3 direction, bool aimToTargetIfExisted = true)
@@ -735,7 +740,13 @@ namespace MultiplayerARPG
 
         public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand, Vector3 targetPosition)
         {
-            return GetAttackAimPosition(damageInfo.GetDamageTransform(this, isLeftHand).position, targetPosition);
+            return GetAttackAimPosition(damageInfo, isLeftHand, targetPosition, out _);
+        }
+
+        public AimPosition GetAttackAimPosition(DamageInfo damageInfo, bool isLeftHand, Vector3 targetPosition, out Transform damageTransform)
+        {
+            damageTransform = damageInfo.GetDamageTransform(this, isLeftHand);
+            return GetAttackAimPosition(damageTransform.position, targetPosition);
         }
 
         public AimPosition GetAttackAimPosition(Vector3 position, Vector3 targetPosition)

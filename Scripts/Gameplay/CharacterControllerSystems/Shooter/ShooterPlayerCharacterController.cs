@@ -1331,22 +1331,25 @@ namespace MultiplayerARPG
             _aimTargetPosition = _centerRay.origin + _centerRay.direction * (_centerOriginToCharacterDistance + attackDistance);
             // Aim to damageable hit boxes (higher priority than other entities)
             // Raycast from camera position to center of screen
+            bool prevQueriesHitBackfaces = Physics.queriesHitBackfaces;
+            Physics.queriesHitBackfaces = true;
             int tempCount = PhysicUtils.SortedRaycastNonAlloc3D(_centerRay.origin, _centerRay.direction, _raycasts, _centerOriginToCharacterDistance + attackDistance, GameInstance.Singleton.GetDamageEntityHitLayerMask());
             for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
             {
                 tempHitInfo = _raycasts[tempCounter];
+                Collider collider = tempHitInfo.collider;
 
-                if (!tempHitInfo.collider.GetComponent<IUnHittable>().IsNull())
+                if (!collider.GetComponent<IUnHittable>().IsNull())
                 {
                     // Don't aim to unhittable objects
                     continue;
                 }
 
                 // Get damageable hit box component from hit target
-                tempHitBox = tempHitInfo.collider.GetComponent<DamageableHitBox>();
+                tempHitBox = collider.GetComponent<DamageableHitBox>();
                 if (tempHitBox == null || !tempHitBox.Entity)
                 {
-                    if (GameInstance.Singleton.IsDamageableLayer(tempHitInfo.collider.gameObject.layer))
+                    if (GameInstance.Singleton.IsDamageableLayer(collider.gameObject.layer))
                     {
                         // Hit something which is part of damageable entities, still continue
                         continue;
@@ -1365,7 +1368,8 @@ namespace MultiplayerARPG
                 }
 
                 // Entity isn't in front of character, so it's not the target
-                if (turnForwardWhileDoingAction && !IsInFront(tempHitInfo.point))
+                Vector3 hitPoint = tempHitInfo.point;
+                if (turnForwardWhileDoingAction && !IsInFront(collider, ref hitPoint))
                     continue;
 
                 // Skip dead entity while attacking (to allow to use resurrect skills)
@@ -1374,7 +1378,7 @@ namespace MultiplayerARPG
 
                 // Entity is in front of character, so this is target
                 if (tempHitBox.CanReceiveDamageFrom(PlayingCharacterEntity.GetInfo()))
-                    _aimTargetPosition = tempHitInfo.point;
+                    _aimTargetPosition = hitPoint;
                 SelectedEntity = tempHitBox.Entity;
                 break;
             }
@@ -1390,14 +1394,16 @@ namespace MultiplayerARPG
                 for (int tempCounter = 0; tempCounter < tempCount; ++tempCounter)
                 {
                     tempHitInfo = _raycasts[tempCounter];
-                    if (!tempHitInfo.collider.GetComponent<IUnHittable>().IsNull())
+                    Collider collider = tempHitInfo.collider;
+
+                    if (!collider.GetComponent<IUnHittable>().IsNull())
                     {
                         // Don't aim to unhittable objects
                         continue;
                     }
 
                     // Get distance between character and raycast hit point
-                    tempGameEntity = tempHitInfo.collider.GetComponent<IGameEntity>();
+                    tempGameEntity = collider.GetComponent<IGameEntity>();
                     if (!tempGameEntity.IsNull())
                     {
                         bool isHideFromHost = PlayingCharacterEntity.Identity.IsServer && tempGameEntity.Identity.IsHideFrom(PlayingCharacterEntity.Identity);
@@ -1417,7 +1423,7 @@ namespace MultiplayerARPG
                         continue;
                     }
 
-                    tempActivatableEntity = tempHitInfo.collider.GetComponent<IBaseActivatableEntity>();
+                    tempActivatableEntity = collider.GetComponent<IBaseActivatableEntity>();
                     if (tempActivatableEntity != null && Vector3.Distance(EntityTransform.position, tempActivatableEntity.EntityTransform.position) <= tempActivatableEntity.GetActivatableDistance())
                     {
                         // Entity is in front of character, so this is target
@@ -1426,6 +1432,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            Physics.queriesHitBackfaces = prevQueriesHitBackfaces;
 
             // Calculate aim direction
             _turnDirection = _aimTargetPosition - EntityTransform.position;
@@ -2190,17 +2197,25 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual bool IsInFront(Vector3 target)
+        public virtual bool IsInFront(Collider collider, ref Vector3 target)
         {
             // Get aim position direction
-            AimPosition aimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref _isLeftHandAttacking, target);
+            AimPosition aimPosition = PlayingCharacterEntity.GetAttackAimPosition(ref _isLeftHandAttacking, target, out Transform damageTransform);
             switch (aimPosition.type)
             {
                 case AimPositionType.Direction:
                     // Check that the direction is in front of character or not
-                    return Vector3.Angle(aimPosition.direction, EntityTransform.forward) < 115f;
+                    bool isInFront = Vector3.Angle(aimPosition.direction, EntityTransform.forward) < 115f;
+                    if (isInFront)
+                        return true;
+                    // Check if launch transform is in hitbox or not
+                    if (collider.bounds.Contains(aimPosition.position))
+                    {
+                        target = aimPosition.position + damageTransform.forward * 0.01f;
+                        return true;
+                    }
+                    return false;
             }
-            // 2D mode?
             return true;
         }
 

@@ -46,6 +46,11 @@ namespace MultiplayerARPG
 
         public override Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
+            return attacker.MissileDamageTransform;
+        }
+
+        public virtual Transform GetDamageEffectTransform(BaseCharacterEntity attacker, bool isLeftHand)
+        {
             Transform transform = null;
             if (attacker.ModelManager.IsFps)
             {
@@ -294,10 +299,21 @@ namespace MultiplayerARPG
                 }
                 --pierceThroughEntities;
             }
+            if (projectileDistance <= 0f)
+                projectileDistance = missileDistance;
 #if !UNITY_SERVER
             // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
             if (isClient)
+            {
+                if (GameInstance.Singleton.DimensionType == DimensionType.Dimension3D)
+                {
+                    Vector3 targetPosition = damagePosition + (damageDirection * projectileDistance);
+                    Transform effectTransform = GetDamageEffectTransform(attacker, isLeftHand);
+                    damagePosition = effectTransform.position;
+                    damageRotation = Quaternion.Euler(Quaternion.LookRotation(targetPosition - damagePosition).eulerAngles);
+                }
                 PlayProjectileEffect(damagePosition, damageRotation, projectileDistance, impactEffectsData);
+            }
 #endif
             return default;
         }
