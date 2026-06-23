@@ -141,7 +141,7 @@ namespace MultiplayerARPG
             set { cameraTargetTransform = value; }
         }
 
-        public ValueOverride<Transform> OverrideCameraTargetTransform { get; } = new ValueOverride<Transform>();
+        public readonly ValueOverride<Transform> OverrideCameraTargetTransform = new ValueOverride<Transform>();
 
         [Tooltip("Transform for position which camera will look at and follow while playing in FPS view mode")]
         [SerializeField]
@@ -202,11 +202,11 @@ namespace MultiplayerARPG
             }
         }
 
-        protected bool _isTeleporting;
-        protected bool _stillMoveAfterTeleport;
-        protected Vector3 _teleportingPosition;
-        protected Quaternion _teleportingRotation;
-        private bool? _wasUpdateEntityComponents;
+        protected bool _isTeleporting = false;
+        protected bool _stillMoveAfterTeleport = false;
+        protected Vector3 _teleportingPosition = Vector3.zero;
+        protected Quaternion _teleportingRotation = Quaternion.identity;
+        private bool? _wasUpdateEntityComponents = null;
 
         /// <summary>
         /// Override this function to initial required components
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
             if (onDestroy != null)
                 onDestroy.Invoke(this);
             this.InvokeInstanceDevExtMethods("OnDestroy");
-            Clean();
+            Clean(true);
         }
         protected virtual void EntityOnDestroy()
         {
@@ -494,6 +494,7 @@ namespace MultiplayerARPG
             base.OnNetworkDestroy(reasons);
             if (onNetworkDestroy != null)
                 onNetworkDestroy.Invoke(this, reasons);
+            Clean(false);
         }
 
         public virtual bool IsHide()

@@ -7,7 +7,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseGameEntity
     {
-        protected float _lastMountActionTime;
+        protected float _lastMountActionTime = 0f;
         public float LastMountActionTime { get { return _lastMountActionTime; } set { _lastMountActionTime = value; } }
         public byte PassengingVehicleSeatIndex { get; private set; }
 

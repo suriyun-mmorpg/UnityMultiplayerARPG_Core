@@ -82,8 +82,8 @@ namespace MultiplayerARPG
 
         protected readonly Dictionary<byte, BaseGameEntity> _passengers = new Dictionary<byte, BaseGameEntity>();
         protected readonly Dictionary<uint, UnityAction<LiteNetLibIdentity>> _spawnEvents = new Dictionary<uint, UnityAction<LiteNetLibIdentity>>();
-        protected bool _isDestroyed;
-        protected CalculatedBuff _cacheBuff = new CalculatedBuff();
+        protected bool _isDestroyed = false;
+        protected readonly CalculatedBuff _cacheBuff = new CalculatedBuff();
         protected int _dirtyLevel = int.MinValue;
 
         protected override void EntityAwake()

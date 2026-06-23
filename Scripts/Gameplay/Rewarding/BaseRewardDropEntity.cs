@@ -46,27 +46,27 @@ namespace MultiplayerARPG
         protected UnityEvent onPickedUp = new UnityEvent();
         public UnityEvent OnPickedUp { get { return onPickedUp; } }
 
-        public float Multiplier { get; protected set; }
+        public float Multiplier { get; protected set; } = 0f;
 
-        public RewardGivenType GivenType { get; protected set; }
+        public RewardGivenType GivenType { get; protected set; } = RewardGivenType.None;
 
-        public int GiverLevel { get; protected set; }
+        public int GiverLevel { get; protected set; } = 0;
 
-        public int SourceLevel { get; protected set; }
+        public int SourceLevel { get; protected set; } = 0;
 
         public HashSet<string> Looters { get; protected set; } = new HashSet<string>();
 
-        public GameSpawnArea<BaseRewardDropEntity> SpawnArea { get; protected set; }
+        public GameSpawnArea<BaseRewardDropEntity> SpawnArea { get; protected set; } = null;
 
-        public BaseRewardDropEntity SpawnPrefab { get; protected set; }
+        public BaseRewardDropEntity SpawnPrefab { get; protected set; } = null;
 
 #if !DISABLE_ADDRESSABLES
-        public GameSpawnArea<BaseRewardDropEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+        public GameSpawnArea<BaseRewardDropEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; } = null;
 #endif
 
-        public int SpawnLevel { get; protected set; }
+        public int SpawnLevel { get; protected set; } = 0;
 
-        public Vector3 SpawnPosition { get; protected set; }
+        public Vector3 SpawnPosition { get; protected set; } = Vector3.zero;
 
         public abstract BaseItem RepresentItem { get; }
 
@@ -100,9 +100,9 @@ namespace MultiplayerARPG
         }
 
         // Private variables
-        protected bool _isPickedUp;
-        protected float _dropTime;
-        private List<GameObject> _allActivatingObjects = new List<GameObject>();
+        protected bool _isPickedUp = false;
+        protected float _dropTime = 0f;
+        private readonly List<GameObject> _allActivatingObjects = new List<GameObject>();
 
         protected override void EntityAwake()
         {

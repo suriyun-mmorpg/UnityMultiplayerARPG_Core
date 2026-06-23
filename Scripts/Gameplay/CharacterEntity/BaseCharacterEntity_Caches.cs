@@ -2,7 +2,7 @@
 {
     public partial class BaseCharacterEntity
     {
-        private CharacterDataCache _cachedData;
+        private CharacterDataCache _cachedData = null;
         public CharacterDataCache CachedData
         {
             get
@@ -17,7 +17,7 @@
         /// <summary>
         /// This variable will be TRUE when cache data have to re-cache
         /// </summary>
-        public bool IsRecaching { get; protected set; }
+        public bool IsRecaching { get; protected set; } = false;
 
         /// <summary>
         /// Make caches for character stats / attributes / skills / resistances / increase damages and so on immdediately

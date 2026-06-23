@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         [SerializeField]
         protected SyncFieldBool isOpen = new SyncFieldBool();
 
-        private bool _dirtyIsOpen;
+        private bool _dirtyIsOpen = false;
 
         public override void PrepareRelatesData()
         {

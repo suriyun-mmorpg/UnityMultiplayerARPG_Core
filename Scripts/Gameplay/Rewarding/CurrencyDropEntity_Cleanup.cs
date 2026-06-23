@@ -2,16 +2,19 @@ namespace MultiplayerARPG
 {
     public partial class CurrencyDropEntity
     {
-        public override void Clean()
+        public override void Clean(bool isObjectDestroyed)
         {
-            base.Clean();
-            for (int i = 0; i < currencyAppearanceSettings.Count; ++i)
+            base.Clean(isObjectDestroyed);
+            if (isObjectDestroyed)
             {
-                currencyAppearanceSettings[i].Clean();
+                for (int i = 0; i < currencyAppearanceSettings.Count; ++i)
+                {
+                    currencyAppearanceSettings[i].Clean();
+                }
+                currencyAppearanceSettings?.Clear();
+                _allCurrencyActivatingObjects?.Clear();
+                _currencyAppearanceSettings?.Clear();
             }
-            currencyAppearanceSettings?.Clear();
-            _allCurrencyActivatingObjects?.Clear();
-            _currencyAppearanceSettings?.Clear();
         }
     }
 }

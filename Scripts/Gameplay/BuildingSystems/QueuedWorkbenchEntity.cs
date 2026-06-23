@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             get { return !this.IsDead(); }
         }
 
-        public float TimeCounter { get; set; }
+        public float TimeCounter { get; set; } = 0f;
 
         public int SourceId
         {

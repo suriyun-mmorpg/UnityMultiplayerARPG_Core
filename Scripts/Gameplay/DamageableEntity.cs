@@ -55,7 +55,7 @@ namespace MultiplayerARPG
         [System.Obsolete("Use `IsInvincible` instead.")]
         public bool IsImmune { get { return IsInvincible; } set { IsInvincible = value; } }
         public virtual int CurrentHp { get { return currentHp.Value; } set { currentHp.Value = value; } }
-        public SafeArea SafeArea { get; set; }
+        public SafeArea SafeArea { get; set; } = null;
         public bool IsInSafeArea { get { return SafeArea != null; } }
         public abstract int MaxHp { get; }
         public float HpRate { get { return (float)CurrentHp / (float)MaxHp; } }

@@ -4,8 +4,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected bool _lastGrounded;
-        protected Vector3 _lastGroundedPosition;
+        protected bool _lastGrounded = false;
+        protected Vector3 _lastGroundedPosition = Vector3.zero;
 
         public override bool ShouldUseRootMotion
         {

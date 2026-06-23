@@ -65,5 +65,10 @@ namespace MultiplayerARPG
             value = best.Value;
             return true;
         }
+
+        public void Clear()
+        {
+            _entries.Clear();
+        }
     }
 }

@@ -7,7 +7,7 @@ namespace MultiplayerARPG
         public System.Action<int> onUpdateRightWeaponAmmoSim;
         public System.Action<int> onUpdateLeftWeaponAmmoSim;
 
-        protected int _rightWeaponAmmoSim;
+        protected int _rightWeaponAmmoSim = 0;
         public int RightWeaponAmmoSim
         {
             get
@@ -25,7 +25,7 @@ namespace MultiplayerARPG
                 }
             }
         }
-        protected int _leftWeaponAmmoSim;
+        protected int _leftWeaponAmmoSim = 0;
         public int LeftWeaponAmmoSim
         {
             get

@@ -125,12 +125,11 @@ namespace MultiplayerARPG
         }
 
         public readonly List<GameObject> InstantiatedObjects = new List<GameObject>();
-
         protected bool _isObjectsInstantiated = false;
-        protected bool _isDestroyed;
+        protected bool _isDestroyed = false;
         protected readonly HashSet<string> _looters = new HashSet<string>();
         protected readonly List<CharacterItem> _droppingItems = new List<CharacterItem>();
-        protected Reward _killedReward;
+        protected Reward _killedReward = null;
         protected float _lastTeleportToSummonerTime = 0f;
 
         public override void PrepareRelatesData()

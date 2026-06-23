@@ -254,9 +254,9 @@ namespace MultiplayerARPG
         protected readonly HashSet<GameObject> _triggerObjects = new HashSet<GameObject>();
         protected readonly HashSet<BuildingEntity> _children = new HashSet<BuildingEntity>();
         protected readonly HashSet<BuildingMaterial> _buildingMaterials = new HashSet<BuildingMaterial>();
-        protected int _lastAddedTriggerObjectFrame;
+        protected int _lastAddedTriggerObjectFrame = 0;
         protected bool _parentFound = true; // No parent by default
-        protected bool _isDestroyed;
+        protected bool _isDestroyed = false;
 
         protected override void EntityAwake()
         {

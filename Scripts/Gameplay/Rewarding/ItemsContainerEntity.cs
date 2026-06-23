@@ -40,7 +40,7 @@ namespace MultiplayerARPG
         {
             get { return _items; }
         }
-        public RewardGivenType GivenType { get; protected set; }
+        public RewardGivenType GivenType { get; protected set; } = RewardGivenType.None;
         public HashSet<string> Looters { get; protected set; }
         public override string EntityTitle
         {
@@ -69,9 +69,9 @@ namespace MultiplayerARPG
         }
 
         // Private variables
-        protected bool _isDestroyed;
-        protected float _dropTime;
-        protected float _appearDuration;
+        protected bool _isDestroyed = false;
+        protected float _dropTime = 0f;
+        protected float _appearDuration = 0f;
 
         protected override void EntityAwake()
         {

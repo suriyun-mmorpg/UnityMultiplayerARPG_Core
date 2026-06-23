@@ -58,25 +58,25 @@ namespace MultiplayerARPG
         protected ItemDropTable itemDropTable;
         #endregion
 
-        public bool PutOnPlaceholder { get; protected set; }
+        public bool PutOnPlaceholder { get; protected set; } = false;
 
-        public RewardGivenType GivenType { get; protected set; }
+        public RewardGivenType GivenType { get; protected set; } = RewardGivenType.None;
 
         public List<CharacterItem> DropItems { get; protected set; } = new List<CharacterItem>();
 
         public HashSet<string> Looters { get; protected set; } = new HashSet<string>();
 
-        public GameSpawnArea<ItemDropEntity> SpawnArea { get; protected set; }
+        public GameSpawnArea<ItemDropEntity> SpawnArea { get; protected set; } = null;
 
-        public ItemDropEntity SpawnPrefab { get; protected set; }
+        public ItemDropEntity SpawnPrefab { get; protected set; } = null;
 
 #if !DISABLE_ADDRESSABLES
-        public GameSpawnArea<ItemDropEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+        public GameSpawnArea<ItemDropEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; } = null;
 #endif
 
-        public int SpawnLevel { get; protected set; }
+        public int SpawnLevel { get; protected set; } = 0;
 
-        public Vector3 SpawnPosition { get; protected set; }
+        public Vector3 SpawnPosition { get; protected set; } = Vector3.zero;
 
         public float DestroyDelay
         {
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             set { destroyRespawnDelay = value; }
         }
 
-        private GameObject _dropModel;
+        private GameObject _dropModel = null;
 
         public override string EntityTitle
         {
@@ -133,8 +133,8 @@ namespace MultiplayerARPG
         }
 
         // Private variables
-        protected bool _isPickedUp;
-        protected float _dropTime;
+        protected bool _isPickedUp = false;
+        protected float _dropTime = 0f;
 
         public override void PrepareRelatesData()
         {

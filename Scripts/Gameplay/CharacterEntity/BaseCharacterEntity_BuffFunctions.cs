@@ -5,7 +5,7 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        private List<string> _restrictBuffTags = new List<string>();
+        private readonly List<string> _restrictBuffTags = new List<string>();
 
         public virtual void ApplyBuff(int dataId, BuffType type, int level, EntityInfo buffApplier, CharacterItem buffApplierWeapon)
         {

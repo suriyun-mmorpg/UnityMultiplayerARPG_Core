@@ -1,5 +1,4 @@
 ﻿using LiteNetLib;
-using UnityEngine;
 
 namespace MultiplayerARPG
 {

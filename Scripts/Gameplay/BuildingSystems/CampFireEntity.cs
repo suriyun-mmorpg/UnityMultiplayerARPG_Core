@@ -108,7 +108,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected List<StorageConvertItemsEntry> _preparedConvertItems = new List<StorageConvertItemsEntry>();
+        protected readonly List<StorageConvertItemsEntry> _preparedConvertItems = new List<StorageConvertItemsEntry>();
         protected float _convertCountDown = 1f;
 
         protected override void SetupNetElements()

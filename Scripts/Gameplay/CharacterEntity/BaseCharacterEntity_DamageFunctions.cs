@@ -6,7 +6,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected int _beforeDamageReceivedHp;
+        protected bool _isKilled = false;
+        protected int _beforeDamageReceivedHp = 0;
         protected readonly Dictionary<string, ReceivedDamageRecord> _receivedDamageRecords = new Dictionary<string, ReceivedDamageRecord>();
 
         public virtual void ValidateRecovery(EntityInfo instigator)
@@ -40,8 +41,11 @@ namespace MultiplayerARPG
             if (CurrentWater > CachedData.MaxWater)
                 CurrentWater = CachedData.MaxWater;
 
-            if (this.IsDead())
+            if (this.IsDead() && !_isKilled)
+            {
+                _isKilled = true;
                 Killed(instigator);
+            }
         }
 
         public virtual void Killed(EntityInfo lastAttacker)
@@ -71,6 +75,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer)
                 return;
+            _isKilled = false;
             _lastGrounded = true;
             _lastGroundedPosition = EntityTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;

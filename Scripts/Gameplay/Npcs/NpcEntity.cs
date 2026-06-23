@@ -92,6 +92,7 @@ namespace MultiplayerARPG
         }
 
         public readonly List<GameObject> InstantiatedObjects = new List<GameObject>();
+        protected bool _isObjectsInstantiated = false;
 
         public override void PrepareRelatesData()
         {
@@ -130,6 +131,9 @@ namespace MultiplayerARPG
             InstantiatedObjects.Clear();
             if (!IsClient)
                 return;
+            if (_isObjectsInstantiated)
+                return;
+            _isObjectsInstantiated = true;
 #if !DISABLE_ADDRESSABLES
             // Instantiates npc objects
             await CurrentGameInstance.AddressableNpcObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NpcObjects, EntityTransform, InstantiatedObjects);

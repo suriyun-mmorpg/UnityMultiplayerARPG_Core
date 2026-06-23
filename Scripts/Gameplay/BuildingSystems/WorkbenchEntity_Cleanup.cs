@@ -2,10 +2,14 @@ namespace MultiplayerARPG
 {
     public partial class WorkbenchEntity
     {
-        public override void Clean()
+        public override void Clean(bool isObjectDestroyed)
         {
-            base.Clean();
-            _cacheItemCrafts?.Clear();
+            base.Clean(isObjectDestroyed);
+            if (isObjectDestroyed)
+            {
+                _cacheItemCrafts?.Clear();
+                _cacheItemCrafts = null;
+            }
         }
     }
 }

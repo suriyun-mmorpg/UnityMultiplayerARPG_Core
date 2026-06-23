@@ -55,17 +55,17 @@ namespace MultiplayerARPG
 
         public float ColliderDetectionRadius { get { return colliderDetectionRadius; } }
 
-        public GameSpawnArea<HarvestableEntity> SpawnArea { get; protected set; }
+        public GameSpawnArea<HarvestableEntity> SpawnArea { get; protected set; } = null;
 
-        public HarvestableEntity SpawnPrefab { get; protected set; }
+        public HarvestableEntity SpawnPrefab { get; protected set; } = null;
 
 #if !DISABLE_ADDRESSABLES
-        public GameSpawnArea<HarvestableEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; }
+        public GameSpawnArea<HarvestableEntity>.AddressablePrefab SpawnAddressablePrefab { get; protected set; } = null;
 #endif
 
-        public int SpawnLevel { get; protected set; }
+        public int SpawnLevel { get; protected set; } = 0;
 
-        public Vector3 SpawnPosition { get; protected set; }
+        public Vector3 SpawnPosition { get; protected set; } = Vector3.zero;
 
         public float DestroyDelay
         {
@@ -79,7 +79,7 @@ namespace MultiplayerARPG
             set { destroyRespawnDelay = value; }
         }
 
-        protected bool _isDestroyed;
+        protected bool _isDestroyed = false;
 
         public override void PrepareRelatesData()
         {
