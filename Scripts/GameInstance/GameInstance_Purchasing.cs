@@ -128,7 +128,7 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static bool IsPurchasingInitialized()
+        public bool IsPurchasingInitialized()
         {
 #if ENABLE_PURCHASING && (UNITY_IOS || UNITY_ANDROID)
             // Only say we are initialized if both the Purchasing references are set.
