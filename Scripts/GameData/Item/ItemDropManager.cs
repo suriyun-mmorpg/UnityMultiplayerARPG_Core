@@ -148,35 +148,32 @@ namespace MultiplayerARPG
                 // Randoming
                 if (_uncertainDropItems.Count == 0 && CacheItemRandomByWeightTables.Count == 0)
                     return;
-                do
+                // Each probabilistic entry is evaluated once otherwise the minimum drop count would retry failed chances until one succeeds
+                _uncertainDropItems.Shuffle();
+                for (i = 0; i < _uncertainDropItems.Count && randomDropCount < targetRandomDropCount; ++i)
                 {
-                    // Drop uncertain drop rate items
-                    _uncertainDropItems.Shuffle();
-                    for (i = 0; i < _uncertainDropItems.Count && randomDropCount < targetRandomDropCount; ++i)
+                    BaseItem dropItem = _uncertainDropItems[i].item;
+                    float dropRate = _uncertainDropItems[i].dropRate * rate;
+                    if (Random.value > dropRate)
+                        continue;
+                    if (BaseGameNetworkManager.CurrentMapInfo != null && BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(dropItem))
+                        continue;
+                    onRandomItem.Invoke(dropItem, _uncertainDropItems[i].GetRandomedLevel(), _uncertainDropItems[i].GetRandomedAmount());
+                    ++randomDropCount;
+                }
+                // Reached max drop items?
+                if (randomDropCount >= targetRandomDropCount)
+                    return;
+                // Drop items by weighted tables
+                CacheItemRandomByWeightTables.Shuffle();
+                for (i = 0; i < CacheItemRandomByWeightTables.Count && randomDropCount < targetRandomDropCount; ++i)
+                {
+                    CacheItemRandomByWeightTables[i].RandomItem((BaseItem item, int level, int amount) =>
                     {
-                        BaseItem dropItem = _uncertainDropItems[i].item;
-                        float dropRate = _uncertainDropItems[i].dropRate * rate;
-                        if (Random.value > dropRate)
-                            continue;
-                        if (BaseGameNetworkManager.CurrentMapInfo != null && BaseGameNetworkManager.CurrentMapInfo.ExcludeItemFromDropping(dropItem))
-                            continue;
-                        onRandomItem.Invoke(dropItem, _uncertainDropItems[i].GetRandomedLevel(), _uncertainDropItems[i].GetRandomedAmount());
+                        onRandomItem?.Invoke(item, level, amount);
                         ++randomDropCount;
-                    }
-                    // Reached max drop items?
-                    if (randomDropCount >= targetRandomDropCount)
-                        return;
-                    // Drop items by weighted tables
-                    CacheItemRandomByWeightTables.Shuffle();
-                    for (i = 0; i < CacheItemRandomByWeightTables.Count && randomDropCount < targetRandomDropCount; ++i)
-                    {
-                        CacheItemRandomByWeightTables[i].RandomItem((BaseItem item, int level, int amount) =>
-                        {
-                            onRandomItem?.Invoke(item, level, amount);
-                            ++randomDropCount;
-                        }, 0, excludeItemDataIds);
-                    }
-                } while (randomDropCount < targetRandomDropCount);
+                    }, 0, excludeItemDataIds);
+                }
             }
         }
 
