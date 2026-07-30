@@ -14,10 +14,8 @@ namespace MultiplayerARPG
         public ItemRandomByWeightTable[] itemRandomByWeightTables = new ItemRandomByWeightTable[0];
         public ItemRandomByWeightTable[] certainItemRandomByWeightTables = new ItemRandomByWeightTable[0];
         [Tooltip("Min kind of items that will be dropped in ground")]
-        [Min(0)]
         public byte minDropItems = 1;
         [Tooltip("Max kind of items that will be dropped in ground")]
-        [Min(1)]
         public byte maxDropItems = 5;
         [Tooltip("If true, certain drop items will be limited by random drop items (Randomed by `minDropItems` and `maxDropItems`)")]
         public bool certainDropLimitedByRandomDropItems = false;
