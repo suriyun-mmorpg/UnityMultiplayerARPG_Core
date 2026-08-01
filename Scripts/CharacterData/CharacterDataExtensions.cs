@@ -925,7 +925,7 @@ namespace MultiplayerARPG
         {
             if (data == null)
                 return 0f;
-            return data.GetAvailableWeaponDamageInfo(ref isLeftHand).GetDistance();
+            return data.GetAvailableWeaponDamageInfo(ref isLeftHand).GetFov();
         }
 
         public static float GetMoveSpeedRateWhileEquipped(this ICharacterData data, IWeaponItem weaponItem)
