@@ -393,15 +393,5 @@ namespace MultiplayerARPG
 
             return true;
         }
-
-        public static bool CanAttack<T>(this T item, BaseCharacterEntity character)
-             where T : IWeaponItem
-        {
-            if (!item.IsWeapon() || character == null)
-                return false;
-
-            AmmoType requireAmmoType = item.WeaponType.AmmoType;
-            return requireAmmoType == null || character.IndexOfAmmoItem(requireAmmoType) >= 0;
-        }
     }
 }
