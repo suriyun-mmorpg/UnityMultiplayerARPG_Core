@@ -435,16 +435,6 @@ namespace MultiplayerARPG
                     tempTotalBattlePoint += tempDamageElement.DamageBattlePointScore * (amount.min + amount.max) * 0.5f;
                 }
 
-                if (characterData.EquipWeapons.NotEmptyRightHandSlot())
-                {
-                    tempTotalBattlePoint += characterData.EquipWeapons.rightHand.GetWeaponDamageBattlePoints();
-                }
-
-                if (characterData.EquipWeapons.NotEmptyLeftHandSlot())
-                {
-                    tempTotalBattlePoint += characterData.EquipWeapons.leftHand.GetWeaponDamageBattlePoints();
-                }
-
                 tempTotalBattlePoint += GameInstance.Singleton.GameplayRule.GetBattlePointFromCharacterStats(Stats);
                 BattlePoints = Mathf.CeilToInt(tempTotalBattlePoint);
 
