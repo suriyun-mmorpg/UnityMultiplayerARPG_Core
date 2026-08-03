@@ -593,10 +593,10 @@ namespace MultiplayerARPG
             // Sum damage with buffs
             if (IsIncreaseAttackDamageAmountsWithBuffs(skillUser, skillLevel))
             {
-                GameDataHelpers.CombineDamages(damageAmounts, skillUser.GetCaches().IncreaseDamages);
                 using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> multiplyDamages))
                 {
                     GameDataHelpers.CombineDamages(multiplyDamages, damageAmounts);
+                    GameDataHelpers.CombineDamages(damageAmounts, skillUser.GetCaches().IncreaseDamages);
                     GameDataHelpers.MultiplyDamages(multiplyDamages, skillUser.GetCaches().IncreaseDamagesRate);
                     GameDataHelpers.CombineDamages(damageAmounts, multiplyDamages);
                 }

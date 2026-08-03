@@ -633,14 +633,14 @@ namespace MultiplayerARPG
             using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> increaseDamages))
             {
                 attributes.GetIncreaseDamages(increaseDamages);
-                GameDataHelpers.CombineDamages(resultDamages, increaseDamages);
-            }
-            GameDataHelpers.CombineDamages(resultDamages, buffDamages);
-            using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> multiplyDamages))
-            {
-                GameDataHelpers.CombineDamages(multiplyDamages, resultDamages);
-                GameDataHelpers.MultiplyDamages(multiplyDamages, buffDamagesRate);
-                GameDataHelpers.CombineDamages(resultDamages, multiplyDamages);
+                GameDataHelpers.CombineDamages(increaseDamages, buffDamages);
+                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> multiplyDamages))
+                {
+                    GameDataHelpers.CombineDamages(multiplyDamages, resultDamages);
+                    GameDataHelpers.CombineDamages(resultDamages, increaseDamages);
+                    GameDataHelpers.MultiplyDamages(multiplyDamages, buffDamagesRate);
+                    GameDataHelpers.CombineDamages(resultDamages, multiplyDamages);
+                }
             }
             /*
             // Sum with ammo
