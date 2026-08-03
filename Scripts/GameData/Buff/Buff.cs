@@ -182,6 +182,7 @@ namespace MultiplayerARPG
             GameInstance.AddDamageElements(increaseResistances);
             GameInstance.AddDamageElements(increaseArmors);
             GameInstance.AddDamageElements(increaseDamages);
+            GameInstance.AddDamageElements(increaseDamagesRate);
             GameInstance.AddSkills(increaseSkills);
             GameInstance.AddSkills(overrideSkills);
             GameInstance.AddStatusEffects(selfStatusEffectsWhenAttacking);
