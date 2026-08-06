@@ -642,37 +642,6 @@ namespace MultiplayerARPG
                     GameDataHelpers.CombineDamages(resultDamages, multiplyDamages);
                 }
             }
-            /*
-            // Sum with ammo
-            if (weaponItem != null)
-            {
-                // Ammo stored in magazine?
-                if (weaponItem.AmmoCapacity > 0)
-                {
-                    // Sum with ammo only when it have ammo in magazine
-                    if (characterItem.ammo > 0 && GameInstance.Items.TryGetValue(characterItem.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                    {
-                        using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
-                        {
-                            tempAmmoItem.GetIncreaseDamages(tempDamages);
-                            GameDataHelpers.CombineDamages(resultDamages, tempDamages);
-                        }
-                    }
-                }
-                else
-                {
-                    // No special condition, just sum with ammo
-                    if (GameInstance.Items.TryGetValue(characterItem.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                    {
-                        using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
-                        {
-                            tempAmmoItem.GetIncreaseDamages(tempDamages);
-                            GameDataHelpers.CombineDamages(resultDamages, tempDamages);
-                        }
-                    }
-                }
-            }
-            */
         }
 
         public static void GetAllStats(this ICharacterData data, bool sumWithEquipments, bool sumWithBuffs, bool sumWithSkills,
