@@ -10,8 +10,7 @@ namespace MultiplayerARPG
         private static ProfilerMarker s_profilerMarker = new ProfilerMarker("CharacterDataCache - GetCaches");
 
         public bool IsRecaching { get; private set; }
-        private CharacterStats _stats;
-        public CharacterStats Stats => _stats;
+        public CharacterStats Stats { get; private set; }
         public Dictionary<Attribute, float> Attributes { get; private set; }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
@@ -34,44 +33,44 @@ namespace MultiplayerARPG
         public Dictionary<string, int> RightHandWeaponAbilityIndexes { get; private set; }
         public List<BaseWeaponAbility> LeftHandWeaponAbilities { get; private set; }
         public Dictionary<string, int> LeftHandWeaponAbilityIndexes { get; private set; }
-        public int MaxHp => (int)_stats.hp;
-        public int MaxMp => (int)_stats.mp;
-        public int MaxStamina => (int)_stats.stamina;
-        public int MaxFood => (int)_stats.food;
-        public int MaxWater => (int)_stats.water;
-        public float AtkSpeed => _stats.atkSpeed;
-        public float MoveSpeed => _stats.moveSpeed;
-        public float SprintSpeed => _stats.sprintSpeed;
-        public float GoldRate => _stats.goldRate;
-        public float ExpRate => _stats.expRate;
-        public float ItemDropRate => _stats.itemDropRate;
-        public float JumpHeight => _stats.jumpHeight;
-        public float HeadDamageAbsorbs => _stats.headDamageAbsorbs;
-        public float BodyDamageAbsorbs => _stats.bodyDamageAbsorbs;
-        public float FallDamageAbsorbs => _stats.fallDamageAbsorbs;
-        public float GravityRate => _stats.gravityRate;
-        public float ProtectedSlotLimit => _stats.protectedSlotLimit;
-        public float AmmoCapacityModifier => _stats.ammoCapacityModifier;
-        public float AmmoCapacityRate => _stats.ammoCapacityRate;
-        public float RecoilModifier => _stats.recoilModifier;
-        public float RecoilYawModifier => _stats.recoilYawModifier;
-        public float RecoilRollModifier => _stats.recoilRollModifier;
-        public float RecoilRate => _stats.recoilRate;
-        public float RecoilYawRate => _stats.recoilYawRate;
-        public float RecoilRollRate => _stats.recoilRollRate;
-        public float RateOfFireModifier => _stats.rateOfFireModifier;
-        public float RateOfFireRate => _stats.rateOfFireRate;
-        public float ReloadDurationModifier => _stats.reloadDurationModifier;
-        public float ReloadDurationRate => _stats.reloadDurationRate;
-        public float FireSpreadRangeModifier => _stats.fireSpreadRangeModifier;
-        public float FireSpreadRangeRate => _stats.fireSpreadRangeRate;
-        public float FireSpreadModifier => _stats.fireSpreadModifier;
-        public float FireSpreadRate => _stats.fireSpreadRate;
-        public float DecreaseFoodDecreation => _stats.decreaseFoodDecreation;
-        public float DecreaseWaterDecreation => _stats.decreaseWaterDecreation;
-        public float DecreaseStaminaDecreation => _stats.decreaseStaminaDecreation;
-        public float BuyItemPriceRate => _stats.buyItemPriceRate;
-        public float SellItemPriceRate => _stats.sellItemPriceRate;
+        public int MaxHp => (int)Stats.hp;
+        public int MaxMp => (int)Stats.mp;
+        public int MaxStamina => (int)Stats.stamina;
+        public int MaxFood => (int)Stats.food;
+        public int MaxWater => (int)Stats.water;
+        public float AtkSpeed => Stats.atkSpeed;
+        public float MoveSpeed => Stats.moveSpeed;
+        public float SprintSpeed => Stats.sprintSpeed;
+        public float GoldRate => Stats.goldRate;
+        public float ExpRate => Stats.expRate;
+        public float ItemDropRate => Stats.itemDropRate;
+        public float JumpHeight => Stats.jumpHeight;
+        public float HeadDamageAbsorbs => Stats.headDamageAbsorbs;
+        public float BodyDamageAbsorbs => Stats.bodyDamageAbsorbs;
+        public float FallDamageAbsorbs => Stats.fallDamageAbsorbs;
+        public float GravityRate => Stats.gravityRate;
+        public float ProtectedSlotLimit => Stats.protectedSlotLimit;
+        public float AmmoCapacityModifier => Stats.ammoCapacityModifier;
+        public float AmmoCapacityRate => Stats.ammoCapacityRate;
+        public float RecoilModifier => Stats.recoilModifier;
+        public float RecoilYawModifier => Stats.recoilYawModifier;
+        public float RecoilRollModifier => Stats.recoilRollModifier;
+        public float RecoilRate => Stats.recoilRate;
+        public float RecoilYawRate => Stats.recoilYawRate;
+        public float RecoilRollRate => Stats.recoilRollRate;
+        public float RateOfFireModifier => Stats.rateOfFireModifier;
+        public float RateOfFireRate => Stats.rateOfFireRate;
+        public float ReloadDurationModifier => Stats.reloadDurationModifier;
+        public float ReloadDurationRate => Stats.reloadDurationRate;
+        public float FireSpreadRangeModifier => Stats.fireSpreadRangeModifier;
+        public float FireSpreadRangeRate => Stats.fireSpreadRangeRate;
+        public float FireSpreadModifier => Stats.fireSpreadModifier;
+        public float FireSpreadRate => Stats.fireSpreadRate;
+        public float DecreaseFoodDecreation => Stats.decreaseFoodDecreation;
+        public float DecreaseWaterDecreation => Stats.decreaseWaterDecreation;
+        public float DecreaseStaminaDecreation => Stats.decreaseStaminaDecreation;
+        public float BuyItemPriceRate => Stats.buyItemPriceRate;
+        public float SellItemPriceRate => Stats.sellItemPriceRate;
         public float BaseMoveSpeed { get; private set; }
         public float BaseSprintSpeed { get; private set; }
         public float TotalItemWeight { get; private set; }
@@ -187,7 +186,7 @@ namespace MultiplayerARPG
 
         private void SetStats(CharacterStats stats)
         {
-            _stats = stats;
+            Stats = stats;
         }
 
         private void SetAttributes(Dictionary<Attribute, float> attributes)
@@ -320,10 +319,10 @@ namespace MultiplayerARPG
                 if (characterData.GetDatabase() != null)
                     BaseSprintSpeed = characterData.GetDatabase().Stats.baseStats.sprintSpeed;
 
-                TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData, _stats);
-                TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData, _stats);
-                LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, _stats);
-                LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, _stats);
+                TotalItemWeight = GameInstance.Singleton.GameplayRule.GetTotalWeight(characterData, Stats);
+                TotalItemSlot = GameInstance.Singleton.GameplayRule.GetTotalSlot(characterData, Stats);
+                LimitItemWeight = GameInstance.Singleton.GameplayRule.GetLimitWeight(characterData, Stats);
+                LimitItemSlot = GameInstance.Singleton.GameplayRule.GetLimitSlot(characterData, Stats);
 
                 IsOverweight = (GameInstance.Singleton.IsLimitInventorySlot && TotalItemSlot > LimitItemSlot) || (GameInstance.Singleton.IsLimitInventoryWeight && TotalItemWeight > LimitItemWeight);
                 DisallowMove = false;
