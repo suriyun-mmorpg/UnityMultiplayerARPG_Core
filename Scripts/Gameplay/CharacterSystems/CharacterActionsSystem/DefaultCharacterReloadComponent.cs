@@ -354,16 +354,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            int ammoCapacity = reloadingWeaponItem.AmmoCapacity;
-            if (!reloadingWeaponItem.NoAmmoCapacityOverriding &&
-                GameInstance.Items.TryGetValue(reloadingAmmoDataId, out BaseItem ammoItem) &&
-                ammoItem.OverrideAmmoCapacity > 0)
-            {
-                // Override capacity by the item
-                ammoCapacity = ammoItem.OverrideAmmoCapacity;
-            }
-            ammoCapacity += Mathf.CeilToInt(Entity.CachedData.AmmoCapacityModifier);
-
+            int ammoCapacity = reloadingWeaponItem.GetAmmoCapacity(Entity, reloadingAmmoDataId);
             int reloadingAmmoAmount = 0;
             if (!reloadingWeaponItem.NoAmmoDataIdChange && reloadingWeapon.ammoDataId != reloadingAmmoDataId)
             {

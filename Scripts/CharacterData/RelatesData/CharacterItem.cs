@@ -213,15 +213,7 @@ namespace MultiplayerARPG
             IWeaponItem item = GetWeaponItem();
             if (item == null)
                 return 0;
-            int baseAmmoCapacity = item.AmmoCapacity;
-            if (ammoDataId != 0 && !item.NoAmmoCapacityOverriding &&
-                GameInstance.Items.TryGetValue(ammoDataId, out BaseItem prevAmmoItem) &&
-                prevAmmoItem.OverrideAmmoCapacity > 0)
-            {
-                baseAmmoCapacity = prevAmmoItem.OverrideAmmoCapacity;
-            }
-            CharacterDataCache cache = characterData.GetCaches();
-            return baseAmmoCapacity + (int)cache.AmmoCapacityModifier + (int)(cache.AmmoCapacityRate * baseAmmoCapacity);
+            return item.GetAmmoCapacity(characterData, ammoDataId);
         }
 
         public void Lock(float duration)
