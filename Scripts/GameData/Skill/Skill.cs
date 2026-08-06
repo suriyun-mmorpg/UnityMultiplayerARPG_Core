@@ -438,19 +438,6 @@ namespace MultiplayerARPG
             damageInfo.PrepareRelatesData();
         }
 
-        public override bool Validate()
-        {
-            bool hasChanges = false;
-#pragma warning disable CS0612 // Type or member is obsolete
-            if (skillType == SkillType.CraftItem)
-            {
-                skillType = SkillType.Active;
-                hasChanges = true;
-            }
-#pragma warning restore CS0612 // Type or member is obsolete
-            return hasChanges || base.Validate();
-        }
-
         public override Transform GetApplyTransform(BaseCharacterEntity skillUser, bool isLeftHand)
         {
             if (TryGetDamageInfo(skillUser, isLeftHand, out DamageInfo damageInfo))
