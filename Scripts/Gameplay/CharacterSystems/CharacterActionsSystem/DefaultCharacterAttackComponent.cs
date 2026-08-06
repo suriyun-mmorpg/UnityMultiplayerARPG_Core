@@ -141,7 +141,7 @@ namespace MultiplayerARPG
             MovementRestrictionWhileAttacking = Entity.GetMovementRestrictionWhileAttacking(weaponItem);
 
             // Get play speed multiplier will use it to play animation faster or slower based on attack speed stats
-            animSpeedRate *= Entity.GetAnimSpeedRate(AnimActionType);
+            animSpeedRate *= Mathf.Clamp(entityCaches.AtkSpeed, 0.1f, entityCaches.AtkSpeed);
 
             if (IsServer)
             {

@@ -882,15 +882,6 @@ namespace MultiplayerARPG
             return IsPlayingAttackOrUseSkillAnimation() || IsPlayingReloadAnimation();
         }
 
-        public float GetAttackSpeed()
-        {
-            float atkSpeed = CachedData.AtkSpeed;
-            // Minimum attack speed is 0.1
-            if (atkSpeed <= 0.1f)
-                atkSpeed = 0.1f;
-            return atkSpeed;
-        }
-
         public override bool IsHide()
         {
             return CachedData.IsHide;
@@ -1121,14 +1112,6 @@ namespace MultiplayerARPG
                     model.GetLeftHandReloadAnimation(skillOrWeaponTypeDataId, out animSpeedRate, out triggerDurations, out totalDuration);
                     break;
             }
-        }
-
-        public float GetAnimSpeedRate(AnimActionType animActionType)
-        {
-            if (animActionType == AnimActionType.AttackRightHand ||
-                animActionType == AnimActionType.AttackLeftHand)
-                return GetAttackSpeed();
-            return 1f;
         }
         #endregion
 
