@@ -9,62 +9,113 @@ namespace MultiplayerARPG
     public partial struct CharacterStats
     {
         public static readonly CharacterStats Empty = new CharacterStats();
+        [CharacterStatTextGen(nameof(hp), false)]
         public float hp;
+        [CharacterStatTextGen(nameof(hpRecovery), false)]
         public float hpRecovery;
+        [CharacterStatTextGen(nameof(hpLeechRate), true)]
         public float hpLeechRate;
+        [CharacterStatTextGen(nameof(mp), false)]
         public float mp;
+        [CharacterStatTextGen(nameof(mpRecovery), false)]
         public float mpRecovery;
+        [CharacterStatTextGen(nameof(mpLeechRate), true)]
         public float mpLeechRate;
+        [CharacterStatTextGen(nameof(stamina), false)]
         public float stamina;
+        [CharacterStatTextGen(nameof(staminaRecovery), false)]
         public float staminaRecovery;
+        [CharacterStatTextGen(nameof(staminaLeechRate), true)]
         public float staminaLeechRate;
+        [CharacterStatTextGen(nameof(food), false)]
         public float food;
+        [CharacterStatTextGen(nameof(water), false)]
         public float water;
+        [CharacterStatTextGen(nameof(accuracy), false)]
         public float accuracy;
+        [CharacterStatTextGen(nameof(evasion), false)]
         public float evasion;
+        [CharacterStatTextGen(nameof(criRate), true)]
         public float criRate;
+        [CharacterStatTextGen(nameof(criDmgRate), true)]
         public float criDmgRate;
+        [CharacterStatTextGen(nameof(blockRate), true)]
         public float blockRate;
+        [CharacterStatTextGen(nameof(blockDmgRate), true)]
         public float blockDmgRate;
+        [CharacterStatTextGen(nameof(moveSpeed), false)]
         public float moveSpeed;
+        [CharacterStatTextGen(nameof(sprintSpeed), false)]
         public float sprintSpeed;
+        [CharacterStatTextGen(nameof(atkSpeed), false)]
         public float atkSpeed;
+        [CharacterStatTextGen(nameof(weightLimit), false)]
         public float weightLimit;
+        [CharacterStatTextGen(nameof(slotLimit), false)]
         public float slotLimit;
+        [CharacterStatTextGen(nameof(goldRate), true)]
         public float goldRate;
+        [CharacterStatTextGen(nameof(expRate), true)]
         public float expRate;
+        [CharacterStatTextGen(nameof(itemDropRate), true)]
         public float itemDropRate;
+        [CharacterStatTextGen(nameof(jumpHeight), false)]
         public float jumpHeight;
+        [CharacterStatTextGen(nameof(headDamageAbsorbs), true)]
         public float headDamageAbsorbs;
+        [CharacterStatTextGen(nameof(bodyDamageAbsorbs), true)]
         public float bodyDamageAbsorbs;
+        [CharacterStatTextGen(nameof(fallDamageAbsorbs), true)]
         public float fallDamageAbsorbs;
+        [CharacterStatTextGen(nameof(gravityRate), true)]
         public float gravityRate;
+        [CharacterStatTextGen(nameof(protectedSlotLimit), false)]
         public float protectedSlotLimit;
         [FormerlySerializedAs("ammoCapacity")]
+        [CharacterStatTextGen(nameof(ammoCapacityModifier), false)]
         public float ammoCapacityModifier;
+        [CharacterStatTextGen(nameof(ammoCapacityRate), true)]
         public float ammoCapacityRate;
+        [CharacterStatTextGen(nameof(recoilModifier), false)]
         public float recoilModifier;
+        [CharacterStatTextGen(nameof(recoilYawModifier), false)]
         public float recoilYawModifier;
+        [CharacterStatTextGen(nameof(recoilRollModifier), false)]
         public float recoilRollModifier;
+        [CharacterStatTextGen(nameof(recoilRate), true)]
         public float recoilRate;
+        [CharacterStatTextGen(nameof(recoilYawRate), true)]
         public float recoilYawRate;
+        [CharacterStatTextGen(nameof(recoilRollRate), true)]
         public float recoilRollRate;
-        [FormerlySerializedAs("rateOfFire")]
+        [CharacterStatTextGen(nameof(rateOfFireModifier), false)]
         public float rateOfFireModifier;
+        [CharacterStatTextGen(nameof(rateOfFireRate), true)]
         public float rateOfFireRate;
         [FormerlySerializedAs("reloadDuration")]
+        [CharacterStatTextGen(nameof(reloadDurationModifier), false)]
         public float reloadDurationModifier;
+        [CharacterStatTextGen(nameof(reloadDurationRate), true)]
         public float reloadDurationRate;
         [FormerlySerializedAs("fireSpreadRange")]
+        [CharacterStatTextGen(nameof(fireSpreadRangeModifier), false)]
         public float fireSpreadRangeModifier;
+        [CharacterStatTextGen(nameof(fireSpreadRangeRate), true)]
         public float fireSpreadRangeRate;
         [FormerlySerializedAs("fireSpread")]
+        [CharacterStatTextGen(nameof(fireSpreadModifier), false)]
         public float fireSpreadModifier;
+        [CharacterStatTextGen(nameof(fireSpreadRate), true)]
         public float fireSpreadRate;
+        [CharacterStatTextGen(nameof(decreaseFoodDecreation), false)]
         public float decreaseFoodDecreation;
+        [CharacterStatTextGen(nameof(decreaseWaterDecreation), false)]
         public float decreaseWaterDecreation;
+        [CharacterStatTextGen(nameof(decreaseStaminaDecreation), false)]
         public float decreaseStaminaDecreation;
+        [CharacterStatTextGen(nameof(buyItemPriceRate), true)]
         public float buyItemPriceRate;
+        [CharacterStatTextGen(nameof(sellItemPriceRate), true)]
         public float sellItemPriceRate;
 
         public static CharacterStats operator +(CharacterStats a, CharacterStats b)
