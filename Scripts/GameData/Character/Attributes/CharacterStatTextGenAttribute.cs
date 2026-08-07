@@ -5,13 +5,17 @@ namespace MultiplayerARPG
     [AttributeUsage(AttributeTargets.Field)]
     public class CharacterStatTextGenAttribute : System.Attribute
     {
-        public string Name { get; private set; }
+        public string FormatKey { get; private set; }
         public bool IsRate { get; private set; }
 
-        public CharacterStatTextGenAttribute(string name, bool isRate)
+        public CharacterStatTextGenAttribute(string formatKey, bool isRate)
         {
-            Name = name;
+            FormatKey = formatKey;
             IsRate = isRate;
+        }
+
+        public CharacterStatTextGenAttribute(bool isRate) : this(string.Empty, isRate)
+        {
         }
     }
 }

@@ -1,6 +1,4 @@
 #if UNITY_EDITOR
-
-using System;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -1232,60 +1230,16 @@ namespace MultiplayerARPG
         private static string GetNormalUIFormatKey(
             string statName)
         {
-            switch (statName)
-            {
-                case nameof(CharacterStats.criRate):
-                    return "UI_FORMAT_CRITICAL_RATE";
-
-                case nameof(CharacterStats.criDmgRate):
-                    return "UI_FORMAT_CRITICAL_DAMAGE_RATE";
-
-                case nameof(CharacterStats.blockDmgRate):
-                    return "UI_FORMAT_BLOCK_DAMAGE_RATE";
-
-                case nameof(CharacterStats.atkSpeed):
-                    return "UI_FORMAT_ATTACK_SPEED";
-
-                case nameof(CharacterStats.weightLimit):
-                    return "UI_FORMAT_WEIGHT";
-
-                case nameof(CharacterStats.slotLimit):
-                    return "UI_FORMAT_SLOT";
-
-                default:
-                    return LocaleKeyPrefix +
+            return LocaleKeyPrefix +
                            ToUpperSnakeCase(statName);
-            }
         }
 
         private static string GetRateUIFormatKey(
             string statName)
         {
-            switch (statName)
-            {
-                case nameof(CharacterStats.criRate):
-                    return "UI_FORMAT_CRITICAL_RATE_RATE";
-
-                case nameof(CharacterStats.criDmgRate):
-                    return "UI_FORMAT_CRITICAL_DAMAGE_RATE_RATE";
-
-                case nameof(CharacterStats.blockDmgRate):
-                    return "UI_FORMAT_BLOCK_DAMAGE_RATE_RATE";
-
-                case nameof(CharacterStats.atkSpeed):
-                    return "UI_FORMAT_ATTACK_SPEED_RATE";
-
-                case nameof(CharacterStats.weightLimit):
-                    return "UI_FORMAT_WEIGHT_RATE";
-
-                case nameof(CharacterStats.slotLimit):
-                    return "UI_FORMAT_SLOT_RATE";
-
-                default:
-                    return LocaleKeyPrefix +
+            return LocaleKeyPrefix +
                            ToUpperSnakeCase(statName) +
                            "_RATE";
-            }
         }
 
         private static string ToPascalCase(
@@ -1381,6 +1335,8 @@ namespace MultiplayerARPG
 
             public string StatName { get; }
 
+            public string FormatKey { get; }
+
             public bool IsRate => Attribute.IsRate;
 
             public string PascalStatName =>
@@ -1402,10 +1358,10 @@ namespace MultiplayerARPG
                 "formatKey" + PascalStatName + "RateStats";
 
             public string NormalUIFormatKey =>
-                GetNormalUIFormatKey(StatName);
+                GetNormalUIFormatKey(FormatKey);
 
             public string RateUIFormatKey =>
-                GetRateUIFormatKey(StatName);
+                GetRateUIFormatKey(FormatKey);
 
             public CharacterStatFieldData(
                 FieldInfo field,
@@ -1414,10 +1370,13 @@ namespace MultiplayerARPG
                 Field = field;
                 Attribute = attribute;
 
-                StatName =
-                    string.IsNullOrWhiteSpace(attribute.Name)
+                StatName = field.Name;
+
+                FormatKey =
+                    string.IsNullOrWhiteSpace(
+                        attribute.FormatKey)
                         ? field.Name
-                        : attribute.Name;
+                        : attribute.FormatKey;
             }
         }
     }
