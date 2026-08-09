@@ -44,6 +44,30 @@ namespace MultiplayerARPG
         private StatusEffectResistanceIncremental[] statusEffectResistances;
         public virtual StatusEffectResistanceIncremental[] StatusEffectResistances { get { return statusEffectResistances; } set { statusEffectResistances = value; } }
 
+        [Tooltip("Status effects that can be applied to the attacker when attacking.")]
+        [SerializeField]
+        [ArrayElementTitle("statusEffect")]
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacking = new StatusEffectApplying[0];
+        public StatusEffectApplying[] SelfStatusEffectsWhenAttacking { get { return selfStatusEffectsWhenAttacking; } set { selfStatusEffectsWhenAttacking = value; } }
+
+        [Tooltip("Status effects that can be applied to the enemy when attacking.")]
+        [SerializeField]
+        [ArrayElementTitle("statusEffect")]
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacking = new StatusEffectApplying[0];
+        public StatusEffectApplying[] EnemyStatusEffectsWhenAttacking { get { return enemyStatusEffectsWhenAttacking; } set { enemyStatusEffectsWhenAttacking = value; } }
+
+        [Tooltip("Status effects that can be applied to the attacker when attacked.")]
+        [SerializeField]
+        [ArrayElementTitle("statusEffect")]
+        private StatusEffectApplying[] selfStatusEffectsWhenAttacked = new StatusEffectApplying[0];
+        public StatusEffectApplying[] SelfStatusEffectsWhenAttacked { get { return selfStatusEffectsWhenAttacked; } set { selfStatusEffectsWhenAttacked = value; } }
+
+        [Tooltip("Status effects that can be applied to the enemy when attacked.")]
+        [SerializeField]
+        [ArrayElementTitle("statusEffect")]
+        private StatusEffectApplying[] enemyStatusEffectsWhenAttacked = new StatusEffectApplying[0];
+        public StatusEffectApplying[] EnemyStatusEffectsWhenAttacked { get { return enemyStatusEffectsWhenAttacked; } set { enemyStatusEffectsWhenAttacked = value; } }
+
         public CharacterStats GetCharacterStats(int level)
         {
             return Stats.GetCharacterStats(level);
@@ -71,6 +95,34 @@ namespace MultiplayerARPG
         {
             result.Clear();
             GameDataHelpers.CombineStatusEffectResistances(StatusEffectResistances, result, level, 1f);
+        }
+
+        public void ApplySelfStatusEffectsWhenAttacking(int level, EntityInfo applier, BaseCharacterEntity target)
+        {
+            if (level <= 0 || target == null)
+                return;
+            selfStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, CharacterItem.Empty, target);
+        }
+
+        public void ApplyEnemyStatusEffectsWhenAttacking(int level, EntityInfo applier, BaseCharacterEntity target)
+        {
+            if (level <= 0 || target == null)
+                return;
+            enemyStatusEffectsWhenAttacking.ApplyStatusEffect(level, applier, CharacterItem.Empty, target);
+        }
+
+        public void ApplySelfStatusEffectsWhenAttacked(int level, EntityInfo applier, BaseCharacterEntity target)
+        {
+            if (level <= 0 || target == null)
+                return;
+            selfStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, CharacterItem.Empty, target);
+        }
+
+        public void ApplyEnemyStatusEffectsWhenAttacked(int level, EntityInfo applier, BaseCharacterEntity target)
+        {
+            if (level <= 0 || target == null)
+                return;
+            enemyStatusEffectsWhenAttacked.ApplyStatusEffect(level, applier, CharacterItem.Empty, target);
         }
 
         public abstract HashSet<int> GetLearnableSkillDataIds();

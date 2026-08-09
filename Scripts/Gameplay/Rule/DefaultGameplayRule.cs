@@ -694,6 +694,12 @@ namespace MultiplayerARPG
                 EntityInfo attackerInfo = attacker.GetInfo();
                 EntityInfo damageReceiverInfo = damageReceiver.GetInfo();
                 // Attacker
+                BaseCharacter attackerDb = attacker.GetDatabase();
+                if (!attacker.IsDead() && attackerDb != null)
+                {
+                    attackerDb.ApplySelfStatusEffectsWhenAttacking(attacker.Level, attackerInfo, attacker);
+                    attackerDb.ApplyEnemyStatusEffectsWhenAttacking(attacker.Level, attackerInfo, damageReceiver);
+                }
                 if (!attacker.IsDead())
                 {
                     // Armors
@@ -755,6 +761,12 @@ namespace MultiplayerARPG
                     }
                 }
                 // Damage Receiver
+                BaseCharacter damageReceiverDb = damageReceiver.GetDatabase();
+                if (!damageReceiver.IsDead() && damageReceiverDb != null)
+                {
+                    damageReceiverDb.ApplySelfStatusEffectsWhenAttacked(damageReceiver.Level, damageReceiverInfo, damageReceiver);
+                    damageReceiverDb.ApplyEnemyStatusEffectsWhenAttacked(damageReceiver.Level, damageReceiverInfo, attacker);
+                }
                 if (!damageReceiver.IsDead())
                 {
                     // Armors
