@@ -76,7 +76,7 @@ namespace MultiplayerARPG
         }
 
         [SerializeField]
-        [Tooltip("Damange amount which will be used when attacking characters, buildings and so on")]
+        [Tooltip("Damage amount which will be used when attacking characters, buildings and so on")]
         private DamageIncremental damageAmount = default;
         public DamageIncremental DamageAmount
         {

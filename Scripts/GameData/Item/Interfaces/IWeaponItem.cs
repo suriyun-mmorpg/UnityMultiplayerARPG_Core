@@ -26,7 +26,7 @@ namespace MultiplayerARPG
         /// </summary>
         EquipmentModel[] OffHandSheathModels { get; }
         /// <summary>
-        /// Damange amount which will be used when attacking characters, buildings and so on
+        /// Damage amount which will be used when attacking characters, buildings and so on
         /// </summary>
         DamageIncremental DamageAmount { get; }
         /// <summary>
