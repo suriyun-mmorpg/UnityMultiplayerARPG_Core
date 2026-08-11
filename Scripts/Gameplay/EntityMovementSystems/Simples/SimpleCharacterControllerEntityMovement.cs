@@ -154,6 +154,8 @@ namespace MultiplayerARPG
         protected float _forceUngroundCountdown = 0f;
         protected int _allowToJumpOrDashCheckFrame = 0;
         protected bool _isAllowToJumpOrDash = true;
+        protected bool _isMovementBoundsDirty = true;
+        protected Bounds _movementBounds;
 
         private void Awake()
         {
@@ -435,9 +437,32 @@ namespace MultiplayerARPG
             EntityTransform.position = position;
         }
 
+        public void MarkMovementBoundsDirty()
+        {
+            _isMovementBoundsDirty = true;
+        }
+
         public Bounds GetMovementBounds()
         {
-            return CacheCharacterController.bounds;
+            if (_isMovementBoundsDirty)
+            {
+                Vector3 scale = EntityTransform.lossyScale;
+
+                float horizontalScale = Mathf.Max(
+                    Mathf.Abs(scale.x),
+                    Mathf.Abs(scale.z));
+
+                float diameter =
+                    CacheCharacterController.radius * horizontalScale * 2f;
+
+                float height =
+                    CacheCharacterController.height * Mathf.Abs(scale.y);
+
+                _movementBounds = new Bounds(
+                    EntityTransform.TransformPoint(CacheCharacterController.center),
+                    new Vector3(diameter, height, diameter));
+            }
+            return _movementBounds;
         }
 
         public void Move(MovementState movementState, ExtraMovementState extraMovementState, Vector3 motion, float deltaTime)
