@@ -1021,10 +1021,13 @@ namespace MultiplayerARPG
             if (!character.Manager.Assets.TryGetSpawnedObject(objectId, out interactingEntity))
                 return false;
             // This function will sort: near to far, so loop from 0
-            float dist = Vector3.Distance(character.EntityTransform.position, interactingEntity.EntityTransform.position);
-            Vector3 dir = (interactingEntity.EntityTransform.position - character.EntityTransform.position).normalized;
+            Vector3 interactPosition = character.EntityTransform.position;
+            Vector3 characterPosition = character.EntityTransform.position;
+            Vector3 offsetVector = characterPosition - interactPosition;
+            float dist = offsetVector.magnitude;
+            Vector3 dir = offsetVector.normalized;
             // Find that the entity is behind the wall or not
-            int count = character.FindPhysicFunctions.Raycast(character.MeleeDamageTransform.position, dir, dist, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
+            int count = character.FindPhysicFunctions.Raycast(interactPosition, dir, dist, GameInstance.Singleton.buildingLayer.Mask, QueryTriggerInteraction.Ignore);
             IGameEntity gameEntity;
             for (int i = 0; i < count; ++i)
             {
