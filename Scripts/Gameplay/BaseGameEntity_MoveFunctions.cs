@@ -71,7 +71,7 @@ namespace MultiplayerARPG
         {
             get
             {
-                return ActiveMovement.IsNull() ? (DirectionVector2)Vector2.down : ActiveMovement.Direction2D;
+                return ActiveMovement.IsNull() || ((Vector2)ActiveMovement.Direction2D).sqrMagnitude < 0.000001f ? (DirectionVector2)Vector2.down : ActiveMovement.Direction2D;
             }
             set
             {
