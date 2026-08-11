@@ -828,7 +828,7 @@ namespace MultiplayerARPG
                     default:
                         PlayingCharacterEntity.SetLookRotation(lookAtRot, false);
                         float currentAngle = Quaternion.Angle(Quaternion.LookRotation(PlayingCharacterEntity.EntityTransform.forward), lookAtRot);
-                        turnedToTarget = currentAngle <= 15f;
+                        turnedToTarget = currentAngle <= 30f;
                         break;
                 }
                 if (turnedToTarget)
