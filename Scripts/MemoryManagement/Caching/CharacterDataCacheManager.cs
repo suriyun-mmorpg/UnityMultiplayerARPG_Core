@@ -14,12 +14,12 @@ namespace MultiplayerARPG
             if (characterData is Object unityObj && unityObj == null)
                 return null;
             int hashCode = characterData.GetHashCode();
-            if (!s_caches.ContainsKey(hashCode))
+            if (!s_caches.TryGetValue(hashCode, out CharacterDataCache cache))
             {
                 // Did not mark to mark cache yet, so mark it here before get caches
                 return s_caches[hashCode] = new CharacterDataCache().MarkToMakeCaches().GetCaches(characterData);
             }
-            return s_caches[hashCode].GetCaches(characterData);
+            return cache.GetCaches(characterData);
         }
 
         public static CharacterDataCache MarkToMakeCaches(this ICharacterData characterData)
@@ -29,12 +29,12 @@ namespace MultiplayerARPG
             if (characterData is Object unityObj && unityObj == null)
                 return null;
             int hashCode = characterData.GetHashCode();
-            if (!s_caches.ContainsKey(hashCode))
+            if (!s_caches.TryGetValue(hashCode, out CharacterDataCache cache))
             {
                 // No stored caching data yet, create a new one and store to a colelction
                 return s_caches[hashCode] = new CharacterDataCache().MarkToMakeCaches();
             }
-            return s_caches[hashCode].MarkToMakeCaches();
+            return cache.MarkToMakeCaches();
         }
 
         public static void RemoveCaches(this ICharacterData characterData)
