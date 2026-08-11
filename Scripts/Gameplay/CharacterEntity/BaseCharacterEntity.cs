@@ -913,6 +913,11 @@ namespace MultiplayerARPG
 
         public bool IsPositionInFov(Vector3 origin, float fov, Vector3 position)
         {
+            if (Movement.GetMovementBounds().Contains(position))
+            {
+                // Very close to target, determine that it is in fov
+                return true;
+            }
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension2D)
                 return origin.GetVector2().IsPositionInFov2D(fov, position, Direction2D);
             return origin.IsPositionInFov3D(fov, position, EntityTransform.forward);
