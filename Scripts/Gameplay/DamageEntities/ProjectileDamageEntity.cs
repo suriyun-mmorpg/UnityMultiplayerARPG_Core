@@ -10,7 +10,6 @@ namespace MultiplayerARPG
         public UnityEvent onProjectileDisappear = new UnityEvent();
 
         [Header("Configuration")]
-        public LayerMask hitLayers;
         [Tooltip("if you don't set it, you better don't change destroy delay.")]
         [FormerlySerializedAs("ProjectileObject")]
         public GameObject projectileObject;
@@ -156,21 +155,25 @@ namespace MultiplayerARPG
             if (!_previousPosition.HasValue)
                 return;
 
+            Vector3 currentPosition = CacheTransform.position;
+            int layerMask = hitLayers == 0 ? GameInstance.Singleton.GetDamageEntityHitLayerMask() : hitLayers;
+            Vector3 offsetVector = currentPosition - _previousPosition.Value;
+            float dist = offsetVector.magnitude;
+
             int hitCount = 0;
-            Vector3 dir = (CacheTransform.position - _previousPosition.Value).normalized;
-            float dist = Vector3.Distance(CacheTransform.position, _previousPosition.Value);
+            Vector3 dir = offsetVector.normalized;
             // Raycast to previous position to check is it hitting something or not
             // If hit, explode
             switch (hitDetectionMode)
             {
                 case HitDetectionMode.Raycast:
-                    hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, hitLayers);
+                    hitCount = Physics.RaycastNonAlloc(_previousPosition.Value, dir, _hits3D, dist, layerMask, QueryTriggerInteraction.Collide);
                     break;
                 case HitDetectionMode.SphereCast:
-                    hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, hitLayers);
+                    hitCount = Physics.SphereCastNonAlloc(_previousPosition.Value, sphereCastRadius, dir, _hits3D, dist, layerMask, QueryTriggerInteraction.Collide);
                     break;
                 case HitDetectionMode.BoxCast:
-                    hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, hitLayers);
+                    hitCount = Physics.BoxCastNonAlloc(_previousPosition.Value, boxCastSize * 0.5f, dir, _hits3D, CacheTransform.rotation, dist, layerMask, QueryTriggerInteraction.Collide);
                     break;
             }
 
