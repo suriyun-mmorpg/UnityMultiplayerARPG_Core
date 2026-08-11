@@ -10,9 +10,8 @@ namespace MultiplayerARPG
             if (GameInstance.Singleton.DimensionType == DimensionType.Dimension2D)
             {
                 position = damageTransform.position;
-                Vector2 aimDirection = attacker.Direction2D;
-                rotation = Quaternion.Euler(0, 0, (Mathf.Atan2(aimDirection.y, aimDirection.x) * (180 / Mathf.PI)) + 90);
                 direction = attacker.Direction2D;
+                GetDamageRotation2D(direction, out rotation);
                 return;
             }
             if (aimPosition.type == AimPositionType.Direction)
