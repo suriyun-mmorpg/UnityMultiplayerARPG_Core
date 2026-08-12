@@ -4,9 +4,9 @@ namespace MultiplayerARPG
 {
     public struct UIEquipmentSocketsData
     {
-        public List<int> sockets;
+        public CharacterItemSockets sockets;
         public SocketEnhancerType[] availableSocketEnhancerTypes;
-        public UIEquipmentSocketsData(List<int> sockets, SocketEnhancerType[] availableSocketEnhancerTypes)
+        public UIEquipmentSocketsData(CharacterItemSockets sockets, SocketEnhancerType[] availableSocketEnhancerTypes)
         {
             this.sockets = sockets;
             this.availableSocketEnhancerTypes = availableSocketEnhancerTypes;

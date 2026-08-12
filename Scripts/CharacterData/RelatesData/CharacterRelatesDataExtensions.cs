@@ -152,16 +152,6 @@ namespace MultiplayerARPG
 
         public static bool IsDifferSockets(this CharacterItem data, CharacterItem anotherData)
         {
-            int len1 = 0;
-            int len2 = 0;
-            if (data.sockets != null)
-                len1 = data.sockets.Count;
-            if (anotherData.sockets != null)
-                len2 = anotherData.sockets.Count;
-            if (len1 != len2)
-                return true;
-            if (len1 == 0)
-                return false;
             for (int i = 0; i < data.sockets.Count; ++i)
             {
                 if (data.sockets[i] != anotherData.sockets[i])

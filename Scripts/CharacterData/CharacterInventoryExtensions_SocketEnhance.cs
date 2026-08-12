@@ -103,18 +103,6 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
                 return false;
             }
-            int maxSocket = GameInstance.Singleton.GameplayRule.GetItemMaxSocket(character, enhancingItem);
-            if (maxSocket <= 0)
-            {
-                // Cannot enhance socket because equipment has no socket(s)
-                gameMessage = UITextKeys.UI_ERROR_NO_EMPTY_SOCKET;
-                return false;
-            }
-            while (enhancingItem.sockets.Count < maxSocket)
-            {
-                // Add empty slots
-                enhancingItem.sockets.Add(0);
-            }
             if (socketIndex >= 0)
             {
                 // Put enhancer to target socket

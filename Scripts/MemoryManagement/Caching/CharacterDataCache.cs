@@ -505,7 +505,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private static void AddOrReplaceWeaponAbilities(List<BaseWeaponAbility> weaponAbilities, Dictionary<string, int> weaponAbilityIndexes, List<int> sockets)
+        private static void AddOrReplaceWeaponAbilities(List<BaseWeaponAbility> weaponAbilities, Dictionary<string, int> weaponAbilityIndexes, CharacterItemSockets sockets)
         {
             weaponAbilityIndexes.Clear();
             int i;

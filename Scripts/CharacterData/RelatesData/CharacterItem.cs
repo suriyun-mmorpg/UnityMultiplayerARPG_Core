@@ -8,23 +8,6 @@ namespace MultiplayerARPG
     {
         public const byte CURRENT_VERSION = 2;
 
-        public bool TryGetSocketEnhancerItemDataId(int index, out int dataId)
-        {
-            dataId = 0;
-            if (index >= 0 && sockets != null && index < sockets.Count && sockets[index] != 0)
-            {
-                dataId = sockets[index];
-                return true;
-            }
-            return false;
-        }
-
-        public bool TryGetSocketEnhancerItem(int index, out BaseItem data)
-        {
-            data = null;
-            return TryGetSocketEnhancerItemDataId(index, out int dataId) && GameInstance.Items.TryGetValue(dataId, out data);
-        }
-
         public BaseItem GetItem()
         {
             return MemoryManager.CharacterItems.GetItem(in this);
@@ -297,7 +280,7 @@ namespace MultiplayerARPG
             newItem.lockRemainsDuration = 0f;
             newItem.ammo = 0;
             newItem.ammoDataId = 0;
-            newItem.sockets = new List<int>();
+            newItem.sockets = default;
             if (GameInstance.Items.TryGetValue(dataId, out BaseItem tempItem))
             {
                 if (tempItem.IsEquipment() && tempItem is IEquipmentItem equipmentItem)

@@ -23,7 +23,7 @@ namespace MultiplayerARPG
             info.AddValue("randomSeed", data.randomSeed);
             info.AddValue("ammo", data.ammo);
             info.AddValue("ammoDataId", data.ammoDataId);
-            info.AddValue("sockets", data.sockets);
+            info.AddValue("sockets", data.sockets.ToList());
             info.AddValue("version", data.version);
         }
 
@@ -42,7 +42,7 @@ namespace MultiplayerARPG
             data.exp = info.GetInt32("exp");
             data.lockRemainsDuration = info.GetSingle("lockRemainsDuration");
             data.ammo = info.GetInt32("ammo");
-            data.sockets = (List<int>)info.GetValue("sockets", typeof(List<int>));
+            data.sockets = ((List<int>)info.GetValue("sockets", typeof(List<int>))).ToCharacterItemSockets();
             // TODO: Backward compatible, this will be removed in future version
             try
             {

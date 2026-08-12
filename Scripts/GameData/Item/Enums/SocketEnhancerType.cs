@@ -10,6 +10,7 @@ namespace MultiplayerARPG
         Type6,
         Type7,
         Type8,
+#if SOCKET_ENHANCER_TYPES_16 || SOCKET_ENHANCER_TYPES_32
         Type9,
         Type10,
         Type11,
@@ -18,6 +19,8 @@ namespace MultiplayerARPG
         Type14,
         Type15,
         Type16,
+#endif
+#if SOCKET_ENHANCER_TYPES_32
         Type17,
         Type18,
         Type19,
@@ -34,5 +37,6 @@ namespace MultiplayerARPG
         Type30,
         Type31,
         Type32,
+#endif
     }
 }

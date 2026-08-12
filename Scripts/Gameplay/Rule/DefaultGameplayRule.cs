@@ -835,8 +835,6 @@ namespace MultiplayerARPG
             bool isWeapon = equipmentItem is IWeaponItem;
             equipmentItem.ApplySelfStatusEffectsWhenAttacking(characterItem.level, attackerInfo, isWeapon ? characterItem : CharacterItem.Empty, attacker);
             equipmentItem.ApplyEnemyStatusEffectsWhenAttacking(characterItem.level, attackerInfo, isWeapon ? characterItem : CharacterItem.Empty, damageReceiver);
-            if (characterItem.sockets == null || characterItem.sockets.Count == 0)
-                return;
             foreach (int socketItemDataId in characterItem.sockets)
             {
                 ApplyStatusEffectsWhenAttacking(isWeapon ? characterItem : CharacterItem.Empty, socketItemDataId, attackerInfo, attacker, damageReceiver);
@@ -858,8 +856,6 @@ namespace MultiplayerARPG
                 return;
             equipmentItem.ApplySelfStatusEffectsWhenAttacked(characterItem.level, damageReceiverInfo, damageReceiver);
             equipmentItem.ApplyEnemyStatusEffectsWhenAttacked(characterItem.level, damageReceiverInfo, attacker);
-            if (characterItem.sockets == null || characterItem.sockets.Count == 0)
-                return;
             foreach (int socketItemDataId in characterItem.sockets)
             {
                 ApplyStatusEffectsWhenAttacked(socketItemDataId, damageReceiverInfo, attacker, damageReceiver);
