@@ -54,6 +54,11 @@ namespace MultiplayerARPG
             get { return entityTitles; }
         }
 
+        public virtual string EntityTitle
+        {
+            get { return Language.GetText(entityTitles, entityTitle); }
+        }
+
         [Category(100, "Sync Fields", false)]
         [SerializeField]
         protected SyncFieldString syncTitle = new SyncFieldString();
@@ -61,6 +66,7 @@ namespace MultiplayerARPG
         {
             get { return syncTitle; }
         }
+
         public string Title
         {
             get { return !string.IsNullOrEmpty(syncTitle.Value) ? syncTitle.Value : EntityTitle; }
@@ -82,11 +88,6 @@ namespace MultiplayerARPG
         public GameObject[] NonOwnerObjects
         {
             get { return nonOwnerObjects; }
-        }
-
-        public virtual string EntityTitle
-        {
-            get { return Language.GetText(entityTitles, entityTitle); }
         }
 
         [Category(2, "Components")]
