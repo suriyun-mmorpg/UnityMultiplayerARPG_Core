@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             get
             {
                 string title = base.EntityTitle;
-                return !string.IsNullOrEmpty(title) ? title : characterDatabase.Title;
+                return !string.IsNullOrWhiteSpace(title) ? title : characterDatabase.Title;
             }
         }
 
