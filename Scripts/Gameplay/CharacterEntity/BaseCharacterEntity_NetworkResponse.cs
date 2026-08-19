@@ -86,12 +86,12 @@ namespace MultiplayerARPG
                 amount = pickingItem.amount;
             pickingItem.amount = amount;
 
-            if (pickingItem.dataId == CurrentGameInstance.GoldDropRepresentItem.DataId)
+            if (CurrentGameInstance.GoldDropRepresentItem != null && pickingItem.dataId == CurrentGameInstance.GoldDropRepresentItem.DataId)
             {
                 CurrentGameplayRule.RewardGold(this, pickingItem.amount, 1f, rewardGivenType, 1, 1, out int rewardedGold);
                 OnRewardGold(rewardGivenType, rewardedGold);
             }
-            else if (pickingItem.dataId == CurrentGameInstance.ExpDropRepresentItem.DataId)
+            else if (CurrentGameInstance.ExpDropRepresentItem != null && pickingItem.dataId == CurrentGameInstance.ExpDropRepresentItem.DataId)
             {
                 bool isLevelUp = CurrentGameplayRule.RewardExp(this, pickingItem.amount, 1f, rewardGivenType, 1, 1, out int rewardedGold);
                 OnRewardExp(rewardGivenType, rewardedGold, isLevelUp);
@@ -148,12 +148,12 @@ namespace MultiplayerARPG
             {
                 CharacterItem pickingItem = itemsContainerEntity.Items[0];
 
-                if (pickingItem.dataId == CurrentGameInstance.GoldDropRepresentItem.DataId)
+                if (CurrentGameInstance.GoldDropRepresentItem != null && pickingItem.dataId == CurrentGameInstance.GoldDropRepresentItem.DataId)
                 {
                     CurrentGameplayRule.RewardGold(this, pickingItem.amount, 1f, rewardGivenType, 1, 1, out int rewardedGold);
                     OnRewardGold(rewardGivenType, rewardedGold);
                 }
-                else if (pickingItem.dataId == CurrentGameInstance.ExpDropRepresentItem.DataId)
+                else if (CurrentGameInstance.ExpDropRepresentItem != null && pickingItem.dataId == CurrentGameInstance.ExpDropRepresentItem.DataId)
                 {
                     bool isLevelUp = CurrentGameplayRule.RewardExp(this, pickingItem.amount, 1f, rewardGivenType, 1, 1, out int rewardedGold);
                     OnRewardExp(rewardGivenType, rewardedGold, isLevelUp);
