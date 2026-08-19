@@ -8,13 +8,31 @@ namespace MultiplayerARPG
         public bool doNotAskForAmount = true;
         private bool readyToPickUp;
 
-        public ItemsContainerEntity TargetEntity { get; private set; }
+        private ItemsContainerEntity _targetEntity;
+        public ItemsContainerEntity TargetEntity
+        {
+            get { return _targetEntity; }
+            set
+            {
+                if (_targetEntity != null)
+                    _targetEntity.Items.onOperation -= OnItemsOperation;
+                _targetEntity = value;
+                if (_targetEntity != null)
+                {
+                    _targetEntity.Items.onOperation -= OnItemsOperation;
+                    _targetEntity.Items.onOperation += OnItemsOperation;
+                }
+            }
+        }
 
         protected override void OnEnable()
         {
             base.OnEnable();
             if (TargetEntity != null)
+            {
+                TargetEntity.Items.onOperation -= OnItemsOperation;
                 TargetEntity.Items.onOperation += OnItemsOperation;
+            }
         }
 
         protected override void OnDisable()
