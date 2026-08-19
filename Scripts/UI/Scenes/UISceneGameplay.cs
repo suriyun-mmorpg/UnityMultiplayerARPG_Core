@@ -143,6 +143,8 @@ namespace MultiplayerARPG
             SetTargetBuilding(null);
             SetTargetHarvestable(null);
             SetTargetVehicle(null);
+            ClientPartyActions.onNotifyPartyInvitation += OnNotifyPartyInvitation;
+            ClientGuildActions.onNotifyGuildInvitation += OnNotifyGuildInvitation;
             this.InvokeInstanceDevExtMethods("Awake");
         }
 
@@ -204,6 +206,8 @@ namespace MultiplayerARPG
             _openedNpcDialogs?.Clear();
             _pointerOverUIResults?.Clear();
             _prevTargetEntity = null;
+            ClientPartyActions.onNotifyPartyInvitation -= OnNotifyPartyInvitation;
+            ClientGuildActions.onNotifyGuildInvitation -= OnNotifyGuildInvitation;
             this.InvokeInstanceDevExtMethods("OnDestroy");
         }
 
@@ -998,8 +1002,6 @@ namespace MultiplayerARPG
                 playerCharacter.onDead.AddListener(OnCharacterDead);
                 playerCharacter.onRespawn.AddListener(OnCharacterRespawn);
             }
-            ClientPartyActions.onNotifyPartyInvitation += OnNotifyPartyInvitation;
-            ClientGuildActions.onNotifyGuildInvitation += OnNotifyGuildInvitation;
         }
 
         public override void OnControllerDesetup(BasePlayerCharacterEntity playerCharacter)
@@ -1028,8 +1030,6 @@ namespace MultiplayerARPG
                 playerCharacter.onDead.RemoveListener(OnCharacterDead);
                 playerCharacter.onRespawn.RemoveListener(OnCharacterRespawn);
             }
-            ClientPartyActions.onNotifyPartyInvitation -= OnNotifyPartyInvitation;
-            ClientGuildActions.onNotifyGuildInvitation -= OnNotifyGuildInvitation;
         }
 
         public override void ShowVending(BasePlayerCharacterEntity playerCharacter)
