@@ -214,8 +214,7 @@ namespace MultiplayerARPG
                 tempUI = ui.GetComponent<UICharacterItem>();
                 tempUI.Setup(new UICharacterItemData(data.Value, itemInventoryType), Character, data.Key);
                 tempUI.Show();
-                if (onGenerateEntry != null)
-                    onGenerateEntry.Invoke(data.Key, data.Value, index, tempUI);
+                OnGenerateEntry(data.Key, data.Value, index, tempUI);
                 UICharacterItemDragHandler dragHandler = tempUI.GetComponentInChildren<UICharacterItemDragHandler>();
                 if (dragHandler != null)
                 {
@@ -266,6 +265,11 @@ namespace MultiplayerARPG
         protected virtual void OnListFiltered(List<KeyValuePair<int, CharacterItem>> filteredList)
         {
 
+        }
+
+        protected virtual void OnGenerateEntry(int indexOfData, CharacterItem uiCharacterItem, int indexOfUi, UICharacterItem ui)
+        {
+            onGenerateEntry?.Invoke(indexOfData, uiCharacterItem, indexOfUi, ui);
         }
 
         protected virtual void Update()
