@@ -1414,7 +1414,7 @@ namespace MultiplayerARPG
                         }
 
                         tempActivatableEntity = tempGameEntity as IBaseActivatableEntity;
-                        if (tempActivatableEntity != null && Vector3.Distance(EntityTransform.position, tempActivatableEntity.EntityTransform.position) <= tempActivatableEntity.GetActivatableDistance())
+                        if (tempActivatableEntity != null && GameplayUtils.IsTargetInDistance(EntityTransform.position, tempActivatableEntity.EntityTransform, tempActivatableEntity.GetActivatableDistance()))
                         {
                             // Entity is in front of character, so this is target
                             SelectedEntity = tempActivatableEntity;
@@ -1424,7 +1424,7 @@ namespace MultiplayerARPG
                     }
 
                     tempActivatableEntity = collider.GetComponent<IBaseActivatableEntity>();
-                    if (tempActivatableEntity != null && Vector3.Distance(EntityTransform.position, tempActivatableEntity.EntityTransform.position) <= tempActivatableEntity.GetActivatableDistance())
+                    if (tempActivatableEntity != null && GameplayUtils.IsTargetInDistance(EntityTransform.position, tempActivatableEntity.EntityTransform, tempActivatableEntity.GetActivatableDistance()))
                     {
                         // Entity is in front of character, so this is target
                         SelectedEntity = tempActivatableEntity;

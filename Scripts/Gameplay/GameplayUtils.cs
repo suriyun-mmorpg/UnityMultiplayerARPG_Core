@@ -192,5 +192,25 @@ namespace MultiplayerARPG
         {
             return Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
         }
+
+        public static bool IsTargetInDistance(Vector3 origin, Transform target, float distance)
+        {
+            if (target == null)
+                return false;
+            if ((target.position - origin).sqrMagnitude <= distance * distance)
+                return true;
+            switch (GameInstance.Singleton.DimensionType)
+            {
+                case DimensionType.Dimension2D:
+                    if (target.TryGetComponent(out Collider2D collider2D) && (collider2D.ClosestPoint(origin) - new Vector2(origin.x, origin.y)).sqrMagnitude <= distance * distance)
+                        return true;
+                    break;
+                default:
+                    if (target.TryGetComponent(out Collider collider) && (collider.ClosestPoint(origin) - origin).sqrMagnitude <= distance * distance)
+                        return true;
+                    break;
+            }
+            return false;
+        }
     }
 }

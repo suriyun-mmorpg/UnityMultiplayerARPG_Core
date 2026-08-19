@@ -431,33 +431,33 @@ namespace MultiplayerARPG
 
         public bool CanActivate(IActivatableEntity entity)
         {
-            return !entity.IsNull() && Vector3.Distance(EntityTransform.position, entity.EntityTransform.position) <= entity.GetActivatableDistance() && entity.CanActivate();
+            
+            return !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanActivate();
         }
 
         public bool CanHoldActivate(IHoldActivatableEntity entity)
         {
-            return !entity.IsNull() && Vector3.Distance(EntityTransform.position, entity.EntityTransform.position) <= entity.GetActivatableDistance() && entity.CanHoldActivate();
+            return !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanHoldActivate();
         }
 
         public bool CanPickupActivate(IPickupActivatableEntity entity)
         {
-            return !entity.IsNull() && Vector3.Distance(EntityTransform.position, entity.EntityTransform.position) <= entity.GetActivatableDistance() && entity.CanPickupActivate();
+            return !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanPickupActivate();
         }
-
 
         public virtual bool ShouldShowActivateButtons()
         {
-            return CanActivate(SelectedGameEntity as IActivatableEntity);
+            return CanActivate(SelectedEntity as IActivatableEntity);
         }
 
         public virtual bool ShouldShowHoldActivateButtons()
         {
-            return CanHoldActivate(SelectedGameEntity as IHoldActivatableEntity);
+            return CanHoldActivate(SelectedEntity as IHoldActivatableEntity);
         }
 
         public virtual bool ShouldShowPickUpButtons()
         {
-            return CanPickupActivate(SelectedGameEntity as IPickupActivatableEntity);
+            return CanPickupActivate(SelectedEntity as IPickupActivatableEntity);
         }
     }
 }
