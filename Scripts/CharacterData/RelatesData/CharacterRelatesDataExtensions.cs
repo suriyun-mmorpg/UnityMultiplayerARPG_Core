@@ -83,15 +83,9 @@ namespace MultiplayerARPG
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static bool IsEmpty(this CharacterItem data)
-        {
-            return data.dataId == 0 || data.amount <= 0;
-        }
-
-        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool IsEmptySlot(this CharacterItem data)
         {
-            return data.IsEmpty() || data.GetItem() == null;
+            return data.dataId == 0 || data.amount <= 0 || data.GetItem() == null;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
