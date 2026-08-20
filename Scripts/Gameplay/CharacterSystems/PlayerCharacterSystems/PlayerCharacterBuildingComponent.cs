@@ -191,15 +191,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(buildingEntity))
+            if (!buildingEntity.IsCreator(Entity))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
             }
 
-            if (!buildingEntity.IsCreator(Entity))
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
             {
-                // Character is not the creator
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -228,6 +228,12 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out StorageEntity storageEntity))
             {
                 // Can't find the entity
+                return;
+            }
+
+            if (storageEntity.OnlyCreatorCanActivate && !storageEntity.IsCreator(Entity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
             }
 
@@ -275,6 +281,12 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out DoorEntity doorEntity))
             {
                 // Can't find the entity
+                return;
+            }
+
+            if (doorEntity.OnlyCreatorCanActivate && !doorEntity.IsCreator(Entity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
             }
 
@@ -352,6 +364,12 @@ namespace MultiplayerARPG
                 return;
             }
 
+            if (campfireEntity.OnlyCreatorCanActivate && !campfireEntity.IsCreator(Entity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
+                return;
+            }
+
             if (!Entity.IsGameEntityInDistance(campfireEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
@@ -386,6 +404,12 @@ namespace MultiplayerARPG
                 return;
             }
 
+            if (campfireEntity.OnlyCreatorCanActivate && !campfireEntity.IsCreator(Entity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
+                return;
+            }
+
             if (!Entity.IsGameEntityInDistance(campfireEntity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
@@ -412,6 +436,12 @@ namespace MultiplayerARPG
             if (!Manager.TryGetEntityByObjectId(objectId, out WorkbenchEntity workbenchEntity))
             {
                 // Can't find the entity
+                return;
+            }
+
+            if (workbenchEntity.OnlyCreatorCanActivate && !workbenchEntity.IsCreator(Entity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
             }
 
@@ -449,15 +479,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(buildingEntity))
+            if (!buildingEntity.IsCreator(Entity))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
             }
 
-            if (!buildingEntity.IsCreator(Entity))
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
             {
-                // Character is not the creator
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -496,15 +526,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(buildingEntity))
+            if (!buildingEntity.IsCreator(Entity))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
             }
 
-            if (!buildingEntity.IsCreator(Entity))
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
             {
-                // Character is not the creator
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 
@@ -542,15 +572,15 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (!Entity.IsGameEntityInDistance(buildingEntity))
+            if (!buildingEntity.IsCreator(Entity))
             {
-                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
             }
 
-            if (!buildingEntity.IsCreator(Entity))
+            if (!Entity.IsGameEntityInDistance(buildingEntity))
             {
-                // Character is not the creator
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
                 return;
             }
 

@@ -1,6 +1,5 @@
 ﻿using Insthync.UnityEditorUtils;
 using LiteNetLibManager;
-using LiteNetLib;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -114,6 +113,8 @@ namespace MultiplayerARPG
         public override bool CanActivate()
         {
             if (Identity != null && Identity.IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
+                return false;
+            if (OnlyCreatorCanActivate && !IsCreator(GameInstance.PlayingCharacterEntity))
                 return false;
             return !this.IsDead();
         }

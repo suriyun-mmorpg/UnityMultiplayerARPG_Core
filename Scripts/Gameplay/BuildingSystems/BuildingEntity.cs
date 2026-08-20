@@ -95,6 +95,10 @@ namespace MultiplayerARPG
         protected int passwordLength = 6;
         public int PasswordLength { get { return passwordLength; } }
 
+        [SerializeField]
+        protected bool onlyCreatorCanActivate = false;
+        public bool OnlyCreatorCanActivate { get { return onlyCreatorCanActivate; } }
+
         [Category("Events")]
         [SerializeField]
         protected UnityEvent onBuildingDestroy = new UnityEvent();
