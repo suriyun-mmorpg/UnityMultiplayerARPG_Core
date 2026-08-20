@@ -87,7 +87,7 @@ namespace MultiplayerARPG
         {
             if (Identity != null && Identity.IsServer && GameInstance.PlayingCharacterEntity != null && Identity.IsHideFrom(GameInstance.PlayingCharacterEntity.Identity))
                 return false;
-            if (OnlyCreatorCanActivate && !IsCreator(GameInstance.PlayingCharacterEntity))
+            if (CanUseByCreatorOnly && !IsCreator(GameInstance.PlayingCharacterEntity))
                 return false;
             return !this.IsDead();
         }

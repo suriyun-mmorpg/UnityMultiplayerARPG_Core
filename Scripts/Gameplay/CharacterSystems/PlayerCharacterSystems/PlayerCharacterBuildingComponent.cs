@@ -231,7 +231,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (storageEntity.OnlyCreatorCanActivate && !storageEntity.IsCreator(Entity))
+            if (storageEntity.CanUseByCreatorOnly && !storageEntity.IsCreator(Entity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
@@ -284,7 +284,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (doorEntity.OnlyCreatorCanActivate && !doorEntity.IsCreator(Entity))
+            if (doorEntity.CanUseByCreatorOnly && !doorEntity.IsCreator(Entity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
@@ -364,7 +364,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (campfireEntity.OnlyCreatorCanActivate && !campfireEntity.IsCreator(Entity))
+            if (campfireEntity.CanUseByCreatorOnly && !campfireEntity.IsCreator(Entity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
@@ -404,7 +404,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (campfireEntity.OnlyCreatorCanActivate && !campfireEntity.IsCreator(Entity))
+            if (campfireEntity.CanUseByCreatorOnly && !campfireEntity.IsCreator(Entity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;
@@ -439,7 +439,7 @@ namespace MultiplayerARPG
                 return;
             }
 
-            if (workbenchEntity.OnlyCreatorCanActivate && !workbenchEntity.IsCreator(Entity))
+            if (workbenchEntity.CanUseByCreatorOnly && !workbenchEntity.IsCreator(Entity))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ALLOWED);
                 return;

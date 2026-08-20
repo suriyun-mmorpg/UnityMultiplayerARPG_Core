@@ -96,8 +96,8 @@ namespace MultiplayerARPG
         public int PasswordLength { get { return passwordLength; } }
 
         [SerializeField]
-        protected bool onlyCreatorCanActivate = false;
-        public bool OnlyCreatorCanActivate { get { return onlyCreatorCanActivate; } }
+        protected bool canUseByCreatorOnly = false;
+        public bool CanUseByCreatorOnly { get { return canUseByCreatorOnly; } }
 
         [Category("Events")]
         [SerializeField]
