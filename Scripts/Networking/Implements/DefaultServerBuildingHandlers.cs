@@ -48,7 +48,7 @@ namespace MultiplayerARPG
             int amount = 0;
             foreach (IBuildingSaveData building in GetBuildings())
             {
-                if (characterId.Equals(building.CreatorId) && entityId == building.EntityId)
+                if (string.Equals(characterId, building.CreatorId) && entityId == building.EntityId)
                     amount++;
             }
             return amount;
