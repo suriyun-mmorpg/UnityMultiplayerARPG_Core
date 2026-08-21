@@ -6,6 +6,8 @@ namespace MultiplayerARPG
     public partial class UIStorageDropHandler : MonoBehaviour, IDropHandler
     {
         public StorageType storageType;
+        [Tooltip("If `sourceUi` is not empty, it will change `storageType` follow `sourceUi`")]
+        public UIStorageItems sourceUi;
 
         protected RectTransform _dropRect;
         public RectTransform DropRect
@@ -27,6 +29,9 @@ namespace MultiplayerARPG
             UIDragHandler dragHandler = UIDragHandler.Get(eventData);
             if (dragHandler == null || !dragHandler.CanDrop)
                 return;
+            StorageType storageType = this.storageType;
+            if (sourceUi != null)
+                storageType = sourceUi.StorageType;
             // Set UI drop state
             dragHandler.IsDropped = true;
             // If dragged item UI
