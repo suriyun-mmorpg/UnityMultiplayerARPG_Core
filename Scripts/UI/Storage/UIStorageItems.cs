@@ -26,21 +26,29 @@ namespace MultiplayerARPG
 
         private bool _doNotCloseStorageOnDisable = true;
 
+        protected override void Awake()
+        {
+            base.Awake();
+            ClientStorageActions.onNotifyStorageItemsUpdated += UpdateData;
+        }
+
+        protected override void OnDestroy()
+        {
+            base.OnDestroy();
+            ClientStorageActions.onNotifyStorageItemsUpdated -= UpdateData;
+        }
+
         protected override void OnEnable()
         {
             inventoryType = InventoryType.StorageItems;
             StorageId storageId = new StorageId(StorageType, StorageOwnerId);
             if (GameInstance.OpenedStorages.TryGetValue(storageId, out List<CharacterItem> updatedItems))
                 UpdateData(StorageType, StorageOwnerId, updatedItems);
-            ClientStorageActions.onNotifyStorageItemsUpdated += UpdateData;
-            onGenerateEntry += OnGenerateEntry;
             base.OnEnable();
         }
 
         protected override void OnDisable()
         {
-            ClientStorageActions.onNotifyStorageItemsUpdated -= UpdateData;
-            onGenerateEntry -= OnGenerateEntry;
             // Close storage
             if (!_doNotCloseStorageOnDisable)
                 GameInstance.ClientStorageHandlers.RequestCloseStorage(ClientStorageActions.ResponseCloseStorage);
@@ -112,8 +120,9 @@ namespace MultiplayerARPG
             base.GenerateList();
         }
 
-        private void OnGenerateEntry(int indexOfData, CharacterItem characterItem, int indexOfUi, UICharacterItem ui)
+        protected override void OnGenerateEntry(int indexOfData, CharacterItem characterItem, int indexOfUi, UICharacterItem ui)
         {
+            base.OnGenerateEntry(indexOfData, characterItem, indexOfUi, ui);
             if (!characterItem.IsEmptySlot())
             {
                 // Increase total weight and used slots, if data is not empty slot
