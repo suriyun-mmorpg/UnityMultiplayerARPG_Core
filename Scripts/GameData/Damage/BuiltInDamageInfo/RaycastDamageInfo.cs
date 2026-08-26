@@ -226,8 +226,8 @@ namespace MultiplayerARPG
                         , tempGameObject
                         , tempHitDistance
                         , ref pierceThroughEntities
-#if !UNITY_SERVER
                         , tempHitPoint
+#if !UNITY_SERVER
                         , tempHitNormal
                         , isPlayImpactEffects
                         , impactEffectsData
@@ -272,8 +272,8 @@ namespace MultiplayerARPG
                     , tempGameObject
                     , tempHitDistance
                     , ref pierceThroughEntities
-#if !UNITY_SERVER
                     , tempHitPoint
+#if !UNITY_SERVER
                     , tempHitNormal
                     , isPlayImpactEffects
                     , impactEffectsData
@@ -307,8 +307,8 @@ namespace MultiplayerARPG
             , GameObject tempGameObject
             , float tempHitDistance
             , ref byte pierceThroughEntities
-#if !UNITY_SERVER
             , Vector3 tempHitPoint
+#if !UNITY_SERVER
             , Vector3 tempHitNormal
             , bool isPlayImpactEffects
             , List<ImpactEffectPlayingData> impactEffectsData
