@@ -91,8 +91,7 @@ namespace MultiplayerARPG
 
             base.Killed(lastAttacker);
 
-            if (IsServer)
-                GameInstance.ServerLogHandlers.LogKilled(this, lastAttacker);
+            GameInstance.ServerLogHandlers.LogKilled(this, lastAttacker);
 
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             if (BaseGameNetworkManager.CurrentMapInfo.AutoRespawnWhenDead)
