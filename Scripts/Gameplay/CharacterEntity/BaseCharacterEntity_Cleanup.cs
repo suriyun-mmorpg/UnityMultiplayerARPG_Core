@@ -37,6 +37,7 @@ namespace MultiplayerARPG
                 onRespawn = null;
                 onLevelUp?.RemoveAllListeners();
                 onLevelUp = null;
+                onKilled = null;
                 onRecached = null;
                 onIdChange = null;
                 onCharacterNameChange = null;
