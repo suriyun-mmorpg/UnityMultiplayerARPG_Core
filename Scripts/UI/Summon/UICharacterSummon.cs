@@ -33,6 +33,7 @@ namespace MultiplayerARPG
 
         protected readonly Dictionary<uint, CharacterSummon> _stackingEntries = new Dictionary<uint, CharacterSummon>();
         protected float _summonRemainsDuration;
+        private int _lastDisplayedRemains = -1;
         private BaseGameData _tempSummonData;
 
         protected override void OnDestroy()
@@ -59,6 +60,7 @@ namespace MultiplayerARPG
         {
             base.OnDisable();
             _summonRemainsDuration = 0f;
+            _lastDisplayedRemains = -1;
         }
 
         public override void ManagedUpdate()
@@ -79,10 +81,16 @@ namespace MultiplayerARPG
             // Update UIs
             if (uiTextRemainsDuration != null)
             {
-                uiTextRemainsDuration.SetGameObjectActive(_summonRemainsDuration > 0);
-                uiTextRemainsDuration.text = ZString.Format(
-                    LanguageManager.GetText(formatKeySummonRemainsDuration),
-                    _summonRemainsDuration.ToString("N0"));
+                bool remainsActive = _summonRemainsDuration > 0;
+                uiTextRemainsDuration.SetGameObjectActive(remainsActive);
+                int displayedRemains = Mathf.RoundToInt(_summonRemainsDuration);
+                if (displayedRemains != _lastDisplayedRemains)
+                {
+                    _lastDisplayedRemains = displayedRemains;
+                    uiTextRemainsDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeySummonRemainsDuration),
+                        displayedRemains.ToString("N0"));
+                }
             }
         }
 

@@ -29,6 +29,8 @@ namespace MultiplayerARPG
         public UIBuff uiBuff;
 
         protected float _buffRemainsDuration;
+        private int _lastDisplayedDuration = -1;
+        private int _lastDisplayedRemains = -1;
 
         protected override void OnDestroy()
         {
@@ -45,6 +47,8 @@ namespace MultiplayerARPG
         {
             base.OnDisable();
             _buffRemainsDuration = 0f;
+            _lastDisplayedDuration = -1;
+            _lastDisplayedRemains = -1;
         }
 
         public override void ManagedUpdate()
@@ -67,17 +71,28 @@ namespace MultiplayerARPG
 
             if (uiTextDuration != null)
             {
-                uiTextDuration.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyBuffDuration),
-                    buffDuration.ToString("N0"));
+                int displayedDuration = Mathf.RoundToInt(buffDuration);
+                if (displayedDuration != _lastDisplayedDuration)
+                {
+                    _lastDisplayedDuration = displayedDuration;
+                    uiTextDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyBuffDuration),
+                        displayedDuration.ToString("N0"));
+                }
             }
 
             if (uiTextRemainsDuration != null)
             {
-                uiTextRemainsDuration.SetGameObjectActive(_buffRemainsDuration > 0f);
-                uiTextRemainsDuration.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyBuffRemainsDuration),
-                    _buffRemainsDuration.ToString("N0"));
+                bool remainsActive = _buffRemainsDuration > 0f;
+                uiTextRemainsDuration.SetGameObjectActive(remainsActive);
+                int displayedRemains = Mathf.RoundToInt(_buffRemainsDuration);
+                if (displayedRemains != _lastDisplayedRemains)
+                {
+                    _lastDisplayedRemains = displayedRemains;
+                    uiTextRemainsDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyBuffRemainsDuration),
+                        displayedRemains.ToString("N0"));
+                }
             }
 
             if (imageDurationGage != null)

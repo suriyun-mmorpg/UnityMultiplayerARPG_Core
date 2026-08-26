@@ -251,6 +251,12 @@ namespace MultiplayerARPG
         protected float _lockRemainsDuration;
         protected bool _dirtyIsLock;
         protected float _coolDownRemainsDuration;
+        private int _lastDisplayedLockRemains = -1;
+        private int _lastDisplayedCoolDown = -1;
+        private int _lastDisplayedCoolDownRemains = -1;
+        private long _lastExpireTimeValue = -1;
+        private long _lastExpireMinuteBucket = -1;
+        private bool _lastExpireVisible;
         protected bool _dirtyIsCountDown;
         protected bool _forceUpdateUi = true;
         protected CalculatedItemRandomBonus _randomBonus = null;
@@ -449,6 +455,9 @@ namespace MultiplayerARPG
         {
             base.OnDisable();
             _lockRemainsDuration = 0f;
+            _lastDisplayedLockRemains = -1;
+            _lastDisplayedCoolDown = -1;
+            _lastDisplayedCoolDownRemains = -1;
             if (uiComparingEquipments != null)
             {
                 foreach (UICharacterItem uiComparingEquipment in uiComparingEquipments)
@@ -497,15 +506,32 @@ namespace MultiplayerARPG
             {
                 if (!CharacterItem.IsEmptySlot() && CharacterItem.expireTime > 0)
                 {
-                    System.DateTime dateTime = GenericUtils.GetDateTimeBySeconds(CharacterItem.expireTime).ToLocalTime();
-                    uiTextExpireTime.SetGameObjectActive(true);
-                    uiTextExpireTime.text = ZString.Format(
-                        LanguageManager.GetText(formatKeyExpireTime),
-                        (new System.DateTime(dateTime.Ticks) - System.DateTime.Now).GetPrettyDate(true));
+                    long currentExpireTime = CharacterItem.expireTime;
+                    System.DateTime dateTime = GenericUtils.GetDateTimeBySeconds(currentExpireTime).ToLocalTime();
+                    long secDiff = (new System.DateTime(dateTime.Ticks) - System.DateTime.Now).Ticks / System.TimeSpan.TicksPerSecond;
+                    long minuteBucket = secDiff < 60 ? 0 : (secDiff / 60) + 1;
+                    if (!_lastExpireVisible ||
+                        minuteBucket != _lastExpireMinuteBucket ||
+                        currentExpireTime != _lastExpireTimeValue)
+                    {
+                        _lastExpireVisible = true;
+                        _lastExpireTimeValue = currentExpireTime;
+                        _lastExpireMinuteBucket = minuteBucket;
+                        uiTextExpireTime.SetGameObjectActive(true);
+                        uiTextExpireTime.text = ZString.Format(
+                            LanguageManager.GetText(formatKeyExpireTime),
+                            (new System.DateTime(dateTime.Ticks) - System.DateTime.Now).GetPrettyDate(true));
+                    }
                 }
                 else
                 {
-                    uiTextExpireTime.SetGameObjectActive(false);
+                    if (_lastExpireVisible)
+                    {
+                        _lastExpireVisible = false;
+                        _lastExpireTimeValue = -1;
+                        _lastExpireMinuteBucket = -1;
+                        uiTextExpireTime.SetGameObjectActive(false);
+                    }
                 }
             }
         }
@@ -527,10 +553,16 @@ namespace MultiplayerARPG
 
             if (uiTextLockRemainsDuration != null)
             {
-                uiTextLockRemainsDuration.SetGameObjectActive(_lockRemainsDuration > 0);
-                uiTextLockRemainsDuration.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyLockRemainsDuration),
-                    _lockRemainsDuration.ToString("N0"));
+                bool lockTextActive = _lockRemainsDuration > 0;
+                uiTextLockRemainsDuration.SetGameObjectActive(lockTextActive);
+                int displayedLockRemains = Mathf.RoundToInt(_lockRemainsDuration);
+                if (displayedLockRemains != _lastDisplayedLockRemains)
+                {
+                    _lastDisplayedLockRemains = displayedLockRemains;
+                    uiTextLockRemainsDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyLockRemainsDuration),
+                        displayedLockRemains.ToString("N0"));
+                }
             }
 
             bool isLock = _lockRemainsDuration > 0f;
@@ -569,18 +601,30 @@ namespace MultiplayerARPG
 
             if (uiTextCoolDownDuration != null)
             {
-                uiTextCoolDownDuration.SetGameObjectActive(coolDownDuration > 0f);
-                uiTextCoolDownDuration.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyCoolDownDuration),
-                    coolDownDuration.ToString("N0"));
+                bool coolDownActive = coolDownDuration > 0f;
+                uiTextCoolDownDuration.SetGameObjectActive(coolDownActive);
+                int displayedCoolDown = Mathf.RoundToInt(coolDownDuration);
+                if (displayedCoolDown != _lastDisplayedCoolDown)
+                {
+                    _lastDisplayedCoolDown = displayedCoolDown;
+                    uiTextCoolDownDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyCoolDownDuration),
+                        displayedCoolDown.ToString("N0"));
+                }
             }
 
             if (uiTextCoolDownRemainsDuration != null)
             {
-                uiTextCoolDownRemainsDuration.SetGameObjectActive(_coolDownRemainsDuration > 0);
-                uiTextCoolDownRemainsDuration.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
-                    _coolDownRemainsDuration.ToString("N0"));
+                bool remainsActive = _coolDownRemainsDuration > 0;
+                uiTextCoolDownRemainsDuration.SetGameObjectActive(remainsActive);
+                int displayedRemains = Mathf.RoundToInt(_coolDownRemainsDuration);
+                if (displayedRemains != _lastDisplayedCoolDownRemains)
+                {
+                    _lastDisplayedCoolDownRemains = displayedRemains;
+                    uiTextCoolDownRemainsDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyCoolDownRemainsDuration),
+                        displayedRemains.ToString("N0"));
+                }
             }
 
             if (imageCoolDownGage != null)

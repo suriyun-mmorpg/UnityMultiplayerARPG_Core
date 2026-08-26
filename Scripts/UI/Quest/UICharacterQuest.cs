@@ -13,6 +13,21 @@ namespace MultiplayerARPG
         public CharacterQuest CharacterQuest { get { return Data; } }
         public Quest Quest { get { return CharacterQuest.GetQuest(); } }
 
+        private struct TaskProgressSnapshot
+        {
+            public int progress;
+            public bool isComplete;
+        }
+
+        private readonly List<TaskProgressSnapshot> _cachedTaskProgresses = new List<TaskProgressSnapshot>();
+        private int _cachedTaskQuestDataId;
+        private int _cachedTaskRandomIndex;
+        private bool _hasCachedTaskProgresses;
+        private bool _lastTitleIsComplete;
+        private bool _lastTitleIsAllTasksDone;
+        private bool _lastTitleHasCompleteAfterTalkedTask;
+        private string _lastTitleQuestTitle;
+
         [Header("Generic Info Format")]
         [Tooltip("Format => {0} = {Title}")]
         public UILocaleKeySetting formatKeyTitleOnGoing = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_QUEST_TITLE_ON_GOING);
@@ -267,6 +282,9 @@ namespace MultiplayerARPG
             if (uiRewardItemDialog != null)
                 uiRewardItemDialog.onHide.RemoveListener(OnRewardItemDialogHide);
             CacheRewardItemSelectionManager.DeselectSelectedUI();
+            _hasCachedTaskProgresses = false;
+            _cachedTaskProgresses.Clear();
+            _lastTitleQuestTitle = null;
         }
 
         protected virtual void OnRewardItemDialogHide()
@@ -304,28 +322,71 @@ namespace MultiplayerARPG
             Quest quest = !Data.IsEmpty() ? Data.GetQuest() : null;
             if (quest != null && showQuestTaskList)
             {
-                UIQuestTask tempUiQuestTask;
-                CacheQuestTaskList.Generate(quest.GetTasks(Data.randomTasksIndex), (index, task, ui) =>
+                QuestTask[] tasks = quest.GetTasks(Data.randomTasksIndex);
+                bool progressChanged = !_hasCachedTaskProgresses ||
+                    _cachedTaskQuestDataId != CharacterQuest.dataId ||
+                    _cachedTaskRandomIndex != CharacterQuest.randomTasksIndex ||
+                    _cachedTaskProgresses.Count != tasks.Length;
+                if (!progressChanged)
                 {
-                    tempUiQuestTask = ui.GetComponent<UIQuestTask>();
-                    bool isComplete = false;
-                    int progress = Data.GetProgress(GameInstance.PlayingCharacter, index, out isComplete);
-                    tempUiQuestTask.Data = new UIQuestTaskData(task, progress);
-                    tempUiQuestTask.Show();
-                });
+                    for (int i = 0; i < tasks.Length; ++i)
+                    {
+                        bool isComplete = false;
+                        int progress = Data.GetProgress(GameInstance.PlayingCharacter, i, out isComplete);
+                        TaskProgressSnapshot snapshot = _cachedTaskProgresses[i];
+                        if (snapshot.progress != progress || snapshot.isComplete != isComplete)
+                        {
+                            progressChanged = true;
+                            break;
+                        }
+                    }
+                }
+                if (progressChanged)
+                {
+                    UIQuestTask tempUiQuestTask;
+                    _cachedTaskProgresses.Clear();
+                    CacheQuestTaskList.Generate(tasks, (index, task, ui) =>
+                    {
+                        tempUiQuestTask = ui.GetComponent<UIQuestTask>();
+                        bool isComplete = false;
+                        int progress = Data.GetProgress(GameInstance.PlayingCharacter, index, out isComplete);
+                        tempUiQuestTask.Data = new UIQuestTaskData(task, progress);
+                        tempUiQuestTask.Show();
+                        _cachedTaskProgresses.Add(new TaskProgressSnapshot()
+                        {
+                            progress = progress,
+                            isComplete = isComplete,
+                        });
+                    });
+                    _cachedTaskQuestDataId = CharacterQuest.dataId;
+                    _cachedTaskRandomIndex = CharacterQuest.randomTasksIndex;
+                    _hasCachedTaskProgresses = true;
+                }
             }
 
-            bool isComplete = CharacterQuest.isComplete;
+            bool titleIsComplete = CharacterQuest.isComplete;
             bool isAllTasksDone = CharacterQuest.IsAllTasksDone(GameInstance.PlayingCharacter, out bool hasCompleteAfterTalkedTask);
+            string questTitle = Quest == null ? null : Quest.Title;
 
-            string titleFormat = isComplete ?
-                LanguageManager.GetText(formatKeyTitleComplete) :
-                (isAllTasksDone && !hasCompleteAfterTalkedTask ?
-                    LanguageManager.GetText(formatKeyTitleTasksComplete) :
-                    LanguageManager.GetText(formatKeyTitleOnGoing));
+            if (uiTextTitle != null &&
+                (titleIsComplete != _lastTitleIsComplete ||
+                    isAllTasksDone != _lastTitleIsAllTasksDone ||
+                    hasCompleteAfterTalkedTask != _lastTitleHasCompleteAfterTalkedTask ||
+                    questTitle != _lastTitleQuestTitle))
+            {
+                _lastTitleIsComplete = titleIsComplete;
+                _lastTitleIsAllTasksDone = isAllTasksDone;
+                _lastTitleHasCompleteAfterTalkedTask = hasCompleteAfterTalkedTask;
+                _lastTitleQuestTitle = questTitle;
 
-            if (uiTextTitle != null)
-                uiTextTitle.text = ZString.Format(titleFormat, Quest == null ? LanguageManager.GetUnknowTitle() : Quest.Title);
+                string titleFormat = titleIsComplete ?
+                    LanguageManager.GetText(formatKeyTitleComplete) :
+                    (isAllTasksDone && !hasCompleteAfterTalkedTask ?
+                        LanguageManager.GetText(formatKeyTitleTasksComplete) :
+                        LanguageManager.GetText(formatKeyTitleOnGoing));
+
+                uiTextTitle.text = ZString.Format(titleFormat, questTitle ?? LanguageManager.GetUnknowTitle());
+            }
         }
 
         protected override void UpdateData()

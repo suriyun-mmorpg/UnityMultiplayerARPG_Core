@@ -63,6 +63,8 @@ namespace MultiplayerARPG
         public UnityEvent onGuildMemberKicked = new UnityEvent();
 
         private IPlayerCharacterData _characterEntity;
+        private bool _lastStatusIsOnline;
+        private int _lastStatusKey = -1;
 
         protected override void OnDestroy()
         {
@@ -130,7 +132,16 @@ namespace MultiplayerARPG
             int offlineOffsets = GameInstance.ClientOnlineCharacterHandlers.GetCharacterOfflineOffsets(Data.id);
 
             if (uiTextOnlineStatus != null)
-                uiTextOnlineStatus.text = GetOnlineStatusText(isOnline, offlineOffsets);
+            {
+                // The displayed text changes per-minute (or below 2 minutes, per-second), so only rebuild when the visible state may change
+                int statusKey = offlineOffsets < 120 ? offlineOffsets : (offlineOffsets / 60) + 120;
+                if (isOnline != _lastStatusIsOnline || statusKey != _lastStatusKey)
+                {
+                    _lastStatusIsOnline = isOnline;
+                    _lastStatusKey = statusKey;
+                    uiTextOnlineStatus.text = GetOnlineStatusText(isOnline, offlineOffsets);
+                }
+            }
 
             // Member online status
             foreach (GameObject obj in memberIsOnlineObjects)

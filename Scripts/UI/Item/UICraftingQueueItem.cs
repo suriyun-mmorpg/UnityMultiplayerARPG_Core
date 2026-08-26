@@ -25,6 +25,9 @@ namespace MultiplayerARPG
         public UICraftingQueueItems CraftingQueueManager { get; set; }
 
         protected float _craftRemainsDuration;
+        private int _lastDisplayedAmount = -1;
+        private int _lastDisplayedDuration = -1;
+        private int _lastDisplayedRemains = -1;
 
         protected override void OnDestroy()
         {
@@ -42,6 +45,9 @@ namespace MultiplayerARPG
         {
             base.OnDisable();
             _craftRemainsDuration = 0f;
+            _lastDisplayedAmount = -1;
+            _lastDisplayedDuration = -1;
+            _lastDisplayedRemains = -1;
         }
 
         public override void ManagedUpdate()
@@ -72,24 +78,39 @@ namespace MultiplayerARPG
 
             if (uiTextAmount != null)
             {
-                uiTextAmount.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyAmount),
-                    Data.amount.ToString("N0"));
+                if (Data.amount != _lastDisplayedAmount)
+                {
+                    _lastDisplayedAmount = Data.amount;
+                    uiTextAmount.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyAmount),
+                        Data.amount.ToString("N0"));
+                }
             }
 
             if (uiTextDuration != null)
             {
-                uiTextDuration.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyCraftDuration),
-                    craftDuration.ToString("N0"));
+                int displayedCraftDuration = Mathf.RoundToInt(craftDuration);
+                if (displayedCraftDuration != _lastDisplayedDuration)
+                {
+                    _lastDisplayedDuration = displayedCraftDuration;
+                    uiTextDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyCraftDuration),
+                        displayedCraftDuration.ToString("N0"));
+                }
             }
 
             if (uiTextRemainsDuration != null)
             {
-                uiTextRemainsDuration.SetGameObjectActive(_craftRemainsDuration > 0);
-                uiTextRemainsDuration.text = ZString.Format(
-                    LanguageManager.GetText(formatKeyCraftRemainsDuration),
-                    _craftRemainsDuration.ToString("N0"));
+                bool remainsActive = _craftRemainsDuration > 0;
+                uiTextRemainsDuration.SetGameObjectActive(remainsActive);
+                int displayedRemains = Mathf.RoundToInt(_craftRemainsDuration);
+                if (displayedRemains != _lastDisplayedRemains)
+                {
+                    _lastDisplayedRemains = displayedRemains;
+                    uiTextRemainsDuration.text = ZString.Format(
+                        LanguageManager.GetText(formatKeyCraftRemainsDuration),
+                        displayedRemains.ToString("N0"));
+                }
             }
 
             if (imageDurationGage != null)
