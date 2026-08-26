@@ -82,7 +82,7 @@ namespace MultiplayerARPG
             RewardGivenType rewardGivenType = itemsContainerEntity.GivenType;
 
             CharacterItem pickingItem = itemsContainerEntity.Items[itemsContainerIndex].Clone();
-            if (amount < 0)
+            if (amount < 0 || amount > pickingItem.amount)
                 amount = pickingItem.amount;
             pickingItem.amount = amount;
 
