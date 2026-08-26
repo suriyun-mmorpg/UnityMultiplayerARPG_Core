@@ -13,6 +13,8 @@ namespace MultiplayerARPG
         public UnityEvent onDead = new UnityEvent();
         public UnityEvent onRespawn = new UnityEvent();
         public UnityEvent onLevelUp = new UnityEvent();
+        // Generic
+        public event CharacterEntityKilledDelegate onKilled;
         // Caching
         public event CharacterEntityDelegate onRecached;
         // Sync variables
