@@ -14,6 +14,7 @@ namespace MultiplayerARPG
         [Tooltip("UI which showing items in inventory, will use it to select items to sell")]
         public UINonEquipItems uiNonEquipItems;
         public TextWrapper uiTextReturnGold;
+        private int _lastReturnGold = -1;
 
         protected override void OnDestroy()
         {
@@ -26,16 +27,14 @@ namespace MultiplayerARPG
         {
             if (uiNonEquipItems == null)
                 uiNonEquipItems = FindFirstObjectByType<UINonEquipItems>();
+            if (uiNonEquipItems != null)
+                uiNonEquipItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
+            _lastReturnGold = -1;
         }
 
         private void OnDisable()
         {
             uiNonEquipItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
-        }
-
-        private void Update()
-        {
-            uiNonEquipItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
         }
 
         private void LateUpdate()
@@ -57,8 +56,9 @@ namespace MultiplayerARPG
                 returnGold += tempCharacterItem.GetItem().SellPrice * tempCharacterItem.amount;
             }
 
-            if (uiTextReturnGold != null)
+            if (uiTextReturnGold != null && returnGold != _lastReturnGold)
             {
+                _lastReturnGold = returnGold;
                 uiTextReturnGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyReturnGold),
                         returnGold.ToString("N0"));

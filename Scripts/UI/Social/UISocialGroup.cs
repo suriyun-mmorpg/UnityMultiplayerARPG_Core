@@ -75,6 +75,11 @@ namespace MultiplayerARPG
         protected int currentSocialId = 0;
         public int memberAmount { get; protected set; }
         public HashSet<string> onlineMembers { get; protected set; } = new HashSet<string>();
+        private int _lastSocialIdTextId = -1;
+        private int _lastMemberAmountTextAmount = -1;
+        private int _lastMemberAmountTextMaxAmount = -1;
+        private int _lastOnlineMemberTextOnlineAmount = -1;
+        private int _lastOnlineMemberTextAmount = -1;
 
         private UIList _memberList;
         public UIList MemberList
@@ -162,32 +167,48 @@ namespace MultiplayerARPG
 
             if (currentSocialId > 0)
             {
-                if (textSocialId != null)
+                if (textSocialId != null && currentSocialId != _lastSocialIdTextId)
                 {
+                    _lastSocialIdTextId = currentSocialId;
                     textSocialId.text = ZString.Format(
                             LanguageManager.GetText(formatKeySocialId),
-                            GetSocialId().ToString("N0"));
+                            currentSocialId.ToString("N0"));
                 }
 
                 if (textMemberAmount != null)
                 {
-                    if (GetMaxMemberAmount() > 0)
+                    int maxMemberAmount = GetMaxMemberAmount();
+                    if (maxMemberAmount > 0)
                     {
-                        textMemberAmount.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyMemberAmount),
-                            memberAmount.ToString("N0"),
-                            GetMaxMemberAmount().ToString("N0"));
+                        if (memberAmount != _lastMemberAmountTextAmount || maxMemberAmount != _lastMemberAmountTextMaxAmount)
+                        {
+                            _lastMemberAmountTextAmount = memberAmount;
+                            _lastMemberAmountTextMaxAmount = maxMemberAmount;
+                            textMemberAmount.text = ZString.Format(
+                                LanguageManager.GetText(formatKeyMemberAmount),
+                                memberAmount.ToString("N0"),
+                                maxMemberAmount.ToString("N0"));
+                        }
                     }
                     else
                     {
-                        textMemberAmount.text = ZString.Format(
-                            LanguageManager.GetText(formatKeyMemberAmountNoLimit),
-                            memberAmount.ToString("N0"));
+                        if (memberAmount != _lastMemberAmountTextAmount || _lastMemberAmountTextMaxAmount >= 0)
+                        {
+                            _lastMemberAmountTextAmount = memberAmount;
+                            _lastMemberAmountTextMaxAmount = -1;
+                            textMemberAmount.text = ZString.Format(
+                                LanguageManager.GetText(formatKeyMemberAmountNoLimit),
+                                memberAmount.ToString("N0"));
+                        }
                     }
                 }
 
-                if (textOnlineMemberAmount != null)
+                int onlineMemberCount = onlineMembers.Count;
+                if (textOnlineMemberAmount != null &&
+                    (onlineMemberCount != _lastOnlineMemberTextOnlineAmount || memberAmount != _lastOnlineMemberTextAmount))
                 {
+                    _lastOnlineMemberTextOnlineAmount = onlineMemberCount;
+                    _lastOnlineMemberTextAmount = memberAmount;
                     textOnlineMemberAmount.text = ZString.Format(
                         LanguageManager.GetText(formatKeyOnlineMemberAmount),
                         onlineMembers.Count.ToString("N0"),

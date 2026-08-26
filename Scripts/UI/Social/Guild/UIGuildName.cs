@@ -11,6 +11,9 @@ namespace MultiplayerARPG
 
         public GuildData Guild { get { return GameInstance.JoinedGuild; } }
 
+        private string _lastGuildName;
+        private bool _appliedHasGuild;
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -19,17 +22,23 @@ namespace MultiplayerARPG
 
         private void Update()
         {
-            if (textGuildName != null)
+            if (textGuildName == null)
+                return;
+            GuildData guild = Guild;
+            bool hasGuild = guild != null;
+            string guildName = hasGuild ? guild.guildName : null;
+            if (hasGuild == _appliedHasGuild && guildName == _lastGuildName)
+                return;
+            _appliedHasGuild = hasGuild;
+            _lastGuildName = guildName;
+            if (hasGuild)
             {
-                if (Guild != null)
-                {
-                    textGuildName.text = ZString.Format(LanguageManager.GetText(formatKeyGuildName), Guild.guildName);
-                    textGuildName.gameObject.SetActive(true);
-                }
-                else
-                {
-                    textGuildName.gameObject.SetActive(false);
-                }
+                textGuildName.text = ZString.Format(LanguageManager.GetText(formatKeyGuildName), guildName);
+                textGuildName.gameObject.SetActive(true);
+            }
+            else
+            {
+                textGuildName.gameObject.SetActive(false);
             }
         }
     }

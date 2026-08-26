@@ -22,6 +22,14 @@ namespace MultiplayerARPG
 
         protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
         protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
+        private readonly List<ItemAmount> _requireItems = new List<ItemAmount>();
+        private readonly List<CurrencyAmount> _requireCurrencies = new List<CurrencyAmount>();
+        private readonly Dictionary<BaseItem, int> _appliedRequireItems = new Dictionary<BaseItem, int>();
+        private readonly Dictionary<Currency, int> _appliedRequireCurrencies = new Dictionary<Currency, int>();
+        private bool _appliedHasItems;
+        private bool _appliedHasCurrencies;
+        private int _lastRequireGold = -1;
+        private int _lastGold = -1;
 
         protected override void OnDestroy()
         {
@@ -30,17 +38,23 @@ namespace MultiplayerARPG
             uiRequireItemAmounts = null;
             uiRequireCurrencyAmounts = null;
             uiTextSimpleRequireGold = null;
+            _requireItems.Clear();
+            _requireCurrencies.Clear();
             _tempRequireCurrencies.Clear();
             _tempRequireCurrencies = null;
             _tempRequireItems.Clear();
             _tempRequireItems = null;
+            _appliedRequireItems.Clear();
+            _appliedRequireCurrencies.Clear();
         }
 
         private void LateUpdate()
         {
             int requireGold = 0;
-            List<ItemAmount> requireItems = new List<ItemAmount>();
-            List<CurrencyAmount> requireCurrencies = new List<CurrencyAmount>();
+            List<ItemAmount> requireItems = _requireItems;
+            List<CurrencyAmount> requireCurrencies = _requireCurrencies;
+            requireItems.Clear();
+            requireCurrencies.Clear();
             ItemRepairPrice tempRepairPrice;
             EquipWeapons equipWeapons = GameInstance.PlayingCharacterEntity.EquipWeapons;
             if (!equipWeapons.IsEmptyRightHandSlot() &&
@@ -78,15 +92,25 @@ namespace MultiplayerARPG
             {
                 if (requireItems.Count == 0)
                 {
-                    uiRequireItemAmounts.Hide();
+                    if (_appliedHasItems)
+                    {
+                        _appliedHasItems = false;
+                        _appliedRequireItems.Clear();
+                        uiRequireItemAmounts.Hide();
+                    }
                 }
                 else
                 {
-                    uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
-                    uiRequireItemAmounts.Show();
                     _tempRequireItems.Clear();
                     GameDataHelpers.CombineItems(requireItems, _tempRequireItems);
-                    uiRequireItemAmounts.Data = _tempRequireItems;
+                    if (!_appliedHasItems || !DictionaryEquals(_appliedRequireItems, _tempRequireItems))
+                    {
+                        _appliedHasItems = true;
+                        CopyDictionary(_appliedRequireItems, _tempRequireItems);
+                        uiRequireItemAmounts.displayType = UIItemAmounts.DisplayType.Requirement;
+                        uiRequireItemAmounts.Show();
+                        uiRequireItemAmounts.Data = _tempRequireItems;
+                    }
                 }
             }
 
@@ -94,35 +118,71 @@ namespace MultiplayerARPG
             {
                 if (requireCurrencies.Count == 0)
                 {
-                    uiRequireCurrencyAmounts.Hide();
+                    if (_appliedHasCurrencies)
+                    {
+                        _appliedHasCurrencies = false;
+                        _appliedRequireCurrencies.Clear();
+                        uiRequireCurrencyAmounts.Hide();
+                    }
                 }
                 else
                 {
-                    uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
-                    uiRequireCurrencyAmounts.Show();
                     _tempRequireCurrencies.Clear();
                     GameDataHelpers.CombineCurrencies(requireCurrencies, _tempRequireCurrencies, 1f);
-                    uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
+                    if (!_appliedHasCurrencies || !DictionaryEquals(_appliedRequireCurrencies, _tempRequireCurrencies))
+                    {
+                        _appliedHasCurrencies = true;
+                        CopyDictionary(_appliedRequireCurrencies, _tempRequireCurrencies);
+                        uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
+                        uiRequireCurrencyAmounts.Show();
+                        uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
+                    }
                 }
             }
 
-            if (uiTextRequireGold != null)
+            int currentGold = GameInstance.PlayingCharacter.Gold;
+            bool requireGoldChanged = requireGold != _lastRequireGold || currentGold != _lastGold;
+            _lastRequireGold = requireGold;
+            _lastGold = currentGold;
+
+            if (uiTextRequireGold != null && requireGoldChanged)
             {
                 uiTextRequireGold.text = ZString.Format(
-                    GameInstance.PlayingCharacter.Gold >= requireGold ?
+                    currentGold >= requireGold ?
                         LanguageManager.GetText(formatKeyRequireGold) :
                         LanguageManager.GetText(formatKeyRequireGoldNotEnough),
-                    GameInstance.PlayingCharacter.Gold.ToString("N0"),
+                    currentGold.ToString("N0"),
                     requireGold.ToString("N0"));
             }
 
-            if (uiTextSimpleRequireGold != null)
+            if (uiTextSimpleRequireGold != null && requireGoldChanged)
                 uiTextSimpleRequireGold.text = ZString.Format(LanguageManager.GetText(formatKeySimpleRequireGold), requireGold.ToString("N0"));
         }
 
         public void OnClickRepairEquipItems()
         {
             GameInstance.ClientInventoryHandlers.RequestRepairEquipItems(ClientInventoryActions.ResponseRepairEquipItems);
+        }
+
+        private static bool DictionaryEquals<TKey, TValue>(Dictionary<TKey, TValue> a, Dictionary<TKey, TValue> b)
+        {
+            if (a.Count != b.Count)
+                return false;
+            foreach (KeyValuePair<TKey, TValue> pair in a)
+            {
+                if (!b.TryGetValue(pair.Key, out TValue value) || !EqualityComparer<TValue>.Default.Equals(value, pair.Value))
+                    return false;
+            }
+            return true;
+        }
+
+        private static void CopyDictionary<TKey, TValue>(Dictionary<TKey, TValue> destination, Dictionary<TKey, TValue> source)
+        {
+            destination.Clear();
+            foreach (KeyValuePair<TKey, TValue> pair in source)
+            {
+                destination.Add(pair.Key, pair.Value);
+            }
         }
     }
 }

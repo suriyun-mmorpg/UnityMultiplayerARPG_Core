@@ -19,6 +19,13 @@ namespace MultiplayerARPG
 
         protected Dictionary<Currency, int> _tempReturningCurrencies = new Dictionary<Currency, int>();
         protected Dictionary<BaseItem, int> _tempReturningItems = new Dictionary<BaseItem, int>();
+        private readonly List<ItemAmount> _returningItems = new List<ItemAmount>();
+        private readonly List<CurrencyAmount> _returningCurrencies = new List<CurrencyAmount>();
+        private readonly Dictionary<BaseItem, int> _appliedReturningItems = new Dictionary<BaseItem, int>();
+        private readonly Dictionary<Currency, int> _appliedReturningCurrencies = new Dictionary<Currency, int>();
+        private bool _appliedHasItems;
+        private bool _appliedHasCurrencies;
+        private int _lastReturnGold = -1;
 
         protected override void OnDestroy()
         {
@@ -27,16 +34,23 @@ namespace MultiplayerARPG
             uiReturnItems = null;
             uiReturnCurrencies = null;
             uiTextReturnGold = null;
+            _returningItems.Clear();
+            _returningCurrencies.Clear();
             _tempReturningCurrencies.Clear();
             _tempReturningCurrencies = null;
             _tempReturningItems.Clear();
             _tempReturningItems = null;
+            _appliedReturningItems.Clear();
+            _appliedReturningCurrencies.Clear();
         }
 
         private void OnEnable()
         {
             if (uiNonEquipItems == null)
                 uiNonEquipItems = FindFirstObjectByType<UINonEquipItems>();
+            if (uiNonEquipItems != null)
+                uiNonEquipItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
+            _lastReturnGold = -1;
         }
 
         private void OnDisable()
@@ -44,16 +58,13 @@ namespace MultiplayerARPG
             uiNonEquipItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectSingle;
         }
 
-        private void Update()
-        {
-            uiNonEquipItems.CacheSelectionManager.selectionMode = UISelectionMode.SelectMultiple;
-        }
-
         private void LateUpdate()
         {
             int returnGold = 0;
-            List<ItemAmount> returningItems = new List<ItemAmount>();
-            List<CurrencyAmount> returningCurrencies = new List<CurrencyAmount>();
+            List<ItemAmount> returningItems = _returningItems;
+            List<CurrencyAmount> returningCurrencies = _returningCurrencies;
+            returningItems.Clear();
+            returningCurrencies.Clear();
             CharacterItem tempCharacterItem;
             List<UICharacterItem> selectedUIs = uiNonEquipItems.CacheSelectionManager.GetSelectedUIs();
             List<ItemAmount> tempReturningItems;
@@ -73,15 +84,25 @@ namespace MultiplayerARPG
             {
                 if (returningItems.Count == 0)
                 {
-                    uiReturnItems.Hide();
+                    if (_appliedHasItems)
+                    {
+                        _appliedHasItems = false;
+                        _appliedReturningItems.Clear();
+                        uiReturnItems.Hide();
+                    }
                 }
                 else
                 {
-                    uiReturnItems.displayType = UIItemAmounts.DisplayType.Simple;
-                    uiReturnItems.Show();
                     _tempReturningItems.Clear();
                     GameDataHelpers.CombineItems(returningItems, _tempReturningItems);
-                    uiReturnItems.Data = _tempReturningItems;
+                    if (!_appliedHasItems || !DictionaryEquals(_appliedReturningItems, _tempReturningItems))
+                    {
+                        _appliedHasItems = true;
+                        CopyDictionary(_appliedReturningItems, _tempReturningItems);
+                        uiReturnItems.displayType = UIItemAmounts.DisplayType.Simple;
+                        uiReturnItems.Show();
+                        uiReturnItems.Data = _tempReturningItems;
+                    }
                 }
             }
 
@@ -89,20 +110,31 @@ namespace MultiplayerARPG
             {
                 if (returningCurrencies.Count == 0)
                 {
-                    uiReturnCurrencies.Hide();
+                    if (_appliedHasCurrencies)
+                    {
+                        _appliedHasCurrencies = false;
+                        _appliedReturningCurrencies.Clear();
+                        uiReturnCurrencies.Hide();
+                    }
                 }
                 else
                 {
-                    uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
-                    uiReturnCurrencies.Show();
                     _tempReturningCurrencies.Clear();
                     GameDataHelpers.CombineCurrencies(returningCurrencies, _tempReturningCurrencies, 1f);
-                    uiReturnCurrencies.Data = _tempReturningCurrencies;
+                    if (!_appliedHasCurrencies || !DictionaryEquals(_appliedReturningCurrencies, _tempReturningCurrencies))
+                    {
+                        _appliedHasCurrencies = true;
+                        CopyDictionary(_appliedReturningCurrencies, _tempReturningCurrencies);
+                        uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
+                        uiReturnCurrencies.Show();
+                        uiReturnCurrencies.Data = _tempReturningCurrencies;
+                    }
                 }
             }
 
-            if (uiTextReturnGold != null)
+            if (uiTextReturnGold != null && returnGold != _lastReturnGold)
             {
+                _lastReturnGold = returnGold;
                 uiTextReturnGold.text = ZString.Format(
                         LanguageManager.GetText(formatKeyReturnGold),
                         returnGold.ToString("N0"));
@@ -125,6 +157,27 @@ namespace MultiplayerARPG
             {
                 selectedIndexes = indexes.ToArray(),
             }, ClientInventoryActions.ResponseDismantleItems);
+        }
+
+        private static bool DictionaryEquals<TKey, TValue>(Dictionary<TKey, TValue> a, Dictionary<TKey, TValue> b)
+        {
+            if (a.Count != b.Count)
+                return false;
+            foreach (KeyValuePair<TKey, TValue> pair in a)
+            {
+                if (!b.TryGetValue(pair.Key, out TValue value) || !EqualityComparer<TValue>.Default.Equals(value, pair.Value))
+                    return false;
+            }
+            return true;
+        }
+
+        private static void CopyDictionary<TKey, TValue>(Dictionary<TKey, TValue> destination, Dictionary<TKey, TValue> source)
+        {
+            destination.Clear();
+            foreach (KeyValuePair<TKey, TValue> pair in source)
+            {
+                destination.Add(pair.Key, pair.Value);
+            }
         }
     }
 }

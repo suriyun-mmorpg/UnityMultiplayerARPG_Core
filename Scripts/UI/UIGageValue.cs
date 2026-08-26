@@ -40,6 +40,7 @@ namespace MultiplayerARPG
         private Coroutine _smoothingCoroutineForSlider;
         private float _prevCurrent = -1f;
         private float _prevMax = -1f;
+        private float _prevTargetRate = -1f;
 
         public void SetVisible(bool isVisible)
         {
@@ -86,31 +87,35 @@ namespace MultiplayerARPG
 
             if (smoothTransition)
             {
-                if (imageGage != null)
+                if (!Mathf.Approximately(_prevTargetRate, _targetRate))
                 {
-                    if (imageGage.isActiveAndEnabled)
+                    _prevTargetRate = _targetRate;
+                    if (imageGage != null)
                     {
-                        if (_smoothingCoroutineForImage != null)
-                            imageGage.StopCoroutine(_smoothingCoroutineForImage);
-                        _smoothingCoroutineForImage = imageGage.StartCoroutine(SmoothUpdateImageGageRoutine(_targetRate));
+                        if (imageGage.isActiveAndEnabled)
+                        {
+                            if (_smoothingCoroutineForImage != null)
+                                imageGage.StopCoroutine(_smoothingCoroutineForImage);
+                            _smoothingCoroutineForImage = imageGage.StartCoroutine(SmoothUpdateImageGageRoutine(_targetRate));
+                        }
+                        else
+                        {
+                            imageGage.fillAmount = _targetRate;
+                        }
                     }
-                    else
+                    if (sliderGage != null)
                     {
-                        imageGage.fillAmount = _targetRate;
-                    }
-                }
-                if (sliderGage != null)
-                {
-                    sliderGage.maxValue = 1f;
-                    if (sliderGage.isActiveAndEnabled)
-                    {
-                        if (_smoothingCoroutineForSlider != null)
-                            sliderGage.StopCoroutine(_smoothingCoroutineForSlider);
-                        _smoothingCoroutineForSlider = sliderGage.StartCoroutine(SmoothUpdateSliderGageRoutine(_targetRate));
-                    }
-                    else
-                    {
-                        sliderGage.value = _targetRate;
+                        sliderGage.maxValue = 1f;
+                        if (sliderGage.isActiveAndEnabled)
+                        {
+                            if (_smoothingCoroutineForSlider != null)
+                                sliderGage.StopCoroutine(_smoothingCoroutineForSlider);
+                            _smoothingCoroutineForSlider = sliderGage.StartCoroutine(SmoothUpdateSliderGageRoutine(_targetRate));
+                        }
+                        else
+                        {
+                            sliderGage.value = _targetRate;
+                        }
                     }
                 }
             }
