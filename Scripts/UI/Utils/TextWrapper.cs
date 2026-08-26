@@ -19,8 +19,10 @@ public class TextWrapper : MonoBehaviour
         set
         {
             _textValue = value;
-            if (unityText != null) unityText.text = value;
-            if (textMeshText != null) textMeshText.text = value;
+            if (unityText != null && !string.Equals(unityText.text, value))
+                unityText.text = value;
+            if (textMeshText != null && !string.Equals(textMeshText.text, value))
+                textMeshText.text = value;
         }
     }
 
