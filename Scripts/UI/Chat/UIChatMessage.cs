@@ -35,8 +35,13 @@ namespace MultiplayerARPG
         public UIChatHandler uiChatHandler;
         public GameObject[] signOnlines = new GameObject[0];
         public GameObject[] signOfflines = new GameObject[0];
+        [Header("Online Status Options")]
+        [Tooltip("Duration in seconds between each online status request to the server")]
+        public float onlineStatusRequestInterval = 10f;
         public UnityEvent onIsTypeWriter = new UnityEvent();
         public UnityEvent onNotTypeWriter = new UnityEvent();
+
+        private float _lastOnlineStatusRequestTime;
 
         protected override void OnDestroy()
         {
@@ -55,7 +60,12 @@ namespace MultiplayerARPG
         protected override void UpdateUI()
         {
             bool isOnline = GameInstance.ClientOnlineCharacterHandlers.IsCharacterOnline(Data.senderId);
-            GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.senderId);
+            // Throttle online-status requests, this runs on a repeating timer per message
+            if (Time.unscaledTime - _lastOnlineStatusRequestTime >= onlineStatusRequestInterval)
+            {
+                _lastOnlineStatusRequestTime = Time.unscaledTime;
+                GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.senderId);
+            }
             for (int i = 0; i < signOnlines.Length; ++i)
             {
                 signOnlines[i].SetActive(isOnline);

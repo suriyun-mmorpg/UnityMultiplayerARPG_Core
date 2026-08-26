@@ -44,6 +44,7 @@ namespace MultiplayerARPG
 
         private T _previousEntity;
         private Color? _defaultTitleColor;
+        private string _lastTitle;
 
         protected override void Awake()
         {
@@ -61,6 +62,7 @@ namespace MultiplayerARPG
             _cacheCanvas = null;
             _previousEntity = null;
             _data = null;
+            _lastTitle = null;
         }
 
         protected virtual void AddEvents(T entity)
@@ -136,6 +138,12 @@ namespace MultiplayerARPG
                 return;
             string tempTitle = Data == null ? string.Empty : Data.Title;
             uiTextTitle.SetGameObjectActive(!string.IsNullOrEmpty(tempTitle));
+
+            // Skip formatting when the title string did not change
+            if (ReferenceEquals(tempTitle, _lastTitle))
+                return;
+            _lastTitle = tempTitle;
+
             uiTextTitle.text = ZString.Format(
                 LanguageManager.GetText(formatKeyTitle),
                 tempTitle);

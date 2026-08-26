@@ -382,7 +382,7 @@ namespace MultiplayerARPG
                 if (playerCharacter != null && GameInstance.PlayerIcons.ContainsKey(playerCharacter.IconDataId))
                     uiPlayerIcon.SetDataByDataId(playerCharacter.IconDataId);
                 else
-                    uiPlayerIcon.SetDataByDataId(GameInstance.PlayerIcons.Keys.FirstOrDefault());
+                    uiPlayerIcon.SetDataByDataId(GetFirstDataIdKey(GameInstance.PlayerIcons));
                 uiPlayerIcon.SetVisible(true);
             }
 
@@ -392,7 +392,7 @@ namespace MultiplayerARPG
                 if (playerCharacter != null && GameInstance.PlayerFrames.ContainsKey(playerCharacter.FrameDataId))
                     uiPlayerFrame.SetDataByDataId(playerCharacter.FrameDataId);
                 else
-                    uiPlayerFrame.SetDataByDataId(GameInstance.PlayerFrames.Keys.FirstOrDefault());
+                    uiPlayerFrame.SetDataByDataId(GetFirstDataIdKey(GameInstance.PlayerFrames));
                 uiPlayerFrame.SetVisible(true);
             }
 
@@ -402,7 +402,7 @@ namespace MultiplayerARPG
                 if (playerCharacter != null && GameInstance.PlayerBackgrounds.ContainsKey(playerCharacter.BackgroundDataId))
                     uiPlayerBackground.SetDataByDataId(playerCharacter.BackgroundDataId);
                 else
-                    uiPlayerBackground.SetDataByDataId(GameInstance.PlayerBackgrounds.Keys.FirstOrDefault());
+                    uiPlayerBackground.SetDataByDataId(GetFirstDataIdKey(GameInstance.PlayerBackgrounds));
                 uiPlayerBackground.SetVisible(true);
             }
 
@@ -412,7 +412,7 @@ namespace MultiplayerARPG
                 if (playerCharacter != null && GameInstance.PlayerTitles.ContainsKey(playerCharacter.TitleDataId))
                     uiPlayerTitle.SetDataByDataId(playerCharacter.TitleDataId);
                 else
-                    uiPlayerTitle.SetDataByDataId(GameInstance.PlayerTitles.Keys.FirstOrDefault());
+                    uiPlayerTitle.SetDataByDataId(GetFirstDataIdKey(GameInstance.PlayerTitles));
                 uiPlayerTitle.SetVisible(true);
             }
 
@@ -423,6 +423,16 @@ namespace MultiplayerARPG
                     uiFaction.SetDataByDataId(playerCharacter.FactionId);
                 uiFaction.SetVisible(playerCharacter != null);
             }
+        }
+
+        private static int GetFirstDataIdKey<TValue>(System.Collections.Generic.Dictionary<int, TValue> dictionary)
+        {
+            if (dictionary == null || dictionary.Count == 0)
+                return 0;
+            // Manual enumeration instead of LINQ FirstOrDefault to avoid allocations
+            var enumerator = dictionary.Keys.GetEnumerator();
+            enumerator.MoveNext();
+            return enumerator.Current;
         }
 
         protected override void UpdateData()

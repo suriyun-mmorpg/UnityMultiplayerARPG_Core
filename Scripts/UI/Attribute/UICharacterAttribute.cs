@@ -41,6 +41,7 @@ namespace MultiplayerARPG
         protected Dictionary<DamageElement, float> _tempArmors = new Dictionary<DamageElement, float>();
         protected Dictionary<DamageElement, MinMaxFloat> _tempDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
         protected Dictionary<StatusEffect, float> _tempStatusEffectResistances = new Dictionary<StatusEffect, float>();
+        private bool _dirtyAbleToIncrease;
 
         protected override void OnDestroy()
         {
@@ -68,10 +69,16 @@ namespace MultiplayerARPG
 
         protected override void UpdateUI()
         {
-            if (Character is IPlayerCharacterData playerCharacter && Attribute.CanIncreaseAmount(playerCharacter, CharacterAttribute.amount, out _))
-                onAbleToIncrease.Invoke();
-            else
-                onUnableToIncrease.Invoke();
+            bool ableToIncrease = Character is IPlayerCharacterData playerCharacter &&
+                Attribute.CanIncreaseAmount(playerCharacter, CharacterAttribute.amount, out _);
+            if (_dirtyAbleToIncrease != ableToIncrease)
+            {
+                _dirtyAbleToIncrease = ableToIncrease;
+                if (ableToIncrease)
+                    onAbleToIncrease.Invoke();
+                else
+                    onUnableToIncrease.Invoke();
+            }
         }
 
         protected override void UpdateData()

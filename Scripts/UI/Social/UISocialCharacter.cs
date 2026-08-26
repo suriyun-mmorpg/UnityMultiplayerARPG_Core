@@ -66,6 +66,11 @@ namespace MultiplayerARPG
         private bool _lastStatusIsOnline;
         private int _lastStatusKey = -1;
 
+        [Header("Online Status Options")]
+        [Tooltip("Duration in seconds between each online status request to the server")]
+        public float onlineStatusRequestInterval = 10f;
+        private float _lastOnlineStatusRequestTime;
+
         protected override void OnDestroy()
         {
             base.OnDestroy();
@@ -212,7 +217,12 @@ namespace MultiplayerARPG
                 }
             }
 
-            GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.id);
+            // Throttle online-status requests, this runs on a repeating timer per entry
+            if (Time.unscaledTime - _lastOnlineStatusRequestTime >= onlineStatusRequestInterval)
+            {
+                _lastOnlineStatusRequestTime = Time.unscaledTime;
+                GameInstance.ClientOnlineCharacterHandlers.RequestOnlineCharacter(Data.id);
+            }
         }
 
         protected override void UpdateData()
