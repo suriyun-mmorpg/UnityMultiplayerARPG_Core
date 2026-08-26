@@ -322,6 +322,10 @@ namespace MultiplayerARPG
     public delegate void CharacterEntityDelegate(
         BaseCharacterEntity target);
 
+    public delegate void CharacterEntityKilledDelegate(
+        BaseCharacterEntity target,
+        EntityInfo instigator);
+
     public delegate void CharacterEntityInt8ChangeDelegate(
         BaseCharacterEntity target,
         sbyte oldValue,
