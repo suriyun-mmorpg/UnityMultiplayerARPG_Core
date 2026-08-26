@@ -1,6 +1,5 @@
 ﻿using LiteNetLibManager;
 using Cysharp.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace MultiplayerARPG
 {
@@ -158,8 +157,12 @@ namespace MultiplayerARPG
             if (gold > Gold)
                 return;
 
-            if (CurrentGameInstance.monsterGoldRewardingMode == RewardingMode.DropOnGround)
-                GoldDropEntity.Drop(this, 1f, RewardGivenType.PlayerDrop, Level, Level, gold, System.Array.Empty<string>()).Forget();
+            switch (CurrentGameInstance.playerDropItemMode)
+            {
+                case PlayerDropItemMode.DropOnGround:
+                    GoldDropEntity.Drop(this, 1f, RewardGivenType.PlayerDrop, Level, Level, gold, System.Array.Empty<string>()).Forget();
+                    break;
+            }
 
             Gold -= gold;
         }
