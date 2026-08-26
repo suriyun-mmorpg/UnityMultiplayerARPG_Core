@@ -69,6 +69,7 @@ namespace MultiplayerARPG
             }
             CallRpcOnDead();
             _receivedDamageRecords.Clear();
+            onKilled?.Invoke(this, lastAttacker);
         }
 
         public virtual void OnRespawn()
