@@ -47,6 +47,7 @@ namespace MultiplayerARPG
         /// </summary>
         /// <param name="objectId"></param>
         /// <param name="itemsContainerIndex"></param>
+        /// <param name="amount"></param>
         [ServerRpc]
         protected virtual void CmdPickupItemFromContainer(uint objectId, int itemsContainerIndex, int amount)
         {
@@ -82,7 +83,7 @@ namespace MultiplayerARPG
             RewardGivenType rewardGivenType = itemsContainerEntity.GivenType;
 
             CharacterItem pickingItem = itemsContainerEntity.Items[itemsContainerIndex].Clone();
-            if (amount < 0 || amount > pickingItem.amount)
+            if (amount <= 0 || amount > pickingItem.amount)
                 amount = pickingItem.amount;
             pickingItem.amount = amount;
 
