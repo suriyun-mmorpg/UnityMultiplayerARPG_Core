@@ -4,8 +4,8 @@ namespace MultiplayerARPG
 {
     public partial class BaseCharacterEntity
     {
-        protected bool _lastGrounded = false;
-        protected Vector3 _lastGroundedPosition = Vector3.zero;
+        public bool LastGrounded { get; set; } = false;
+        public Vector3 LastGroundedPosition { get; set; } = Vector3.zero;
 
         public override bool ShouldUseRootMotion
         {
@@ -219,8 +219,8 @@ namespace MultiplayerARPG
             // Clear target entity when teleport
             SetTargetEntity(null);
             // Setup ground check data
-            _lastGrounded = true;
-            _lastGroundedPosition = position;
+            LastGrounded = true;
+            LastGroundedPosition = position;
         }
     }
 }

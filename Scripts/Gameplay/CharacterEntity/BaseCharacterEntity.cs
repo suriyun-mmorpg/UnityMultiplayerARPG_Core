@@ -225,8 +225,8 @@ namespace MultiplayerARPG
         {
             base.EntityAwake();
             ForceMakeCaches();
-            _lastGrounded = false;
-            _lastGroundedPosition = EntityTransform.position;
+            LastGrounded = false;
+            LastGroundedPosition = EntityTransform.position;
             if (CurrentGameInstance.DimensionType == DimensionType.Dimension3D)
             {
                 AttackPhysicFunctions = new PhysicFunctions(64);
@@ -285,17 +285,17 @@ namespace MultiplayerARPG
             {
                 bool isGrounded = MovementState.Has(MovementState.IsGrounded) || MovementState.Has(MovementState.IsClimbing);
                 // Ground check, ground damage will be calculated at server while dimension type is 3d only
-                if (!_lastGrounded && isGrounded)
+                if (!LastGrounded && isGrounded)
                 {
                     // Apply fall damage when falling last frame and grounded this frame
-                    CurrentGameplayRule.ApplyFallDamage(this, _lastGroundedPosition);
+                    CurrentGameplayRule.ApplyFallDamage(this, LastGroundedPosition);
                 }
                 // Set last grounded state, it will be used next frame to find
-                _lastGrounded = isGrounded || FallDamageDisableState.IsActive;
-                if (_lastGrounded)
+                LastGrounded = isGrounded || FallDamageDisableState.IsActive;
+                if (LastGrounded)
                 {
                     // Set last grounded position, it will be used to calculate fall damage
-                    _lastGroundedPosition = EntityTransform.position;
+                    LastGroundedPosition = EntityTransform.position;
                 }
             }
 

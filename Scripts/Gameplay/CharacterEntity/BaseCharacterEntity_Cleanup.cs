@@ -101,8 +101,8 @@ namespace MultiplayerARPG
             _beforeDamageReceivedHp = 0;
             _receivedDamageRecords?.Clear();
             // Move Functions
-            _lastGrounded = false;
-            _lastGroundedPosition = Vector3.zero;
+            LastGrounded = false;
+            LastGroundedPosition = Vector3.zero;
         }
     }
 }

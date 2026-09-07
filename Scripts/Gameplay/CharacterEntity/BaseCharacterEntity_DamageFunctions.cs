@@ -77,8 +77,8 @@ namespace MultiplayerARPG
             if (!IsServer)
                 return;
             _isKilled = false;
-            _lastGrounded = true;
-            _lastGroundedPosition = EntityTransform.position;
+            LastGrounded = true;
+            LastGroundedPosition = EntityTransform.position;
             RespawnGroundedCheckCountDown = RESPAWN_GROUNDED_CHECK_DURATION;
             RespawnInvincibleCountDown = RESPAWN_INVINCIBLE_DURATION;
             CallRpcOnRespawn();
