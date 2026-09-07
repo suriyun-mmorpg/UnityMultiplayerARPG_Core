@@ -95,6 +95,8 @@ namespace MultiplayerARPG
         public GameObject isRevealsHideObject;
         [Tooltip("This will activate if buff's is blind is `TRUE`, developer may set text or icon here")]
         public GameObject isBlindObject;
+        [Tooltip("This will activate if buff's is invincible is `TRUE`, developer may set text or icon here")]
+        public GameObject isInvincibleObject;
         [Tooltip("This will activate if buff's do not remove on dead is `TRUE`, developer may set text or icon here")]
         public GameObject doNotRemoveOnDeadObject;
         [Tooltip("This will activate if buff's mute footstep sound is `TRUE`, developer may set text or icon here")]
@@ -368,6 +370,7 @@ namespace MultiplayerARPG
                     Data.buff.isHide ||
                     Data.buff.isRevealsHide ||
                     Data.buff.isBlind ||
+                    Data.buff.isInvincible ||
                     Data.buff.doNotRemoveOnDead ||
                     Data.buff.muteFootstepSound ||
                     Data.buff.isExtendDuration);
@@ -403,6 +406,8 @@ namespace MultiplayerARPG
                         ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_IS_REVEALS_HIDE.ToString(), "Reveals Hide"));
                     if (Data.buff.isBlind)
                         ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_IS_BLIND.ToString(), "Blind"));
+                    if (Data.buff.isInvincible)
+                        ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_IS_INVINCIBLE.ToString(), "Invincible"));
                     if (Data.buff.doNotRemoveOnDead)
                         ailments.Add(LanguageManager.GetText(UITextKeys.UI_LABEL_BUFF_DO_NOT_REMOVE_ON_DEAD.ToString(), "Won't Be Removed On Dead"));
                     if (Data.buff.muteFootstepSound)
@@ -735,6 +740,9 @@ namespace MultiplayerARPG
 
             if (isBlindObject != null)
                 isBlindObject.SetActive(Data.buff.isBlind);
+
+            if (isInvincibleObject != null)
+                isInvincibleObject.SetActive(Data.buff.isInvincible);
 
             if (doNotRemoveOnDeadObject != null)
                 doNotRemoveOnDeadObject.SetActive(Data.buff.doNotRemoveOnDead);

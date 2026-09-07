@@ -550,9 +550,9 @@ namespace MultiplayerARPG
             return this.FindGroundedPosition(fromPosition, groundCheckRadius, findDistance, GameInstance.Singleton.GetGameEntityGroundDetectionLayerMask(), ABOVE_GROUND_OFFSETS, out result);
         }
 
-        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration, bool clearForces)
         {
-            Functions.ApplyForce(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration);
+            Functions.ApplyForce(mode, direction, sourceType, sourceDataId, sourceLevel, force, deceleration, duration, clearForces);
         }
 
         public EntityMovementForceApplier FindForceByActionKey(ApplyMovementForceSourceType sourceType, int sourceDataId)

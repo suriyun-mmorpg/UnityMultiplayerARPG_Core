@@ -91,6 +91,7 @@ namespace MultiplayerARPG
         public bool IsHide { get; private set; }
         public bool IsRevealsHide { get; private set; }
         public bool IsBlind { get; private set; }
+        public bool IsInvincible { get; private set; }
         public bool MuteFootstepSound { get; private set; }
         public bool IsOverweight { get; private set; }
         public bool HavingChanceToRemoveBuffWhenAttack { get; private set; }
@@ -339,6 +340,7 @@ namespace MultiplayerARPG
                 IsHide = false;
                 IsRevealsHide = false;
                 IsBlind = false;
+                IsInvincible = false;
                 MuteFootstepSound = false;
                 HavingChanceToRemoveBuffWhenAttack = false;
                 HavingChanceToRemoveBuffWhenAttacked = false;
@@ -785,6 +787,8 @@ namespace MultiplayerARPG
                 IsRevealsHide = true;
             if (tempBuff.isBlind)
                 IsBlind = true;
+            if (tempBuff.isInvincible)
+                IsInvincible = true;
             if (tempBuff.muteFootstepSound)
                 MuteFootstepSound = true;
             if (buff.GetRemoveBuffWhenAttackChance() > 0f)

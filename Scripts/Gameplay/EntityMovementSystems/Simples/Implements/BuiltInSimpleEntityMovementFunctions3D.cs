@@ -375,11 +375,15 @@ namespace MultiplayerARPG
             await OnTeleport(position, rotation, stillMoveAfterTeleport);
         }
 
-        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration)
+        public void ApplyForce(ApplyMovementForceMode mode, Vector3 direction, ApplyMovementForceSourceType sourceType, int sourceDataId, int sourceLevel, float force, float deceleration, float duration, bool clearForces)
         {
             if (!IsServer)
                 return;
-            if (mode.IsReplaceMovement())
+            if (clearForces)
+            {
+                _movementForceAppliers.Clear();
+            }
+            else if (mode.IsReplaceMovement())
             {
                 // Can have only one replace movement force applier, so remove stored ones
                 _movementForceAppliers.RemoveReplaceMovementForces();

@@ -157,7 +157,7 @@ namespace MultiplayerARPG
             }
             set { }
         }
-        public override bool IsInvincible { get { return base.IsInvincible || RespawnInvincibleCountDown > 0f; } set { base.IsInvincible = value; } }
+        public override bool IsInvincible { get { return base.IsInvincible || this.GetCaches().IsInvincible || RespawnInvincibleCountDown > 0f; } set { base.IsInvincible = value; } }
         public override int MaxHp { get { return CachedData.MaxHp; } }
         public int MaxMp { get { return CachedData.MaxMp; } }
         public int MaxStamina { get { return CachedData.MaxStamina; } }

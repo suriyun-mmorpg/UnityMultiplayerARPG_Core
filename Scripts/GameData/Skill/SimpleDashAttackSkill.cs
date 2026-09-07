@@ -184,7 +184,7 @@ namespace MultiplayerARPG
                 else
                     duration = EntityMovementForceApplierData.CalculateDuration(distance, speed, deceleration);
             }
-            skillUser.ApplyForce(forceMode, direction, ApplyMovementForceSourceType.Skill, DataId, skillLevel, speed, deceleration, duration);
+            skillUser.ApplyForce(forceMode, direction, ApplyMovementForceSourceType.Skill, DataId, skillLevel, speed, deceleration, duration, false);
         }
     }
 }
