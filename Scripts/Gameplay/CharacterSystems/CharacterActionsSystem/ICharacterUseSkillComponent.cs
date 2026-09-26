@@ -22,6 +22,7 @@
         System.Action OnSkillInterupted { get; set; }
 
         void InterruptCastingSkill();
+        void StopChannelSkill();
         void CancelSkill();
         void ClearUseSkillStates();
         void UseSkill(int dataId, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition);

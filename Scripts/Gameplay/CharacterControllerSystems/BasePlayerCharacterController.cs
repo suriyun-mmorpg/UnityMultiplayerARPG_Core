@@ -45,6 +45,7 @@ namespace MultiplayerARPG
             {
                 if (value.IsOwnerClient)
                 {
+                    StopChanneledSkill();
                     Desetup(GameInstance.PlayingCharacterEntity);
                     GameInstance.PlayingCharacter = value;
                     GameInstance.OpenedStorages.Clear();
@@ -211,6 +212,7 @@ namespace MultiplayerARPG
 
         protected int _buildingItemIndex = -1;
         protected UsingSkillData _queueUsingSkill;
+        protected BaseSkill _heldChanneledSkill;
 
         protected virtual void Awake()
         {
@@ -225,6 +227,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnDisable()
         {
+            StopChanneledSkill();
             UpdateManager.Unregister(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER, this);
         }
 
@@ -268,6 +271,7 @@ namespace MultiplayerARPG
 
         protected virtual void OnDestroy()
         {
+            StopChanneledSkill();
             Desetup(PlayingCharacterEntity);
             if (Singleton == this)
                 Singleton = null;
@@ -428,6 +432,34 @@ namespace MultiplayerARPG
         }
 
         public abstract bool UseHotkey(HotkeyType type, string relateId, AimPosition aimPosition);
+
+        public virtual bool StartChanneledSkill(HotkeyType type, string relateId, AimPosition aimPosition)
+        {
+            if (type != HotkeyType.Skill || PlayingCharacterEntity == null)
+                return false;
+            int dataId = BaseGameData.MakeDataId(relateId);
+            if (!GameInstance.Skills.TryGetValue(dataId, out BaseSkill skill) || !skill.IsChanneledAbility())
+                return false;
+            if (PlayingCharacterEntity.IndexOfSkillUsage(SkillUsageType.Skill, dataId) >= 0)
+                return false;
+            if (_heldChanneledSkill != null)
+                StopChanneledSkill();
+            if (!UseHotkey(type, relateId, aimPosition))
+                return false;
+            _heldChanneledSkill = skill;
+            return true;
+        }
+
+        public virtual void StopChanneledSkill()
+        {
+            if (_heldChanneledSkill == null)
+                return;
+            if (_queueUsingSkill.skill == _heldChanneledSkill)
+                ClearQueueUsingSkill();
+            if (PlayingCharacterEntity != null && PlayingCharacterEntity.UsingSkill == _heldChanneledSkill)
+                PlayingCharacterEntity.StopChannelSkill();
+            _heldChanneledSkill = null;
+        }
 
         public bool CanActivate(IActivatableEntity entity)
         {

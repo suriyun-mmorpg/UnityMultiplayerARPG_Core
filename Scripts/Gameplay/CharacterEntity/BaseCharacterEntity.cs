@@ -657,6 +657,11 @@ namespace MultiplayerARPG
             UseSkillComponent.InterruptCastingSkill();
         }
 
+        public void StopChannelSkill()
+        {
+            UseSkillComponent.StopChannelSkill();
+        }
+
         public bool StartCharge(ref bool isLeftHand)
         {
             if (!IsOwnerClientOrOwnedByServer)

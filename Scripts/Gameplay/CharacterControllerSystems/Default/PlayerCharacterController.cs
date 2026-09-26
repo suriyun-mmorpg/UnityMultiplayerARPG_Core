@@ -472,6 +472,24 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public override void StopChanneledSkill()
+        {
+            bool hadHeldChannel = _heldChanneledSkill != null;
+            bool wasApproachingTarget = _heldChanneledSkill != null &&
+                _queueUsingSkill.skill == _heldChanneledSkill && _targetActionType == TargetActionType.UseSkill;
+            base.StopChanneledSkill();
+            if (wasApproachingTarget)
+            {
+                ClearTarget(true);
+                PlayingCharacterEntity.StopMove();
+            }
+            if (hadHeldChannel && _turnToTargetActionType == TargetActionType.UseSkill)
+            {
+                _turnToTargetActionType = TargetActionType.None;
+                _turnToTargetPosition = null;
+            }
+        }
+
         public override bool ShouldShowActivateButtons()
         {
             if (ActivatableEntityDetector.activatableEntities.Count > 0)

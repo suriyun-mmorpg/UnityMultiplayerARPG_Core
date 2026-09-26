@@ -2,13 +2,14 @@
 using LiteNetLibManager;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.Events;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
     [DefaultExecutionOrder(DefaultExecutionOrders.UI_CHARACTER_HOTKEY)]
-    public partial class UICharacterHotkey : UISelectionEntry<CharacterHotkey>
+    public partial class UICharacterHotkey : UISelectionEntry<CharacterHotkey>, IPointerDownHandler, IPointerUpHandler
     {
         public int IndexOfData { get; protected set; }
         public string HotkeyId { get { return Data.hotkeyId; } }
@@ -35,6 +36,7 @@ namespace MultiplayerARPG
         private GuildSkill _usingGuildSkill;
         private int _usingGuildSkillLevel;
         private bool _channeledActionStarted;
+        private bool _pointerChannelStarted;
 
         protected override void OnDestroy()
         {
@@ -64,6 +66,15 @@ namespace MultiplayerARPG
 
         protected override void OnDisable()
         {
+            if (_channeledActionStarted || _pointerChannelStarted || UICharacterHotkeys.UsingHotkey == this)
+            {
+                _channeledActionStarted = false;
+                _pointerChannelStarted = false;
+                if (UICharacterHotkeys.UsingHotkey == this)
+                    UICharacterHotkeys.FinishHotkeyAimControls(true);
+                else
+                    StopChanneledAbility();
+            }
             base.OnDisable();
             if (!GameInstance.PlayingCharacterEntity) return;
             GameInstance.PlayingCharacterEntity.onNonEquipItemsOperation -= OnNonEquipItemsOperation;
@@ -87,6 +98,16 @@ namespace MultiplayerARPG
 
         public void Setup(UICharacterHotkeys uiCharacterHotkeys, UICharacterHotkeyAssigner uiCharacterHotkeyAssigner, CharacterHotkey data, int indexOfData)
         {
+            if ((_channeledActionStarted || _pointerChannelStarted || UICharacterHotkeys.UsingHotkey == this) &&
+                (Data.type != data.type || Data.relateId != data.relateId))
+            {
+                _channeledActionStarted = false;
+                _pointerChannelStarted = false;
+                if (UICharacterHotkeys.UsingHotkey == this)
+                    UICharacterHotkeys.FinishHotkeyAimControls(true);
+                else
+                    StopChanneledAbility();
+            }
             UICharacterHotkeys = uiCharacterHotkeys;
             if (this.uiCharacterHotkeyAssigner == null)
                 this.uiCharacterHotkeyAssigner = uiCharacterHotkeyAssigner;
@@ -108,10 +129,20 @@ namespace MultiplayerARPG
             }
 
             if (GenericUtils.IsFocusInputField())
+            {
+                if (_channeledActionStarted || _pointerChannelStarted)
+                {
+                    _channeledActionStarted = false;
+                    _pointerChannelStarted = false;
+                    UICharacterHotkeys.FinishHotkeyAimControls(true);
+                }
                 return;
+            }
 
             if (IsChanneledAbility())
             {
+                if (_pointerChannelStarted)
+                    return;
                 bool pressing = InputManager.GetKey(key) || InputManager.GetButton(buttonName);
                 if (pressing && !_channeledActionStarted)
                 {
@@ -347,7 +378,7 @@ namespace MultiplayerARPG
             if (ability != null)
             {
                 ability.FinishAimControls(isCancel);
-                if (ability.IsChanneledAbility())
+                if (IsChanneledAbility())
                 {
                     StopChanneledAbility();
                     return;
@@ -359,11 +390,6 @@ namespace MultiplayerARPG
 
         public bool IsChanneledAbility()
         {
-            if (_usingItem != null &&
-                _usingItem.IsChanneledAbility())
-            {
-                return true;
-            }
             if (_usingSkill != null && _usingSkillLevel > 0 &&
                 _usingSkill.IsActive &&
                 _usingSkill.IsChanneledAbility())
@@ -371,6 +397,27 @@ namespace MultiplayerARPG
                 return true;
             }
             return false;
+        }
+
+        public void OnPointerDown(PointerEventData eventData)
+        {
+            if (InputManager.IsUseMobileInput() || eventData.button != PointerEventData.InputButton.Left ||
+                !IsChanneledAbility() || GenericUtils.IsFocusInputField() ||
+                (uiCharacterHotkeyAssigner != null && uiCharacterHotkeyAssigner.IsVisible()))
+                return;
+            _pointerChannelStarted = true;
+            if (UICharacterHotkeys.UsingHotkey != this)
+                UICharacterHotkeys.SetUsingHotkey(this);
+        }
+
+        public void OnPointerUp(PointerEventData eventData)
+        {
+            if (!_pointerChannelStarted || eventData.button != PointerEventData.InputButton.Left)
+                return;
+            _pointerChannelStarted = false;
+            _channeledActionStarted = InputManager.GetKey(key) || InputManager.GetButton(buttonName);
+            if (!_channeledActionStarted && UICharacterHotkeys.UsingHotkey == this)
+                UICharacterHotkeys.FinishHotkeyAimControls(false);
         }
 
         public void OnClickAssign()
@@ -437,12 +484,17 @@ namespace MultiplayerARPG
 
         public void StartChanneledAbility()
         {
-
+            if (BasePlayerCharacterController.Singleton != null && !Data.IsEmpty())
+            {
+                if (!BasePlayerCharacterController.Singleton.StartChanneledSkill(Data.type, Data.relateId, UpdateAimControls(Vector2.zero)))
+                    UICharacterHotkeys.FinishHotkeyAimControls(true);
+            }
         }
 
         public void StopChanneledAbility()
         {
-
+            if (BasePlayerCharacterController.Singleton != null)
+                BasePlayerCharacterController.Singleton.StopChanneledSkill();
         }
 
         public bool CanAssignGuildSkill(GuildSkill guildSkill)

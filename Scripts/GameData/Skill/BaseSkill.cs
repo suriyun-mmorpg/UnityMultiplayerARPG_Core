@@ -49,6 +49,14 @@ namespace MultiplayerARPG
         public IncrementalFloat castDuration = new IncrementalFloat();
         public bool canBeInterruptedWhileCasting;
 
+        [Header("Channeling")]
+        [Tooltip("Hold the hotkey to repeat this skill. Zero disables channeling.")]
+        public IncrementalFloat channelDuration = new IncrementalFloat();
+        [Tooltip("Seconds between channel ticks. Clamped to at least 0.1 seconds.")]
+        public IncrementalFloat channelTickInterval = new IncrementalFloat() { baseAmount = 0.5f };
+        [Tooltip("Additional MP consumed on each channel tick, after the normal activation cost.")]
+        public IncrementalInt channelConsumeMpPerTick = new IncrementalInt();
+
         [Header("Casted Effects")]
 #if UNITY_EDITOR || !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
         [SerializeField]
@@ -336,6 +344,21 @@ namespace MultiplayerARPG
             return castDuration.GetAmount(level);
         }
 
+        public float GetChannelDuration(int level)
+        {
+            return Mathf.Max(0f, channelDuration.GetAmount(level));
+        }
+
+        public float GetChannelTickInterval(int level)
+        {
+            return Mathf.Max(0.1f, channelTickInterval.GetAmount(level));
+        }
+
+        public int GetChannelConsumeMpPerTick(int level)
+        {
+            return Mathf.Max(0, channelConsumeMpPerTick.GetAmount(level));
+        }
+
         public GameEffect[] SkillActivateEffects
         {
             get
@@ -524,7 +547,7 @@ namespace MultiplayerARPG
 
         public virtual bool IsChanneledAbility()
         {
-            return false;
+            return channelDuration.baseAmount > 0f;
         }
         #endregion
 

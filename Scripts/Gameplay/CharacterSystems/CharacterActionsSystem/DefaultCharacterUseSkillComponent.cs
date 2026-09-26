@@ -75,6 +75,7 @@ namespace MultiplayerARPG
         protected CharacterActionComponentManager _manager;
         // Network data sending
         protected UseSkillState? _simulateState;
+        protected int _nextChannelTickSeed = -1;
         // Logging data
         bool _entityIsPlayer = false;
         BasePlayerCharacterEntity _playerCharacterEntity = null;
@@ -217,7 +218,8 @@ namespace MultiplayerARPG
                 List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, triggerDurations.Length);
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
-                if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
+                if ((!skill.IsChanneledAbility() || itemDataId.HasValue) &&
+                    ((IsServer && !IsOwnerClient) || !IsOwnedByServer))
                     HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, 0, damageInfo, damageAmounts, weaponHandlingState, weapon, skill, skillLevel);
 
                 // Play special effect
@@ -266,6 +268,13 @@ namespace MultiplayerARPG
                     OnCastSkillStart?.Invoke();
                     await GenericUtils.FrameBasedDelay(CastingSkillDuration, skillCancellationTokenSource.Token);
                     OnCastSkillEnd?.Invoke();
+                }
+
+                if (skill.IsChanneledAbility() && !itemDataId.HasValue)
+                {
+                    await ChannelSkillRoutine(simulateState, simulateSeed, weapon, damageInfo, isLeftHand,
+                        skillCancellationTokenSource.Token);
+                    return;
                 }
 
                 // Play special effect
@@ -415,22 +424,158 @@ namespace MultiplayerARPG
             }
             finally
             {
+                if (skill.IsChanneledAbility() && !itemDataId.HasValue)
+                {
+                    Entity.ActionModel?.StopSkillCastAnimation();
+                    (Entity.PassengingVehicleModel as BaseCharacterModel)?.StopSkillCastAnimation();
+                    Entity.FpsModel?.StopSkillCastAnimation();
+                }
                 LastUseSkillEndTime = Time.unscaledTime;
                 skillCancellationTokenSource.Dispose();
                 _skillCancellationTokenSources.Remove(skillCancellationTokenSource);
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillEnd(_playerCharacterEntity, simulateSeed);
                 OnUseSkillEnd?.Invoke();
+                ClearUseSkillStates();
             }
-            // Clear action states at clients and server
-            ClearUseSkillStates();
+        }
+
+        protected virtual async UniTask ChannelSkillRoutine(UseSkillState state, int startSeed,
+            CharacterItem weapon, DamageInfo damageInfo, bool isLeftHand, CancellationToken cancellationToken)
+        {
+            BaseSkill skill = state.Skill;
+            int level = state.SkillLevel;
+            float duration = skill.GetChannelDuration(level);
+            if (duration <= 0f)
+                return;
+
+            LastUseSkillEndTime = Time.unscaledTime + duration;
+            BaseCharacterModel actionModel = Entity.ActionModel;
+            BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
+            BaseCharacterModel fpsModel = Entity.FpsModel;
+            if (vehicleModel != null)
+                vehicleModel.PlaySkillCastClip(skill.DataId, duration, out _skipMovementValidation, out _shouldUseRootMotion);
+            if (actionModel != null && actionModel.gameObject.activeSelf &&
+                (vehicleModel == null || !Entity.PassengingVehicleSeat.overridePassengerActionAnimations))
+                actionModel.PlaySkillCastClip(skill.DataId, duration, out _skipMovementValidation, out _shouldUseRootMotion);
+            if (IsClient && fpsModel != null && fpsModel.gameObject.activeSelf)
+                fpsModel.PlaySkillCastClip(skill.DataId, duration, out _, out _);
+
+            OnUseSkillStart?.Invoke();
+            if (!IsServer)
+            {
+                // The server alone schedules and authorizes ticks. This delay is a fallback if its stop RPC is lost.
+                await GenericUtils.FrameBasedDelay(duration + 2f, cancellationToken);
+                return;
+            }
+
+            float endTime = Time.unscaledTime + duration;
+            float interval = skill.GetChannelTickInterval(level);
+            bool firstTick = true;
+            while (Time.unscaledTime < endTime)
+            {
+                if (!firstTick)
+                    await GenericUtils.FrameBasedDelay(interval, cancellationToken);
+                firstTick = false;
+                cancellationToken.ThrowIfCancellationRequested();
+                if (Time.unscaledTime >= endTime || Entity.IsDead())
+                    break;
+                if (skill.RequiredTarget &&
+                    (!Entity.CurrentGameManager.TryGetEntityByObjectId(state.TargetObjectId, out BaseCharacterEntity target) ||
+                     target.IsDead() || !Entity.IsGameEntityInDistance(target, skill.GetCastDistance(Entity, level, isLeftHand))))
+                    break;
+                int tickMp = skill.GetChannelConsumeMpPerTick(level);
+                if (Entity.CurrentMp < tickMp)
+                    break;
+
+                Dictionary<DamageElement, MinMaxFloat> baseDamage = skill.GetAttackDamages(Entity, level, isLeftHand);
+                List<Dictionary<DamageElement, MinMaxFloat>> damages = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamage, 1);
+                if (damages.Count == 0 || !skill.DecreaseResources(Entity, weapon, isLeftHand, out _))
+                    break;
+                Entity.CurrentMp -= tickMp;
+                int tickSeed = _nextChannelTickSeed--;
+                AimPosition aimPosition = skill.HasCustomAimControls() && state.AimPosition.type == AimPositionType.Position
+                    ? state.AimPosition : Entity.AimPosition;
+                HitRegistrationManager.PrepareHitRegValidation(Entity, tickSeed, new float[] { 0f }, 0,
+                    damageInfo, damages, state.WeaponHandlingState, weapon, skill, level);
+                PlayChannelTickEffects(skill);
+                OnUseSkillTrigger?.Invoke(0);
+                Entity.OnUseSkillRoutine(skill, level, isLeftHand, weapon, tickSeed, 0, damages,
+                    state.TargetObjectId, aimPosition);
+                ApplySkillUsing(skill, level, state.WeaponHandlingState, weapon, tickSeed, 0, damages,
+                    state.TargetObjectId, aimPosition);
+                RPC(RpcChannelSkillTick, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered,
+                    startSeed, tickSeed, state.TargetObjectId, aimPosition);
+            }
+            RPC(RpcStopChannelSkill, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, startSeed);
+        }
+
+        [AllRpc]
+        protected void RpcChannelSkillTick(int startSeed, int tickSeed, uint targetObjectId, AimPosition aimPosition)
+        {
+            if (IsServer || !_simulateState.HasValue || _simulateState.Value.SimulateSeed != startSeed)
+                return;
+            UseSkillState state = _simulateState.Value;
+            if (!state.Skill.IsChanneledAbility())
+                return;
+            bool isLeftHand = state.WeaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
+            Entity.GetUsingSkillData(state.Skill, ref isLeftHand, out _, out _, out CharacterItem weapon,
+                out DamageInfo damageInfo);
+            Dictionary<DamageElement, MinMaxFloat> baseDamage = state.Skill.GetAttackDamages(Entity, state.SkillLevel, isLeftHand);
+            List<Dictionary<DamageElement, MinMaxFloat>> damages = state.Skill.PrepareDamageAmounts(Entity,
+                isLeftHand, baseDamage, 1);
+            if (damages.Count == 0)
+                damages.Add(baseDamage);
+            HitRegistrationManager.PrepareHitRegValidation(Entity, tickSeed, new float[] { 0f }, 0,
+                damageInfo, damages, state.WeaponHandlingState, weapon, state.Skill, state.SkillLevel);
+            PlayChannelTickEffects(state.Skill);
+            OnUseSkillTrigger?.Invoke(0);
+            Entity.OnUseSkillRoutine(state.Skill, state.SkillLevel, isLeftHand, weapon, tickSeed, 0, damages,
+                targetObjectId, aimPosition);
+            ApplySkillUsing(state.Skill, state.SkillLevel, state.WeaponHandlingState, weapon, tickSeed, 0,
+                damages, targetObjectId, aimPosition);
+        }
+
+        protected virtual void PlayChannelTickEffects(BaseSkill skill)
+        {
+            if (!IsClient)
+                return;
+            BaseCharacterModel vehicleModel = Entity.PassengingVehicleModel as BaseCharacterModel;
+            BaseCharacterModel actionModel = Entity.ActionModel;
+            BaseCharacterModel fpsModel = Entity.FpsModel;
+            if (vehicleModel != null)
+            {
+                vehicleModel.InstantiateEffect(skill.SkillActivateEffects);
+#if !DISABLE_ADDRESSABLES
+                vehicleModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+#endif
+            }
+            if (vehicleModel != null && Entity.PassengingVehicleSeat.overridePassengerActionAnimations)
+                return;
+            if (actionModel != null && actionModel.gameObject.activeSelf)
+            {
+                actionModel.InstantiateEffect(skill.SkillActivateEffects);
+#if !DISABLE_ADDRESSABLES
+                actionModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+#endif
+            }
+            if (fpsModel != null && fpsModel.gameObject.activeSelf)
+            {
+                fpsModel.InstantiateEffect(skill.SkillActivateEffects);
+#if !DISABLE_ADDRESSABLES
+                fpsModel.InstantiateEffect(skill.AddressableSkillActivateEffects).Forget();
+#endif
+            }
         }
 
         [ServerRpc]
         protected void CmdSimulateActionTrigger(SimulateActionTriggerData data)
         {
             HitValidateData validateData = HitRegistrationManager.GetHitValidateData(Entity, data.simulateSeed);
-            if (validateData == null || validateData.Skill == null)
+            if (validateData == null || validateData.Skill == null ||
+                (validateData.Skill.IsChanneledAbility() &&
+                 (!_simulateState.HasValue || !_simulateState.Value.ItemDataId.HasValue ||
+                  _simulateState.Value.SimulateSeed != data.simulateSeed)))
             {
                 if (_entityIsPlayer && IsServer)
                     GameInstance.ServerLogHandlers.LogUseSkillTriggerFail(_playerCharacterEntity, data.simulateSeed, data.triggerIndex, ActionTriggerFailReasons.NoValidateData);
@@ -509,6 +654,8 @@ namespace MultiplayerARPG
 
         protected void ProceedCmdUseSkill(long peerTimestamp, int dataId, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
+            if (IsUsingSkill)
+                return;
             if (!Entity.ValidateSkillToUse(dataId, weaponHandlingState.Has(WeaponHandlingState.IsLeftHand), targetObjectId, out BaseSkill skill, out int skillLevel, out _))
                 return;
             RPC(RpcUseSkill, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, dataId, skillLevel, weaponHandlingState, targetObjectId, aimPosition);
@@ -571,6 +718,8 @@ namespace MultiplayerARPG
 
         protected void ProceedCmdUseSkillItem(long peerTimestamp, int itemIndex, WeaponHandlingState weaponHandlingState, uint targetObjectId, AimPosition aimPosition)
         {
+            if (IsUsingSkill)
+                return;
             if (!Entity.ValidateSkillItemToUse(itemIndex, weaponHandlingState.Has(WeaponHandlingState.IsLeftHand), targetObjectId, out ISkillItem skillItem, out BaseSkill skill, out int skillLevel, out _))
                 return;
             RPC(RpcUseSkillItem, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, peerTimestamp, skillItem.DataId, weaponHandlingState, targetObjectId, aimPosition);
@@ -603,6 +752,48 @@ namespace MultiplayerARPG
                 AimPosition = aimPosition,
             };
             UseSkillRoutine(peerTimestamp, simulateState).Forget();
+        }
+
+        public virtual void StopChannelSkill()
+        {
+            if (!_simulateState.HasValue || !_simulateState.Value.Skill.IsChanneledAbility())
+                return;
+            int startSeed = _simulateState.Value.SimulateSeed;
+            if (!IsServer)
+            {
+                if (!IsOwnerClient)
+                    return;
+                RPC(CmdStopChannelSkill, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, startSeed);
+            }
+            else
+            {
+                RPC(RpcStopChannelSkill, BaseGameEntity.ACTION_DATA_CHANNEL, DeliveryMethod.ReliableOrdered, startSeed);
+            }
+            ProceedStopChannelSkill(startSeed);
+        }
+
+        [ServerRpc]
+        protected void CmdStopChannelSkill(int startSeed)
+        {
+            if (!_simulateState.HasValue || _simulateState.Value.SimulateSeed != startSeed ||
+                !_simulateState.Value.Skill.IsChanneledAbility())
+                return;
+            StopChannelSkill();
+        }
+
+        [AllRpc]
+        protected void RpcStopChannelSkill(int startSeed)
+        {
+            if (!IsServer)
+                ProceedStopChannelSkill(startSeed);
+        }
+
+        protected virtual void ProceedStopChannelSkill(int startSeed)
+        {
+            if (!_simulateState.HasValue || _simulateState.Value.SimulateSeed != startSeed ||
+                !_simulateState.Value.Skill.IsChanneledAbility())
+                return;
+            CancelSkill();
         }
 
         public virtual void InterruptCastingSkill()
