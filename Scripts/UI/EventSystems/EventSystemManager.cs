@@ -29,7 +29,7 @@ namespace MultiplayerARPG
                 return;
 
             await UniTask.SwitchToMainThread();
-            CurrentEventSystem = FindFirstObjectByType<EventSystem>();
+            CurrentEventSystem = FindAnyObjectByType<EventSystem>();
             // Create a new event system
             if (CurrentEventSystem == null)
             {
@@ -48,6 +48,7 @@ namespace MultiplayerARPG
             CurrentEventSystem.gameObject.GetOrAddComponent<InputSystemUIInputModule>();
 #endif
             CurrentEventSystem.sendNavigationEvents = false;
+            CurrentEventSystem.pixelDragThreshold = 1;
 
             if (onEventSystemReady != null)
                 onEventSystemReady.Invoke();
