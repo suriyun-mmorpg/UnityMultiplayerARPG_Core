@@ -46,8 +46,9 @@ namespace MultiplayerARPG
             }
 
             Animator instantiatedAnimator = instantiatedObject.GetComponentInChildren<Animator>();
-            if (instantiatedAnimator == null || instantiatedAnimator.avatar == null || !instantiatedAnimator.avatar.isHuman)
+            if (instantiatedAnimator == null || instantiatedAnimator.avatar == null)
                 return;
+
             Transform instantiatedTopMostRootBone = FindTopMostRootBone(instantiatedAnimator.avatarRoot);
             if (instantiatedTopMostRootBone == null)
             {
