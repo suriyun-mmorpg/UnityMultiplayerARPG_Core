@@ -188,7 +188,9 @@ namespace MultiplayerARPG
             if (IsAttack)
             {
                 result = new Dictionary<DamageElement, float>();
-                GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, result, skillLevel);
+                DamageElementFloatAmounts indexedInflictions = default;
+                GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, ref indexedInflictions, skillLevel);
+                indexedInflictions.CopyTo(result);
                 return true;
             }
             return base.TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
@@ -209,7 +211,9 @@ namespace MultiplayerARPG
             if (IsAttack)
             {
                 result = new Dictionary<DamageElement, MinMaxFloat>();
-                GameDataHelpers.CombineDamages(additionalDamageAmounts, result, skillLevel, 1f);
+                DamageElementMinMaxFloatAmounts indexedDamages = default;
+                GameDataHelpers.CombineDamages(additionalDamageAmounts, ref indexedDamages, skillLevel, 1f);
+                indexedDamages.CopyTo(result);
                 return true;
             }
             return base.TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);

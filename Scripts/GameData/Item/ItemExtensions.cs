@@ -97,7 +97,11 @@ namespace MultiplayerARPG
         {
             result.Clear();
             if (ammoItem != null && ammoItem.IsAmmo())
-                GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, result, 1, 1f);
+            {
+                DamageElementMinMaxFloatAmounts amounts = default;
+                GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, ref amounts, 1, 1f);
+                amounts.CopyTo(result);
+            }
         }
         #endregion
 
@@ -123,7 +127,11 @@ namespace MultiplayerARPG
         {
             result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributes, result, level, 1f);
+            {
+                AttributeAmounts amounts = default;
+                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributes, ref amounts, level, 1f);
+                amounts.CopyTo(result);
+            }
         }
 
         public static void GetIncreaseAttributesRate<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result)
@@ -131,7 +139,11 @@ namespace MultiplayerARPG
         {
             result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, result, level, 1f);
+            {
+                AttributeAmounts amounts = default;
+                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, ref amounts, level, 1f);
+                amounts.CopyTo(result);
+            }
         }
 
         public static void GetIncreaseResistances<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
@@ -139,7 +151,11 @@ namespace MultiplayerARPG
         {
             result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineResistances(equipmentItem.IncreaseResistances, result, level, 1f);
+            {
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineResistances(equipmentItem.IncreaseResistances, ref amounts, level, 1f);
+                amounts.CopyTo(result);
+            }
         }
 
         public static void GetIncreaseArmors<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
@@ -147,7 +163,11 @@ namespace MultiplayerARPG
         {
             result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmors, result, level, 1f);
+            {
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmors, ref amounts, level, 1f);
+                amounts.CopyTo(result);
+            }
         }
 
         public static void GetIncreaseArmorsRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
@@ -155,7 +175,11 @@ namespace MultiplayerARPG
         {
             result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmorsRate, result, level, 1f);
+            {
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmorsRate, ref amounts, level, 1f);
+                amounts.CopyTo(result);
+            }
         }
 
         public static void GetIncreaseDamages<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result)
@@ -163,7 +187,11 @@ namespace MultiplayerARPG
         {
             result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, result, level, 1f);
+            {
+                DamageElementMinMaxFloatAmounts amounts = default;
+                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, ref amounts, level, 1f);
+                amounts.CopyTo(result);
+            }
         }
 
         public static void GetIncreaseDamagesRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result)
@@ -171,7 +199,11 @@ namespace MultiplayerARPG
         {
             result.Clear();
             if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, result, level, 1f);
+            {
+                DamageElementMinMaxFloatAmounts amounts = default;
+                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, ref amounts, level, 1f);
+                amounts.CopyTo(result);
+            }
         }
 
         public static void GetIncreaseSkills<T>(this T equipmentItem, int level, Dictionary<BaseSkill, int> result)

@@ -100,8 +100,9 @@ namespace MultiplayerARPG
 
         public virtual void GetIncreaseResistancesByLevel(float level, Dictionary<DamageElement, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineResistances(IncreaseResistances, result, Mathf.CeilToInt(level), 1f);
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineResistances(IncreaseResistances, ref amounts, Mathf.CeilToInt(level), 1f);
+            amounts.CopyTo(result);
         }
 
         public virtual void GetIncreaseResistancesByLevel(float level, ref DamageElementFloatAmounts result)
@@ -128,8 +129,9 @@ namespace MultiplayerARPG
 
         public virtual void GetIncreaseArmorsByLevel(float level, Dictionary<DamageElement, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineArmors(IncreaseArmors, result, Mathf.CeilToInt(level), 1f);
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineArmors(IncreaseArmors, ref amounts, Mathf.CeilToInt(level), 1f);
+            amounts.CopyTo(result);
         }
 
         public virtual void GetIncreaseArmorsByLevel(float level, ref DamageElementFloatAmounts result)
@@ -156,8 +158,9 @@ namespace MultiplayerARPG
 
         public virtual void GetIncreaseDamagesByLevel(float level, Dictionary<DamageElement, MinMaxFloat> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineDamages(IncreaseDamages, result, Mathf.CeilToInt(level), 1f);
+            DamageElementMinMaxFloatAmounts amounts = default;
+            GameDataHelpers.CombineDamages(IncreaseDamages, ref amounts, Mathf.CeilToInt(level), 1f);
+            amounts.CopyTo(result);
         }
 
         public virtual void GetIncreaseDamagesByLevel(float level, ref DamageElementMinMaxFloatAmounts result)

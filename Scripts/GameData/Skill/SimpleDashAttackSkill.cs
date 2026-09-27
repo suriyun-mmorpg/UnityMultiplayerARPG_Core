@@ -78,7 +78,9 @@ namespace MultiplayerARPG
                 if (entities == null || entities.Count == 0)
                     return;
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-                GameDataHelpers.CombineDamages(preDashDamageAmounts, damageAmounts, skillLevel, 1f);
+                DamageElementMinMaxFloatAmounts indexedDamages = default;
+                GameDataHelpers.CombineDamages(preDashDamageAmounts, ref indexedDamages, skillLevel, 1f);
+                indexedDamages.CopyTo(damageAmounts);
                 for (int i = 0; i < entities.Count; ++i)
                 {
                     entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), damageAmounts, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));
@@ -102,7 +104,9 @@ namespace MultiplayerARPG
                 if (entities == null || entities.Count == 0)
                     return;
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-                GameDataHelpers.CombineDamages(dashMovingDamageAmounts, damageAmounts, skillLevel, 1f);
+                DamageElementMinMaxFloatAmounts indexedDamages = default;
+                GameDataHelpers.CombineDamages(dashMovingDamageAmounts, ref indexedDamages, skillLevel, 1f);
+                indexedDamages.CopyTo(damageAmounts);
                 for (int i = 0; i < entities.Count; ++i)
                 {
                     entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), damageAmounts, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));
@@ -126,7 +130,9 @@ namespace MultiplayerARPG
                 if (entities == null || entities.Count == 0)
                     return;
                 Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-                GameDataHelpers.CombineDamages(postDashDamageAmounts, damageAmounts, skillLevel, 1f);
+                DamageElementMinMaxFloatAmounts indexedDamages = default;
+                GameDataHelpers.CombineDamages(postDashDamageAmounts, ref indexedDamages, skillLevel, 1f);
+                indexedDamages.CopyTo(damageAmounts);
                 for (int i = 0; i < entities.Count; ++i)
                 {
                     entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), damageAmounts, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));

@@ -117,10 +117,16 @@ namespace MultiplayerARPG
         {
             if (Resistances == null)
                 Resistances = new Dictionary<DamageElement, float>();
-            GameDataHelpers.CombineResistances(resistances, Resistances, Level, 1);
+            DamageElementFloatAmounts indexedResistances = default;
+            indexedResistances.Combine(Resistances);
+            GameDataHelpers.CombineResistances(resistances, ref indexedResistances, Level, 1f);
+            indexedResistances.CopyTo(Resistances);
             if (Armors == null)
                 Armors = new Dictionary<DamageElement, float>();
-            GameDataHelpers.CombineArmors(armors, Armors, Level, 1);
+            DamageElementFloatAmounts indexedArmors = default;
+            indexedArmors.Combine(Armors);
+            GameDataHelpers.CombineArmors(armors, ref indexedArmors, Level, 1f);
+            indexedArmors.CopyTo(Armors);
         }
 
         public override void OnIdentityInitialize()
