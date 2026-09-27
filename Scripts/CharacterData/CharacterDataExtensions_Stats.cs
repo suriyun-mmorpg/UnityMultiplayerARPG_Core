@@ -654,27 +654,6 @@ namespace MultiplayerARPG
         }
 
         public static void GetWeaponDamages(CharacterItem characterItem, IWeaponItem weaponItem, KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount,
-            Dictionary<Attribute, float> attributes, Dictionary<DamageElement, MinMaxFloat> buffDamages, Dictionary<DamageElement, MinMaxFloat> buffDamagesRate, Dictionary<DamageElement, MinMaxFloat> resultDamages)
-        {
-            resultDamages.Clear();
-            if (weaponItem != null)
-                weaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(weaponItem.WeaponType.CacheEffectivenessAttributes, attributes, weaponDamageAmount);
-            GameDataHelpers.CombineDamages(resultDamages, weaponDamageAmount);
-            using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> increaseDamages))
-            {
-                attributes.GetIncreaseDamages(increaseDamages);
-                GameDataHelpers.CombineDamages(increaseDamages, buffDamages);
-                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> multiplyDamages))
-                {
-                    GameDataHelpers.CombineDamages(multiplyDamages, resultDamages);
-                    GameDataHelpers.CombineDamages(resultDamages, increaseDamages);
-                    GameDataHelpers.MultiplyDamages(multiplyDamages, buffDamagesRate);
-                    GameDataHelpers.CombineDamages(resultDamages, multiplyDamages);
-                }
-            }
-        }
-
-        public static void GetWeaponDamages(CharacterItem characterItem, IWeaponItem weaponItem, KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount,
             AttributeAmounts attributes, DamageElementMinMaxFloatAmounts buffDamages, DamageElementMinMaxFloatAmounts buffDamagesRate, ref DamageElementMinMaxFloatAmounts resultDamages)
         {
             resultDamages.Clear();

@@ -275,7 +275,7 @@ namespace MultiplayerARPG
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    result = GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().Attributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
+                    result = GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().IndexedAttributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
                     return true;
                 case SkillAttackType.BasedOnWeapon:
                     if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)

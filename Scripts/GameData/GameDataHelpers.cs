@@ -275,19 +275,6 @@ namespace MultiplayerARPG
         #endregion
 
         #region Calculate functions
-        public static float GetEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, Dictionary<Attribute, float> characterAttributes)
-        {
-            float damageEffectiveness = 0f;
-            if (effectivenessAttributes == null || characterAttributes == null)
-                return damageEffectiveness;
-            foreach (KeyValuePair<Attribute, float> entry in characterAttributes)
-            {
-                if (entry.Key != null && effectivenessAttributes.TryGetValue(entry.Key, out float rate))
-                    damageEffectiveness += rate * entry.Value;
-            }
-            return damageEffectiveness;
-        }
-
         public static float GetEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, AttributeAmounts characterAttributes)
         {
             float result = 0f;
@@ -299,15 +286,6 @@ namespace MultiplayerARPG
                     result += entry.Value * amount;
             }
             return result;
-        }
-
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageWithEffectiveness(Dictionary<Attribute, float> effectivenessAttributes, Dictionary<Attribute, float> characterAttributes, KeyValuePair<DamageElement, MinMaxFloat> pureDamage)
-        {
-            float damageEffectiveness = GetEffectivenessDamage(effectivenessAttributes, characterAttributes);
-            DamageElement damageElement = pureDamage.Key;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, pureDamage.Value + damageEffectiveness);
         }
 
         public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageWithEffectiveness(Dictionary<Attribute, float> effectivenessAttributes, AttributeAmounts characterAttributes, KeyValuePair<DamageElement, MinMaxFloat> pureDamage)
