@@ -675,7 +675,7 @@ namespace MultiplayerARPG
         }
 
         public static void GetWeaponDamages(CharacterItem characterItem, IWeaponItem weaponItem, KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount,
-            AttributeAmounts attributes, DamageElementRangeAmounts buffDamages, DamageElementRangeAmounts buffDamagesRate, ref DamageElementRangeAmounts resultDamages)
+            AttributeAmounts attributes, DamageElementMinMaxFloatAmounts buffDamages, DamageElementMinMaxFloatAmounts buffDamagesRate, ref DamageElementMinMaxFloatAmounts resultDamages)
         {
             resultDamages.Clear();
             if (weaponItem != null)
@@ -683,10 +683,10 @@ namespace MultiplayerARPG
             DamageElement element = weaponDamageAmount.Key == null ? GameInstance.Singleton.DefaultDamageElement : weaponDamageAmount.Key;
             resultDamages.Add(RuntimeGameDataSlots.GetSlot(element), weaponDamageAmount.Value);
 
-            DamageElementRangeAmounts increaseDamages = default;
+            DamageElementMinMaxFloatAmounts increaseDamages = default;
             attributes.GetIncreaseDamages(ref increaseDamages);
             increaseDamages.Combine(buffDamages);
-            DamageElementRangeAmounts multiplyDamages = resultDamages;
+            DamageElementMinMaxFloatAmounts multiplyDamages = resultDamages;
             resultDamages.Combine(increaseDamages);
             multiplyDamages.MultiplyRates(buffDamagesRate);
             resultDamages.Combine(multiplyDamages);
@@ -746,8 +746,8 @@ namespace MultiplayerARPG
             data.GetCharacterStatusEffectResistances(resultStatusEffectResistances);
             Dictionary<BaseSkill, int> resultSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
             data.GetCharacterSkills(resultSkills);
-            DamageElementRangeAmounts resultRightHandDamages = default;
-            DamageElementRangeAmounts resultLeftHandDamages = default;
+            DamageElementMinMaxFloatAmounts resultRightHandDamages = default;
+            DamageElementMinMaxFloatAmounts resultLeftHandDamages = default;
             Dictionary<EquipmentSet, int> resultEquipmentSets = CollectionPool<Dictionary<EquipmentSet, int>, KeyValuePair<EquipmentSet, int>>.Get();
 
             // Prepare buff stats
@@ -759,8 +759,8 @@ namespace MultiplayerARPG
             DamageElementFloatAmounts buffArmors = default;
             DamageElementFloatAmounts buffArmorsRate = default;
             Dictionary<StatusEffect, float> buffStatusEffectResistances = CollectionPool<Dictionary<StatusEffect, float>, KeyValuePair<StatusEffect, float>>.Get();
-            DamageElementRangeAmounts buffDamages = default;
-            DamageElementRangeAmounts buffDamagesRate = default;
+            DamageElementMinMaxFloatAmounts buffDamages = default;
+            DamageElementMinMaxFloatAmounts buffDamagesRate = default;
             Dictionary<BaseSkill, int> buffSkills = CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get();
 
             // If not found equipped weapon, it will use default weapon which set in game instance as equipped weapon

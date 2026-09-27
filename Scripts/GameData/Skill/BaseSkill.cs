@@ -572,7 +572,7 @@ namespace MultiplayerARPG
 
             if (!IsAttack)
                 return damageAmounts;
-            DamageElementRangeAmounts calculatedDamages = default;
+            DamageElementMinMaxFloatAmounts calculatedDamages = default;
 
             // Base attack damage amount will sum with other variables later
             if (TryGetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand, out KeyValuePair<DamageElement, MinMaxFloat> baseDamageAmount))
@@ -618,7 +618,7 @@ namespace MultiplayerARPG
             if (IsIncreaseAttackDamageAmountsWithBuffs(skillUser, skillLevel))
             {
                 CharacterDataCache cache = skillUser.GetCaches();
-                DamageElementRangeAmounts multiplyDamages = calculatedDamages;
+                DamageElementMinMaxFloatAmounts multiplyDamages = calculatedDamages;
                 calculatedDamages.Combine(cache.IndexedIncreaseDamages);
                 multiplyDamages.MultiplyRates(cache.IndexedIncreaseDamagesRate);
                 calculatedDamages.Combine(multiplyDamages);

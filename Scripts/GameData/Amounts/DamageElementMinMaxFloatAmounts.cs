@@ -3,7 +3,7 @@ using System;
 namespace MultiplayerARPG
 {
     /// <summary>Runtime amounts indexed by slots assigned to registered game data.</summary>
-    public struct DamageElementRangeAmounts
+    public struct DamageElementMinMaxFloatAmounts
     {
 #if DAMAGE_ELEMENT_AMOUNTS_32
         public const int Capacity = 32;
@@ -235,7 +235,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void Combine(DamageElementRangeAmounts source)
+        public void Combine(DamageElementMinMaxFloatAmounts source)
         {
             uint mask = source.OccupiedMask;
             for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)
@@ -245,7 +245,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public void MultiplyRates(DamageElementRangeAmounts rates)
+        public void MultiplyRates(DamageElementMinMaxFloatAmounts rates)
         {
             uint common = _occupiedMask & rates.OccupiedMask;
             for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)

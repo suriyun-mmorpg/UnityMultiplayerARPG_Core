@@ -51,7 +51,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public static void GetIncreaseDamages(this AttributeAmounts amounts, ref DamageElementRangeAmounts result)
+        public static void GetIncreaseDamages(this AttributeAmounts amounts, ref DamageElementMinMaxFloatAmounts result)
         {
             result.Clear();
             uint mask = amounts.OccupiedMask;

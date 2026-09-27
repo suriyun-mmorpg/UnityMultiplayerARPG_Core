@@ -24,22 +24,22 @@ namespace MultiplayerARPG
         public DamageInfo RightHandDamageInfo { get; private set; }
         public bool IsRightHandItemAvailable { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> RightHandDamages { get; private set; }
-        private DamageElementRangeAmounts _indexedRightHandDamages;
-        public DamageElementRangeAmounts IndexedRightHandDamages => _indexedRightHandDamages;
+        private DamageElementMinMaxFloatAmounts _indexedRightHandDamages;
+        public DamageElementMinMaxFloatAmounts IndexedRightHandDamages => _indexedRightHandDamages;
         public KeyValuePair<DamageElement, MinMaxFloat>? RightHandWeaponDamage { get; private set; }
         public CharacterItem LeftHandItem { get; private set; }
         public DamageInfo LeftHandDamageInfo { get; private set; }
         public bool IsLeftHandItemAvailable { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> LeftHandDamages { get; private set; }
-        private DamageElementRangeAmounts _indexedLeftHandDamages;
-        public DamageElementRangeAmounts IndexedLeftHandDamages => _indexedLeftHandDamages;
+        private DamageElementMinMaxFloatAmounts _indexedLeftHandDamages;
+        public DamageElementMinMaxFloatAmounts IndexedLeftHandDamages => _indexedLeftHandDamages;
         public KeyValuePair<DamageElement, MinMaxFloat>? LeftHandWeaponDamage { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamagesRate { get; private set; }
-        private DamageElementRangeAmounts _indexedIncreaseDamages;
-        private DamageElementRangeAmounts _indexedIncreaseDamagesRate;
-        public DamageElementRangeAmounts IndexedIncreaseDamages => _indexedIncreaseDamages;
-        public DamageElementRangeAmounts IndexedIncreaseDamagesRate => _indexedIncreaseDamagesRate;
+        private DamageElementMinMaxFloatAmounts _indexedIncreaseDamages;
+        private DamageElementMinMaxFloatAmounts _indexedIncreaseDamagesRate;
+        public DamageElementMinMaxFloatAmounts IndexedIncreaseDamages => _indexedIncreaseDamages;
+        public DamageElementMinMaxFloatAmounts IndexedIncreaseDamagesRate => _indexedIncreaseDamagesRate;
         public Dictionary<BaseSkill, int> Skills { get; private set; }
         public Dictionary<StatusEffect, float> StatusEffectResistances { get; private set; }
         public Dictionary<EquipmentSet, int> EquipmentSets { get; private set; }
@@ -238,7 +238,7 @@ namespace MultiplayerARPG
         private void SetRightHandDamages(Dictionary<DamageElement, MinMaxFloat> rightHandDamages)
         {
             RightHandDamages = rightHandDamages;
-            DamageElementRangeAmounts indexed = default;
+            DamageElementMinMaxFloatAmounts indexed = default;
             indexed.Combine(rightHandDamages);
             _indexedRightHandDamages = indexed;
         }
@@ -251,7 +251,7 @@ namespace MultiplayerARPG
         private void SetLeftHandDamages(Dictionary<DamageElement, MinMaxFloat> leftHandDamages)
         {
             LeftHandDamages = leftHandDamages;
-            DamageElementRangeAmounts indexed = default;
+            DamageElementMinMaxFloatAmounts indexed = default;
             indexed.Combine(leftHandDamages);
             _indexedLeftHandDamages = indexed;
         }
@@ -264,7 +264,7 @@ namespace MultiplayerARPG
         private void SetIncreaseDamages(Dictionary<DamageElement, MinMaxFloat> increaseDamages)
         {
             IncreaseDamages = increaseDamages;
-            DamageElementRangeAmounts indexed = default;
+            DamageElementMinMaxFloatAmounts indexed = default;
             indexed.Combine(increaseDamages);
             _indexedIncreaseDamages = indexed;
         }
@@ -272,7 +272,7 @@ namespace MultiplayerARPG
         private void SetIncreaseDamagesRate(Dictionary<DamageElement, MinMaxFloat> increaseDamagesRate)
         {
             IncreaseDamagesRate = increaseDamagesRate;
-            DamageElementRangeAmounts indexed = default;
+            DamageElementMinMaxFloatAmounts indexed = default;
             indexed.Combine(increaseDamagesRate);
             _indexedIncreaseDamagesRate = indexed;
         }
