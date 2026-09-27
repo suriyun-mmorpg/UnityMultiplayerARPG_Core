@@ -7,89 +7,6 @@ namespace MultiplayerARPG
     {
         #region Make KeyValuePair functions
         /// <summary>
-        /// Make damage - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<DamageElement, MinMaxFloat> ToKeyValuePair(this DamageAmount source, float rate)
-        {
-            DamageElement damageElement = source.damageElement;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, source.amount * rate);
-        }
-
-        /// <summary>
-        /// Make damage amount
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<DamageElement, MinMaxFloat> ToKeyValuePair(this DamageIncremental source, int level, float rate)
-        {
-            DamageElement damageElement = source.damageElement;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, source.amount.GetAmount(level) * rate);
-        }
-
-        /// <summary>
-        /// Make damage infliction - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this DamageInflictionAmount source)
-        {
-            DamageElement damageElement = source.damageElement;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, float>(damageElement, source.rate);
-        }
-
-        /// <summary>
-        /// Make damage infliction - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="level"></param>
-        /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this DamageInflictionIncremental source, int level)
-        {
-            DamageElement damageElement = source.damageElement;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, float>(damageElement, source.rate.GetAmount(level));
-        }
-
-        /// <summary>
-        /// Make attribute - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<Attribute, float> ToKeyValuePair(this AttributeAmount source, float rate)
-        {
-            if (source.attribute == null)
-                return new KeyValuePair<Attribute, float>();
-            return new KeyValuePair<Attribute, float>(source.attribute, source.amount * rate);
-        }
-
-        /// <summary>
-        /// Make attribute - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<Attribute, float> ToKeyValuePair(this AttributeIncremental source, int level, float rate)
-        {
-            if (source.attribute == null)
-                return new KeyValuePair<Attribute, float>();
-            return new KeyValuePair<Attribute, float>(source.attribute, source.amount.GetAmount(level) * rate);
-        }
-
-        /// <summary>
         /// Make currency - amount key-value pair
         /// </summary>
         /// <param name="source"></param>
@@ -98,64 +15,6 @@ namespace MultiplayerARPG
         public static KeyValuePair<Currency, int> ToKeyValuePair(this CurrencyAmount source, float rate)
         {
             return new KeyValuePair<Currency, int>(source.currency, Mathf.CeilToInt(source.amount * rate));
-        }
-
-        /// <summary>
-        /// Make resistance - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ResistanceAmount source, float rate)
-        {
-            DamageElement damageElement = source.damageElement;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, float>(damageElement, source.amount * rate);
-        }
-
-        /// <summary>
-        /// Make resistance - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ResistanceIncremental source, int level, float rate)
-        {
-            DamageElement damageElement = source.damageElement;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, float>(damageElement, source.amount.GetAmount(level) * rate);
-        }
-
-        /// <summary>
-        /// Make armor - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ArmorAmount source, float rate)
-        {
-            DamageElement damageElement = source.damageElement;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, float>(damageElement, source.amount * rate);
-        }
-
-        /// <summary>
-        /// Make armor - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<DamageElement, float> ToKeyValuePair(this ArmorIncremental source, int level, float rate)
-        {
-            DamageElement damageElement = source.damageElement;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, float>(damageElement, source.amount.GetAmount(level) * rate);
         }
 
         /// <summary>
@@ -274,44 +133,5 @@ namespace MultiplayerARPG
         }
         #endregion
 
-        #region Calculate functions
-        public static float GetEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, AttributeAmounts characterAttributes)
-        {
-            float result = 0f;
-            if (effectivenessAttributes == null)
-                return result;
-            foreach (KeyValuePair<Attribute, float> entry in effectivenessAttributes)
-            {
-                if (entry.Key != null && characterAttributes.TryGetValue(RuntimeGameDataSlots.GetSlot(entry.Key), out float amount))
-                    result += entry.Value * amount;
-            }
-            return result;
-        }
-
-        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageWithEffectiveness(Dictionary<Attribute, float> effectivenessAttributes, AttributeAmounts characterAttributes, KeyValuePair<DamageElement, MinMaxFloat> pureDamage)
-        {
-            float damageEffectiveness = GetEffectivenessDamage(effectivenessAttributes, characterAttributes);
-            DamageElement damageElement = pureDamage.Key;
-            if (damageElement == null)
-                damageElement = GameInstance.Singleton.DefaultDamageElement;
-            return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, pureDamage.Value + damageEffectiveness);
-        }
-
-        public static MinMaxFloat GetSumDamages(Dictionary<DamageElement, MinMaxFloat> damages)
-        {
-            MinMaxFloat totalDamageAmount = new MinMaxFloat()
-            {
-                min = 0,
-                max = 0,
-            };
-            if (damages == null || damages.Count <= 0)
-                return totalDamageAmount;
-            foreach (MinMaxFloat damageAmount in damages.Values)
-            {
-                totalDamageAmount += damageAmount;
-            }
-            return totalDamageAmount;
-        }
-        #endregion
     }
 }

@@ -261,6 +261,17 @@ namespace MultiplayerARPG
             }
         }
 
+        public MinMaxFloat Sum()
+        {
+            MinMaxFloat result = default;
+            for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)
+            {
+                if ((_occupiedMask & (1u << i)) != 0)
+                    result += this[i];
+            }
+            return result;
+        }
+
         public void CopyTo(System.Collections.Generic.Dictionary<DamageElement, MinMaxFloat> result)
         {
             result.Clear();

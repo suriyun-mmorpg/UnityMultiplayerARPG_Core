@@ -245,6 +245,19 @@ namespace MultiplayerARPG
             }
         }
 
+        public void MultiplyValues(DamageElementFloatAmounts rates)
+        {
+            for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)
+            {
+                if ((_occupiedMask & (1u << i)) == 0)
+                    continue;
+                if (!rates.Contains(i))
+                    Remove(i);
+                else
+                    this[i] *= rates[i];
+            }
+        }
+
         public void ApplyRates(DamageElementFloatAmounts rates)
         {
             uint shared = _occupiedMask & rates.OccupiedMask;

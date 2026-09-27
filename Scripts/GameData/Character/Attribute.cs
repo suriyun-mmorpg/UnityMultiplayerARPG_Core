@@ -1,6 +1,7 @@
 ﻿using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -103,16 +104,82 @@ namespace MultiplayerARPG
             GameDataHelpers.CombineResistances(IncreaseResistances, result, Mathf.CeilToInt(level), 1f);
         }
 
+        public virtual void GetIncreaseResistancesByLevel(float level, ref DamageElementFloatAmounts result)
+        {
+            result.Clear();
+            if (GetType() != typeof(Attribute))
+            {
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> temporary))
+                {
+                    GetIncreaseResistancesByLevel(level, temporary);
+                    result.Combine(temporary);
+                }
+                return;
+            }
+            if (IncreaseResistances == null)
+                return;
+            int roundedLevel = Mathf.CeilToInt(level);
+            foreach (ResistanceIncremental entry in IncreaseResistances)
+            {
+                DamageElement element = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), entry.amount.GetAmount(roundedLevel));
+            }
+        }
+
         public virtual void GetIncreaseArmorsByLevel(float level, Dictionary<DamageElement, float> result)
         {
             result.Clear();
             GameDataHelpers.CombineArmors(IncreaseArmors, result, Mathf.CeilToInt(level), 1f);
         }
 
+        public virtual void GetIncreaseArmorsByLevel(float level, ref DamageElementFloatAmounts result)
+        {
+            result.Clear();
+            if (GetType() != typeof(Attribute))
+            {
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> temporary))
+                {
+                    GetIncreaseArmorsByLevel(level, temporary);
+                    result.Combine(temporary);
+                }
+                return;
+            }
+            if (IncreaseArmors == null)
+                return;
+            int roundedLevel = Mathf.CeilToInt(level);
+            foreach (ArmorIncremental entry in IncreaseArmors)
+            {
+                DamageElement element = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), entry.amount.GetAmount(roundedLevel));
+            }
+        }
+
         public virtual void GetIncreaseDamagesByLevel(float level, Dictionary<DamageElement, MinMaxFloat> result)
         {
             result.Clear();
             GameDataHelpers.CombineDamages(IncreaseDamages, result, Mathf.CeilToInt(level), 1f);
+        }
+
+        public virtual void GetIncreaseDamagesByLevel(float level, ref DamageElementMinMaxFloatAmounts result)
+        {
+            result.Clear();
+            if (GetType() != typeof(Attribute))
+            {
+                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> temporary))
+                {
+                    GetIncreaseDamagesByLevel(level, temporary);
+                    result.Combine(temporary);
+                }
+                return;
+            }
+            if (IncreaseDamages == null)
+                return;
+            int roundedLevel = Mathf.CeilToInt(level);
+            foreach (DamageIncremental entry in IncreaseDamages)
+            {
+                DamageElement element = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), entry.amount.GetAmount(roundedLevel));
+            }
         }
 
         public virtual void GetIncreaseStatusEffectResistancesByLevel(float level, Dictionary<StatusEffect, float> result)

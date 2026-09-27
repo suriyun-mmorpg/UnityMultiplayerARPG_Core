@@ -69,15 +69,19 @@ namespace MultiplayerARPG
         public ItemCraft itemCraft = new ItemCraft();
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> _cacheEffectivenessAttributes = null;
-        public Dictionary<Attribute, float> CacheEffectivenessAttributes
+        private AttributeAmounts _cacheEffectivenessAttributes;
+        [System.NonSerialized]
+        private int _cacheEffectivenessGeneration = -1;
+        [Newtonsoft.Json.JsonIgnore]
+        public AttributeAmounts CacheEffectivenessAttributes
         {
             get
             {
-                if (_cacheEffectivenessAttributes == null)
+                if (_cacheEffectivenessGeneration != RuntimeGameDataSlots.Generation)
                 {
-                    _cacheEffectivenessAttributes = new Dictionary<Attribute, float>();
-                    GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, _cacheEffectivenessAttributes);
+                    _cacheEffectivenessAttributes = default;
+                    _cacheEffectivenessAttributes.CombineEffectiveness(effectivenessAttributes);
+                    _cacheEffectivenessGeneration = RuntimeGameDataSlots.Generation;
                 }
                 return _cacheEffectivenessAttributes;
             }
@@ -275,7 +279,9 @@ namespace MultiplayerARPG
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    result = GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().IndexedAttributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
+                    result = new KeyValuePair<DamageElement, MinMaxFloat>(
+                        damageAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : damageAmount.damageElement,
+                        damageAmount.amount.GetAmount(skillLevel) + skillUser.GetCaches().IndexedAttributes.GetWeightedAmount(CacheEffectivenessAttributes));
                     return true;
                 case SkillAttackType.BasedOnWeapon:
                     if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)

@@ -13,6 +13,7 @@ namespace MultiplayerARPG
 
         public static int AttributeCount => s_attributeCount;
         public static int DamageElementCount => s_damageElementCount;
+        public static int Generation { get; private set; }
 
         public static int GetSlot(Attribute attribute)
         {
@@ -96,6 +97,7 @@ namespace MultiplayerARPG
 
         public static void Clear()
         {
+            ++Generation;
             for (int i = 0; i < s_attributeCount; ++i)
             {
                 if (s_attributes[i] != null)

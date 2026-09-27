@@ -658,7 +658,9 @@ namespace MultiplayerARPG
         {
             resultDamages.Clear();
             if (weaponItem != null)
-                weaponDamageAmount = GameDataHelpers.GetDamageWithEffectiveness(weaponItem.WeaponType.CacheEffectivenessAttributes, attributes, weaponDamageAmount);
+                weaponDamageAmount = new KeyValuePair<DamageElement, MinMaxFloat>(
+                    weaponDamageAmount.Key == null ? GameInstance.Singleton.DefaultDamageElement : weaponDamageAmount.Key,
+                    weaponDamageAmount.Value + attributes.GetWeightedAmount(weaponItem.WeaponType.CacheEffectivenessAttributes));
             DamageElement element = weaponDamageAmount.Key == null ? GameInstance.Singleton.DefaultDamageElement : weaponDamageAmount.Key;
             resultDamages.Add(RuntimeGameDataSlots.GetSlot(element), weaponDamageAmount.Value);
 

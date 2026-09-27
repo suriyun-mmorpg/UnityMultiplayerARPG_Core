@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -23,10 +22,10 @@ namespace MultiplayerARPG
             }
             if (combineDictionary == null || combineDictionary.Count <= 0)
                 return;
-            foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in combineDictionary)
-            {
-                CombineDamages(resultDictionary, entry, rate);
-            }
+            DamageElementMinMaxFloatAmounts amounts = default;
+            amounts.Combine(resultDictionary);
+            amounts.Combine(combineDictionary, rate);
+            amounts.CopyTo(resultDictionary);
             return;
         }
 
@@ -43,27 +42,12 @@ namespace MultiplayerARPG
                 Debug.LogError("Collecton is null");
                 return;
             }
-            if (multiplyDictionary != null && multiplyDictionary.Count > 0)
-            {
-                // Remove attributes that are not multiplying
-                using (CollectionPool<List<DamageElement>, DamageElement>.Get(out List<DamageElement> availableDamages))
-                {
-                    availableDamages.AddRange(resultDictionary.Keys);
-                    foreach (DamageElement damage in availableDamages)
-                    {
-                        if (!multiplyDictionary.ContainsKey(damage))
-                            resultDictionary.Remove(damage);
-                    }
-                }
-                foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in multiplyDictionary)
-                {
-                    MultiplyDamages(resultDictionary, entry);
-                }
-            }
-            else
-            {
-                resultDictionary.Clear();
-            }
+            DamageElementMinMaxFloatAmounts amounts = default;
+            amounts.Combine(resultDictionary);
+            DamageElementMinMaxFloatAmounts rates = default;
+            rates.Combine(multiplyDictionary);
+            amounts.MultiplyRates(rates);
+            amounts.CopyTo(resultDictionary);
             return;
         }
 
@@ -82,10 +66,10 @@ namespace MultiplayerARPG
             }
             if (combineDictionary == null || combineDictionary.Count <= 0)
                 return;
-            foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
-            {
-                CombineDamageInflictions(resultDictionary, entry);
-            }
+            DamageElementFloatAmounts amounts = default;
+            amounts.Combine(resultDictionary);
+            amounts.Combine(combineDictionary);
+            amounts.CopyTo(resultDictionary);
             return;
         }
 
@@ -104,10 +88,10 @@ namespace MultiplayerARPG
             }
             if (combineDictionary == null || combineDictionary.Count <= 0)
                 return;
-            foreach (KeyValuePair<Attribute, float> entry in combineDictionary)
-            {
-                CombineAttributes(resultDictionary, entry);
-            }
+            AttributeAmounts amounts = default;
+            amounts.Combine(resultDictionary);
+            amounts.Combine(combineDictionary);
+            amounts.CopyTo(resultDictionary);
             return;
         }
 
@@ -124,27 +108,12 @@ namespace MultiplayerARPG
                 Debug.LogError("Collecton is null");
                 return;
             }
-            if (multiplyDictionary != null && multiplyDictionary.Count > 0)
-            {
-                // Remove attributes that are not multiplying
-                using (CollectionPool<List<Attribute>, Attribute>.Get(out List<Attribute> availableAttributes))
-                {
-                    availableAttributes.AddRange(resultDictionary.Keys);
-                    foreach (Attribute attribute in availableAttributes)
-                    {
-                        if (!multiplyDictionary.ContainsKey(attribute))
-                            resultDictionary.Remove(attribute);
-                    }
-                }
-                foreach (KeyValuePair<Attribute, float> entry in multiplyDictionary)
-                {
-                    MultiplyAttributes(resultDictionary, entry);
-                }
-            }
-            else
-            {
-                resultDictionary.Clear();
-            }
+            AttributeAmounts amounts = default;
+            amounts.Combine(resultDictionary);
+            AttributeAmounts rates = default;
+            rates.Combine(multiplyDictionary);
+            amounts.MultiplyValues(rates);
+            amounts.CopyTo(resultDictionary);
             return;
         }
 
@@ -163,10 +132,10 @@ namespace MultiplayerARPG
             }
             if (combineDictionary == null || combineDictionary.Count <= 0)
                 return;
-            foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
-            {
-                CombineResistances(resultDictionary, entry);
-            }
+            DamageElementFloatAmounts amounts = default;
+            amounts.Combine(resultDictionary);
+            amounts.Combine(combineDictionary);
+            amounts.CopyTo(resultDictionary);
             return;
         }
 
@@ -185,10 +154,10 @@ namespace MultiplayerARPG
             }
             if (combineDictionary == null || combineDictionary.Count <= 0)
                 return;
-            foreach (KeyValuePair<DamageElement, float> entry in combineDictionary)
-            {
-                CombineArmors(resultDictionary, entry);
-            }
+            DamageElementFloatAmounts amounts = default;
+            amounts.Combine(resultDictionary);
+            amounts.Combine(combineDictionary);
+            amounts.CopyTo(resultDictionary);
             return;
         }
 
@@ -205,27 +174,12 @@ namespace MultiplayerARPG
                 Debug.LogError("Collecton is null");
                 return;
             }
-            if (multiplyDictionary != null && multiplyDictionary.Count > 0)
-            {
-                // Remove attributes that are not multiplying
-                using (CollectionPool<List<DamageElement>, DamageElement>.Get(out List<DamageElement> availableArmors))
-                {
-                    availableArmors.AddRange(resultDictionary.Keys);
-                    foreach (DamageElement armor in availableArmors)
-                    {
-                        if (!multiplyDictionary.ContainsKey(armor))
-                            resultDictionary.Remove(armor);
-                    }
-                }
-                foreach (KeyValuePair<DamageElement, float> entry in multiplyDictionary)
-                {
-                    MultiplyArmors(resultDictionary, entry);
-                }
-            }
-            else
-            {
-                resultDictionary.Clear();
-            }
+            DamageElementFloatAmounts amounts = default;
+            amounts.Combine(resultDictionary);
+            DamageElementFloatAmounts rates = default;
+            rates.Combine(multiplyDictionary);
+            amounts.MultiplyValues(rates);
+            amounts.CopyTo(resultDictionary);
             return;
         }
 

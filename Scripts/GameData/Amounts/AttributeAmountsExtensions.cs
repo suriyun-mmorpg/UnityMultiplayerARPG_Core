@@ -21,16 +21,14 @@ namespace MultiplayerARPG
         {
             result.Clear();
             uint mask = amounts.OccupiedMask;
-            using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> temporary))
+            DamageElementFloatAmounts temporary = default;
+            for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
             {
-                for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
-                {
-                    if ((mask & (1u << i)) == 0)
-                        continue;
-                    temporary.Clear();
-                    RuntimeGameDataSlots.GetAttribute(i).GetIncreaseResistancesByLevel(amounts[i], temporary);
-                    result.Combine(temporary);
-                }
+                if ((mask & (1u << i)) == 0)
+                    continue;
+                temporary.Clear();
+                RuntimeGameDataSlots.GetAttribute(i).GetIncreaseResistancesByLevel(amounts[i], ref temporary);
+                result.Combine(temporary);
             }
         }
 
@@ -38,16 +36,14 @@ namespace MultiplayerARPG
         {
             result.Clear();
             uint mask = amounts.OccupiedMask;
-            using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> temporary))
+            DamageElementFloatAmounts temporary = default;
+            for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
             {
-                for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
-                {
-                    if ((mask & (1u << i)) == 0)
-                        continue;
-                    temporary.Clear();
-                    RuntimeGameDataSlots.GetAttribute(i).GetIncreaseArmorsByLevel(amounts[i], temporary);
-                    result.Combine(temporary);
-                }
+                if ((mask & (1u << i)) == 0)
+                    continue;
+                temporary.Clear();
+                RuntimeGameDataSlots.GetAttribute(i).GetIncreaseArmorsByLevel(amounts[i], ref temporary);
+                result.Combine(temporary);
             }
         }
 
@@ -55,16 +51,14 @@ namespace MultiplayerARPG
         {
             result.Clear();
             uint mask = amounts.OccupiedMask;
-            using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> temporary))
+            DamageElementMinMaxFloatAmounts temporary = default;
+            for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
             {
-                for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
-                {
-                    if ((mask & (1u << i)) == 0)
-                        continue;
-                    temporary.Clear();
-                    RuntimeGameDataSlots.GetAttribute(i).GetIncreaseDamagesByLevel(amounts[i], temporary);
-                    result.Combine(temporary);
-                }
+                if ((mask & (1u << i)) == 0)
+                    continue;
+                temporary.Clear();
+                RuntimeGameDataSlots.GetAttribute(i).GetIncreaseDamagesByLevel(amounts[i], ref temporary);
+                result.Combine(temporary);
             }
         }
 

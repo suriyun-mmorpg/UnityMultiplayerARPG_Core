@@ -482,7 +482,9 @@ namespace MultiplayerARPG
                 {
                     if (_tempRightHandDamages != null)
                     {
-                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(_tempRightHandDamages);
+                        DamageElementMinMaxFloatAmounts damageAmounts = default;
+                        damageAmounts.Combine(_tempRightHandDamages);
+                        MinMaxFloat sumDamages = damageAmounts.Sum();
                         if (textDamages.Length > 0)
                             textDamages.Append('\n');
                         textDamages.AppendFormat(
@@ -492,7 +494,9 @@ namespace MultiplayerARPG
                     }
                     if (_tempLeftHandDamages != null)
                     {
-                        MinMaxFloat sumDamages = GameDataHelpers.GetSumDamages(_tempLeftHandDamages);
+                        DamageElementMinMaxFloatAmounts damageAmounts = default;
+                        damageAmounts.Combine(_tempLeftHandDamages);
+                        MinMaxFloat sumDamages = damageAmounts.Sum();
                         if (textDamages.Length > 0)
                             textDamages.Append('\n');
                         textDamages.AppendFormat(

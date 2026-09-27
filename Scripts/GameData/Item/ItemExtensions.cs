@@ -245,7 +245,10 @@ namespace MultiplayerARPG
         {
             if (defendItem == null || !defendItem.IsDefendEquipment())
                 return new KeyValuePair<DamageElement, float>();
-            return GameDataHelpers.ToKeyValuePair(defendItem.ArmorAmount, level, rate);
+            ArmorIncremental amount = defendItem.ArmorAmount;
+            return new KeyValuePair<DamageElement, float>(
+                amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement,
+                amount.amount.GetAmount(level) * rate);
         }
 
         public static string GetEquipPosition<T>(this T armorItem)
@@ -287,7 +290,10 @@ namespace MultiplayerARPG
         {
             if (weaponItem == null || !weaponItem.IsWeapon())
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.ToKeyValuePair(weaponItem.DamageAmount, itemLevel, statsRate);
+            DamageIncremental amount = weaponItem.DamageAmount;
+            return new KeyValuePair<DamageElement, MinMaxFloat>(
+                amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement,
+                amount.amount.GetAmount(itemLevel) * statsRate);
         }
 
         public static bool TryGetWeaponItemEquipType<T>(this T weaponItem, out WeaponItemEquipType equipType)

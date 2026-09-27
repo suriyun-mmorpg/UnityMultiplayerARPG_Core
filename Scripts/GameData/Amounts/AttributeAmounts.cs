@@ -239,6 +239,42 @@ namespace MultiplayerARPG
             }
         }
 
+        public void CombineEffectiveness(DamageEffectivenessAttribute[] source)
+        {
+            if (source == null)
+                return;
+            foreach (DamageEffectivenessAttribute entry in source)
+            {
+                if (entry.attribute != null)
+                    Add(RuntimeGameDataSlots.GetSlot(entry.attribute), entry.effectiveness);
+            }
+        }
+
+        public float GetWeightedAmount(AttributeAmounts weights)
+        {
+            float result = 0f;
+            uint shared = _occupiedMask & weights.OccupiedMask;
+            for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
+            {
+                if ((shared & (1u << i)) != 0)
+                    result += this[i] * weights[i];
+            }
+            return result;
+        }
+
+        public void MultiplyValues(AttributeAmounts rates)
+        {
+            for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
+            {
+                if ((_occupiedMask & (1u << i)) == 0)
+                    continue;
+                if (!rates.Contains(i))
+                    Remove(i);
+                else
+                    this[i] *= rates[i];
+            }
+        }
+
         public void ApplyRates(AttributeAmounts rates)
         {
             uint shared = _occupiedMask & rates.OccupiedMask;
