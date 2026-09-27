@@ -530,12 +530,13 @@ namespace MultiplayerARPG
             // Currencies
             if (buildingRepairData.requireCurrencies != null)
             {
-                Dictionary<Currency, int> playerCurrencies = repairPlayer.GetCurrencies();
+                CurrencyAmounts playerCurrencies = repairPlayer.GetIndexedCurrencies();
                 for (i = 0; i < buildingRepairData.requireCurrencies.Length; ++i)
                 {
                     if (buildingRepairData.requireCurrencies[i].currency == null || buildingRepairData.requireCurrencies[i].amount == 0)
                         continue;
-                    if (!playerCurrencies.TryGetValue(buildingRepairData.requireCurrencies[i].currency, out int currentAmount))
+                    int currencySlot = RuntimeGameDataSlots.GetSlot(buildingRepairData.requireCurrencies[i].currency);
+                    if (!playerCurrencies.TryGetValue(currencySlot, out int currentAmount))
                     {
                         repairAmount = 0;
                         errorMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;

@@ -1035,6 +1035,8 @@ namespace MultiplayerARPG
                     RuntimeGameDataSlots.Register(attribute);
                 else if (data is DamageElement damageElement)
                     RuntimeGameDataSlots.Register(damageElement);
+                else if (data is Currency currency)
+                    RuntimeGameDataSlots.Register(currency);
                 dict[data.DataId] = data;
                 data.PrepareRelatesData();
             }

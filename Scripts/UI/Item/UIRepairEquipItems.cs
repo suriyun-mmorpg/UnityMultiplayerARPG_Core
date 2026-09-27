@@ -128,7 +128,7 @@ namespace MultiplayerARPG
                 else
                 {
                     _tempRequireCurrencies.Clear();
-                    GameDataHelpers.CombineCurrencies(requireCurrencies, _tempRequireCurrencies, 1f);
+                    CurrencyDictionaryView.CopyToDictionary(requireCurrencies, _tempRequireCurrencies, 1f);
                     if (!_appliedHasCurrencies || !DictionaryEquals(_appliedRequireCurrencies, _tempRequireCurrencies))
                     {
                         _appliedHasCurrencies = true;

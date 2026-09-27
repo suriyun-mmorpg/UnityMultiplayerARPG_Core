@@ -105,32 +105,18 @@ namespace MultiplayerARPG
                 result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
             }
         }
-        #region Combine Dictionary with Array functions
-        /// <summary>
-        /// Combine currency amounts dictionary
-        /// </summary>
-        /// <param name="sourceAmounts"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineCurrencies(CurrencyAmount[] sourceAmounts, Dictionary<Currency, int> resultDictionary, float rate)
+        public static void CombineCurrencies(CurrencyAmount[] sourceAmounts, ref CurrencyAmounts result, float rate)
         {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
             if (sourceAmounts == null)
                 return;
-            KeyValuePair<Currency, int> pair;
             foreach (CurrencyAmount sourceAmount in sourceAmounts)
             {
-                pair = ToKeyValuePair(sourceAmount, rate);
-                CombineCurrencies(resultDictionary, pair);
+                if (sourceAmount.currency != null)
+                    result.Add(RuntimeGameDataSlots.GetSlot(sourceAmount.currency), Mathf.CeilToInt(sourceAmount.amount * rate));
             }
-            return;
         }
 
+        #region Combine Dictionary with Array functions
         /// <summary>
         /// Combine skill levels dictionary
         /// </summary>

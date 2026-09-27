@@ -482,20 +482,23 @@ namespace MultiplayerARPG
 
         public static Dictionary<Currency, int> GetCurrencies(this IPlayerCharacterData data)
         {
-            if (data == null)
-                return new Dictionary<Currency, int>();
             Dictionary<Currency, int> result = new Dictionary<Currency, int>();
+            data.GetIndexedCurrencies().CopyTo(result);
+            return result;
+        }
+
+        public static CurrencyAmounts GetIndexedCurrencies(this IPlayerCharacterData data)
+        {
+            CurrencyAmounts result = default;
+            if (data == null)
+                return result;
 #if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
             foreach (CharacterCurrency characterCurrency in data.Currencies)
             {
                 Currency key = characterCurrency.GetCurrency();
-                int value = characterCurrency.amount;
                 if (key == null)
                     continue;
-                if (!result.ContainsKey(key))
-                    result[key] = value;
-                else
-                    result[key] += value;
+                result.Add(RuntimeGameDataSlots.GetSlot(key), characterCurrency.amount);
             }
 #endif
             return result;
@@ -524,11 +527,16 @@ namespace MultiplayerARPG
 
         public static void IncreaseCurrencies(this IPlayerCharacterData character, Dictionary<Currency, int> currencyAmounts, float multiplier = 1)
         {
-            if (currencyAmounts == null)
-                return;
-            foreach (KeyValuePair<Currency, int> currencyAmount in currencyAmounts)
+            character.IncreaseCurrencies(currencyAmounts.ToCurrencyAmounts(), multiplier);
+        }
+
+        public static void IncreaseCurrencies(this IPlayerCharacterData character, CurrencyAmounts currencyAmounts, float multiplier = 1)
+        {
+            uint mask = currencyAmounts.OccupiedMask;
+            for (int slot = 0; slot < RuntimeGameDataSlots.CurrencyCount; ++slot)
             {
-                character.IncreaseCurrency(currencyAmount.Key, Mathf.CeilToInt(currencyAmount.Value * multiplier));
+                if ((mask & (1u << slot)) != 0)
+                    character.IncreaseCurrency(RuntimeGameDataSlots.GetCurrency(slot), Mathf.CeilToInt(currencyAmounts[slot] * multiplier));
             }
         }
 
@@ -572,11 +580,16 @@ namespace MultiplayerARPG
 
         public static void DecreaseCurrencies(this IPlayerCharacterData character, Dictionary<Currency, int> currencyAmounts, float multiplier = 1)
         {
-            if (currencyAmounts == null)
-                return;
-            foreach (KeyValuePair<Currency, int> currencyAmount in currencyAmounts)
+            character.DecreaseCurrencies(currencyAmounts.ToCurrencyAmounts(), multiplier);
+        }
+
+        public static void DecreaseCurrencies(this IPlayerCharacterData character, CurrencyAmounts currencyAmounts, float multiplier = 1)
+        {
+            uint mask = currencyAmounts.OccupiedMask;
+            for (int slot = 0; slot < RuntimeGameDataSlots.CurrencyCount; ++slot)
             {
-                character.DecreaseCurrency(currencyAmount.Key, Mathf.CeilToInt(currencyAmount.Value * multiplier));
+                if ((mask & (1u << slot)) != 0)
+                    character.DecreaseCurrency(RuntimeGameDataSlots.GetCurrency(slot), Mathf.CeilToInt(currencyAmounts[slot] * multiplier));
             }
         }
 
@@ -621,13 +634,24 @@ namespace MultiplayerARPG
 
         public static bool HasEnoughCurrencyAmounts(this IPlayerCharacterData data, Dictionary<Currency, int> requiredCurrencyAmounts, out UITextKeys gameMessage, out Dictionary<Currency, int> currentCurrencyAmounts, float multiplier = 1)
         {
+            bool result = data.HasEnoughCurrencyAmounts(requiredCurrencyAmounts.ToCurrencyAmounts(), out gameMessage, out CurrencyAmounts current, multiplier);
+            currentCurrencyAmounts = new Dictionary<Currency, int>();
+            current.CopyTo(currentCurrencyAmounts);
+            return result;
+        }
+
+        public static bool HasEnoughCurrencyAmounts(this IPlayerCharacterData data, CurrencyAmounts requiredCurrencyAmounts, out UITextKeys gameMessage, out CurrencyAmounts currentCurrencyAmounts, float multiplier = 1)
+        {
             gameMessage = UITextKeys.NONE;
-            currentCurrencyAmounts = data.GetCurrencies();
-            foreach (Currency requireCurrency in requiredCurrencyAmounts.Keys)
+            currentCurrencyAmounts = data.GetIndexedCurrencies();
+            uint mask = requiredCurrencyAmounts.OccupiedMask;
+            for (int slot = 0; slot < RuntimeGameDataSlots.CurrencyCount; ++slot)
             {
-                int requiredCurrency = Mathf.CeilToInt(requiredCurrencyAmounts[requireCurrency] * multiplier);
-                if (requiredCurrency < 0 || !currentCurrencyAmounts.ContainsKey(requireCurrency) ||
-                    currentCurrencyAmounts[requireCurrency] < requiredCurrency)
+                if ((mask & (1u << slot)) == 0)
+                    continue;
+                int requiredCurrency = Mathf.CeilToInt(requiredCurrencyAmounts[slot] * multiplier);
+                if (requiredCurrency < 0 || !currentCurrencyAmounts.Contains(slot) ||
+                    currentCurrencyAmounts[slot] < requiredCurrency)
                 {
                     gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
                     return false;

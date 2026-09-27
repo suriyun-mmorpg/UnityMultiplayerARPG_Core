@@ -90,6 +90,8 @@ namespace MultiplayerARPG.Tests
 
             Skill skill = CreateAsset<Skill>();
             skill.requirementEachLevels.Add(new SkillRequirementEntry());
+            // TODO: Add boundary tests for skill and item requirements above
+            // requirementEachLevels.Count after BaseSkill's out-of-range indexing is fixed.
             skill.requirementEachLevels.Add(new SkillRequirementEntry
             {
                 attributeAmounts = new[]

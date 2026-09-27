@@ -5,6 +5,10 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.CURRENCY_FILE, menuName = GameDataMenuConsts.CURRENCY_MENU, order = GameDataMenuConsts.CURRENCY_ORDER)]
     public partial class Currency : BaseGameData
     {
+        [System.NonSerialized]
+        private int _runtimeSlot = -1;
+        [Newtonsoft.Json.JsonIgnore]
+        public int RuntimeSlot { get { return _runtimeSlot; } internal set { _runtimeSlot = value; } }
     }
 
     [System.Serializable]

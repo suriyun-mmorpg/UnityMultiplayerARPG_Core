@@ -7,12 +7,15 @@ namespace MultiplayerARPG
     {
         private static readonly Attribute[] s_attributes = new Attribute[AttributeAmounts.Capacity];
         private static readonly DamageElement[] s_damageElements = new DamageElement[DamageElementFloatAmounts.Capacity];
+        private static readonly Currency[] s_currencies = new Currency[CurrencyAmounts.Capacity];
         private static int s_attributeCount;
+        private static int s_currencyCount;
         // Slot zero is reserved for the default damage element, including before it is registered.
         private static int s_damageElementCount = 1;
 
         public static int AttributeCount => s_attributeCount;
         public static int DamageElementCount => s_damageElementCount;
+        public static int CurrencyCount => s_currencyCount;
         public static int Generation { get; private set; }
 
         public static int GetSlot(Attribute attribute)
@@ -38,6 +41,17 @@ namespace MultiplayerARPG
             else
                 Register(damageElement);
             return damageElement.RuntimeSlot;
+        }
+
+        public static int GetSlot(Currency currency)
+        {
+            if (currency == null)
+                throw new ArgumentNullException(nameof(currency));
+            int slot = currency.RuntimeSlot;
+            if (slot >= 0 && slot < s_currencyCount && ReferenceEquals(s_currencies[slot], currency))
+                return slot;
+            Register(currency);
+            return currency.RuntimeSlot;
         }
 
         public static void Register(Attribute attribute)
@@ -68,6 +82,20 @@ namespace MultiplayerARPG
             damageElement.RuntimeSlot = slot;
         }
 
+        public static void Register(Currency currency)
+        {
+            if (currency == null)
+                return;
+            int oldSlot = currency.RuntimeSlot;
+            if (oldSlot >= 0 && oldSlot < s_currencyCount && ReferenceEquals(s_currencies[oldSlot], currency))
+                return;
+            if (s_currencyCount >= CurrencyAmounts.Capacity)
+                throw new InvalidOperationException($"Registered currencies exceed the {CurrencyAmounts.Capacity} available slots. Define CURRENCY_AMOUNTS_16 or CURRENCY_AMOUNTS_32.");
+            int slot = s_currencyCount++;
+            s_currencies[slot] = currency;
+            currency.RuntimeSlot = slot;
+        }
+
         public static void RegisterDefaultDamageElement(DamageElement damageElement)
         {
             if (damageElement == null)
@@ -95,6 +123,13 @@ namespace MultiplayerARPG
             return s_damageElements[slot];
         }
 
+        public static Currency GetCurrency(int slot)
+        {
+            if (slot < 0 || slot >= s_currencyCount)
+                throw new IndexOutOfRangeException($"Invalid currency slot: {slot}");
+            return s_currencies[slot];
+        }
+
         public static void Clear()
         {
             ++Generation;
@@ -110,8 +145,15 @@ namespace MultiplayerARPG
                     s_damageElements[i].RuntimeSlot = -1;
                 s_damageElements[i] = null;
             }
+            for (int i = 0; i < s_currencyCount; ++i)
+            {
+                if (s_currencies[i] != null)
+                    s_currencies[i].RuntimeSlot = -1;
+                s_currencies[i] = null;
+            }
             s_attributeCount = 0;
             s_damageElementCount = 1;
+            s_currencyCount = 0;
         }
     }
 }

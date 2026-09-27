@@ -91,7 +91,7 @@ namespace MultiplayerARPG
                 uiSellPrices.displayType = UICurrencyAmounts.DisplayType.Simple;
                 uiSellPrices.isBonus = false;
                 _tempPriceCurrencies.Clear();
-                GameDataHelpers.CombineCurrencies(Data.sellPrices, _tempPriceCurrencies, sellPriceRate);
+                CurrencyDictionaryView.CopyToDictionary(Data.sellPrices, _tempPriceCurrencies, sellPriceRate);
                 uiSellPrices.Data = _tempPriceCurrencies;
             }
         }

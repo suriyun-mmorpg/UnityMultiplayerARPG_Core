@@ -452,11 +452,9 @@ namespace MultiplayerARPG
                 return false;
             if (sellItem.sellPrices != null && sellItem.sellPrices.Length > 0)
             {
-                using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> tempData))
-                {
-                    GameDataHelpers.CombineCurrencies(sellItem.sellPrices, tempData, rate);
-                    return character.HasEnoughCurrencyAmounts(tempData, out _, out _, amount);
-                }
+                CurrencyAmounts tempData = default;
+                GameDataHelpers.CombineCurrencies(sellItem.sellPrices, ref tempData, rate);
+                return character.HasEnoughCurrencyAmounts(tempData, out _, out CurrencyAmounts _, amount);
             }
             return true;
         }
@@ -487,11 +485,9 @@ namespace MultiplayerARPG
                 return false;
             if (refineLevel.RequireCurrencies != null && refineLevel.RequireCurrencies.Length > 0)
             {
-                using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> tempData))
-                {
-                    GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, tempData, 1f);
-                    return character.HasEnoughCurrencyAmounts(tempData, out _, out _);
-                }
+                CurrencyAmounts tempData = default;
+                GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, ref tempData, 1f);
+                return character.HasEnoughCurrencyAmounts(tempData, out _, out CurrencyAmounts _);
             }
             return true;
         }
@@ -517,11 +513,9 @@ namespace MultiplayerARPG
                 return false;
             if (repairPrice.RequireCurrencies != null && repairPrice.RequireCurrencies.Length > 0)
             {
-                using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> tempData))
-                {
-                    GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, tempData, 1f);
-                    return character.HasEnoughCurrencyAmounts(tempData, out _, out _);
-                }
+                CurrencyAmounts tempData = default;
+                GameDataHelpers.CombineCurrencies(repairPrice.RequireCurrencies, ref tempData, 1f);
+                return character.HasEnoughCurrencyAmounts(tempData, out _, out CurrencyAmounts _);
             }
             return true;
         }
@@ -540,11 +534,9 @@ namespace MultiplayerARPG
                 return false;
             if (itemCraft.RequireCurrencies != null && itemCraft.RequireCurrencies.Length > 0)
             {
-                using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> tempData))
-                {
-                    GameDataHelpers.CombineCurrencies(itemCraft.RequireCurrencies, tempData, 1f);
-                    return character.HasEnoughCurrencyAmounts(tempData, out _, out _);
-                }
+                CurrencyAmounts tempData = default;
+                GameDataHelpers.CombineCurrencies(itemCraft.RequireCurrencies, ref tempData, 1f);
+                return character.HasEnoughCurrencyAmounts(tempData, out _, out CurrencyAmounts _);
             }
             return true;
         }
@@ -563,11 +555,9 @@ namespace MultiplayerARPG
                 return false;
             if (GameInstance.Singleton.enhancerRemoval.RequireCurrencies != null && GameInstance.Singleton.enhancerRemoval.RequireCurrencies.Length > 0)
             {
-                using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> tempData))
-                {
-                    GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, tempData, 1f);
-                    return character.HasEnoughCurrencyAmounts(tempData, out _, out _);
-                }
+                CurrencyAmounts tempData = default;
+                GameDataHelpers.CombineCurrencies(GameInstance.Singleton.enhancerRemoval.RequireCurrencies, ref tempData, 1f);
+                return character.HasEnoughCurrencyAmounts(tempData, out _, out CurrencyAmounts _);
             }
             return true;
         }
@@ -586,8 +576,9 @@ namespace MultiplayerARPG
                 return false;
             if (setting.CreateGuildRequiredCash > 0 && character.UserCash < setting.CreateGuildRequiredCash)
                 return false;
-            if (setting.CreateGuildRequireCurrencies.Count > 0)
-                return character.HasEnoughCurrencyAmounts(setting.CreateGuildRequireCurrencies, out _, out _);
+            CurrencyAmounts requireCurrencies = setting.IndexedCreateGuildRequireCurrencies;
+            if (!requireCurrencies.IsEmpty)
+                return character.HasEnoughCurrencyAmounts(requireCurrencies, out _, out CurrencyAmounts _);
             return true;
         }
 
@@ -597,8 +588,9 @@ namespace MultiplayerARPG
                 character.Gold -= setting.CreateGuildRequiredGold;
             if (setting.CreateGuildRequiredCash > 0)
                 GameInstance.ServerUserHandlers.ChangeUserCash(character.UserId, -setting.CreateGuildRequiredCash);
-            if (setting.CreateGuildRequireCurrencies.Count > 0)
-                character.DecreaseCurrencies(setting.CreateGuildRequireCurrencies);
+            CurrencyAmounts requireCurrencies = setting.IndexedCreateGuildRequireCurrencies;
+            if (!requireCurrencies.IsEmpty)
+                character.DecreaseCurrencies(requireCurrencies);
         }
 
         public virtual Reward MakeMonsterReward(MonsterCharacter monster, int level)

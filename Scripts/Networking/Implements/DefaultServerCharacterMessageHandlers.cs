@@ -64,11 +64,7 @@ namespace MultiplayerARPG
             int requireGold = skill.GetRequireCharacterGold(learnLevel);
             playerCharacter.SkillPoint -= requireSkillPoint;
             playerCharacter.Gold -= requireGold;
-            using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> requireCurrencies))
-            {
-                skill.GetRequireCurrencyAmounts(learnLevel, requireCurrencies);
-                playerCharacter.DecreaseCurrencies(requireCurrencies);
-            }
+            playerCharacter.DecreaseCurrencies(skill.GetRequireCurrencyAmounts(learnLevel));
             using (CollectionPool<Dictionary<BaseItem, int>, KeyValuePair<BaseItem, int>>.Get(out Dictionary<BaseItem, int> requireItems))
             {
                 skill.GetRequireItemAmounts(learnLevel, requireItems);

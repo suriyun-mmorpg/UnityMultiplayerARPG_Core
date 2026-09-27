@@ -98,14 +98,33 @@ namespace MultiplayerARPG
 
         [System.NonSerialized]
         private Dictionary<Currency, int> _createGuildRequireCurrencies = null;
+        [System.NonSerialized]
+        private CurrencyAmounts _indexedCreateGuildRequireCurrencies;
+        [System.NonSerialized]
+        private int _currencyGeneration = -1;
+        public CurrencyAmounts IndexedCreateGuildRequireCurrencies
+        {
+            get
+            {
+                if (_currencyGeneration != RuntimeGameDataSlots.Generation)
+                {
+                    _indexedCreateGuildRequireCurrencies = default;
+                    GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, ref _indexedCreateGuildRequireCurrencies, 1f);
+                    _createGuildRequireCurrencies = null;
+                    _currencyGeneration = RuntimeGameDataSlots.Generation;
+                }
+                return _indexedCreateGuildRequireCurrencies;
+            }
+        }
         public Dictionary<Currency, int> CreateGuildRequireCurrencies
         {
             get
             {
+                CurrencyAmounts amounts = IndexedCreateGuildRequireCurrencies;
                 if (_createGuildRequireCurrencies == null)
                 {
                     _createGuildRequireCurrencies = new Dictionary<Currency, int>();
-                    GameDataHelpers.CombineCurrencies(createGuildRequireCurrencies, _createGuildRequireCurrencies, 1f);
+                    amounts.CopyTo(_createGuildRequireCurrencies);
                 }
                 return _createGuildRequireCurrencies;
             }

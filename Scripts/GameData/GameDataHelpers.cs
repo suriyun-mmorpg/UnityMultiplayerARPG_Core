@@ -7,17 +7,6 @@ namespace MultiplayerARPG
     {
         #region Make KeyValuePair functions
         /// <summary>
-        /// Make currency - amount key-value pair
-        /// </summary>
-        /// <param name="source"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static KeyValuePair<Currency, int> ToKeyValuePair(this CurrencyAmount source, float rate)
-        {
-            return new KeyValuePair<Currency, int>(source.currency, Mathf.CeilToInt(source.amount * rate));
-        }
-
-        /// <summary>
         /// Make skill - level key-value pair
         /// </summary>
         /// <param name="source"></param>

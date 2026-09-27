@@ -7,28 +7,6 @@ namespace MultiplayerARPG
     {
         #region Combine Dictionary with KeyValuePair functions
         /// <summary>
-        /// Combine currency amounts dictionary
-        /// </summary>
-        /// <param name="resultDictionary"></param>
-        /// <param name="newEntry"></param>
-        /// <returns></returns>
-        public static void CombineCurrencies(Dictionary<Currency, int> resultDictionary, KeyValuePair<Currency, int> newEntry)
-        {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
-            if (newEntry.Key == null)
-                return;
-            if (!resultDictionary.ContainsKey(newEntry.Key))
-                resultDictionary[newEntry.Key] = newEntry.Value;
-            else
-                resultDictionary[newEntry.Key] += newEntry.Value;
-            return;
-        }
-
-        /// <summary>
         /// Combine skill levels dictionary
         /// </summary>
         /// <param name="resultDictionary"></param>

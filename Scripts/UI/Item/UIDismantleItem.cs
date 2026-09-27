@@ -114,7 +114,7 @@ namespace MultiplayerARPG
                     uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
                     uiReturnCurrencies.Show();
                     _tempReturningCurrencies.Clear();
-                    GameDataHelpers.CombineCurrencies(returningCurrencies, _tempReturningCurrencies, 1f);
+                    CurrencyDictionaryView.CopyToDictionary(returningCurrencies, _tempReturningCurrencies, 1f);
                     uiReturnCurrencies.Data = _tempReturningCurrencies;
                 }
             }

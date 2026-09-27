@@ -506,12 +506,17 @@ namespace MultiplayerARPG
 
         public void GetRequireCurrencyAmounts(int level, Dictionary<Currency, int> result)
         {
+            GetRequireCurrencyAmounts(level).CopyTo(result);
+        }
+
+        public CurrencyAmounts GetRequireCurrencyAmounts(int level)
+        {
+            CurrencyAmounts result = default;
             if (level < 0 || requirementEachLevels.Count == 0)
-                return;
-            result.Clear();
-            if (level >= requirementEachLevels.Count)
-                GameDataHelpers.CombineCurrencies(requirementEachLevels[requirementEachLevels.Count - 1].currencyAmounts, result, 1f);
-            GameDataHelpers.CombineCurrencies(requirementEachLevels[level].currencyAmounts, result, 1f);
+                return result;
+            int index = Mathf.Min(level, requirementEachLevels.Count - 1);
+            GameDataHelpers.CombineCurrencies(requirementEachLevels[index].currencyAmounts, ref result, 1f);
+            return result;
         }
 
         public void GetRequireItemAmounts(int level, Dictionary<BaseItem, int> result)
@@ -1013,12 +1018,8 @@ namespace MultiplayerARPG
             }
 
             // Check is it pass currency requirement or not
-            using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> requireCurrencyAmounts))
-            {
-                GetRequireCurrencyAmounts(level, requireCurrencyAmounts);
-                if (!character.HasEnoughCurrencyAmounts(requireCurrencyAmounts, out gameMessage, out _))
-                    return false;
-            }
+            if (!character.HasEnoughCurrencyAmounts(GetRequireCurrencyAmounts(level), out gameMessage, out CurrencyAmounts _))
+                return false;
 
             // Check is it pass item requirement or not
             using (CollectionPool<Dictionary<BaseItem, int>, KeyValuePair<BaseItem, int>>.Get(out Dictionary<BaseItem, int> requireItemAmounts))

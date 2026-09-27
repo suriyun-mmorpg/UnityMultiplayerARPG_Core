@@ -187,7 +187,7 @@ namespace MultiplayerARPG
             {
                 _tempReceiveCurrencies.Clear();
                 if (Data != null)
-                    GameDataHelpers.CombineCurrencies(Data.ReceiveCurrencies, _tempReceiveCurrencies, 1f);
+                    CurrencyDictionaryView.CopyToDictionary(Data.ReceiveCurrencies, _tempReceiveCurrencies, 1f);
                 uiReceiveCurrencies.Data = _tempReceiveCurrencies;
             }
 
