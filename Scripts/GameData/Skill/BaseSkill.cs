@@ -629,7 +629,7 @@ namespace MultiplayerARPG
                 calculatedDamages.Combine(multiplyDamages);
             }
 
-            calculatedDamages.CopyTo(damageAmounts);
+            calculatedDamages.CopyToDictionary(damageAmounts);
             return damageAmounts;
         }
 
@@ -746,7 +746,7 @@ namespace MultiplayerARPG
                         combinedDamageAmounts.Combine(baseDamageAmounts);
                         combinedDamageAmounts.Combine(tempIncreaseDamageAmounts);
                         Dictionary<DamageElement, MinMaxFloat> newDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-                        combinedDamageAmounts.CopyTo(newDamageAmounts);
+                        combinedDamageAmounts.CopyToDictionary(newDamageAmounts);
                         result.Add(newDamageAmounts);
                     }
                     return result;

@@ -771,16 +771,13 @@ namespace MultiplayerARPG
             NetworkDestroy();
         }
 
-        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override DamageElementMinMaxFloatAmounts PrepareDamageAmountsForReceive(HitBoxPosition position, DamageElementMinMaxFloatAmounts damageAmounts)
         {
-            if (damageAmounts == null)
-            {
-                Logging.LogWarning($"{name}({nameof(BaseCharacterEntity)}) damage amounts dictionary is null, this should not occurring.");
-                combatAmountType = CombatAmountType.Miss;
-                totalDamage = 0;
-                return;
-            }
+            return damageAmounts;
+        }
 
+        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
+        {
             if (instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter))
             {
                 // Notify enemy spotted when received damage from enemy
@@ -801,10 +798,13 @@ namespace MultiplayerARPG
             // Calculate damages
             combatAmountType = CombatAmountType.NormalDamage;
             float calculatingTotalDamage = 0f;
-            foreach (DamageElement damageElement in damageAmounts.Keys)
+            for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
             {
+                if (!damageAmounts.Contains(slot))
+                    continue;
+                DamageElement damageElement = RuntimeGameDataSlots.GetDamageElement(slot);
                 calculatingTotalDamage += damageElement.GetDamageReducedByResistance(CachedData.IndexedResistances, CachedData.IndexedArmors,
-                    CurrentGameInstance.GameplayRule.RandomAttackDamage(fromPosition, attackerCharacter, this, damageElement, damageAmounts[damageElement], weapon, skill, skillLevel, randomSeed));
+                    CurrentGameInstance.GameplayRule.RandomAttackDamage(fromPosition, attackerCharacter, this, damageElement, damageAmounts[slot], weapon, skill, skillLevel, randomSeed));
             }
 
             if (attackerCharacter != null)

@@ -17,7 +17,7 @@ namespace MultiplayerARPG
         HitBoxPosition position,
         Vector3 fromPosition,
         EntityInfo instigator,
-        Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+        DamageElementMinMaxFloatAmounts damageAmounts,
         CharacterItem weapon,
         BaseSkill skill,
         int skillLevel);

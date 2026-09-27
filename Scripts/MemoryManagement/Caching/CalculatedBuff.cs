@@ -134,16 +134,16 @@ namespace MultiplayerARPG
                 GameDataHelpers.CombineArmors(buff.increaseArmorsRate, ref _cacheIncreaseArmorsRate, level, 1f);
                 _cacheIncreaseArmorsRate.CopyTo(_viewIncreaseArmorsRate);
                 GameDataHelpers.CombineDamages(buff.increaseDamages, ref _cacheIncreaseDamages, level, 1f);
-                _cacheIncreaseDamages.CopyTo(_viewIncreaseDamages);
+                _cacheIncreaseDamages.CopyToDictionary(_viewIncreaseDamages);
                 GameDataHelpers.CombineDamages(buff.increaseDamagesRate, ref _cacheIncreaseDamagesRate, level, 1f);
-                _cacheIncreaseDamagesRate.CopyTo(_viewIncreaseDamagesRate);
+                _cacheIncreaseDamagesRate.CopyToDictionary(_viewIncreaseDamagesRate);
                 buff.GetIncreaseSkills(level, _cacheIncreaseSkills);
                 if (buff.isOverrideSkills)
                     buff.GetOverrideSkills(level, _cacheOverrideSkills);
                 buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
                 buff.GetBuffRemovals(level, _cacheBuffRemovals);
                 GameDataHelpers.CombineDamages(buff.damageOverTimes, ref _cacheDamageOverTimes, level, 1f);
-                _cacheDamageOverTimes.CopyTo(_viewDamageOverTimes);
+                _cacheDamageOverTimes.CopyToDictionary(_viewDamageOverTimes);
                 _cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
                 _cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
                 _cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);

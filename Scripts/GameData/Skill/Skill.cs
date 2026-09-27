@@ -325,7 +325,7 @@ namespace MultiplayerARPG
                 result = new Dictionary<DamageElement, MinMaxFloat>();
                 DamageElementMinMaxFloatAmounts indexedDamages = default;
                 GameDataHelpers.CombineDamages(additionalDamageAmounts, ref indexedDamages, skillLevel, 1f);
-                indexedDamages.CopyTo(result);
+                indexedDamages.CopyToDictionary(result);
                 return true;
             }
             return base.TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);

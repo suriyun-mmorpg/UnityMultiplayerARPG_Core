@@ -160,7 +160,7 @@ namespace MultiplayerARPG
         {
             DamageElementMinMaxFloatAmounts amounts = default;
             GameDataHelpers.CombineDamages(IncreaseDamages, ref amounts, Mathf.CeilToInt(level), 1f);
-            amounts.CopyTo(result);
+            amounts.CopyToDictionary(result);
         }
 
         public virtual void GetIncreaseDamagesByLevel(float level, ref DamageElementMinMaxFloatAmounts result)

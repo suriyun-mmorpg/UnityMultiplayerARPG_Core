@@ -552,7 +552,7 @@ namespace MultiplayerARPG
                     uiBuffDamages.Show();
                     DamageElementMinMaxFloatAmounts amounts = default;
                     GameDataHelpers.CombineDamages(Buff.increaseDamages, ref amounts, Level, 1f);
-                    amounts.CopyTo(_tempBuffDamages);
+                    amounts.CopyToDictionary(_tempBuffDamages);
                     uiBuffDamages.Data = _tempBuffDamages;
                 }
             }
@@ -570,7 +570,7 @@ namespace MultiplayerARPG
                     uiBuffDamagesRate.Show();
                     DamageElementMinMaxFloatAmounts amounts = default;
                     GameDataHelpers.CombineDamages(Buff.increaseDamagesRate, ref amounts, Level, 1f);
-                    amounts.CopyTo(_tempBuffDamagesRate);
+                    amounts.CopyToDictionary(_tempBuffDamagesRate);
                     uiBuffDamagesRate.Data = _tempBuffDamagesRate;
                 }
             }
@@ -587,7 +587,7 @@ namespace MultiplayerARPG
                     uiDamageOverTimes.Show();
                     DamageElementMinMaxFloatAmounts amounts = default;
                     GameDataHelpers.CombineDamages(Buff.damageOverTimes, ref amounts, Level, 1f);
-                    amounts.CopyTo(_tempDamageOverTimes);
+                    amounts.CopyToDictionary(_tempDamageOverTimes);
                     uiDamageOverTimes.Data = _tempDamageOverTimes;
                 }
             }

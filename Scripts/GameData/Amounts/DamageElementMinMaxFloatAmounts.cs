@@ -261,6 +261,15 @@ namespace MultiplayerARPG
             }
         }
 
+        public void Scale(float rate)
+        {
+            for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)
+            {
+                if ((_occupiedMask & (1u << i)) != 0)
+                    this[i] *= rate;
+            }
+        }
+
         public MinMaxFloat Sum()
         {
             MinMaxFloat result = default;
@@ -270,16 +279,6 @@ namespace MultiplayerARPG
                     result += this[i];
             }
             return result;
-        }
-
-        public void CopyTo(System.Collections.Generic.Dictionary<DamageElement, MinMaxFloat> result)
-        {
-            result.Clear();
-            for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)
-            {
-                if ((_occupiedMask & (1u << i)) != 0)
-                    result[RuntimeGameDataSlots.GetDamageElement(i)] = this[i];
-            }
         }
 
         private static void ValidateIndex(int index)

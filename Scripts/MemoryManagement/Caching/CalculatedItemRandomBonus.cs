@@ -698,13 +698,13 @@ namespace MultiplayerARPG
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
         {
-            _indexedIncreaseDamages.CopyTo(_cacheIncreaseDamages);
+            _indexedIncreaseDamages.CopyToDictionary(_cacheIncreaseDamages);
             return _cacheIncreaseDamages;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate()
         {
-            _indexedIncreaseDamagesRate.CopyTo(_cacheIncreaseDamagesRate);
+            _indexedIncreaseDamagesRate.CopyToDictionary(_cacheIncreaseDamagesRate);
             return _cacheIncreaseDamagesRate;
         }
 

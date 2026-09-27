@@ -162,7 +162,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
+        public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
         {
             isCritical = false;
             isBlocked = false;
@@ -1024,7 +1024,7 @@ namespace MultiplayerARPG
             if (intDamage < 0)
                 intDamage = 0;
             character.CurrentHp -= intDamage;
-            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.FallDamage, intDamage, CharacterItem.Empty, null, 0, CharacterBuff.Empty);
+            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, default, CombatAmountType.FallDamage, intDamage, CharacterItem.Empty, null, 0, CharacterBuff.Empty);
         }
 
         public override bool CanInteractEntity(BaseCharacterEntity character, uint objectId)

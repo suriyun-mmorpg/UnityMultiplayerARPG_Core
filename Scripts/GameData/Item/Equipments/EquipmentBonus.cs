@@ -239,7 +239,7 @@ namespace MultiplayerARPG
                 if (_dictionaryDamages == null)
                 {
                     _dictionaryDamages = new Dictionary<DamageElement, MinMaxFloat>();
-                    _cacheDamages.CopyTo(_dictionaryDamages);
+                    _cacheDamages.CopyToDictionary(_dictionaryDamages);
                 }
                 return _dictionaryDamages;
             }
@@ -270,7 +270,7 @@ namespace MultiplayerARPG
                 if (_dictionaryDamagesRate == null)
                 {
                     _dictionaryDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
-                    _cacheDamagesRate.CopyTo(_dictionaryDamagesRate);
+                    _cacheDamagesRate.CopyToDictionary(_dictionaryDamagesRate);
                 }
                 return _dictionaryDamagesRate;
             }

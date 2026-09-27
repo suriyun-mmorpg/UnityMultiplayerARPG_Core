@@ -84,14 +84,14 @@ namespace MultiplayerARPG
         {
             DamageElementMinMaxFloatAmounts amounts = default;
             GameDataHelpers.CombineDamages(buff.increaseDamages, ref amounts, level, 1f);
-            amounts.CopyTo(result);
+            amounts.CopyToDictionary(result);
         }
 
         public static void GetIncreaseDamagesRate(this Buff buff, int level, Dictionary<DamageElement, MinMaxFloat> result)
         {
             DamageElementMinMaxFloatAmounts amounts = default;
             GameDataHelpers.CombineDamages(buff.increaseDamagesRate, ref amounts, level, 1f);
-            amounts.CopyTo(result);
+            amounts.CopyToDictionary(result);
         }
 
         public static void GetIncreaseSkills(this Buff buff, int level, Dictionary<BaseSkill, int> result)
@@ -122,7 +122,7 @@ namespace MultiplayerARPG
         {
             DamageElementMinMaxFloatAmounts amounts = default;
             GameDataHelpers.CombineDamages(buff.damageOverTimes, ref amounts, level, 1f);
-            amounts.CopyTo(result);
+            amounts.CopyToDictionary(result);
         }
 
         public static float GetRemoveBuffWhenAttackChance(this Buff buff, int level)

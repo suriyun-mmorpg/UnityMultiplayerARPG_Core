@@ -78,7 +78,7 @@ namespace MultiplayerARPG
             attributes.Combine(entries);
             DamageElementMinMaxFloatAmounts amounts = default;
             attributes.GetIncreaseDamages(ref amounts);
-            amounts.CopyTo(result);
+            amounts.CopyToDictionary(result);
         }
 
         public static void GetIncreaseDamages(this Attribute attribute, float amount, Dictionary<DamageElement, MinMaxFloat> result)

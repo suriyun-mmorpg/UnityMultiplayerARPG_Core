@@ -1073,7 +1073,7 @@ namespace MultiplayerARPG
             if (onGetRightHandDamages != null)
             {
                 resultRightHandDamagesDictionary = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
-                resultRightHandDamages.CopyTo(resultRightHandDamagesDictionary);
+                resultRightHandDamages.CopyToDictionary(resultRightHandDamagesDictionary);
                 onGetRightHandDamages.Invoke(resultRightHandDamagesDictionary);
             }
 
@@ -1088,7 +1088,7 @@ namespace MultiplayerARPG
             if (onGetLeftHandDamages != null)
             {
                 resultLeftHandDamagesDictionary = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
-                resultLeftHandDamages.CopyTo(resultLeftHandDamagesDictionary);
+                resultLeftHandDamages.CopyToDictionary(resultLeftHandDamagesDictionary);
                 onGetLeftHandDamages.Invoke(resultLeftHandDamagesDictionary);
             }
 
@@ -1161,14 +1161,14 @@ namespace MultiplayerARPG
             if (onGetIncreasingDamages != null)
             {
                 buffDamagesDictionary = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
-                buffDamages.CopyTo(buffDamagesDictionary);
+                buffDamages.CopyToDictionary(buffDamagesDictionary);
                 onGetIncreasingDamages.Invoke(buffDamagesDictionary);
             }
             Dictionary<DamageElement, MinMaxFloat> buffDamagesRateDictionary = null;
             if (onGetIncreasingDamagesRate != null)
             {
                 buffDamagesRateDictionary = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
-                buffDamagesRate.CopyTo(buffDamagesRateDictionary);
+                buffDamagesRate.CopyToDictionary(buffDamagesRateDictionary);
                 onGetIncreasingDamagesRate.Invoke(buffDamagesRateDictionary);
             }
             if (onGetIncreasingSkills != null)

@@ -77,13 +77,11 @@ namespace MultiplayerARPG
                 user.FindAliveEntities(entities, user.EntityTransform.position, preDashEnemyLookupRadius, false, true, true, GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.monsterLayer.Mask);
                 if (entities == null || entities.Count == 0)
                     return;
-                Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
                 DamageElementMinMaxFloatAmounts indexedDamages = default;
                 GameDataHelpers.CombineDamages(preDashDamageAmounts, ref indexedDamages, skillLevel, 1f);
-                indexedDamages.CopyTo(damageAmounts);
                 for (int i = 0; i < entities.Count; ++i)
                 {
-                    entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), damageAmounts, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));
+                    entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), indexedDamages, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));
 
                     if (preDashKnockbackEffect.force > 0)
                     {
@@ -103,13 +101,11 @@ namespace MultiplayerARPG
                 user.FindAliveEntities(entities, user.EntityTransform.position, dashMovingEnemyLookupRadius, false, true, true, GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.monsterLayer.Mask);
                 if (entities == null || entities.Count == 0)
                     return;
-                Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
                 DamageElementMinMaxFloatAmounts indexedDamages = default;
                 GameDataHelpers.CombineDamages(dashMovingDamageAmounts, ref indexedDamages, skillLevel, 1f);
-                indexedDamages.CopyTo(damageAmounts);
                 for (int i = 0; i < entities.Count; ++i)
                 {
-                    entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), damageAmounts, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));
+                    entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), indexedDamages, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));
 
                     if (dashMovingKnockbackEffect.force > 0)
                     {
@@ -129,13 +125,11 @@ namespace MultiplayerARPG
                 user.FindAliveEntities(entities, user.EntityTransform.position, postDashEnemyLookupRadius, false, true, true, GameInstance.Singleton.playerLayer.Mask | GameInstance.Singleton.monsterLayer.Mask);
                 if (entities == null || entities.Count == 0)
                     return;
-                Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
                 DamageElementMinMaxFloatAmounts indexedDamages = default;
                 GameDataHelpers.CombineDamages(postDashDamageAmounts, ref indexedDamages, skillLevel, 1f);
-                indexedDamages.CopyTo(damageAmounts);
                 for (int i = 0; i < entities.Count; ++i)
                 {
-                    entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), damageAmounts, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));
+                    entities[i].ApplyDamage(HitBoxPosition.Body, user.EntityTransform.position, user.GetInfo(), indexedDamages, CharacterItem.Empty, this, skillLevel, Random.Range(0, 255));
 
                     if (postDashKnockbackEffect.force > 0)
                     {

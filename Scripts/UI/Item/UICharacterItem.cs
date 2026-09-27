@@ -1289,7 +1289,7 @@ namespace MultiplayerARPG
                     amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedDamages);
                 }
 
-                amounts.CopyTo(_tempDamageAmounts);
+                amounts.CopyToDictionary(_tempDamageAmounts);
 
                 if (_tempDamageAmounts == null || _tempDamageAmounts.Count == 0)
                 {
@@ -1321,7 +1321,7 @@ namespace MultiplayerARPG
                     amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedDamagesRate);
                 }
 
-                amounts.CopyTo(_tempDamageAmountsRate);
+                amounts.CopyToDictionary(_tempDamageAmountsRate);
 
                 if (_tempDamageAmountsRate == null || _tempDamageAmountsRate.Count == 0)
                 {

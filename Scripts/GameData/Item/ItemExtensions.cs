@@ -100,7 +100,7 @@ namespace MultiplayerARPG
             {
                 DamageElementMinMaxFloatAmounts amounts = default;
                 GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, ref amounts, 1, 1f);
-                amounts.CopyTo(result);
+                amounts.CopyToDictionary(result);
             }
         }
         #endregion
@@ -190,7 +190,7 @@ namespace MultiplayerARPG
             {
                 DamageElementMinMaxFloatAmounts amounts = default;
                 GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, ref amounts, level, 1f);
-                amounts.CopyTo(result);
+                amounts.CopyToDictionary(result);
             }
         }
 
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
             {
                 DamageElementMinMaxFloatAmounts amounts = default;
                 GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, ref amounts, level, 1f);
-                amounts.CopyTo(result);
+                amounts.CopyToDictionary(result);
             }
         }
 

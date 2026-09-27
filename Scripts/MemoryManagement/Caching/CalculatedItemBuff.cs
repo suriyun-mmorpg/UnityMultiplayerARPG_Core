@@ -124,10 +124,10 @@ namespace MultiplayerARPG
             _cacheIncreaseArmorsRate.CopyTo(_viewIncreaseArmorsRate);
             GameDataHelpers.CombineDamages(item.IncreaseDamages, ref _cacheIncreaseDamages, _level, 1f);
             _cacheIncreaseDamages.Combine(_cacheRandomBonus.GetIndexedIncreaseDamages());
-            _cacheIncreaseDamages.CopyTo(_viewIncreaseDamages);
+            _cacheIncreaseDamages.CopyToDictionary(_viewIncreaseDamages);
             GameDataHelpers.CombineDamages(item.IncreaseDamagesRate, ref _cacheIncreaseDamagesRate, _level, 1f);
             _cacheIncreaseDamagesRate.Combine(_cacheRandomBonus.GetIndexedIncreaseDamagesRate());
-            _cacheIncreaseDamagesRate.CopyTo(_viewIncreaseDamagesRate);
+            _cacheIncreaseDamagesRate.CopyToDictionary(_viewIncreaseDamagesRate);
             item.GetIncreaseSkills(_level, _cacheIncreaseSkills);
             GameDataHelpers.CombineSkills(_cacheIncreaseSkills, _cacheRandomBonus.GetIncreaseSkills());
             // TODO: Implement random bonus for increase status effect resistances

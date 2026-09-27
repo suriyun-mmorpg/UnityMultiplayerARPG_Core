@@ -24,7 +24,7 @@ namespace MultiplayerARPG
         /// <param name="isCritical"></param>
         /// <param name="isBlocked"></param>
         /// <returns></returns>
-        public abstract bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked);
+        public abstract bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked);
 
         /// <summary>
         /// This function will be called when applying damage to a character, implement it to calculate character's attack damage to another character
