@@ -93,15 +93,12 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Extension
-        public static void GetIncreaseDamages(this IAmmoItem ammoItem, Dictionary<DamageElement, MinMaxFloat> result)
+        public static DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamages(this IAmmoItem ammoItem)
         {
-            result.Clear();
+            DamageElementMinMaxFloatAmounts amounts = default;
             if (ammoItem != null && ammoItem.IsAmmo())
-            {
-                DamageElementMinMaxFloatAmounts amounts = default;
                 GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, ref amounts, 1, 1f);
-                amounts.CopyToDictionary(result);
-            }
+            return amounts;
         }
         #endregion
 
@@ -120,90 +117,6 @@ namespace MultiplayerARPG
             if (equipmentItem == null || !equipmentItem.IsEquipment())
                 return new CharacterStats();
             return equipmentItem.IncreaseStatsRate.GetCharacterStats(level);
-        }
-
-        public static void GetIncreaseAttributes<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-            {
-                AttributeAmounts amounts = default;
-                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributes, ref amounts, level, 1f);
-                amounts.CopyTo(result);
-            }
-        }
-
-        public static void GetIncreaseAttributesRate<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-            {
-                AttributeAmounts amounts = default;
-                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, ref amounts, level, 1f);
-                amounts.CopyTo(result);
-            }
-        }
-
-        public static void GetIncreaseResistances<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-            {
-                DamageElementFloatAmounts amounts = default;
-                GameDataHelpers.CombineResistances(equipmentItem.IncreaseResistances, ref amounts, level, 1f);
-                amounts.CopyTo(result);
-            }
-        }
-
-        public static void GetIncreaseArmors<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-            {
-                DamageElementFloatAmounts amounts = default;
-                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmors, ref amounts, level, 1f);
-                amounts.CopyTo(result);
-            }
-        }
-
-        public static void GetIncreaseArmorsRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-            {
-                DamageElementFloatAmounts amounts = default;
-                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmorsRate, ref amounts, level, 1f);
-                amounts.CopyTo(result);
-            }
-        }
-
-        public static void GetIncreaseDamages<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-            {
-                DamageElementMinMaxFloatAmounts amounts = default;
-                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, ref amounts, level, 1f);
-                amounts.CopyToDictionary(result);
-            }
-        }
-
-        public static void GetIncreaseDamagesRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-            {
-                DamageElementMinMaxFloatAmounts amounts = default;
-                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, ref amounts, level, 1f);
-                amounts.CopyToDictionary(result);
-            }
         }
 
         public static void GetIncreaseSkills<T>(this T equipmentItem, int level, Dictionary<BaseSkill, int> result)

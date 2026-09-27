@@ -577,7 +577,8 @@ namespace MultiplayerARPG
             increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
             if (ammoType == null || amount < 0)
                 return false;
-            Dictionary<int, Dictionary<DamageElement, MinMaxFloat>> calculatingDamageAmounts = new Dictionary<int, Dictionary<DamageElement, MinMaxFloat>>();
+            HashSet<int> calculatingAmmoIds = new HashSet<int>();
+            DamageElementMinMaxFloatAmounts combinedDamageAmounts = default;
             List<int> decreasingItemIndexes = new List<int>();
             List<int> decreasingItemAmounts = new List<int>();
             CharacterItem tempNonEquipItem;
@@ -597,13 +598,9 @@ namespace MultiplayerARPG
                         tempDecresingAmount = tempNonEquipItem.amount;
                     else
                         tempDecresingAmount = amount;
-                    if (tempDecresingAmount > 0 && !calculatingDamageAmounts.ContainsKey(tempAmmoItemData.DataId))
+                    if (tempDecresingAmount > 0 && calculatingAmmoIds.Add(tempAmmoItemData.DataId))
                     {
-                        using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamages))
-                        {
-                            tempAmmoItemData.GetIncreaseDamages(tempIncreaseDamages);
-                            calculatingDamageAmounts.Add(tempAmmoItemData.DataId, tempIncreaseDamages);
-                        }
+                        combinedDamageAmounts.Combine(tempAmmoItemData.GetIndexedIncreaseDamages());
                     }
                     amount -= tempDecresingAmount;
                     decreasingItemIndexes.Add(i);
@@ -617,13 +614,8 @@ namespace MultiplayerARPG
             if (amount > 0)
                 return false;
 
-            float entryRate = 1f / calculatingDamageAmounts.Count;
-            DamageElementMinMaxFloatAmounts combinedDamageAmounts = default;
-            combinedDamageAmounts.Combine(increaseDamageAmounts);
-            foreach (Dictionary<DamageElement, MinMaxFloat> damageAmounts in calculatingDamageAmounts.Values)
-            {
-                combinedDamageAmounts.Combine(damageAmounts, entryRate);
-            }
+            if (calculatingAmmoIds.Count > 0)
+                combinedDamageAmounts.Scale(1f / calculatingAmmoIds.Count);
             combinedDamageAmounts.CopyToDictionary(increaseDamageAmounts);
 
             for (i = decreasingItemIndexes.Count - 1; i >= 0; --i)
@@ -665,7 +657,7 @@ namespace MultiplayerARPG
                 {
                     increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                     if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                        tempAmmoItem.GetIncreaseDamages(increaseDamages);
+                        tempAmmoItem.GetIndexedIncreaseDamages().CopyToDictionary(increaseDamages);
                     weapon.ammo -= amount;
                     if (isLeftHand)
                         equipWeapons.leftHand = weapon;
@@ -700,7 +692,7 @@ namespace MultiplayerARPG
                         nonEquipItems.FillEmptySlots(isLimitSlot, slotLimit);
                         increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                         if (tempItemData is IAmmoItem tempAmmoItem)
-                            tempAmmoItem.GetIncreaseDamages(increaseDamages);
+                            tempAmmoItem.GetIndexedIncreaseDamages().CopyToDictionary(increaseDamages);
                         return true;
                     }
                 }
