@@ -5,6 +5,106 @@ namespace MultiplayerARPG
 {
     public static partial class GameDataHelpers
     {
+        public static void CombineDamages(DamageAmount[] sourceAmounts, ref DamageElementMinMaxFloatAmounts result, float rate)
+        {
+            if (sourceAmounts == null)
+                return;
+            foreach (DamageAmount sourceAmount in sourceAmounts)
+            {
+                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
+            }
+        }
+
+        public static void CombineDamages(DamageIncremental[] sourceIncrementals, ref DamageElementMinMaxFloatAmounts result, int level, float rate)
+        {
+            if (sourceIncrementals == null)
+                return;
+            foreach (DamageIncremental sourceIncremental in sourceIncrementals)
+            {
+                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
+            }
+        }
+
+        public static void CombineDamageInflictions(DamageInflictionIncremental[] sourceIncrementals, ref DamageElementFloatAmounts result, int level)
+        {
+            if (sourceIncrementals == null)
+                return;
+            foreach (DamageInflictionIncremental sourceIncremental in sourceIncrementals)
+            {
+                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.rate.GetAmount(level));
+            }
+        }
+
+        public static void CombineAttributes(AttributeAmount[] sourceAmounts, ref AttributeAmounts result, float rate)
+        {
+            if (sourceAmounts == null)
+                return;
+            foreach (AttributeAmount sourceAmount in sourceAmounts)
+            {
+                Attribute attribute = sourceAmount.attribute;
+                if (attribute != null)
+                    result.Add(RuntimeGameDataSlots.GetSlot(attribute), sourceAmount.amount * rate);
+            }
+        }
+
+        public static void CombineAttributes(AttributeIncremental[] sourceIncrementals, ref AttributeAmounts result, int level, float rate)
+        {
+            if (sourceIncrementals == null)
+                return;
+            foreach (AttributeIncremental sourceIncremental in sourceIncrementals)
+            {
+                Attribute attribute = sourceIncremental.attribute;
+                if (attribute != null)
+                    result.Add(RuntimeGameDataSlots.GetSlot(attribute), sourceIncremental.amount.GetAmount(level) * rate);
+            }
+        }
+
+        public static void CombineResistances(ResistanceAmount[] sourceAmounts, ref DamageElementFloatAmounts result, float rate)
+        {
+            if (sourceAmounts == null)
+                return;
+            foreach (ResistanceAmount sourceAmount in sourceAmounts)
+            {
+                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
+            }
+        }
+
+        public static void CombineResistances(ResistanceIncremental[] sourceIncrementals, ref DamageElementFloatAmounts result, int level, float rate)
+        {
+            if (sourceIncrementals == null)
+                return;
+            foreach (ResistanceIncremental sourceIncremental in sourceIncrementals)
+            {
+                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
+            }
+        }
+
+        public static void CombineArmors(ArmorAmount[] sourceAmounts, ref DamageElementFloatAmounts result, float rate)
+        {
+            if (sourceAmounts == null)
+                return;
+            foreach (ArmorAmount sourceAmount in sourceAmounts)
+            {
+                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
+            }
+        }
+
+        public static void CombineArmors(ArmorIncremental[] sourceIncrementals, ref DamageElementFloatAmounts result, int level, float rate)
+        {
+            if (sourceIncrementals == null)
+                return;
+            foreach (ArmorIncremental sourceIncremental in sourceIncrementals)
+            {
+                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
+            }
+        }
         #region Combine Dictionary with Array functions
         /// <summary>
         /// Combine damage amounts dictionary
@@ -24,11 +124,7 @@ namespace MultiplayerARPG
                 return;
             DamageElementMinMaxFloatAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (DamageAmount sourceAmount in sourceAmounts)
-            {
-                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
-            }
+            CombineDamages(sourceAmounts, ref amounts, rate);
             amounts.CopyTo(resultDictionary);
         }
 
@@ -51,11 +147,7 @@ namespace MultiplayerARPG
                 return;
             DamageElementMinMaxFloatAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (DamageIncremental sourceIncremental in sourceIncrementals)
-            {
-                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
-            }
+            CombineDamages(sourceIncrementals, ref amounts, level, rate);
             amounts.CopyTo(resultDictionary);
         }
 
@@ -77,11 +169,7 @@ namespace MultiplayerARPG
                 return;
             DamageElementFloatAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (DamageInflictionIncremental sourceIncremental in sourceIncrementals)
-            {
-                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.rate.GetAmount(level));
-            }
+            CombineDamageInflictions(sourceIncrementals, ref amounts, level);
             amounts.CopyTo(resultDictionary);
         }
 
@@ -103,11 +191,7 @@ namespace MultiplayerARPG
                 return;
             AttributeAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (AttributeAmount sourceAmount in sourceAmounts)
-            {
-                if (sourceAmount.attribute != null)
-                    amounts.Add(RuntimeGameDataSlots.GetSlot(sourceAmount.attribute), sourceAmount.amount * rate);
-            }
+            CombineAttributes(sourceAmounts, ref amounts, rate);
             amounts.CopyTo(resultDictionary);
         }
 
@@ -130,11 +214,7 @@ namespace MultiplayerARPG
                 return;
             AttributeAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (AttributeIncremental sourceIncremental in sourceIncrementals)
-            {
-                if (sourceIncremental.attribute != null)
-                    amounts.Add(RuntimeGameDataSlots.GetSlot(sourceIncremental.attribute), sourceIncremental.amount.GetAmount(level) * rate);
-            }
+            CombineAttributes(sourceIncrementals, ref amounts, level, rate);
             amounts.CopyTo(resultDictionary);
         }
 
@@ -181,11 +261,7 @@ namespace MultiplayerARPG
                 return;
             DamageElementFloatAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (ResistanceAmount sourceAmount in sourceAmounts)
-            {
-                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
-            }
+            CombineResistances(sourceAmounts, ref amounts, rate);
             amounts.CopyTo(resultDictionary);
         }
 
@@ -208,11 +284,7 @@ namespace MultiplayerARPG
                 return;
             DamageElementFloatAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (ResistanceIncremental sourceIncremental in sourceIncrementals)
-            {
-                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
-            }
+            CombineResistances(sourceIncrementals, ref amounts, level, rate);
             amounts.CopyTo(resultDictionary);
         }
 
@@ -234,11 +306,7 @@ namespace MultiplayerARPG
                 return;
             DamageElementFloatAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (ArmorAmount sourceAmount in sourceAmounts)
-            {
-                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
-            }
+            CombineArmors(sourceAmounts, ref amounts, rate);
             amounts.CopyTo(resultDictionary);
         }
 
@@ -261,11 +329,7 @@ namespace MultiplayerARPG
                 return;
             DamageElementFloatAmounts amounts = default;
             amounts.Combine(resultDictionary);
-            foreach (ArmorIncremental sourceIncremental in sourceIncrementals)
-            {
-                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
-            }
+            CombineArmors(sourceIncrementals, ref amounts, level, rate);
             amounts.CopyTo(resultDictionary);
         }
 

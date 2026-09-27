@@ -618,10 +618,13 @@ namespace MultiplayerARPG
                 return false;
 
             float entryRate = 1f / calculatingDamageAmounts.Count;
+            DamageElementMinMaxFloatAmounts combinedDamageAmounts = default;
+            combinedDamageAmounts.Combine(increaseDamageAmounts);
             foreach (Dictionary<DamageElement, MinMaxFloat> damageAmounts in calculatingDamageAmounts.Values)
             {
-                GameDataHelpers.CombineDamages(increaseDamageAmounts, damageAmounts, entryRate);
+                combinedDamageAmounts.Combine(damageAmounts, entryRate);
             }
+            combinedDamageAmounts.CopyTo(increaseDamageAmounts);
 
             for (i = decreasingItemIndexes.Count - 1; i >= 0; --i)
             {
@@ -1006,6 +1009,33 @@ namespace MultiplayerARPG
                     return i;
             }
             return -1;
+        }
+
+        public static bool HasEnoughAttributeAmounts(this ICharacterData data, AttributeAmounts requiredAttributeAmounts, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1, bool willReleaseAttributes = false)
+        {
+            gameMessage = UITextKeys.NONE;
+            Dictionary<Attribute, float> tempAttributeAmounts = null;
+            data.GetAllStats(sumWithEquipments, false, true,
+                onGetAttributes: attributeAmounts => tempAttributeAmounts = attributeAmounts,
+                willReleaseAttributes: false);
+            currentAttributeAmounts = tempAttributeAmounts;
+            for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
+            {
+                if (!requiredAttributeAmounts.Contains(i))
+                    continue;
+                Attribute attribute = RuntimeGameDataSlots.GetAttribute(i);
+                if (!currentAttributeAmounts.TryGetValue(attribute, out float currentAmount) ||
+                    currentAmount < Mathf.CeilToInt(requiredAttributeAmounts[i] * multiplier))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                    if (willReleaseAttributes)
+                        CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(currentAttributeAmounts);
+                    return false;
+                }
+            }
+            if (willReleaseAttributes)
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(currentAttributeAmounts);
+            return true;
         }
 
         public static bool HasEnoughAttributeAmounts(this ICharacterData data, Dictionary<Attribute, float> requiredAttributeAmounts, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1, bool willReleaseAttributes = false)
@@ -1447,8 +1477,11 @@ namespace MultiplayerARPG
             {
                 if (!DecreaseAmmos(data, isLeftHand, ammoAmountEachTrigger, out tempIncreaseDamageAmounts, validIfNoRequireAmmoType, false))
                     break;
-                tempCombinedDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(baseDamageAmounts);
-                GameDataHelpers.CombineDamages(tempCombinedDamageAmounts, tempIncreaseDamageAmounts);
+                DamageElementMinMaxFloatAmounts combinedDamageAmounts = default;
+                combinedDamageAmounts.Combine(baseDamageAmounts);
+                combinedDamageAmounts.Combine(tempIncreaseDamageAmounts);
+                tempCombinedDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+                combinedDamageAmounts.CopyTo(tempCombinedDamageAmounts);
                 result.Add(tempCombinedDamageAmounts);
             }
             return result;

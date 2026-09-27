@@ -16,15 +16,19 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> _cacheRequireAttributeAmounts = null;
-        public Dictionary<Attribute, float> RequireAttributeAmounts
+        private AttributeAmounts _cacheRequireAttributeAmounts;
+        [System.NonSerialized]
+        private int _cacheRequireAttributeAmountsGeneration = -1;
+        [Newtonsoft.Json.JsonIgnore]
+        public AttributeAmounts RequireAttributeAmounts
         {
             get
             {
-                if (_cacheRequireAttributeAmounts == null)
+                if (_cacheRequireAttributeAmountsGeneration != RuntimeGameDataSlots.Generation)
                 {
-                    _cacheRequireAttributeAmounts = new Dictionary<Attribute, float>();
-                    GameDataHelpers.CombineAttributes(requirement.attributeAmounts, _cacheRequireAttributeAmounts, 1f);
+                    _cacheRequireAttributeAmounts = default;
+                    GameDataHelpers.CombineAttributes(requirement.attributeAmounts, ref _cacheRequireAttributeAmounts, 1f);
+                    _cacheRequireAttributeAmountsGeneration = RuntimeGameDataSlots.Generation;
                 }
                 return _cacheRequireAttributeAmounts;
             }

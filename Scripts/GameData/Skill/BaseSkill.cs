@@ -481,12 +481,17 @@ namespace MultiplayerARPG
 
         public void GetRequireAttributeAmounts(int level, Dictionary<Attribute, float> result)
         {
-            result.Clear();
+            GetRequireAttributeAmounts(level).CopyTo(result);
+        }
+
+        public AttributeAmounts GetRequireAttributeAmounts(int level)
+        {
+            AttributeAmounts result = default;
             if (level < 0 || requirementEachLevels.Count == 0)
-                return;
-            if (level >= requirementEachLevels.Count)
-                GameDataHelpers.CombineAttributes(requirementEachLevels[requirementEachLevels.Count - 1].attributeAmounts, result, 1f);
-            GameDataHelpers.CombineAttributes(requirementEachLevels[level].attributeAmounts, result, 1f);
+                return result;
+            int index = Mathf.Min(level, requirementEachLevels.Count - 1);
+            GameDataHelpers.CombineAttributes(requirementEachLevels[index].attributeAmounts, ref result, 1f);
+            return result;
         }
 
         public void GetRequireSkillLevels(int level, Dictionary<BaseSkill, int> result)
@@ -737,15 +742,12 @@ namespace MultiplayerARPG
                     {
                         if (!DecreaseAmmos(skillUser, isLeftHand, out tempIncreaseDamageAmounts, false))
                             break;
-                        using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> newDamageAmounts))
-                        {
-                            foreach (KeyValuePair<DamageElement, MinMaxFloat> damageAmount in baseDamageAmounts)
-                            {
-                                newDamageAmounts[damageAmount.Key] = damageAmount.Value;
-                            }
-                            GameDataHelpers.CombineDamages(newDamageAmounts, tempIncreaseDamageAmounts);
-                            result.Add(newDamageAmounts);
-                        }
+                        DamageElementMinMaxFloatAmounts combinedDamageAmounts = default;
+                        combinedDamageAmounts.Combine(baseDamageAmounts);
+                        combinedDamageAmounts.Combine(tempIncreaseDamageAmounts);
+                        Dictionary<DamageElement, MinMaxFloat> newDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+                        combinedDamageAmounts.CopyTo(newDamageAmounts);
+                        result.Add(newDamageAmounts);
                     }
                     return result;
             }
@@ -987,12 +989,8 @@ namespace MultiplayerARPG
             }
 
             // Check is it pass attribute requirement or not
-            using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> requireAttributeAmounts))
-            {
-                GetRequireAttributeAmounts(level, requireAttributeAmounts);
-                if (!character.HasEnoughAttributeAmounts(requireAttributeAmounts, false, out gameMessage, out _, willReleaseAttributes: true))
-                    return false;
-            }
+            if (!character.HasEnoughAttributeAmounts(GetRequireAttributeAmounts(level), false, out gameMessage, out _, willReleaseAttributes: true))
+                return false;
 
             // Check is it pass skill level requirement or not
             using (CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get(out Dictionary<BaseSkill, int> requireSkillLevels))

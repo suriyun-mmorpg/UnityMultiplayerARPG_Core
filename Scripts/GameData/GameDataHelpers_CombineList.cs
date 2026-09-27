@@ -5,139 +5,107 @@ namespace MultiplayerARPG
 {
     public static partial class GameDataHelpers
     {
-        #region Combine Dictionary with List functions
-        /// <summary>
-        /// Combine damage amounts dictionary
-        /// </summary>
-        /// <param name="sourceAmounts"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineDamages(List<DamageAmount> sourceAmounts, Dictionary<DamageElement, MinMaxFloat> resultDictionary, float rate)
+        public static void CombineDamages(List<DamageAmount> sourceAmounts, ref DamageElementMinMaxFloatAmounts result, float rate)
         {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
             if (sourceAmounts == null)
                 return;
-            DamageElementMinMaxFloatAmounts amounts = default;
-            amounts.Combine(resultDictionary);
             foreach (DamageAmount sourceAmount in sourceAmounts)
             {
                 DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
             }
-            amounts.CopyTo(resultDictionary);
         }
 
-        /// <summary>
-        /// Combine damage amounts dictionary
-        /// </summary>
-        /// <param name="sourceIncrementals"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineDamages(List<DamageIncremental> sourceIncrementals, Dictionary<DamageElement, MinMaxFloat> resultDictionary, int level, float rate)
+        public static void CombineDamages(List<DamageIncremental> sourceIncrementals, ref DamageElementMinMaxFloatAmounts result, int level, float rate)
         {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
             if (sourceIncrementals == null)
                 return;
-            DamageElementMinMaxFloatAmounts amounts = default;
-            amounts.Combine(resultDictionary);
             foreach (DamageIncremental sourceIncremental in sourceIncrementals)
             {
                 DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
             }
-            amounts.CopyTo(resultDictionary);
         }
 
-        /// <summary>
-        /// Combine damage infliction amounts dictionary
-        /// </summary>
-        /// <param name="sourceIncrementals"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="level"></param>
-        /// <returns></returns>
-        public static void CombineDamageInflictions(List<DamageInflictionIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, int level)
+        public static void CombineDamageInflictions(List<DamageInflictionIncremental> sourceIncrementals, ref DamageElementFloatAmounts result, int level)
         {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
             if (sourceIncrementals == null)
                 return;
-            DamageElementFloatAmounts amounts = default;
-            amounts.Combine(resultDictionary);
             foreach (DamageInflictionIncremental sourceIncremental in sourceIncrementals)
             {
                 DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.rate.GetAmount(level));
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.rate.GetAmount(level));
             }
-            amounts.CopyTo(resultDictionary);
         }
 
-        /// <summary>
-        /// Combine attribute amounts dictionary
-        /// </summary>
-        /// <param name="sourceAmounts"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineAttributes(List<AttributeAmount> sourceAmounts, Dictionary<Attribute, float> resultDictionary, float rate)
+        public static void CombineAttributes(List<AttributeAmount> sourceAmounts, ref AttributeAmounts result, float rate)
         {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
             if (sourceAmounts == null)
                 return;
-            AttributeAmounts amounts = default;
-            amounts.Combine(resultDictionary);
             foreach (AttributeAmount sourceAmount in sourceAmounts)
             {
-                if (sourceAmount.attribute != null)
-                    amounts.Add(RuntimeGameDataSlots.GetSlot(sourceAmount.attribute), sourceAmount.amount * rate);
+                Attribute attribute = sourceAmount.attribute;
+                if (attribute != null)
+                    result.Add(RuntimeGameDataSlots.GetSlot(attribute), sourceAmount.amount * rate);
             }
-            amounts.CopyTo(resultDictionary);
         }
 
-        /// <summary>
-        /// Combine attribute amounts dictionary
-        /// </summary>
-        /// <param name="sourceIncrementals"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineAttributes(List<AttributeIncremental> sourceIncrementals, Dictionary<Attribute, float> resultDictionary, int level, float rate)
+        public static void CombineAttributes(List<AttributeIncremental> sourceIncrementals, ref AttributeAmounts result, int level, float rate)
         {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
             if (sourceIncrementals == null)
                 return;
-            AttributeAmounts amounts = default;
-            amounts.Combine(resultDictionary);
             foreach (AttributeIncremental sourceIncremental in sourceIncrementals)
             {
-                if (sourceIncremental.attribute != null)
-                    amounts.Add(RuntimeGameDataSlots.GetSlot(sourceIncremental.attribute), sourceIncremental.amount.GetAmount(level) * rate);
+                Attribute attribute = sourceIncremental.attribute;
+                if (attribute != null)
+                    result.Add(RuntimeGameDataSlots.GetSlot(attribute), sourceIncremental.amount.GetAmount(level) * rate);
             }
-            amounts.CopyTo(resultDictionary);
         }
 
+        public static void CombineResistances(List<ResistanceAmount> sourceAmounts, ref DamageElementFloatAmounts result, float rate)
+        {
+            if (sourceAmounts == null)
+                return;
+            foreach (ResistanceAmount sourceAmount in sourceAmounts)
+            {
+                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
+            }
+        }
+
+        public static void CombineResistances(List<ResistanceIncremental> sourceIncrementals, ref DamageElementFloatAmounts result, int level, float rate)
+        {
+            if (sourceIncrementals == null)
+                return;
+            foreach (ResistanceIncremental sourceIncremental in sourceIncrementals)
+            {
+                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
+            }
+        }
+
+        public static void CombineArmors(List<ArmorAmount> sourceAmounts, ref DamageElementFloatAmounts result, float rate)
+        {
+            if (sourceAmounts == null)
+                return;
+            foreach (ArmorAmount sourceAmount in sourceAmounts)
+            {
+                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
+            }
+        }
+
+        public static void CombineArmors(List<ArmorIncremental> sourceIncrementals, ref DamageElementFloatAmounts result, int level, float rate)
+        {
+            if (sourceIncrementals == null)
+                return;
+            foreach (ArmorIncremental sourceIncremental in sourceIncrementals)
+            {
+                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
+            }
+        }
+        #region Combine Dictionary with List functions
         /// <summary>
         /// Combine currency amounts dictionary
         /// </summary>
@@ -161,112 +129,6 @@ namespace MultiplayerARPG
                 CombineCurrencies(resultDictionary, pair);
             }
             return;
-        }
-
-        /// <summary>
-        /// Combine resistance amounts dictionary
-        /// </summary>
-        /// <param name="sourceAmounts"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineResistances(List<ResistanceAmount> sourceAmounts, Dictionary<DamageElement, float> resultDictionary, float rate)
-        {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
-            if (sourceAmounts == null)
-                return;
-            DamageElementFloatAmounts amounts = default;
-            amounts.Combine(resultDictionary);
-            foreach (ResistanceAmount sourceAmount in sourceAmounts)
-            {
-                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
-            }
-            amounts.CopyTo(resultDictionary);
-        }
-
-        /// <summary>
-        /// Combine resistance amounts dictionary
-        /// </summary>
-        /// <param name="sourceIncrementals"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineResistances(List<ResistanceIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, int level, float rate)
-        {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
-            if (sourceIncrementals == null)
-                return;
-            DamageElementFloatAmounts amounts = default;
-            amounts.Combine(resultDictionary);
-            foreach (ResistanceIncremental sourceIncremental in sourceIncrementals)
-            {
-                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
-            }
-            amounts.CopyTo(resultDictionary);
-        }
-
-        /// <summary>
-        /// Combine armor amounts dictionary
-        /// </summary>
-        /// <param name="sourceAmounts"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineArmors(List<ArmorAmount> sourceAmounts, Dictionary<DamageElement, float> resultDictionary, float rate)
-        {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
-            if (sourceAmounts == null)
-                return;
-            DamageElementFloatAmounts amounts = default;
-            amounts.Combine(resultDictionary);
-            foreach (ArmorAmount sourceAmount in sourceAmounts)
-            {
-                DamageElement element = sourceAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceAmount.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceAmount.amount * rate);
-            }
-            amounts.CopyTo(resultDictionary);
-        }
-
-        /// <summary>
-        /// Combine armor amounts dictionary
-        /// </summary>
-        /// <param name="sourceIncrementals"></param>
-        /// <param name="resultDictionary"></param>
-        /// <param name="level"></param>
-        /// <param name="rate"></param>
-        /// <returns></returns>
-        public static void CombineArmors(List<ArmorIncremental> sourceIncrementals, Dictionary<DamageElement, float> resultDictionary, int level, float rate)
-        {
-            if (resultDictionary == null)
-            {
-                Debug.LogError("Collecton is null");
-                return;
-            }
-            if (sourceIncrementals == null)
-                return;
-            DamageElementFloatAmounts amounts = default;
-            amounts.Combine(resultDictionary);
-            foreach (ArmorIncremental sourceIncremental in sourceIncrementals)
-            {
-                DamageElement element = sourceIncremental.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : sourceIncremental.damageElement;
-                amounts.Add(RuntimeGameDataSlots.GetSlot(element), sourceIncremental.amount.GetAmount(level) * rate);
-            }
-            amounts.CopyTo(resultDictionary);
         }
 
         /// <summary>

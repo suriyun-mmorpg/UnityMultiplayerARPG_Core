@@ -658,6 +658,14 @@ namespace MultiplayerARPG
             return _cacheIncreaseStatsRate;
         }
 
+        public AttributeAmounts GetIndexedIncreaseAttributes() => _indexedIncreaseAttributes;
+        public AttributeAmounts GetIndexedIncreaseAttributesRate() => _indexedIncreaseAttributesRate;
+        public DamageElementFloatAmounts GetIndexedIncreaseResistances() => _indexedIncreaseResistances;
+        public DamageElementFloatAmounts GetIndexedIncreaseArmors() => _indexedIncreaseArmors;
+        public DamageElementFloatAmounts GetIndexedIncreaseArmorsRate() => _indexedIncreaseArmorsRate;
+        public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamages() => _indexedIncreaseDamages;
+        public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamagesRate() => _indexedIncreaseDamagesRate;
+
         public Dictionary<Attribute, float> GetIncreaseAttributes()
         {
             _indexedIncreaseAttributes.CopyTo(_cacheIncreaseAttributes);

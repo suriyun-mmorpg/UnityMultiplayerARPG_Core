@@ -115,13 +115,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this ISocketEnhancerItem socketEnhancerItem,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -132,19 +132,19 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.StatsRate);
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(socketEnhancerItem.SocketEnhanceEffect.Attributes);
+                onIncreasingAttributes.Invoke(socketEnhancerItem.SocketEnhanceEffect.IndexedAttributes);
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.AttributesRate);
+                onIncreasingAttributesRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.IndexedAttributesRate);
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(socketEnhancerItem.SocketEnhanceEffect.Resistances);
+                onIncreasingResistances.Invoke(socketEnhancerItem.SocketEnhanceEffect.IndexedResistances);
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(socketEnhancerItem.SocketEnhanceEffect.Armors);
+                onIncreasingArmors.Invoke(socketEnhancerItem.SocketEnhanceEffect.IndexedArmors);
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.ArmorsRate);
+                onIncreasingArmorsRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.IndexedArmorsRate);
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(socketEnhancerItem.SocketEnhanceEffect.Damages);
+                onIncreasingDamages.Invoke(socketEnhancerItem.SocketEnhanceEffect.IndexedDamages);
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.DamagesRate);
+                onIncreasingDamagesRate.Invoke(socketEnhancerItem.SocketEnhanceEffect.IndexedDamagesRate);
             if (onIncreasingSkills != null)
                 onIncreasingSkills.Invoke(socketEnhancerItem.SocketEnhanceEffect.Skills);
             if (onIncreasingStatusEffectResistances != null)
@@ -154,13 +154,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this CharacterItem item,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -174,19 +174,19 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(item.GetBuff().GetIncreaseStatsRate());
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(item.GetBuff().GetIncreaseAttributes());
+                onIncreasingAttributes.Invoke(item.GetBuff().GetIndexedIncreaseAttributes());
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(item.GetBuff().GetIncreaseAttributesRate());
+                onIncreasingAttributesRate.Invoke(item.GetBuff().GetIndexedIncreaseAttributesRate());
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(item.GetBuff().GetIncreaseResistances());
+                onIncreasingResistances.Invoke(item.GetBuff().GetIndexedIncreaseResistances());
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(item.GetBuff().GetIncreaseArmors());
+                onIncreasingArmors.Invoke(item.GetBuff().GetIndexedIncreaseArmors());
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(item.GetBuff().GetIncreaseArmorsRate());
+                onIncreasingArmorsRate.Invoke(item.GetBuff().GetIndexedIncreaseArmorsRate());
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(item.GetBuff().GetIncreaseDamages());
+                onIncreasingDamages.Invoke(item.GetBuff().GetIndexedIncreaseDamages());
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(item.GetBuff().GetIncreaseDamagesRate());
+                onIncreasingDamagesRate.Invoke(item.GetBuff().GetIndexedIncreaseDamagesRate());
             if (onIncreasingSkills != null)
                 onIncreasingSkills.Invoke(item.GetBuff().GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
@@ -215,13 +215,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this EquipmentSet equipmentSet, int setAmount,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -238,19 +238,19 @@ namespace MultiplayerARPG
                     if (onIncreasingStatsRate != null)
                         onIncreasingStatsRate.Invoke(effects[i].StatsRate);
                     if (onIncreasingAttributes != null)
-                        onIncreasingAttributes.Invoke(effects[i].Attributes);
+                        onIncreasingAttributes.Invoke(effects[i].IndexedAttributes);
                     if (onIncreasingAttributesRate != null)
-                        onIncreasingAttributesRate.Invoke(effects[i].AttributesRate);
+                        onIncreasingAttributesRate.Invoke(effects[i].IndexedAttributesRate);
                     if (onIncreasingResistances != null)
-                        onIncreasingResistances.Invoke(effects[i].Resistances);
+                        onIncreasingResistances.Invoke(effects[i].IndexedResistances);
                     if (onIncreasingArmors != null)
-                        onIncreasingArmors.Invoke(effects[i].Armors);
+                        onIncreasingArmors.Invoke(effects[i].IndexedArmors);
                     if (onIncreasingArmorsRate != null)
-                        onIncreasingArmorsRate.Invoke(effects[i].ArmorsRate);
+                        onIncreasingArmorsRate.Invoke(effects[i].IndexedArmorsRate);
                     if (onIncreasingDamages != null)
-                        onIncreasingDamages.Invoke(effects[i].Damages);
+                        onIncreasingDamages.Invoke(effects[i].IndexedDamages);
                     if (onIncreasingDamagesRate != null)
-                        onIncreasingDamagesRate.Invoke(effects[i].DamagesRate);
+                        onIncreasingDamagesRate.Invoke(effects[i].IndexedDamagesRate);
                     if (onIncreasingSkills != null)
                         onIncreasingSkills.Invoke(effects[i].Skills);
                     if (onIncreasingStatusEffectResistances != null)
@@ -264,13 +264,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this CharacterBuff buff,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -281,19 +281,19 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(buff.GetBuff().GetIncreaseStatsRate());
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(buff.GetBuff().GetIncreaseAttributes());
+                onIncreasingAttributes.Invoke(buff.GetBuff().GetIndexedIncreaseAttributes());
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(buff.GetBuff().GetIncreaseAttributesRate());
+                onIncreasingAttributesRate.Invoke(buff.GetBuff().GetIndexedIncreaseAttributesRate());
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(buff.GetBuff().GetIncreaseResistances());
+                onIncreasingResistances.Invoke(buff.GetBuff().GetIndexedIncreaseResistances());
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(buff.GetBuff().GetIncreaseArmors());
+                onIncreasingArmors.Invoke(buff.GetBuff().GetIndexedIncreaseArmors());
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(buff.GetBuff().GetIncreaseArmorsRate());
+                onIncreasingArmorsRate.Invoke(buff.GetBuff().GetIndexedIncreaseArmorsRate());
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(buff.GetBuff().GetIncreaseDamages());
+                onIncreasingDamages.Invoke(buff.GetBuff().GetIndexedIncreaseDamages());
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(buff.GetBuff().GetIncreaseDamagesRate());
+                onIncreasingDamagesRate.Invoke(buff.GetBuff().GetIndexedIncreaseDamagesRate());
             if (onIncreasingSkills != null)
                 onIncreasingSkills.Invoke(buff.GetBuff().GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
@@ -303,13 +303,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this CharacterSummon summon,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -320,19 +320,19 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(summon.GetBuff().GetIncreaseStatsRate());
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(summon.GetBuff().GetIncreaseAttributes());
+                onIncreasingAttributes.Invoke(summon.GetBuff().GetIndexedIncreaseAttributes());
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(summon.GetBuff().GetIncreaseAttributesRate());
+                onIncreasingAttributesRate.Invoke(summon.GetBuff().GetIndexedIncreaseAttributesRate());
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(summon.GetBuff().GetIncreaseResistances());
+                onIncreasingResistances.Invoke(summon.GetBuff().GetIndexedIncreaseResistances());
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(summon.GetBuff().GetIncreaseArmors());
+                onIncreasingArmors.Invoke(summon.GetBuff().GetIndexedIncreaseArmors());
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(summon.GetBuff().GetIncreaseArmorsRate());
+                onIncreasingArmorsRate.Invoke(summon.GetBuff().GetIndexedIncreaseArmorsRate());
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(summon.GetBuff().GetIncreaseDamages());
+                onIncreasingDamages.Invoke(summon.GetBuff().GetIndexedIncreaseDamages());
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(summon.GetBuff().GetIncreaseDamagesRate());
+                onIncreasingDamagesRate.Invoke(summon.GetBuff().GetIndexedIncreaseDamagesRate());
             if (onIncreasingSkills != null)
                 onIncreasingSkills.Invoke(summon.GetBuff().GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
@@ -342,13 +342,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this IVehicleEntity vehicleEntity,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -359,19 +359,19 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(vehicleEntity.GetBuff().GetIncreaseStatsRate());
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(vehicleEntity.GetBuff().GetIncreaseAttributes());
+                onIncreasingAttributes.Invoke(vehicleEntity.GetBuff().GetIndexedIncreaseAttributes());
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(vehicleEntity.GetBuff().GetIncreaseAttributesRate());
+                onIncreasingAttributesRate.Invoke(vehicleEntity.GetBuff().GetIndexedIncreaseAttributesRate());
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(vehicleEntity.GetBuff().GetIncreaseResistances());
+                onIncreasingResistances.Invoke(vehicleEntity.GetBuff().GetIndexedIncreaseResistances());
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(vehicleEntity.GetBuff().GetIncreaseArmors());
+                onIncreasingArmors.Invoke(vehicleEntity.GetBuff().GetIndexedIncreaseArmors());
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(vehicleEntity.GetBuff().GetIncreaseArmorsRate());
+                onIncreasingArmorsRate.Invoke(vehicleEntity.GetBuff().GetIndexedIncreaseArmorsRate());
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(vehicleEntity.GetBuff().GetIncreaseDamages());
+                onIncreasingDamages.Invoke(vehicleEntity.GetBuff().GetIndexedIncreaseDamages());
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(vehicleEntity.GetBuff().GetIncreaseDamagesRate());
+                onIncreasingDamagesRate.Invoke(vehicleEntity.GetBuff().GetIndexedIncreaseDamagesRate());
             if (onIncreasingSkills != null)
                 onIncreasingSkills.Invoke(vehicleEntity.GetBuff().GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
@@ -381,13 +381,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this PlayerTitle title,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -398,19 +398,19 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(title.CacheBuff.GetIncreaseStatsRate());
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(title.CacheBuff.GetIncreaseAttributes());
+                onIncreasingAttributes.Invoke(title.CacheBuff.GetIndexedIncreaseAttributes());
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(title.CacheBuff.GetIncreaseAttributesRate());
+                onIncreasingAttributesRate.Invoke(title.CacheBuff.GetIndexedIncreaseAttributesRate());
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(title.CacheBuff.GetIncreaseResistances());
+                onIncreasingResistances.Invoke(title.CacheBuff.GetIndexedIncreaseResistances());
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(title.CacheBuff.GetIncreaseArmors());
+                onIncreasingArmors.Invoke(title.CacheBuff.GetIndexedIncreaseArmors());
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(title.CacheBuff.GetIncreaseArmorsRate());
+                onIncreasingArmorsRate.Invoke(title.CacheBuff.GetIndexedIncreaseArmorsRate());
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(title.CacheBuff.GetIncreaseDamages());
+                onIncreasingDamages.Invoke(title.CacheBuff.GetIndexedIncreaseDamages());
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(title.CacheBuff.GetIncreaseDamagesRate());
+                onIncreasingDamagesRate.Invoke(title.CacheBuff.GetIndexedIncreaseDamagesRate());
             if (onIncreasingSkills != null)
                 onIncreasingSkills.Invoke(title.CacheBuff.GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
@@ -420,13 +420,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this Faction faction,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -437,19 +437,19 @@ namespace MultiplayerARPG
             if (onIncreasingStatsRate != null)
                 onIncreasingStatsRate.Invoke(faction.CacheBuff.GetIncreaseStatsRate());
             if (onIncreasingAttributes != null)
-                onIncreasingAttributes.Invoke(faction.CacheBuff.GetIncreaseAttributes());
+                onIncreasingAttributes.Invoke(faction.CacheBuff.GetIndexedIncreaseAttributes());
             if (onIncreasingAttributesRate != null)
-                onIncreasingAttributesRate.Invoke(faction.CacheBuff.GetIncreaseAttributesRate());
+                onIncreasingAttributesRate.Invoke(faction.CacheBuff.GetIndexedIncreaseAttributesRate());
             if (onIncreasingResistances != null)
-                onIncreasingResistances.Invoke(faction.CacheBuff.GetIncreaseResistances());
+                onIncreasingResistances.Invoke(faction.CacheBuff.GetIndexedIncreaseResistances());
             if (onIncreasingArmors != null)
-                onIncreasingArmors.Invoke(faction.CacheBuff.GetIncreaseArmors());
+                onIncreasingArmors.Invoke(faction.CacheBuff.GetIndexedIncreaseArmors());
             if (onIncreasingArmorsRate != null)
-                onIncreasingArmorsRate.Invoke(faction.CacheBuff.GetIncreaseArmorsRate());
+                onIncreasingArmorsRate.Invoke(faction.CacheBuff.GetIndexedIncreaseArmorsRate());
             if (onIncreasingDamages != null)
-                onIncreasingDamages.Invoke(faction.CacheBuff.GetIncreaseDamages());
+                onIncreasingDamages.Invoke(faction.CacheBuff.GetIndexedIncreaseDamages());
             if (onIncreasingDamagesRate != null)
-                onIncreasingDamagesRate.Invoke(faction.CacheBuff.GetIncreaseDamagesRate());
+                onIncreasingDamagesRate.Invoke(faction.CacheBuff.GetIndexedIncreaseDamagesRate());
             if (onIncreasingSkills != null)
                 onIncreasingSkills.Invoke(faction.CacheBuff.GetIncreaseSkills());
             if (onIncreasingStatusEffectResistances != null)
@@ -459,13 +459,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this BaseSkill skill, int level,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -483,59 +483,45 @@ namespace MultiplayerARPG
                 onIncreasingStatsRate.Invoke(buff.GetIncreaseStatsRate(level));
             if (onIncreasingAttributes != null)
             {
-                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> tempAttributes))
-                {
-                    buff.GetIncreaseAttributes(level, tempAttributes);
-                    onIncreasingAttributes.Invoke(tempAttributes);
-                }
+                AttributeAmounts amounts = default;
+                GameDataHelpers.CombineAttributes(buff.increaseAttributes, ref amounts, level, 1f);
+                onIncreasingAttributes.Invoke(amounts);
             }
             if (onIncreasingAttributesRate != null)
             {
-                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> tempAttributes))
-                {
-                    buff.GetIncreaseAttributesRate(level, tempAttributes);
-                    onIncreasingAttributesRate.Invoke(tempAttributes);
-                }
+                AttributeAmounts amounts = default;
+                GameDataHelpers.CombineAttributes(buff.increaseAttributesRate, ref amounts, level, 1f);
+                onIncreasingAttributesRate.Invoke(amounts);
             }
             if (onIncreasingResistances != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempResistances))
-                {
-                    buff.GetIncreaseResistances(level, tempResistances);
-                    onIncreasingResistances.Invoke(tempResistances);
-                }
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineResistances(buff.increaseResistances, ref amounts, level, 1f);
+                onIncreasingResistances.Invoke(amounts);
             }
             if (onIncreasingArmors != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempArmors))
-                {
-                    buff.GetIncreaseArmors(level, tempArmors);
-                    onIncreasingArmors.Invoke(tempArmors);
-                }
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineArmors(buff.increaseArmors, ref amounts, level, 1f);
+                onIncreasingArmors.Invoke(amounts);
             }
             if (onIncreasingArmorsRate != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempArmors))
-                {
-                    buff.GetIncreaseArmorsRate(level, tempArmors);
-                    onIncreasingArmorsRate.Invoke(tempArmors);
-                }
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineArmors(buff.increaseArmorsRate, ref amounts, level, 1f);
+                onIncreasingArmorsRate.Invoke(amounts);
             }
             if (onIncreasingDamages != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
-                {
-                    buff.GetIncreaseDamages(level, tempDamages);
-                    onIncreasingDamages.Invoke(tempDamages);
-                }
+                DamageElementMinMaxFloatAmounts amounts = default;
+                GameDataHelpers.CombineDamages(buff.increaseDamages, ref amounts, level, 1f);
+                onIncreasingDamages.Invoke(amounts);
             }
             if (onIncreasingDamagesRate != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
-                {
-                    buff.GetIncreaseDamagesRate(level, tempDamages);
-                    onIncreasingDamagesRate.Invoke(tempDamages);
-                }
+                DamageElementMinMaxFloatAmounts amounts = default;
+                GameDataHelpers.CombineDamages(buff.increaseDamagesRate, ref amounts, level, 1f);
+                onIncreasingDamagesRate.Invoke(amounts);
             }
             if (onIncreasingSkills != null)
             {
@@ -558,13 +544,13 @@ namespace MultiplayerARPG
         public static void GetBuffs(this GuildSkill skill, int level,
             System.Action<CharacterStats> onIncreasingStats,
             System.Action<CharacterStats> onIncreasingStatsRate,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributes,
-            System.Action<Dictionary<Attribute, float>> onIncreasingAttributesRate,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingResistances,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmors,
-            System.Action<Dictionary<DamageElement, float>> onIncreasingArmorsRate,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamages,
-            System.Action<Dictionary<DamageElement, MinMaxFloat>> onIncreasingDamagesRate,
+            System.Action<AttributeAmounts> onIncreasingAttributes,
+            System.Action<AttributeAmounts> onIncreasingAttributesRate,
+            System.Action<DamageElementFloatAmounts> onIncreasingResistances,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmors,
+            System.Action<DamageElementFloatAmounts> onIncreasingArmorsRate,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamages,
+            System.Action<DamageElementMinMaxFloatAmounts> onIncreasingDamagesRate,
             System.Action<Dictionary<BaseSkill, int>> onIncreasingSkills,
             System.Action<Dictionary<StatusEffect, float>> onIncreasingStatusEffectResistances)
         {
@@ -581,59 +567,45 @@ namespace MultiplayerARPG
                 onIncreasingStatsRate.Invoke(buff.GetIncreaseStatsRate(level));
             if (onIncreasingAttributes != null)
             {
-                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> tempAttributes))
-                {
-                    buff.GetIncreaseAttributes(level, tempAttributes);
-                    onIncreasingAttributes.Invoke(tempAttributes);
-                }
+                AttributeAmounts amounts = default;
+                GameDataHelpers.CombineAttributes(buff.increaseAttributes, ref amounts, level, 1f);
+                onIncreasingAttributes.Invoke(amounts);
             }
             if (onIncreasingAttributesRate != null)
             {
-                using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> tempAttributes))
-                {
-                    buff.GetIncreaseAttributesRate(level, tempAttributes);
-                    onIncreasingAttributesRate.Invoke(tempAttributes);
-                }
+                AttributeAmounts amounts = default;
+                GameDataHelpers.CombineAttributes(buff.increaseAttributesRate, ref amounts, level, 1f);
+                onIncreasingAttributesRate.Invoke(amounts);
             }
             if (onIncreasingResistances != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempResistances))
-                {
-                    buff.GetIncreaseResistances(level, tempResistances);
-                    onIncreasingResistances.Invoke(tempResistances);
-                }
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineResistances(buff.increaseResistances, ref amounts, level, 1f);
+                onIncreasingResistances.Invoke(amounts);
             }
             if (onIncreasingArmors != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempArmors))
-                {
-                    buff.GetIncreaseArmors(level, tempArmors);
-                    onIncreasingArmors.Invoke(tempArmors);
-                }
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineArmors(buff.increaseArmors, ref amounts, level, 1f);
+                onIncreasingArmors.Invoke(amounts);
             }
             if (onIncreasingArmorsRate != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> tempArmors))
-                {
-                    buff.GetIncreaseArmorsRate(level, tempArmors);
-                    onIncreasingArmorsRate.Invoke(tempArmors);
-                }
+                DamageElementFloatAmounts amounts = default;
+                GameDataHelpers.CombineArmors(buff.increaseArmorsRate, ref amounts, level, 1f);
+                onIncreasingArmorsRate.Invoke(amounts);
             }
             if (onIncreasingDamages != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
-                {
-                    buff.GetIncreaseDamages(level, tempDamages);
-                    onIncreasingDamages.Invoke(tempDamages);
-                }
+                DamageElementMinMaxFloatAmounts amounts = default;
+                GameDataHelpers.CombineDamages(buff.increaseDamages, ref amounts, level, 1f);
+                onIncreasingDamages.Invoke(amounts);
             }
             if (onIncreasingDamagesRate != null)
             {
-                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> tempDamages))
-                {
-                    buff.GetIncreaseDamagesRate(level, tempDamages);
-                    onIncreasingDamagesRate.Invoke(tempDamages);
-                }
+                DamageElementMinMaxFloatAmounts amounts = default;
+                GameDataHelpers.CombineDamages(buff.increaseDamagesRate, ref amounts, level, 1f);
+                onIncreasingDamagesRate.Invoke(amounts);
             }
             if (onIncreasingSkills != null)
             {
