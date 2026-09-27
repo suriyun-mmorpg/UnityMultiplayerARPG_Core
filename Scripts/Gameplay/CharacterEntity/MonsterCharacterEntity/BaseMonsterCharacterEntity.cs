@@ -803,7 +803,7 @@ namespace MultiplayerARPG
             float calculatingTotalDamage = 0f;
             foreach (DamageElement damageElement in damageAmounts.Keys)
             {
-                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(CachedData.Resistances, CachedData.Armors,
+                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(CachedData.IndexedResistances, CachedData.IndexedArmors,
                     CurrentGameInstance.GameplayRule.RandomAttackDamage(fromPosition, attackerCharacter, this, damageElement, damageAmounts[damageElement], weapon, skill, skillLevel, randomSeed));
             }
 

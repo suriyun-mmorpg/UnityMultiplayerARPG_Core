@@ -8,6 +8,11 @@ namespace MultiplayerARPG
     public partial class Attribute : BaseGameData
     {
 
+        [System.NonSerialized]
+        private int _runtimeSlot = -1;
+        [Newtonsoft.Json.JsonIgnore]
+        public int RuntimeSlot { get { return _runtimeSlot; } internal set { _runtimeSlot = value; } }
+
         [Category("Attribute Settings")]
         [SerializeField]
         private float battlePointScore = 10;

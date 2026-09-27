@@ -231,6 +231,24 @@ namespace MultiplayerARPG
             return damageAmount;
         }
 
+        public override float GetDamageReducedByResistance(DamageElementFloatAmounts damageReceiverResistances, DamageElementFloatAmounts damageReceiverArmors, float damageAmount, DamageElement damageElement)
+        {
+            if (GetType() != typeof(DefaultGameplayRule))
+                return base.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, damageElement);
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            int slot = RuntimeGameDataSlots.GetSlot(damageElement);
+            if (damageReceiverResistances.TryGetValue(slot, out float resistanceAmount))
+            {
+                if (resistanceAmount > damageElement.MaxResistanceAmount)
+                    resistanceAmount = damageElement.MaxResistanceAmount;
+                damageAmount -= damageAmount * resistanceAmount;
+            }
+            if (damageReceiverArmors.TryGetValue(slot, out float armorAmount))
+                damageAmount *= 100f / (100f + Mathf.Max(0f, armorAmount));
+            return damageAmount;
+        }
+
         public virtual float GetCriticalChance(BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver)
         {
             float criRate = attacker.GetCaches().Stats.criRate;

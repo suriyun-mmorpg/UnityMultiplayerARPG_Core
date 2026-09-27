@@ -280,15 +280,37 @@ namespace MultiplayerARPG
             float damageEffectiveness = 0f;
             if (effectivenessAttributes == null || characterAttributes == null)
                 return damageEffectiveness;
-            foreach (Attribute attribute in characterAttributes.Keys)
+            foreach (KeyValuePair<Attribute, float> entry in characterAttributes)
             {
-                if (attribute != null && effectivenessAttributes.ContainsKey(attribute))
-                    damageEffectiveness += effectivenessAttributes[attribute] * characterAttributes[attribute];
+                if (entry.Key != null && effectivenessAttributes.TryGetValue(entry.Key, out float rate))
+                    damageEffectiveness += rate * entry.Value;
             }
             return damageEffectiveness;
         }
 
+        public static float GetEffectivenessDamage(Dictionary<Attribute, float> effectivenessAttributes, AttributeAmounts characterAttributes)
+        {
+            float result = 0f;
+            if (effectivenessAttributes == null)
+                return result;
+            foreach (KeyValuePair<Attribute, float> entry in effectivenessAttributes)
+            {
+                if (entry.Key != null && characterAttributes.TryGetValue(RuntimeGameDataSlots.GetSlot(entry.Key), out float amount))
+                    result += entry.Value * amount;
+            }
+            return result;
+        }
+
         public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageWithEffectiveness(Dictionary<Attribute, float> effectivenessAttributes, Dictionary<Attribute, float> characterAttributes, KeyValuePair<DamageElement, MinMaxFloat> pureDamage)
+        {
+            float damageEffectiveness = GetEffectivenessDamage(effectivenessAttributes, characterAttributes);
+            DamageElement damageElement = pureDamage.Key;
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            return new KeyValuePair<DamageElement, MinMaxFloat>(damageElement, pureDamage.Value + damageEffectiveness);
+        }
+
+        public static KeyValuePair<DamageElement, MinMaxFloat> GetDamageWithEffectiveness(Dictionary<Attribute, float> effectivenessAttributes, AttributeAmounts characterAttributes, KeyValuePair<DamageElement, MinMaxFloat> pureDamage)
         {
             float damageEffectiveness = GetEffectivenessDamage(effectivenessAttributes, characterAttributes);
             DamageElement damageElement = pureDamage.Key;

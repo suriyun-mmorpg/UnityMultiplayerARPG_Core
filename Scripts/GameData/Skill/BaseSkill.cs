@@ -572,10 +572,11 @@ namespace MultiplayerARPG
 
             if (!IsAttack)
                 return damageAmounts;
+            DamageElementRangeAmounts calculatedDamages = default;
 
             // Base attack damage amount will sum with other variables later
             if (TryGetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand, out KeyValuePair<DamageElement, MinMaxFloat> baseDamageAmount))
-                GameDataHelpers.CombineDamages(damageAmounts, baseDamageAmount);
+                calculatedDamages.Combine(baseDamageAmount);
 
             // Sum damage with weapon damage inflictions
             if (TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out Dictionary<DamageElement, float> damageInflictions))
@@ -587,11 +588,11 @@ namespace MultiplayerARPG
                 else
                     weaponDamageAmount = skillUser.GetCaches().RightHandWeaponDamage.Value;
 
-                foreach (DamageElement element in damageInflictions.Keys)
+                foreach (KeyValuePair<DamageElement, float> entry in damageInflictions)
                 {
-                    if (element == null)
+                    if (entry.Key == null)
                         continue;
-                    GameDataHelpers.CombineDamages(damageAmounts, new KeyValuePair<DamageElement, MinMaxFloat>(element, weaponDamageAmount.Value * damageInflictions[element]));
+                    calculatedDamages.Combine(new KeyValuePair<DamageElement, MinMaxFloat>(entry.Key, weaponDamageAmount.Value * entry.Value));
                 }
             }
 
@@ -606,25 +607,24 @@ namespace MultiplayerARPG
                     weaponDamageAmount = skillUser.GetCaches().RightHandWeaponDamage.Value;
 
                 // Multiply both min and max damage by the multiplicator
-                GameDataHelpers.CombineDamages(damageAmounts, new KeyValuePair<DamageElement, MinMaxFloat>(weaponDamageAmount.Key, weaponDamageAmount.Value * multiplicator));
+                calculatedDamages.Combine(new KeyValuePair<DamageElement, MinMaxFloat>(weaponDamageAmount.Key, weaponDamageAmount.Value * multiplicator));
             }
 
             // Sum damage with additional damage amounts
             if (TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
-                GameDataHelpers.CombineDamages(damageAmounts, additionalDamageAmounts);
+                calculatedDamages.Combine(additionalDamageAmounts);
 
             // Sum damage with buffs
             if (IsIncreaseAttackDamageAmountsWithBuffs(skillUser, skillLevel))
             {
-                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> multiplyDamages))
-                {
-                    GameDataHelpers.CombineDamages(multiplyDamages, damageAmounts);
-                    GameDataHelpers.CombineDamages(damageAmounts, skillUser.GetCaches().IncreaseDamages);
-                    GameDataHelpers.MultiplyDamages(multiplyDamages, skillUser.GetCaches().IncreaseDamagesRate);
-                    GameDataHelpers.CombineDamages(damageAmounts, multiplyDamages);
-                }
+                CharacterDataCache cache = skillUser.GetCaches();
+                DamageElementRangeAmounts multiplyDamages = calculatedDamages;
+                calculatedDamages.Combine(cache.IndexedIncreaseDamages);
+                multiplyDamages.MultiplyRates(cache.IndexedIncreaseDamagesRate);
+                calculatedDamages.Combine(multiplyDamages);
             }
 
+            calculatedDamages.CopyTo(damageAmounts);
             return damageAmounts;
         }
 

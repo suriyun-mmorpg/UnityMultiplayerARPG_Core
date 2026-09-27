@@ -51,6 +51,18 @@ namespace MultiplayerARPG
         /// <returns></returns>
         public abstract float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount, DamageElement damageElement);
 
+        public virtual float GetDamageReducedByResistance(DamageElementFloatAmounts damageReceiverResistances, DamageElementFloatAmounts damageReceiverArmors, float damageAmount, DamageElement damageElement)
+        {
+            // Preserve custom rules which override the dictionary-based method.
+            using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> resistances))
+            using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> armors))
+            {
+                damageReceiverResistances.CopyTo(resistances);
+                damageReceiverArmors.CopyTo(armors);
+                return GetDamageReducedByResistance(resistances, armors, damageAmount, damageElement);
+            }
+        }
+
         /// <summary>
         /// This function will be called when applying damage to a character, implement it to calculate character's attack damage to another character when critical occurs
         /// </summary>

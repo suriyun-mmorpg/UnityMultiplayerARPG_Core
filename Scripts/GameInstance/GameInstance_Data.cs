@@ -1031,6 +1031,10 @@ namespace MultiplayerARPG
             if (!dict.TryGetValue(data.DataId, out T tempData) || (tempData as Object) == null)
             {
                 data.Validate();
+                if (data is Attribute attribute)
+                    RuntimeGameDataSlots.Register(attribute);
+                else if (data is DamageElement damageElement)
+                    RuntimeGameDataSlots.Register(damageElement);
                 dict[data.DataId] = data;
                 data.PrepareRelatesData();
             }

@@ -22,10 +22,10 @@ namespace MultiplayerARPG
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
-            if (!resultDictionary.ContainsKey(damageElement))
+            if (!resultDictionary.TryGetValue(damageElement, out MinMaxFloat oldDamage))
                 resultDictionary[damageElement] = newEntry.Value * rate;
             else
-                resultDictionary[damageElement] += newEntry.Value * rate;
+                resultDictionary[damageElement] = oldDamage + newEntry.Value * rate;
             return;
         }
 
@@ -63,10 +63,10 @@ namespace MultiplayerARPG
             DamageElement damageElement = newEntry.Key;
             if (damageElement == null)
                 damageElement = GameInstance.Singleton.DefaultDamageElement;
-            if (!resultDictionary.ContainsKey(damageElement))
+            if (!resultDictionary.TryGetValue(damageElement, out float oldInfliction))
                 resultDictionary[damageElement] = newEntry.Value;
             else
-                resultDictionary[damageElement] += newEntry.Value;
+                resultDictionary[damageElement] = oldInfliction + newEntry.Value;
             return;
         }
 
@@ -85,10 +85,10 @@ namespace MultiplayerARPG
             }
             if (newEntry.Key == null)
                 return;
-            if (!resultDictionary.ContainsKey(newEntry.Key))
+            if (!resultDictionary.TryGetValue(newEntry.Key, out float oldAttribute))
                 resultDictionary[newEntry.Key] = newEntry.Value;
             else
-                resultDictionary[newEntry.Key] += newEntry.Value;
+                resultDictionary[newEntry.Key] = oldAttribute + newEntry.Value;
             return;
         }
 
@@ -147,10 +147,10 @@ namespace MultiplayerARPG
             }
             if (newEntry.Key == null)
                 return;
-            if (!resultDictionary.ContainsKey(newEntry.Key))
+            if (!resultDictionary.TryGetValue(newEntry.Key, out float oldResistance))
                 resultDictionary[newEntry.Key] = newEntry.Value;
             else
-                resultDictionary[newEntry.Key] += newEntry.Value;
+                resultDictionary[newEntry.Key] = oldResistance + newEntry.Value;
             return;
         }
 
@@ -169,10 +169,10 @@ namespace MultiplayerARPG
             }
             if (newEntry.Key == null)
                 return;
-            if (!resultDictionary.ContainsKey(newEntry.Key))
+            if (!resultDictionary.TryGetValue(newEntry.Key, out float oldArmor))
                 resultDictionary[newEntry.Key] = newEntry.Value;
             else
-                resultDictionary[newEntry.Key] += newEntry.Value;
+                resultDictionary[newEntry.Key] = oldArmor + newEntry.Value;
             return;
         }
 

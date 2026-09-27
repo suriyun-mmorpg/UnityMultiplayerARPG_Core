@@ -14,18 +14,32 @@ namespace MultiplayerARPG
         public Dictionary<Attribute, float> Attributes { get; private set; }
         public Dictionary<DamageElement, float> Resistances { get; private set; }
         public Dictionary<DamageElement, float> Armors { get; private set; }
+        private AttributeAmounts _indexedAttributes;
+        private DamageElementFloatAmounts _indexedResistances;
+        private DamageElementFloatAmounts _indexedArmors;
+        public AttributeAmounts IndexedAttributes => _indexedAttributes;
+        public DamageElementFloatAmounts IndexedResistances => _indexedResistances;
+        public DamageElementFloatAmounts IndexedArmors => _indexedArmors;
         public CharacterItem RightHandItem { get; private set; }
         public DamageInfo RightHandDamageInfo { get; private set; }
         public bool IsRightHandItemAvailable { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> RightHandDamages { get; private set; }
+        private DamageElementRangeAmounts _indexedRightHandDamages;
+        public DamageElementRangeAmounts IndexedRightHandDamages => _indexedRightHandDamages;
         public KeyValuePair<DamageElement, MinMaxFloat>? RightHandWeaponDamage { get; private set; }
         public CharacterItem LeftHandItem { get; private set; }
         public DamageInfo LeftHandDamageInfo { get; private set; }
         public bool IsLeftHandItemAvailable { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> LeftHandDamages { get; private set; }
+        private DamageElementRangeAmounts _indexedLeftHandDamages;
+        public DamageElementRangeAmounts IndexedLeftHandDamages => _indexedLeftHandDamages;
         public KeyValuePair<DamageElement, MinMaxFloat>? LeftHandWeaponDamage { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; private set; }
         public Dictionary<DamageElement, MinMaxFloat> IncreaseDamagesRate { get; private set; }
+        private DamageElementRangeAmounts _indexedIncreaseDamages;
+        private DamageElementRangeAmounts _indexedIncreaseDamagesRate;
+        public DamageElementRangeAmounts IndexedIncreaseDamages => _indexedIncreaseDamages;
+        public DamageElementRangeAmounts IndexedIncreaseDamagesRate => _indexedIncreaseDamagesRate;
         public Dictionary<BaseSkill, int> Skills { get; private set; }
         public Dictionary<StatusEffect, float> StatusEffectResistances { get; private set; }
         public Dictionary<EquipmentSet, int> EquipmentSets { get; private set; }
@@ -124,6 +138,13 @@ namespace MultiplayerARPG
 
         private void CleanCacheData()
         {
+            _indexedAttributes = default;
+            _indexedResistances = default;
+            _indexedArmors = default;
+            _indexedRightHandDamages = default;
+            _indexedLeftHandDamages = default;
+            _indexedIncreaseDamages = default;
+            _indexedIncreaseDamagesRate = default;
             // Release buffs
             if (IncreaseDamages != null)
             {
@@ -193,21 +214,33 @@ namespace MultiplayerARPG
         private void SetAttributes(Dictionary<Attribute, float> attributes)
         {
             Attributes = attributes;
+            AttributeAmounts indexed = default;
+            indexed.Combine(attributes);
+            _indexedAttributes = indexed;
         }
 
         private void SetResistances(Dictionary<DamageElement, float> resistances)
         {
             Resistances = resistances;
+            DamageElementFloatAmounts indexed = default;
+            indexed.Combine(resistances);
+            _indexedResistances = indexed;
         }
 
         private void SetArmors(Dictionary<DamageElement, float> armors)
         {
             Armors = armors;
+            DamageElementFloatAmounts indexed = default;
+            indexed.Combine(armors);
+            _indexedArmors = indexed;
         }
 
         private void SetRightHandDamages(Dictionary<DamageElement, MinMaxFloat> rightHandDamages)
         {
             RightHandDamages = rightHandDamages;
+            DamageElementRangeAmounts indexed = default;
+            indexed.Combine(rightHandDamages);
+            _indexedRightHandDamages = indexed;
         }
 
         private void SetRightHandWeaponDamage(KeyValuePair<DamageElement, MinMaxFloat> rightHandDamage)
@@ -218,6 +251,9 @@ namespace MultiplayerARPG
         private void SetLeftHandDamages(Dictionary<DamageElement, MinMaxFloat> leftHandDamages)
         {
             LeftHandDamages = leftHandDamages;
+            DamageElementRangeAmounts indexed = default;
+            indexed.Combine(leftHandDamages);
+            _indexedLeftHandDamages = indexed;
         }
 
         private void SetLeftHandWeaponDamage(KeyValuePair<DamageElement, MinMaxFloat> leftHandDamage)
@@ -228,11 +264,17 @@ namespace MultiplayerARPG
         private void SetIncreaseDamages(Dictionary<DamageElement, MinMaxFloat> increaseDamages)
         {
             IncreaseDamages = increaseDamages;
+            DamageElementRangeAmounts indexed = default;
+            indexed.Combine(increaseDamages);
+            _indexedIncreaseDamages = indexed;
         }
 
         private void SetIncreaseDamagesRate(Dictionary<DamageElement, MinMaxFloat> increaseDamagesRate)
         {
             IncreaseDamagesRate = increaseDamagesRate;
+            DamageElementRangeAmounts indexed = default;
+            indexed.Combine(increaseDamagesRate);
+            _indexedIncreaseDamagesRate = indexed;
         }
 
         private void SetSkills(Dictionary<BaseSkill, int> skills)
@@ -613,7 +655,7 @@ namespace MultiplayerARPG
             Attribute data;
             float result;
             if (GameInstance.Attributes.TryGetValue(dataId, out data) &&
-                Attributes.TryGetValue(data, out result))
+                _indexedAttributes.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return 0f;
         }
@@ -628,7 +670,7 @@ namespace MultiplayerARPG
             DamageElement data;
             float result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                Resistances.TryGetValue(data, out result))
+                _indexedResistances.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return 0f;
         }
@@ -643,7 +685,7 @@ namespace MultiplayerARPG
             DamageElement data;
             float result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                Armors.TryGetValue(data, out result))
+                _indexedArmors.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return 0f;
         }
@@ -658,7 +700,7 @@ namespace MultiplayerARPG
             DamageElement data;
             MinMaxFloat result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                RightHandDamages.TryGetValue(data, out result))
+                _indexedRightHandDamages.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return default;
         }
@@ -673,7 +715,7 @@ namespace MultiplayerARPG
             DamageElement data;
             MinMaxFloat result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                LeftHandDamages.TryGetValue(data, out result))
+                _indexedLeftHandDamages.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return default;
         }
