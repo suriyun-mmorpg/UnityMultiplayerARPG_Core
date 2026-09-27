@@ -313,19 +313,18 @@ namespace MultiplayerARPG
             return DamageableEntity == null ? false : DamageableEntity.CanReceiveDamageFrom(instigator);
         }
 
-        public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
+        public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
             if (DamageableEntity == null || !DamageableEntity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
                 return;
             ReceiveDamageWithoutConditionCheck(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
         }
 
-        public virtual void ReceiveDamageWithoutConditionCheck(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
+        public virtual void ReceiveDamageWithoutConditionCheck(Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
             if (DamageableEntity.IsHitBoxesOverridedByVehicle())
                 return;
-            DamageElementMinMaxFloatAmounts modifiedDamageAmounts = default;
-            modifiedDamageAmounts.Combine(damageAmounts);
+            DamageElementMinMaxFloatAmounts modifiedDamageAmounts = damageAmounts;
             modifiedDamageAmounts.Scale(damageRate);
             if (DamageableEntity is IVehicleEntity vehicleEntity)
             {

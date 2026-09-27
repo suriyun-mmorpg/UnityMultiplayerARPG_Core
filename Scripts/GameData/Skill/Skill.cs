@@ -124,7 +124,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
@@ -308,6 +308,17 @@ namespace MultiplayerARPG
             return base.TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
         }
 
+        public override bool TryGetIndexedAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel, out DamageElementFloatAmounts result)
+        {
+            result = default;
+            if (GetType() != typeof(Skill))
+                return base.TryGetIndexedAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
+            if (!IsAttack)
+                return base.TryGetIndexedAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
+            GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, ref result, skillLevel);
+            return true;
+        }
+
         public override bool TryGetAttackWeaponDamageMultiplicator(ICharacterData skillUser, int skillLevel, out float result)
         {
             if (IsAttack)
@@ -329,6 +340,17 @@ namespace MultiplayerARPG
                 return true;
             }
             return base.TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);
+        }
+
+        public override bool TryGetIndexedAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel, out DamageElementMinMaxFloatAmounts result)
+        {
+            result = default;
+            if (GetType() != typeof(Skill))
+                return base.TryGetIndexedAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);
+            if (!IsAttack)
+                return base.TryGetIndexedAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);
+            GameDataHelpers.CombineDamages(additionalDamageAmounts, ref result, skillLevel, 1f);
+            return true;
         }
 
         public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel)

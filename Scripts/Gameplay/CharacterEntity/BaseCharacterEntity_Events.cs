@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             DamageInfo damageInfo,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             AimPosition aimPosition)
         {
             if (onAttackRoutine != null)
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
@@ -104,7 +104,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             AimPosition aimPosition)

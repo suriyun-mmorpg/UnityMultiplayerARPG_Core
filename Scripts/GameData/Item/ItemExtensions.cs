@@ -340,7 +340,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!character.HasEnoughAttributeAmounts(item.RequireAttributeAmounts, true, out gameMessage, out _, willReleaseAttributes: true))
+            if (!character.HasEnoughAttributeAmounts(item.RequireAttributeAmounts, true, out gameMessage))
                 return false;
 
             return true;

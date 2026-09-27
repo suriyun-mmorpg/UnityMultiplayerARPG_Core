@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            DamageElementMinMaxFloatAmounts damageAmounts,
             BaseSkill skill,
             int skillLevel,
             HitRegisterData hitRegisterData,

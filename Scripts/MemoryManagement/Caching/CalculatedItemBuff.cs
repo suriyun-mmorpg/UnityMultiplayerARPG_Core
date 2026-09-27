@@ -12,45 +12,31 @@ namespace MultiplayerARPG
         private CharacterStats _cacheIncreaseStats = new CharacterStats();
         private CharacterStats _cacheIncreaseStatsRate = new CharacterStats();
         private AttributeAmounts _cacheIncreaseAttributes;
-        private readonly Dictionary<Attribute, float> _viewIncreaseAttributes;
+        private Dictionary<Attribute, float> _viewIncreaseAttributes;
         private AttributeAmounts _cacheIncreaseAttributesRate;
-        private readonly Dictionary<Attribute, float> _viewIncreaseAttributesRate;
+        private Dictionary<Attribute, float> _viewIncreaseAttributesRate;
         private DamageElementFloatAmounts _cacheIncreaseResistances;
-        private readonly Dictionary<DamageElement, float> _viewIncreaseResistances;
+        private Dictionary<DamageElement, float> _viewIncreaseResistances;
         private DamageElementFloatAmounts _cacheIncreaseArmors;
-        private readonly Dictionary<DamageElement, float> _viewIncreaseArmors;
+        private Dictionary<DamageElement, float> _viewIncreaseArmors;
         private DamageElementFloatAmounts _cacheIncreaseArmorsRate;
-        private readonly Dictionary<DamageElement, float> _viewIncreaseArmorsRate;
+        private Dictionary<DamageElement, float> _viewIncreaseArmorsRate;
         private DamageElementMinMaxFloatAmounts _cacheIncreaseDamages;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _viewIncreaseDamages;
+        private Dictionary<DamageElement, MinMaxFloat> _viewIncreaseDamages;
         private DamageElementMinMaxFloatAmounts _cacheIncreaseDamagesRate;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _viewIncreaseDamagesRate;
+        private Dictionary<DamageElement, MinMaxFloat> _viewIncreaseDamagesRate;
         private readonly Dictionary<BaseSkill, int> _cacheIncreaseSkills;
         private readonly Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances;
         private CalculatedItemRandomBonus _cacheRandomBonus = new CalculatedItemRandomBonus();
 
         public CalculatedItemBuff()
         {
-            _viewIncreaseAttributes = new Dictionary<Attribute, float>();
-            _viewIncreaseAttributesRate = new Dictionary<Attribute, float>();
-            _viewIncreaseResistances = new Dictionary<DamageElement, float>();
-            _viewIncreaseArmors = new Dictionary<DamageElement, float>();
-            _viewIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-            _viewIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _viewIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
             _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
         }
 
         public CalculatedItemBuff(IEquipmentItem item, int level, int randomSeed, byte version)
         {
-            _viewIncreaseAttributes = new Dictionary<Attribute, float>();
-            _viewIncreaseAttributesRate = new Dictionary<Attribute, float>();
-            _viewIncreaseResistances = new Dictionary<DamageElement, float>();
-            _viewIncreaseArmors = new Dictionary<DamageElement, float>();
-            _viewIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-            _viewIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _viewIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
             _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
             Build(item, level, randomSeed, version);
@@ -109,32 +95,33 @@ namespace MultiplayerARPG
             _cacheIncreaseStatsRate = item.GetIncreaseStatsRate(_level) + _cacheRandomBonus.GetIncreaseStatsRate();
             GameDataHelpers.CombineAttributes(item.IncreaseAttributes, ref _cacheIncreaseAttributes, _level, 1f);
             _cacheIncreaseAttributes.Combine(_cacheRandomBonus.GetIndexedIncreaseAttributes());
-            _cacheIncreaseAttributes.CopyTo(_viewIncreaseAttributes);
             GameDataHelpers.CombineAttributes(item.IncreaseAttributesRate, ref _cacheIncreaseAttributesRate, _level, 1f);
             _cacheIncreaseAttributesRate.Combine(_cacheRandomBonus.GetIndexedIncreaseAttributesRate());
-            _cacheIncreaseAttributesRate.CopyTo(_viewIncreaseAttributesRate);
             GameDataHelpers.CombineResistances(item.IncreaseResistances, ref _cacheIncreaseResistances, _level, 1f);
             _cacheIncreaseResistances.Combine(_cacheRandomBonus.GetIndexedIncreaseResistances());
-            _cacheIncreaseResistances.CopyTo(_viewIncreaseResistances);
             GameDataHelpers.CombineArmors(item.IncreaseArmors, ref _cacheIncreaseArmors, _level, 1f);
             _cacheIncreaseArmors.Combine(_cacheRandomBonus.GetIndexedIncreaseArmors());
-            _cacheIncreaseArmors.CopyTo(_viewIncreaseArmors);
             GameDataHelpers.CombineArmors(item.IncreaseArmorsRate, ref _cacheIncreaseArmorsRate, _level, 1f);
             _cacheIncreaseArmorsRate.Combine(_cacheRandomBonus.GetIndexedIncreaseArmorsRate());
-            _cacheIncreaseArmorsRate.CopyTo(_viewIncreaseArmorsRate);
             GameDataHelpers.CombineDamages(item.IncreaseDamages, ref _cacheIncreaseDamages, _level, 1f);
             _cacheIncreaseDamages.Combine(_cacheRandomBonus.GetIndexedIncreaseDamages());
-            _cacheIncreaseDamages.CopyToDictionary(_viewIncreaseDamages);
             GameDataHelpers.CombineDamages(item.IncreaseDamagesRate, ref _cacheIncreaseDamagesRate, _level, 1f);
             _cacheIncreaseDamagesRate.Combine(_cacheRandomBonus.GetIndexedIncreaseDamagesRate());
-            _cacheIncreaseDamagesRate.CopyToDictionary(_viewIncreaseDamagesRate);
             item.GetIncreaseSkills(_level, _cacheIncreaseSkills);
             GameDataHelpers.CombineSkills(_cacheIncreaseSkills, _cacheRandomBonus.GetIncreaseSkills());
             // TODO: Implement random bonus for increase status effect resistances
             item.GetIncreaseStatusEffectResistances(_level, _cacheIncreaseStatusEffectResistances);
 
+            RefreshAllocatedViews();
             if (GameExtensionInstance.onBuildCalculatedItemBuff != null)
             {
+                GetIncreaseAttributes();
+                GetIncreaseAttributesRate();
+                GetIncreaseResistances();
+                GetIncreaseArmors();
+                GetIncreaseArmorsRate();
+                GetIncreaseDamages();
+                GetIncreaseDamagesRate();
                 GameExtensionInstance.onBuildCalculatedItemBuff(this);
                 _cacheIncreaseAttributes = default;
                 _cacheIncreaseAttributes.Combine(_viewIncreaseAttributes);
@@ -151,6 +138,29 @@ namespace MultiplayerARPG
                 _cacheIncreaseDamagesRate = default;
                 _cacheIncreaseDamagesRate.Combine(_viewIncreaseDamagesRate);
             }
+            if (GameExtensionInstance.onBuildCalculatedItemBuffIndexed != null)
+            {
+                GameExtensionInstance.onBuildCalculatedItemBuffIndexed(this);
+                RefreshAllocatedViews();
+            }
+        }
+
+        private void RefreshAllocatedViews()
+        {
+            if (_viewIncreaseAttributes != null)
+                _cacheIncreaseAttributes.CopyTo(_viewIncreaseAttributes);
+            if (_viewIncreaseAttributesRate != null)
+                _cacheIncreaseAttributesRate.CopyTo(_viewIncreaseAttributesRate);
+            if (_viewIncreaseResistances != null)
+                _cacheIncreaseResistances.CopyTo(_viewIncreaseResistances);
+            if (_viewIncreaseArmors != null)
+                _cacheIncreaseArmors.CopyTo(_viewIncreaseArmors);
+            if (_viewIncreaseArmorsRate != null)
+                _cacheIncreaseArmorsRate.CopyTo(_viewIncreaseArmorsRate);
+            if (_viewIncreaseDamages != null)
+                _cacheIncreaseDamages.CopyToDictionary(_viewIncreaseDamages);
+            if (_viewIncreaseDamagesRate != null)
+                _cacheIncreaseDamagesRate.CopyToDictionary(_viewIncreaseDamagesRate);
         }
 
         public IEquipmentItem GetItem()
@@ -176,6 +186,14 @@ namespace MultiplayerARPG
         public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamages() => _cacheIncreaseDamages;
         public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamagesRate() => _cacheIncreaseDamagesRate;
 
+        public void SetIndexedIncreaseAttributes(AttributeAmounts value) { _cacheIncreaseAttributes = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseAttributesRate(AttributeAmounts value) { _cacheIncreaseAttributesRate = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseResistances(DamageElementFloatAmounts value) { _cacheIncreaseResistances = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseArmors(DamageElementFloatAmounts value) { _cacheIncreaseArmors = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseArmorsRate(DamageElementFloatAmounts value) { _cacheIncreaseArmorsRate = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseDamages(DamageElementMinMaxFloatAmounts value) { _cacheIncreaseDamages = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseDamagesRate(DamageElementMinMaxFloatAmounts value) { _cacheIncreaseDamagesRate = value; RefreshAllocatedViews(); }
+
         public CharacterStats GetIncreaseStats()
         {
             return _cacheIncreaseStats;
@@ -188,36 +206,71 @@ namespace MultiplayerARPG
 
         public Dictionary<Attribute, float> GetIncreaseAttributes()
         {
+            if (_viewIncreaseAttributes == null)
+            {
+                _viewIncreaseAttributes = new Dictionary<Attribute, float>();
+                _cacheIncreaseAttributes.CopyTo(_viewIncreaseAttributes);
+            }
             return _viewIncreaseAttributes;
         }
 
         public Dictionary<Attribute, float> GetIncreaseAttributesRate()
         {
+            if (_viewIncreaseAttributesRate == null)
+            {
+                _viewIncreaseAttributesRate = new Dictionary<Attribute, float>();
+                _cacheIncreaseAttributesRate.CopyTo(_viewIncreaseAttributesRate);
+            }
             return _viewIncreaseAttributesRate;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseResistances()
         {
+            if (_viewIncreaseResistances == null)
+            {
+                _viewIncreaseResistances = new Dictionary<DamageElement, float>();
+                _cacheIncreaseResistances.CopyTo(_viewIncreaseResistances);
+            }
             return _viewIncreaseResistances;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseArmors()
         {
+            if (_viewIncreaseArmors == null)
+            {
+                _viewIncreaseArmors = new Dictionary<DamageElement, float>();
+                _cacheIncreaseArmors.CopyTo(_viewIncreaseArmors);
+            }
             return _viewIncreaseArmors;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseArmorsRate()
         {
+            if (_viewIncreaseArmorsRate == null)
+            {
+                _viewIncreaseArmorsRate = new Dictionary<DamageElement, float>();
+                _cacheIncreaseArmorsRate.CopyTo(_viewIncreaseArmorsRate);
+            }
             return _viewIncreaseArmorsRate;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
         {
+            if (_viewIncreaseDamages == null)
+            {
+                _viewIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                _cacheIncreaseDamages.CopyToDictionary(_viewIncreaseDamages);
+            }
             return _viewIncreaseDamages;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate()
         {
+            if (_viewIncreaseDamagesRate == null)
+            {
+                _viewIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
+                _cacheIncreaseDamagesRate.CopyToDictionary(_viewIncreaseDamagesRate);
+            }
             return _viewIncreaseDamagesRate;
         }
 

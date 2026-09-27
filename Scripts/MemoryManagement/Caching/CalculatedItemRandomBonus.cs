@@ -14,13 +14,6 @@ namespace MultiplayerARPG
         private int _runtimeSlotGeneration = -1;
         private CharacterStats _cacheIncreaseStats = new CharacterStats();
         private CharacterStats _cacheIncreaseStatsRate = new CharacterStats();
-        private readonly Dictionary<Attribute, float> _cacheIncreaseAttributes;
-        private readonly Dictionary<Attribute, float> _cacheIncreaseAttributesRate;
-        private readonly Dictionary<DamageElement, float> _cacheIncreaseResistances;
-        private readonly Dictionary<DamageElement, float> _cacheIncreaseArmors;
-        private readonly Dictionary<DamageElement, float> _cacheIncreaseArmorsRate;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate;
         private readonly Dictionary<BaseSkill, int> _cacheIncreaseSkills;
         private AttributeAmounts _indexedIncreaseAttributes;
         private AttributeAmounts _indexedIncreaseAttributesRate;
@@ -35,25 +28,11 @@ namespace MultiplayerARPG
 
         public CalculatedItemRandomBonus()
         {
-            _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
-            _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
-            _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
-            _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
-            _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-            _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
         }
 
         public CalculatedItemRandomBonus(IEquipmentItem item, int level, int randomSeed, byte version)
         {
-            _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
-            _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
-            _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
-            _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
-            _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-            _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
             Build(item, level, randomSeed, version);
         }
@@ -74,13 +53,6 @@ namespace MultiplayerARPG
             _indexedIncreaseArmorsRate = default;
             _indexedIncreaseDamages = default;
             _indexedIncreaseDamagesRate = default;
-            _cacheIncreaseAttributes?.Clear();
-            _cacheIncreaseAttributesRate?.Clear();
-            _cacheIncreaseResistances?.Clear();
-            _cacheIncreaseArmors?.Clear();
-            _cacheIncreaseArmorsRate?.Clear();
-            _cacheIncreaseDamages?.Clear();
-            _cacheIncreaseDamagesRate?.Clear();
             _cacheIncreaseSkills?.Clear();
         }
 
@@ -665,48 +637,6 @@ namespace MultiplayerARPG
         public DamageElementFloatAmounts GetIndexedIncreaseArmorsRate() => _indexedIncreaseArmorsRate;
         public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamages() => _indexedIncreaseDamages;
         public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamagesRate() => _indexedIncreaseDamagesRate;
-
-        public Dictionary<Attribute, float> GetIncreaseAttributes()
-        {
-            _indexedIncreaseAttributes.CopyTo(_cacheIncreaseAttributes);
-            return _cacheIncreaseAttributes;
-        }
-
-        public Dictionary<Attribute, float> GetIncreaseAttributesRate()
-        {
-            _indexedIncreaseAttributesRate.CopyTo(_cacheIncreaseAttributesRate);
-            return _cacheIncreaseAttributesRate;
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseResistances()
-        {
-            _indexedIncreaseResistances.CopyTo(_cacheIncreaseResistances);
-            return _cacheIncreaseResistances;
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseArmors()
-        {
-            _indexedIncreaseArmors.CopyTo(_cacheIncreaseArmors);
-            return _cacheIncreaseArmors;
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseArmorsRate()
-        {
-            _indexedIncreaseArmorsRate.CopyTo(_cacheIncreaseArmorsRate);
-            return _cacheIncreaseArmorsRate;
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
-        {
-            _indexedIncreaseDamages.CopyToDictionary(_cacheIncreaseDamages);
-            return _cacheIncreaseDamages;
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate()
-        {
-            _indexedIncreaseDamagesRate.CopyToDictionary(_cacheIncreaseDamagesRate);
-            return _cacheIncreaseDamagesRate;
-        }
 
         public Dictionary<BaseSkill, int> GetIncreaseSkills()
         {

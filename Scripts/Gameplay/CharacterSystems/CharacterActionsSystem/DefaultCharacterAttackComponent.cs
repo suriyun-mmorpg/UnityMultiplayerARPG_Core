@@ -130,11 +130,9 @@ namespace MultiplayerARPG
 
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts;
-            if (isLeftHand && entityCaches.LeftHandDamages != null)
-                baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(entityCaches.LeftHandDamages);
-            else
-                baseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(entityCaches.RightHandDamages);
+            DamageElementMinMaxFloatAmounts baseDamageAmounts = isLeftHand && entityCaches.HasIndexedLeftHandDamages
+                ? entityCaches.IndexedLeftHandDamages
+                : entityCaches.IndexedRightHandDamages;
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileAttacking = Entity.GetMoveSpeedRateWhileAttacking(weaponItem);
@@ -222,7 +220,7 @@ namespace MultiplayerARPG
                 }
 
                 // Prepare damage amounts
-                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = Entity.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, triggerDurations.Length, 1);
+                List<DamageElementMinMaxFloatAmounts> damageAmounts = Entity.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, triggerDurations.Length, 1);
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
@@ -396,7 +394,7 @@ namespace MultiplayerARPG
             ApplyAttack(Entity.GetCaches(), validateData.WeaponHandlingState, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
         }
 
-        protected virtual async void ApplyAttack(CharacterDataCache entityCaches, WeaponHandlingState weaponHandlingState, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, AimPosition aimPosition)
+        protected virtual async void ApplyAttack(CharacterDataCache entityCaches, WeaponHandlingState weaponHandlingState, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<DamageElementMinMaxFloatAmounts> damageAmounts, AimPosition aimPosition)
         {
             if (triggerIndex >= damageAmounts.Count)
             {

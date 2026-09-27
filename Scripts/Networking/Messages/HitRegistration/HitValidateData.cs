@@ -23,7 +23,7 @@ namespace MultiplayerARPG
         /// <summary>
         /// Damage amounts each trigger
         /// </summary>
-        public List<Dictionary<DamageElement, MinMaxFloat>> DamageAmounts { get; set; }
+        public List<DamageElementMinMaxFloatAmounts> DamageAmounts { get; set; }
         /// <summary>
         /// Attack by left-hand weapon?, while aimming?, while in FPS view mode?
         /// </summary>

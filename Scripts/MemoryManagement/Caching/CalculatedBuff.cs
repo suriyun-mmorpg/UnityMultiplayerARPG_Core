@@ -15,25 +15,25 @@ namespace MultiplayerARPG
         private CharacterStats _cacheIncreaseStats;
         private CharacterStats _cacheIncreaseStatsRate;
         private AttributeAmounts _cacheIncreaseAttributes;
-        private readonly Dictionary<Attribute, float> _viewIncreaseAttributes;
+        private Dictionary<Attribute, float> _viewIncreaseAttributes;
         private AttributeAmounts _cacheIncreaseAttributesRate;
-        private readonly Dictionary<Attribute, float> _viewIncreaseAttributesRate;
+        private Dictionary<Attribute, float> _viewIncreaseAttributesRate;
         private DamageElementFloatAmounts _cacheIncreaseResistances;
-        private readonly Dictionary<DamageElement, float> _viewIncreaseResistances;
+        private Dictionary<DamageElement, float> _viewIncreaseResistances;
         private DamageElementFloatAmounts _cacheIncreaseArmors;
-        private readonly Dictionary<DamageElement, float> _viewIncreaseArmors;
+        private Dictionary<DamageElement, float> _viewIncreaseArmors;
         private DamageElementFloatAmounts _cacheIncreaseArmorsRate;
-        private readonly Dictionary<DamageElement, float> _viewIncreaseArmorsRate;
+        private Dictionary<DamageElement, float> _viewIncreaseArmorsRate;
         private DamageElementMinMaxFloatAmounts _cacheIncreaseDamages;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _viewIncreaseDamages;
+        private Dictionary<DamageElement, MinMaxFloat> _viewIncreaseDamages;
         private DamageElementMinMaxFloatAmounts _cacheIncreaseDamagesRate;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _viewIncreaseDamagesRate;
+        private Dictionary<DamageElement, MinMaxFloat> _viewIncreaseDamagesRate;
         private readonly Dictionary<BaseSkill, int> _cacheIncreaseSkills;
         private readonly Dictionary<BaseSkill, int> _cacheOverrideSkills;
         private readonly Dictionary<StatusEffect, float> _cacheIncreaseStatusEffectResistances;
         private readonly Dictionary<BuffRemoval, float> _cacheBuffRemovals;
         private DamageElementMinMaxFloatAmounts _cacheDamageOverTimes;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _viewDamageOverTimes;
+        private Dictionary<DamageElement, MinMaxFloat> _viewDamageOverTimes;
         private float _cacheRemoveBuffWhenAttackChance;
         private float _cacheRemoveBuffWhenAttackedChance;
         private float _cacheRemoveBuffWhenUseSkillChance;
@@ -45,34 +45,18 @@ namespace MultiplayerARPG
 
         public CalculatedBuff()
         {
-            _viewIncreaseAttributes = new Dictionary<Attribute, float>();
-            _viewIncreaseAttributesRate = new Dictionary<Attribute, float>();
-            _viewIncreaseResistances = new Dictionary<DamageElement, float>();
-            _viewIncreaseArmors = new Dictionary<DamageElement, float>();
-            _viewIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-            _viewIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _viewIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
             _cacheOverrideSkills = new Dictionary<BaseSkill, int>();
             _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
             _cacheBuffRemovals = new Dictionary<BuffRemoval, float>();
-            _viewDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
         }
 
         public CalculatedBuff(Buff buff, int level)
         {
-            _viewIncreaseAttributes = new Dictionary<Attribute, float>();
-            _viewIncreaseAttributesRate = new Dictionary<Attribute, float>();
-            _viewIncreaseResistances = new Dictionary<DamageElement, float>();
-            _viewIncreaseArmors = new Dictionary<DamageElement, float>();
-            _viewIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-            _viewIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _viewIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
             _cacheOverrideSkills = new Dictionary<BaseSkill, int>();
             _cacheIncreaseStatusEffectResistances = new Dictionary<StatusEffect, float>();
             _cacheBuffRemovals = new Dictionary<BuffRemoval, float>();
-            _viewDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
             Build(buff, level);
         }
 
@@ -124,26 +108,18 @@ namespace MultiplayerARPG
                 _cacheIncreaseStats = buff.GetIncreaseStats(level);
                 _cacheIncreaseStatsRate = buff.GetIncreaseStatsRate(level);
                 GameDataHelpers.CombineAttributes(buff.increaseAttributes, ref _cacheIncreaseAttributes, level, 1f);
-                _cacheIncreaseAttributes.CopyTo(_viewIncreaseAttributes);
                 GameDataHelpers.CombineAttributes(buff.increaseAttributesRate, ref _cacheIncreaseAttributesRate, level, 1f);
-                _cacheIncreaseAttributesRate.CopyTo(_viewIncreaseAttributesRate);
                 GameDataHelpers.CombineResistances(buff.increaseResistances, ref _cacheIncreaseResistances, level, 1f);
-                _cacheIncreaseResistances.CopyTo(_viewIncreaseResistances);
                 GameDataHelpers.CombineArmors(buff.increaseArmors, ref _cacheIncreaseArmors, level, 1f);
-                _cacheIncreaseArmors.CopyTo(_viewIncreaseArmors);
                 GameDataHelpers.CombineArmors(buff.increaseArmorsRate, ref _cacheIncreaseArmorsRate, level, 1f);
-                _cacheIncreaseArmorsRate.CopyTo(_viewIncreaseArmorsRate);
                 GameDataHelpers.CombineDamages(buff.increaseDamages, ref _cacheIncreaseDamages, level, 1f);
-                _cacheIncreaseDamages.CopyToDictionary(_viewIncreaseDamages);
                 GameDataHelpers.CombineDamages(buff.increaseDamagesRate, ref _cacheIncreaseDamagesRate, level, 1f);
-                _cacheIncreaseDamagesRate.CopyToDictionary(_viewIncreaseDamagesRate);
                 buff.GetIncreaseSkills(level, _cacheIncreaseSkills);
                 if (buff.isOverrideSkills)
                     buff.GetOverrideSkills(level, _cacheOverrideSkills);
                 buff.GetIncreaseStatusEffectResistances(level, _cacheIncreaseStatusEffectResistances);
                 buff.GetBuffRemovals(level, _cacheBuffRemovals);
                 GameDataHelpers.CombineDamages(buff.damageOverTimes, ref _cacheDamageOverTimes, level, 1f);
-                _cacheDamageOverTimes.CopyToDictionary(_viewDamageOverTimes);
                 _cacheRemoveBuffWhenAttackChance = buff.GetRemoveBuffWhenAttackChance(level);
                 _cacheRemoveBuffWhenAttackedChance = buff.GetRemoveBuffWhenAttackedChance(level);
                 _cacheRemoveBuffWhenUseSkillChance = buff.GetRemoveBuffWhenUseSkillChance(level);
@@ -162,8 +138,17 @@ namespace MultiplayerARPG
                 buff = Buff.Empty;
             }
 
+            RefreshAllocatedViews();
             if (GameExtensionInstance.onBuildCalculatedBuff != null)
             {
+                GetIncreaseAttributes();
+                GetIncreaseAttributesRate();
+                GetIncreaseResistances();
+                GetIncreaseArmors();
+                GetIncreaseArmorsRate();
+                GetIncreaseDamages();
+                GetIncreaseDamagesRate();
+                GetDamageOverTimes();
                 GameExtensionInstance.onBuildCalculatedBuff(this);
                 _cacheIncreaseAttributes = default;
                 _cacheIncreaseAttributes.Combine(_viewIncreaseAttributes);
@@ -182,6 +167,31 @@ namespace MultiplayerARPG
                 _cacheDamageOverTimes = default;
                 _cacheDamageOverTimes.Combine(_viewDamageOverTimes);
             }
+            if (GameExtensionInstance.onBuildCalculatedBuffIndexed != null)
+            {
+                GameExtensionInstance.onBuildCalculatedBuffIndexed(this);
+                RefreshAllocatedViews();
+            }
+        }
+
+        private void RefreshAllocatedViews()
+        {
+            if (_viewIncreaseAttributes != null)
+                _cacheIncreaseAttributes.CopyTo(_viewIncreaseAttributes);
+            if (_viewIncreaseAttributesRate != null)
+                _cacheIncreaseAttributesRate.CopyTo(_viewIncreaseAttributesRate);
+            if (_viewIncreaseResistances != null)
+                _cacheIncreaseResistances.CopyTo(_viewIncreaseResistances);
+            if (_viewIncreaseArmors != null)
+                _cacheIncreaseArmors.CopyTo(_viewIncreaseArmors);
+            if (_viewIncreaseArmorsRate != null)
+                _cacheIncreaseArmorsRate.CopyTo(_viewIncreaseArmorsRate);
+            if (_viewIncreaseDamages != null)
+                _cacheIncreaseDamages.CopyToDictionary(_viewIncreaseDamages);
+            if (_viewIncreaseDamagesRate != null)
+                _cacheIncreaseDamagesRate.CopyToDictionary(_viewIncreaseDamagesRate);
+            if (_viewDamageOverTimes != null)
+                _cacheDamageOverTimes.CopyToDictionary(_viewDamageOverTimes);
         }
 
         public Buff GetBuff()
@@ -239,6 +249,15 @@ namespace MultiplayerARPG
         public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamagesRate() => _cacheIncreaseDamagesRate;
         public DamageElementMinMaxFloatAmounts GetIndexedDamageOverTimes() => _cacheDamageOverTimes;
 
+        public void SetIndexedIncreaseAttributes(AttributeAmounts value) { _cacheIncreaseAttributes = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseAttributesRate(AttributeAmounts value) { _cacheIncreaseAttributesRate = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseResistances(DamageElementFloatAmounts value) { _cacheIncreaseResistances = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseArmors(DamageElementFloatAmounts value) { _cacheIncreaseArmors = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseArmorsRate(DamageElementFloatAmounts value) { _cacheIncreaseArmorsRate = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseDamages(DamageElementMinMaxFloatAmounts value) { _cacheIncreaseDamages = value; RefreshAllocatedViews(); }
+        public void SetIndexedIncreaseDamagesRate(DamageElementMinMaxFloatAmounts value) { _cacheIncreaseDamagesRate = value; RefreshAllocatedViews(); }
+        public void SetIndexedDamageOverTimes(DamageElementMinMaxFloatAmounts value) { _cacheDamageOverTimes = value; RefreshAllocatedViews(); }
+
         public CharacterStats GetIncreaseStats()
         {
             return _cacheIncreaseStats;
@@ -251,36 +270,71 @@ namespace MultiplayerARPG
 
         public Dictionary<Attribute, float> GetIncreaseAttributes()
         {
+            if (_viewIncreaseAttributes == null)
+            {
+                _viewIncreaseAttributes = new Dictionary<Attribute, float>();
+                _cacheIncreaseAttributes.CopyTo(_viewIncreaseAttributes);
+            }
             return _viewIncreaseAttributes;
         }
 
         public Dictionary<Attribute, float> GetIncreaseAttributesRate()
         {
+            if (_viewIncreaseAttributesRate == null)
+            {
+                _viewIncreaseAttributesRate = new Dictionary<Attribute, float>();
+                _cacheIncreaseAttributesRate.CopyTo(_viewIncreaseAttributesRate);
+            }
             return _viewIncreaseAttributesRate;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseResistances()
         {
+            if (_viewIncreaseResistances == null)
+            {
+                _viewIncreaseResistances = new Dictionary<DamageElement, float>();
+                _cacheIncreaseResistances.CopyTo(_viewIncreaseResistances);
+            }
             return _viewIncreaseResistances;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseArmors()
         {
+            if (_viewIncreaseArmors == null)
+            {
+                _viewIncreaseArmors = new Dictionary<DamageElement, float>();
+                _cacheIncreaseArmors.CopyTo(_viewIncreaseArmors);
+            }
             return _viewIncreaseArmors;
         }
 
         public Dictionary<DamageElement, float> GetIncreaseArmorsRate()
         {
+            if (_viewIncreaseArmorsRate == null)
+            {
+                _viewIncreaseArmorsRate = new Dictionary<DamageElement, float>();
+                _cacheIncreaseArmorsRate.CopyTo(_viewIncreaseArmorsRate);
+            }
             return _viewIncreaseArmorsRate;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
         {
+            if (_viewIncreaseDamages == null)
+            {
+                _viewIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                _cacheIncreaseDamages.CopyToDictionary(_viewIncreaseDamages);
+            }
             return _viewIncreaseDamages;
         }
 
         public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate()
         {
+            if (_viewIncreaseDamagesRate == null)
+            {
+                _viewIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
+                _cacheIncreaseDamagesRate.CopyToDictionary(_viewIncreaseDamagesRate);
+            }
             return _viewIncreaseDamagesRate;
         }
 
@@ -321,6 +375,11 @@ namespace MultiplayerARPG
 
         public Dictionary<DamageElement, MinMaxFloat> GetDamageOverTimes()
         {
+            if (_viewDamageOverTimes == null)
+            {
+                _viewDamageOverTimes = new Dictionary<DamageElement, MinMaxFloat>();
+                _cacheDamageOverTimes.CopyToDictionary(_viewDamageOverTimes);
+            }
             return _viewDamageOverTimes;
         }
 

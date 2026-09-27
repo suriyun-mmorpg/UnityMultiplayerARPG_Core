@@ -76,7 +76,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override async UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<DamageElementMinMaxFloatAmounts> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             ThrowableDamageEntity loadedDamageEntity;
 #if !DISABLE_ADDRESSABLES

@@ -10,7 +10,7 @@ namespace MultiplayerARPG
         protected int _simulateSeed;
         protected byte _triggerIndex;
         protected byte _spreadIndex;
-        protected Dictionary<DamageElement, MinMaxFloat> _damageAmounts;
+        protected DamageElementMinMaxFloatAmounts _damageAmounts;
         protected BaseSkill _skill;
         protected int _skillLevel;
         protected HitRegisterData _hitRegisterData;
@@ -61,7 +61,7 @@ namespace MultiplayerARPG
         protected virtual void OnDestroy()
         {
             CacheTransform = null;
-            _damageAmounts?.Clear();
+            _damageAmounts.Clear();
             _skill = null;
             _fxCollection = null;
         }
@@ -90,7 +90,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts,
+            DamageElementMinMaxFloatAmounts damageAmounts,
             BaseSkill skill,
             int skillLevel,
             HitRegisterData hitRegisterData)

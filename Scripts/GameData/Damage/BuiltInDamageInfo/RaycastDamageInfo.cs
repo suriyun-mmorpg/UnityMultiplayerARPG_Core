@@ -139,7 +139,7 @@ namespace MultiplayerARPG
             return isHeadshotInstantDeath;
         }
 
-        public override UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<DamageElementMinMaxFloatAmounts> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;
             bool isServer = attacker.IsServer;
@@ -194,7 +194,7 @@ namespace MultiplayerARPG
             Vector3 tempHitPoint;
             Vector3 tempHitNormal;
             GameObject tempGameObject;
-            Dictionary<DamageElement, MinMaxFloat> damage = damageAmounts[triggerIndex];
+            DamageElementMinMaxFloatAmounts damage = damageAmounts[triggerIndex];
 
             int layerMask = GameInstance.Singleton.GetDamageEntityHitLayerMask();
             int tempLoopCounter = 0;
@@ -298,7 +298,7 @@ namespace MultiplayerARPG
             , EntityInfo instigator
             , CharacterItem weapon
             , int simulateSeed
-            , Dictionary<DamageElement, MinMaxFloat> damage
+            , DamageElementMinMaxFloatAmounts damage
             , BaseSkill skill
             , int skillLevel
             , ref HitRegisterData hitRegData

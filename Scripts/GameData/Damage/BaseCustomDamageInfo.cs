@@ -14,7 +14,7 @@ namespace MultiplayerARPG
             byte triggerIndex,
             byte spreadIndex,
             Vector3 fireSpreadRange,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             BaseSkill skill,
             int skillLevel,
             AimPosition aimPosition);

@@ -572,9 +572,9 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Functions
-        public static bool DecreaseAmmos(this IList<CharacterItem> nonEquipItems, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, Dictionary<CharacterItem, int> decreaseItems)
+        public static bool DecreaseAmmos(this IList<CharacterItem> nonEquipItems, AmmoType ammoType, int amount, out DamageElementMinMaxFloatAmounts increaseDamageAmounts, Dictionary<CharacterItem, int> decreaseItems)
         {
-            increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+            increaseDamageAmounts = default;
             if (ammoType == null || amount < 0)
                 return false;
             HashSet<int> calculatingAmmoIds = new HashSet<int>();
@@ -616,7 +616,7 @@ namespace MultiplayerARPG
 
             if (calculatingAmmoIds.Count > 0)
                 combinedDamageAmounts.Scale(1f / calculatingAmmoIds.Count);
-            combinedDamageAmounts.CopyToDictionary(increaseDamageAmounts);
+            increaseDamageAmounts = combinedDamageAmounts;
 
             for (i = decreasingItemIndexes.Count - 1; i >= 0; --i)
             {
@@ -628,20 +628,20 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool applyChanges = true)
+        public static bool DecreaseAmmos(this ICharacterData data, AmmoType ammoType, int amount, out DamageElementMinMaxFloatAmounts increaseDamageAmounts, bool applyChanges = true)
         {
             if (data.CurrentHp <= 0)
             {
-                increaseDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
+                increaseDamageAmounts = default;
                 return false;
             }
             IList<CharacterItem> nonEquipItems = applyChanges ? data.NonEquipItems : new List<CharacterItem>(data.NonEquipItems);
             return nonEquipItems.DecreaseAmmos(ammoType, amount, out increaseDamageAmounts, null);
         }
 
-        public static bool DecreaseAmmos(ref EquipWeapons equipWeapons, IList<CharacterItem> nonEquipItems, bool isLimitSlot, int slotLimit, CharacterItem weapon, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true)
+        public static bool DecreaseAmmos(ref EquipWeapons equipWeapons, IList<CharacterItem> nonEquipItems, bool isLimitSlot, int slotLimit, CharacterItem weapon, bool isLeftHand, int amount, out DamageElementMinMaxFloatAmounts increaseDamages, bool validIfNoRequireAmmoType = true)
         {
-            increaseDamages = null;
+            increaseDamages = default;
 
             // Avoid null data
             if (weapon.IsEmptySlot())
@@ -655,9 +655,8 @@ namespace MultiplayerARPG
                 // Ammo capacity >= `amount` reduce loaded ammo
                 if (weapon.ammo >= amount)
                 {
-                    increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                     if (GameInstance.Items.TryGetValue(weapon.ammoDataId, out BaseItem tempItemData) && tempItemData is IAmmoItem tempAmmoItem)
-                        tempAmmoItem.GetIndexedIncreaseDamages().CopyToDictionary(increaseDamages);
+                        increaseDamages = tempAmmoItem.GetIndexedIncreaseDamages();
                     weapon.ammo -= amount;
                     if (isLeftHand)
                         equipWeapons.leftHand = weapon;
@@ -690,9 +689,8 @@ namespace MultiplayerARPG
                     if (nonEquipItems.DecreaseItems(tempAmmoDataId, amount, isLimitSlot))
                     {
                         nonEquipItems.FillEmptySlots(isLimitSlot, slotLimit);
-                        increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
                         if (tempItemData is IAmmoItem tempAmmoItem)
-                            tempAmmoItem.GetIndexedIncreaseDamages().CopyToDictionary(increaseDamages);
+                            increaseDamages = tempAmmoItem.GetIndexedIncreaseDamages();
                         return true;
                     }
                 }
@@ -703,35 +701,35 @@ namespace MultiplayerARPG
             return validIfNoRequireAmmoType;
         }
 
-        public static bool DecreaseAmmos(this ICharacterData data, bool isLeftHand, int amount, out Dictionary<DamageElement, MinMaxFloat> increaseDamages, bool validIfNoRequireAmmoType = true, bool applyChanges = true)
+        public static bool DecreaseAmmos(this ICharacterData data, bool isLeftHand, int amount, out DamageElementMinMaxFloatAmounts increaseDamages, bool validIfNoRequireAmmoType = true, bool applyChanges = true)
         {
             CharacterItem weapon = isLeftHand ? data.EquipWeapons.leftHand : data.EquipWeapons.rightHand;
             if (data.CurrentHp <= 0)
             {
-                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                increaseDamages = default;
                 return false;
             }
             IWeaponItem weaponItem = weapon.GetWeaponItem();
             if (weaponItem == null)
             {
-                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                increaseDamages = default;
                 return true;
             }
             bool hasAmmoType = weaponItem.WeaponType.AmmoType != null;
             bool hasAmmoItems = weaponItem.AmmoItemIds.Count > 0;
             if (!hasAmmoType && !hasAmmoItems)
             {
-                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                increaseDamages = default;
                 return true;
             }
             if (isLeftHand && data.EquipWeapons.leftHand.IsDiffer(weapon))
             {
-                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                increaseDamages = default;
                 return false;
             }
             if (!isLeftHand && data.EquipWeapons.rightHand.IsDiffer(weapon))
             {
-                increaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                increaseDamages = default;
                 return false;
             }
             EquipWeapons equipWeapons = data.EquipWeapons.Clone();
@@ -1001,6 +999,25 @@ namespace MultiplayerARPG
                     return i;
             }
             return -1;
+        }
+
+        public static bool HasEnoughAttributeAmounts(this ICharacterData data, AttributeAmounts requiredAttributeAmounts, bool sumWithEquipments, out UITextKeys gameMessage, float multiplier = 1)
+        {
+            AttributeAmounts currentAttributeAmounts = default;
+            data.GetAllStats(sumWithEquipments, false, true,
+                onGetIndexedAttributes: amounts => currentAttributeAmounts = amounts);
+            for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
+            {
+                if (requiredAttributeAmounts.Contains(i) &&
+                    (!currentAttributeAmounts.TryGetValue(i, out float currentAmount) ||
+                    currentAmount < Mathf.CeilToInt(requiredAttributeAmounts[i] * multiplier)))
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
+                    return false;
+                }
+            }
+            gameMessage = UITextKeys.NONE;
+            return true;
         }
 
         public static bool HasEnoughAttributeAmounts(this ICharacterData data, AttributeAmounts requiredAttributeAmounts, bool sumWithEquipments, out UITextKeys gameMessage, out Dictionary<Attribute, float> currentAttributeAmounts, float multiplier = 1, bool willReleaseAttributes = false)
@@ -1414,7 +1431,7 @@ namespace MultiplayerARPG
                 return false;
             }
 
-            if (!character.HasEnoughAttributeAmounts(usableItem.RequireAttributeAmounts, true, out gameMessage, out _, willReleaseAttributes: true))
+            if (!character.HasEnoughAttributeAmounts(usableItem.RequireAttributeAmounts, true, out gameMessage))
             {
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_ATTRIBUTE_AMOUNTS;
                 return false;
@@ -1460,21 +1477,17 @@ namespace MultiplayerARPG
             return validIfNoRequireAmmoType;
         }
 
-        public static List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(this ICharacterData data, bool isLeftHand, Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts, int triggerCount, int ammoAmountEachTrigger, bool validIfNoRequireAmmoType = true)
+        public static List<DamageElementMinMaxFloatAmounts> PrepareDamageAmounts(this ICharacterData data, bool isLeftHand, DamageElementMinMaxFloatAmounts baseDamageAmounts, int triggerCount, int ammoAmountEachTrigger, bool validIfNoRequireAmmoType = true)
         {
-            List<Dictionary<DamageElement, MinMaxFloat>> result = new List<Dictionary<DamageElement, MinMaxFloat>>();
-            Dictionary<DamageElement, MinMaxFloat> tempCombinedDamageAmounts;
-            Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamageAmounts;
+            List<DamageElementMinMaxFloatAmounts> result = new List<DamageElementMinMaxFloatAmounts>(triggerCount);
+            DamageElementMinMaxFloatAmounts tempIncreaseDamageAmounts;
             for (int i = 0; i < triggerCount; ++i)
             {
                 if (!DecreaseAmmos(data, isLeftHand, ammoAmountEachTrigger, out tempIncreaseDamageAmounts, validIfNoRequireAmmoType, false))
                     break;
-                DamageElementMinMaxFloatAmounts combinedDamageAmounts = default;
-                combinedDamageAmounts.Combine(baseDamageAmounts);
+                DamageElementMinMaxFloatAmounts combinedDamageAmounts = baseDamageAmounts;
                 combinedDamageAmounts.Combine(tempIncreaseDamageAmounts);
-                tempCombinedDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-                combinedDamageAmounts.CopyToDictionary(tempCombinedDamageAmounts);
-                result.Add(tempCombinedDamageAmounts);
+                result.Add(combinedDamageAmounts);
             }
             return result;
         }

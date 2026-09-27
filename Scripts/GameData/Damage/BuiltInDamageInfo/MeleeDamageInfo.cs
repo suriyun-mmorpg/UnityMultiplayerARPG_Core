@@ -47,7 +47,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
+        public override UniTask LaunchDamageEntity(BaseCharacterEntity attacker, bool isLeftHand, CharacterItem weapon, int simulateSeed, byte triggerIndex, byte spreadIndex, Vector3 fireSpreadRange, List<DamageElementMinMaxFloatAmounts> damageAmounts, BaseSkill skill, int skillLevel, AimPosition aimPosition)
         {
             bool isClient = attacker.IsClient;
             bool isServer = attacker.IsServer;
