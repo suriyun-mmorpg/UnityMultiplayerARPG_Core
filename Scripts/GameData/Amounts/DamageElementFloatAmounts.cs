@@ -237,12 +237,56 @@ namespace MultiplayerARPG
 
         public void Combine(DamageElementFloatAmounts source)
         {
-            uint mask = source.OccupiedMask;
-            for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)
-            {
-                if ((mask & (1u << i)) != 0)
-                    Add(i, source[i]);
-            }
+            uint mask = source._occupiedMask;
+            int count = RuntimeGameDataSlots.DamageElementCount;
+            // Amounts can outlive a slot registration; only combine currently registered slots.
+            if (count < Capacity)
+                mask &= (1u << count) - 1u;
+            if (mask == 0)
+                return;
+            if ((mask & (1u << 0)) != 0) _value1 += source._value1;
+            if ((mask & (1u << 1)) != 0) _value2 += source._value2;
+            if ((mask & (1u << 2)) != 0) _value3 += source._value3;
+            if ((mask & (1u << 3)) != 0) _value4 += source._value4;
+            if ((mask & (1u << 4)) != 0) _value5 += source._value5;
+            if ((mask & (1u << 5)) != 0) _value6 += source._value6;
+            if ((mask & (1u << 6)) != 0) _value7 += source._value7;
+            if ((mask & (1u << 7)) != 0) _value8 += source._value8;
+#if DAMAGE_ELEMENT_AMOUNTS_16 || DAMAGE_ELEMENT_AMOUNTS_32
+            if ((mask & (1u << 8)) != 0) _value9 += source._value9;
+            if ((mask & (1u << 9)) != 0) _value10 += source._value10;
+            if ((mask & (1u << 10)) != 0) _value11 += source._value11;
+            if ((mask & (1u << 11)) != 0) _value12 += source._value12;
+            if ((mask & (1u << 12)) != 0) _value13 += source._value13;
+            if ((mask & (1u << 13)) != 0) _value14 += source._value14;
+            if ((mask & (1u << 14)) != 0) _value15 += source._value15;
+            if ((mask & (1u << 15)) != 0) _value16 += source._value16;
+#endif
+#if DAMAGE_ELEMENT_AMOUNTS_32
+            if ((mask & (1u << 16)) != 0) _value17 += source._value17;
+            if ((mask & (1u << 17)) != 0) _value18 += source._value18;
+            if ((mask & (1u << 18)) != 0) _value19 += source._value19;
+            if ((mask & (1u << 19)) != 0) _value20 += source._value20;
+            if ((mask & (1u << 20)) != 0) _value21 += source._value21;
+            if ((mask & (1u << 21)) != 0) _value22 += source._value22;
+            if ((mask & (1u << 22)) != 0) _value23 += source._value23;
+            if ((mask & (1u << 23)) != 0) _value24 += source._value24;
+            if ((mask & (1u << 24)) != 0) _value25 += source._value25;
+            if ((mask & (1u << 25)) != 0) _value26 += source._value26;
+            if ((mask & (1u << 26)) != 0) _value27 += source._value27;
+            if ((mask & (1u << 27)) != 0) _value28 += source._value28;
+            if ((mask & (1u << 28)) != 0) _value29 += source._value29;
+            if ((mask & (1u << 29)) != 0) _value30 += source._value30;
+            if ((mask & (1u << 30)) != 0) _value31 += source._value31;
+            if ((mask & (1u << 31)) != 0) _value32 += source._value32;
+#endif
+            _occupiedMask |= mask;
+        }
+
+        public static DamageElementFloatAmounts operator +(DamageElementFloatAmounts left, DamageElementFloatAmounts right)
+        {
+            left.Combine(right);
+            return left;
         }
 
         public void MultiplyValues(DamageElementFloatAmounts rates)

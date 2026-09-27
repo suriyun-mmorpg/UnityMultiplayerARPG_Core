@@ -237,12 +237,184 @@ namespace MultiplayerARPG
 
         public void Combine(DamageElementMinMaxFloatAmounts source)
         {
-            uint mask = source.OccupiedMask;
-            for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)
+            uint mask = source._occupiedMask;
+            int count = RuntimeGameDataSlots.DamageElementCount;
+            // Amounts can outlive a slot registration; only combine currently registered slots.
+            if (count < Capacity)
+                mask &= (1u << count) - 1u;
+            if (mask == 0)
+                return;
+            if ((mask & (1u << 0)) != 0)
             {
-                if ((mask & (1u << i)) != 0)
-                    Add(i, source[i]);
+                _value1.min += source._value1.min;
+                _value1.max += source._value1.max;
             }
+            if ((mask & (1u << 1)) != 0)
+            {
+                _value2.min += source._value2.min;
+                _value2.max += source._value2.max;
+            }
+            if ((mask & (1u << 2)) != 0)
+            {
+                _value3.min += source._value3.min;
+                _value3.max += source._value3.max;
+            }
+            if ((mask & (1u << 3)) != 0)
+            {
+                _value4.min += source._value4.min;
+                _value4.max += source._value4.max;
+            }
+            if ((mask & (1u << 4)) != 0)
+            {
+                _value5.min += source._value5.min;
+                _value5.max += source._value5.max;
+            }
+            if ((mask & (1u << 5)) != 0)
+            {
+                _value6.min += source._value6.min;
+                _value6.max += source._value6.max;
+            }
+            if ((mask & (1u << 6)) != 0)
+            {
+                _value7.min += source._value7.min;
+                _value7.max += source._value7.max;
+            }
+            if ((mask & (1u << 7)) != 0)
+            {
+                _value8.min += source._value8.min;
+                _value8.max += source._value8.max;
+            }
+#if DAMAGE_ELEMENT_AMOUNTS_16 || DAMAGE_ELEMENT_AMOUNTS_32
+            if ((mask & (1u << 8)) != 0)
+            {
+                _value9.min += source._value9.min;
+                _value9.max += source._value9.max;
+            }
+            if ((mask & (1u << 9)) != 0)
+            {
+                _value10.min += source._value10.min;
+                _value10.max += source._value10.max;
+            }
+            if ((mask & (1u << 10)) != 0)
+            {
+                _value11.min += source._value11.min;
+                _value11.max += source._value11.max;
+            }
+            if ((mask & (1u << 11)) != 0)
+            {
+                _value12.min += source._value12.min;
+                _value12.max += source._value12.max;
+            }
+            if ((mask & (1u << 12)) != 0)
+            {
+                _value13.min += source._value13.min;
+                _value13.max += source._value13.max;
+            }
+            if ((mask & (1u << 13)) != 0)
+            {
+                _value14.min += source._value14.min;
+                _value14.max += source._value14.max;
+            }
+            if ((mask & (1u << 14)) != 0)
+            {
+                _value15.min += source._value15.min;
+                _value15.max += source._value15.max;
+            }
+            if ((mask & (1u << 15)) != 0)
+            {
+                _value16.min += source._value16.min;
+                _value16.max += source._value16.max;
+            }
+#endif
+#if DAMAGE_ELEMENT_AMOUNTS_32
+            if ((mask & (1u << 16)) != 0)
+            {
+                _value17.min += source._value17.min;
+                _value17.max += source._value17.max;
+            }
+            if ((mask & (1u << 17)) != 0)
+            {
+                _value18.min += source._value18.min;
+                _value18.max += source._value18.max;
+            }
+            if ((mask & (1u << 18)) != 0)
+            {
+                _value19.min += source._value19.min;
+                _value19.max += source._value19.max;
+            }
+            if ((mask & (1u << 19)) != 0)
+            {
+                _value20.min += source._value20.min;
+                _value20.max += source._value20.max;
+            }
+            if ((mask & (1u << 20)) != 0)
+            {
+                _value21.min += source._value21.min;
+                _value21.max += source._value21.max;
+            }
+            if ((mask & (1u << 21)) != 0)
+            {
+                _value22.min += source._value22.min;
+                _value22.max += source._value22.max;
+            }
+            if ((mask & (1u << 22)) != 0)
+            {
+                _value23.min += source._value23.min;
+                _value23.max += source._value23.max;
+            }
+            if ((mask & (1u << 23)) != 0)
+            {
+                _value24.min += source._value24.min;
+                _value24.max += source._value24.max;
+            }
+            if ((mask & (1u << 24)) != 0)
+            {
+                _value25.min += source._value25.min;
+                _value25.max += source._value25.max;
+            }
+            if ((mask & (1u << 25)) != 0)
+            {
+                _value26.min += source._value26.min;
+                _value26.max += source._value26.max;
+            }
+            if ((mask & (1u << 26)) != 0)
+            {
+                _value27.min += source._value27.min;
+                _value27.max += source._value27.max;
+            }
+            if ((mask & (1u << 27)) != 0)
+            {
+                _value28.min += source._value28.min;
+                _value28.max += source._value28.max;
+            }
+            if ((mask & (1u << 28)) != 0)
+            {
+                _value29.min += source._value29.min;
+                _value29.max += source._value29.max;
+            }
+            if ((mask & (1u << 29)) != 0)
+            {
+                _value30.min += source._value30.min;
+                _value30.max += source._value30.max;
+            }
+            if ((mask & (1u << 30)) != 0)
+            {
+                _value31.min += source._value31.min;
+                _value31.max += source._value31.max;
+            }
+            if ((mask & (1u << 31)) != 0)
+            {
+                _value32.min += source._value32.min;
+                _value32.max += source._value32.max;
+            }
+#endif
+            _occupiedMask |= mask;
+        }
+
+        public static DamageElementMinMaxFloatAmounts operator +(DamageElementMinMaxFloatAmounts left, DamageElementMinMaxFloatAmounts right)
+        {
+            left.Combine(right);
+            return left;
         }
 
         public void MultiplyRates(DamageElementMinMaxFloatAmounts rates)
