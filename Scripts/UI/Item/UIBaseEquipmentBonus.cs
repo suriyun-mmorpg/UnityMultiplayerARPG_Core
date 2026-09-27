@@ -418,93 +418,113 @@ namespace MultiplayerARPG
                 }
 
                 // Attributes
-                foreach (KeyValuePair<Attribute, float> entry in equipmentBonus.Attributes)
+                AttributeAmounts attributes = equipmentBonus.IndexedAttributes;
+                for (int slot = 0; slot < RuntimeGameDataSlots.AttributeCount; ++slot)
                 {
-                    if (entry.Key == null || entry.Value == 0)
+                    if (!attributes.Contains(slot) || attributes[slot] == 0)
                         continue;
+                    Attribute attribute = RuntimeGameDataSlots.GetAttribute(slot);
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyAttributeAmount),
-                        entry.Key.Title,
-                        entry.Value.ToBonusString("N0"));
+                        attribute.Title,
+                        attributes[slot].ToBonusString("N0"));
                 }
 
-                foreach (KeyValuePair<Attribute, float> entry in equipmentBonus.AttributesRate)
+                AttributeAmounts attributesRate = equipmentBonus.IndexedAttributesRate;
+                for (int slot = 0; slot < RuntimeGameDataSlots.AttributeCount; ++slot)
                 {
-                    if (entry.Key == null || entry.Value == 0)
+                    if (!attributesRate.Contains(slot) || attributesRate[slot] == 0)
                         continue;
+                    Attribute attribute = RuntimeGameDataSlots.GetAttribute(slot);
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyAttributeAmountRate),
-                        entry.Key.Title,
-                        (entry.Value * 100).ToBonusString("N2"));
+                        attribute.Title,
+                        (attributesRate[slot] * 100).ToBonusString("N2"));
                 }
 
                 // Resistances
-                foreach (KeyValuePair<DamageElement, float> entry in equipmentBonus.Resistances)
+                DamageElementFloatAmounts resistances = equipmentBonus.IndexedResistances;
+                for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
                 {
-                    if (entry.Key == null || entry.Value == 0)
+                    if (!resistances.Contains(slot) || resistances[slot] == 0)
                         continue;
+                    DamageElement damageElement = RuntimeGameDataSlots.GetDamageElement(slot);
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyResistanceAmount),
-                        entry.Key.Title,
-                        (entry.Value * 100).ToBonusString("N2"));
+                        damageElement.Title,
+                        (resistances[slot] * 100).ToBonusString("N2"));
                 }
 
                 // Damages
-                foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in equipmentBonus.Damages)
+                DamageElementMinMaxFloatAmounts damages = equipmentBonus.IndexedDamages;
+                for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
                 {
-                    if (entry.Key == null || (entry.Value.min == 0 && entry.Value.max == 0))
+                    if (!damages.Contains(slot))
                         continue;
+                    MinMaxFloat amount = damages[slot];
+                    if (amount.min == 0 && amount.max == 0)
+                        continue;
+                    DamageElement damageElement = RuntimeGameDataSlots.GetDamageElement(slot);
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyDamageAmount),
-                        entry.Key.Title,
-                        entry.Value.min.ToBonusString("N0"),
-                        entry.Value.max.ToString("N0"));
+                        damageElement.Title,
+                        amount.min.ToBonusString("N0"),
+                        amount.max.ToString("N0"));
                 }
 
-                foreach (KeyValuePair<DamageElement, MinMaxFloat> entry in equipmentBonus.DamagesRate)
+                DamageElementMinMaxFloatAmounts damagesRate = equipmentBonus.IndexedDamagesRate;
+                for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
                 {
-                    if (entry.Key == null || (entry.Value.min == 0 && entry.Value.max == 0))
+                    if (!damagesRate.Contains(slot))
                         continue;
+                    MinMaxFloat amount = damagesRate[slot];
+                    if (amount.min == 0 && amount.max == 0)
+                        continue;
+                    DamageElement damageElement = RuntimeGameDataSlots.GetDamageElement(slot);
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyDamageAmountRate),
-                        entry.Key.Title,
-                        (entry.Value.min * 100).ToBonusString("N2"),
-                        (entry.Value.max * 100).ToString("N2"));
+                        damageElement.Title,
+                        (amount.min * 100).ToBonusString("N2"),
+                        (amount.max * 100).ToString("N2"));
                 }
 
                 // Armors
-                foreach (KeyValuePair<DamageElement, float> entry in equipmentBonus.Armors)
+                DamageElementFloatAmounts armors = equipmentBonus.IndexedArmors;
+                for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
                 {
-                    if (entry.Value == 0)
+                    if (!armors.Contains(slot) || armors[slot] == 0)
                         continue;
+                    DamageElement damageElement = RuntimeGameDataSlots.GetDamageElement(slot);
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyArmorAmount),
-                        entry.Key.Title,
-                        entry.Value.ToBonusString("N0"));
+                        damageElement.Title,
+                        armors[slot].ToBonusString("N0"));
                 }
 
-                foreach (KeyValuePair<DamageElement, float> entry in equipmentBonus.ArmorsRate)
+                DamageElementFloatAmounts armorsRate = equipmentBonus.IndexedArmorsRate;
+                for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
                 {
-                    if (entry.Value == 0)
+                    if (!armorsRate.Contains(slot) || armorsRate[slot] == 0)
                         continue;
+                    DamageElement damageElement = RuntimeGameDataSlots.GetDamageElement(slot);
                     if (result.Length > 0)
                         result.Append('\n');
                     result.AppendFormat(
                         LanguageManager.GetText(formatKeyArmorAmountRate),
-                        entry.Key.Title,
-                        (entry.Value * 100).ToBonusString("N2"));
+                        damageElement.Title,
+                        (armorsRate[slot] * 100).ToBonusString("N2"));
                 }
 
                 // Skills
