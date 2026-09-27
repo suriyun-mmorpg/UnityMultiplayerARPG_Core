@@ -465,6 +465,12 @@ namespace MultiplayerARPG
                         requested = true;
                     }
                 }
+                if (requested && _queueUsingSkill.itemIndex < 0 && _queueUsingSkill.skill.IsChanneledAbility())
+                {
+                    _isFollowingTarget = false;
+                    _turnToTargetActionType = TargetActionType.None;
+                    _turnToTargetPosition = null;
+                }
                 ClearQueueUsingSkill();
                 return requested;
             }

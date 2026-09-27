@@ -577,6 +577,13 @@ namespace MultiplayerARPG
             _destination = null;
             BaseSkill skill = _queueUsingSkill.skill;
             int skillLevel = _queueUsingSkill.level;
+            if (_queueUsingSkill.itemIndex < 0 && skill.IsChanneledAbility() && !skill.RequiredTarget)
+            {
+                // Untargeted channels activate in the current facing direction.
+                RequestUsePendingSkill();
+                _isFollowingTarget = false;
+                return;
+            }
             BaseCharacterEntity targetEntity;
             // Point click mode always lock on target
             bool wasdLockAttackTarget = this.wasdLockAttackTarget || controllerMode == PlayerCharacterControllerMode.PointClick;
@@ -811,6 +818,16 @@ namespace MultiplayerARPG
             if (TargetGameEntity == null && !_turnToTargetPosition.HasValue)
             {
                 _turnToTargetActionType = TargetActionType.None;
+                return;
+            }
+            if (_turnToTargetActionType == TargetActionType.UseSkill &&
+                _queueUsingSkill.itemIndex < 0 && _queueUsingSkill.skill != null &&
+                _queueUsingSkill.skill.IsChanneledAbility())
+            {
+                RequestUsePendingSkill();
+                OnUseSkillOnEntity();
+                _turnToTargetActionType = TargetActionType.None;
+                _turnToTargetPosition = null;
                 return;
             }
             if (_turnToTargetActionType != TargetActionType.None)
