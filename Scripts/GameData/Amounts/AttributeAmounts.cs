@@ -308,15 +308,108 @@ namespace MultiplayerARPG
 
         public void MultiplyValues(AttributeAmounts rates)
         {
-            for (int i = 0; i < RuntimeGameDataSlots.AttributeCount; ++i)
-            {
-                if ((_occupiedMask & (1u << i)) == 0)
-                    continue;
-                if (!rates.Contains(i))
-                    Remove(i);
-                else
-                    this[i] *= rates[i];
-            }
+            uint mask = _occupiedMask;
+            int count = RuntimeGameDataSlots.AttributeCount;
+            if (count < Capacity)
+                mask &= (1u << count) - 1u;
+            if (mask == 0)
+                return;
+            uint shared = mask & rates._occupiedMask;
+            if ((mask & (1u << 0)) != 0) _value1 = (shared & (1u << 0)) != 0 ? _value1 * rates._value1 : default;
+            if ((mask & (1u << 1)) != 0) _value2 = (shared & (1u << 1)) != 0 ? _value2 * rates._value2 : default;
+            if ((mask & (1u << 2)) != 0) _value3 = (shared & (1u << 2)) != 0 ? _value3 * rates._value3 : default;
+            if ((mask & (1u << 3)) != 0) _value4 = (shared & (1u << 3)) != 0 ? _value4 * rates._value4 : default;
+            if ((mask & (1u << 4)) != 0) _value5 = (shared & (1u << 4)) != 0 ? _value5 * rates._value5 : default;
+            if ((mask & (1u << 5)) != 0) _value6 = (shared & (1u << 5)) != 0 ? _value6 * rates._value6 : default;
+            if ((mask & (1u << 6)) != 0) _value7 = (shared & (1u << 6)) != 0 ? _value7 * rates._value7 : default;
+            if ((mask & (1u << 7)) != 0) _value8 = (shared & (1u << 7)) != 0 ? _value8 * rates._value8 : default;
+#if ATTRIBUTE_AMOUNTS_16 || ATTRIBUTE_AMOUNTS_32
+            if ((mask & (1u << 8)) != 0) _value9 = (shared & (1u << 8)) != 0 ? _value9 * rates._value9 : default;
+            if ((mask & (1u << 9)) != 0) _value10 = (shared & (1u << 9)) != 0 ? _value10 * rates._value10 : default;
+            if ((mask & (1u << 10)) != 0) _value11 = (shared & (1u << 10)) != 0 ? _value11 * rates._value11 : default;
+            if ((mask & (1u << 11)) != 0) _value12 = (shared & (1u << 11)) != 0 ? _value12 * rates._value12 : default;
+            if ((mask & (1u << 12)) != 0) _value13 = (shared & (1u << 12)) != 0 ? _value13 * rates._value13 : default;
+            if ((mask & (1u << 13)) != 0) _value14 = (shared & (1u << 13)) != 0 ? _value14 * rates._value14 : default;
+            if ((mask & (1u << 14)) != 0) _value15 = (shared & (1u << 14)) != 0 ? _value15 * rates._value15 : default;
+            if ((mask & (1u << 15)) != 0) _value16 = (shared & (1u << 15)) != 0 ? _value16 * rates._value16 : default;
+#endif
+#if ATTRIBUTE_AMOUNTS_32
+            if ((mask & (1u << 16)) != 0) _value17 = (shared & (1u << 16)) != 0 ? _value17 * rates._value17 : default;
+            if ((mask & (1u << 17)) != 0) _value18 = (shared & (1u << 17)) != 0 ? _value18 * rates._value18 : default;
+            if ((mask & (1u << 18)) != 0) _value19 = (shared & (1u << 18)) != 0 ? _value19 * rates._value19 : default;
+            if ((mask & (1u << 19)) != 0) _value20 = (shared & (1u << 19)) != 0 ? _value20 * rates._value20 : default;
+            if ((mask & (1u << 20)) != 0) _value21 = (shared & (1u << 20)) != 0 ? _value21 * rates._value21 : default;
+            if ((mask & (1u << 21)) != 0) _value22 = (shared & (1u << 21)) != 0 ? _value22 * rates._value22 : default;
+            if ((mask & (1u << 22)) != 0) _value23 = (shared & (1u << 22)) != 0 ? _value23 * rates._value23 : default;
+            if ((mask & (1u << 23)) != 0) _value24 = (shared & (1u << 23)) != 0 ? _value24 * rates._value24 : default;
+            if ((mask & (1u << 24)) != 0) _value25 = (shared & (1u << 24)) != 0 ? _value25 * rates._value25 : default;
+            if ((mask & (1u << 25)) != 0) _value26 = (shared & (1u << 25)) != 0 ? _value26 * rates._value26 : default;
+            if ((mask & (1u << 26)) != 0) _value27 = (shared & (1u << 26)) != 0 ? _value27 * rates._value27 : default;
+            if ((mask & (1u << 27)) != 0) _value28 = (shared & (1u << 27)) != 0 ? _value28 * rates._value28 : default;
+            if ((mask & (1u << 28)) != 0) _value29 = (shared & (1u << 28)) != 0 ? _value29 * rates._value29 : default;
+            if ((mask & (1u << 29)) != 0) _value30 = (shared & (1u << 29)) != 0 ? _value30 * rates._value30 : default;
+            if ((mask & (1u << 30)) != 0) _value31 = (shared & (1u << 30)) != 0 ? _value31 * rates._value31 : default;
+            if ((mask & (1u << 31)) != 0) _value32 = (shared & (1u << 31)) != 0 ? _value32 * rates._value32 : default;
+#endif
+            _occupiedMask = (_occupiedMask & ~mask) | shared;
+        }
+
+        public void Scale(float multiplier)
+        {
+            uint mask = _occupiedMask;
+            int count = RuntimeGameDataSlots.AttributeCount;
+            if (count < Capacity)
+                mask &= (1u << count) - 1u;
+            if (mask == 0)
+                return;
+            if ((mask & (1u << 0)) != 0) _value1 *= multiplier;
+            if ((mask & (1u << 1)) != 0) _value2 *= multiplier;
+            if ((mask & (1u << 2)) != 0) _value3 *= multiplier;
+            if ((mask & (1u << 3)) != 0) _value4 *= multiplier;
+            if ((mask & (1u << 4)) != 0) _value5 *= multiplier;
+            if ((mask & (1u << 5)) != 0) _value6 *= multiplier;
+            if ((mask & (1u << 6)) != 0) _value7 *= multiplier;
+            if ((mask & (1u << 7)) != 0) _value8 *= multiplier;
+#if ATTRIBUTE_AMOUNTS_16 || ATTRIBUTE_AMOUNTS_32
+            if ((mask & (1u << 8)) != 0) _value9 *= multiplier;
+            if ((mask & (1u << 9)) != 0) _value10 *= multiplier;
+            if ((mask & (1u << 10)) != 0) _value11 *= multiplier;
+            if ((mask & (1u << 11)) != 0) _value12 *= multiplier;
+            if ((mask & (1u << 12)) != 0) _value13 *= multiplier;
+            if ((mask & (1u << 13)) != 0) _value14 *= multiplier;
+            if ((mask & (1u << 14)) != 0) _value15 *= multiplier;
+            if ((mask & (1u << 15)) != 0) _value16 *= multiplier;
+#endif
+#if ATTRIBUTE_AMOUNTS_32
+            if ((mask & (1u << 16)) != 0) _value17 *= multiplier;
+            if ((mask & (1u << 17)) != 0) _value18 *= multiplier;
+            if ((mask & (1u << 18)) != 0) _value19 *= multiplier;
+            if ((mask & (1u << 19)) != 0) _value20 *= multiplier;
+            if ((mask & (1u << 20)) != 0) _value21 *= multiplier;
+            if ((mask & (1u << 21)) != 0) _value22 *= multiplier;
+            if ((mask & (1u << 22)) != 0) _value23 *= multiplier;
+            if ((mask & (1u << 23)) != 0) _value24 *= multiplier;
+            if ((mask & (1u << 24)) != 0) _value25 *= multiplier;
+            if ((mask & (1u << 25)) != 0) _value26 *= multiplier;
+            if ((mask & (1u << 26)) != 0) _value27 *= multiplier;
+            if ((mask & (1u << 27)) != 0) _value28 *= multiplier;
+            if ((mask & (1u << 28)) != 0) _value29 *= multiplier;
+            if ((mask & (1u << 29)) != 0) _value30 *= multiplier;
+            if ((mask & (1u << 30)) != 0) _value31 *= multiplier;
+            if ((mask & (1u << 31)) != 0) _value32 *= multiplier;
+#endif
+        }
+
+        public static AttributeAmounts operator *(AttributeAmounts left, AttributeAmounts right)
+        {
+            left.MultiplyValues(right);
+            return left;
+        }
+
+        public static AttributeAmounts operator *(AttributeAmounts amounts, float multiplier)
+        {
+            amounts.Scale(multiplier);
+            return amounts;
         }
 
         public void ApplyRates(AttributeAmounts rates)
