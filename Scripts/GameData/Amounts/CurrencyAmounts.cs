@@ -60,6 +60,18 @@ namespace MultiplayerARPG
             return (_occupiedMask & (1u << index)) != 0;
         }
 
+        public bool HasSameAmounts(CurrencyAmounts other)
+        {
+            if (_occupiedMask != other._occupiedMask)
+                return false;
+            for (int slot = 0; slot < Capacity; ++slot)
+            {
+                if ((_occupiedMask & (1u << slot)) != 0 && this[slot] != other[slot])
+                    return false;
+            }
+            return true;
+        }
+
         public bool TryGetValue(int index, out int value)
         {
             if (Contains(index))

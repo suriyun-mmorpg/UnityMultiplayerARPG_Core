@@ -32,7 +32,7 @@ namespace MultiplayerARPG
 
         protected Dictionary<Attribute, float> _tempRequireAttributes = new Dictionary<Attribute, float>();
         protected Dictionary<BaseSkill, int> _tempRequireSkills = new Dictionary<BaseSkill, int>();
-        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempRequireCurrencies;
         protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
@@ -52,7 +52,6 @@ namespace MultiplayerARPG
             _tempRequireSkills.Clear();
             _tempRequireSkills = null;
             _tempRequireCurrencies.Clear();
-            _tempRequireCurrencies = null;
             _tempRequireItems.Clear();
             _tempRequireItems = null;
         }
@@ -197,7 +196,7 @@ namespace MultiplayerARPG
                     uiRequireCurrencyAmounts.isBonus = false;
                     uiRequireCurrencyAmounts.Show();
                     _tempRequireCurrencies.Clear();
-                    skill.GetRequireCurrencyAmounts(level, _tempRequireCurrencies);
+                    _tempRequireCurrencies = skill.GetRequireCurrencyAmounts(level);
                     uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
                 }
             }

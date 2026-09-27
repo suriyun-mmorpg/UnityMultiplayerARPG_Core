@@ -78,8 +78,6 @@ namespace MultiplayerARPG
         }
 
         [System.NonSerialized]
-        private Dictionary<Currency, int> _cacheRewardCurrencies = null;
-        [System.NonSerialized]
         private CurrencyAmounts _indexedRewardCurrencies;
         [System.NonSerialized]
         private int _currencyGeneration = -1;
@@ -91,26 +89,11 @@ namespace MultiplayerARPG
                 {
                     _indexedRewardCurrencies = default;
                     GameDataHelpers.CombineCurrencies(rewardCurrencies, ref _indexedRewardCurrencies, 1f);
-                    _cacheRewardCurrencies = null;
                     _currencyGeneration = RuntimeGameDataSlots.Generation;
                 }
                 return _indexedRewardCurrencies;
             }
         }
-        public Dictionary<Currency, int> CacheRewardCurrencies
-        {
-            get
-            {
-                CurrencyAmounts amounts = IndexedRewardCurrencies;
-                if (_cacheRewardCurrencies == null)
-                {
-                    _cacheRewardCurrencies = new Dictionary<Currency, int>();
-                    amounts.CopyTo(_cacheRewardCurrencies);
-                }
-                return _cacheRewardCurrencies;
-            }
-        }
-
         public QuestTask[] GetTasks(int index)
         {
             if (randomTasks == null || randomTasks.Length == 0)

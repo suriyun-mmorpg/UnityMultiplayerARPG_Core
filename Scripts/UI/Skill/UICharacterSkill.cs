@@ -104,7 +104,7 @@ namespace MultiplayerARPG
         protected bool _forceUpdateUi = true;
         protected Dictionary<Attribute, float> _tempRequireAttributes = new Dictionary<Attribute, float>();
         protected Dictionary<BaseSkill, int> _tempRequireSkills = new Dictionary<BaseSkill, int>();
-        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempRequireCurrencies;
         protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
@@ -159,7 +159,6 @@ namespace MultiplayerARPG
             _tempRequireSkills.Clear();
             _tempRequireSkills = null;
             _tempRequireCurrencies.Clear();
-            _tempRequireCurrencies = null;
             _tempRequireItems.Clear();
             _tempRequireItems = null;
         }
@@ -455,7 +454,7 @@ namespace MultiplayerARPG
             {
                 Skill.GetRequireAttributeAmounts(Level, _tempRequireAttributes);
                 Skill.GetRequireSkillLevels(Level, _tempRequireSkills);
-                Skill.GetRequireCurrencyAmounts(Level, _tempRequireCurrencies);
+                _tempRequireCurrencies = Skill.GetRequireCurrencyAmounts(Level);
                 Skill.GetRequireItemAmounts(Level, _tempRequireItems);
                 if (Skill == null || Level <= 0 ||
                     (!Skill.IsDisallowToLevelUp(Level) &&
@@ -464,7 +463,7 @@ namespace MultiplayerARPG
                     Skill.GetRequireCharacterGold(Level) <= 0 &&
                     _tempRequireAttributes.Count == 0 &&
                     _tempRequireSkills.Count == 0 &&
-                    _tempRequireCurrencies.Count == 0 &&
+                    _tempRequireCurrencies.IsEmpty &&
                     _tempRequireItems.Count == 0))
                 {
                     uiRequirement.Hide();

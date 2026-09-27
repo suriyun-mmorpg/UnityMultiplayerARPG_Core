@@ -20,12 +20,12 @@ namespace MultiplayerARPG
         public UICurrencyAmounts uiRequireCurrencyAmounts;
         public TextWrapper uiTextSimpleRequireGold;
 
-        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempRequireCurrencies;
         protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
         private readonly List<ItemAmount> _requireItems = new List<ItemAmount>();
         private readonly List<CurrencyAmount> _requireCurrencies = new List<CurrencyAmount>();
         private readonly Dictionary<BaseItem, int> _appliedRequireItems = new Dictionary<BaseItem, int>();
-        private readonly Dictionary<Currency, int> _appliedRequireCurrencies = new Dictionary<Currency, int>();
+        private CurrencyAmounts _appliedRequireCurrencies;
         private bool _appliedHasItems;
         private bool _appliedHasCurrencies;
         private int _lastRequireGold = -1;
@@ -41,7 +41,6 @@ namespace MultiplayerARPG
             _requireItems.Clear();
             _requireCurrencies.Clear();
             _tempRequireCurrencies.Clear();
-            _tempRequireCurrencies = null;
             _tempRequireItems.Clear();
             _tempRequireItems = null;
             _appliedRequireItems.Clear();
@@ -128,11 +127,11 @@ namespace MultiplayerARPG
                 else
                 {
                     _tempRequireCurrencies.Clear();
-                    CurrencyDictionaryView.CopyToDictionary(requireCurrencies, _tempRequireCurrencies, 1f);
-                    if (!_appliedHasCurrencies || !DictionaryEquals(_appliedRequireCurrencies, _tempRequireCurrencies))
+                    GameDataHelpers.CombineCurrencies(requireCurrencies, ref _tempRequireCurrencies, 1f);
+                    if (!_appliedHasCurrencies || !_appliedRequireCurrencies.HasSameAmounts(_tempRequireCurrencies))
                     {
                         _appliedHasCurrencies = true;
-                        CopyDictionary(_appliedRequireCurrencies, _tempRequireCurrencies);
+                        _appliedRequireCurrencies = _tempRequireCurrencies;
                         uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                         uiRequireCurrencyAmounts.Show();
                         uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;

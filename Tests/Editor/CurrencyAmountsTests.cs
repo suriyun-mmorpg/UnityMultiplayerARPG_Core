@@ -66,7 +66,7 @@ namespace MultiplayerARPG.Tests
         }
 
         [Test]
-        public void DuplicateEntriesRoundIndividuallyAndDictionaryViewKeepsExplicitZero()
+        public void DuplicateEntriesRoundIndividuallyAndKeepExplicitZero()
         {
             Currency coins = CreateAsset<Currency>();
             Currency gems = CreateAsset<Currency>();
@@ -86,18 +86,17 @@ namespace MultiplayerARPG.Tests
             Assert.That(amounts[gems.RuntimeSlot], Is.Zero);
             Assert.That(amounts.Contains(gems.RuntimeSlot), Is.True);
 
-            Dictionary<Currency, int> view = new Dictionary<Currency, int>();
-            amounts.CopyTo(view);
-            Assert.That(view[coins], Is.EqualTo(4));
-            Assert.That(view[gems], Is.Zero);
-            Assert.That(view.ToCurrencyAmounts()[coins.RuntimeSlot], Is.EqualTo(4));
-
             CurrencyAmounts fromList = default;
             GameDataHelpers.CombineCurrencies(new List<CurrencyAmount>(entries), ref fromList, 0.5f);
             Assert.That(fromList.OccupiedMask, Is.EqualTo(amounts.OccupiedMask));
             Assert.That(fromList[coins.RuntimeSlot], Is.EqualTo(4));
+            Assert.That(fromList.HasSameAmounts(amounts), Is.True);
+            CurrencyAmounts differentValue = fromList;
+            differentValue.Add(coins.RuntimeSlot, 1);
+            Assert.That(differentValue.HasSameAmounts(amounts), Is.False);
             amounts.Remove(gems.RuntimeSlot);
             Assert.That(amounts.Contains(gems.RuntimeSlot), Is.False);
+            Assert.That(fromList.HasSameAmounts(amounts), Is.False);
         }
 
         [Test]
@@ -128,14 +127,12 @@ namespace MultiplayerARPG.Tests
             Assert.That(skill.GetRequireCurrencyAmounts(99)[gems.RuntimeSlot], Is.EqualTo(1));
             Assert.That(quest.IndexedRewardCurrencies[coins.RuntimeSlot], Is.EqualTo(5));
             Assert.That(guild.IndexedCreateGuildRequireCurrencies[gems.RuntimeSlot], Is.EqualTo(1));
-            Assert.That(guild.CreateGuildRequireCurrencies[coins], Is.EqualTo(5));
 
             RuntimeGameDataSlots.Clear();
             RuntimeGameDataSlots.Register(gems);
             RuntimeGameDataSlots.Register(coins);
             Assert.That(quest.IndexedRewardCurrencies[coins.RuntimeSlot], Is.EqualTo(5));
             Assert.That(guild.IndexedCreateGuildRequireCurrencies[gems.RuntimeSlot], Is.EqualTo(1));
-            Assert.That(guild.CreateGuildRequireCurrencies[coins], Is.EqualTo(5));
         }
     }
 }

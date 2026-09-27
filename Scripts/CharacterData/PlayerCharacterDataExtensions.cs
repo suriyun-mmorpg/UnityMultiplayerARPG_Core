@@ -480,13 +480,6 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public static Dictionary<Currency, int> GetCurrencies(this IPlayerCharacterData data)
-        {
-            Dictionary<Currency, int> result = new Dictionary<Currency, int>();
-            data.GetIndexedCurrencies().CopyTo(result);
-            return result;
-        }
-
         public static CurrencyAmounts GetIndexedCurrencies(this IPlayerCharacterData data)
         {
             CurrencyAmounts result = default;
@@ -523,11 +516,6 @@ namespace MultiplayerARPG
             }
 #endif
             return result;
-        }
-
-        public static void IncreaseCurrencies(this IPlayerCharacterData character, Dictionary<Currency, int> currencyAmounts, float multiplier = 1)
-        {
-            character.IncreaseCurrencies(currencyAmounts.ToCurrencyAmounts(), multiplier);
         }
 
         public static void IncreaseCurrencies(this IPlayerCharacterData character, CurrencyAmounts currencyAmounts, float multiplier = 1)
@@ -578,11 +566,6 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static void DecreaseCurrencies(this IPlayerCharacterData character, Dictionary<Currency, int> currencyAmounts, float multiplier = 1)
-        {
-            character.DecreaseCurrencies(currencyAmounts.ToCurrencyAmounts(), multiplier);
-        }
-
         public static void DecreaseCurrencies(this IPlayerCharacterData character, CurrencyAmounts currencyAmounts, float multiplier = 1)
         {
             uint mask = currencyAmounts.OccupiedMask;
@@ -630,14 +613,6 @@ namespace MultiplayerARPG
                 character.Currencies.Add(CharacterCurrency.Create(currency, -amount));
             }
 #endif
-        }
-
-        public static bool HasEnoughCurrencyAmounts(this IPlayerCharacterData data, Dictionary<Currency, int> requiredCurrencyAmounts, out UITextKeys gameMessage, out Dictionary<Currency, int> currentCurrencyAmounts, float multiplier = 1)
-        {
-            bool result = data.HasEnoughCurrencyAmounts(requiredCurrencyAmounts.ToCurrencyAmounts(), out gameMessage, out CurrencyAmounts current, multiplier);
-            currentCurrencyAmounts = new Dictionary<Currency, int>();
-            current.CopyTo(currentCurrencyAmounts);
-            return result;
         }
 
         public static bool HasEnoughCurrencyAmounts(this IPlayerCharacterData data, CurrencyAmounts requiredCurrencyAmounts, out UITextKeys gameMessage, out CurrencyAmounts currentCurrencyAmounts, float multiplier = 1)

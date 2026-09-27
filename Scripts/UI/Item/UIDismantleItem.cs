@@ -32,7 +32,7 @@ namespace MultiplayerARPG
 
         protected bool _activated;
         protected string _activeItemId;
-        protected Dictionary<Currency, int> _tempReturningCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempReturningCurrencies;
         protected Dictionary<BaseItem, int> _tempReturningItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
@@ -43,7 +43,6 @@ namespace MultiplayerARPG
             uiTextReturnGold = null;
             uiTextDismantleAmount = null;
             _tempReturningCurrencies.Clear();
-            _tempReturningCurrencies = null;
             _tempReturningItems.Clear();
             _tempReturningItems = null;
         }
@@ -114,7 +113,7 @@ namespace MultiplayerARPG
                     uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
                     uiReturnCurrencies.Show();
                     _tempReturningCurrencies.Clear();
-                    CurrencyDictionaryView.CopyToDictionary(returningCurrencies, _tempReturningCurrencies, 1f);
+                    GameDataHelpers.CombineCurrencies(returningCurrencies, ref _tempReturningCurrencies, 1f);
                     uiReturnCurrencies.Data = _tempReturningCurrencies;
                 }
             }

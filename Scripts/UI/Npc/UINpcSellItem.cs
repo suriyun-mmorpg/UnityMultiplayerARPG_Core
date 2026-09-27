@@ -23,7 +23,7 @@ namespace MultiplayerARPG
 
         public int IndexOfData { get; protected set; }
 
-        protected Dictionary<Currency, int> _tempPriceCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempPriceCurrencies;
 
         protected override void Awake()
         {
@@ -42,7 +42,6 @@ namespace MultiplayerARPG
             if (uiAmountInputDialog != null && uiAmountInputDialog.uiInputField != null)
                 uiAmountInputDialog.uiInputField.onValueChanged.RemoveListener(OnBuyAmountChanged);
             _tempPriceCurrencies.Clear();
-            _tempPriceCurrencies = null;
         }
 
         public void Setup(NpcSellItem data, int indexOfData)
@@ -91,7 +90,7 @@ namespace MultiplayerARPG
                 uiSellPrices.displayType = UICurrencyAmounts.DisplayType.Simple;
                 uiSellPrices.isBonus = false;
                 _tempPriceCurrencies.Clear();
-                CurrencyDictionaryView.CopyToDictionary(Data.sellPrices, _tempPriceCurrencies, sellPriceRate);
+                GameDataHelpers.CombineCurrencies(Data.sellPrices, ref _tempPriceCurrencies, sellPriceRate);
                 uiSellPrices.Data = _tempPriceCurrencies;
             }
         }

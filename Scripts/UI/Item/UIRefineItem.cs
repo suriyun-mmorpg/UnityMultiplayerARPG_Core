@@ -42,7 +42,7 @@ namespace MultiplayerARPG
         protected bool _activated;
         protected string _activeItemId;
         protected List<int> _enhancerDataIds = new List<int>();
-        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempRequireCurrencies;
         protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
 
         protected override void Awake()
@@ -67,7 +67,6 @@ namespace MultiplayerARPG
             _enhancerDataIds.Clear();
             _enhancerDataIds = null;
             _tempRequireCurrencies.Clear();
-            _tempRequireCurrencies = null;
             _tempRequireItems.Clear();
             _tempRequireItems = null;
         }
@@ -218,7 +217,7 @@ namespace MultiplayerARPG
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.Show();
                     _tempRequireCurrencies.Clear();
-                    CurrencyDictionaryView.CopyToDictionary(refineLevel.RequireCurrencies, _tempRequireCurrencies, 1f);
+                    GameDataHelpers.CombineCurrencies(refineLevel.RequireCurrencies, ref _tempRequireCurrencies, 1f);
                     uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
                 }
             }

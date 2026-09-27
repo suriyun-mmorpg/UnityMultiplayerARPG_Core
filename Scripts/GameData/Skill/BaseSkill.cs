@@ -504,11 +504,6 @@ namespace MultiplayerARPG
             GameDataHelpers.CombineSkills(requirementEachLevels[level].skillLevels, result, 1f);
         }
 
-        public void GetRequireCurrencyAmounts(int level, Dictionary<Currency, int> result)
-        {
-            GetRequireCurrencyAmounts(level).CopyTo(result);
-        }
-
         public CurrencyAmounts GetRequireCurrencyAmounts(int level)
         {
             CurrencyAmounts result = default;
