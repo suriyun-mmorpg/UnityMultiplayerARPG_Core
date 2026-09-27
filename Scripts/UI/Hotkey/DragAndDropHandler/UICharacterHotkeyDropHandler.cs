@@ -47,6 +47,11 @@ namespace MultiplayerARPG
             UICharacterSkillDragHandler draggedSkillUI = dragHandler as UICharacterSkillDragHandler;
             if (draggedSkillUI != null)
             {
+                // Skills granted by character data can have no learned level, while the UI shows their effective level.
+                UICharacterSkill skillUI = draggedSkillUI.CacheUI;
+                CharacterSkill characterSkill = skillUI.Skill != null
+                    ? CharacterSkill.Create(skillUI.Skill, skillUI.Level)
+                    : default;
                 if (draggedSkillUI.Location == UICharacterSkillDragHandler.SourceLocation.Hotkey)
                 {
                     swappingHotkeyId = draggedSkillUI.UIHotkey.Data.hotkeyId;
@@ -54,10 +59,10 @@ namespace MultiplayerARPG
                     swappingDataId = uiCharacterHotkey.Data.relateId;
                 }
 
-                if (uiCharacterHotkey.CanAssignCharacterSkill(draggedSkillUI.CacheUI.Data.characterSkill))
+                if (uiCharacterHotkey.CanAssignCharacterSkill(characterSkill))
                 {
                     // Assign item to hotkey
-                    GameInstance.PlayingCharacterEntity.AssignSkillHotkey(uiCharacterHotkey.Data.hotkeyId, draggedSkillUI.CacheUI.CharacterSkill);
+                    GameInstance.PlayingCharacterEntity.AssignSkillHotkey(uiCharacterHotkey.Data.hotkeyId, characterSkill);
                 }
 
                 if (draggedSkillUI.Location == UICharacterSkillDragHandler.SourceLocation.Hotkey)

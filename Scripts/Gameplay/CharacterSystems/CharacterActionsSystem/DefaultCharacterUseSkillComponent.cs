@@ -174,7 +174,7 @@ namespace MultiplayerARPG
                 {
                     Entity.AddOrUpdateSkillUsage(SkillUsageType.UsableItem, itemDataId.Value, skillLevel);
                 }
-                else
+                else if (!skill.IsChanneledAbility())
                 {
                     Entity.AddOrUpdateSkillUsage(SkillUsageType.Skill, skill.DataId, skillLevel);
                 }
@@ -424,6 +424,8 @@ namespace MultiplayerARPG
             }
             finally
             {
+                if (IsServer && skill.IsChanneledAbility() && !itemDataId.HasValue)
+                    Entity.AddOrUpdateSkillUsage(SkillUsageType.Skill, skill.DataId, skillLevel);
                 if (skill.IsChanneledAbility() && !itemDataId.HasValue)
                 {
                     Entity.ActionModel?.StopSkillCastAnimation();
