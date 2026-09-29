@@ -517,13 +517,15 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.StopHost();
         }
 
-        public void OnCharacterDead()
+        public void OnCharacterDead(BaseCharacterEntity target)
         {
+            MobileInputToggleInstanceManager.UnToggleAll();
             onCharacterDead.Invoke();
         }
 
-        public void OnCharacterRespawn()
+        public void OnCharacterRespawn(BaseCharacterEntity target)
         {
+            MobileInputToggleInstanceManager.UnToggleAll();
             onCharacterRespawn.Invoke();
         }
 

@@ -93,7 +93,7 @@ namespace MultiplayerARPG
             Entity.onDead.AddListener(OnDead);
         }
 
-        protected void OnDead()
+        protected void OnDead(BaseCharacterEntity target)
         {
             if (!IsServer)
                 return;

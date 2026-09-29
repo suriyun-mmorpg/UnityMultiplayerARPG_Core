@@ -320,7 +320,7 @@ namespace MultiplayerARPG
                 ClearActionStates();
             }
             if (onDead != null)
-                onDead.Invoke();
+                onDead.Invoke(this);
         }
 
         [AllRpc]
@@ -329,7 +329,7 @@ namespace MultiplayerARPG
             if (IsOwnerClient)
                 ClearActionStates();
             if (onRespawn != null)
-                onRespawn.Invoke();
+                onRespawn.Invoke(this);
         }
 
         [AllRpc]
@@ -337,7 +337,7 @@ namespace MultiplayerARPG
         {
             PlayLevelUpEffects();
             if (onLevelUp != null)
-                onLevelUp.Invoke();
+                onLevelUp.Invoke(this);
         }
 
         protected virtual void PlayLevelUpEffects()
