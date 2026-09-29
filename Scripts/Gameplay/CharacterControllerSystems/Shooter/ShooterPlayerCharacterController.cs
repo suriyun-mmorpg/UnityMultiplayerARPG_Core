@@ -551,6 +551,32 @@ namespace MultiplayerARPG
             }
         }
 
+        public ValueOverride<FireType> OverrideRightHandFireType { get; private set; } = new ValueOverride<FireType>();
+        public FireType CurrentRightHandFireType
+        {
+            get
+            {
+                if (OverrideRightHandFireType.TryGetValue(out FireType overrideFireType))
+                    return overrideFireType;
+                if (_rightHandWeapon != null)
+                    return _rightHandWeapon.FireType;
+                return FireType.Automatic;
+            }
+        }
+
+        public ValueOverride<FireType> OverrideLeftHandFireType { get; private set; } = new ValueOverride<FireType>();
+        public FireType CurrentLeftHandFireType
+        {
+            get
+            {
+                if (OverrideLeftHandFireType.TryGetValue(out FireType overrideFireType))
+                    return overrideFireType;
+                if (_leftHandWeapon != null)
+                    return _leftHandWeapon.FireType;
+                return FireType.Automatic;
+            }
+        }
+
         public byte PauseFireInputFrames { get; set; }
         public bool IsAimming
         {
@@ -1506,17 +1532,8 @@ namespace MultiplayerARPG
         {
             _updatingInputs = true;
             // Prepare fire type data
-            FireType rightHandFireType = GameInstance.Singleton.DefaultWeaponItem.FireType;
-            if (_rightHandWeapon != null)
-            {
-                rightHandFireType = _rightHandWeapon.FireType;
-            }
-            // Prepare fire type data
-            FireType leftHandFireType = GameInstance.Singleton.DefaultWeaponItem.FireType;
-            if (_leftHandWeapon != null)
-            {
-                leftHandFireType = _leftHandWeapon.FireType;
-            }
+            FireType rightHandFireType = CurrentRightHandFireType;
+            FireType leftHandFireType = CurrentLeftHandFireType;
             // Have to release fire key, then check press fire key later on next frame
             if (_mustReleaseFireKey)
             {
