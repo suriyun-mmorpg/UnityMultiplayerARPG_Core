@@ -2064,7 +2064,7 @@ namespace MultiplayerARPG
             WeaponAbilityState = WeaponAbility.UpdateActivation(WeaponAbilityState, isBlockController, deltaTime);
         }
 
-        protected virtual void DeactivateWeaponAbility()
+        public virtual void DeactivateWeaponAbility()
         {
             if (WeaponAbility == null)
                 return;
