@@ -163,9 +163,23 @@ namespace MultiplayerARPG
         }
 
         protected readonly Dictionary<int, BaseCharacterModel> _characterModelByEntityId = new Dictionary<int, BaseCharacterModel>();
+        private int _characterLoadVersion;
         protected BaseCharacterModel _selectedModel;
         public BaseCharacterModel SelectedModel { get { return _selectedModel; } }
         protected readonly Dictionary<int, List<PlayerCharacter>> _playerCharactersByEntityId = new Dictionary<int, List<PlayerCharacter>>();
+#if !DISABLE_ADDRESSABLES
+        private readonly List<AsyncOperationHandle<GameObject>> _loadedCharacterPrefabHandles = new List<AsyncOperationHandle<GameObject>>();
+
+        private void ReleaseCharacterPrefabs()
+        {
+            foreach (AsyncOperationHandle<GameObject> handle in _loadedCharacterPrefabHandles)
+            {
+                if (handle.IsValid())
+                    Addressables.Release(handle);
+            }
+            _loadedCharacterPrefabHandles.Clear();
+        }
+#endif
         protected List<PlayerCharacter> _selectableCharacterClasses;
         public List<PlayerCharacter> SelectableCharacterClasses { get { return _selectableCharacterClasses; } }
         protected PlayerCharacter _selectedPlayerCharacter;
@@ -190,6 +204,9 @@ namespace MultiplayerARPG
 
         protected override void OnDestroy()
         {
+#if !DISABLE_ADDRESSABLES
+            ReleaseCharacterPrefabs();
+#endif
             base.OnDestroy();
             characterModelContainer = null;
             uiCharacterPrefab = null;
@@ -265,6 +282,7 @@ namespace MultiplayerARPG
         protected virtual async Task<List<PlayerCharacterData>> GetCreatableCharacters()
         {
             List<PlayerCharacterData> result = new List<PlayerCharacterData>();
+            int loadVersion = _characterLoadVersion;
 #if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             if (GameInstance.PlayerCharacterEntities.Count > 0)
             {
@@ -282,55 +300,76 @@ namespace MultiplayerARPG
 #if !DISABLE_ADDRESSABLES
             if (GameInstance.AddressablePlayerCharacterEntities.Count > 0)
             {
-                List<AsyncOperationHandle<GameObject>> asyncOps = new List<AsyncOperationHandle<GameObject>>();
-                List<Task<GameObject>> loadTasks = new List<Task<GameObject>>();
                 foreach (AssetReferenceBasePlayerCharacterEntity entry in GameInstance.AddressablePlayerCharacterEntities.Values)
                 {
-                    AsyncOperationHandle<GameObject> asyncOp = Addressables.LoadAssetAsync<GameObject>(entry.RuntimeKey);
-                    asyncOps.Add(asyncOp);
-                    loadTasks.Add(asyncOp.Task);
-                }
-                await Task.WhenAll(loadTasks);
-                for (int i = 0; i < loadTasks.Count; ++i)
-                {
-                    GameObject loadedObject = asyncOps[i].Result;
-                    if (!loadedObject.TryGetComponent(out BasePlayerCharacterEntity prefab))
+                    if (loadVersion != _characterLoadVersion || !isActiveAndEnabled)
+                        break;
+                    AsyncOperationHandle<GameObject> asyncOp = default;
+                    bool retainHandle = false;
+                    try
                     {
-                        Addressables.Release(asyncOps[i]);
-                        continue;
+                        asyncOp = Addressables.LoadAssetAsync<GameObject>(entry.RuntimeKey);
+                        GameObject loadedObject = await asyncOp.Task;
+                        if (loadVersion != _characterLoadVersion || !isActiveAndEnabled)
+                            break;
+                        if (loadedObject == null || !loadedObject.TryGetComponent(out BasePlayerCharacterEntity prefab))
+                            continue;
+                        if (RaceToggles.Count > 0 && prefab.Race != null && !SelectedRaces.Contains(prefab.Race))
+                            continue;
+                        PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
+                        data.CharacterName = prefab.EntityTitle;
+                        result.Add(data);
+                        _playerCharactersByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
+                        _loadedCharacterPrefabHandles.Add(asyncOp);
+                        retainHandle = true;
                     }
-                    if (RaceToggles.Count > 0 && prefab.Race != null && !SelectedRaces.Contains(prefab.Race))
+                    catch (System.Exception ex)
                     {
-                        Addressables.Release(asyncOps[i]);
-                        continue;
+                        Debug.LogException(ex);
                     }
-                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
-                    data.CharacterName = prefab.EntityTitle;
-                    result.Add(data);
-                    _playerCharactersByEntityId[prefab.EntityId] = new List<PlayerCharacter>(prefab.CharacterDatabases);
-                    if (RaceToggles.Count > 0 && prefab.Race != null && !SelectedRaces.Contains(prefab.Race))
-                        Addressables.Release(asyncOps[i]);
+                    finally
+                    {
+                        if (!retainHandle && asyncOp.IsValid())
+                            Addressables.Release(asyncOp);
+                    }
                 }
             }
 #endif
             if (GameInstance.PlayerCharacterEntityMetaDataList.Count > 0)
             {
-#if !DISABLE_ADDRESSABLES
-                List<AsyncOperationHandle<GameObject>> asyncOps = new List<AsyncOperationHandle<GameObject>>();
-                List<Task<GameObject>> loadTasks = new List<Task<GameObject>>();
-#endif
-                List<PlayerCharacterEntityMetaData> loadMetaDataList = new List<PlayerCharacterEntityMetaData>();
                 foreach (PlayerCharacterEntityMetaData entry in GameInstance.PlayerCharacterEntityMetaDataList.Values)
                 {
+                    if (loadVersion != _characterLoadVersion || !isActiveAndEnabled)
+                        break;
                     if (RaceToggles.Count > 0 && entry.Race != null && !SelectedRaces.Contains(entry.Race))
                         continue;
 #if !DISABLE_ADDRESSABLES
                     if (entry.AddressableEntityPrefab.IsDataValid())
                     {
-                        AsyncOperationHandle<GameObject> asyncOp = Addressables.LoadAssetAsync<GameObject>(entry.AddressableEntityPrefab.RuntimeKey);
-                        asyncOps.Add(asyncOp);
-                        loadTasks.Add(asyncOp.Task);
-                        loadMetaDataList.Add(entry);
+                        AsyncOperationHandle<GameObject> asyncOp = default;
+                        try
+                        {
+                            asyncOp = Addressables.LoadAssetAsync<GameObject>(entry.AddressableEntityPrefab.RuntimeKey);
+                            GameObject loadedObject = await asyncOp.Task;
+                            if (loadVersion != _characterLoadVersion || !isActiveAndEnabled)
+                                break;
+                            if (loadedObject != null && loadedObject.TryGetComponent(out BasePlayerCharacterEntity prefab))
+                            {
+                                PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
+                                data.CharacterName = entry.Title;
+                                data.EntityId = entry.DataId;
+                                result.Add(data);
+                            }
+                        }
+                        catch (System.Exception ex)
+                        {
+                            Debug.LogException(ex);
+                        }
+                        finally
+                        {
+                            if (asyncOp.IsValid())
+                                Addressables.Release(asyncOp);
+                        }
                     }
 #else
                     if (false) { }
@@ -345,23 +384,6 @@ namespace MultiplayerARPG
                     }
                     _playerCharactersByEntityId[entry.DataId] = new List<PlayerCharacter>(entry.CharacterDatabases);
                 }
-#if !DISABLE_ADDRESSABLES
-                await Task.WhenAll(loadTasks);
-                for (int i = 0; i < loadTasks.Count; ++i)
-                {
-                    GameObject loadedObject = asyncOps[i].Result;
-                    if (!loadedObject.TryGetComponent(out BasePlayerCharacterEntity prefab))
-                    {
-                        Addressables.Release(asyncOps[i]);
-                        continue;
-                    }
-                    PlayerCharacterData data = prefab.CloneTo(new PlayerCharacterData(), true, true, true, false, false, true, false, false, false, false, false, false, false, false, false);
-                    data.CharacterName = loadMetaDataList[i].Title;
-                    data.EntityId = loadMetaDataList[i].DataId;
-                    result.Add(data);
-                    Addressables.Release(asyncOps[i]);
-                }
-#endif
             }
             await UniTask.Yield();
             return result;
@@ -374,17 +396,24 @@ namespace MultiplayerARPG
 
         protected virtual async void LoadCharacters()
         {
+            int loadVersion = ++_characterLoadVersion;
             // Remove all models
             characterModelContainer.DestroyChildren();
             _characterModelByEntityId.Clear();
             // Remove all cached data
             _playerCharactersByEntityId.Clear();
+#if !DISABLE_ADDRESSABLES
+            ReleaseCharacterPrefabs();
+#endif
             // Clear character selection
             CharacterSelectionManager.Clear();
             CharacterList.HideAll();
             // Show list of characters that can be created
             PlayerCharacterData firstData = null;
-            CharacterList.Generate(await GetCreatableCharacters(), (index, characterData, ui) =>
+            List<PlayerCharacterData> creatableCharacters = await GetCreatableCharacters();
+            if (loadVersion != _characterLoadVersion || !isActiveAndEnabled)
+                return;
+            CharacterList.Generate(creatableCharacters, (index, characterData, ui) =>
             {
                 // Prepare data
                 BaseCharacter playerCharacter = _playerCharactersByEntityId[characterData.EntityId][0];
@@ -483,7 +512,14 @@ namespace MultiplayerARPG
 
         protected virtual void OnDisable()
         {
+            ++_characterLoadVersion;
             characterModelContainer.DestroyChildren();
+#if !DISABLE_ADDRESSABLES
+            ReleaseCharacterPrefabs();
+#endif
+            _playerCharactersByEntityId.Clear();
+            _selectableCharacterClasses = null;
+            _selectedPlayerCharacter = null;
             uiInputCharacterName.text = string.Empty;
         }
 

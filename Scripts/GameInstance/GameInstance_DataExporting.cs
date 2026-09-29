@@ -144,25 +144,29 @@ namespace MultiplayerARPG
             {
                 if (!kv.Value.IsDataValid())
                     continue;
-                var op = kv.Value.InstantiateAsync();
-                op.WaitForCompletion();
-                BasePlayerCharacterEntity comp = op.Result.GetComponent<BasePlayerCharacterEntity>();
-                if (comp.CharacterDatabases == null || comp.CharacterDatabases.Length == 0)
+                var op = Addressables.LoadAssetAsync<GameObject>(kv.Value.RuntimeKey);
+                try
                 {
-                    Addressables.ReleaseInstance(op.Result);
-                    Addressables.Release(op);
-                    DestroyImmediate(op.Result);
-                    continue;
+                    GameObject prefab = op.WaitForCompletion();
+                    if (prefab == null || !prefab.TryGetComponent(out BasePlayerCharacterEntity comp) ||
+                        comp.CharacterDatabases == null || comp.CharacterDatabases.Length == 0)
+                        continue;
+                    if (!data.AvailableCharacters.ContainsKey(kv.Key))
+                        data.AvailableCharacters[kv.Key] = new Dictionary<int, PlayerCharacterData>();
+                    foreach (var database in comp.CharacterDatabases)
+                    {
+                        data.AvailableCharacters[kv.Key][database.DataId] = new PlayerCharacterData().SetNewPlayerCharacterData(string.Empty, database.DataId, kv.Key, 0);
+                    }
                 }
-                if (!data.AvailableCharacters.ContainsKey(kv.Key))
-                    data.AvailableCharacters[kv.Key] = new Dictionary<int, PlayerCharacterData>();
-                foreach (var database in comp.CharacterDatabases)
+                catch (System.Exception ex)
                 {
-                    data.AvailableCharacters[kv.Key][database.DataId] = new PlayerCharacterData().SetNewPlayerCharacterData(string.Empty, database.DataId, kv.Key, 0);
+                    Debug.LogException(ex);
                 }
-                Addressables.ReleaseInstance(op.Result);
-                Addressables.Release(op);
-                DestroyImmediate(op.Result);
+                finally
+                {
+                    if (op.IsValid())
+                        Addressables.Release(op);
+                }
             }
 #endif
             foreach (var kv in Factions)

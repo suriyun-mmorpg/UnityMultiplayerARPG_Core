@@ -693,11 +693,29 @@ namespace MultiplayerARPG
 #if !DISABLE_ADDRESSABLES
             if (data.TryGetEntityAddressablePrefab(out var assetRef, out metaDataId))
             {
-                AsyncOperationHandle<GameObject> handler = Addressables.LoadAssetAsync<GameObject>(assetRef.RuntimeKey);
-                handler.WaitForCompletion();
-                result = Object.Instantiate(handler.Result).GetComponent<BaseCharacterEntity>();
-                result.gameObject.AddComponent<AssetReferenceReleaser>();
-                Addressables.Release(handler);
+                AsyncOperationHandle<GameObject> handler = default;
+                try
+                {
+                    handler = Addressables.InstantiateAsync(assetRef.RuntimeKey);
+                    GameObject instance = handler.WaitForCompletion();
+                    if (handler.Status != AsyncOperationStatus.Succeeded || instance == null ||
+                        !instance.TryGetComponent(out result))
+                        throw handler.OperationException ?? new System.Exception($"Unable to instantiate addressable character model: {assetRef.RuntimeKey}");
+                    if (instance.GetComponent<AssetReferenceReleaser>() == null)
+                        instance.AddComponent<AssetReferenceReleaser>();
+                }
+                catch (System.Exception ex)
+                {
+                    Debug.LogException(ex);
+                    if (handler.IsValid())
+                    {
+                        if (handler.Status == AsyncOperationStatus.Succeeded)
+                            Addressables.ReleaseInstance(handler);
+                        else
+                            Addressables.Release(handler);
+                    }
+                    return null;
+                }
             }
 #else
             if (false) { }

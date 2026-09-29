@@ -3,6 +3,9 @@ using Insthync.AddressableAssetTools;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+#if !DISABLE_ADDRESSABLES
+using UnityEngine.ResourceManagement.AsyncOperations;
+#endif
 
 namespace MultiplayerARPG
 {
@@ -85,6 +88,12 @@ namespace MultiplayerARPG
                 if (sliderGage != null)
                     sliderGage.value = asyncOp.PercentComplete;
                 await UniTask.Yield();
+            }
+            if (asyncOp.Status != AsyncOperationStatus.Succeeded)
+            {
+                System.Exception exception = asyncOp.OperationException ?? new System.Exception($"Unable to load addressable scene: {sceneRef.RuntimeKey}");
+                await GameInstance.UnloadAddressableScenes();
+                throw exception;
             }
             await UniTask.Yield();
             if (uiTextProgress != null)

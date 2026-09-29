@@ -48,7 +48,17 @@ namespace MultiplayerARPG
                 return;
             for (int i = 0; i < s_loadingAddressableSceneHandles.Count; ++i)
             {
-                AsyncOperationHandle<SceneInstance> addressableAsyncOp = Addressables.UnloadSceneAsync(s_loadingAddressableSceneHandles[i], UnloadSceneOptions.UnloadAllEmbeddedSceneObjects, true);
+                AsyncOperationHandle<SceneInstance> sceneHandle = s_loadingAddressableSceneHandles[i];
+                if (!sceneHandle.IsValid())
+                    continue;
+                while (!sceneHandle.IsDone)
+                    await UniTask.Yield();
+                if (sceneHandle.Status != AsyncOperationStatus.Succeeded)
+                {
+                    Addressables.Release(sceneHandle);
+                    continue;
+                }
+                AsyncOperationHandle<SceneInstance> addressableAsyncOp = Addressables.UnloadSceneAsync(sceneHandle, UnloadSceneOptions.UnloadAllEmbeddedSceneObjects, true);
                 while (!addressableAsyncOp.IsDone)
                 {
                     await UniTask.Yield();

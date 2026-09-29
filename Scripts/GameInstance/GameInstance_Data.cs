@@ -1089,33 +1089,31 @@ namespace MultiplayerARPG
             where TBehaviour : AssetReferenceLiteNetLibBehaviour<TType>
             where TType : BaseGameEntity
         {
-            if (!data.IsDataValid())
+            if (data == null || !data.IsDataValid())
                 return false;
             if (!dict.ContainsKey(data.HashAssetId))
             {
-                bool isError = true;
                 object runtimeKey = data.RuntimeKey;
-                AsyncOperationHandle<GameObject> loadOp = Addressables.LoadAssetAsync<GameObject>(runtimeKey);
+                AsyncOperationHandle<GameObject> loadOp = default;
                 try
                 {
+                    loadOp = Addressables.LoadAssetAsync<GameObject>(runtimeKey);
                     GameObject loadedObject = await loadOp.Task;
-                    if (loadedObject.TryGetComponent(out TType loadedData))
-                        loadedData.PrepareRelatesData();
+                    if (loadedObject == null || !loadedObject.TryGetComponent(out TType loadedData))
+                        return false;
+                    loadedData.PrepareRelatesData();
+                    dict[data.HashAssetId] = data;
                 }
                 catch (System.Exception ex)
                 {
-                    isError = true;
                     Debug.LogException(ex);
+                    return false;
                 }
                 finally
                 {
-                    Addressables.Release(loadOp);
+                    if (loadOp.IsValid())
+                        Addressables.Release(loadOp);
                 }
-                System.GC.Collect();
-                if (isError)
-                    return false;
-                else
-                    dict[data.HashAssetId] = data;
             }
             return true;
         }
