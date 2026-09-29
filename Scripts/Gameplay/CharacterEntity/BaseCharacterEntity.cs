@@ -1152,7 +1152,7 @@ namespace MultiplayerARPG
             // If passenging vehicle seat want to hide it, then hide it.
             if (!isHide && PassengingVehicleSeat != null && PassengingVehicleSeat.hidePassenger)
                 isHide = true;
-            ModelManager.SetIsHide(CharacterModelManager.HIDE_SETTER_ENTITY, isHide);
+            ModelManager.SetIsHide(CharacterModelManager.EntityHidder, isHide);
         }
 
         protected void UpdateCharacterModel(float deltaTime)

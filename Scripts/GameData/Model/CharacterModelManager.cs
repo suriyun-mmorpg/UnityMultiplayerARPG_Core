@@ -11,8 +11,8 @@ namespace MultiplayerARPG
     [DisallowMultipleComponent]
     public partial class CharacterModelManager : BaseGameEntityComponent<BaseGameEntity>
     {
-        public const byte HIDE_SETTER_ENTITY = 0;
-        public const byte HIDE_SETTER_CONTROLLER = 1;
+        public static readonly object EntityHidder = new object();
+        public static readonly object ControllerHidder = new object();
 
         [Header("TPS Model Settings")]
         [SerializeField]
@@ -291,12 +291,12 @@ namespace MultiplayerARPG
             ActiveFpsModel.SwitchModel(previousModel);
         }
 
-        public void SetIsHide(byte setter, bool isHide)
+        public void SetIsHide(object source, bool isHide)
         {
             if (isHide)
-                HideState.Add(setter);
+                HideState.Add(source);
             else
-                HideState.Remove(setter);
+                HideState.Remove(source);
             UpdateVisibleState();
         }
 
