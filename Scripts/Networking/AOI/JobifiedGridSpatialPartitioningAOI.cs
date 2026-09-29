@@ -9,6 +9,7 @@ namespace MultiplayerARPG
 {
     public class JobifiedGridSpatialPartitioningAOI : BaseInterestManager
     {
+        private const int InitialResultCapacity = 64;
         protected static readonly ProfilerMarker s_UpdateProfilerMarker = new ProfilerMarker("JobifiedGridSpatialPartitioningAOI - Update");
         protected static readonly ProfilerMarker s_CompleteProfilerMarker = new ProfilerMarker("JobifiedGridSpatialPartitioningAOI - Complete");
 
@@ -23,6 +24,8 @@ namespace MultiplayerARPG
         private float _updateCountDown;
         private Bounds _bounds;
         private Dictionary<uint, HashSet<uint>> _playerSubscribings = new Dictionary<uint, HashSet<uint>>();
+        private HashSet<uint> _activePlayerObjectIds = new HashSet<uint>();
+        private List<uint> _stalePlayerObjectIds = new List<uint>();
         private HashSet<uint> _alwaysVisibleObjects = new HashSet<uint>();
         private Queue<NativeList<SpatialObject>> _queryQueue = new Queue<NativeList<SpatialObject>>();
         private Dictionary<uint, NativeList<SpatialObject>> _queryingPlayerSubscribings = new Dictionary<uint, NativeList<SpatialObject>>();
@@ -37,7 +40,7 @@ namespace MultiplayerARPG
             }
             else
             {
-                return new NativeList<SpatialObject>(1024, Allocator.Persistent);
+                return new NativeList<SpatialObject>(InitialResultCapacity, Allocator.Persistent);
             }
         }
 
@@ -77,8 +80,27 @@ namespace MultiplayerARPG
 
         private void OnDestroy()
         {
-            _system = null;
+            ResetSystem();
             DisposeResultLists();
+        }
+
+        private void ResetSystem()
+        {
+            _system?.Dispose();
+            _system = null;
+            _isQuerying = false;
+
+            foreach (var resultList in _queryingPlayerSubscribings.Values)
+                ReturnResultList(resultList);
+            _queryingPlayerSubscribings.Clear();
+            foreach (var resultList in _queryingComponentSubscribings.Values)
+                ReturnResultList(resultList);
+            _queryingComponentSubscribings.Clear();
+
+            _playerSubscribings.Clear();
+            _activePlayerObjectIds.Clear();
+            _stalePlayerObjectIds.Clear();
+            _alwaysVisibleObjects.Clear();
         }
 
         public override void Setup(LiteNetLibGameManager manager)
@@ -93,7 +115,7 @@ namespace MultiplayerARPG
         {
             if (!IsServer || !isOnline)
             {
-                _system = null;
+                ResetSystem();
                 return;
             }
             PrepareSystem();
@@ -101,12 +123,10 @@ namespace MultiplayerARPG
 
         public void PrepareSystem()
         {
+            ResetSystem();
             if (!IsServer || !Manager.ServerSceneInfo.HasValue)
-            {
-                _system = null;
                 return;
-            }
-            _system = null;
+
             var mapBounds = GenericUtils.GetComponentsFromAllLoadedScenes<AOIMapBounds>(true);
             if (mapBounds.Count > 0)
             {
@@ -260,24 +280,21 @@ namespace MultiplayerARPG
                     LiteNetLibIdentity foundPlayerObject;
                     foreach (var playerQueryKvp in _queryingPlayerSubscribings)
                     {
-                        if (!Manager.Assets.TryGetSpawnedObject(playerQueryKvp.Key, out LiteNetLibIdentity spawnedObject))
-                            continue;
                         queryResult = playerQueryKvp.Value;
-                        for (int i = 0; i < queryResult.Length; ++i)
+                        if (Manager.Assets.TryGetSpawnedObject(playerQueryKvp.Key, out LiteNetLibIdentity spawnedObject))
                         {
-                            uint contactedObjectId = queryResult[i].objectId;
-                            if (!Manager.Assets.TryGetSpawnedObject(contactedObjectId, out foundPlayerObject))
+                            for (int i = 0; i < queryResult.Length; ++i)
                             {
-                                continue;
+                                uint contactedObjectId = queryResult[i].objectId;
+                                if (!Manager.Assets.TryGetSpawnedObject(contactedObjectId, out foundPlayerObject))
+                                    continue;
+                                if (!ShouldSubscribe(foundPlayerObject, spawnedObject, false))
+                                    continue;
+                                if (!_playerSubscribings.TryGetValue(contactedObjectId, out subscribings))
+                                    subscribings = new HashSet<uint>();
+                                subscribings.Add(spawnedObject.ObjectId);
+                                _playerSubscribings[contactedObjectId] = subscribings;
                             }
-                            if (!ShouldSubscribe(foundPlayerObject, spawnedObject, false))
-                            {
-                                continue;
-                            }
-                            if (!_playerSubscribings.TryGetValue(contactedObjectId, out subscribings))
-                                subscribings = new HashSet<uint>();
-                            subscribings.Add(spawnedObject.ObjectId);
-                            _playerSubscribings[contactedObjectId] = subscribings;
                         }
                         ReturnResultList(queryResult);
                     }
@@ -285,19 +302,21 @@ namespace MultiplayerARPG
 
                     foreach (var componentQueryKvp in _queryingComponentSubscribings)
                     {
-                        if (!SpatialObjectContainer.TryGet(componentQueryKvp.Key, out ISpatialObjectComponent component))
-                            continue;
                         queryResult = componentQueryKvp.Value;
-                        for (int i = 0; i < queryResult.Length; ++i)
+                        if (SpatialObjectContainer.TryGet(componentQueryKvp.Key, out ISpatialObjectComponent component))
                         {
-                            uint contactedObjectId = queryResult[i].objectId;
-                            if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out foundPlayerObject))
-                                component.AddSubscriber(foundPlayerObject.ObjectId);
+                            for (int i = 0; i < queryResult.Length; ++i)
+                            {
+                                uint contactedObjectId = queryResult[i].objectId;
+                                if (Manager.Assets.TryGetSpawnedObject(contactedObjectId, out foundPlayerObject))
+                                    component.AddSubscriber(foundPlayerObject.ObjectId);
+                            }
                         }
                         ReturnResultList(queryResult);
                     }
                     _queryingComponentSubscribings.Clear();
 
+                    _activePlayerObjectIds.Clear();
                     var players = Manager.GetPlayers();
                     while (players.MoveNext())
                     {
@@ -311,6 +330,7 @@ namespace MultiplayerARPG
                         while (playerObjs.MoveNext())
                         {
                             LiteNetLibIdentity playerObj = playerObjs.Current.Value;
+                            _activePlayerObjectIds.Add(playerObj.ObjectId);
                             if (_playerSubscribings.TryGetValue(playerObj.ObjectId, out subscribings))
                             {
                                 if (_alwaysVisibleObjects.Count > 0)
@@ -333,6 +353,14 @@ namespace MultiplayerARPG
                             }
                         }
                     }
+                    _stalePlayerObjectIds.Clear();
+                    foreach (uint playerObjectId in _playerSubscribings.Keys)
+                    {
+                        if (!_activePlayerObjectIds.Contains(playerObjectId))
+                            _stalePlayerObjectIds.Add(playerObjectId);
+                    }
+                    foreach (uint playerObjectId in _stalePlayerObjectIds)
+                        _playerSubscribings.Remove(playerObjectId);
                 }
             }
 
