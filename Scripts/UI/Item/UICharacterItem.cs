@@ -1033,12 +1033,12 @@ namespace MultiplayerARPG
                     (EquipmentItem.Requirement.level <= 0 &&
                     !EquipmentItem.Requirement.HasAvailableClasses() &&
                     !EquipmentItem.Requirement.HasAvailableFactions() &&
-                    EquipmentItem.RequireAttributeAmounts.Count == 0)) &&
+                    EquipmentItem.RequireAttributeAmounts.OccupiedMask == 0)) &&
                     (UsableItem == null ||
                     (UsableItem.Requirement.level <= 0 &&
                     !UsableItem.Requirement.HasAvailableClasses() &&
                     !UsableItem.Requirement.HasAvailableFactions() &&
-                    UsableItem.RequireAttributeAmounts.Count == 0)))
+                    UsableItem.RequireAttributeAmounts.OccupiedMask == 0)))
                 {
                     uiRequirement.Hide();
                 }
@@ -1116,19 +1116,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseAttributes != null)
             {
-                _tempAttributes.Clear();
+                AttributeAmounts amounts = default;
                 if (EquipmentItem != null)
                 {
-                    EquipmentItem.GetIncreaseAttributes(Level, _tempAttributes);
+                    GameDataHelpers.CombineAttributes(EquipmentItem.IncreaseAttributes, ref amounts, Level, 1f);
                     if (!dontCalculateRandomBonus)
                     {
-                        GameDataHelpers.CombineAttributes(_tempAttributes, GetRandomBonus().GetIncreaseAttributes());
+                        amounts.Combine(GetRandomBonus().GetIndexedIncreaseAttributes());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    GameDataHelpers.CombineAttributes(_tempAttributes, SocketEnhancerItem.SocketEnhanceEffect.Attributes);
+                    amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedAttributes);
                 }
+
+                amounts.CopyTo(_tempAttributes);
 
                 if (_tempAttributes == null || _tempAttributes.Count == 0)
                 {
@@ -1146,19 +1148,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseAttributesRate != null)
             {
-                _tempAttributesRate.Clear();
+                AttributeAmounts amounts = default;
                 if (EquipmentItem != null)
                 {
-                    EquipmentItem.GetIncreaseAttributesRate(Level, _tempAttributesRate);
+                    GameDataHelpers.CombineAttributes(EquipmentItem.IncreaseAttributesRate, ref amounts, Level, 1f);
                     if (!dontCalculateRandomBonus)
                     {
-                        GameDataHelpers.CombineAttributes(_tempAttributesRate, GetRandomBonus().GetIncreaseAttributesRate());
+                        amounts.Combine(GetRandomBonus().GetIndexedIncreaseAttributesRate());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    GameDataHelpers.CombineAttributes(_tempAttributesRate, SocketEnhancerItem.SocketEnhanceEffect.AttributesRate);
+                    amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedAttributesRate);
                 }
+
+                amounts.CopyTo(_tempAttributesRate);
 
                 if (_tempAttributesRate == null || _tempAttributesRate.Count == 0)
                 {
@@ -1176,19 +1180,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseResistances != null)
             {
-                _tempResistances.Clear();
+                DamageElementFloatAmounts amounts = default;
                 if (EquipmentItem != null)
                 {
-                    EquipmentItem.GetIncreaseResistances(Level, _tempResistances);
+                    GameDataHelpers.CombineResistances(EquipmentItem.IncreaseResistances, ref amounts, Level, 1f);
                     if (!dontCalculateRandomBonus)
                     {
-                        GameDataHelpers.CombineResistances(_tempResistances, GetRandomBonus().GetIncreaseResistances());
+                        amounts.Combine(GetRandomBonus().GetIndexedIncreaseResistances());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    GameDataHelpers.CombineResistances(_tempResistances, SocketEnhancerItem.SocketEnhanceEffect.Resistances);
+                    amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedResistances);
                 }
+
+                amounts.CopyTo(_tempResistances);
 
                 if (_tempResistances == null || _tempResistances.Count == 0)
                 {
@@ -1205,19 +1211,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseArmors != null)
             {
-                _tempArmors.Clear();
+                DamageElementFloatAmounts amounts = default;
                 if (EquipmentItem != null)
                 {
-                    EquipmentItem.GetIncreaseArmors(Level, _tempArmors);
+                    GameDataHelpers.CombineArmors(EquipmentItem.IncreaseArmors, ref amounts, Level, 1f);
                     if (!dontCalculateRandomBonus)
                     {
-                        GameDataHelpers.CombineArmors(_tempArmors, GetRandomBonus().GetIncreaseArmors());
+                        amounts.Combine(GetRandomBonus().GetIndexedIncreaseArmors());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    GameDataHelpers.CombineArmors(_tempArmors, SocketEnhancerItem.SocketEnhanceEffect.Armors);
+                    amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedArmors);
                 }
+
+                amounts.CopyTo(_tempArmors);
 
                 if (_tempArmors == null || _tempArmors.Count == 0)
                 {
@@ -1235,19 +1243,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseArmorsRate != null)
             {
-                _tempArmorsRate.Clear();
+                DamageElementFloatAmounts amounts = default;
                 if (EquipmentItem != null)
                 {
-                    EquipmentItem.GetIncreaseArmorsRate(Level, _tempArmorsRate);
+                    GameDataHelpers.CombineArmors(EquipmentItem.IncreaseArmorsRate, ref amounts, Level, 1f);
                     if (!dontCalculateRandomBonus)
                     {
-                        GameDataHelpers.CombineArmors(_tempArmorsRate, GetRandomBonus().GetIncreaseArmorsRate());
+                        amounts.Combine(GetRandomBonus().GetIndexedIncreaseArmorsRate());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    GameDataHelpers.CombineArmors(_tempArmorsRate, SocketEnhancerItem.SocketEnhanceEffect.ArmorsRate);
+                    amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedArmorsRate);
                 }
+
+                amounts.CopyTo(_tempArmorsRate);
 
                 if (_tempArmorsRate == null || _tempArmorsRate.Count == 0)
                 {
@@ -1265,19 +1275,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseDamages != null)
             {
-                _tempDamageAmounts.Clear();
+                DamageElementMinMaxFloatAmounts amounts = default;
                 if (EquipmentItem != null)
                 {
-                    EquipmentItem.GetIncreaseDamages(Level, _tempDamageAmounts);
+                    GameDataHelpers.CombineDamages(EquipmentItem.IncreaseDamages, ref amounts, Level, 1f);
                     if (!dontCalculateRandomBonus)
                     {
-                        GameDataHelpers.CombineDamages(_tempDamageAmounts, GetRandomBonus().GetIncreaseDamages());
+                        amounts.Combine(GetRandomBonus().GetIndexedIncreaseDamages());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    GameDataHelpers.CombineDamages(_tempDamageAmounts, SocketEnhancerItem.SocketEnhanceEffect.Damages);
+                    amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedDamages);
                 }
+
+                amounts.CopyToDictionary(_tempDamageAmounts);
 
                 if (_tempDamageAmounts == null || _tempDamageAmounts.Count == 0)
                 {
@@ -1295,19 +1307,21 @@ namespace MultiplayerARPG
 
             if (uiIncreaseDamagesRate != null)
             {
-                _tempDamageAmountsRate.Clear();
+                DamageElementMinMaxFloatAmounts amounts = default;
                 if (EquipmentItem != null)
                 {
-                    EquipmentItem.GetIncreaseDamagesRate(Level, _tempDamageAmountsRate);
+                    GameDataHelpers.CombineDamages(EquipmentItem.IncreaseDamagesRate, ref amounts, Level, 1f);
                     if (!dontCalculateRandomBonus)
                     {
-                        GameDataHelpers.CombineDamages(_tempDamageAmountsRate, GetRandomBonus().GetIncreaseDamagesRate());
+                        amounts.Combine(GetRandomBonus().GetIndexedIncreaseDamagesRate());
                     }
                 }
                 else if (SocketEnhancerItem != null)
                 {
-                    GameDataHelpers.CombineDamages(_tempDamageAmountsRate, SocketEnhancerItem.SocketEnhanceEffect.DamagesRate);
+                    amounts.Combine(SocketEnhancerItem.SocketEnhanceEffect.IndexedDamagesRate);
                 }
+
+                amounts.CopyToDictionary(_tempDamageAmountsRate);
 
                 if (_tempDamageAmountsRate == null || _tempDamageAmountsRate.Count == 0)
                 {

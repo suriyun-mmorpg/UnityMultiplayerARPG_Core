@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -17,7 +16,7 @@ namespace MultiplayerARPG
         public float DecreasingFood { get; set; } = 0f;
         public float DecreasingWater { get; set; } = 0f;
         public float TotalDamageOverTime { get; set; } = 0f;
-        public Dictionary<DamageElement, MinMaxFloat> DamageOverTimes { get; set; } = new Dictionary<DamageElement, MinMaxFloat>();
+        public DamageElementMinMaxFloatAmounts DamageOverTimes { get; set; }
 
         private float _calculatingRecoveryingHp = 0f;
         private float _calculatingRecoveryingMp = 0f;
@@ -42,10 +41,13 @@ namespace MultiplayerARPG
             _buff = buff;
             // Damage over time
             TotalDamageOverTime = 0f;
-            DamageOverTimes = calculatedBuff.GetDamageOverTimes();
-            foreach (KeyValuePair<DamageElement, MinMaxFloat> damageOverTime in DamageOverTimes)
+            DamageOverTimes = calculatedBuff.GetIndexedDamageOverTimes();
+            for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
             {
-                TotalDamageOverTime += damageOverTime.Key.GetDamageReducedByResistance(CharacterEntity.CachedData.Resistances, CharacterEntity.CachedData.Armors, damageOverTime.Value.Random(Random.Range(0, 255)));
+                if (!DamageOverTimes.Contains(slot))
+                    continue;
+                DamageElement element = RuntimeGameDataSlots.GetDamageElement(slot);
+                TotalDamageOverTime += element.GetDamageReducedByResistance(CharacterEntity.CachedData.IndexedResistances, CharacterEntity.CachedData.IndexedArmors, DamageOverTimes[slot].Random(Random.Range(0, 255)));
             }
             int tempAmount;
             // Hp recovery
@@ -94,7 +96,7 @@ namespace MultiplayerARPG
             DecreasingFood = 0f;
             DecreasingWater = 0f;
             TotalDamageOverTime = 0f;
-            DamageOverTimes.Clear();
+            DamageOverTimes = default;
             _calculatingRecoveryingHp = 0f;
             _calculatingRecoveryingMp = 0f;
             _calculatingRecoveryingStamina = 0f;

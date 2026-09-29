@@ -1,12 +1,18 @@
 ﻿using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.ATTRIBUTE_FILE, menuName = GameDataMenuConsts.ATTRIBUTE_MENU, order = GameDataMenuConsts.ATTRIBUTE_ORDER)]
     public partial class Attribute : BaseGameData
     {
+
+        [System.NonSerialized]
+        private int _runtimeSlot = -1;
+        [Newtonsoft.Json.JsonIgnore]
+        public int RuntimeSlot { get { return _runtimeSlot; } internal set { _runtimeSlot = value; } }
 
         [Category("Attribute Settings")]
         [SerializeField]
@@ -94,20 +100,89 @@ namespace MultiplayerARPG
 
         public virtual void GetIncreaseResistancesByLevel(float level, Dictionary<DamageElement, float> result)
         {
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineResistances(IncreaseResistances, ref amounts, Mathf.CeilToInt(level), 1f);
+            amounts.CopyTo(result);
+        }
+
+        public virtual void GetIncreaseResistancesByLevel(float level, ref DamageElementFloatAmounts result)
+        {
             result.Clear();
-            GameDataHelpers.CombineResistances(IncreaseResistances, result, Mathf.CeilToInt(level), 1f);
+            if (GetType() != typeof(Attribute))
+            {
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> temporary))
+                {
+                    GetIncreaseResistancesByLevel(level, temporary);
+                    result.Combine(temporary);
+                }
+                return;
+            }
+            if (IncreaseResistances == null)
+                return;
+            int roundedLevel = Mathf.CeilToInt(level);
+            foreach (ResistanceIncremental entry in IncreaseResistances)
+            {
+                DamageElement element = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), entry.amount.GetAmount(roundedLevel));
+            }
         }
 
         public virtual void GetIncreaseArmorsByLevel(float level, Dictionary<DamageElement, float> result)
         {
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineArmors(IncreaseArmors, ref amounts, Mathf.CeilToInt(level), 1f);
+            amounts.CopyTo(result);
+        }
+
+        public virtual void GetIncreaseArmorsByLevel(float level, ref DamageElementFloatAmounts result)
+        {
             result.Clear();
-            GameDataHelpers.CombineArmors(IncreaseArmors, result, Mathf.CeilToInt(level), 1f);
+            if (GetType() != typeof(Attribute))
+            {
+                using (CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get(out Dictionary<DamageElement, float> temporary))
+                {
+                    GetIncreaseArmorsByLevel(level, temporary);
+                    result.Combine(temporary);
+                }
+                return;
+            }
+            if (IncreaseArmors == null)
+                return;
+            int roundedLevel = Mathf.CeilToInt(level);
+            foreach (ArmorIncremental entry in IncreaseArmors)
+            {
+                DamageElement element = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), entry.amount.GetAmount(roundedLevel));
+            }
         }
 
         public virtual void GetIncreaseDamagesByLevel(float level, Dictionary<DamageElement, MinMaxFloat> result)
         {
+            DamageElementMinMaxFloatAmounts amounts = default;
+            GameDataHelpers.CombineDamages(IncreaseDamages, ref amounts, Mathf.CeilToInt(level), 1f);
+            amounts.CopyToDictionary(result);
+        }
+
+        public virtual void GetIncreaseDamagesByLevel(float level, ref DamageElementMinMaxFloatAmounts result)
+        {
             result.Clear();
-            GameDataHelpers.CombineDamages(IncreaseDamages, result, Mathf.CeilToInt(level), 1f);
+            if (GetType() != typeof(Attribute))
+            {
+                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> temporary))
+                {
+                    GetIncreaseDamagesByLevel(level, temporary);
+                    result.Combine(temporary);
+                }
+                return;
+            }
+            if (IncreaseDamages == null)
+                return;
+            int roundedLevel = Mathf.CeilToInt(level);
+            foreach (DamageIncremental entry in IncreaseDamages)
+            {
+                DamageElement element = entry.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : entry.damageElement;
+                result.Add(RuntimeGameDataSlots.GetSlot(element), entry.amount.GetAmount(roundedLevel));
+            }
         }
 
         public virtual void GetIncreaseStatusEffectResistancesByLevel(float level, Dictionary<StatusEffect, float> result)

@@ -1,7 +1,6 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 using LiteNetLibManager;
-using UnityEngine.Pool;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -314,44 +313,30 @@ namespace MultiplayerARPG
             return DamageableEntity == null ? false : DamageableEntity.CanReceiveDamageFrom(instigator);
         }
 
-        public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
+        public virtual void ReceiveDamage(Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
             if (DamageableEntity == null || !DamageableEntity.IsServer || this.IsDead() || !CanReceiveDamageFrom(instigator))
                 return;
             ReceiveDamageWithoutConditionCheck(fromPosition, instigator, damageAmounts, weapon, skill, skillLevel, randomSeed);
         }
 
-        public virtual void ReceiveDamageWithoutConditionCheck(Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
+        public virtual void ReceiveDamageWithoutConditionCheck(Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed)
         {
             if (DamageableEntity.IsHitBoxesOverridedByVehicle())
                 return;
-            using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> modifiedDamageAmounts))
+            DamageElementMinMaxFloatAmounts modifiedDamageAmounts = damageAmounts;
+            modifiedDamageAmounts.Scale(damageRate);
+            if (DamageableEntity is IVehicleEntity vehicleEntity)
             {
-                if (damageAmounts != null)
+                for (byte i = 0; i < vehicleEntity.Seats.Count; ++i)
                 {
-                    modifiedDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>(damageAmounts);
-                    List<DamageElement> keys = new List<DamageElement>(modifiedDamageAmounts.Keys);
-                    foreach (DamageElement key in keys)
-                    {
-                        modifiedDamageAmounts[key] = modifiedDamageAmounts[key] * damageRate;
-                    }
+                    if (!vehicleEntity.Seats[i].overridePassengerHitBoxes)
+                        continue;
+                    if (vehicleEntity.GetPassenger(i) is DamageableEntity damageablePassenger)
+                        damageablePassenger.ApplyDamage(position, fromPosition, instigator, modifiedDamageAmounts, weapon, skill, skillLevel, randomSeed);
                 }
-                else
-                {
-                    modifiedDamageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-                }
-                if (DamageableEntity is IVehicleEntity vehicleEntity)
-                {
-                    for (byte i = 0; i < vehicleEntity.Seats.Count; ++i)
-                    {
-                        if (!vehicleEntity.Seats[i].overridePassengerHitBoxes)
-                            continue;
-                        if (vehicleEntity.GetPassenger(i) is DamageableEntity damageablePassenger)
-                            damageablePassenger.ApplyDamage(position, fromPosition, instigator, modifiedDamageAmounts, weapon, skill, skillLevel, randomSeed);
-                    }
-                }
-                DamageableEntity.ApplyDamage(position, fromPosition, instigator, modifiedDamageAmounts, weapon, skill, skillLevel, randomSeed);
             }
+            DamageableEntity.ApplyDamage(position, fromPosition, instigator, modifiedDamageAmounts, weapon, skill, skillLevel, randomSeed);
         }
 
         public virtual void PrepareRelatesData()

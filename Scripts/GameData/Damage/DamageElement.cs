@@ -8,6 +8,11 @@ namespace MultiplayerARPG
     [CreateAssetMenu(fileName = GameDataMenuConsts.DAMAGE_ELEMENT_FILE, menuName = GameDataMenuConsts.DAMAGE_ELEMENT_MENU, order = GameDataMenuConsts.DAMAGE_ELEMENT_ORDER)]
     public partial class DamageElement : BaseGameData
     {
+        [System.NonSerialized]
+        private int _runtimeSlot = -1;
+        [Newtonsoft.Json.JsonIgnore]
+        public int RuntimeSlot { get { return _runtimeSlot; } internal set { _runtimeSlot = value; } }
+
         [Category("Damage Element Settings")]
         [SerializeField]
         private float resistanceBattlePointScore = 5;
@@ -67,6 +72,11 @@ namespace MultiplayerARPG
 #endif
 
         public float GetDamageReducedByResistance(Dictionary<DamageElement, float> damageReceiverResistances, Dictionary<DamageElement, float> damageReceiverArmors, float damageAmount)
+        {
+            return GameInstance.Singleton.GameplayRule.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, this);
+        }
+
+        public float GetDamageReducedByResistance(DamageElementFloatAmounts damageReceiverResistances, DamageElementFloatAmounts damageReceiverArmors, float damageAmount)
         {
             return GameInstance.Singleton.GameplayRule.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, this);
         }

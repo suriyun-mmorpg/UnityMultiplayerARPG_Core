@@ -28,7 +28,7 @@ namespace MultiplayerARPG
         public CrafterType CrafterType { get; private set; }
         public BaseGameEntity TargetEntity { get; private set; }
 
-        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempRequireCurrencies;
         protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
@@ -41,7 +41,6 @@ namespace MultiplayerARPG
             uiTextSimpleRequireGold = null;
             TargetEntity = null;
             _tempRequireCurrencies.Clear();
-            _tempRequireCurrencies = null;
             _tempRequireItems.Clear();
             _tempRequireItems = null;
         }
@@ -94,7 +93,7 @@ namespace MultiplayerARPG
                     uiRequireCurrencyAmounts.displayType = UICurrencyAmounts.DisplayType.Requirement;
                     uiRequireCurrencyAmounts.Show();
                     _tempRequireCurrencies.Clear();
-                    GameDataHelpers.CombineCurrencies(ItemCraft.RequireCurrencies, _tempRequireCurrencies, 1f);
+                    GameDataHelpers.CombineCurrencies(ItemCraft.RequireCurrencies, ref _tempRequireCurrencies, 1f);
                     uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
                 }
             }

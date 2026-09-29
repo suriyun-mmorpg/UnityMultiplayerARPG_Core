@@ -69,15 +69,19 @@ namespace MultiplayerARPG
         public ItemCraft itemCraft = new ItemCraft();
 
         [System.NonSerialized]
-        private Dictionary<Attribute, float> _cacheEffectivenessAttributes = null;
-        public Dictionary<Attribute, float> CacheEffectivenessAttributes
+        private AttributeAmounts _cacheEffectivenessAttributes;
+        [System.NonSerialized]
+        private int _cacheEffectivenessGeneration = -1;
+        [Newtonsoft.Json.JsonIgnore]
+        public AttributeAmounts CacheEffectivenessAttributes
         {
             get
             {
-                if (_cacheEffectivenessAttributes == null)
+                if (_cacheEffectivenessGeneration != RuntimeGameDataSlots.Generation)
                 {
-                    _cacheEffectivenessAttributes = new Dictionary<Attribute, float>();
-                    GameDataHelpers.CombineDamageEffectivenessAttributes(effectivenessAttributes, _cacheEffectivenessAttributes);
+                    _cacheEffectivenessAttributes = default;
+                    _cacheEffectivenessAttributes.CombineEffectiveness(effectivenessAttributes);
+                    _cacheEffectivenessGeneration = RuntimeGameDataSlots.Generation;
                 }
                 return _cacheEffectivenessAttributes;
             }
@@ -120,7 +124,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
@@ -275,7 +279,9 @@ namespace MultiplayerARPG
             switch (skillAttackType)
             {
                 case SkillAttackType.Normal:
-                    result = GameDataHelpers.GetDamageWithEffectiveness(CacheEffectivenessAttributes, skillUser.GetCaches().Attributes, damageAmount.ToKeyValuePair(skillLevel, 1f));
+                    result = new KeyValuePair<DamageElement, MinMaxFloat>(
+                        damageAmount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : damageAmount.damageElement,
+                        damageAmount.amount.GetAmount(skillLevel) + skillUser.GetCaches().IndexedAttributes.GetWeightedAmount(CacheEffectivenessAttributes));
                     return true;
                 case SkillAttackType.BasedOnWeapon:
                     if (isLeftHand && skillUser.GetCaches().LeftHandWeaponDamage.HasValue)
@@ -294,10 +300,23 @@ namespace MultiplayerARPG
             if (IsAttack)
             {
                 result = new Dictionary<DamageElement, float>();
-                GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, result, skillLevel);
+                DamageElementFloatAmounts indexedInflictions = default;
+                GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, ref indexedInflictions, skillLevel);
+                indexedInflictions.CopyTo(result);
                 return true;
             }
             return base.TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
+        }
+
+        public override bool TryGetIndexedAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel, out DamageElementFloatAmounts result)
+        {
+            result = default;
+            if (GetType() != typeof(Skill))
+                return base.TryGetIndexedAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
+            if (!IsAttack)
+                return base.TryGetIndexedAttackWeaponDamageInflictions(skillUser, skillLevel, out result);
+            GameDataHelpers.CombineDamageInflictions(weaponDamageInflictions, ref result, skillLevel);
+            return true;
         }
 
         public override bool TryGetAttackWeaponDamageMultiplicator(ICharacterData skillUser, int skillLevel, out float result)
@@ -315,10 +334,23 @@ namespace MultiplayerARPG
             if (IsAttack)
             {
                 result = new Dictionary<DamageElement, MinMaxFloat>();
-                GameDataHelpers.CombineDamages(additionalDamageAmounts, result, skillLevel, 1f);
+                DamageElementMinMaxFloatAmounts indexedDamages = default;
+                GameDataHelpers.CombineDamages(additionalDamageAmounts, ref indexedDamages, skillLevel, 1f);
+                indexedDamages.CopyToDictionary(result);
                 return true;
             }
             return base.TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);
+        }
+
+        public override bool TryGetIndexedAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel, out DamageElementMinMaxFloatAmounts result)
+        {
+            result = default;
+            if (GetType() != typeof(Skill))
+                return base.TryGetIndexedAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);
+            if (!IsAttack)
+                return base.TryGetIndexedAttackAdditionalDamageAmounts(skillUser, skillLevel, out result);
+            GameDataHelpers.CombineDamages(additionalDamageAmounts, ref result, skillLevel, 1f);
+            return true;
         }
 
         public override bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel)

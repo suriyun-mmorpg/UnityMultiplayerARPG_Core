@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         public UICurrencyAmounts uiRequireCurrencyAmounts;
         public UIItemAmounts uiRequireItemAmounts;
 
-        protected Dictionary<Currency, int> _tempRequireCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempRequireCurrencies;
         protected Dictionary<BaseItem, int> _tempRequireItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
@@ -26,7 +26,6 @@ namespace MultiplayerARPG
             uiRequireCurrencyAmounts = null;
             uiRequireItemAmounts = null;
             _tempRequireCurrencies.Clear();
-            _tempRequireCurrencies = null;
             _tempRequireItems.Clear();
             _tempRequireItems = null;
         }
@@ -67,7 +66,7 @@ namespace MultiplayerARPG
                 uiRequireCurrencyAmounts.isBonus = false;
                 uiRequireCurrencyAmounts.Show();
                 _tempRequireCurrencies.Clear();
-                GameDataHelpers.CombineCurrencies(Data.currencyAmounts, _tempRequireCurrencies, 1f);
+                GameDataHelpers.CombineCurrencies(Data.currencyAmounts, ref _tempRequireCurrencies, 1f);
                 uiRequireCurrencyAmounts.Data = _tempRequireCurrencies;
             }
 

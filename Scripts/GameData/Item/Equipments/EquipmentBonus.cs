@@ -7,6 +7,50 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class EquipmentBonus
     {
+        [System.NonSerialized]
+        private int _indexedGeneration = -1;
+
+        private void EnsureIndexed()
+        {
+            if (_indexedGeneration == RuntimeGameDataSlots.Generation)
+                return;
+            _cacheAttributes = default;
+            _cacheAttributesRate = default;
+            _cacheResistances = default;
+            _cacheArmors = default;
+            _cacheArmorsRate = default;
+            _cacheDamages = default;
+            _cacheDamagesRate = default;
+            GameDataHelpers.CombineAttributes(attributes, ref _cacheAttributes, 1f);
+            GameDataHelpers.CombineAttributes(attributesRate, ref _cacheAttributesRate, 1f);
+            GameDataHelpers.CombineResistances(resistances, ref _cacheResistances, 1f);
+            GameDataHelpers.CombineArmors(armors, ref _cacheArmors, 1f);
+            GameDataHelpers.CombineArmors(armorsRate, ref _cacheArmorsRate, 1f);
+            GameDataHelpers.CombineDamages(damages, ref _cacheDamages, 1f);
+            GameDataHelpers.CombineDamages(damagesRate, ref _cacheDamagesRate, 1f);
+            _dictionaryAttributes = null;
+            _dictionaryAttributesRate = null;
+            _dictionaryResistances = null;
+            _dictionaryArmors = null;
+            _dictionaryArmorsRate = null;
+            _dictionaryDamages = null;
+            _dictionaryDamagesRate = null;
+            _indexedGeneration = RuntimeGameDataSlots.Generation;
+        }
+
+        public void RegisterReferencedData()
+        {
+            GameInstance.AddAttributes(attributes);
+            GameInstance.AddAttributes(attributesRate);
+            GameInstance.AddDamageElements(resistances);
+            GameInstance.AddDamageElements(armors);
+            GameInstance.AddDamageElements(armorsRate);
+            GameInstance.AddDamageElements(damages);
+            GameInstance.AddDamageElements(damagesRate);
+            GameInstance.AddSkills(Skills.Keys);
+            GameInstance.AddStatusEffects(StatusEffectResistances.Keys);
+        }
+
         [SerializeField]
         private CharacterStats stats = new CharacterStats();
         public CharacterStats Stats => stats;
@@ -19,17 +63,30 @@ namespace MultiplayerARPG
         [SerializeField]
         private AttributeAmount[] attributes = new AttributeAmount[0];
         [System.NonSerialized]
-        private Dictionary<Attribute, float> _cacheAttributes = null;
+        private AttributeAmounts _cacheAttributes;
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> _dictionaryAttributes;
+        [Newtonsoft.Json.JsonIgnore]
+        public AttributeAmounts IndexedAttributes
+        {
+            get
+            {
+                EnsureIndexed();
+                return _cacheAttributes;
+            }
+        }
+        [Newtonsoft.Json.JsonIgnore]
         public Dictionary<Attribute, float> Attributes
         {
             get
             {
-                if (_cacheAttributes == null)
+                EnsureIndexed();
+                if (_dictionaryAttributes == null)
                 {
-                    _cacheAttributes = new Dictionary<Attribute, float>();
-                    GameDataHelpers.CombineAttributes(attributes, _cacheAttributes, 1f);
+                    _dictionaryAttributes = new Dictionary<Attribute, float>();
+                    _cacheAttributes.CopyTo(_dictionaryAttributes);
                 }
-                return _cacheAttributes;
+                return _dictionaryAttributes;
             }
         }
 
@@ -37,17 +94,30 @@ namespace MultiplayerARPG
         [SerializeField]
         private AttributeAmount[] attributesRate = new AttributeAmount[0];
         [System.NonSerialized]
-        private Dictionary<Attribute, float> _cacheAttributesRate = null;
+        private AttributeAmounts _cacheAttributesRate;
+        [System.NonSerialized]
+        private Dictionary<Attribute, float> _dictionaryAttributesRate;
+        [Newtonsoft.Json.JsonIgnore]
+        public AttributeAmounts IndexedAttributesRate
+        {
+            get
+            {
+                EnsureIndexed();
+                return _cacheAttributesRate;
+            }
+        }
+        [Newtonsoft.Json.JsonIgnore]
         public Dictionary<Attribute, float> AttributesRate
         {
             get
             {
-                if (_cacheAttributesRate == null)
+                EnsureIndexed();
+                if (_dictionaryAttributesRate == null)
                 {
-                    _cacheAttributesRate = new Dictionary<Attribute, float>();
-                    GameDataHelpers.CombineAttributes(attributesRate, _cacheAttributesRate, 1f);
+                    _dictionaryAttributesRate = new Dictionary<Attribute, float>();
+                    _cacheAttributesRate.CopyTo(_dictionaryAttributesRate);
                 }
-                return _cacheAttributesRate;
+                return _dictionaryAttributesRate;
             }
         }
 
@@ -55,17 +125,30 @@ namespace MultiplayerARPG
         [SerializeField]
         private ResistanceAmount[] resistances = new ResistanceAmount[0];
         [System.NonSerialized]
-        private Dictionary<DamageElement, float> _cacheResistances = null;
+        private DamageElementFloatAmounts _cacheResistances;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, float> _dictionaryResistances;
+        [Newtonsoft.Json.JsonIgnore]
+        public DamageElementFloatAmounts IndexedResistances
+        {
+            get
+            {
+                EnsureIndexed();
+                return _cacheResistances;
+            }
+        }
+        [Newtonsoft.Json.JsonIgnore]
         public Dictionary<DamageElement, float> Resistances
         {
             get
             {
-                if (_cacheResistances == null)
+                EnsureIndexed();
+                if (_dictionaryResistances == null)
                 {
-                    _cacheResistances = new Dictionary<DamageElement, float>();
-                    GameDataHelpers.CombineResistances(resistances, _cacheResistances, 1f);
+                    _dictionaryResistances = new Dictionary<DamageElement, float>();
+                    _cacheResistances.CopyTo(_dictionaryResistances);
                 }
-                return _cacheResistances;
+                return _dictionaryResistances;
             }
         }
 
@@ -73,17 +156,30 @@ namespace MultiplayerARPG
         [SerializeField]
         private ArmorAmount[] armors = new ArmorAmount[0];
         [System.NonSerialized]
-        private Dictionary<DamageElement, float> _cacheArmors = null;
+        private DamageElementFloatAmounts _cacheArmors;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, float> _dictionaryArmors;
+        [Newtonsoft.Json.JsonIgnore]
+        public DamageElementFloatAmounts IndexedArmors
+        {
+            get
+            {
+                EnsureIndexed();
+                return _cacheArmors;
+            }
+        }
+        [Newtonsoft.Json.JsonIgnore]
         public Dictionary<DamageElement, float> Armors
         {
             get
             {
-                if (_cacheArmors == null)
+                EnsureIndexed();
+                if (_dictionaryArmors == null)
                 {
-                    _cacheArmors = new Dictionary<DamageElement, float>();
-                    GameDataHelpers.CombineArmors(armors, _cacheArmors, 1f);
+                    _dictionaryArmors = new Dictionary<DamageElement, float>();
+                    _cacheArmors.CopyTo(_dictionaryArmors);
                 }
-                return _cacheArmors;
+                return _dictionaryArmors;
             }
         }
 
@@ -91,17 +187,30 @@ namespace MultiplayerARPG
         [SerializeField]
         private ArmorAmount[] armorsRate = new ArmorAmount[0];
         [System.NonSerialized]
-        private Dictionary<DamageElement, float> _cacheArmorsRate = null;
+        private DamageElementFloatAmounts _cacheArmorsRate;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, float> _dictionaryArmorsRate;
+        [Newtonsoft.Json.JsonIgnore]
+        public DamageElementFloatAmounts IndexedArmorsRate
+        {
+            get
+            {
+                EnsureIndexed();
+                return _cacheArmorsRate;
+            }
+        }
+        [Newtonsoft.Json.JsonIgnore]
         public Dictionary<DamageElement, float> ArmorsRate
         {
             get
             {
-                if (_cacheArmorsRate == null)
+                EnsureIndexed();
+                if (_dictionaryArmorsRate == null)
                 {
-                    _cacheArmorsRate = new Dictionary<DamageElement, float>();
-                    GameDataHelpers.CombineArmors(armorsRate, _cacheArmorsRate, 1f);
+                    _dictionaryArmorsRate = new Dictionary<DamageElement, float>();
+                    _cacheArmorsRate.CopyTo(_dictionaryArmorsRate);
                 }
-                return _cacheArmorsRate;
+                return _dictionaryArmorsRate;
             }
         }
 
@@ -109,17 +218,30 @@ namespace MultiplayerARPG
         [SerializeField]
         private DamageAmount[] damages = new DamageAmount[0];
         [System.NonSerialized]
-        private Dictionary<DamageElement, MinMaxFloat> _cacheDamages = null;
+        private DamageElementMinMaxFloatAmounts _cacheDamages;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, MinMaxFloat> _dictionaryDamages;
+        [Newtonsoft.Json.JsonIgnore]
+        public DamageElementMinMaxFloatAmounts IndexedDamages
+        {
+            get
+            {
+                EnsureIndexed();
+                return _cacheDamages;
+            }
+        }
+        [Newtonsoft.Json.JsonIgnore]
         public Dictionary<DamageElement, MinMaxFloat> Damages
         {
             get
             {
-                if (_cacheDamages == null)
+                EnsureIndexed();
+                if (_dictionaryDamages == null)
                 {
-                    _cacheDamages = new Dictionary<DamageElement, MinMaxFloat>();
-                    GameDataHelpers.CombineDamages(damages, _cacheDamages, 1f);
+                    _dictionaryDamages = new Dictionary<DamageElement, MinMaxFloat>();
+                    _cacheDamages.CopyToDictionary(_dictionaryDamages);
                 }
-                return _cacheDamages;
+                return _dictionaryDamages;
             }
         }
 
@@ -127,17 +249,30 @@ namespace MultiplayerARPG
         [SerializeField]
         private DamageAmount[] damagesRate = new DamageAmount[0];
         [System.NonSerialized]
-        private Dictionary<DamageElement, MinMaxFloat> _cacheDamagesRate = null;
+        private DamageElementMinMaxFloatAmounts _cacheDamagesRate;
+        [System.NonSerialized]
+        private Dictionary<DamageElement, MinMaxFloat> _dictionaryDamagesRate;
+        [Newtonsoft.Json.JsonIgnore]
+        public DamageElementMinMaxFloatAmounts IndexedDamagesRate
+        {
+            get
+            {
+                EnsureIndexed();
+                return _cacheDamagesRate;
+            }
+        }
+        [Newtonsoft.Json.JsonIgnore]
         public Dictionary<DamageElement, MinMaxFloat> DamagesRate
         {
             get
             {
-                if (_cacheDamagesRate == null)
+                EnsureIndexed();
+                if (_dictionaryDamagesRate == null)
                 {
-                    _cacheDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
-                    GameDataHelpers.CombineDamages(damagesRate, _cacheDamagesRate, 1f);
+                    _dictionaryDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
+                    _cacheDamagesRate.CopyToDictionary(_dictionaryDamagesRate);
                 }
-                return _cacheDamagesRate;
+                return _dictionaryDamagesRate;
             }
         }
 

@@ -40,7 +40,7 @@ namespace MultiplayerARPG
             base.OnDestroy();
         }
 
-        protected void OnDead()
+        protected void OnDead(BaseCharacterEntity target)
         {
             if (!IsServer)
                 return;

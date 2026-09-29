@@ -93,11 +93,12 @@ namespace MultiplayerARPG
         #endregion
 
         #region Ammo Extension
-        public static void GetIncreaseDamages(this IAmmoItem ammoItem, Dictionary<DamageElement, MinMaxFloat> result)
+        public static DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamages(this IAmmoItem ammoItem)
         {
-            result.Clear();
+            DamageElementMinMaxFloatAmounts amounts = default;
             if (ammoItem != null && ammoItem.IsAmmo())
-                GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, result, 1, 1f);
+                GameDataHelpers.CombineDamages(ammoItem.IncreaseDamages, ref amounts, 1, 1f);
+            return amounts;
         }
         #endregion
 
@@ -116,62 +117,6 @@ namespace MultiplayerARPG
             if (equipmentItem == null || !equipmentItem.IsEquipment())
                 return new CharacterStats();
             return equipmentItem.IncreaseStatsRate.GetCharacterStats(level);
-        }
-
-        public static void GetIncreaseAttributes<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributes, result, level, 1f);
-        }
-
-        public static void GetIncreaseAttributesRate<T>(this T equipmentItem, int level, Dictionary<Attribute, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineAttributes(equipmentItem.IncreaseAttributesRate, result, level, 1f);
-        }
-
-        public static void GetIncreaseResistances<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineResistances(equipmentItem.IncreaseResistances, result, level, 1f);
-        }
-
-        public static void GetIncreaseArmors<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmors, result, level, 1f);
-        }
-
-        public static void GetIncreaseArmorsRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, float> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineArmors(equipmentItem.IncreaseArmorsRate, result, level, 1f);
-        }
-
-        public static void GetIncreaseDamages<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamages, result, level, 1f);
-        }
-
-        public static void GetIncreaseDamagesRate<T>(this T equipmentItem, int level, Dictionary<DamageElement, MinMaxFloat> result)
-            where T : IEquipmentItem
-        {
-            result.Clear();
-            if (equipmentItem != null && equipmentItem.IsEquipment())
-                GameDataHelpers.CombineDamages(equipmentItem.IncreaseDamagesRate, result, level, 1f);
         }
 
         public static void GetIncreaseSkills<T>(this T equipmentItem, int level, Dictionary<BaseSkill, int> result)
@@ -245,7 +190,10 @@ namespace MultiplayerARPG
         {
             if (defendItem == null || !defendItem.IsDefendEquipment())
                 return new KeyValuePair<DamageElement, float>();
-            return GameDataHelpers.ToKeyValuePair(defendItem.ArmorAmount, level, rate);
+            ArmorIncremental amount = defendItem.ArmorAmount;
+            return new KeyValuePair<DamageElement, float>(
+                amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement,
+                amount.amount.GetAmount(level) * rate);
         }
 
         public static string GetEquipPosition<T>(this T armorItem)
@@ -287,7 +235,10 @@ namespace MultiplayerARPG
         {
             if (weaponItem == null || !weaponItem.IsWeapon())
                 return new KeyValuePair<DamageElement, MinMaxFloat>();
-            return GameDataHelpers.ToKeyValuePair(weaponItem.DamageAmount, itemLevel, statsRate);
+            DamageIncremental amount = weaponItem.DamageAmount;
+            return new KeyValuePair<DamageElement, MinMaxFloat>(
+                amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement,
+                amount.amount.GetAmount(itemLevel) * statsRate);
         }
 
         public static bool TryGetWeaponItemEquipType<T>(this T weaponItem, out WeaponItemEquipType equipType)
@@ -389,7 +340,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!character.HasEnoughAttributeAmounts(item.RequireAttributeAmounts, true, out gameMessage, out _, willReleaseAttributes: true))
+            if (!character.HasEnoughAttributeAmounts(item.RequireAttributeAmounts, true, out gameMessage))
                 return false;
 
             return true;

@@ -75,20 +75,23 @@ namespace MultiplayerARPG
 
         public void GetCharacterAttributes(int level, Dictionary<Attribute, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineAttributes(Attributes, result, level, 1f);
+            AttributeAmounts amounts = default;
+            GameDataHelpers.CombineAttributes(Attributes, ref amounts, level, 1f);
+            amounts.CopyTo(result);
         }
 
         public void GetCharacterResistances(int level, Dictionary<DamageElement, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineResistances(Resistances, result, level, 1f);
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineResistances(Resistances, ref amounts, level, 1f);
+            amounts.CopyTo(result);
         }
 
         public void GetCharacterArmors(int level, Dictionary<DamageElement, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineArmors(Armors, result, level, 1f);
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineArmors(Armors, ref amounts, level, 1f);
+            amounts.CopyTo(result);
         }
 
         public void GetCharacterStatusEffectResistances(int level, Dictionary<StatusEffect, float> result)

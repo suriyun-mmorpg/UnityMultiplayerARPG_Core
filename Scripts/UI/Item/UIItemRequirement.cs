@@ -6,6 +6,8 @@ namespace MultiplayerARPG
 {
     public partial class UIItemRequirement : UISelectionEntry<IItemWithRequirement>
     {
+        private readonly System.Collections.Generic.Dictionary<Attribute, float> _displayRequireAttributeAmounts =
+            new System.Collections.Generic.Dictionary<Attribute, float>();
         [Header("String Formats")]
         [Tooltip("Format => {0} = {Require Level}")]
         public UILocaleKeySetting formatKeyRequireLevel = new UILocaleKeySetting(UIFormatKeys.UI_FORMAT_REQUIRE_LEVEL);
@@ -161,7 +163,9 @@ namespace MultiplayerARPG
                     uiRequireAttributeAmounts.includeSkillsForCurrentAmounts = true;
                     uiRequireAttributeAmounts.isBonus = false;
                     uiRequireAttributeAmounts.Show();
-                    uiRequireAttributeAmounts.Data = Data.RequireAttributeAmounts;
+                    AttributeAmounts requireAmounts = Data.RequireAttributeAmounts;
+                    requireAmounts.CopyTo(_displayRequireAttributeAmounts);
+                    uiRequireAttributeAmounts.Data = _displayRequireAttributeAmounts;
                 }
             }
         }

@@ -47,44 +47,51 @@ namespace MultiplayerARPG
 
         public static void GetIncreaseAttributes(this Buff buff, int level, Dictionary<Attribute, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineAttributes(buff.increaseAttributes, result, level, 1f);
+            AttributeAmounts amounts = default;
+            GameDataHelpers.CombineAttributes(buff.increaseAttributes, ref amounts, level, 1f);
+            amounts.CopyTo(result);
         }
 
         public static void GetIncreaseAttributesRate(this Buff buff, int level, Dictionary<Attribute, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineAttributes(buff.increaseAttributesRate, result, level, 1f);
+            AttributeAmounts amounts = default;
+            GameDataHelpers.CombineAttributes(buff.increaseAttributesRate, ref amounts, level, 1f);
+            amounts.CopyTo(result);
         }
 
         public static void GetIncreaseResistances(this Buff buff, int level, Dictionary<DamageElement, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineResistances(buff.increaseResistances, result, level, 1f);
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineResistances(buff.increaseResistances, ref amounts, level, 1f);
+            amounts.CopyTo(result);
         }
 
         public static void GetIncreaseArmors(this Buff buff, int level, Dictionary<DamageElement, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineArmors(buff.increaseArmors, result, level, 1f);
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineArmors(buff.increaseArmors, ref amounts, level, 1f);
+            amounts.CopyTo(result);
         }
 
         public static void GetIncreaseArmorsRate(this Buff buff, int level, Dictionary<DamageElement, float> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineArmors(buff.increaseArmorsRate, result, level, 1f);
+            DamageElementFloatAmounts amounts = default;
+            GameDataHelpers.CombineArmors(buff.increaseArmorsRate, ref amounts, level, 1f);
+            amounts.CopyTo(result);
         }
 
         public static void GetIncreaseDamages(this Buff buff, int level, Dictionary<DamageElement, MinMaxFloat> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineDamages(buff.increaseDamages, result, level, 1f);
+            DamageElementMinMaxFloatAmounts amounts = default;
+            GameDataHelpers.CombineDamages(buff.increaseDamages, ref amounts, level, 1f);
+            amounts.CopyToDictionary(result);
         }
 
         public static void GetIncreaseDamagesRate(this Buff buff, int level, Dictionary<DamageElement, MinMaxFloat> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineDamages(buff.increaseDamagesRate, result, level, 1f);
+            DamageElementMinMaxFloatAmounts amounts = default;
+            GameDataHelpers.CombineDamages(buff.increaseDamagesRate, ref amounts, level, 1f);
+            amounts.CopyToDictionary(result);
         }
 
         public static void GetIncreaseSkills(this Buff buff, int level, Dictionary<BaseSkill, int> result)
@@ -113,8 +120,9 @@ namespace MultiplayerARPG
 
         public static void GetDamageOverTimes(this Buff buff, int level, Dictionary<DamageElement, MinMaxFloat> result)
         {
-            result.Clear();
-            GameDataHelpers.CombineDamages(buff.damageOverTimes, result, level, 1f);
+            DamageElementMinMaxFloatAmounts amounts = default;
+            GameDataHelpers.CombineDamages(buff.damageOverTimes, ref amounts, level, 1f);
+            amounts.CopyToDictionary(result);
         }
 
         public static float GetRemoveBuffWhenAttackChance(this Buff buff, int level)

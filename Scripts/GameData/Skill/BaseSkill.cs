@@ -481,12 +481,17 @@ namespace MultiplayerARPG
 
         public void GetRequireAttributeAmounts(int level, Dictionary<Attribute, float> result)
         {
-            result.Clear();
+            GetRequireAttributeAmounts(level).CopyTo(result);
+        }
+
+        public AttributeAmounts GetRequireAttributeAmounts(int level)
+        {
+            AttributeAmounts result = default;
             if (level < 0 || requirementEachLevels.Count == 0)
-                return;
-            if (level >= requirementEachLevels.Count)
-                GameDataHelpers.CombineAttributes(requirementEachLevels[requirementEachLevels.Count - 1].attributeAmounts, result, 1f);
-            GameDataHelpers.CombineAttributes(requirementEachLevels[level].attributeAmounts, result, 1f);
+                return result;
+            int index = Mathf.Min(level, requirementEachLevels.Count - 1);
+            GameDataHelpers.CombineAttributes(requirementEachLevels[index].attributeAmounts, ref result, 1f);
+            return result;
         }
 
         public void GetRequireSkillLevels(int level, Dictionary<BaseSkill, int> result)
@@ -499,14 +504,14 @@ namespace MultiplayerARPG
             GameDataHelpers.CombineSkills(requirementEachLevels[level].skillLevels, result, 1f);
         }
 
-        public void GetRequireCurrencyAmounts(int level, Dictionary<Currency, int> result)
+        public CurrencyAmounts GetRequireCurrencyAmounts(int level)
         {
+            CurrencyAmounts result = default;
             if (level < 0 || requirementEachLevels.Count == 0)
-                return;
-            result.Clear();
-            if (level >= requirementEachLevels.Count)
-                GameDataHelpers.CombineCurrencies(requirementEachLevels[requirementEachLevels.Count - 1].currencyAmounts, result, 1f);
-            GameDataHelpers.CombineCurrencies(requirementEachLevels[level].currencyAmounts, result, 1f);
+                return result;
+            int index = Mathf.Min(level, requirementEachLevels.Count - 1);
+            GameDataHelpers.CombineCurrencies(requirementEachLevels[index].currencyAmounts, ref result, 1f);
+            return result;
         }
 
         public void GetRequireItemAmounts(int level, Dictionary<BaseItem, int> result)
@@ -566,19 +571,18 @@ namespace MultiplayerARPG
             get { return true; }
         }
 
-        public Dictionary<DamageElement, MinMaxFloat> GetAttackDamages(ICharacterData skillUser, int skillLevel, bool isLeftHand)
+        public DamageElementMinMaxFloatAmounts GetAttackDamages(ICharacterData skillUser, int skillLevel, bool isLeftHand)
         {
-            Dictionary<DamageElement, MinMaxFloat> damageAmounts = new Dictionary<DamageElement, MinMaxFloat>();
-
+            DamageElementMinMaxFloatAmounts calculatedDamages = default;
             if (!IsAttack)
-                return damageAmounts;
+                return calculatedDamages;
 
             // Base attack damage amount will sum with other variables later
             if (TryGetBaseAttackDamageAmount(skillUser, skillLevel, isLeftHand, out KeyValuePair<DamageElement, MinMaxFloat> baseDamageAmount))
-                GameDataHelpers.CombineDamages(damageAmounts, baseDamageAmount);
+                calculatedDamages.Combine(baseDamageAmount);
 
             // Sum damage with weapon damage inflictions
-            if (TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out Dictionary<DamageElement, float> damageInflictions))
+            if (TryGetIndexedAttackWeaponDamageInflictions(skillUser, skillLevel, out DamageElementFloatAmounts damageInflictions))
             {
                 // Prepare weapon damage amount
                 KeyValuePair<DamageElement, MinMaxFloat> weaponDamageAmount;
@@ -587,11 +591,11 @@ namespace MultiplayerARPG
                 else
                     weaponDamageAmount = skillUser.GetCaches().RightHandWeaponDamage.Value;
 
-                foreach (DamageElement element in damageInflictions.Keys)
+                for (int i = 0; i < RuntimeGameDataSlots.DamageElementCount; ++i)
                 {
-                    if (element == null)
+                    if (!damageInflictions.Contains(i))
                         continue;
-                    GameDataHelpers.CombineDamages(damageAmounts, new KeyValuePair<DamageElement, MinMaxFloat>(element, weaponDamageAmount.Value * damageInflictions[element]));
+                    calculatedDamages.Add(i, weaponDamageAmount.Value * damageInflictions[i]);
                 }
             }
 
@@ -606,26 +610,24 @@ namespace MultiplayerARPG
                     weaponDamageAmount = skillUser.GetCaches().RightHandWeaponDamage.Value;
 
                 // Multiply both min and max damage by the multiplicator
-                GameDataHelpers.CombineDamages(damageAmounts, new KeyValuePair<DamageElement, MinMaxFloat>(weaponDamageAmount.Key, weaponDamageAmount.Value * multiplicator));
+                calculatedDamages.Combine(new KeyValuePair<DamageElement, MinMaxFloat>(weaponDamageAmount.Key, weaponDamageAmount.Value * multiplicator));
             }
 
             // Sum damage with additional damage amounts
-            if (TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out Dictionary<DamageElement, MinMaxFloat> additionalDamageAmounts))
-                GameDataHelpers.CombineDamages(damageAmounts, additionalDamageAmounts);
+            if (TryGetIndexedAttackAdditionalDamageAmounts(skillUser, skillLevel, out DamageElementMinMaxFloatAmounts additionalDamageAmounts))
+                calculatedDamages.Combine(additionalDamageAmounts);
 
             // Sum damage with buffs
             if (IsIncreaseAttackDamageAmountsWithBuffs(skillUser, skillLevel))
             {
-                using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> multiplyDamages))
-                {
-                    GameDataHelpers.CombineDamages(multiplyDamages, damageAmounts);
-                    GameDataHelpers.CombineDamages(damageAmounts, skillUser.GetCaches().IncreaseDamages);
-                    GameDataHelpers.MultiplyDamages(multiplyDamages, skillUser.GetCaches().IncreaseDamagesRate);
-                    GameDataHelpers.CombineDamages(damageAmounts, multiplyDamages);
-                }
+                CharacterDataCache cache = skillUser.GetCaches();
+                DamageElementMinMaxFloatAmounts multiplyDamages = calculatedDamages;
+                calculatedDamages.Combine(cache.IndexedIncreaseDamages);
+                multiplyDamages.MultiplyRates(cache.IndexedIncreaseDamagesRate);
+                calculatedDamages.Combine(multiplyDamages);
             }
 
-            return damageAmounts;
+            return calculatedDamages;
         }
 
         public virtual bool IsIncreaseAttackDamageAmountsWithBuffs(ICharacterData skillUser, int skillLevel)
@@ -645,6 +647,15 @@ namespace MultiplayerARPG
             return false;
         }
 
+        public virtual bool TryGetIndexedAttackWeaponDamageInflictions(ICharacterData skillUser, int skillLevel, out DamageElementFloatAmounts weaponDamageInflictions)
+        {
+            weaponDamageInflictions = default;
+            if (!TryGetAttackWeaponDamageInflictions(skillUser, skillLevel, out Dictionary<DamageElement, float> values))
+                return false;
+            weaponDamageInflictions.Combine(values);
+            return true;
+        }
+
         public virtual bool TryGetAttackWeaponDamageMultiplicator(ICharacterData skillUser, int skillLevel, out float weaponDamageMultiplicator)
         {
             weaponDamageMultiplicator = 0;
@@ -655,6 +666,15 @@ namespace MultiplayerARPG
         {
             additionalDamageAmounts = null;
             return false;
+        }
+
+        public virtual bool TryGetIndexedAttackAdditionalDamageAmounts(ICharacterData skillUser, int skillLevel, out DamageElementMinMaxFloatAmounts additionalDamageAmounts)
+        {
+            additionalDamageAmounts = default;
+            if (!TryGetAttackAdditionalDamageAmounts(skillUser, skillLevel, out Dictionary<DamageElement, MinMaxFloat> values))
+                return false;
+            additionalDamageAmounts.Combine(values);
+            return true;
         }
 
         public virtual bool TryGetBuff(out Buff buff)
@@ -704,9 +724,9 @@ namespace MultiplayerARPG
             BaseCharacterEntity skillUser,
             CharacterItem weapon,
             bool isLeftHand,
-            out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts)
+            out DamageElementMinMaxFloatAmounts increaseDamageAmounts)
         {
-            increaseDamageAmounts = null;
+            increaseDamageAmounts = default;
             if (skillUser is BasePlayerCharacterEntity)
             {
                 // Not enough items
@@ -719,37 +739,31 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public virtual List<Dictionary<DamageElement, MinMaxFloat>> PrepareDamageAmounts(
+        public virtual List<DamageElementMinMaxFloatAmounts> PrepareDamageAmounts(
             BaseCharacterEntity skillUser,
             bool isLeftHand,
-            Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts,
+            DamageElementMinMaxFloatAmounts baseDamageAmounts,
             int triggerCount)
         {
-            List<Dictionary<DamageElement, MinMaxFloat>> result;
+            List<DamageElementMinMaxFloatAmounts> result;
             switch (requireAmmoType)
             {
                 case RequireAmmoType.BasedOnWeapon:
                     return skillUser.PrepareDamageAmounts(isLeftHand, baseDamageAmounts, triggerCount, requireAmmoAmount, true);
                 case RequireAmmoType.BasedOnSkill:
-                    result = new List<Dictionary<DamageElement, MinMaxFloat>>();
-                    Dictionary<DamageElement, MinMaxFloat> tempIncreaseDamageAmounts;
+                    result = new List<DamageElementMinMaxFloatAmounts>();
+                    DamageElementMinMaxFloatAmounts tempIncreaseDamageAmounts;
                     for (int i = 0; i < triggerCount; ++i)
                     {
                         if (!DecreaseAmmos(skillUser, isLeftHand, out tempIncreaseDamageAmounts, false))
                             break;
-                        using (CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get(out Dictionary<DamageElement, MinMaxFloat> newDamageAmounts))
-                        {
-                            foreach (KeyValuePair<DamageElement, MinMaxFloat> damageAmount in baseDamageAmounts)
-                            {
-                                newDamageAmounts[damageAmount.Key] = damageAmount.Value;
-                            }
-                            GameDataHelpers.CombineDamages(newDamageAmounts, tempIncreaseDamageAmounts);
-                            result.Add(newDamageAmounts);
-                        }
+                        DamageElementMinMaxFloatAmounts combinedDamageAmounts = baseDamageAmounts;
+                        combinedDamageAmounts.Combine(tempIncreaseDamageAmounts);
+                        result.Add(combinedDamageAmounts);
                     }
                     return result;
             }
-            result = new List<Dictionary<DamageElement, MinMaxFloat>>();
+            result = new List<DamageElementMinMaxFloatAmounts>();
             for (int i = 0; i < triggerCount; ++i)
             {
                 result.Add(baseDamageAmounts);
@@ -777,7 +791,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition)
         {
@@ -889,7 +903,7 @@ namespace MultiplayerARPG
             int simulateSeed,
             byte triggerIndex,
             byte spreadIndex,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             uint targetObjectId,
             AimPosition aimPosition);
 
@@ -912,7 +926,7 @@ namespace MultiplayerARPG
             CharacterItem weapon,
             int simulateSeed,
             byte triggerIndex,
-            List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts,
+            List<DamageElementMinMaxFloatAmounts> damageAmounts,
             AimPosition aimPosition)
         {
             return false;
@@ -987,12 +1001,8 @@ namespace MultiplayerARPG
             }
 
             // Check is it pass attribute requirement or not
-            using (CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get(out Dictionary<Attribute, float> requireAttributeAmounts))
-            {
-                GetRequireAttributeAmounts(level, requireAttributeAmounts);
-                if (!character.HasEnoughAttributeAmounts(requireAttributeAmounts, false, out gameMessage, out _, willReleaseAttributes: true))
-                    return false;
-            }
+            if (!character.HasEnoughAttributeAmounts(GetRequireAttributeAmounts(level), false, out gameMessage))
+                return false;
 
             // Check is it pass skill level requirement or not
             using (CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Get(out Dictionary<BaseSkill, int> requireSkillLevels))
@@ -1003,12 +1013,8 @@ namespace MultiplayerARPG
             }
 
             // Check is it pass currency requirement or not
-            using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> requireCurrencyAmounts))
-            {
-                GetRequireCurrencyAmounts(level, requireCurrencyAmounts);
-                if (!character.HasEnoughCurrencyAmounts(requireCurrencyAmounts, out gameMessage, out _))
-                    return false;
-            }
+            if (!character.HasEnoughCurrencyAmounts(GetRequireCurrencyAmounts(level), out gameMessage, out CurrencyAmounts _))
+                return false;
 
             // Check is it pass item requirement or not
             using (CollectionPool<Dictionary<BaseItem, int>, KeyValuePair<BaseItem, int>>.Get(out Dictionary<BaseItem, int> requireItemAmounts))
@@ -1250,9 +1256,9 @@ namespace MultiplayerARPG
             return false;
         }
 
-        protected bool DecreaseAmmos(BaseCharacterEntity character, bool isLeftHand, out Dictionary<DamageElement, MinMaxFloat> increaseDamageAmounts, bool applyChanges = true)
+        protected bool DecreaseAmmos(BaseCharacterEntity character, bool isLeftHand, out DamageElementMinMaxFloatAmounts increaseDamageAmounts, bool applyChanges = true)
         {
-            increaseDamageAmounts = null;
+            increaseDamageAmounts = default;
             AmmoType ammoType;
             int amount;
             switch (requireAmmoType)

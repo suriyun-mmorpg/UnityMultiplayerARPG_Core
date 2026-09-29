@@ -935,12 +935,10 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD;
                 return false;
             }
-            using (CollectionPool<Dictionary<Currency, int>, KeyValuePair<Currency, int>>.Get(out Dictionary<Currency, int> requireCurrencyAmounts))
-            {
-                GameDataHelpers.CombineCurrencies(confirmRequirement.currencyAmounts, requireCurrencyAmounts, 1f);
-                if (!character.HasEnoughCurrencyAmounts(requireCurrencyAmounts, out gameMessage, out _))
-                    return false;
-            }
+            CurrencyAmounts requireCurrencyAmounts = default;
+            GameDataHelpers.CombineCurrencies(confirmRequirement.currencyAmounts, ref requireCurrencyAmounts, 1f);
+            if (!character.HasEnoughCurrencyAmounts(requireCurrencyAmounts, out gameMessage, out CurrencyAmounts _))
+                return false;
             using (CollectionPool<Dictionary<BaseItem, int>, KeyValuePair<BaseItem, int>>.Get(out Dictionary<BaseItem, int> requireItemAmounts))
             {
                 GameDataHelpers.CombineItems(confirmRequirement.itemAmounts, requireItemAmounts);

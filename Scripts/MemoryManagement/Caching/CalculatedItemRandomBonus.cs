@@ -11,41 +11,28 @@ namespace MultiplayerARPG
         private int _level;
         private int _randomSeed;
         private byte _version;
+        private int _runtimeSlotGeneration = -1;
         private CharacterStats _cacheIncreaseStats = new CharacterStats();
         private CharacterStats _cacheIncreaseStatsRate = new CharacterStats();
-        private readonly Dictionary<Attribute, float> _cacheIncreaseAttributes;
-        private readonly Dictionary<Attribute, float> _cacheIncreaseAttributesRate;
-        private readonly Dictionary<DamageElement, float> _cacheIncreaseResistances;
-        private readonly Dictionary<DamageElement, float> _cacheIncreaseArmors;
-        private readonly Dictionary<DamageElement, float> _cacheIncreaseArmorsRate;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamages;
-        private readonly Dictionary<DamageElement, MinMaxFloat> _cacheIncreaseDamagesRate;
         private readonly Dictionary<BaseSkill, int> _cacheIncreaseSkills;
+        private AttributeAmounts _indexedIncreaseAttributes;
+        private AttributeAmounts _indexedIncreaseAttributesRate;
+        private DamageElementFloatAmounts _indexedIncreaseResistances;
+        private DamageElementFloatAmounts _indexedIncreaseArmors;
+        private DamageElementFloatAmounts _indexedIncreaseArmorsRate;
+        private DamageElementMinMaxFloatAmounts _indexedIncreaseDamages;
+        private DamageElementMinMaxFloatAmounts _indexedIncreaseDamagesRate;
 
         private ItemRandomBonus _randomBonus;
         private int _appliedAmount = 0;
 
         public CalculatedItemRandomBonus()
         {
-            _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
-            _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
-            _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
-            _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
-            _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-            _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
         }
 
         public CalculatedItemRandomBonus(IEquipmentItem item, int level, int randomSeed, byte version)
         {
-            _cacheIncreaseAttributes = new Dictionary<Attribute, float>();
-            _cacheIncreaseAttributesRate = new Dictionary<Attribute, float>();
-            _cacheIncreaseResistances = new Dictionary<DamageElement, float>();
-            _cacheIncreaseArmors = new Dictionary<DamageElement, float>();
-            _cacheIncreaseArmorsRate = new Dictionary<DamageElement, float>();
-            _cacheIncreaseDamages = new Dictionary<DamageElement, MinMaxFloat>();
-            _cacheIncreaseDamagesRate = new Dictionary<DamageElement, MinMaxFloat>();
             _cacheIncreaseSkills = new Dictionary<BaseSkill, int>();
             Build(item, level, randomSeed, version);
         }
@@ -59,26 +46,28 @@ namespace MultiplayerARPG
         {
             _cacheIncreaseStats = new CharacterStats();
             _cacheIncreaseStatsRate = new CharacterStats();
-            _cacheIncreaseAttributes?.Clear();
-            _cacheIncreaseAttributesRate?.Clear();
-            _cacheIncreaseResistances?.Clear();
-            _cacheIncreaseArmors?.Clear();
-            _cacheIncreaseArmorsRate?.Clear();
-            _cacheIncreaseDamages?.Clear();
-            _cacheIncreaseDamagesRate?.Clear();
+            _indexedIncreaseAttributes = default;
+            _indexedIncreaseAttributesRate = default;
+            _indexedIncreaseResistances = default;
+            _indexedIncreaseArmors = default;
+            _indexedIncreaseArmorsRate = default;
+            _indexedIncreaseDamages = default;
+            _indexedIncreaseDamagesRate = default;
             _cacheIncreaseSkills?.Clear();
         }
 
         public void Build(IEquipmentItem item, int level, int randomSeed, byte version)
         {
             // Don't rebuild if it has no difference
-            if (_item != null && _item.DataId == item.DataId && _level == level && _randomSeed == randomSeed && _version == version)
+            if (_item != null && _item.DataId == item.DataId && _level == level && _randomSeed == randomSeed && _version == version &&
+                _runtimeSlotGeneration == RuntimeGameDataSlots.Generation)
                 return;
 
             _item = item;
             _level = level;
             _randomSeed = randomSeed;
             _version = version;
+            _runtimeSlotGeneration = RuntimeGameDataSlots.Generation;
             _appliedAmount = 0;
 
             Clear();
@@ -140,7 +129,9 @@ namespace MultiplayerARPG
                     if (_version > 1)
                         index = s_randomIndexes[i];
                     if (!_randomBonus.randomAttributeAmounts[index].Apply(random)) continue;
-                    GameDataHelpers.CombineAttributes(_cacheIncreaseAttributes, _randomBonus.randomAttributeAmounts[index].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    AttributeAmount amount = _randomBonus.randomAttributeAmounts[index].GetRandomedAmount(random);
+                    if (amount.attribute != null)
+                        _indexedIncreaseAttributes.Add(RuntimeGameDataSlots.GetSlot(amount.attribute), amount.amount);
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -161,7 +152,9 @@ namespace MultiplayerARPG
                     if (_version > 1)
                         index = s_randomIndexes[i];
                     if (!_randomBonus.randomAttributeAmountRates[index].Apply(random)) continue;
-                    GameDataHelpers.CombineAttributes(_cacheIncreaseAttributesRate, _randomBonus.randomAttributeAmountRates[index].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    AttributeAmount amount = _randomBonus.randomAttributeAmountRates[index].GetRandomedAmount(random);
+                    if (amount.attribute != null)
+                        _indexedIncreaseAttributesRate.Add(RuntimeGameDataSlots.GetSlot(amount.attribute), amount.amount);
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -182,7 +175,9 @@ namespace MultiplayerARPG
                     if (_version > 1)
                         index = s_randomIndexes[i];
                     if (!_randomBonus.randomResistanceAmounts[index].Apply(random)) continue;
-                    GameDataHelpers.CombineResistances(_cacheIncreaseResistances, _randomBonus.randomResistanceAmounts[index].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    ResistanceAmount amount = _randomBonus.randomResistanceAmounts[index].GetRandomedAmount(random);
+                    DamageElement element = amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement;
+                    _indexedIncreaseResistances.Add(RuntimeGameDataSlots.GetSlot(element), amount.amount);
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -203,7 +198,9 @@ namespace MultiplayerARPG
                     if (_version > 1)
                         index = s_randomIndexes[i];
                     if (!_randomBonus.randomArmorAmounts[index].Apply(random)) continue;
-                    GameDataHelpers.CombineArmors(_cacheIncreaseArmors, _randomBonus.randomArmorAmounts[index].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    ArmorAmount amount = _randomBonus.randomArmorAmounts[index].GetRandomedAmount(random);
+                    DamageElement element = amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement;
+                    _indexedIncreaseArmors.Add(RuntimeGameDataSlots.GetSlot(element), amount.amount);
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -224,7 +221,9 @@ namespace MultiplayerARPG
                     if (_version > 1)
                         index = s_randomIndexes[i];
                     if (!_randomBonus.randomArmorAmountRates[index].Apply(random)) continue;
-                    GameDataHelpers.CombineArmors(_cacheIncreaseArmorsRate, _randomBonus.randomArmorAmountRates[index].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    ArmorAmount amount = _randomBonus.randomArmorAmountRates[index].GetRandomedAmount(random);
+                    DamageElement element = amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement;
+                    _indexedIncreaseArmorsRate.Add(RuntimeGameDataSlots.GetSlot(element), amount.amount);
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -245,7 +244,9 @@ namespace MultiplayerARPG
                     if (_version > 1)
                         index = s_randomIndexes[i];
                     if (!_randomBonus.randomDamageAmounts[index].Apply(random)) continue;
-                    GameDataHelpers.CombineDamages(_cacheIncreaseDamages, _randomBonus.randomDamageAmounts[index].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    DamageAmount amount = _randomBonus.randomDamageAmounts[index].GetRandomedAmount(random);
+                    DamageElement element = amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement;
+                    _indexedIncreaseDamages.Add(RuntimeGameDataSlots.GetSlot(element), amount.amount);
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -266,7 +267,9 @@ namespace MultiplayerARPG
                     if (_version > 1)
                         index = s_randomIndexes[i];
                     if (!_randomBonus.randomDamageAmountRates[index].Apply(random)) continue;
-                    GameDataHelpers.CombineDamages(_cacheIncreaseDamagesRate, _randomBonus.randomDamageAmountRates[index].GetRandomedAmount(random).ToKeyValuePair(1f));
+                    DamageAmount amount = _randomBonus.randomDamageAmountRates[index].GetRandomedAmount(random);
+                    DamageElement element = amount.damageElement == null ? GameInstance.Singleton.DefaultDamageElement : amount.damageElement;
+                    _indexedIncreaseDamagesRate.Add(RuntimeGameDataSlots.GetSlot(element), amount.amount);
                     _appliedAmount++;
                     if (IsReachedMaxRandomStatsAmount())
                         return;
@@ -627,40 +630,13 @@ namespace MultiplayerARPG
             return _cacheIncreaseStatsRate;
         }
 
-        public Dictionary<Attribute, float> GetIncreaseAttributes()
-        {
-            return _cacheIncreaseAttributes;
-        }
-
-        public Dictionary<Attribute, float> GetIncreaseAttributesRate()
-        {
-            return _cacheIncreaseAttributesRate;
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseResistances()
-        {
-            return _cacheIncreaseResistances;
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseArmors()
-        {
-            return _cacheIncreaseArmors;
-        }
-
-        public Dictionary<DamageElement, float> GetIncreaseArmorsRate()
-        {
-            return _cacheIncreaseArmorsRate;
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamages()
-        {
-            return _cacheIncreaseDamages;
-        }
-
-        public Dictionary<DamageElement, MinMaxFloat> GetIncreaseDamagesRate()
-        {
-            return _cacheIncreaseDamagesRate;
-        }
+        public AttributeAmounts GetIndexedIncreaseAttributes() => _indexedIncreaseAttributes;
+        public AttributeAmounts GetIndexedIncreaseAttributesRate() => _indexedIncreaseAttributesRate;
+        public DamageElementFloatAmounts GetIndexedIncreaseResistances() => _indexedIncreaseResistances;
+        public DamageElementFloatAmounts GetIndexedIncreaseArmors() => _indexedIncreaseArmors;
+        public DamageElementFloatAmounts GetIndexedIncreaseArmorsRate() => _indexedIncreaseArmorsRate;
+        public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamages() => _indexedIncreaseDamages;
+        public DamageElementMinMaxFloatAmounts GetIndexedIncreaseDamagesRate() => _indexedIncreaseDamagesRate;
 
         public Dictionary<BaseSkill, int> GetIncreaseSkills()
         {

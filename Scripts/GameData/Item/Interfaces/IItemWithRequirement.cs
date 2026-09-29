@@ -8,6 +8,6 @@ namespace MultiplayerARPG
         /// <summary>
         /// Cached required attribute amounts to equip the item
         /// </summary>
-        Dictionary<Attribute, float> RequireAttributeAmounts { get; }
+        AttributeAmounts RequireAttributeAmounts { get; }
     }
 }

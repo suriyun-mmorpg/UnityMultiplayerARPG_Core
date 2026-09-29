@@ -530,12 +530,13 @@ namespace MultiplayerARPG
             // Currencies
             if (buildingRepairData.requireCurrencies != null)
             {
-                Dictionary<Currency, int> playerCurrencies = repairPlayer.GetCurrencies();
+                CurrencyAmounts playerCurrencies = repairPlayer.GetIndexedCurrencies();
                 for (i = 0; i < buildingRepairData.requireCurrencies.Length; ++i)
                 {
                     if (buildingRepairData.requireCurrencies[i].currency == null || buildingRepairData.requireCurrencies[i].amount == 0)
                         continue;
-                    if (!playerCurrencies.TryGetValue(buildingRepairData.requireCurrencies[i].currency, out int currentAmount))
+                    int currencySlot = RuntimeGameDataSlots.GetSlot(buildingRepairData.requireCurrencies[i].currency);
+                    if (!playerCurrencies.TryGetValue(currencySlot, out int currentAmount))
                     {
                         repairAmount = 0;
                         errorMessage = UITextKeys.UI_ERROR_NOT_ENOUGH_CURRENCY_AMOUNTS;
@@ -557,7 +558,7 @@ namespace MultiplayerARPG
             return true;
         }
 
-        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
             // Repairing
             if (instigator.TryGetEntity(out BasePlayerCharacterEntity attackPlayer) && !weapon.IsEmptySlot() && CacheRepairs.TryGetValue(weapon.GetItem(), out BuildingRepairData buildingRepairData))
@@ -581,9 +582,10 @@ namespace MultiplayerARPG
 
             // Calculate damages
             float calculatingTotalDamage = 0f;
-            foreach (DamageElement damageElement in damageAmounts.Keys)
+            for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
             {
-                calculatingTotalDamage += damageAmounts[damageElement].Random(randomSeed);
+                if (damageAmounts.Contains(slot))
+                    calculatingTotalDamage += damageAmounts[slot].Random(randomSeed);
             }
             // Apply damages
             combatAmountType = CombatAmountType.NormalDamage;
@@ -593,7 +595,7 @@ namespace MultiplayerARPG
             CurrentHp -= totalDamage;
         }
 
-        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
+        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
             if (this.IsDead())

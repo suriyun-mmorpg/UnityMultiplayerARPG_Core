@@ -17,12 +17,12 @@ namespace MultiplayerARPG
         public UICurrencyAmounts uiReturnCurrencies;
         public TextWrapper uiTextReturnGold;
 
-        protected Dictionary<Currency, int> _tempReturningCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempReturningCurrencies;
         protected Dictionary<BaseItem, int> _tempReturningItems = new Dictionary<BaseItem, int>();
         private readonly List<ItemAmount> _returningItems = new List<ItemAmount>();
         private readonly List<CurrencyAmount> _returningCurrencies = new List<CurrencyAmount>();
         private readonly Dictionary<BaseItem, int> _appliedReturningItems = new Dictionary<BaseItem, int>();
-        private readonly Dictionary<Currency, int> _appliedReturningCurrencies = new Dictionary<Currency, int>();
+        private CurrencyAmounts _appliedReturningCurrencies;
         private bool _appliedHasItems;
         private bool _appliedHasCurrencies;
         private int _lastReturnGold = -1;
@@ -37,7 +37,6 @@ namespace MultiplayerARPG
             _returningItems.Clear();
             _returningCurrencies.Clear();
             _tempReturningCurrencies.Clear();
-            _tempReturningCurrencies = null;
             _tempReturningItems.Clear();
             _tempReturningItems = null;
             _appliedReturningItems.Clear();
@@ -120,11 +119,11 @@ namespace MultiplayerARPG
                 else
                 {
                     _tempReturningCurrencies.Clear();
-                    GameDataHelpers.CombineCurrencies(returningCurrencies, _tempReturningCurrencies, 1f);
-                    if (!_appliedHasCurrencies || !DictionaryEquals(_appliedReturningCurrencies, _tempReturningCurrencies))
+                    GameDataHelpers.CombineCurrencies(returningCurrencies, ref _tempReturningCurrencies, 1f);
+                    if (!_appliedHasCurrencies || !_appliedReturningCurrencies.HasSameAmounts(_tempReturningCurrencies))
                     {
                         _appliedHasCurrencies = true;
-                        CopyDictionary(_appliedReturningCurrencies, _tempReturningCurrencies);
+                        _appliedReturningCurrencies = _tempReturningCurrencies;
                         uiReturnCurrencies.displayType = UICurrencyAmounts.DisplayType.Simple;
                         uiReturnCurrencies.Show();
                         uiReturnCurrencies.Data = _tempReturningCurrencies;

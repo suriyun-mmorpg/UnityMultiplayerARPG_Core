@@ -50,7 +50,7 @@ namespace MultiplayerARPG
             return null;
         }
 
-        public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, WeaponHandlingState weaponHandlingState, CharacterItem weapon, BaseSkill skill, int skillLevel)
+        public void PrepareHitRegValidation(BaseGameEntity attacker, int simulateSeed, float[] triggerDurations, byte fireSpread, DamageInfo damageInfo, List<DamageElementMinMaxFloatAmounts> damageAmounts, WeaponHandlingState weaponHandlingState, CharacterItem weapon, BaseSkill skill, int skillLevel)
         {
             string id = HitRegistrationUtils.MakeValidateId(attacker.ObjectId, simulateSeed);
             bool appending = false;

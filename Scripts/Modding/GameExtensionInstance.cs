@@ -9,5 +9,8 @@ namespace MultiplayerARPG
         public static RandomCharacterStatsDelegate onRandomCharacterStats;
         public static CalculatedBuffDelegate onBuildCalculatedBuff;
         public static CalculatedItemBuffDelegate onBuildCalculatedItemBuff;
+        // Runs after the dictionary hooks. Use SetIndexed... methods to change numeric amounts.
+        public static CalculatedBuffDelegate onBuildCalculatedBuffIndexed;
+        public static CalculatedItemBuffDelegate onBuildCalculatedItemBuffIndexed;
     }
 }

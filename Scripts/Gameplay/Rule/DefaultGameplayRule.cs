@@ -162,7 +162,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
+        public override bool RandomAttackHitOccurs(Vector3 fromPosition, BaseCharacterEntity attacker, BaseCharacterEntity damageReceiver, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out bool isCritical, out bool isBlocked)
         {
             isCritical = false;
             isBlocked = false;
@@ -228,6 +228,24 @@ namespace MultiplayerARPG
                 // Formula: Attack * 100 / (100 + Defend)
                 damageAmount *= 100f / (100f + Mathf.Max(0f, armorAmount));
             }
+            return damageAmount;
+        }
+
+        public override float GetDamageReducedByResistance(DamageElementFloatAmounts damageReceiverResistances, DamageElementFloatAmounts damageReceiverArmors, float damageAmount, DamageElement damageElement)
+        {
+            if (GetType() != typeof(DefaultGameplayRule))
+                return base.GetDamageReducedByResistance(damageReceiverResistances, damageReceiverArmors, damageAmount, damageElement);
+            if (damageElement == null)
+                damageElement = GameInstance.Singleton.DefaultDamageElement;
+            int slot = RuntimeGameDataSlots.GetSlot(damageElement);
+            if (damageReceiverResistances.TryGetValue(slot, out float resistanceAmount))
+            {
+                if (resistanceAmount > damageElement.MaxResistanceAmount)
+                    resistanceAmount = damageElement.MaxResistanceAmount;
+                damageAmount -= damageAmount * resistanceAmount;
+            }
+            if (damageReceiverArmors.TryGetValue(slot, out float armorAmount))
+                damageAmount *= 100f / (100f + Mathf.Max(0f, armorAmount));
             return damageAmount;
         }
 
@@ -1006,7 +1024,7 @@ namespace MultiplayerARPG
             if (intDamage < 0)
                 intDamage = 0;
             character.CurrentHp -= intDamage;
-            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, null, CombatAmountType.FallDamage, intDamage, CharacterItem.Empty, null, 0, CharacterBuff.Empty);
+            character.ReceivedDamage(HitBoxPosition.None, character.EntityTransform.position, EntityInfo.Empty, default, CombatAmountType.FallDamage, intDamage, CharacterItem.Empty, null, 0, CharacterBuff.Empty);
         }
 
         public override bool CanInteractEntity(BaseCharacterEntity character, uint objectId)

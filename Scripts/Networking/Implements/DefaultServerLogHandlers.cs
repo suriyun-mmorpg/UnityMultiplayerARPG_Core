@@ -36,7 +36,7 @@ namespace MultiplayerARPG
         public void LogBuffApply(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff) { }
         public void LogBuffRemove(IPlayerCharacterData playerCharacter, CharacterBuff characterBuff, BuffRemoveReasons reason) { }
 
-        public void LogDamageReceived(IPlayerCharacterData playerCharacter, HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime) { }
+        public void LogDamageReceived(IPlayerCharacterData playerCharacter, HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime) { }
         public void LogKilled(IPlayerCharacterData playerCharacter, EntityInfo lastAttacker) { }
 
         public void LogCraftItem(IPlayerCharacterData playerCharacter, ItemCraft itemCraft) { }

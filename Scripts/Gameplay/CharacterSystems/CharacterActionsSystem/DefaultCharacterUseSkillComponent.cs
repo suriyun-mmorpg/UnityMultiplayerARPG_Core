@@ -184,7 +184,7 @@ namespace MultiplayerARPG
 
             // Prepare required data and get damages data
             IWeaponItem weaponItem = weapon.GetWeaponItem();
-            Dictionary<DamageElement, MinMaxFloat> baseDamageAmounts = skill.GetAttackDamages(Entity, skillLevel, isLeftHand);
+            DamageElementMinMaxFloatAmounts baseDamageAmounts = skill.GetAttackDamages(Entity, skillLevel, isLeftHand);
 
             // Calculate move speed rate while doing action at clients and server
             MoveSpeedRateWhileUsingSkill = skill.moveSpeedRateWhileUsingSkill;
@@ -215,7 +215,7 @@ namespace MultiplayerARPG
                 bool fpsModelAvailable = IsClient && fpsModel != null && fpsModel.gameObject.activeSelf;
 
                 // Prepare damage amounts
-                List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, triggerDurations.Length);
+                List<DamageElementMinMaxFloatAmounts> damageAmounts = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamageAmounts, triggerDurations.Length);
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((!skill.IsChanneledAbility() || itemDataId.HasValue) &&
@@ -490,8 +490,8 @@ namespace MultiplayerARPG
                 if (Entity.CurrentMp < tickMp)
                     break;
 
-                Dictionary<DamageElement, MinMaxFloat> baseDamage = skill.GetAttackDamages(Entity, level, isLeftHand);
-                List<Dictionary<DamageElement, MinMaxFloat>> damages = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamage, 1);
+                DamageElementMinMaxFloatAmounts baseDamage = skill.GetAttackDamages(Entity, level, isLeftHand);
+                List<DamageElementMinMaxFloatAmounts> damages = skill.PrepareDamageAmounts(Entity, isLeftHand, baseDamage, 1);
                 if (damages.Count == 0 || !skill.DecreaseResources(Entity, weapon, isLeftHand, out _))
                     break;
                 Entity.CurrentMp -= tickMp;
@@ -523,8 +523,8 @@ namespace MultiplayerARPG
             bool isLeftHand = state.WeaponHandlingState.Has(WeaponHandlingState.IsLeftHand);
             Entity.GetUsingSkillData(state.Skill, ref isLeftHand, out _, out _, out CharacterItem weapon,
                 out DamageInfo damageInfo);
-            Dictionary<DamageElement, MinMaxFloat> baseDamage = state.Skill.GetAttackDamages(Entity, state.SkillLevel, isLeftHand);
-            List<Dictionary<DamageElement, MinMaxFloat>> damages = state.Skill.PrepareDamageAmounts(Entity,
+            DamageElementMinMaxFloatAmounts baseDamage = state.Skill.GetAttackDamages(Entity, state.SkillLevel, isLeftHand);
+            List<DamageElementMinMaxFloatAmounts> damages = state.Skill.PrepareDamageAmounts(Entity,
                 isLeftHand, baseDamage, 1);
             if (damages.Count == 0)
                 damages.Add(baseDamage);
@@ -608,7 +608,7 @@ namespace MultiplayerARPG
             ApplySkillUsing(validateData.Skill, validateData.SkillLevel, validateData.WeaponHandlingState, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageAmounts, data.targetObjectId, data.aimPosition);
         }
 
-        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, WeaponHandlingState weaponHandlingState, CharacterItem weapon, int simulateSeed, byte triggerIndex, List<Dictionary<DamageElement, MinMaxFloat>> damageAmounts, uint targetObjectId, AimPosition aimPosition)
+        protected virtual void ApplySkillUsing(BaseSkill skill, int skillLevel, WeaponHandlingState weaponHandlingState, CharacterItem weapon, int simulateSeed, byte triggerIndex, List<DamageElementMinMaxFloatAmounts> damageAmounts, uint targetObjectId, AimPosition aimPosition)
         {
             if (triggerIndex >= damageAmounts.Count)
             {

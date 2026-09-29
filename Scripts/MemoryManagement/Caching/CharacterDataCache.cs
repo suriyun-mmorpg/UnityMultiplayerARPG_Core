@@ -10,22 +10,136 @@ namespace MultiplayerARPG
         private static ProfilerMarker s_profilerMarker = new ProfilerMarker("CharacterDataCache - GetCaches");
 
         public bool IsRecaching { get; private set; }
+        private bool _numericResultsReady;
         public CharacterStats Stats { get; private set; }
-        public Dictionary<Attribute, float> Attributes { get; private set; }
-        public Dictionary<DamageElement, float> Resistances { get; private set; }
-        public Dictionary<DamageElement, float> Armors { get; private set; }
+        private Dictionary<Attribute, float> _attributes;
+        private Dictionary<DamageElement, float> _resistances;
+        private Dictionary<DamageElement, float> _armors;
+        public Dictionary<Attribute, float> Attributes
+        {
+            get
+            {
+                if (!_numericResultsReady)
+                    return null;
+                if (_attributes == null)
+                {
+                    _attributes = CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Get();
+                    _indexedAttributes.CopyTo(_attributes);
+                }
+                return _attributes;
+            }
+        }
+        public Dictionary<DamageElement, float> Resistances
+        {
+            get
+            {
+                if (!_numericResultsReady)
+                    return null;
+                if (_resistances == null)
+                {
+                    _resistances = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+                    _indexedResistances.CopyTo(_resistances);
+                }
+                return _resistances;
+            }
+        }
+        public Dictionary<DamageElement, float> Armors
+        {
+            get
+            {
+                if (!_numericResultsReady)
+                    return null;
+                if (_armors == null)
+                {
+                    _armors = CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Get();
+                    _indexedArmors.CopyTo(_armors);
+                }
+                return _armors;
+            }
+        }
+        private AttributeAmounts _indexedAttributes;
+        private DamageElementFloatAmounts _indexedResistances;
+        private DamageElementFloatAmounts _indexedArmors;
+        public AttributeAmounts IndexedAttributes => _indexedAttributes;
+        public DamageElementFloatAmounts IndexedResistances => _indexedResistances;
+        public DamageElementFloatAmounts IndexedArmors => _indexedArmors;
         public CharacterItem RightHandItem { get; private set; }
         public DamageInfo RightHandDamageInfo { get; private set; }
         public bool IsRightHandItemAvailable { get; private set; }
-        public Dictionary<DamageElement, MinMaxFloat> RightHandDamages { get; private set; }
+        private Dictionary<DamageElement, MinMaxFloat> _rightHandDamages;
+        public Dictionary<DamageElement, MinMaxFloat> RightHandDamages
+        {
+            get
+            {
+                if (!_numericResultsReady)
+                    return null;
+                if (_rightHandDamages == null)
+                {
+                    _rightHandDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+                    _indexedRightHandDamages.CopyToDictionary(_rightHandDamages);
+                }
+                return _rightHandDamages;
+            }
+        }
+        private DamageElementMinMaxFloatAmounts _indexedRightHandDamages;
+        public DamageElementMinMaxFloatAmounts IndexedRightHandDamages => _indexedRightHandDamages;
         public KeyValuePair<DamageElement, MinMaxFloat>? RightHandWeaponDamage { get; private set; }
         public CharacterItem LeftHandItem { get; private set; }
         public DamageInfo LeftHandDamageInfo { get; private set; }
         public bool IsLeftHandItemAvailable { get; private set; }
-        public Dictionary<DamageElement, MinMaxFloat> LeftHandDamages { get; private set; }
+        private Dictionary<DamageElement, MinMaxFloat> _leftHandDamages;
+        public Dictionary<DamageElement, MinMaxFloat> LeftHandDamages
+        {
+            get
+            {
+                if (!_numericResultsReady)
+                    return null;
+                if (_leftHandDamages == null)
+                {
+                    _leftHandDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+                    _indexedLeftHandDamages.CopyToDictionary(_leftHandDamages);
+                }
+                return _leftHandDamages;
+            }
+        }
+        private DamageElementMinMaxFloatAmounts _indexedLeftHandDamages;
+        public DamageElementMinMaxFloatAmounts IndexedLeftHandDamages => _indexedLeftHandDamages;
+        public bool HasIndexedLeftHandDamages { get; private set; }
         public KeyValuePair<DamageElement, MinMaxFloat>? LeftHandWeaponDamage { get; private set; }
-        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages { get; private set; }
-        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamagesRate { get; private set; }
+        private Dictionary<DamageElement, MinMaxFloat> _increaseDamages;
+        private Dictionary<DamageElement, MinMaxFloat> _increaseDamagesRate;
+        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamages
+        {
+            get
+            {
+                if (!_numericResultsReady)
+                    return null;
+                if (_increaseDamages == null)
+                {
+                    _increaseDamages = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+                    _indexedIncreaseDamages.CopyToDictionary(_increaseDamages);
+                }
+                return _increaseDamages;
+            }
+        }
+        public Dictionary<DamageElement, MinMaxFloat> IncreaseDamagesRate
+        {
+            get
+            {
+                if (!_numericResultsReady)
+                    return null;
+                if (_increaseDamagesRate == null)
+                {
+                    _increaseDamagesRate = CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Get();
+                    _indexedIncreaseDamagesRate.CopyToDictionary(_increaseDamagesRate);
+                }
+                return _increaseDamagesRate;
+            }
+        }
+        private DamageElementMinMaxFloatAmounts _indexedIncreaseDamages;
+        private DamageElementMinMaxFloatAmounts _indexedIncreaseDamagesRate;
+        public DamageElementMinMaxFloatAmounts IndexedIncreaseDamages => _indexedIncreaseDamages;
+        public DamageElementMinMaxFloatAmounts IndexedIncreaseDamagesRate => _indexedIncreaseDamagesRate;
         public Dictionary<BaseSkill, int> Skills { get; private set; }
         public Dictionary<StatusEffect, float> StatusEffectResistances { get; private set; }
         public Dictionary<EquipmentSet, int> EquipmentSets { get; private set; }
@@ -124,33 +238,42 @@ namespace MultiplayerARPG
 
         private void CleanCacheData()
         {
+            _numericResultsReady = false;
+            _indexedAttributes = default;
+            _indexedResistances = default;
+            _indexedArmors = default;
+            _indexedRightHandDamages = default;
+            _indexedLeftHandDamages = default;
+            HasIndexedLeftHandDamages = false;
+            _indexedIncreaseDamages = default;
+            _indexedIncreaseDamagesRate = default;
             // Release buffs
-            if (IncreaseDamages != null)
+            if (_increaseDamages != null)
             {
-                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(IncreaseDamages);
-                IncreaseDamages = null;
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_increaseDamages);
+                _increaseDamages = null;
             }
-            if (IncreaseDamagesRate != null)
+            if (_increaseDamagesRate != null)
             {
-                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(IncreaseDamagesRate);
-                IncreaseDamagesRate = null;
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_increaseDamagesRate);
+                _increaseDamagesRate = null;
             }
 
             // Release results
-            if (Attributes != null)
+            if (_attributes != null)
             {
-                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(Attributes);
-                Attributes = null;
+                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(_attributes);
+                _attributes = null;
             }
-            if (Resistances != null)
+            if (_resistances != null)
             {
-                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(Resistances);
-                Resistances = null;
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_resistances);
+                _resistances = null;
             }
-            if (Armors != null)
+            if (_armors != null)
             {
-                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(Armors);
-                Armors = null;
+                CollectionPool<Dictionary<DamageElement, float>, KeyValuePair<DamageElement, float>>.Release(_armors);
+                _armors = null;
             }
             if (StatusEffectResistances != null)
             {
@@ -162,15 +285,15 @@ namespace MultiplayerARPG
                 CollectionPool<Dictionary<BaseSkill, int>, KeyValuePair<BaseSkill, int>>.Release(Skills);
                 Skills = null;
             }
-            if (RightHandDamages != null)
+            if (_rightHandDamages != null)
             {
-                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(RightHandDamages);
-                RightHandDamages = null;
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_rightHandDamages);
+                _rightHandDamages = null;
             }
-            if (LeftHandDamages != null)
+            if (_leftHandDamages != null)
             {
-                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(LeftHandDamages);
-                LeftHandDamages = null;
+                CollectionPool<Dictionary<DamageElement, MinMaxFloat>, KeyValuePair<DamageElement, MinMaxFloat>>.Release(_leftHandDamages);
+                _leftHandDamages = null;
             }
             if (EquipmentSets != null)
             {
@@ -190,34 +313,20 @@ namespace MultiplayerARPG
             Stats = stats;
         }
 
-        private void SetAttributes(Dictionary<Attribute, float> attributes)
-        {
-            Attributes = attributes;
-        }
-
-        private void SetResistances(Dictionary<DamageElement, float> resistances)
-        {
-            Resistances = resistances;
-        }
-
-        private void SetArmors(Dictionary<DamageElement, float> armors)
-        {
-            Armors = armors;
-        }
-
-        private void SetRightHandDamages(Dictionary<DamageElement, MinMaxFloat> rightHandDamages)
-        {
-            RightHandDamages = rightHandDamages;
-        }
+        private void SetIndexedAttributes(AttributeAmounts attributes) => _indexedAttributes = attributes;
+        private void SetIndexedResistances(DamageElementFloatAmounts resistances) => _indexedResistances = resistances;
+        private void SetIndexedArmors(DamageElementFloatAmounts armors) => _indexedArmors = armors;
+        private void SetIndexedRightHandDamages(DamageElementMinMaxFloatAmounts damages) => _indexedRightHandDamages = damages;
 
         private void SetRightHandWeaponDamage(KeyValuePair<DamageElement, MinMaxFloat> rightHandDamage)
         {
             RightHandWeaponDamage = rightHandDamage;
         }
 
-        private void SetLeftHandDamages(Dictionary<DamageElement, MinMaxFloat> leftHandDamages)
+        private void SetIndexedLeftHandDamages(DamageElementMinMaxFloatAmounts damages)
         {
-            LeftHandDamages = leftHandDamages;
+            _indexedLeftHandDamages = damages;
+            HasIndexedLeftHandDamages = true;
         }
 
         private void SetLeftHandWeaponDamage(KeyValuePair<DamageElement, MinMaxFloat> leftHandDamage)
@@ -225,15 +334,8 @@ namespace MultiplayerARPG
             LeftHandWeaponDamage = leftHandDamage;
         }
 
-        private void SetIncreaseDamages(Dictionary<DamageElement, MinMaxFloat> increaseDamages)
-        {
-            IncreaseDamages = increaseDamages;
-        }
-
-        private void SetIncreaseDamagesRate(Dictionary<DamageElement, MinMaxFloat> increaseDamagesRate)
-        {
-            IncreaseDamagesRate = increaseDamagesRate;
-        }
+        private void SetIndexedIncreaseDamages(DamageElementMinMaxFloatAmounts damages) => _indexedIncreaseDamages = damages;
+        private void SetIndexedIncreaseDamagesRate(DamageElementMinMaxFloatAmounts damages) => _indexedIncreaseDamagesRate = damages;
 
         private void SetSkills(Dictionary<BaseSkill, int> skills)
         {
@@ -291,28 +393,27 @@ namespace MultiplayerARPG
 
                 characterData.GetAllStats(true, true, true,
                     SetStats,
-                    SetAttributes,
-                    SetResistances,
-                    SetArmors,
-                    SetRightHandDamages,
-                    SetRightHandWeaponDamage,
-                    SetLeftHandDamages,
-                    SetLeftHandWeaponDamage,
-                    isOverrideSkills ? null : SetSkills,
-                    SetStatusEffectResistances,
-                    SetEquipmentSets,
-                    onGetIncreasingDamages: SetIncreaseDamages,
-                    onGetIncreasingDamagesRate: SetIncreaseDamagesRate,
-                    willReleaseAttributes: false,
-                    willReleaseResistances: false,
-                    willReleaseArmors: false,
-                    willReleaseRightHandDamages: false,
-                    willReleaseLeftHandDamages: false,
+                    onGetAttributes: null,
+                    onGetResistances: null,
+                    onGetArmors: null,
+                    onGetRightHandDamages: null,
+                    onGetRightHandWeaponDamage: SetRightHandWeaponDamage,
+                    onGetLeftHandDamages: null,
+                    onGetLeftHandWeaponDamage: SetLeftHandWeaponDamage,
+                    onGetSkills: isOverrideSkills ? null : SetSkills,
+                    onGetStatusEffectResistances: SetStatusEffectResistances,
+                    onGetEquipmentSets: SetEquipmentSets,
+                    onGetIndexedAttributes: SetIndexedAttributes,
+                    onGetIndexedResistances: SetIndexedResistances,
+                    onGetIndexedArmors: SetIndexedArmors,
+                    onGetIndexedRightHandDamages: SetIndexedRightHandDamages,
+                    onGetIndexedLeftHandDamages: SetIndexedLeftHandDamages,
+                    onGetIndexedIncreasingDamages: SetIndexedIncreaseDamages,
+                    onGetIndexedIncreasingDamagesRate: SetIndexedIncreaseDamagesRate,
                     willReleaseSkills: isOverrideSkills,
                     willReleaseStatusEffectResistances: false,
-                    willReleaseEquipmentSets: false,
-                    willReleaseBuffDamages: false,
-                    willReleaseBuffDamagesRate: false);
+                    willReleaseEquipmentSets: false);
+                _numericResultsReady = true;
 
                 if (characterData.GetDatabase() != null)
                     BaseMoveSpeed = characterData.GetDatabase().Stats.baseStats.moveSpeed;
@@ -613,7 +714,7 @@ namespace MultiplayerARPG
             Attribute data;
             float result;
             if (GameInstance.Attributes.TryGetValue(dataId, out data) &&
-                Attributes.TryGetValue(data, out result))
+                _indexedAttributes.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return 0f;
         }
@@ -628,7 +729,7 @@ namespace MultiplayerARPG
             DamageElement data;
             float result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                Resistances.TryGetValue(data, out result))
+                _indexedResistances.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return 0f;
         }
@@ -643,7 +744,7 @@ namespace MultiplayerARPG
             DamageElement data;
             float result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                Armors.TryGetValue(data, out result))
+                _indexedArmors.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return 0f;
         }
@@ -658,7 +759,7 @@ namespace MultiplayerARPG
             DamageElement data;
             MinMaxFloat result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                RightHandDamages.TryGetValue(data, out result))
+                _indexedRightHandDamages.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return default;
         }
@@ -673,7 +774,7 @@ namespace MultiplayerARPG
             DamageElement data;
             MinMaxFloat result;
             if (GameInstance.DamageElements.TryGetValue(dataId, out data) &&
-                LeftHandDamages.TryGetValue(data, out result))
+                _indexedLeftHandDamages.TryGetValue(RuntimeGameDataSlots.GetSlot(data), out result))
                 return result;
             return default;
         }

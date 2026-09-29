@@ -461,8 +461,9 @@ namespace MultiplayerARPG
                     uiBuffAttributes.displayType = UIAttributeAmounts.DisplayType.Simple;
                     uiBuffAttributes.isBonus = true;
                     uiBuffAttributes.Show();
-                    _tempBuffAttributes.Clear();
-                    GameDataHelpers.CombineAttributes(Buff.increaseAttributes, _tempBuffAttributes, Level, 1f);
+                    AttributeAmounts amounts = default;
+                    GameDataHelpers.CombineAttributes(Buff.increaseAttributes, ref amounts, Level, 1f);
+                    amounts.CopyTo(_tempBuffAttributes);
                     uiBuffAttributes.Data = _tempBuffAttributes;
                 }
             }
@@ -478,8 +479,9 @@ namespace MultiplayerARPG
                     uiBuffAttributesRate.displayType = UIAttributeAmounts.DisplayType.Rate;
                     uiBuffAttributesRate.isBonus = true;
                     uiBuffAttributesRate.Show();
-                    _tempBuffAttributesRate.Clear();
-                    GameDataHelpers.CombineAttributes(Buff.increaseAttributesRate, _tempBuffAttributesRate, Level, 1f);
+                    AttributeAmounts amounts = default;
+                    GameDataHelpers.CombineAttributes(Buff.increaseAttributesRate, ref amounts, Level, 1f);
+                    amounts.CopyTo(_tempBuffAttributesRate);
                     uiBuffAttributesRate.Data = _tempBuffAttributesRate;
                 }
             }
@@ -494,8 +496,9 @@ namespace MultiplayerARPG
                 {
                     uiBuffResistances.isBonus = true;
                     uiBuffResistances.Show();
-                    _tempBuffResistances.Clear();
-                    GameDataHelpers.CombineResistances(Buff.increaseResistances, _tempBuffResistances, Level, 1f);
+                    DamageElementFloatAmounts amounts = default;
+                    GameDataHelpers.CombineResistances(Buff.increaseResistances, ref amounts, Level, 1f);
+                    amounts.CopyTo(_tempBuffResistances);
                     uiBuffResistances.Data = _tempBuffResistances;
                 }
             }
@@ -511,8 +514,9 @@ namespace MultiplayerARPG
                     uiBuffArmors.displayType = UIArmorAmounts.DisplayType.Simple;
                     uiBuffArmors.isBonus = true;
                     uiBuffArmors.Show();
-                    _tempBuffArmors.Clear();
-                    GameDataHelpers.CombineArmors(Buff.increaseArmors, _tempBuffArmors, Level, 1f);
+                    DamageElementFloatAmounts amounts = default;
+                    GameDataHelpers.CombineArmors(Buff.increaseArmors, ref amounts, Level, 1f);
+                    amounts.CopyTo(_tempBuffArmors);
                     uiBuffArmors.Data = _tempBuffArmors;
                 }
             }
@@ -528,8 +532,9 @@ namespace MultiplayerARPG
                     uiBuffArmorsRate.displayType = UIArmorAmounts.DisplayType.Rate;
                     uiBuffArmorsRate.isBonus = true;
                     uiBuffArmorsRate.Show();
-                    _tempBuffArmorsRate.Clear();
-                    GameDataHelpers.CombineArmors(Buff.increaseArmorsRate, _tempBuffArmorsRate, Level, 1f);
+                    DamageElementFloatAmounts amounts = default;
+                    GameDataHelpers.CombineArmors(Buff.increaseArmorsRate, ref amounts, Level, 1f);
+                    amounts.CopyTo(_tempBuffArmorsRate);
                     uiBuffArmorsRate.Data = _tempBuffArmorsRate;
                 }
             }
@@ -545,8 +550,9 @@ namespace MultiplayerARPG
                     uiBuffDamages.displayType = UIDamageElementAmounts.DisplayType.Simple;
                     uiBuffDamages.isBonus = true;
                     uiBuffDamages.Show();
-                    _tempBuffDamages.Clear();
-                    GameDataHelpers.CombineDamages(Buff.increaseDamages, _tempBuffDamages, Level, 1f);
+                    DamageElementMinMaxFloatAmounts amounts = default;
+                    GameDataHelpers.CombineDamages(Buff.increaseDamages, ref amounts, Level, 1f);
+                    amounts.CopyToDictionary(_tempBuffDamages);
                     uiBuffDamages.Data = _tempBuffDamages;
                 }
             }
@@ -562,8 +568,9 @@ namespace MultiplayerARPG
                     uiBuffDamagesRate.displayType = UIDamageElementAmounts.DisplayType.Rate;
                     uiBuffDamagesRate.isBonus = true;
                     uiBuffDamagesRate.Show();
-                    _tempBuffDamagesRate.Clear();
-                    GameDataHelpers.CombineDamages(Buff.increaseDamagesRate, _tempBuffDamagesRate, Level, 1f);
+                    DamageElementMinMaxFloatAmounts amounts = default;
+                    GameDataHelpers.CombineDamages(Buff.increaseDamagesRate, ref amounts, Level, 1f);
+                    amounts.CopyToDictionary(_tempBuffDamagesRate);
                     uiBuffDamagesRate.Data = _tempBuffDamagesRate;
                 }
             }
@@ -578,8 +585,9 @@ namespace MultiplayerARPG
                 {
                     uiDamageOverTimes.isBonus = false;
                     uiDamageOverTimes.Show();
-                    _tempDamageOverTimes.Clear();
-                    GameDataHelpers.CombineDamages(Buff.damageOverTimes, _tempDamageOverTimes, Level, 1f);
+                    DamageElementMinMaxFloatAmounts amounts = default;
+                    GameDataHelpers.CombineDamages(Buff.damageOverTimes, ref amounts, Level, 1f);
+                    amounts.CopyToDictionary(_tempDamageOverTimes);
                     uiDamageOverTimes.Data = _tempDamageOverTimes;
                 }
             }

@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using Cysharp.Text;
 using UnityEngine;
-using UnityEngine.Pool;
 
 namespace MultiplayerARPG
 {
@@ -80,7 +79,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected Dictionary<Attribute, float> _tempAttributes;
+        protected AttributeAmounts _tempAttributes;
 
         protected override void OnDestroy()
         {
@@ -99,11 +98,7 @@ namespace MultiplayerARPG
 
         protected void CleanTempData()
         {
-            if (_tempAttributes != null)
-            {
-                CollectionPool<Dictionary<Attribute, float>, KeyValuePair<Attribute, float>>.Release(_tempAttributes);
-                _tempAttributes = null;
-            }
+            _tempAttributes.Clear();
         }
 
         protected override void UpdateData()
@@ -126,8 +121,7 @@ namespace MultiplayerARPG
                 IPlayerCharacterData character = GameInstance.PlayingCharacter;
                 if (character != null)
                     character.GetAllStats(includeEquipmentsForCurrentAmounts, includeBuffsForCurrentAmounts, includeSkillsForCurrentAmounts, 
-                        onGetAttributes: attributes => _tempAttributes = attributes,
-                        willReleaseAttributes: false);
+                        onGetIndexedAttributes: attributes => _tempAttributes = attributes);
                 // In-loop temp data
                 using (Utf16ValueStringBuilder tempAllText = ZString.CreateStringBuilder(false))
                 {
@@ -149,7 +143,10 @@ namespace MultiplayerARPG
                         tempTargetAmount = dataEntry.Value;
                         tempCurrentAmount = 0;
                         // Get attribute amount
-                        _tempAttributes.TryGetValue(tempData, out tempCurrentAmount);
+                        int currentSlot = tempData.RuntimeSlot;
+                        if (currentSlot >= 0 && currentSlot < RuntimeGameDataSlots.AttributeCount &&
+                            ReferenceEquals(RuntimeGameDataSlots.GetAttribute(currentSlot), tempData))
+                            _tempAttributes.TryGetValue(currentSlot, out tempCurrentAmount);
                         // Use difference format by option
                         switch (displayType)
                         {

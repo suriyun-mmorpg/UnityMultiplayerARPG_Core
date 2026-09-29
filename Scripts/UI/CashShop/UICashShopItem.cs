@@ -56,7 +56,7 @@ namespace MultiplayerARPG
             }
         }
 
-        protected Dictionary<Currency, int> _tempReceiveCurrencies = new Dictionary<Currency, int>();
+        protected CurrencyAmounts _tempReceiveCurrencies;
         protected Dictionary<BaseItem, int> _tempReceiveItems = new Dictionary<BaseItem, int>();
 
         protected override void OnDestroy()
@@ -78,7 +78,6 @@ namespace MultiplayerARPG
             goldObjects.Nullify();
             _data = null;
             _tempReceiveCurrencies.Clear();
-            _tempReceiveCurrencies = null;
             _tempReceiveItems.Clear();
             _tempReceiveItems = null;
         }
@@ -187,7 +186,7 @@ namespace MultiplayerARPG
             {
                 _tempReceiveCurrencies.Clear();
                 if (Data != null)
-                    GameDataHelpers.CombineCurrencies(Data.ReceiveCurrencies, _tempReceiveCurrencies, 1f);
+                    GameDataHelpers.CombineCurrencies(Data.ReceiveCurrencies, ref _tempReceiveCurrencies, 1f);
                 uiReceiveCurrencies.Data = _tempReceiveCurrencies;
             }
 

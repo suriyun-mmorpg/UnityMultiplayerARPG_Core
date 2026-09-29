@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public partial class UICurrencyAmounts : UISelectionEntry<Dictionary<Currency, int>>
+    public partial class UICurrencyAmounts : UISelectionEntry<CurrencyAmounts>
     {
         public enum DisplayType
         {
@@ -59,6 +59,7 @@ namespace MultiplayerARPG
 
 
         private UIList _cacheList;
+        private readonly List<CurrencyAmount> _listAmounts = new List<CurrencyAmount>();
         public UIList CacheList
         {
             get
@@ -82,7 +83,8 @@ namespace MultiplayerARPG
             uiListContainer = null;
             _cacheTextAmounts?.Clear();
             _cacheList = null;
-            _data?.Clear();
+            _listAmounts.Clear();
+            _data.Clear();
         }
 
         protected override void UpdateData()
@@ -93,7 +95,7 @@ namespace MultiplayerARPG
                 SetDefaultValue(entry);
             }
             // Set number by updated data
-            if (Data == null || Data.Count == 0)
+            if (Data.IsEmpty)
             {
                 if (uiTextAllAmounts != null)
                     uiTextAllAmounts.SetGameObjectActive(false);
@@ -111,13 +113,14 @@ namespace MultiplayerARPG
                     string tempFormat;
                     string tempAmountText;
                     UICurrencyTextPair tempComponentPair;
-                    foreach (KeyValuePair<Currency, int> dataEntry in Data)
+                    uint mask = Data.OccupiedMask;
+                    for (int slot = 0; slot < RuntimeGameDataSlots.CurrencyCount; ++slot)
                     {
-                        if (dataEntry.Key == null)
+                        if ((mask & (1u << slot)) == 0)
                             continue;
                         // Set temp data
-                        tempData = dataEntry.Key;
-                        tempTargetAmount = dataEntry.Value;
+                        tempData = RuntimeGameDataSlots.GetCurrency(slot);
+                        tempTargetAmount = Data[slot];
                         tempCurrentAmount = 0;
                         // Get currency amount from character
                         if (GameInstance.PlayingCharacter != null)
@@ -152,7 +155,7 @@ namespace MultiplayerARPG
                                 break;
                         }
                         // Append current currency amount text
-                        if (dataEntry.Value != 0 || !inactiveIfAmountZero)
+                        if (tempTargetAmount != 0 || !inactiveIfAmountZero)
                         {
                             // Add new line if text is not empty
                             if (tempAllText.Length > 0)
@@ -217,10 +220,17 @@ namespace MultiplayerARPG
                 return;
             CacheList.HideAll();
             UICharacterCurrency tempUI;
-            CacheList.Generate(Data, (index, data, ui) =>
+            _listAmounts.Clear();
+            uint mask = Data.OccupiedMask;
+            for (int slot = 0; slot < RuntimeGameDataSlots.CurrencyCount; ++slot)
+            {
+                if ((mask & (1u << slot)) != 0)
+                    _listAmounts.Add(new CurrencyAmount { currency = RuntimeGameDataSlots.GetCurrency(slot), amount = Data[slot] });
+            }
+            CacheList.Generate(_listAmounts, (index, data, ui) =>
             {
                 tempUI = ui.GetComponent<UICharacterCurrency>();
-                tempUI.Data = new UICharacterCurrencyData(CharacterCurrency.Create(data.Key, Mathf.CeilToInt(data.Value)));
+                tempUI.Data = new UICharacterCurrencyData(CharacterCurrency.Create(data.currency, data.amount));
             });
         }
     }

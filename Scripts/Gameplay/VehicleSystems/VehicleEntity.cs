@@ -72,8 +72,39 @@ namespace MultiplayerARPG
         public int Level { get { return level.Value; } set { level.Value = value; } }
         public virtual bool IsDestroyWhenDriverExit { get { return false; } }
         public virtual bool HasDriver { get { return _passengers.ContainsKey(0); } }
-        public Dictionary<DamageElement, float> Resistances { get; private set; }
-        public Dictionary<DamageElement, float> Armors { get; private set; }
+        private DamageElementFloatAmounts _indexedResistances;
+        private DamageElementFloatAmounts _indexedArmors;
+        private int _runtimeSlotGeneration = -1;
+        private Dictionary<DamageElement, float> _resistances;
+        private Dictionary<DamageElement, float> _armors;
+        public Dictionary<DamageElement, float> Resistances
+        {
+            get
+            {
+                if (_runtimeSlotGeneration < 0)
+                    return null;
+                if (_resistances == null)
+                {
+                    _resistances = new Dictionary<DamageElement, float>();
+                    _indexedResistances.CopyTo(_resistances);
+                }
+                return _resistances;
+            }
+        }
+        public Dictionary<DamageElement, float> Armors
+        {
+            get
+            {
+                if (_runtimeSlotGeneration < 0)
+                    return null;
+                if (_armors == null)
+                {
+                    _armors = new Dictionary<DamageElement, float>();
+                    _indexedArmors.CopyTo(_armors);
+                }
+                return _armors;
+            }
+        }
         public override bool IsInvincible { get { return base.IsInvincible || !canBeAttacked; } set { base.IsInvincible = value; } }
         public override int MaxHp { get { return canBeAttacked ? hp.GetAmount(Level) : 1; } }
         public Vector3 SpawnPosition { get; protected set; }
@@ -115,12 +146,30 @@ namespace MultiplayerARPG
         /// </summary>
         public void UpdateStats()
         {
-            if (Resistances == null)
-                Resistances = new Dictionary<DamageElement, float>();
-            GameDataHelpers.CombineResistances(resistances, Resistances, Level, 1);
-            if (Armors == null)
-                Armors = new Dictionary<DamageElement, float>();
-            GameDataHelpers.CombineArmors(armors, Armors, Level, 1);
+            if (_runtimeSlotGeneration != RuntimeGameDataSlots.Generation)
+            {
+                _indexedResistances.Clear();
+                _indexedArmors.Clear();
+                _resistances?.Clear();
+                _armors?.Clear();
+                _runtimeSlotGeneration = RuntimeGameDataSlots.Generation;
+            }
+            if (_resistances != null)
+            {
+                _indexedResistances.Clear();
+                _indexedResistances.Combine(_resistances);
+            }
+            GameDataHelpers.CombineResistances(resistances, ref _indexedResistances, Level, 1f);
+            if (_resistances != null)
+                _indexedResistances.CopyTo(_resistances);
+            if (_armors != null)
+            {
+                _indexedArmors.Clear();
+                _indexedArmors.Combine(_armors);
+            }
+            GameDataHelpers.CombineArmors(armors, ref _indexedArmors, Level, 1f);
+            if (_armors != null)
+                _indexedArmors.CopyTo(_armors);
         }
 
         public override void OnIdentityInitialize()
@@ -336,8 +385,10 @@ namespace MultiplayerARPG
                 onVehicleDestroy.Invoke();
         }
 
-        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
+        protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
+            if (_runtimeSlotGeneration != RuntimeGameDataSlots.Generation)
+                UpdateStats();
             if (!canBeAttacked)
             {
                 combatAmountType = CombatAmountType.Miss;
@@ -346,9 +397,25 @@ namespace MultiplayerARPG
             }
             // Calculate damages
             float calculatingTotalDamage = 0f;
-            foreach (DamageElement damageElement in damageAmounts.Keys)
+            DamageElementFloatAmounts currentResistances = _indexedResistances;
+            DamageElementFloatAmounts currentArmors = _indexedArmors;
+            // External code may have edited the public dictionary views.
+            if (_resistances != null)
             {
-                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(Resistances, Armors, damageAmounts[damageElement].Random(randomSeed));
+                currentResistances.Clear();
+                currentResistances.Combine(_resistances);
+            }
+            if (_armors != null)
+            {
+                currentArmors.Clear();
+                currentArmors.Combine(_armors);
+            }
+            for (int slot = 0; slot < RuntimeGameDataSlots.DamageElementCount; ++slot)
+            {
+                if (!damageAmounts.Contains(slot))
+                    continue;
+                DamageElement damageElement = RuntimeGameDataSlots.GetDamageElement(slot);
+                calculatingTotalDamage += damageElement.GetDamageReducedByResistance(currentResistances, currentArmors, damageAmounts[slot].Random(randomSeed));
             }
             // Apply damages
             combatAmountType = CombatAmountType.NormalDamage;
@@ -358,7 +425,7 @@ namespace MultiplayerARPG
             CurrentHp -= totalDamage;
         }
 
-        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, Dictionary<DamageElement, MinMaxFloat> damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
+        public override void ReceivedDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CombatAmountType combatAmountType, int totalDamage, CharacterItem weapon, BaseSkill skill, int skillLevel, CharacterBuff buff, bool isDamageOverTime = false)
         {
             base.ReceivedDamage(position, fromPosition, instigator, damageAmounts, combatAmountType, totalDamage, weapon, skill, skillLevel, buff, isDamageOverTime);
 
