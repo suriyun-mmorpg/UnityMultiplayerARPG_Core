@@ -4,6 +4,8 @@ namespace MultiplayerARPG
     {
         public override void Clean(bool isObjectDestroyed)
         {
+            // Ownership-specific objects are rebuilt on spawn, including after pooling.
+            ++_objectsLoadVersion;
             base.Clean(isObjectDestroyed);
             if (isObjectDestroyed)
             {

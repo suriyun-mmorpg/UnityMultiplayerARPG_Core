@@ -15,11 +15,14 @@ namespace MultiplayerARPG
         private int _lastUpdateFrame;
         private bool _beginDragged;
         private GameObject _targetObject;
+        private int _targetLoadVersion;
 
         private async void InstantiateTargetObject(BaseAreaSkill skill)
         {
+            int version = ++_targetLoadVersion;
             if (_targetObject != null)
                 Destroy(_targetObject);
+            _targetObject = null;
             GameObject prefab;
 #if !DISABLE_ADDRESSABLES
             prefab = await skill.AddressableTargetObjectPrefab.GetOrLoadAssetAsyncOrUsePrefab(skill.TargetObjectPrefab);
@@ -27,6 +30,8 @@ namespace MultiplayerARPG
             await UniTask.Yield();
             prefab = skill.TargetObjectPrefab;
 #endif
+            if (this == null || version != _targetLoadVersion || !_beginDragged)
+                return;
             if (prefab != null)
             {
                 _targetObject = Instantiate(prefab);
@@ -49,9 +54,16 @@ namespace MultiplayerARPG
 
         public void FinishAimControls(bool isCancel)
         {
+            ++_targetLoadVersion;
             _beginDragged = false;
             if (_targetObject != null)
                 Destroy(_targetObject);
+            _targetObject = null;
+        }
+
+        private void OnDisable()
+        {
+            FinishAimControls(true);
         }
 
         public AimPosition UpdateAimControls_PC(Vector3 cursorPosition, BaseAreaSkill skill, int skillLevel)

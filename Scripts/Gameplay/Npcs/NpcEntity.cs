@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
 using System.Collections.Generic;
@@ -92,6 +92,7 @@ namespace MultiplayerARPG
         }
 
         public readonly List<GameObject> InstantiatedObjects = new List<GameObject>();
+        private int _objectsLoadVersion;
         protected bool _isObjectsInstantiated = false;
 
         public override void PrepareRelatesData()
@@ -127,37 +128,61 @@ namespace MultiplayerARPG
 
         private async void InstantiateNpcObjects()
         {
-            InstantiatedObjects.DestroyAndNullify();
-            InstantiatedObjects.Clear();
             if (!IsClient)
                 return;
             if (_isObjectsInstantiated)
                 return;
+            int version = ++_objectsLoadVersion;
             _isObjectsInstantiated = true;
-#if !DISABLE_ADDRESSABLES
-            // Instantiates npc objects
-            await CurrentGameInstance.AddressableNpcObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NpcObjects, EntityTransform, InstantiatedObjects);
-#else
-            foreach (var prefab in CurrentGameInstance.NpcObjects)
+            InstantiatedObjects.DestroyAndNullify();
+            InstantiatedObjects.Clear();
+            using var loadedObjectsLease = UnityEngine.Pool.ListPool<GameObject>.Get(out var loadedObjects);
+            bool completed = false;
+            try
             {
-                if (prefab == null) continue;
-                InstantiatedObjects.Add(Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform));
-            }
+#if !DISABLE_ADDRESSABLES
+                // Instantiates npc objects
+                await CurrentGameInstance.AddressableNpcObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NpcObjects, EntityTransform, loadedObjects);
+                if (this == null || version != _objectsLoadVersion) return;
+#else
+                foreach (var prefab in CurrentGameInstance.NpcObjects)
+                {
+                    if (prefab == null) continue;
+                    loadedObjects.Add(Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform));
+                }
 #endif
 #if !DISABLE_ADDRESSABLES
-            // Instantiates npc minimap objects
-            await CurrentGameInstance.AddressableNpcMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NpcMiniMapObjects, EntityTransform, InstantiatedObjects);
+                // Instantiates npc minimap objects
+                await CurrentGameInstance.AddressableNpcMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.NpcMiniMapObjects, EntityTransform, loadedObjects);
+                if (this == null || version != _objectsLoadVersion) return;
 #else
-            foreach (var prefab in CurrentGameInstance.NpcMiniMapObjects)
-            {
-                if (prefab == null) continue;
-                InstantiatedObjects.Add(Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform));
-            }
+                foreach (var prefab in CurrentGameInstance.NpcMiniMapObjects)
+                {
+                    if (prefab == null) continue;
+                    loadedObjects.Add(Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform));
+                }
 #endif
-            // Instantiates npc UI
-            InstantiateUI(await CurrentGameInstance.GetLoadedNpcUIPrefab());
-            // Instantiates npc quest indicator
-            InstantiateQuestIndicator(await CurrentGameInstance.GetLoadedNpcQuestIndicatorPrefab());
+                // Instantiates npc UI
+                var uiPrefab = await CurrentGameInstance.GetLoadedNpcUIPrefab();
+                if (this == null || version != _objectsLoadVersion) return;
+                InstantiateUI(uiPrefab);
+                // Instantiates npc quest indicator
+                var indicatorPrefab = await CurrentGameInstance.GetLoadedNpcQuestIndicatorPrefab();
+                if (this == null || version != _objectsLoadVersion) return;
+                InstantiateQuestIndicator(indicatorPrefab);
+                completed = true;
+            }
+            finally
+            {
+                if (completed && this != null && version == _objectsLoadVersion)
+                    InstantiatedObjects.AddRange(loadedObjects);
+                else
+                {
+                    loadedObjects.DestroyAndNullify();
+                    if (version == _objectsLoadVersion)
+                        _isObjectsInstantiated = false;
+                }
+            }
         }
 
         public void InstantiateUI(UINpcEntity prefab)

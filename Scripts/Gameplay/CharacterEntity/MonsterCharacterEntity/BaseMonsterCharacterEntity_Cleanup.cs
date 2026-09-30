@@ -9,11 +9,12 @@ namespace MultiplayerARPG
             base.Clean(isObjectDestroyed);
             if (isObjectDestroyed)
             {
-                characterDatabase = null;
-                faction = null;
+                ++_objectsLoadVersion;
                 InstantiatedObjects.DestroyAndNullify();
                 InstantiatedObjects.Clear();
                 _isObjectsInstantiated = false;
+                characterDatabase = null;
+                faction = null;
             }
             SpawnArea = null;
             SpawnPrefab = null;

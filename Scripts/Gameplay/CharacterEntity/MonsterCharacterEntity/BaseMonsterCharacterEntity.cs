@@ -1,4 +1,4 @@
-﻿using Cysharp.Text;
+using Cysharp.Text;
 using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using Insthync.UnityEditorUtils;
@@ -125,6 +125,7 @@ namespace MultiplayerARPG
         }
 
         public readonly List<GameObject> InstantiatedObjects = new List<GameObject>();
+        private int _objectsLoadVersion;
         protected bool _isObjectsInstantiated = false;
         protected bool _isDestroyed = false;
         protected readonly HashSet<string> _looters = new HashSet<string>();
@@ -245,35 +246,57 @@ namespace MultiplayerARPG
 
         private async void InstantiateMonsterCharacterObjects()
         {
-            InstantiatedObjects.DestroyAndNullify();
-            InstantiatedObjects.Clear();
             if (!IsClient)
                 return;
             if (_isObjectsInstantiated)
                 return;
+            int version = ++_objectsLoadVersion;
             _isObjectsInstantiated = true;
-#if !DISABLE_ADDRESSABLES
-            // Instantiates monster objects
-            await CurrentGameInstance.AddressableMonsterCharacterObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.MonsterCharacterObjects, EntityTransform, InstantiatedObjects);
-#else
-            foreach (var prefab in CurrentGameInstance.MonsterCharacterObjects)
+            InstantiatedObjects.DestroyAndNullify();
+            InstantiatedObjects.Clear();
+            using var loadedObjectsLease = UnityEngine.Pool.ListPool<GameObject>.Get(out var loadedObjects);
+            bool completed = false;
+            try
             {
-                if (prefab == null) continue;
-                InstantiatedObjects.Add(Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform));
-            }
+#if !DISABLE_ADDRESSABLES
+                // Instantiates monster objects
+                await CurrentGameInstance.AddressableMonsterCharacterObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.MonsterCharacterObjects, EntityTransform, loadedObjects);
+                if (this == null || version != _objectsLoadVersion) return;
+#else
+                foreach (var prefab in CurrentGameInstance.MonsterCharacterObjects)
+                {
+                    if (prefab == null) continue;
+                    loadedObjects.Add(Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform));
+                }
 #endif
 #if !DISABLE_ADDRESSABLES
-            // Instantiates monster minimap objects
-            await CurrentGameInstance.AddressableMonsterCharacterMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.MonsterCharacterMiniMapObjects, EntityTransform, InstantiatedObjects);
+                // Instantiates monster minimap objects
+                await CurrentGameInstance.AddressableMonsterCharacterMiniMapObjects.InstantiateObjectsOrUsePrefabs(CurrentGameInstance.MonsterCharacterMiniMapObjects, EntityTransform, loadedObjects);
+                if (this == null || version != _objectsLoadVersion) return;
 #else
-            foreach (var prefab in CurrentGameInstance.MonsterCharacterMiniMapObjects)
-            {
-                if (prefab == null) continue;
-                InstantiatedObjects.Add(Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform));
-            }
+                foreach (var prefab in CurrentGameInstance.MonsterCharacterMiniMapObjects)
+                {
+                    if (prefab == null) continue;
+                    loadedObjects.Add(Instantiate(prefab, EntityTransform.position, EntityTransform.rotation, EntityTransform));
+                }
 #endif
-            // Instantiates monster character UI
-            InstantiateUI(await CurrentGameInstance.GetLoadedMonsterCharacterUIPrefab());
+                // Instantiates monster character UI
+                var uiPrefab = await CurrentGameInstance.GetLoadedMonsterCharacterUIPrefab();
+                if (this == null || version != _objectsLoadVersion) return;
+                InstantiateUI(uiPrefab);
+                completed = true;
+            }
+            finally
+            {
+                if (completed && this != null && version == _objectsLoadVersion)
+                    InstantiatedObjects.AddRange(loadedObjects);
+                else
+                {
+                    loadedObjects.DestroyAndNullify();
+                    if (version == _objectsLoadVersion)
+                        _isObjectsInstantiated = false;
+                }
+            }
         }
 
         public void SetSpawnArea(GameSpawnArea<BaseMonsterCharacterEntity> spawnArea, BaseMonsterCharacterEntity spawnPrefab, int spawnLevel, Vector3 spawnPosition)

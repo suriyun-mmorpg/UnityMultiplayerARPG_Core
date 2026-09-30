@@ -1,4 +1,4 @@
-﻿using Cysharp.Threading.Tasks;
+using Cysharp.Threading.Tasks;
 using Insthync.AddressableAssetTools;
 using UnityEngine;
 using UnityEngine.Serialization;
@@ -108,6 +108,7 @@ namespace MultiplayerARPG
         private int _dirtyVehicleDataId;
         private byte _dirtySeatIndex;
         private byte _modelIdCounter = 0;
+        private int _fpsLoadVersion;
 
         private void Awake()
         {
@@ -117,6 +118,7 @@ namespace MultiplayerARPG
 
         protected override void OnDestroy()
         {
+            ReleaseFpsModel();
             base.OnDestroy();
 
             mainTpsModel = null;
@@ -129,6 +131,15 @@ namespace MultiplayerARPG
             ActiveTpsModel = null;
             ActiveFpsModel = null;
             MainFpsModel = null;
+        }
+
+        private void ReleaseFpsModel()
+        {
+            ++_fpsLoadVersion;
+            if (MainFpsModel != null)
+                Destroy(MainFpsModel.gameObject);
+            MainFpsModel = null;
+            ActiveFpsModel = null;
         }
 
         public bool TryGetMetaData(out PlayerCharacterEntityMetaData metaData)
@@ -169,6 +180,8 @@ namespace MultiplayerARPG
 
         public async UniTask<BaseCharacterModel> InstantiateFpsModel(Transform container)
         {
+            int version = ++_fpsLoadVersion;
+            bool hadContainer = container != null;
             BaseCharacterModel loadedPrefab;
 #if !DISABLE_ADDRESSABLES
             loadedPrefab = await AddressableFpsModelPrefab.GetOrLoadAssetAsyncOrUsePrefab(FpsModelPrefab);
@@ -176,8 +189,10 @@ namespace MultiplayerARPG
             await UniTask.Yield();
             loadedPrefab = FpsModelPrefab;
 #endif
-            if (loadedPrefab == null)
+            if (this == null || version != _fpsLoadVersion || loadedPrefab == null || (hadContainer && container == null))
                 return null;
+            if (MainFpsModel != null)
+                Destroy(MainFpsModel.gameObject);
             MainFpsModel = Instantiate(loadedPrefab, container);
             MainFpsModel.transform.localPosition = FpsModelPositionOffsets;
             MainFpsModel.transform.localEulerAngles = FpsModelRotationOffsets;

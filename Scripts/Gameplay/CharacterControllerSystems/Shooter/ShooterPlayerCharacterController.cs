@@ -721,8 +721,11 @@ namespace MultiplayerARPG
             RecoilUpdater.Controller = this;
         }
 
+        private int _fpsSetupVersion;
+
         protected override async void Setup(BasePlayerCharacterEntity characterEntity)
         {
+            int version = ++_fpsSetupVersion;
             base.Setup(characterEntity);
             CacheGameplayCameraController.Setup(characterEntity);
             CacheMinimapCameraController.Setup(characterEntity);
@@ -742,14 +745,24 @@ namespace MultiplayerARPG
                 fpsModelContainer = CacheGameplayCameraController.CameraTransform;
                 updateFpsModelContainerActivating = false;
             }
-            CacheFpsModel = await characterEntity.ModelManager.InstantiateFpsModel(fpsModelContainer);
+            BaseCharacterModel model = await characterEntity.ModelManager.InstantiateFpsModel(fpsModelContainer);
+            if (this == null || version != _fpsSetupVersion)
+            {
+                if (model != null)
+                    Destroy(model.gameObject);
+                return;
+            }
+            CacheFpsModel = model;
             await UniTask.NextFrame();
+            if (this == null || characterEntity == null || version != _fpsSetupVersion)
+                return;
             characterEntity.ModelManager.SetIsFps(ActiveViewMode == ShooterControllerViewMode.Fps);
             UpdateViewMode();
         }
 
         protected override void Desetup(BasePlayerCharacterEntity characterEntity)
         {
+            ++_fpsSetupVersion;
             base.Desetup(characterEntity);
             CacheGameplayCameraController.Desetup(characterEntity);
             CacheMinimapCameraController.Desetup(characterEntity);
