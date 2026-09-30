@@ -1,12 +1,11 @@
 ﻿using Insthync.CameraAndInput;
-using Insthync.ManagedUpdating;
 using LiteNetLibManager;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public partial class PlayerCharacterController : BasePlayerCharacterController, IManagedLateUpdate
+    public partial class PlayerCharacterController : BasePlayerCharacterController
     {
         public enum PlayerCharacterControllerMode
         {
@@ -126,6 +125,7 @@ namespace MultiplayerARPG
         public IGameplayCameraController CacheGameplayCameraController { get; protected set; }
         public IMinimapCameraController CacheMinimapCameraController { get; protected set; }
         public override Camera MainCamera => CacheGameplayCameraController.Camera;
+        public override IGameplayCameraController GameplayCameraController => CacheGameplayCameraController;
         public override Transform MainCameraTransform => CacheGameplayCameraController.CameraTransform;
         public override Vector3 AssignedCameraTargetOffset { get; set; }
         public override float AssignedCameraZoomDistance { get; set; }
@@ -254,7 +254,31 @@ namespace MultiplayerARPG
                 Destroy(EnemyEntityDetector.gameObject);
         }
 
-        public override void ManagedUpdate()
+        protected override void ResetCharacterControlState()
+        {
+            base.ResetCharacterControlState();
+            _destination = null;
+            _targetPosition = null;
+            _turnToTargetPosition = null;
+            _isFollowingTarget = false;
+            _targetActionType = _previousTargetActionType = _turnToTargetActionType = TargetActionType.None;
+            _previousPointClickPosition = Vector3.positiveInfinity;
+            _moveDirection = Vector3.zero;
+            _getMouse = _getMouseDown = _getMouseUp = false;
+            _isSprinting = _isWalking = false;
+            _isWASDAttackInputLastFrame = false;
+            _mobileAxesControllingFrameCount = 0;
+            _activateInput?.Reset();
+            _pickupItemInput?.Reset();
+            _reloadInput?.Reset();
+            _findEnemyInput?.Reset();
+            _exitVehicleInput?.Reset();
+            _switchEquipWeaponSetInput?.Reset();
+            if (CacheTargetObject != null)
+                CacheTargetObject.gameObject.SetActive(false);
+        }
+
+        protected override void UpdateController()
         {
             if (PlayingCharacterEntity == null || !PlayingCharacterEntity.IsOwnerClient)
                 return;
@@ -302,7 +326,7 @@ namespace MultiplayerARPG
             PlayingCharacterEntity.SetSmoothTurnSpeed(turnSmoothSpeed);
         }
 
-        public virtual void ManagedLateUpdate()
+        protected override void LateUpdateController()
         {
             _activateInput.OnLateUpdate();
             _pickupItemInput.OnLateUpdate();

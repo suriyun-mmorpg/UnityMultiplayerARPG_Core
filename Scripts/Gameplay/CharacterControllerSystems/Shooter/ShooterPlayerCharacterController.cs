@@ -1,13 +1,12 @@
 ﻿using Cysharp.Threading.Tasks;
 using Insthync.CameraAndInput;
-using Insthync.ManagedUpdating;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Serialization;
 
 namespace MultiplayerARPG
 {
-    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController, IManagedLateUpdate
+    public partial class ShooterPlayerCharacterController : BasePlayerCharacterController, IShooterWeaponController, IWeaponAbilityController
     {
         public const byte PAUSE_FIRE_INPUT_FRAMES_AFTER_CONFIRM_BUILD = 3;
 
@@ -240,6 +239,7 @@ namespace MultiplayerARPG
         public IShooterGameplayCameraController CacheGameplayCameraController { get; protected set; }
         public IMinimapCameraController CacheMinimapCameraController { get; protected set; }
         public override Camera MainCamera => CacheGameplayCameraController.Camera;
+        public override IGameplayCameraController GameplayCameraController => CacheGameplayCameraController;
         public override Transform MainCameraTransform => CacheGameplayCameraController.CameraTransform;
         public override Transform CameraTargetTransform
         {
@@ -808,7 +808,32 @@ namespace MultiplayerARPG
                 ChangeWeaponAbility(0);
         }
 
-        public override void ManagedUpdate()
+        public override bool IsVehicleInputBlocked()
+        {
+            return base.IsVehicleInputBlocked() || ControllerBlockState.IsActive;
+        }
+
+        protected override void ResetCharacterControlState()
+        {
+            base.ResetCharacterControlState();
+            _moveInput = Vector2.zero;
+            _moveDirection = Vector3.zero;
+            _movementState = MovementState.None;
+            _extraMovementState = ExtraMovementState.None;
+            _toggleSprintOn = _toggleWalkOn = _toggleCrouchOn = _toggleCrawlOn = false;
+            _activateInput?.Reset();
+            _pickupItemInput?.Reset();
+            _reloadInput?.Reset();
+            _exitVehicleInput?.Reset();
+            _switchEquipWeaponSetInput?.Reset();
+            if (WeaponAbility != null && WeaponAbilityState != WeaponAbilityState.Deactivated)
+            {
+                WeaponAbility.ForceDeactivated();
+                WeaponAbilityState = WeaponAbilityState.Deactivated;
+            }
+        }
+
+        protected override void UpdateController()
         {
             // Reset input states
             _moveInput = Vector2.zero;
@@ -1239,7 +1264,7 @@ namespace MultiplayerARPG
             }
         }
 
-        public virtual void ManagedLateUpdate()
+        protected override void LateUpdateController()
         {
             if (PlayingCharacterEntity.MovementState.Has(MovementState.IsUnderWater))
             {

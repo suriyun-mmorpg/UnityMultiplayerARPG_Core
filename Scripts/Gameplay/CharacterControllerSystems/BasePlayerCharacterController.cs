@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BasePlayerCharacterController : MonoBehaviour, IManagedUpdate
+    public abstract partial class BasePlayerCharacterController : MonoBehaviour, IManagedUpdate, IManagedLateUpdate
     {
         public struct UsingSkillData
         {
@@ -227,13 +227,59 @@ namespace MultiplayerARPG
 
         protected virtual void OnDisable()
         {
+            ReleaseVehicleController();
             StopChanneledSkill();
             UpdateManager.Unregister(DefaultExecutionOrders.PLAYER_CHARACTER_CONTROLLER, this);
         }
 
-        public virtual void ManagedUpdate()
+        /// <summary>
+        /// Shared update entry point. Derived controllers implement UpdateController instead.
+        /// </summary>
+        public void ManagedUpdate()
         {
+            _controllerUpdateFrame = -1;
+            if (!isActiveAndEnabled || PlayingCharacterEntity == null || !PlayingCharacterEntity.IsOwnerClient)
+            {
+                ReleaseVehicleController();
+                return;
+            }
+            _updatedCharacter = PlayingCharacterEntity;
+            _updatedVehicle = PlayingCharacterEntity.PassengingVehicleEntity;
+            _updatedSeat = PlayingCharacterEntity.PassengingVehicleSeatIndex;
+            if (!UpdateVehicleController())
+                UpdateController();
+            _controllerUpdateFrame = Time.frameCount;
         }
+
+        /// <summary>
+        /// Shared late-update entry point. Derived controllers implement LateUpdateController instead.
+        /// </summary>
+        public void ManagedLateUpdate()
+        {
+            if (!isActiveAndEnabled || _controllerUpdateFrame != Time.frameCount)
+                return;
+            _controllerUpdateFrame = -1;
+            if (_updatedCharacter == null || _updatedCharacter != PlayingCharacterEntity || !_updatedCharacter.IsOwnerClient ||
+                !ReferenceEquals(_updatedVehicle, PlayingCharacterEntity.PassengingVehicleEntity) ||
+                _updatedSeat != PlayingCharacterEntity.PassengingVehicleSeatIndex)
+            {
+                ReleaseVehicleController();
+                return;
+            }
+            // Never switch controllers between the two phases of a frame.
+            if (_usedVehicleController)
+            {
+                if (_updatedVehicleController != null && _updatedVehicleController == ActiveVehicleController && IsVehicleControllerContextCurrent())
+                    ActiveVehicleController.TickLateUpdate(Time.deltaTime);
+                else
+                    ReleaseVehicleController();
+                return;
+            }
+            LateUpdateController();
+        }
+
+        protected abstract void UpdateController();
+        protected abstract void LateUpdateController();
 
         protected virtual void Setup(BasePlayerCharacterEntity characterEntity)
         {
@@ -260,6 +306,7 @@ namespace MultiplayerARPG
 
         protected virtual void Desetup(BasePlayerCharacterEntity characterEntity)
         {
+            ReleaseVehicleController();
             if (UISceneGameplay != null)
             {
                 UISceneGameplay.OnControllerDesetup(characterEntity);

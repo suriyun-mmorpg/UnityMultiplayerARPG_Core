@@ -1,4 +1,4 @@
-﻿using Insthync.CameraAndInput;
+using Insthync.CameraAndInput;
 using UnityEngine;
 
 namespace MultiplayerARPG
@@ -12,15 +12,15 @@ namespace MultiplayerARPG
             Key,
         }
 
-        private InputType inputType;
-        private string buttonName;
-        private int mouseButton;
-        private KeyCode keyCode;
-        private float holdDuration;
-        private bool isHolding;
-        private bool isHolded;
-        private float holdTime;
-        private float lastDeltaTime;
+        private InputType _inputType;
+        private string _buttonName;
+        private int _mouseButton;
+        private KeyCode _keyCode;
+        private float _holdDuration;
+        private bool _isHolding;
+        private bool _isHolded;
+        private float _holdTime;
+        private float _lastDeltaTime;
 
         public bool IsPress { get; private set; }
         public bool IsRelease { get; private set; }
@@ -29,38 +29,50 @@ namespace MultiplayerARPG
 
         public InputStateManager(string buttonName, float holdDuration)
         {
-            inputType = InputType.Button;
-            this.buttonName = buttonName;
-            this.holdDuration = holdDuration;
+            _inputType = InputType.Button;
+            _buttonName = buttonName;
+            _holdDuration = holdDuration;
         }
 
         public InputStateManager(string buttonName) : this(buttonName, 1f) { }
 
         public InputStateManager(int mouseButton, float holdDuration)
         {
-            inputType = InputType.Mouse;
-            this.mouseButton = mouseButton;
-            this.holdDuration = holdDuration;
+            _inputType = InputType.Mouse;
+            _mouseButton = mouseButton;
+            _holdDuration = holdDuration;
         }
 
         public InputStateManager(int mouseIndex) : this(mouseIndex, 1f) { }
 
         public InputStateManager(KeyCode keyCode, float holdDuration)
         {
-            inputType = InputType.Key;
-            this.keyCode = keyCode;
-            this.holdDuration = holdDuration;
+            _inputType = InputType.Key;
+            _keyCode = keyCode;
+            _holdDuration = holdDuration;
         }
 
         public InputStateManager(KeyCode keyCode) : this(keyCode, 1f) { }
 
-        public void OnUpdate(float deltaTime)
+        public void Reset()
         {
-            lastDeltaTime = deltaTime;
+            _isHolding = false;
+            _isHolded = false;
+            _holdTime = 0f;
+            _lastDeltaTime = 0f;
             IsPress = false;
             IsRelease = false;
             IsPressed = false;
-            switch (inputType)
+            IsHold = false;
+        }
+
+        public void OnUpdate(float deltaTime)
+        {
+            _lastDeltaTime = deltaTime;
+            IsPress = false;
+            IsRelease = false;
+            IsPressed = false;
+            switch (_inputType)
             {
                 case InputType.Button:
                     OnUpdate_Button(deltaTime);
@@ -72,62 +84,62 @@ namespace MultiplayerARPG
                     OnUpdate_Key(deltaTime);
                     break;
             }
-            isHolding = IsPress || IsPressed;
-            if (holdTime >= holdDuration)
+            _isHolding = IsPress || IsPressed;
+            if (_holdTime >= _holdDuration)
             {
                 // Holded, so clear input states
                 IsPress = false;
                 IsRelease = false;
                 IsPressed = false;
                 // Set is hold to true just one time, in future frames it will be false
-                IsHold = !isHolded;
-                if (IsHold && !isHolded)
-                    isHolded = true;
+                IsHold = !_isHolded;
+                if (IsHold && !_isHolded)
+                    _isHolded = true;
             }
         }
 
         private void OnUpdate_Button(float deltaTime)
         {
-            if (InputManager.GetButtonDown(buttonName))
+            if (InputManager.GetButtonDown(_buttonName))
                 IsPress = true;
-            else if (InputManager.GetButtonUp(buttonName))
+            else if (InputManager.GetButtonUp(_buttonName))
                 IsRelease = true;
-            else if (InputManager.GetButton(buttonName))
+            else if (InputManager.GetButton(_buttonName))
                 IsPressed = true;
         }
 
         private void OnUpdate_Mouse(float deltaTime)
         {
-            if (InputManager.GetMouseButtonDown(mouseButton))
+            if (InputManager.GetMouseButtonDown(_mouseButton))
                 IsPress = true;
-            else if (InputManager.GetMouseButtonUp(mouseButton))
+            else if (InputManager.GetMouseButtonUp(_mouseButton))
                 IsRelease = true;
-            else if (InputManager.GetMouseButton(mouseButton))
+            else if (InputManager.GetMouseButton(_mouseButton))
                 IsPressed = true;
         }
 
         private void OnUpdate_Key(float deltaTime)
         {
-            if (InputManager.GetKeyDown(keyCode))
+            if (InputManager.GetKeyDown(_keyCode))
                 IsPress = true;
-            else if (InputManager.GetKeyUp(keyCode))
+            else if (InputManager.GetKeyUp(_keyCode))
                 IsRelease = true;
-            else if (InputManager.GetKey(keyCode))
+            else if (InputManager.GetKey(_keyCode))
                 IsPressed = true;
         }
 
         public void OnLateUpdate()
         {
-            if (isHolding)
+            if (_isHolding)
             {
                 // Update hode time
-                holdTime += lastDeltaTime;
+                _holdTime += _lastDeltaTime;
             }
             else
             {
                 // Reset hold state
-                holdTime = 0f;
-                isHolded = false;
+                _holdTime = 0f;
+                _isHolded = false;
             }
         }
     }
