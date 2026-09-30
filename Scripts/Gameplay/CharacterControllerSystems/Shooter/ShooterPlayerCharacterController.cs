@@ -1264,7 +1264,7 @@ namespace MultiplayerARPG
             if (PlayingCharacterEntity.MovementDisableState.IsActive)
                 return;
 
-            _cameraForward = LookForwardTransform.forward;
+            _cameraForward = LookForwardTransform == null ? Vector3.forward : LookForwardTransform.forward;
             _cameraForward.y = 0f;
             _cameraForward.Normalize();
 
