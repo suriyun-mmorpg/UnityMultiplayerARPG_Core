@@ -794,11 +794,6 @@ namespace MultiplayerARPG
             NetworkDestroy();
         }
 
-        protected override DamageElementMinMaxFloatAmounts PrepareDamageAmountsForReceive(HitBoxPosition position, DamageElementMinMaxFloatAmounts damageAmounts)
-        {
-            return damageAmounts;
-        }
-
         protected override void ApplyReceiveDamage(HitBoxPosition position, Vector3 fromPosition, EntityInfo instigator, DamageElementMinMaxFloatAmounts damageAmounts, CharacterItem weapon, BaseSkill skill, int skillLevel, int randomSeed, out CombatAmountType combatAmountType, out int totalDamage)
         {
             if (instigator.TryGetEntity(out BaseCharacterEntity attackerCharacter))
