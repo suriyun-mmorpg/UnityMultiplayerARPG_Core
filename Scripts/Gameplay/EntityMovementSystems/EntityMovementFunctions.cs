@@ -135,12 +135,19 @@ namespace MultiplayerARPG
         #region Sync Transform Serialization (3D)
         public static void ServerWriteSyncTransform3D(this IEntityMovement movement, List<EntityMovementForceApplier> movementForceAppliers, NetDataWriter writer)
         {
+            movement.ServerWriteSyncTransform3D(movementForceAppliers, writer,
+                movement.Entity.EntityTransform.position, movement.Entity.EntityTransform.eulerAngles.y);
+        }
+
+        public static void ServerWriteSyncTransform3D(this IEntityMovement movement, List<EntityMovementForceApplier> movementForceAppliers,
+            NetDataWriter writer, Vector3 position, float yAngle)
+        {
             if (!movement.Entity.IsServer)
                 return;
             writer.PutPackedUInt((uint)movement.MovementState);
             writer.Put((byte)movement.ExtraMovementState);
-            writer.PutVector3(movement.Entity.EntityTransform.position);
-            writer.PutPackedInt(GetCompressedAngle(movement.Entity.EntityTransform.eulerAngles.y));
+            writer.PutVector3(position);
+            writer.PutPackedInt(GetCompressedAngle(yAngle));
             writer.PutList(movementForceAppliers);
         }
 

@@ -130,8 +130,7 @@ namespace MultiplayerARPG
         protected Vector3 _velocityBeforeAirborne;
         protected Collider _waterCollider;
         protected byte _underWaterFrameCount;
-        protected Transform _groundedTransform;
-        protected Vector3 _previousPlatformPosition;
+        private readonly EntityMovementPlatform _platform = new EntityMovementPlatform();
         protected Vector3 _previousPosition;
         protected Vector3 _previousMovement;
         protected bool _previouslyGrounded = false;
@@ -182,6 +181,7 @@ namespace MultiplayerARPG
 
         public void EntityStart()
         {
+            ResetPlatform();
             _clientTeleportState = MovementTeleportState.Responding;
             _yAngle = EntityTransform.eulerAngles.y;
             _verticalVelocity = 0;
@@ -191,6 +191,7 @@ namespace MultiplayerARPG
 
         public void ComponentEnabled()
         {
+            ResetPlatform();
             _verticalVelocity = 0;
             _lastTeleportFrame = Time.frameCount;
             _previousPosition = EntityTransform.position;
@@ -209,6 +210,7 @@ namespace MultiplayerARPG
 
         public void OnSetOwnerClient(bool isOwnerClient)
         {
+            ResetPlatform();
             NavPaths = null;
         }
 
@@ -503,6 +505,7 @@ namespace MultiplayerARPG
 
         protected void UpdateClimbMovement(float deltaTime)
         {
+            ResetPlatform();
             if (IsPreparingToTeleport)
                 return;
 
@@ -975,16 +978,8 @@ namespace MultiplayerARPG
                 tempMoveVelocity.z = 0;
             }
 
-            Vector3 platformMotion = Vector3.zero;
-            if (!IsUnderWater)
-            {
-                // Apply platform motion
-                if (_groundedTransform != null)
-                {
-                    platformMotion = (_groundedTransform.position - _previousPlatformPosition) / deltaTime;
-                    _previousPlatformPosition = _groundedTransform.position;
-                }
-            }
+            Vector3 platformMotion = _platform.ConsumeVelocity(
+                IsGrounded && !IsUnderWater && _verticalVelocity <= 0f, deltaTime);
             Vector3 snapToGroundMotion = EntityMovement.GetSnapToGroundMotion(tempMoveVelocity, platformMotion, forceMotion);
             _previousMovement = ((tempMoveVelocity + platformMotion + forceMotion) * deltaTime) + snapToGroundMotion;
             if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent &&
@@ -1095,18 +1090,18 @@ namespace MultiplayerARPG
             }
         }
 
+        public void ResetPlatform() => _platform.Reset();
+
+        public void OnControllerColliderHit(Vector3 hitPoint, Vector3 hitNormal, Transform hitTransform, float minimumNormalY)
+        {
+            _platform.RecordContact(hitPoint, hitNormal, hitTransform, minimumNormalY);
+        }
+
+        // Retained for custom movement components using the previous contact API.
         public void OnControllerColliderHit(Vector3 hitPoint, Transform hitTransform)
         {
-            if (IsGrounded)
-            {
-                if (EntityTransform.position.y >= hitPoint.y)
-                {
-                    _groundedTransform = hitTransform;
-                    _previousPlatformPosition = _groundedTransform.position;
-                    return;
-                }
-            }
-            _groundedTransform = null;
+            if (IsGrounded && EntityTransform.position.y >= hitPoint.y)
+                _platform.RecordContact(hitPoint, Vector3.up, hitTransform, 0f);
         }
 
         public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)

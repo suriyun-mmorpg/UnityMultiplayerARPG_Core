@@ -137,8 +137,10 @@ namespace MultiplayerARPG
         private Vector3 _velocityBeforeAirborne;
         private Collider _waterCollider;
         private byte _underWaterFrameCount;
-        private Transform _groundedTransform;
-        private Vector3 _previousPlatformPosition;
+        private readonly EntityMovementPlatform _platform = new EntityMovementPlatform();
+        private EntityMovementPlatformState _receivedPlatform;
+        private EntityMovementPlatformState _localPlatformState;
+        private Vector3 _startPlatformPosition;
         private Vector3 _previousPosition;
         private Vector3 _previousMovement;
         private bool _previouslyGrounded = false;
@@ -173,6 +175,7 @@ namespace MultiplayerARPG
         private bool _acceptedJump;
         private bool _acceptedDash;
         private long _acceptedPositionTimestamp;
+        private float _acceptedYAngle;
         private Vector3 _startInterpPosition;
         private Vector3 _endInterpPosition;
         private float _interpElapsedTime;
@@ -196,12 +199,14 @@ namespace MultiplayerARPG
             EntityMovement = entityMovement;
             TeleportPreparer = entity.GetComponent<IEntityTeleportPreparer>();
             _forceUpdateListeners = entity.GetComponents<IEntityMovementForceUpdateListener>();
-            _yAngle = _targetYAngle = EntityTransform.eulerAngles.y;
+            _acceptedYAngle = _yAngle = _targetYAngle = EntityTransform.eulerAngles.y;
             _lookRotationApplied = true;
         }
 
         public void EntityStart()
         {
+            _receivedPlatform = default;
+            ResetPlatform();
             _isClientConfirmingTeleport = true;
             _isStarted = true;
             _yAngle = EntityTransform.eulerAngles.y;
@@ -212,6 +217,8 @@ namespace MultiplayerARPG
 
         public void ComponentEnabled()
         {
+            _receivedPlatform = default;
+            ResetPlatform();
             _verticalVelocity = 0;
             _lastTeleportFrame = Time.frameCount;
             _previousPosition = EntityTransform.position;
@@ -230,6 +237,8 @@ namespace MultiplayerARPG
 
         public void OnSetOwnerClient(bool isOwnerClient)
         {
+            _receivedPlatform = default;
+            ResetPlatform();
             NavPaths = null;
             _simulatingKeyMovement = false;
         }
@@ -485,7 +494,12 @@ namespace MultiplayerARPG
             if (_acceptedPositionTimestamp > 0)
             {
                 _interpElapsedTime += deltaTime;
-                Vector3 newPosition = Vector3.Lerp(_startInterpPosition, _endInterpPosition, _interpElapsedTime / Entity.Manager.LogicUpdater.DeltaTimeF);
+                // Dedicated servers have no presentation to smooth. Hosts interpolate only their displayed replica.
+                float fraction = IsServer && !IsClient ? 1f : _interpElapsedTime / Entity.Manager.LogicUpdater.DeltaTimeF;
+                Vector3 newPosition = Vector3.Lerp(_startInterpPosition, _endInterpPosition, fraction);
+                if (_receivedPlatform.TryResolve(Entity.Manager, out Transform support))
+                    newPosition = support.TransformPoint(Vector3.Lerp(_startPlatformPosition,
+                        _receivedPlatform.localPosition, fraction));
                 EntityMovement.SetPosition(newPosition);
             }
         }
@@ -520,6 +534,7 @@ namespace MultiplayerARPG
 
         protected void UpdateClimbMovement(float deltaTime)
         {
+            ResetPlatform();
             if (IsPreparingToTeleport)
                 return;
 
@@ -1017,16 +1032,8 @@ namespace MultiplayerARPG
                 tempMoveVelocity.z = 0;
             }
 
-            Vector3 platformMotion = Vector3.zero;
-            if (!IsUnderWater)
-            {
-                // Apply platform motion
-                if (_groundedTransform != null)
-                {
-                    platformMotion = (_groundedTransform.position - _previousPlatformPosition) / deltaTime;
-                    _previousPlatformPosition = _groundedTransform.position;
-                }
-            }
+            Vector3 platformMotion = _platform.ConsumeVelocity(
+                IsGrounded && !IsUnderWater && _verticalVelocity <= 0f, deltaTime);
             Vector3 snapToGroundMotion = EntityMovement.GetSnapToGroundMotion(tempMoveVelocity, platformMotion, forceMotion);
             _previousMovement = ((tempMoveVelocity + platformMotion + forceMotion) * deltaTime) + snapToGroundMotion;
             if (Entity.IsOwnerClientOrOwnedByServer && LadderComponent &&
@@ -1075,6 +1082,9 @@ namespace MultiplayerARPG
                 if (_isJumping || IsAirborne)
                     ExtraMovementState = _extraMovementStateWhenJump;
             }
+            // Capture the rider/platform pair at the end of the same movement step. A send can run
+            // after the vehicle advances again but before this character's next managed update.
+            _localPlatformState = CapturePlatformState();
             _previouslyGrounded = IsGrounded;
             _previouslyAirborne = IsAirborne;
             _previousPosition = EntityTransform.position;
@@ -1178,18 +1188,58 @@ namespace MultiplayerARPG
             }
         }
 
+        private EntityMovementPlatformState GetPlatformState()
+        {
+            if (_isTeleporting || !EntityMovement.isActiveAndEnabled || MovementState.Has(MovementState.IsJump))
+                return default;
+            // Forward the owning client's relative pose through the server without deriving it from old world coordinates.
+            if (IsServer && !CanSimulateMovement())
+                return _receivedPlatform.TryResolve(Entity.Manager, out _) ? _receivedPlatform : default;
+            return _localPlatformState;
+        }
+
+        private EntityMovementPlatformState CapturePlatformState()
+        {
+            Transform support = _platform.Support;
+            if (support == null || !EntityMovement.GroundCheck() || IsUnderWater || IsClimbing || _verticalVelocity > 0f)
+                return default;
+            BaseGameEntity platform = support.GetComponentInParent<BaseGameEntity>();
+            if (!(platform is IVehicleEntity) || platform == Entity)
+                return default;
+            return new EntityMovementPlatformState { objectId = platform.ObjectId,
+                localPosition = platform.EntityTransform.InverseTransformPoint(EntityTransform.position) };
+        }
+
+        private void ReceivePlatform(EntityMovementPlatformState state, ref Vector3 position)
+        {
+            if (state.TryResolve(Entity.Manager, out Transform support, true))
+            {
+                _startPlatformPosition = _receivedPlatform.objectId == state.objectId
+                    ? Vector3.Lerp(_startPlatformPosition, _receivedPlatform.localPosition,
+                        _interpElapsedTime / Entity.Manager.LogicUpdater.DeltaTimeF) : state.localPosition;
+                position = support.TransformPoint(state.localPosition);
+                _receivedPlatform = state;
+            }
+            else
+                _receivedPlatform = default;
+        }
+
+        public void ResetPlatform()
+        {
+            _platform.Reset();
+            _localPlatformState = default;
+        }
+
+        public void OnControllerColliderHit(Vector3 hitPoint, Vector3 hitNormal, Transform hitTransform, float minimumNormalY)
+        {
+            _platform.RecordContact(hitPoint, hitNormal, hitTransform, minimumNormalY);
+        }
+
+        // Retained for custom movement components using the previous contact API.
         public void OnControllerColliderHit(Vector3 hitPoint, Transform hitTransform)
         {
-            if (IsGrounded)
-            {
-                if (EntityTransform.position.y >= hitPoint.y)
-                {
-                    _groundedTransform = hitTransform;
-                    _previousPlatformPosition = _groundedTransform.position;
-                    return;
-                }
-            }
-            _groundedTransform = null;
+            if (IsGrounded && EntityTransform.position.y >= hitPoint.y)
+                _platform.RecordContact(hitPoint, Vector3.up, hitTransform, 0f);
         }
 
         public bool WriteClientState(long writeTimestamp, NetDataWriter writer, out bool shouldSendReliably)
@@ -1224,6 +1274,7 @@ namespace MultiplayerARPG
                     MovementState |= MovementState.IsTeleport;
                 }
                 Entity.ClientWriteSyncTransform3D(writer);
+                GetPlatformState().Write(writer);
                 _sendingJump = false;
                 _sendingDash = false;
                 _isClientConfirmingTeleport = false;
@@ -1315,7 +1366,20 @@ namespace MultiplayerARPG
             {
                 MovementState &= ~MovementState.IsTeleport;
             }
-            Entity.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
+            EntityMovementPlatformState platformState = GetPlatformState();
+            if (movementSecure == MovementSecure.NotSecure && !IsOwnerClientOrOwnedByServer &&
+                _acceptedPositionTimestamp > 0 && !_isTeleporting && !_isServerWaitingTeleportConfirm &&
+                Entity.PassengingVehicleEntity.IsNull())
+            {
+                // Relay the accepted owner pose, never the host's interpolated transform. In particular, a
+                // detach must pair its world position with the same packet's cleared platform state.
+                Vector3 position = platformState.TryResolve(Entity.Manager, out Transform support)
+                    ? support.TransformPoint(platformState.localPosition) : _endInterpPosition;
+                Entity.ServerWriteSyncTransform3D(_movementForceAppliers, writer, position, _acceptedYAngle);
+            }
+            else
+                Entity.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
+            platformState.Write(writer);
             _sendingJump = false;
             _sendingDash = false;
             _isTeleporting = false;
@@ -1339,6 +1403,7 @@ namespace MultiplayerARPG
         public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
             reader.ClientReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers);
+            EntityMovementPlatformState platformState = EntityMovementPlatformState.Read(reader);
             if (IsServer)
             {
                 // Don't read and apply transform, because it was done at server
@@ -1360,6 +1425,10 @@ namespace MultiplayerARPG
             }
             else if (!IsPreparingToTeleport && _acceptedPositionTimestamp <= peerTimestamp)
             {
+                if (!IsOwnerClient)
+                    ReceivePlatform(platformState, ref position);
+                else if (platformState.TryResolve(Entity.Manager, out Transform support))
+                    position = support.TransformPoint(platformState.localPosition);
                 // Prepare time
                 long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
                 float unityDeltaTime = (float)(deltaTime * TIMESTAMP_TO_UNITY_TIME_MULTIPLIER);
@@ -1375,6 +1444,7 @@ namespace MultiplayerARPG
                     ExtraMovementState = _tempExtraMovementState = extraMovementState;
                     _startInterpPosition = position;
                     _endInterpPosition = position;
+                    _startPlatformPosition = _receivedPlatform.localPosition;
                 }
                 else if (!IsOwnerClient)
                 {
@@ -1496,6 +1566,7 @@ namespace MultiplayerARPG
                 return;
             }
             reader.ServerReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle);
+            EntityMovementPlatformState platformState = EntityMovementPlatformState.Read(reader);
             if (movementState.Has(MovementState.IsTeleport))
             {
                 // Teleport confirming from client
@@ -1511,6 +1582,9 @@ namespace MultiplayerARPG
                 // Invalid timestamp
                 return;
             }
+            if (movementState.Has(MovementState.IsTeleport) || movementState.Has(MovementState.IsJump))
+                platformState = default;
+            ReceivePlatform(platformState, ref position);
             // Prepare time
             long deltaTime = _acceptedPositionTimestamp > 0 ? (peerTimestamp - _acceptedPositionTimestamp) : 0;
             float unityDeltaTime = (float)(deltaTime * TIMESTAMP_TO_UNITY_TIME_MULTIPLIER);
@@ -1553,24 +1627,10 @@ namespace MultiplayerARPG
             }
             else
             {
-                // TODO: Speed hack detection
-                if (!IsClient)
-                {
-                    // Allow to move to the position
-                    EntityMovement.SetPosition(newPos);
-                    // Update character rotation
-                    RemoteTurnSimulation(true, yAngle, unityDeltaTime);
-                }
-                else
-                {
-                    // It's both server and client, simulate movement
-                    if (Vector3.Distance(newPos, oldPos) > MIN_DISTANCE_TO_SIMULATE_MOVEMENT)
-                    {
-                        _simulatingKeyMovement = true;
-                        SetMovePaths(newPos, false);
-                    }
-                    RemoteTurnSimulation(true, yAngle, unityDeltaTime);
-                }
+                // Owner-authoritative remote entities are displayed by UpdateInterpolate on hosts.
+                // Do not create a second movement path or smooth the pose sent to other clients.
+                _acceptedYAngle = yAngle;
+                RemoteTurnSimulation(true, yAngle, unityDeltaTime);
                 if (movementState.Has(MovementState.IsJump))
                 {
                     _acceptedJump = true;
@@ -1582,9 +1642,14 @@ namespace MultiplayerARPG
                 }
             }
             _acceptedPositionTimestamp = peerTimestamp;
-            _startInterpPosition = oldPos;
+            _startInterpPosition = EntityTransform.position;
             _endInterpPosition = newPos;
             _interpElapsedTime = 0f;
+            if (!IsClient)
+            {
+                EntityMovement.SetPosition(newPos);
+                _startInterpPosition = newPos;
+            }
         }
 
         protected virtual Vector3 GetMoveablePosition(Vector3 oldPos, Vector3 newPos, bool falling, float clientHorMoveDist, float horMoveableDist, float clientVerMoveDist, float verMoveableDist)
@@ -1596,6 +1661,7 @@ namespace MultiplayerARPG
 
         private void OnTeleport(Vector3 position, float yAngle, bool stillMoveAfterTeleport)
         {
+            _receivedPlatform = default;
             if (!stillMoveAfterTeleport)
                 NavPaths = null;
             _verticalVelocity = 0;

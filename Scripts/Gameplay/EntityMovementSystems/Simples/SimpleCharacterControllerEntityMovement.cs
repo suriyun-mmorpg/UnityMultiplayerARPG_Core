@@ -283,7 +283,9 @@ namespace MultiplayerARPG
 
         protected void OnControllerColliderHit(ControllerColliderHit hit)
         {
-            Functions.OnControllerColliderHit(hit.point, hit.transform);
+            Functions.OnControllerColliderHit(hit.point, hit.normal,
+                hit.rigidbody != null ? hit.rigidbody.transform : hit.transform,
+                Mathf.Cos(CacheCharacterController.slopeLimit * Mathf.Deg2Rad));
         }
 
         public void ManagedUpdate()
@@ -434,6 +436,7 @@ namespace MultiplayerARPG
 
         public void SetPosition(Vector3 position)
         {
+            Functions.ResetPlatform();
             EntityTransform.position = position;
         }
 
