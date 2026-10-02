@@ -14,6 +14,7 @@
         public event GameEntityDelegate onSetOwnerClient;
         public event IsUpdateEntityComponentsDelegate onIsUpdateEntityComponentsChanged;
         public event NetworkDestroyDelegate onNetworkDestroy;
+        public event GameEntityDelegate onSetPassengingVehicle;
         public event CanMoveDelegate onCanMoveValidated;
         public event CanSprintDelegate onCanSprintValidated;
         public event CanWalkDelegate onCanWalkValidated;

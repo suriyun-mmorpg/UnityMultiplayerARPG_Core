@@ -238,6 +238,7 @@ namespace MultiplayerARPG
         {
             PassengingVehicleSeatIndex = seatIndex;
             PassengingVehicleEntity = vehicleEntity;
+            onSetPassengingVehicle?.Invoke(this);
         }
         public void CallCmdEnterVehicle(uint objectId, byte seatIndex)
         {

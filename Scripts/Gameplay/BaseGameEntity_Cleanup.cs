@@ -26,6 +26,7 @@ namespace MultiplayerARPG
                 onSetOwnerClient = null;
                 onIsUpdateEntityComponentsChanged = null;
                 onNetworkDestroy = null;
+                onSetPassengingVehicle = null;
                 onCanMoveValidated = null;
                 onCanSprintValidated = null;
                 onCanWalkValidated = null;
