@@ -20,13 +20,44 @@ namespace MultiplayerARPG
         public GameObject[] activateObjects = new GameObject[0];
         [Tooltip("Hidden when a condition matches, shown otherwise. This component's GameObject and its ancestors cannot be targets.")]
         public GameObject[] deactivateObjects = new GameObject[0];
+        protected BasePlayerCharacterEntity _previousEntity;
 
         private void OnEnable()
         {
+            GameInstance.OnSetPlayingCharacterEvent += GameInstance_OnSetPlayingCharacter;
+            GameInstance_OnSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
+        }
+
+        private void OnDisable()
+        {
+            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_OnSetPlayingCharacter;
+            GameInstance_OnSetPlayingCharacter(null);
+        }
+
+        private void GameInstance_OnSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
+        {
+            RemoveEvents(_previousEntity);
+            BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
+            _previousEntity = playerCharacterEntity;
+            AddEvents(_previousEntity);
             Refresh();
         }
 
-        private void LateUpdate()
+        private void AddEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        {
+            if (PlayingCharacterEntity == null)
+                return;
+            PlayingCharacterEntity.onSetPassengingVehicle += Character_onSetPassengingVehicle;
+        }
+
+        private void RemoveEvents(BasePlayerCharacterEntity PlayingCharacterEntity)
+        {
+            if (PlayingCharacterEntity == null)
+                return;
+            PlayingCharacterEntity.onSetPassengingVehicle -= Character_onSetPassengingVehicle;
+        }
+
+        private void Character_onSetPassengingVehicle(BaseGameEntity target)
         {
             Refresh();
         }
@@ -34,11 +65,10 @@ namespace MultiplayerARPG
         public void Refresh()
         {
             bool matches = false;
-            BasePlayerCharacterEntity character = GameInstance.PlayingCharacterEntity;
-            if (character != null)
+            if (_previousEntity != null)
             {
-                IVehicleEntity vehicle = character.PassengingVehicleEntity;
-                byte seatIndex = character.PassengingVehicleSeatIndex;
+                IVehicleEntity vehicle = _previousEntity.PassengingVehicleEntity;
+                byte seatIndex = _previousEntity.PassengingVehicleSeatIndex;
                 if (!vehicle.IsNull() && vehicle.Seats != null && seatIndex < vehicle.Seats.Count)
                     matches = MatchesVehicleSeat(vehicle.VehicleType, seatIndex);
             }
