@@ -1,6 +1,7 @@
 using UnityEngine;
 
-namespace MultiplayerARPG {
+namespace MultiplayerARPG
+{
     public class IsInSafeAreaActivator : MonoBehaviour
     {
         public GameObject[] activateObjects = new GameObject[0];
