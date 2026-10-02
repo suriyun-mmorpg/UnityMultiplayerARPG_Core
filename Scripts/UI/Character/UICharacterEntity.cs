@@ -26,7 +26,6 @@ namespace MultiplayerARPG
 
         protected float _castingSkillCountDown;
         protected float _castingSkillDuration;
-        protected BasePlayerCharacterEntity _previousPlayingCharacterEntity;
 
         protected override void OnDestroy()
         {
@@ -38,9 +37,6 @@ namespace MultiplayerARPG
             imageSkillCastGage = null;
             sliderSkillCastGage = null;
             uiCharacterBuffs = null;
-            if (_previousPlayingCharacterEntity != null)
-                _previousPlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
-            _previousPlayingCharacterEntity = null;
         }
 
         protected override void AddEvents(BaseCharacterEntity entity)
@@ -52,12 +48,13 @@ namespace MultiplayerARPG
             entity.onLevelChange += OnLevelChange;
             entity.onCurrentMpChange += OnCurrentMpChange;
             entity.onBuffsOperation += OnBuffsOperation;
-#if !DISABLE_CLASSIC_PK
             if (entity is BasePlayerCharacterEntity playerEntity)
+            {
+#if !DISABLE_CLASSIC_PK
                 playerEntity.onPkPointChange += OnPkPointChange;
 #endif
-            GameInstance.OnSetPlayingCharacterEvent += GameInstance_onSetPlayingCharacter;
-            GameInstance_onSetPlayingCharacter(GameInstance.PlayingCharacterEntity);
+                playerEntity.onCharacterNameChange += OnCharacterNameChange;
+            }
         }
 
         protected override void RemoveEvents(BaseCharacterEntity entity)
@@ -69,15 +66,16 @@ namespace MultiplayerARPG
             entity.onLevelChange -= OnLevelChange;
             entity.onCurrentMpChange -= OnCurrentMpChange;
             entity.onBuffsOperation -= OnBuffsOperation;
-#if !DISABLE_CLASSIC_PK
             if (entity is BasePlayerCharacterEntity playerEntity)
+            {
+#if !DISABLE_CLASSIC_PK
                 playerEntity.onPkPointChange -= OnPkPointChange;
 #endif
-            GameInstance.OnSetPlayingCharacterEvent -= GameInstance_onSetPlayingCharacter;
-            GameInstance_onSetPlayingCharacter(null);
+                playerEntity.onCharacterNameChange -= OnCharacterNameChange;
+            }
         }
 
-        protected void OnRecached(BaseCharacterEntity target)
+        protected void OnRecached(BaseCharacterEntity entity)
         {
             UpdateHp();
             UpdateMp();
@@ -103,22 +101,7 @@ namespace MultiplayerARPG
             UpdateTitle();
         }
 
-        protected void GameInstance_onSetPlayingCharacter(IPlayerCharacterData playingCharacterData)
-        {
-            if (_previousPlayingCharacterEntity != null)
-            {
-                _previousPlayingCharacterEntity.onLevelChange += PlayingCharacterEntity_onLevelChange;
-            }
-            BasePlayerCharacterEntity playerCharacterEntity = playingCharacterData as BasePlayerCharacterEntity;
-            _previousPlayingCharacterEntity = playerCharacterEntity;
-            if (_previousPlayingCharacterEntity != null)
-            {
-                _previousPlayingCharacterEntity.onLevelChange -= PlayingCharacterEntity_onLevelChange;
-                UpdateTitle();
-            }
-        }
-
-        protected void PlayingCharacterEntity_onLevelChange(BaseCharacterEntity target, int oldLevel, int level)
+        protected void OnCharacterNameChange(BaseCharacterEntity target, string oldCharacterName, string characterName)
         {
             UpdateTitle();
         }
