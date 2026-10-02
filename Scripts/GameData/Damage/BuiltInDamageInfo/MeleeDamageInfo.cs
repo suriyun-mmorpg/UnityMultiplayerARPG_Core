@@ -22,6 +22,8 @@ namespace MultiplayerARPG
 
         public override Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
+            if (attacker.TryGetVehicleMeleeDamageTransform(out Transform vehicleDamageTransform))
+                return vehicleDamageTransform;
             return attacker.MeleeDamageTransform;
         }
 

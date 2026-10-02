@@ -56,6 +56,20 @@ namespace MultiplayerARPG
             }
         }
 
+        public bool TryGetVehicleMeleeDamageTransform(out Transform result)
+        {
+            VehicleSeat seat = PassengingVehicleSeat;
+            result = seat != null ? seat.meleeDamageTransform : null;
+            return result != null;
+        }
+
+        public bool TryGetVehicleMissileDamageTransform(out Transform result)
+        {
+            VehicleSeat seat = PassengingVehicleSeat;
+            result = seat != null ? seat.missileDamageTransform : null;
+            return result != null;
+        }
+
         private CancellationTokenSource _enterVehicleCancellation = null;
         private CancellationTokenSource _exitVehicleCancellation = null;
 

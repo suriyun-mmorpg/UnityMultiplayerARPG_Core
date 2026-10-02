@@ -88,6 +88,8 @@ namespace MultiplayerARPG
 
         public override Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand)
         {
+            if (attacker.TryGetVehicleMissileDamageTransform(out Transform vehicleDamageTransform))
+                return vehicleDamageTransform;
             Transform transform = null;
             if (attacker.ModelManager.IsFps)
             {
