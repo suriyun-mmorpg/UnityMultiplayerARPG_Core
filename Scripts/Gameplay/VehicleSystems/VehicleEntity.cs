@@ -225,13 +225,30 @@ namespace MultiplayerARPG
 
         private void OnPassengerIdsOperation(LiteNetLibSyncListOp operation, int index, uint oldItem, uint newItem)
         {
-            if (index >= passengerIds.Count)
+            if (index < 0 || index >= passengerIds.Count)
+            {
+                if (operation == LiteNetLibSyncListOp.Clear)
+                {
+                    _passengers.Clear();
+                    foreach (UnityAction<LiteNetLibIdentity> spawnEvent in _spawnEvents.Values)
+                        Manager.Assets.onObjectSpawn.RemoveListener(spawnEvent);
+                    _spawnEvents.Clear();
+                }
+                NotifyPassengersChanged();
                 return;
+            }
             // Set passenger entity to dictionary if the id > 0
             uint passengerId = passengerIds[index];
             if (passengerId == 0)
             {
                 _passengers.Remove((byte)index);
+                if (oldItem != 0 && !passengerIds.Contains(oldItem) &&
+                    _spawnEvents.TryGetValue(oldItem, out UnityAction<LiteNetLibIdentity> exitedEvent))
+                {
+                    Manager.Assets.onObjectSpawn.RemoveListener(exitedEvent);
+                    _spawnEvents.Remove(oldItem);
+                }
+                NotifyPassengersChanged();
                 return;
             }
             if (Manager.Assets.TryGetSpawnedObject(passengerId, out LiteNetLibIdentity identity))
@@ -243,21 +260,28 @@ namespace MultiplayerARPG
             }
             else
             {
-                // Create a new event to set passenger when passenger object spawn
-                _spawnEvents[passengerId] = (identity) =>
+                // A passenger can change seats before their entity reaches this client.
+                // Replace the old pending binding and verify the latest seat on spawn.
+                if (_spawnEvents.TryGetValue(passengerId, out UnityAction<LiteNetLibIdentity> previousEvent))
+                    Manager.Assets.onObjectSpawn.RemoveListener(previousEvent);
+                UnityAction<LiteNetLibIdentity> spawnEvent = null;
+                spawnEvent = (identity) =>
                 {
                     if (identity.ObjectId != passengerId)
+                        return;
+                    Manager.Assets.onObjectSpawn.RemoveListener(spawnEvent);
+                    _spawnEvents.Remove(passengerId);
+                    if (index >= passengerIds.Count || passengerIds[index] != passengerId)
                         return;
                     BaseGameEntity passenger = identity.GetComponent<BaseGameEntity>();
                     passenger.SetPassengingVehicle((byte)index, this);
                     _passengers[(byte)index] = passenger;
-                    // Remove the event after passenger was set
-                    Manager.Assets.onObjectSpawn.RemoveListener(_spawnEvents[passengerId]);
-                    _spawnEvents.Remove(passengerId);
+                    NotifyPassengersChanged();
                 };
-                // Set the event
-                Manager.Assets.onObjectSpawn.AddListener(_spawnEvents[passengerId]);
+                _spawnEvents[passengerId] = spawnEvent;
+                Manager.Assets.onObjectSpawn.AddListener(spawnEvent);
             }
+            NotifyPassengersChanged();
         }
 
         public override float GetMoveSpeed_Implementation(MovementState movementState, ExtraMovementState extraMovementState)

@@ -8,6 +8,8 @@ namespace MultiplayerARPG
         int CurrentHp { get; set; }
         VehicleType VehicleType { get; }
         List<VehicleSeat> Seats { get; }
+        event System.Action onPassengersChanged;
+        bool TryChangePassengerSeat(BaseGameEntity passenger, byte seatIndex);
         bool HasDriver { get; }
         bool CanBePassenger(byte seatIndex, BaseGameEntity gameEntity);
         BaseGameEntity GetPassenger(byte seatIndex);
