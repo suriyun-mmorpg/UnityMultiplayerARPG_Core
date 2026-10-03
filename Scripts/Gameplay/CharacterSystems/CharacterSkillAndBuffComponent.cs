@@ -47,7 +47,7 @@ namespace MultiplayerARPG
                 CharacterRecoveryData tempRecoveryData;
                 int tempCount;
                 // Removing mount if it should
-                if (Entity.PassengingVehicleEntity != null)
+                if (!Entity.PassengingVehicleEntity.IsNull())
                 {
                     CharacterMount mount = Entity.Mount;
                     tempCalculatedBuff = Entity.PassengingVehicleEntity.GetBuff();

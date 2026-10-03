@@ -1,4 +1,4 @@
-﻿using Insthync.UnityEditorUtils;
+using Insthync.UnityEditorUtils;
 using LiteNetLib;
 using LiteNetLibManager;
 using System.Collections;
@@ -524,7 +524,7 @@ namespace MultiplayerARPG
 
         public virtual bool CanActivate()
         {
-            return !this.IsDead() && GameInstance.PlayingCharacterEntity.PassengingVehicleEntity == null;
+            return !this.IsDead() && GameInstance.PlayingCharacterEntity.PassengingVehicleEntity.IsNull();
         }
 
         public virtual void OnActivate()

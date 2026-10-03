@@ -185,7 +185,7 @@ namespace MultiplayerARPG
                 return;
 
             // Don't play sound while passenging vehicle
-            if (Entity.PassengingVehicleEntity != null)
+            if (!Entity.PassengingVehicleEntity.IsNull())
                 return;
 
             audioSource.pitch = Random.Range(currentFootstepSettings.randomPitchMin, currentFootstepSettings.randomPitchMax);
