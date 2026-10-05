@@ -174,13 +174,27 @@ namespace MultiplayerARPG.Tests
             Assert.That(_vehicle.TryChangePassengerSeat(_character, 1), Is.False);
         }
 
-        [Test]
-        public void PanelAndSeatStatesFollowMountAndOccupancyEvents()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void PanelAndSeatStatesFollowMountAndOccupancyEvents(bool useTmp)
         {
+            var label = Child("Seat number", _ui.seatPrefab.transform);
+            var wrapper = label.AddComponent<TextWrapper>();
+            if (useTmp)
+                wrapper.textMeshText = label.AddComponent<TMPro.TextMeshProUGUI>();
+            else
+                wrapper.unityText = label.AddComponent<UnityEngine.UI.Text>();
+            _ui.seatPrefab.textSeatNumber = wrapper;
             Assert.That(_ui.controlsRoot.activeSelf, Is.False);
             Mount(0);
             Assert.That(_ui.controlsRoot.activeSelf, Is.True);
             Assert.That(Seats().Length, Is.EqualTo(4));
+            for (byte i = 0; i < 4; ++i)
+            {
+                var text = Seat(i).textSeatNumber;
+                Assert.That(text.text, Is.EqualTo((i + 1).ToString()));
+                Assert.That(useTmp ? text.textMeshText.text : text.unityText.text, Is.EqualTo((i + 1).ToString()));
+            }
             Assert.That(Seat(0).background.color, Is.EqualTo(Seat(0).currentColor));
             Assert.That(Seat(1).button.interactable, Is.True);
             var other = Child("Other player", _entities).AddComponent<PlayerCharacterEntity>();

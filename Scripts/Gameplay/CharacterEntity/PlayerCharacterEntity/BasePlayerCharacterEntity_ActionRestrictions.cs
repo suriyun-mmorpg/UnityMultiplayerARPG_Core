@@ -62,7 +62,7 @@ namespace MultiplayerARPG
                 return false;
             if (this.IsDead())
                 return false;
-            return true;
+            return base.CanPickup();
         }
 
         public override bool CanDropItem()

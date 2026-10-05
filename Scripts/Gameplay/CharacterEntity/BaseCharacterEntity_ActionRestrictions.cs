@@ -19,6 +19,10 @@ namespace MultiplayerARPG
 
         public virtual bool CanPickup()
         {
+            if (!PassengingVehicleEntity.IsNull() &&
+                PassengingVehicleSeat != null &&
+                !PassengingVehicleSeat.canPickup)
+                return false;
             return true;
         }
 

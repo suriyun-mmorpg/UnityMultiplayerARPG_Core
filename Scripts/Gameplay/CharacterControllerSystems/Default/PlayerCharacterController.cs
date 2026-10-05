@@ -528,7 +528,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < ActivatableEntityDetector.activatableEntities.Count; ++i)
                 {
                     activatable = ActivatableEntityDetector.activatableEntities[i];
-                    if (activatable.CanActivate())
+                    if (CanActivate(activatable))
                         return true;
                 }
             }
@@ -543,7 +543,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < ActivatableEntityDetector.holdActivatableEntities.Count; ++i)
                 {
                     activatable = ActivatableEntityDetector.holdActivatableEntities[i];
-                    if (activatable.CanHoldActivate())
+                    if (CanHoldActivate(activatable))
                         return true;
                 }
             }
@@ -558,7 +558,7 @@ namespace MultiplayerARPG
                 for (int i = 0; i < ItemDropEntityDetector.pickupActivatableEntities.Count; ++i)
                 {
                     activatable = ItemDropEntityDetector.pickupActivatableEntities[i];
-                    if (activatable.CanPickupActivate())
+                    if (CanPickupActivate(activatable))
                         return true;
                 }
             }

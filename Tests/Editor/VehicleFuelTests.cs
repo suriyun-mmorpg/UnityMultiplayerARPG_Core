@@ -195,8 +195,9 @@ namespace MultiplayerARPG.Tests
             }
         }
 
-        [Test]
-        public void MountedHudTracksFuelSeatChangesRefillingAndExiting()
+        [TestCase(false)]
+        [TestCase(true)]
+        public void MountedHudTracksFuelSeatChangesRefillingAndExiting(bool useTmp)
         {
             var observer = new GameObject("Fuel HUD", typeof(RectTransform));
             observer.transform.SetParent(_root.transform, false);
@@ -204,7 +205,11 @@ namespace MultiplayerARPG.Tests
             var controls = new GameObject("Controls", typeof(RectTransform));
             controls.transform.SetParent(observer.transform, false);
             ui.controlsRoot = controls;
-            ui.textFuel = controls.AddComponent<TMPro.TextMeshProUGUI>();
+            ui.textFuel = controls.AddComponent<TextWrapper>();
+            if (useTmp)
+                ui.textFuel.textMeshText = controls.AddComponent<TMPro.TextMeshProUGUI>();
+            else
+                ui.textFuel.unityText = controls.AddComponent<UnityEngine.UI.Text>();
             var bar = new GameObject("Fill", typeof(RectTransform));
             bar.transform.SetParent(controls.transform, false);
             ui.fuelFill = bar.AddComponent<UnityEngine.UI.Image>();
@@ -223,6 +228,7 @@ namespace MultiplayerARPG.Tests
                 Assert.That(controls.activeSelf, Is.True);
                 _fuel.ServerRestoreFuel(0f);
                 Assert.That(ui.textFuel.text, Is.EqualTo("FUEL EMPTY"));
+                Assert.That(useTmp ? ui.textFuel.textMeshText.text : ui.textFuel.unityText.text, Is.EqualTo("FUEL EMPTY"));
                 Assert.That(ui.fuelFill.color, Is.EqualTo(ui.emptyColor));
                 _fuel.ServerRefuel(10f, out _);
                 Assert.That(ui.fuelFill.fillAmount, Is.EqualTo(1f));

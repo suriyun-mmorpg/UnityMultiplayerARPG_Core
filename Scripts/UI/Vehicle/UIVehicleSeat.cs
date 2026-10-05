@@ -9,7 +9,7 @@ namespace MultiplayerARPG
     {
         public UnityEngine.UI.Button button;
         public UnityEngine.UI.Image background;
-        public TMPro.TMP_Text textSeatNumber;
+        public TextWrapper textSeatNumber;
         public GameObject driverIndicator;
         public Color availableColor = new Color(0.86f, 0.9f, 0.94f);
         public Color currentColor = new Color(1f, 0.74f, 0.18f);

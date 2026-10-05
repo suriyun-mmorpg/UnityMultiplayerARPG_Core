@@ -17,6 +17,8 @@ namespace MultiplayerARPG
         public Transform missileDamageTransform;
         public bool canAttack;
         public bool canUseSkill;
+        public bool canActivate;
+        public bool canPickup;
         public bool hidePassenger;
         public bool overridePassengerActionAnimations;
         public bool overridePassengerHitBoxes;

@@ -7,7 +7,7 @@ namespace MultiplayerARPG
     public class UIVehicleFuel : MonoBehaviour
     {
         public GameObject controlsRoot;
-        public TMPro.TMP_Text textFuel;
+        public TextWrapper textFuel;
         public UnityEngine.UI.Image fuelFill;
         public UnityEngine.UI.Button buttonRefuel;
         public Color normalColor = new Color(0.3f, 0.85f, 0.6f);

@@ -126,7 +126,7 @@ namespace MultiplayerARPG
             return image;
         }
 
-        private static TMPro.TextMeshProUGUI Label(string name, Transform parent, string text, Vector2 size, Vector2 position)
+        private static TextWrapper Label(string name, Transform parent, string text, Vector2 size, Vector2 position)
         {
             var label = Rect(name, parent, size, position).gameObject.AddComponent<TMPro.TextMeshProUGUI>();
             label.font = TMPro.TMP_Settings.defaultFontAsset;
@@ -135,7 +135,9 @@ namespace MultiplayerARPG
             label.alignment = TMPro.TextAlignmentOptions.Center;
             label.color = Color.white;
             label.raycastTarget = false;
-            return label;
+            var wrapper = label.gameObject.AddComponent<TextWrapper>();
+            wrapper.textMeshText = label;
+            return wrapper;
         }
     }
 }

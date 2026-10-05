@@ -416,7 +416,7 @@ namespace MultiplayerARPG
 
         public virtual void ActivateBuilding(BuildingEntity targetBuildingEntity)
         {
-            if (targetBuildingEntity == null)
+            if (targetBuildingEntity == null || !CanActivateFromCurrentSeat())
                 return;
             targetBuildingEntity.OnActivate();
             DeselectBuilding();
@@ -508,20 +508,27 @@ namespace MultiplayerARPG
             _heldChanneledSkill = null;
         }
 
+        protected bool CanActivateFromCurrentSeat()
+        {
+            BasePlayerCharacterEntity character = PlayingCharacterEntity;
+            return character == null || character.PassengingVehicleEntity.IsNull() ||
+                character.PassengingVehicleSeat == null || character.PassengingVehicleSeat.canActivate;
+        }
+
         public bool CanActivate(IActivatableEntity entity)
         {
             
-            return !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanActivate();
+            return CanActivateFromCurrentSeat() && !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanActivate();
         }
 
         public bool CanHoldActivate(IHoldActivatableEntity entity)
         {
-            return !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanHoldActivate();
+            return CanActivateFromCurrentSeat() && !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanHoldActivate();
         }
 
         public bool CanPickupActivate(IPickupActivatableEntity entity)
         {
-            return !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanPickupActivate();
+            return PlayingCharacterEntity != null && PlayingCharacterEntity.CanPickup() && !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanPickupActivate();
         }
 
         public virtual bool ShouldShowActivateButtons()
