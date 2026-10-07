@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public UnityEngine.UI.Image background;
         public TextWrapper textSeatNumber;
         public GameObject driverIndicator;
+        public GameObject passengerIndicator;
         public Color availableColor = new Color(0.86f, 0.9f, 0.94f);
         public Color currentColor = new Color(1f, 0.74f, 0.18f);
         public Color occupiedColor = new Color(0.38f, 0.4f, 0.44f);
@@ -34,6 +35,8 @@ namespace MultiplayerARPG
                 textSeatNumber.text = (seatIndex + 1).ToString();
             if (driverIndicator != null)
                 driverIndicator.SetActive(seatIndex == 0);
+            if (passengerIndicator != null)
+                passengerIndicator.SetActive(seatIndex != 0);
         }
 
         public void SetState(bool current, bool selectable, bool preview)
