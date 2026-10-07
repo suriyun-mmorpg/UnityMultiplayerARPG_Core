@@ -53,6 +53,9 @@ namespace MultiplayerARPG
         {
             _zoomWeaponAbilityController.ShowZoomCrosshair = false;
             _zoomWeaponAbilityController.OverrideHideCrosshair.Remove(this);
+            _zoomWeaponAbilityController.OverrideCameraFov.Remove(this);
+            _zoomWeaponAbilityController.OverrideIsZoomAimming.Remove(this);
+            _zoomWeaponAbilityController.OverrideCameraRotationSpeedScale.Remove(this);
             _zoomWeaponAbilityController.UpdateCameraSettings();
             OnDeactivateZoomAbility?.Invoke();
         }
