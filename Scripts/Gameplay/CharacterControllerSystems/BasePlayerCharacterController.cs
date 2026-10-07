@@ -517,7 +517,6 @@ namespace MultiplayerARPG
 
         public bool CanActivate(IActivatableEntity entity)
         {
-            
             return CanActivateFromCurrentSeat() && !entity.IsNull() && GameplayUtils.IsTargetInDistance(EntityTransform.position, entity.EntityTransform, entity.GetActivatableDistance()) && entity.CanActivate();
         }
 
