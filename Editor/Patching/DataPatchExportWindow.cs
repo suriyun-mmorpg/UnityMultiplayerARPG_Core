@@ -38,7 +38,7 @@ namespace MultiplayerARPG
         private Font jsonFont;
         private string Scope => database == null ? "" : JsonConvert.SerializeObject(new
         {
-        database.patchDatabaseId, database.dataPatchSettings.serviceUrl, database.dataPatchSettings.environment
+        database.patchDatabaseId, database.dataPatchSettings.serviceUrl
         }
 
         );
@@ -68,7 +68,7 @@ namespace MultiplayerARPG
             }
 
             PatchUploadConfig config = PatchUploadConfig.LoadOrCreate();
-            EditorGUILayout.LabelField("Target", database == null ? "Select a profile" : database.dataPatchSettings.environment + " / " + database.dataPatchSettings.serviceUrl);
+            EditorGUILayout.LabelField("Target", database == null ? "Select a profile" : database.patchDatabaseId + " / " + database.dataPatchSettings.serviceUrl);
             using (new EditorGUI.DisabledScope(uploading))
                 description = EditorGUILayout.TextField("Description", description);
             using (new EditorGUI.DisabledScope(uploading || EditorApplication.isPlaying || database == null))
@@ -339,17 +339,16 @@ namespace MultiplayerARPG
                     throw new InvalidOperationException("Use HTTPS, or loopback HTTP for local development.");
                 List<string> chunks = BuildUploadChunks(out string manifestJson);
                 string bodyHash = DataPatchHttp.Hash(manifestJson + "\n" + description + "\n" + database.dataPatchSettings.serviceUrl);
-                if (config.pendingPayloadHash != bodyHash || config.pendingDatabaseId != database.patchDatabaseId || config.pendingEnvironment != database.dataPatchSettings.environment || string.IsNullOrEmpty(config.pendingUploadId))
+                if (config.pendingPayloadHash != bodyHash || config.pendingDatabaseId != database.patchDatabaseId || string.IsNullOrEmpty(config.pendingUploadId))
                     config.pendingUploadId = Guid.NewGuid().ToString("N");
                 config.pendingPayloadHash = bodyHash;
                 config.pendingDatabaseId = database.patchDatabaseId;
-                config.pendingEnvironment = database.dataPatchSettings.environment;
                 EditorUtility.SetDirty(config);
                 AssetDatabase.SaveAssets();
                 string id = config.pendingUploadId;
                 string json = JsonConvert.SerializeObject(new
                 {
-                id, databaseId = database.patchDatabaseId, environment = database.dataPatchSettings.environment, schemaVersion = 2, description, manifestJson
+                id, databaseId = database.patchDatabaseId, schemaVersion = 2, description, manifestJson
                 }
 
                 );

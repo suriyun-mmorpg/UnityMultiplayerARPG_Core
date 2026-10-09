@@ -7,12 +7,10 @@ namespace MultiplayerARPG
     {
         public string serviceUrl = "";
         public string secretKey = "";
-        public string environment = "staging";
         public int requestTimeoutSeconds = 30;
         public string pendingUploadId = "";
         public string pendingPayloadHash = "";
         public string pendingDatabaseId = "";
-        public string pendingEnvironment = "";
         public const string AssetPath = "Assets/Editor/Resources/DataPatching/PatchUploadConfig.asset";
 
         public static PatchUploadConfig LoadOrCreate()
@@ -61,7 +59,7 @@ namespace MultiplayerARPG
             config.secretKey = EditorGUILayout.PasswordField("Upload Secret", config.secretKey);
             if (EditorGUI.EndChangeCheck())
                 EditorUtility.SetDirty(config);
-            EditorGUILayout.HelpBox("The patch profile supplies the endpoint and environment. Local editor credential. Set a key accepted by PATCH_UPLOAD_SECRET_KEYS. This asset must stay out of Git and player builds.", MessageType.Info);
+            EditorGUILayout.HelpBox("The patch profile supplies the endpoint and database ID. Local editor credential. Set a key accepted by PATCH_UPLOAD_SECRET_KEYS. This asset must stay out of Git and player builds.", MessageType.Info);
         }
     }
 }

@@ -120,11 +120,11 @@ namespace MultiplayerARPG
             DataPatchSettings settings = database.dataPatchSettings;
             if (!Uri.TryCreate(settings.serviceUrl, UriKind.Absolute, out Uri uri) || (uri.Scheme != "https" && !uri.IsLoopback))
                 throw new InvalidOperationException("Patch service requires HTTPS (HTTP allowed only on loopback).");
-            string route = string.IsNullOrEmpty(releaseId) ? "latest?databaseId=" + Uri.EscapeDataString(database.patchDatabaseId) + "&environment=" + Uri.EscapeDataString(settings.environment) : Uri.EscapeDataString(releaseId);
+            string route = string.IsNullOrEmpty(releaseId) ? "latest?databaseId=" + Uri.EscapeDataString(database.patchDatabaseId) : Uri.EscapeDataString(releaseId);
             string baseUrl = settings.serviceUrl.TrimEnd('/') + "/game-data-patches/";
             DataPatchRelease release;
 #if UNITY_EDITOR
-            Debug.Log($"[Data Patch] Download started. Database: {database.patchDatabaseId}, environment: {settings.environment}, release: {(string.IsNullOrEmpty(releaseId) ? "latest" : releaseId)}.");
+            Debug.Log($"[Data Patch] Download started. Database: {database.patchDatabaseId}, release: {(string.IsNullOrEmpty(releaseId) ? "latest" : releaseId)}.");
 #endif
             ReportProgress(0, "Loading patch manifest");
             try
@@ -133,7 +133,7 @@ namespace MultiplayerARPG
                 if (json == null)
                 {
 #if UNITY_EDITOR
-                    Debug.Log($"[Data Patch] Download check finished. No published patch for database {database.patchDatabaseId}, environment {settings.environment}.");
+                    Debug.Log($"[Data Patch] Download check finished. No published patch for database {database.patchDatabaseId}.");
 #endif
                     ReportProgress(1, "No published patch");
                     return null;
@@ -150,7 +150,7 @@ namespace MultiplayerARPG
             }
             DataPatchManifest manifest = ValidateManifest(release);
             if ((!string.IsNullOrEmpty(releaseId) && release.id != releaseId) || release.databaseId != database.patchDatabaseId ||
-                release.environment != settings.environment || string.IsNullOrEmpty(release.publishTime))
+                string.IsNullOrEmpty(release.publishTime))
                 throw new InvalidOperationException("Patch ID, scope or publication mismatch.");
             if (manifest != null)
             {
@@ -202,7 +202,7 @@ namespace MultiplayerARPG
                 return true;
             });
 #if UNITY_EDITOR
-            Debug.Log($"[Data Patch] Download finished and integrity verified. Release: {release.id}, version: {release.version}, database: {release.databaseId}, environment: {release.environment}.");
+            Debug.Log($"[Data Patch] Download finished and integrity verified. Release: {release.id}, version: {release.version}, database: {release.databaseId}.");
 #endif
             ReportProgress(1, "Patch download verified");
             return release;
@@ -266,7 +266,7 @@ namespace MultiplayerARPG
 
         private static string CachePath(DataPatchProfile database, string id)
         {
-            return Path.Combine(Application.persistentDataPath, "GameDataPatches", Hash(database.patchDatabaseId + "/" + database.dataPatchSettings.environment + "/" + id) + ".json");
+            return Path.Combine(Application.persistentDataPath, "GameDataPatches", Hash(database.patchDatabaseId + "/" + id) + ".json");
         }
 
         private static string ChunkPath(string hash)

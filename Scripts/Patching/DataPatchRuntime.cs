@@ -35,16 +35,7 @@ namespace MultiplayerARPG
             try
             {
                 await Engine.RefreshAsync();
-#if !UNITY_SERVER
-                // Clients select the exact server release during the connection handshake.
-                if (!database.dataPatchSettings.loadAtStartup)
-                {
-                    IsReady = true;
-                    return;
-                }
-
-#endif
-                await Prepare(database.dataPatchSettings.startupReleaseId);
+                await Prepare(string.Empty);
                 Commit();
                 IsReady = true;
             }

@@ -463,7 +463,7 @@ namespace MultiplayerARPG
         private static DataPatchRelease Release(DataPatchProfile database, string id, DataPatchEntry[] entries)
         {
             string json = JsonConvert.SerializeObject(entries);
-            return new DataPatchRelease{id = id, databaseId = database.patchDatabaseId, environment = database.dataPatchSettings.environment, schemaVersion = 1, publishTime = DateTime.UtcNow.ToString("O"), payloadJson = json, payloadHash = DataPatchHttp.Hash(json)};
+            return new DataPatchRelease{id = id, databaseId = database.patchDatabaseId, schemaVersion = 1, publishTime = DateTime.UtcNow.ToString("O"), payloadJson = json, payloadHash = DataPatchHttp.Hash(json)};
         }
 
         private static void Check(bool success, string message)

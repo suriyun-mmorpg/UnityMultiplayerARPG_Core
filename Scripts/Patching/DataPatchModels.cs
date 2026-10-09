@@ -9,10 +9,6 @@ namespace MultiplayerARPG
     {
         public bool enabled;
         public string serviceUrl = "";
-        public string environment = "staging";
-        public string startupReleaseId = "";
-        [UnityEngine.Tooltip("Enable for a server hosted from a regular player build or Editor. Dedicated server builds always load at startup.")]
-        public bool loadAtStartup;
         public int requestTimeoutSeconds = 30;
         [Min(0.1f)]
         [Tooltip("Main-thread preparation budget per frame. One record can exceed this budget; activation remains atomic.")]
@@ -32,7 +28,6 @@ namespace MultiplayerARPG
     {
         public string id;
         public string databaseId;
-        public string environment;
         public int version;
         public int schemaVersion;
         public string payloadHash;

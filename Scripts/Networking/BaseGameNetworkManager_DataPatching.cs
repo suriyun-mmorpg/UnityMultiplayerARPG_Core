@@ -31,8 +31,7 @@ namespace MultiplayerARPG
                 string id = message.Reader.GetString();
                 string hash = message.Reader.GetString();
                 string databaseId = message.Reader.GetString();
-                string environment = message.Reader.GetString();
-                ReceivePatchState(mode, nonce, id, hash, databaseId, environment).Forget();
+                ReceivePatchState(mode, nonce, id, hash, databaseId).Forget();
             });
             RegisterServerMessage(GameNetworkingConsts.PatchAckMessage, message =>
             {
@@ -57,11 +56,10 @@ namespace MultiplayerARPG
                 writer.Put(id);
                 writer.Put(hash);
                 writer.Put(database?.patchDatabaseId ?? "");
-                writer.Put(database?.dataPatchSettings.environment ?? "");
             });
         }
 
-        private async UniTaskVoid ReceivePatchState(byte mode, string nonce, string id, string hash, string databaseId, string environment)
+        private async UniTaskVoid ReceivePatchState(byte mode, string nonce, string id, string hash, string databaseId)
         {
             try
             {
@@ -92,7 +90,7 @@ namespace MultiplayerARPG
                 {
                     if (!string.IsNullOrEmpty(id))
                     {
-                        if (DataPatchRuntime.Profile == null || databaseId != DataPatchRuntime.Profile.patchDatabaseId || environment != DataPatchRuntime.Profile.dataPatchSettings.environment)
+                        if (DataPatchRuntime.Profile == null || databaseId != DataPatchRuntime.Profile.patchDatabaseId)
                             throw new InvalidOperationException("Server requires a patch scope unavailable on this client.");
                         await DataPatchRuntime.Prepare(id);
                         if (DataPatchRuntime.Engine.PreparedRelease?.payloadHash != hash)

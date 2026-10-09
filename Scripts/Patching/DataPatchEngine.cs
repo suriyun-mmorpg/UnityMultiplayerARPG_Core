@@ -182,7 +182,7 @@ namespace MultiplayerARPG
 
         private void ValidateScope(DataPatchRelease release)
         {
-            if (release != null && (release.databaseId != database.patchDatabaseId || release.environment != database.dataPatchSettings.environment || (release.schemaVersion != 1 && release.schemaVersion != 2) || string.IsNullOrEmpty(release.publishTime)))
+            if (release != null && (release.databaseId != database.patchDatabaseId || (release.schemaVersion != 1 && release.schemaVersion != 2) || string.IsNullOrEmpty(release.publishTime)))
                 throw new InvalidOperationException("Patch scope, schema, or publication mismatch.");
         }
 
