@@ -168,6 +168,8 @@ namespace MultiplayerARPG
         private BaseEquipmentModelBonesSetupManager equipmentModelBonesSetupManager = null;
         [SerializeField]
         private NetworkSetting networkSetting = null;
+        [SerializeField]
+        private DataPatchProfile dataPatchProfile = null;
 
         [Header("Gameplay Objects")]
         [SerializeField]
@@ -659,6 +661,11 @@ namespace MultiplayerARPG
         public NetworkSetting NetworkSetting
         {
             get { return networkSetting; }
+        }
+
+        public DataPatchProfile DataPatchProfile
+        {
+            get { return dataPatchProfile; }
         }
 
         public BaseGameDatabase GameDatabase

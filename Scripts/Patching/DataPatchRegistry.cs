@@ -45,10 +45,10 @@ namespace MultiplayerARPG
 
         private void AddGraphCore(object value)
         {
-            if (value == null || value is UnityEngine.Object obj && obj == null || !visited.Add(value))
+            if (value == null || value is UnityEngine.Object obj && obj == null)
                 return;
             Type type = value.GetType();
-            if (type.IsPrimitive || type.IsEnum || type == typeof(string))
+            if (type.IsPrimitive || type.IsEnum || type == typeof(string) || !visited.Add(value))
                 return;
             if (value is IPatchableData data && value is ScriptableObject asset)
                 Add(asset, data.DataId);
@@ -75,12 +75,12 @@ namespace MultiplayerARPG
             // Subclasses still share one GameInstance registry and must not alias an ID.
             string family = asset is BaseItem ? nameof(BaseItem) : asset is BaseCharacter ? nameof(BaseCharacter) : asset.GetType().Name;
             string identity = Key(family, id);
-            if (sharedRegistryIdentities.TryGetValue(identity, out ScriptableObject duplicate) && !ReferenceEquals(duplicate, asset))
-                throw new InvalidOperationException($"Duplicate registry identity or hash collision: {identity} ({duplicate.name}, {asset.name}).");
+            if (sharedRegistryIdentities.TryGetValue(identity, out ScriptableObject duplicate) && duplicate != asset)
+                throw new InvalidOperationException($"Duplicate registry identity or hash collision: {identity} ({Describe(duplicate)}, {Describe(asset)}).");
             sharedRegistryIdentities[identity] = asset;
             string key = Key(asset.GetType().Name, id);
-            if (Targets.TryGetValue(key, out ScriptableObject previous) && !ReferenceEquals(previous, asset))
-                throw new InvalidOperationException($"Duplicate identity or hash collision: {key} ({previous.name}, {asset.name}).");
+            if (Targets.TryGetValue(key, out ScriptableObject previous) && previous != asset)
+                throw new InvalidOperationException($"Duplicate identity or hash collision: {key} ({Describe(previous)}, {Describe(asset)}).");
             Targets[key] = asset;
         }
 
@@ -98,7 +98,7 @@ namespace MultiplayerARPG
                     continue;
                 if (asset is BaseItem item)
                 {
-                    if (GameInstance.Items.TryGetValue(data.DataId, out BaseItem existing) && !ReferenceEquals(existing, asset))
+                    if (GameInstance.Items.TryGetValue(data.DataId, out BaseItem existing) && existing != asset)
                         throw new InvalidOperationException($"Conflicting item ID {data.DataId}.");
                     if (existing == null)
                         GameInstance.AddItems(item);
@@ -107,14 +107,14 @@ namespace MultiplayerARPG
 
                 if (asset is BaseCharacter character)
                 {
-                    if (GameInstance.Characters.TryGetValue(data.DataId, out BaseCharacter existing) && !ReferenceEquals(existing, asset))
+                    if (GameInstance.Characters.TryGetValue(data.DataId, out BaseCharacter existing) && existing != asset)
                         throw new InvalidOperationException($"Conflicting character ID {data.DataId}.");
                     if (existing == null)
                         GameInstance.AddCharacters(character);
                     continue;
                 }
 
-                foreach (FieldInfo field in typeof(GameInstance).GetFields(BindingFlags.Public | BindingFlags.Static))
+                foreach (FieldInfo field in RuntimeDataRegistries())
                 {
                     Type fieldType = field.FieldType;
                     if (!fieldType.IsGenericType || fieldType.GetGenericTypeDefinition() != typeof(Dictionary<, >))
@@ -122,7 +122,7 @@ namespace MultiplayerARPG
                     Type[] args = fieldType.GetGenericArguments();
                     if (args[0] != typeof(int) || !args[1].IsInstanceOfType(asset) || !(field.GetValue(null)is IDictionary dictionary))
                         continue;
-                    if (dictionary.Contains(data.DataId) && !ReferenceEquals(dictionary[data.DataId], asset))
+                    if (dictionary.Contains(data.DataId) && !SameObject(dictionary[data.DataId], asset))
                         throw new InvalidOperationException($"Conflicting runtime asset {asset.name}, ID {data.DataId}.");
                     if (!dictionary.Contains(data.DataId))
                     {
@@ -139,7 +139,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            foreach (FieldInfo field in typeof(GameInstance).GetFields(BindingFlags.Public | BindingFlags.Static))
+            foreach (FieldInfo field in RuntimeDataRegistries())
                 if (field.GetValue(null)is IDictionary dict)
                     foreach (object value in dict.Values)
                         if (value is IPatchableData)
@@ -166,10 +166,10 @@ namespace MultiplayerARPG
             if (expected == typeof(Attribute) && GameInstance.Attributes.TryGetValue(id, out Attribute attribute))
                 return attribute;
             object match = null;
-            foreach (FieldInfo field in typeof(GameInstance).GetFields(BindingFlags.Public | BindingFlags.Static))
+            foreach (FieldInfo field in RuntimeDataRegistries())
                 if (field.GetValue(null)is IDictionary dict && dict.Contains(id) && expected.IsInstanceOfType(dict[id]))
                 {
-                    if (match != null && !ReferenceEquals(match, dict[id]))
+                    if (match != null && !SameObject(match, dict[id]))
                         throw new InvalidOperationException($"Ambiguous {expected.Name} ID {id}.");
                     match = dict[id];
                 }
@@ -179,7 +179,7 @@ namespace MultiplayerARPG
             // Some data (for example maps and weapon abilities) has no int-keyed
             // GameInstance registry. Resolve those references from the loaded catalog.
             bool hasRuntimeRegistry = false;
-            foreach (FieldInfo field in typeof(GameInstance).GetFields(BindingFlags.Public | BindingFlags.Static))
+            foreach (FieldInfo field in RuntimeDataRegistries())
             {
                 Type type = field.FieldType;
                 if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(Dictionary<, >))
@@ -194,7 +194,7 @@ namespace MultiplayerARPG
                 foreach (ScriptableObject asset in Targets.Values)
                     if (expected.IsInstanceOfType(asset) && DataId(asset) == id)
                     {
-                        if (match != null && !ReferenceEquals(match, asset))
+                        if (match != null && !SameObject(match, asset))
                             throw new InvalidOperationException($"Ambiguous {expected.Name} ID {id} in patch catalog.");
                         match = asset;
                     }
@@ -206,13 +206,55 @@ namespace MultiplayerARPG
             throw new InvalidOperationException($"Missing {expected.Name} ID {id} in GameInstance.");
         }
 
+        private static IEnumerable<FieldInfo> RuntimeDataRegistries()
+        {
+            foreach (FieldInfo field in typeof(GameInstance).GetFields(BindingFlags.Public | BindingFlags.Static))
+            {
+                // These are secondary lookups keyed by entity/currency ID, not asset DataId.
+                if (field.Name == nameof(GameInstance.MonsterEntitiesData) || field.Name == nameof(GameInstance.CurrencyDropRepresentItems))
+                    continue;
+                Type type = field.FieldType;
+                if (!type.IsGenericType || type.GetGenericTypeDefinition() != typeof(Dictionary<,>))
+                    continue;
+                Type[] arguments = type.GetGenericArguments();
+                if (typeof(IPatchableData).IsAssignableFrom(arguments[1]))
+                    yield return field;
+            }
+        }
+
+        private static bool SameObject(object left, object right)
+        {
+            if (left is UnityEngine.Object leftAsset && right is UnityEngine.Object rightAsset)
+                return leftAsset == rightAsset;
+            return ReferenceEquals(left, right);
+        }
+
+        private static string Describe(ScriptableObject asset)
+        {
+            string description = $"{asset.name}, instance {asset.GetInstanceID()}";
+#if UNITY_EDITOR
+            string path = UnityEditor.AssetDatabase.GetAssetPath(asset);
+            if (!string.IsNullOrEmpty(path))
+                description += ", " + path;
+#endif
+            return description;
+        }
+
         private sealed class ReferenceComparer : IEqualityComparer<object>
         {
             public static readonly ReferenceComparer Instance = new ReferenceComparer();
 
-            public new bool Equals(object a, object b) => ReferenceEquals(a, b);
+            public new bool Equals(object a, object b)
+            {
+                return SameObject(a, b);
+            }
 
-            public int GetHashCode(object value) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(value);
+            public int GetHashCode(object value)
+            {
+                if (value is UnityEngine.Object asset)
+                    return asset.GetInstanceID();
+                return System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(value);
+            }
         }
     }
 }

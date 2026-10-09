@@ -31,9 +31,10 @@ namespace MultiplayerARPG
             if (database.database != loadedDatabase)
                 throw new InvalidOperationException("Patch profile references a different game database.");
             Profile = database;
-            Engine = new DataPatchEngine(database);
+            Engine = new DataPatchEngine(database, refresh: false);
             try
             {
+                await Engine.RefreshAsync();
 #if !UNITY_SERVER
                 // Clients select the exact server release during the connection handshake.
                 if (!database.dataPatchSettings.loadAtStartup)
@@ -61,20 +62,37 @@ namespace MultiplayerARPG
             if (Engine == null)
                 throw new InvalidOperationException("Enable data patching on the GameInstance patch profile first.");
             IsLoading = true;
+            DataPatchEngine engine = Engine;
+            DataPatchProfile profile = Profile;
             try
             {
-                DataPatchRelease release = baseline ? null : await DataPatchHttp.Load(Profile, id);
-                Engine.Prepare(release);
+                DataPatchRelease release = baseline ? null : await DataPatchHttp.Load(profile, id);
+                if (Engine != engine)
+                    throw new OperationCanceledException("Patch runtime was reset.");
+                await engine.PrepareAsync(release);
+                try
+                {
+                    // Save before activation so the synchronous commit performs no file IO or hashing.
+                    await DataPatchHttp.CacheAsync(profile, release);
+                }
+                catch (Exception ex)
+                {
+                    Debug.LogWarning("Game-data patch prepared, but its cache could not be saved: " + ex.Message);
+                }
+                if (Engine != engine)
+                    throw new OperationCanceledException("Patch runtime was reset.");
                 LastError = "";
             }
             catch (Exception ex)
             {
-                LastError = ex.Message;
+                if (Engine == engine)
+                    LastError = ex.Message;
                 throw;
             }
             finally
             {
-                IsLoading = false;
+                if (Engine == engine)
+                    IsLoading = false;
             }
         }
 
@@ -83,15 +101,6 @@ namespace MultiplayerARPG
             DataPatchRelease release = Engine.PreparedRelease;
             Engine.Commit();
             ActiveHash = release?.payloadHash ?? "";
-            try
-            {
-                DataPatchHttp.Cache(Profile, release);
-            }
-            catch (Exception)
-            {
-                Debug.LogWarning("Game-data patch applied, but its cache could not be saved.");
-            }
-
             Debug.Log($"Game-data patch activated: {ActiveReleaseId}");
         }
 

@@ -45,7 +45,7 @@ namespace MultiplayerARPG
             data.Remove(KEY_TYPE);
             data.Remove(KEY_ID);
             var database = GameInstance.Singleton.GameDatabase as GameDatabase;
-            var registry = DataPatchRegistry.Runtime(database, GameInstance.Singleton.dataPatchProfile?.scannedData);
+            var registry = DataPatchRegistry.Runtime(database, GameInstance.Singleton.DataPatchProfile?.scannedData);
             object copy = target is ScriptableObject asset ? UnityEngine.Object.Instantiate(asset) : typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(target, null);
             try
             {

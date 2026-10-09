@@ -20,7 +20,7 @@ namespace MultiplayerARPG
         private string patchRequiredHash = "";
         private string patchClientNonce = "";
         private string patchClientPreparedId = "";
-        private bool PatchProtocolEnabled => GameInstance.Singleton.dataPatchProfile?.dataPatchSettings.enabled == true;
+        private bool PatchProtocolEnabled => GameInstance.Singleton.DataPatchProfile?.dataPatchSettings.enabled == true;
 
         private void RegisterPatchMessages()
         {
@@ -49,7 +49,7 @@ namespace MultiplayerARPG
 
         private void SendPatchState(long connectionId, byte mode, string nonce, string id, string hash)
         {
-            DataPatchProfile database = GameInstance.Singleton.dataPatchProfile;
+            DataPatchProfile database = GameInstance.Singleton.DataPatchProfile;
             ServerSendPacket(connectionId, 0, DeliveryMethod.ReliableOrdered, GameNetworkingConsts.PatchStateMessage, writer =>
             {
                 writer.Put(mode);

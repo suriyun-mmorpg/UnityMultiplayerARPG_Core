@@ -44,7 +44,7 @@ namespace MultiplayerARPG
             get
             {
                 string title = base.EntityTitle;
-                return !string.IsNullOrWhiteSpace(title) ? title : characterDatabase.Title;
+                return !string.IsNullOrWhiteSpace(title) ? title : CharacterDatabase.Title;
             }
         }
 
@@ -62,7 +62,13 @@ namespace MultiplayerARPG
 
         public MonsterCharacter CharacterDatabase
         {
-            get { return characterDatabase; }
+            get
+            {
+                // Prefabs loaded from bundles can reference a separate copy of the data asset.
+                if (characterDatabase != null && GameInstance.MonsterCharacters.TryGetValue(characterDatabase.DataId, out MonsterCharacter registered) && registered != null)
+                    return registered;
+                return characterDatabase;
+            }
             set { characterDatabase = value; }
         }
 

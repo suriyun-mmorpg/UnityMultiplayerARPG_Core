@@ -134,7 +134,7 @@ namespace MultiplayerARPG
             GameInstance.AddFactions(factions);
             GameInstance.AddGachas(gachas);
             this.InvokeInstanceDevExtMethods("LoadDataImplement", gameInstance);
-            await DataPatchRuntime.Initialize(gameInstance.dataPatchProfile, this);
+            await DataPatchRuntime.Initialize(gameInstance.DataPatchProfile, this);
         }
 
         public void LoadReferredData()

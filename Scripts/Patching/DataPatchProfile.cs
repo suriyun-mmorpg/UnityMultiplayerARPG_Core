@@ -2,7 +2,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [CreateAssetMenu(fileName = "DataPatchProfile", menuName = "Multiplayer ARPG/Data Patch Profile")]
+    [CreateAssetMenu(fileName = GameDataMenuConsts.DATA_PATCH_PROFILE_FILE, menuName = GameDataMenuConsts.DATA_PATCH_PROFILE_MENU, order = GameDataMenuConsts.DATA_PATCH_PROFILE_ORDER)]
     public sealed class DataPatchProfile : ScriptableObject
     {
         public GameDatabase database;

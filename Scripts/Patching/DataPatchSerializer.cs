@@ -12,6 +12,9 @@ namespace MultiplayerARPG
 {
     public static class DataPatchSerializer
     {
+        private static readonly Dictionary<(Type, bool), FieldInfo[]> fieldCache = new Dictionary<(Type, bool), FieldInfo[]>();
+        private static readonly Dictionary<Type, Dictionary<string, FieldInfo>> readableFieldCache = new Dictionary<Type, Dictionary<string, FieldInfo>>();
+
         private static bool IsDataReference(Type type) => typeof(IPatchableData).IsAssignableFrom(type);
 
         public static bool IsSupportedFieldType(Type type)
@@ -96,6 +99,33 @@ namespace MultiplayerARPG
 
         public static IEnumerable<FieldInfo> Fields(Type type, bool patchOnly = true)
         {
+            lock (fieldCache)
+            {
+                var key = (type, patchOnly);
+                if (!fieldCache.TryGetValue(key, out FieldInfo[] fields))
+                {
+                    fields = FindFields(type, patchOnly).ToArray();
+                    fieldCache.Add(key, fields);
+                }
+                return fields;
+            }
+        }
+
+        private static Dictionary<string, FieldInfo> ReadableFields(Type type)
+        {
+            lock (readableFieldCache)
+            {
+                if (!readableFieldCache.TryGetValue(type, out Dictionary<string, FieldInfo> fields))
+                {
+                    fields = Fields(type).ToDictionary(field => field.Name, StringComparer.Ordinal);
+                    readableFieldCache.Add(type, fields);
+                }
+                return fields;
+            }
+        }
+
+        private static IEnumerable<FieldInfo> FindFields(Type type, bool patchOnly = true)
+        {
             for (; type != null && type != typeof(UnityEngine.Object); type = type.BaseType)
             {
                 foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
@@ -165,7 +195,7 @@ namespace MultiplayerARPG
         {
             if (depth > 32)
                 throw new InvalidOperationException("Patch nesting exceeds 32 levels.");
-            var fields = Fields(target.GetType()).ToDictionary(field => field.Name, StringComparer.Ordinal);
+            var fields = ReadableFields(target.GetType());
             foreach (JProperty entry in data.Properties())
             {
                 if (!fields.TryGetValue(entry.Name, out FieldInfo field))
@@ -618,7 +648,7 @@ namespace MultiplayerARPG
                 ValidateWeapon(weapon);
             if (value is BaseEquipmentItem equipment)
                 ValidateEquipment(equipment);
-            if (value is BaseItem item && item is IUsableItem usable)
+            if (value is BaseItem item && item.IsUsable() && item is IUsableItem usable)
                 ValidateConsumable(item, usable);
             if (value is ItemCraft craft)
                 ValidateCraft(craft);
@@ -813,7 +843,7 @@ namespace MultiplayerARPG
                 }
             }
 
-            if (!(item is IPotionItem potion))
+            if (!item.IsPotion() || !(item is IPotionItem potion))
                 return;
             if (potion.BuffData == null)
                 throw new InvalidOperationException("Potion buff cannot be null.");

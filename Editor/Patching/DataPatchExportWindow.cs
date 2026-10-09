@@ -69,8 +69,6 @@ namespace MultiplayerARPG
 
             PatchUploadConfig config = PatchUploadConfig.LoadOrCreate();
             EditorGUILayout.LabelField("Target", database == null ? "Select a profile" : database.dataPatchSettings.environment + " / " + database.dataPatchSettings.serviceUrl);
-            if (GUILayout.Button("Configure Upload"))
-                Selection.activeObject = config;
             using (new EditorGUI.DisabledScope(uploading))
                 description = EditorGUILayout.TextField("Description", description);
             using (new EditorGUI.DisabledScope(uploading || EditorApplication.isPlaying || database == null))
@@ -339,12 +337,8 @@ namespace MultiplayerARPG
                     throw new InvalidOperationException("Upload secret is required.");
                 if (!Uri.TryCreate(database.dataPatchSettings.serviceUrl, UriKind.Absolute, out Uri uri) || uri.Scheme != "https" && !uri.IsLoopback)
                     throw new InvalidOperationException("Use HTTPS, or loopback HTTP for local development.");
-                string bodyHash = DataPatchHttp.Hash(JsonConvert.SerializeObject(new
-                {
-                description, entries
-                }
-
-                ));
+                List<string> chunks = BuildUploadChunks(out string manifestJson);
+                string bodyHash = DataPatchHttp.Hash(manifestJson + "\n" + description + "\n" + database.dataPatchSettings.serviceUrl);
                 if (config.pendingPayloadHash != bodyHash || config.pendingDatabaseId != database.patchDatabaseId || config.pendingEnvironment != database.dataPatchSettings.environment || string.IsNullOrEmpty(config.pendingUploadId))
                     config.pendingUploadId = Guid.NewGuid().ToString("N");
                 config.pendingPayloadHash = bodyHash;
@@ -355,21 +349,38 @@ namespace MultiplayerARPG
                 string id = config.pendingUploadId;
                 string json = JsonConvert.SerializeObject(new
                 {
-                id, databaseId = database.patchDatabaseId, environment = database.dataPatchSettings.environment, schemaVersion = 1, description, entries
+                id, databaseId = database.patchDatabaseId, environment = database.dataPatchSettings.environment, schemaVersion = 2, description, manifestJson
                 }
 
                 );
                 string serviceUrl = database.dataPatchSettings.serviceUrl;
                 string secret = config.secretKey;
                 int timeout = database.dataPatchSettings.requestTimeoutSeconds;
-                await Post(serviceUrl, secret, timeout, "/game-data-patches", json);
+                EditorUtility.DisplayProgressBar("Upload Patch", "Creating upload manifest", 0);
+                await Post(serviceUrl, secret, timeout, "/game-data-patches/chunked", json);
+                string statusJson = await Post(serviceUrl, secret, timeout, "/game-data-patches/" + id + "/upload-status", "{}");
+                var uploaded = new HashSet<int>(JObject.Parse(statusJson)["uploadedIndices"].Values<int>());
+                for (int i = 0; i < chunks.Count; ++i)
+                {
+                    if (EditorUtility.DisplayCancelableProgressBar("Upload Patch", $"Chunk {i + 1} / {chunks.Count}", (float)i / Math.Max(1, chunks.Count)))
+                        throw new OperationCanceledException("Upload paused. Retry will resume the same release.");
+                    if (uploaded.Contains(i))
+                        continue;
+                    await Post(serviceUrl, secret, timeout, "/game-data-patches/" + id + "/chunks/" + i, JsonConvert.SerializeObject(new { payloadJson = chunks[i] }));
+                }
+                EditorUtility.DisplayProgressBar("Upload Patch", "Verifying and publishing all chunks", 1);
                 string published = await Post(serviceUrl, secret, timeout, "/game-data-patches/" + id + "/publish", "{}");
                 DataPatchRelease release = JsonConvert.DeserializeObject<DataPatchRelease>(published);
-                DataPatchHttp.ValidateHash(release);
+                DataPatchHttp.ValidateManifest(release);
+                if (release.id != id || release.payloadHash != DataPatchHttp.Hash(manifestJson) || string.IsNullOrEmpty(release.publishTime))
+                    throw new InvalidOperationException("Published patch does not match the reviewed manifest.");
                 result = $"Published release {release.id}, version {release.version}, {entries.Length} records.";
                 config.pendingUploadId = "";
                 EditorUtility.SetDirty(config);
                 AssetDatabase.SaveAssets();
+
+                EditorUtility.ClearProgressBar();
+                EditorUtility.DisplayDialog("Patch Upload Successful", result, "OK");
             }
             catch (Exception ex)
             {
@@ -377,9 +388,58 @@ namespace MultiplayerARPG
             }
             finally
             {
+                EditorUtility.ClearProgressBar();
                 uploading = false;
                 Repaint();
             }
+        }
+
+        private List<string> BuildUploadChunks(out string manifestJson)
+        {
+            var payloads = new List<string>();
+            var descriptors = new List<DataPatchChunk>();
+            var records = new List<string>();
+            int bytes = 2;
+            string dataType = null;
+            Action flush = () =>
+            {
+                if (records.Count == 0)
+                    return;
+                string payload = "[" + string.Join(",", records) + "]";
+                descriptors.Add(new DataPatchChunk
+                {
+                    index = payloads.Count,
+                    dataType = dataType,
+                    hash = DataPatchHttp.Hash(payload),
+                    bytes = Encoding.UTF8.GetByteCount(payload),
+                    entryCount = records.Count,
+                });
+                payloads.Add(payload);
+                records.Clear();
+                bytes = 2;
+            };
+            foreach (DataPatchEntry entry in entries.OrderBy(value => value.dataType, StringComparer.Ordinal).ThenBy(value => value.dataId))
+            {
+                string record = JsonConvert.SerializeObject(entry);
+                int recordBytes = Encoding.UTF8.GetByteCount(record);
+                if (recordBytes + 2 > DataPatchHttp.MaxChunkBytes)
+                    throw new InvalidOperationException($"{entry.dataType}/{entry.dataId} exceeds the 1 MiB per-record limit.");
+                if (dataType != entry.dataType || bytes + recordBytes + 1 > 512 * 1024)
+                    flush();
+                dataType = entry.dataType;
+                bytes += recordBytes + (records.Count > 0 ? 1 : 0);
+                records.Add(record);
+            }
+            flush();
+            manifestJson = JsonConvert.SerializeObject(new DataPatchManifest { chunks = descriptors.ToArray() });
+            DataPatchHttp.ValidateManifest(new DataPatchRelease
+            {
+                id = "preview",
+                schemaVersion = 2,
+                manifestJson = manifestJson,
+                payloadHash = DataPatchHttp.Hash(manifestJson),
+            });
+            return payloads;
         }
 
         private static async UniTask<string> Post(string serviceUrl, string secret, int timeout, string route, string json)
@@ -397,13 +457,40 @@ namespace MultiplayerARPG
                 }
                 catch (UnityWebRequestException)
                 {
-                    throw new InvalidOperationException($"Patch upload failed (HTTP {request.responseCode}). Check endpoint and credential configuration; retry uses the same upload ID.");
+                    throw new InvalidOperationException(GetUploadError(request, secret));
                 }
 
                 if (request.result != UnityWebRequest.Result.Success)
-                    throw new InvalidOperationException($"Patch upload failed (HTTP {request.responseCode}).");
+                    throw new InvalidOperationException(GetUploadError(request, secret));
                 return request.downloadHandler.text;
             }
+        }
+
+        private static string GetUploadError(UnityWebRequest request, string secret)
+        {
+            string detail = request.error;
+            string response = request.downloadHandler?.text;
+            if (!string.IsNullOrWhiteSpace(response))
+            {
+                try
+                {
+                    JObject body = JObject.Parse(response);
+                    JToken message = body["message"] ?? body["error"];
+                    if (message is JArray messages)
+                        detail = string.Join("\n", messages.Values<string>());
+                    else if (message?.Type == JTokenType.String)
+                        detail = message.Value<string>();
+                }
+                catch (JsonException)
+                {
+                    // Non-JSON responses retain the HTTP error instead of displaying HTML.
+                }
+            }
+
+            if (!string.IsNullOrEmpty(secret) && !string.IsNullOrEmpty(detail))
+                detail = detail.Replace(secret, "[redacted]");
+
+            return $"Patch upload failed (HTTP {request.responseCode}).\n{detail}\nRetry uses the same upload ID.";
         }
     }
 }

@@ -1,4 +1,5 @@
 using System;
+using UnityEngine;
 using Newtonsoft.Json.Linq;
 
 namespace MultiplayerARPG
@@ -13,6 +14,9 @@ namespace MultiplayerARPG
         [UnityEngine.Tooltip("Enable for a server hosted from a regular player build or Editor. Dedicated server builds always load at startup.")]
         public bool loadAtStartup;
         public int requestTimeoutSeconds = 30;
+        [Min(0.1f)]
+        [Tooltip("Main-thread preparation budget per frame. One record can exceed this budget; activation remains atomic.")]
+        public float preparationFrameBudgetMilliseconds = 2f;
     }
 
     [Serializable]
@@ -33,6 +37,27 @@ namespace MultiplayerARPG
         public int schemaVersion;
         public string payloadHash;
         public string payloadJson;
+        public string manifestJson;
+        [NonSerialized, Newtonsoft.Json.JsonIgnore]
+        public string[] chunkPaths;
         public string publishTime;
     }
+
+    [Serializable]
+    public sealed class DataPatchManifest
+    {
+        public int schemaVersion = 2;
+        public DataPatchChunk[] chunks;
+    }
+
+    [Serializable]
+    public sealed class DataPatchChunk
+    {
+        public int index;
+        public string dataType;
+        public string hash;
+        public int bytes;
+        public int entryCount;
+    }
+
 }

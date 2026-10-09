@@ -9,6 +9,10 @@ namespace MultiplayerARPG
         #endregion
 
         #region Game Database
+        public const string DATA_PATCH_PROFILE_FILE = "Data Patch Profile";
+        public const string DATA_PATCH_PROFILE_MENU = "Create GameDatabase/Data Patch Profile";
+        public const int DATA_PATCH_PROFILE_ORDER = -7000;
+
         public const string GAME_DATABASE_FILE = "Game Database";
         public const string GAME_DATABASE_MENU = "Create GameDatabase/Game Database";
         public const int GAME_DATABASE_ORDER = -6999;
