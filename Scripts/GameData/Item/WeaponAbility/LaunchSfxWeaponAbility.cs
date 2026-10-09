@@ -2,7 +2,6 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    [NotPatchable]
     [CreateAssetMenu(fileName = GameDataMenuConsts.LAUNCH_SFX_WEAPON_ABILITY_FILE, menuName = GameDataMenuConsts.LAUNCH_SFX_WEAPON_ABILITY_MENU, order = GameDataMenuConsts.LAUNCH_SFX_WEAPON_ABILITY_ORDER)]
     public class LaunchSfxWeaponAbility : BaseWeaponAbility
     {

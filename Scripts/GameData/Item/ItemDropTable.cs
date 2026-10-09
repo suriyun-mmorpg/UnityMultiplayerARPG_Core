@@ -7,8 +7,13 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.ITEM_DROP_TABLE_FILE, menuName = GameDataMenuConsts.ITEM_DROP_TABLE_MENU, order = GameDataMenuConsts.ITEM_DROP_TABLE_ORDER)]
-    public class ItemDropTable : ScriptableObject
+    public class ItemDropTable : ScriptableObject, IPatchableData
     {
+        [SerializeField]
+        private string id = "";
+        public string Id => string.IsNullOrEmpty(id) ? name : id;
+        public int DataId => BaseGameData.MakeDataId(Id);
+
         [ArrayElementTitle("item")]
         public ItemDrop[] randomItems;
         [ArrayElementTitle("currency")]
@@ -33,5 +38,10 @@ namespace MultiplayerARPG
             EditorUtility.SetDirty(this);
         }
 #endif
+
+        public void ClearPatchCaches()
+        {
+        }
+
     }
 }

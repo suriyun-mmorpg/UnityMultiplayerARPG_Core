@@ -145,5 +145,13 @@ namespace MultiplayerARPG
             GameInstance.AddAssetReferenceMonsterCharacterEntities(AddressableMonsterCharacterEntity);
 #endif
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheRequireAttributeAmounts = default;
+            _cacheRequireAttributeAmountsGeneration = -1;
+        }
+
     }
 }

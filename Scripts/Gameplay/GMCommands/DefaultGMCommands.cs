@@ -118,6 +118,8 @@ namespace MultiplayerARPG
         /// </summary>
         public const string CloseServer = "/close_server";
 
+        public const string GameData = "/gamedata";
+
         public const string HelpResponse = "/level {level} = Set character's level to {level} value.\n" +
             "/statpoint {amount} = Set character's stat point to {amount} value.\n" +
             "/skillpoint {amount} = Set character's skill point to {amount} value.\n" +
@@ -143,7 +145,8 @@ namespace MultiplayerARPG
             "/visible = Show user character to other players.\n" +
             "/invisible = Hide user character from other players.\n" +
             "/close_servers = Close the servers.\n" +
-            "/close_server {channel_id} = Close the server by channel ID.\n";
+            "/close_server {channel_id} = Close the server by channel ID.\n" +
+            "/gamedata patch status|reload|load {release_id}\n";
 #endif
 
         public virtual bool IsDataLengthValid(string command, int dataLength)
@@ -217,6 +220,8 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             string[] splited = chatMessage.Split(' ');
             command = splited[0];
+            if (command.Equals(GameData, StringComparison.OrdinalIgnoreCase))
+                return true;
             if (string.Equals(command, Help, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(command, Level, StringComparison.OrdinalIgnoreCase) ||
                 string.Equals(command, StatPoint, StringComparison.OrdinalIgnoreCase) ||
@@ -266,6 +271,20 @@ namespace MultiplayerARPG
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
             string[] data = chatMessage.Split(' ');
             string commandKey = data[0];
+            if (commandKey.Equals(GameData, System.StringComparison.OrdinalIgnoreCase))
+            {
+                if (senderCharacter == null || !senderCharacter.IsServer || senderCharacter.UserLevel <= 0)
+                    return "GM permission required.";
+                if (data.Length < 3 || data[1] != "patch")
+                    return "Usage: /gamedata patch status|reload|load {release_id}";
+                if (data.Length == 3 && data[2] == "status")
+                    return $"Active patch: {DataPatchRuntime.ActiveReleaseId}; hash: {DataPatchRuntime.ActiveHash}; loading: {DataPatchRuntime.IsLoading}; error: {DataPatchRuntime.LastError}";
+                if (data.Length == 3 && data[2] == "reload")
+                    return await BaseGameNetworkManager.Singleton.ReloadGameDataPatch();
+                if (data.Length == 4 && data[2] == "load")
+                    return await BaseGameNetworkManager.Singleton.ReloadGameDataPatch(data[3]);
+                return "Usage: /gamedata patch status|reload|load {release_id}";
+            }
             string receiver;
             BasePlayerCharacterEntity targetCharacter;
             if (IsDataLengthValid(commandKey, data.Length))

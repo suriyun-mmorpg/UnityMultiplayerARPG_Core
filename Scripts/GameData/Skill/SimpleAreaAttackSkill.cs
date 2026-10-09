@@ -289,5 +289,13 @@ namespace MultiplayerARPG
             }
             return base.TryGetAttackStatusEffectApplyings(out statusEffectApplyings);
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheEffectivenessAttributes = default;
+            _cacheEffectivenessGeneration = -1;
+        }
+
     }
 }

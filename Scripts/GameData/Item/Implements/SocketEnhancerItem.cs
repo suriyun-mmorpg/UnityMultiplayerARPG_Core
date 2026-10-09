@@ -114,6 +114,13 @@ namespace MultiplayerARPG
         public override void PrepareRelatesData()
         {
             base.PrepareRelatesData();
+            if (SocketEnhanceEffect != null)
+            {
+                GameInstance.AddAttributes(SocketEnhanceEffect.Attributes.Keys);
+                GameInstance.AddAttributes(SocketEnhanceEffect.AttributesRate.Keys);
+                GameInstance.AddSkills(SocketEnhanceEffect.Skills.Keys);
+                GameInstance.AddStatusEffects(SocketEnhanceEffect.StatusEffectResistances.Keys);
+            }
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(EnemyStatusEffectsWhenAttacking);
             GameInstance.AddStatusEffects(SelfStatusEffectsWhenAttacked);

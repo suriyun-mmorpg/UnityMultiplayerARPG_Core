@@ -38,6 +38,13 @@ namespace MultiplayerARPG
         private ItemAmount[] receiveItems = new ItemAmount[0];
         public ItemAmount[] ReceiveItems { get { return receiveItems; } }
 
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddItems(receiveItems);
+            GameInstance.AddCurrencies(receiveCurrencies);
+        }
+
         public override bool Validate()
         {
             bool hasChanges = false;

@@ -252,5 +252,13 @@ namespace MultiplayerARPG
             // Data migration
             GameInstance.MigrateEquipmentEntities(EquipmentModels);
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheRequireAttributeAmounts = default;
+            _cacheRequireAttributeAmountsGeneration = -1;
+        }
+
     }
 }

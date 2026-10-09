@@ -13,7 +13,7 @@ using UnityEditor;
 
 namespace MultiplayerARPG
 {
-    public abstract partial class BaseNpcDialog : Node, IGameData
+    public abstract partial class BaseNpcDialog : Node, IGameData, IPatchableData
     {
         [Input]
         public BaseNpcDialog input;
@@ -318,5 +318,10 @@ namespace MultiplayerARPG
             }
             await UniTask.WhenAll(tasks);
         }
+
+        public virtual void ClearPatchCaches()
+        {
+        }
+
     }
 }

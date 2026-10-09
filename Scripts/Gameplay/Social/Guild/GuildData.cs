@@ -4,6 +4,7 @@ namespace MultiplayerARPG
 {
     public partial class GuildData
     {
+        private uint _cachePatchRevision;
         private int _increaseMaxMember;
         public int IncreaseMaxMember
         {
@@ -111,9 +112,10 @@ namespace MultiplayerARPG
 
         private void MakeCaches()
         {
-            if (IsCached)
+            if (IsCached && _cachePatchRevision == DataPatchEngine.Revision)
                 return;
             IsCached = true;
+            _cachePatchRevision = DataPatchEngine.Revision;
             _increaseMaxMember = 0;
             _increaseExpGainPercentage = 0;
             _increaseGoldGainPercentage = 0;

@@ -216,8 +216,10 @@ namespace MultiplayerARPG
             for (int i = 0; i < cashShopItemGeneratingList.Length; ++i)
             {
                 generatingData = cashShopItemGeneratingList[i];
+                string generatedName = $"<CASHSHOPITEM_{name}_{i}>";
+                if (GameInstance.CashShopItems.ContainsKey(generatedName.GenerateHashId())) continue;
                 cashShopItem = CreateInstance<CashShopItem>();
-                cashShopItem.name = $"<CASHSHOPITEM_{name}_{i}>";
+                cashShopItem.name = generatedName;
                 cashShopItem.GenerateByItem(this, generatingData);
                 GameInstance.CashShopItems[cashShopItem.DataId] = cashShopItem;
             }

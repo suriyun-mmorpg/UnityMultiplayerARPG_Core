@@ -101,5 +101,13 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             BuffData?.PrepareRelatesData();
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheRequireAttributeAmounts = default;
+            _cacheRequireAttributeAmountsGeneration = -1;
+        }
+
     }
 }

@@ -102,5 +102,13 @@ namespace MultiplayerARPG
         {
             return false;
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheRequireAttributeAmounts = default;
+            _cacheRequireAttributeAmountsGeneration = -1;
+        }
+
     }
 }

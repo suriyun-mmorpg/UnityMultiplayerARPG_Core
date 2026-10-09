@@ -20,7 +20,6 @@ namespace MultiplayerARPG
 
 #if UNITY_EDITOR
         [StringShowConditional(nameof(taskType), nameof(QuestTaskType.TalkToNpc))]
-        [NotPatchable]
         [Tooltip("Have to talk to this NPC to complete task")]
         public NpcEntity npcEntity;
 #endif

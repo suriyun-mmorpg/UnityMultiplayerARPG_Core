@@ -81,6 +81,32 @@ namespace MultiplayerARPG
 
         private BaseCustomDamageInfo _builtInDamageInfo;
 
+        public void RefreshPatchCache()
+        {
+            // Keep the cached asset identity: staging copies share it until commit.
+            if (_builtInDamageInfo is MeleeDamageInfo melee)
+            {
+                melee.hitDistance = hitDistance;
+                melee.hitFov = hitFov;
+            }
+            else if (_builtInDamageInfo is MissileDamageInfo missile)
+            {
+                missile.missileDistance = missileDistance;
+                missile.missileSpeed = missileSpeed;
+            }
+            else if (_builtInDamageInfo is RaycastDamageInfo raycast)
+            {
+                raycast.missileDistance = missileDistance;
+                raycast.missileSpeed = missileSpeed;
+                raycast.pierceThroughEntities = pierceThroughEntities;
+            }
+            else if (_builtInDamageInfo is ThrowableDamageInfo throwable)
+            {
+                throwable.throwForce = throwForce;
+                throwable.throwableLifeTime = throwableLifeTime;
+            }
+        }
+
         private bool TryGetDamageInfo(out BaseCustomDamageInfo damageInfo)
         {
             damageInfo = GetDamageInfo();

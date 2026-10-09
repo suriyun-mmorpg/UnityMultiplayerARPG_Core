@@ -12,6 +12,7 @@ namespace MultiplayerARPG
 {
     public partial class GameInstance
     {
+        public DataPatchProfile dataPatchProfile;
         public static readonly Dictionary<int, Attribute> Attributes = new Dictionary<int, Attribute>();
         public static readonly Dictionary<int, Currency> Currencies = new Dictionary<int, Currency>();
         public static readonly Dictionary<int, BaseItem> CurrencyDropRepresentItems = new Dictionary<int, BaseItem>();

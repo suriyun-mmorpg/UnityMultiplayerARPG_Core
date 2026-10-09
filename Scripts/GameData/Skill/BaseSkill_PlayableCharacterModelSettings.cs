@@ -15,7 +15,6 @@ namespace MultiplayerARPG
         }
 
         [Category(1000, "Character Model Settings")]
-        [NotPatchable]
         [SerializeField]
         private PlayableCharacterModelSettingsData playableCharacterModelSettings;
         public PlayableCharacterModelSettingsData PlayableCharacterModelSettings

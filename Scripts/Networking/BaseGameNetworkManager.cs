@@ -174,6 +174,7 @@ namespace MultiplayerARPG
         protected override void RegisterMessages()
         {
             base.RegisterMessages();
+            RegisterPatchMessages();
             RegisterHandlerMessages();
             RegisterRequestToServer<EmptyMessage, EmptyMessage>(GameNetworkingConsts.SafeDisconnect, HandleSafeDisconnectRequest, HandleSafeDisconnectResponse);
             // Keeping `RegisterClientMessages` and `RegisterServerMessages` for backward compatibility, can use any of below dev extension methods
@@ -288,6 +289,7 @@ namespace MultiplayerARPG
 
         public override void OnClientConnected()
         {
+            patchClientReady = !PatchProtocolEnabled;
             this.InvokeInstanceDevExtMethods("OnClientConnected");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -327,10 +329,17 @@ namespace MultiplayerARPG
                 component.OnPeerConnected(this, connectionId);
             }
             base.OnPeerConnected(connectionId);
+            if (!patchReloading)
+                SendPatchState(connectionId, 2, System.Guid.NewGuid().ToString("N"), DataPatchRuntime.ActiveReleaseId, DataPatchRuntime.ActiveHash);
+            else
+                patchQueuedPeers.Add(connectionId);
         }
 
         public override void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
         {
+            patchPeerVersions.Remove(connectionId);
+            patchQueuedPeers.Remove(connectionId);
+            patchPreparedPeers.Remove(connectionId);
             this.InvokeInstanceDevExtMethods("OnPeerDisconnected", connectionId, reason, socketError);
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -357,7 +366,7 @@ namespace MultiplayerARPG
 
         public override void SendClientReady()
         {
-            if (!IsClientConnected)
+            if (!IsClientConnected || !patchClientReady)
                 return;
             this.InvokeInstanceDevExtMethods("SendClientReady");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
@@ -1194,6 +1203,8 @@ namespace MultiplayerARPG
 
         public bool IsClientReadyToInstantiateObjects()
         {
+            if (!patchClientReady)
+                return false;
             if (!_isClientReadyToInstantiateObjects)
             {
                 _clientReadyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - _clientSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;

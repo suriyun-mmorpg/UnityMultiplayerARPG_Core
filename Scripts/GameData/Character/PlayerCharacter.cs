@@ -265,5 +265,13 @@ namespace MultiplayerARPG
             }
             return hasChanges || base.Validate();
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _learnableSkillIds = null;
+            _cacheStartMapsByCondition = null;
+        }
+
     }
 }

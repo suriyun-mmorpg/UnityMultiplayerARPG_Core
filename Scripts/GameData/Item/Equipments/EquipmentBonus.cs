@@ -311,5 +311,15 @@ namespace MultiplayerARPG
                 return _cacheStatusEffectResistances;
             }
         }
+
+        public void ClearPatchCaches()
+        {
+            _cacheAttributes = default;
+            _cacheAttributesRate = default;
+            _cacheSkills = null;
+            _cacheStatusEffectResistances = null;
+            _indexedGeneration = -1;
+        }
+
     }
 }

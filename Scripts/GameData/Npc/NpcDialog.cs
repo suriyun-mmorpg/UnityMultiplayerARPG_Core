@@ -511,7 +511,7 @@ namespace MultiplayerARPG
             menuActions.Add(confirmMenuAction);
             menuActions.Add(cancelMenuAction);
         }
-        
+
         protected virtual void RenderRepairItemUI(UINpcDialog uiNpcDialog, List<UINpcDialogMenuAction> menuActions)
         {
             if (uiNpcDialog.onSwitchToRepairItemDialog != null)
@@ -951,5 +951,11 @@ namespace MultiplayerARPG
             character.DecreaseItems(confirmRequirement.itemAmounts);
             return true;
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+        }
+
     }
 }

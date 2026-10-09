@@ -44,7 +44,7 @@ namespace MultiplayerARPG
 
         private async void InitializePurchasing()
         {
-            CashShopItems.Clear();
+
             CashPackages.Clear();
 
             if (cashShopDatabase != null)
@@ -53,7 +53,7 @@ namespace MultiplayerARPG
                 {
                     if (cashShopItem == null || CashShopItems.ContainsKey(cashShopItem.DataId))
                         continue;
-                    CashShopItems[cashShopItem.DataId] = cashShopItem;
+                    AddCashShopItems(new[] { cashShopItem });
                 }
             }
             // Generate and add cash shop items by items data
@@ -332,5 +332,20 @@ namespace MultiplayerARPG
             }
         }
         #endregion
+
+        public static void AddCashShopItems(IEnumerable<CashShopItem> items)
+        {
+            if (items == null)
+                return;
+            foreach (CashShopItem item in items)
+            {
+                if (item == null)
+                    continue;
+                if (CashShopItems.TryGetValue(item.DataId, out CashShopItem existing) && !ReferenceEquals(existing, item))
+                    throw new System.InvalidOperationException("Conflicting cash shop data ID: " + item.DataId);
+                CashShopItems[item.DataId] = item;
+                item.PrepareRelatesData();
+            }
+        }
     }
 }

@@ -11,6 +11,7 @@ namespace MultiplayerARPG
         public HarvestEffectiveness[] harvestEffectivenesses = new HarvestEffectiveness[0];
         public SkillHarvestEffectiveness[] skillHarvestEffectivenesses = new SkillHarvestEffectiveness[0];
         [Tooltip("Ex. if this is 10 when damage to harvestable entity = 2, character will receives 20 exp")]
+        [Min(0)]
         public int expPerDamage = 0;
 
         [System.NonSerialized]
@@ -129,5 +130,15 @@ namespace MultiplayerARPG
                 }
             }
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheHarvestEffectivenesses = null;
+            _cacheHarvestItems = null;
+            _cacheSkillHarvestEffectivenesses = null;
+            _cacheSkillHarvestItems = null;
+        }
+
     }
 }

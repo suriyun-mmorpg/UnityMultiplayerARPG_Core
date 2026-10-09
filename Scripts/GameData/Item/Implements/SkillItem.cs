@@ -97,5 +97,13 @@ namespace MultiplayerARPG
             base.PrepareRelatesData();
             GameInstance.AddSkills(SkillData);
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheRequireAttributeAmounts = default;
+            _cacheRequireAttributeAmountsGeneration = -1;
+        }
+
     }
 }

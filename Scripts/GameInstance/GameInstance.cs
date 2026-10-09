@@ -1442,7 +1442,7 @@ namespace MultiplayerARPG
                 return NewCharacterSetting != null;
             }
         }
-        
+
         public HashSet<int> IgnoreRaycastLayersValues { get; private set; }
 
         public static readonly Dictionary<string, bool> LoadHomeScenePreventions = new Dictionary<string, bool>();
@@ -1662,6 +1662,11 @@ namespace MultiplayerARPG
         }
 #endif
 
+        private void OnApplicationQuit()
+        {
+            DataPatchRuntime.Reset();
+        }
+
         protected virtual void OnDestroy()
         {
 #if UNITY_EDITOR
@@ -1679,6 +1684,7 @@ namespace MultiplayerARPG
             Currencies.Clear();
             CurrencyDropRepresentItems.Clear();
             Items.Clear();
+            CashShopItems.Clear();
             ItemsByAmmoType.Clear();
             ItemCraftFormulas.Clear();
             Harvestables.Clear();

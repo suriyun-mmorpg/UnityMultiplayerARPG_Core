@@ -82,7 +82,7 @@ namespace MultiplayerARPG
         [SerializeField]
         public Color titleColor = Color.clear;
         public Color TitleColor { get { return titleColor; } }
-        
+
         [Range(0.01f, 1f)]
         [SerializeField]
         private float successRate = 0.01f;
@@ -188,6 +188,10 @@ namespace MultiplayerARPG
         [SerializeField]
         private int requireGold = 0;
         public int RequireGold { get { return requireGold; } }
+
+        public ItemRepairPrice()
+        {
+        }
 
         public ItemRepairPrice(
             float durabilityRate,

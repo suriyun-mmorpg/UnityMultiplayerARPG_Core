@@ -600,5 +600,12 @@ namespace MultiplayerARPG
             EditorUtility.SetDirty(this);
         }
 #endif
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheAmmoItemIds = null;
         }
+
     }
+}

@@ -34,5 +34,12 @@ namespace MultiplayerARPG
                 return _cacheBuff;
             }
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheBuff = null;
+        }
+
     }
 }

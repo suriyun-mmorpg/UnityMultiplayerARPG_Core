@@ -83,7 +83,7 @@ namespace MultiplayerARPG
         }
 #endif
 
-        protected override UniTask LoadDataImplement(GameInstance gameInstance)
+        protected override async UniTask LoadDataImplement(GameInstance gameInstance)
         {
 #if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddPlayerCharacterEntities(playerCharacterEntities);
@@ -134,7 +134,7 @@ namespace MultiplayerARPG
             GameInstance.AddFactions(factions);
             GameInstance.AddGachas(gachas);
             this.InvokeInstanceDevExtMethods("LoadDataImplement", gameInstance);
-            return default;
+            await DataPatchRuntime.Initialize(gameInstance.dataPatchProfile, this);
         }
 
         public void LoadReferredData()

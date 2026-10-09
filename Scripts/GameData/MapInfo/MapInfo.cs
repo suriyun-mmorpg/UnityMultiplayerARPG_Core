@@ -16,7 +16,7 @@ namespace MultiplayerARPG
         public PvpMode pvpMode;
         [Tooltip("If this length is more than 1 it will find respawn points which its condition is match with the character")]
         [FormerlySerializedAs("overrideRespawnPoints")]
-        public WarpPointByCondition[] respawnPointsByCondition;
+        public WarpPointByCondition[] respawnPointsByCondition = new WarpPointByCondition[0];
         [Tooltip("If this is `TRUE`, only duelers can attacks each other, other characters cannot do it, duelers also cannot attacks other")]
         public bool duelersCanAttackEachOtherOnly;
         [Tooltip("If this is `TRUE`, non-summoned monsters with same faction as player/monster will be treated as allies. Keep this `FALSE` to always allow attacking monsters regardless of faction.")]
@@ -287,5 +287,12 @@ namespace MultiplayerARPG
             duelersCanAttackEachOtherOnly = reader.GetBool();
             useMonsterFactionAsAlliance = reader.GetBool();
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheRespawnPointsByCondition = null;
+        }
+
     }
 }

@@ -66,6 +66,12 @@ namespace MultiplayerARPG
             }
         }
 
+        public override void PrepareRelatesData()
+        {
+            base.PrepareRelatesData();
+            GameInstance.AddItems(randomItems);
+        }
+
         public List<RewardedItem> GetRandomedItems(int count)
         {
             List<RewardedItem> rewardItems = new List<RewardedItem>();
@@ -84,5 +90,12 @@ namespace MultiplayerARPG
             }
             return rewardItems;
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheRandomItems = null;
+        }
+
     }
 }

@@ -25,6 +25,9 @@
         public const ushort EntityState = 119;
         public const ushort FormattedGameMessage = 121;
         public const ushort UpdateServerInfo = 122;
+        public const ushort PatchStateMessage = 123;
+        public const ushort PatchAckMessage = 124;
+
         // Networking requests/responses
         public const ushort CashShopInfo = 100;
         public const ushort CashShopBuy = 101;

@@ -10,8 +10,13 @@ using UnityEditor;
 namespace MultiplayerARPG
 {
     [CreateAssetMenu(fileName = GameDataMenuConsts.ITEM_RANDOM_BY_WEIGHT_TABLE_FILE, menuName = GameDataMenuConsts.ITEM_RANDOM_BY_WEIGHT_TABLE_MENU, order = GameDataMenuConsts.ITEM_RANDOM_BY_WEIGHT_TABLE_ORDER)]
-    public class ItemRandomByWeightTable : ScriptableObject
+    public class ItemRandomByWeightTable : ScriptableObject, IPatchableData
     {
+        [SerializeField]
+        private string id = "";
+        public string Id => string.IsNullOrEmpty(id) ? name : id;
+        public int DataId => BaseGameData.MakeDataId(Id);
+
         [Tooltip("Can set empty item as a chance to not drop any items")]
         [ArrayElementTitle("item")]
         public ItemRandomByWeight[] randomItems = new ItemRandomByWeight[0];
@@ -144,5 +149,11 @@ namespace MultiplayerARPG
             Debug.Log($"Total Weight: {totalWeight}");
         }
 #endif
+
+        public void ClearPatchCaches()
+        {
+            _cacheRandomItems = null;
+        }
+
     }
 }

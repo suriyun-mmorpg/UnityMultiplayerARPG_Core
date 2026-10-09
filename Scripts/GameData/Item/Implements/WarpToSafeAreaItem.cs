@@ -117,5 +117,13 @@ namespace MultiplayerARPG
             BaseGameNetworkManager.Singleton.WarpCharacter(playerCharacterEntity, string.Empty, foundPosition.Value, false, characterEntity.EntityTransform.eulerAngles);
             return true;
         }
+
+        public override void ClearPatchCaches()
+        {
+            base.ClearPatchCaches();
+            _cacheRequireAttributeAmounts = default;
+            _cacheRequireAttributeAmountsGeneration = -1;
+        }
+
     }
 }

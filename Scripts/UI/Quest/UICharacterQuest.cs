@@ -448,7 +448,7 @@ namespace MultiplayerARPG
                 CacheRewardItemList.Generate(Quest.rewardItems, (index, rewardItem, ui) =>
                 {
                     UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(rewardItem.item, 1, rewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(rewardItem.item, Mathf.Max(1, rewardItem.level), rewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
                     uiCharacterItem.Show();
                     CacheRewardItemSelectionManager.Add(uiCharacterItem);
                 });
@@ -463,7 +463,7 @@ namespace MultiplayerARPG
                 CacheSelectableRewardItemList.Generate(Quest.selectableRewardItems, (index, SelectablerewardItem, ui) =>
                 {
                     UICharacterItem uiCharacterItem = ui.GetComponent<UICharacterItem>();
-                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(SelectablerewardItem.item, 1, SelectablerewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
+                    uiCharacterItem.Setup(new UICharacterItemData(CharacterItem.Create(SelectablerewardItem.item, Mathf.Max(1, SelectablerewardItem.level), SelectablerewardItem.amount), InventoryType.NonEquipItems), GameInstance.PlayingCharacter, -1);
                     uiCharacterItem.Show();
                     CacheRewardItemSelectionManager.Add(uiCharacterItem);
                 });

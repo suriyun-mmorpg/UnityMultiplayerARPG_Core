@@ -190,17 +190,15 @@ namespace MultiplayerARPG
         protected virtual void OnEnable()
         {
             string key = this.GetPatchKey();
-            if (PatchDataManager.PatchableData.TryAdd(key, this) &&
-                PatchDataManager.PatchingData.TryGetValue(key, out Dictionary<string, object> patch))
-            {
-                this.ApplyPatch(patch);
-            }
+            // Patches are applied after GameInstance registries are populated, never in OnEnable.
+            PatchDataManager.PatchableData.TryAdd(key, this);
         }
 
         protected virtual void OnDisable()
         {
             string key = this.GetPatchKey();
-            PatchDataManager.PatchableData.Remove(key);
+            if (PatchDataManager.PatchableData.TryGetValue(key, out IPatchableData registered) && ReferenceEquals(registered, this))
+                PatchDataManager.PatchableData.Remove(key);
         }
 
 #if UNITY_EDITOR
@@ -285,5 +283,10 @@ namespace MultiplayerARPG
         {
             Debug.Log(DataId);
         }
+
+        public virtual void ClearPatchCaches()
+        {
+        }
+
     }
 }

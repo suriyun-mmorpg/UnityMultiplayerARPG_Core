@@ -8,6 +8,8 @@ namespace MultiplayerARPG
     [System.Serializable]
     public class ItemDropManager
     {
+        [System.NonSerialized]
+        private uint _cachePatchRevision;
         [ArrayElementTitle("item")]
         public ItemDrop[] randomItems = new ItemDrop[0];
         public ItemDropTable[] itemDropTables = new ItemDropTable[0];
@@ -26,6 +28,7 @@ namespace MultiplayerARPG
         {
             get
             {
+                EnsurePatchCacheRevision();
                 if (_cacheItemRandomByWeightTables == null)
                 {
                     _cacheItemRandomByWeightTables = new List<ItemRandomByWeightTable>();
@@ -47,6 +50,7 @@ namespace MultiplayerARPG
         {
             get
             {
+                EnsurePatchCacheRevision();
                 if (_cacheRandomItems == null)
                 {
                     int i;
@@ -100,6 +104,12 @@ namespace MultiplayerARPG
                 }
                 return _cacheRandomItems;
             }
+        }
+
+        private void EnsurePatchCacheRevision()
+        {
+            if (_cachePatchRevision != DataPatchEngine.Revision)
+                ClearPatchCaches();
         }
 
         public void PrepareRelatesData()
@@ -202,5 +212,15 @@ namespace MultiplayerARPG
             }
             itemAmounts.Clear();
         }
+
+        public void ClearPatchCaches()
+        {
+            _cachePatchRevision = DataPatchEngine.Revision;
+            _cacheItemRandomByWeightTables = null;
+            _cacheRandomItems = null;
+            _certainDropItems.Clear();
+            _uncertainDropItems.Clear();
+        }
+
     }
 }
