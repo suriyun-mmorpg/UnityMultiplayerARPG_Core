@@ -13,8 +13,6 @@ namespace MultiplayerARPG
         private bool _numericResultsReady;
         public CharacterStats Stats { get; private set; }
         private Dictionary<Attribute, float> _attributes;
-        private Dictionary<DamageElement, float> _resistances;
-        private Dictionary<DamageElement, float> _armors;
         public Dictionary<Attribute, float> Attributes
         {
             get
@@ -29,6 +27,7 @@ namespace MultiplayerARPG
                 return _attributes;
             }
         }
+        private Dictionary<DamageElement, float> _resistances;
         public Dictionary<DamageElement, float> Resistances
         {
             get
@@ -43,6 +42,7 @@ namespace MultiplayerARPG
                 return _resistances;
             }
         }
+        private Dictionary<DamageElement, float> _armors;
         public Dictionary<DamageElement, float> Armors
         {
             get
