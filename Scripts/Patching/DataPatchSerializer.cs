@@ -41,6 +41,12 @@ namespace MultiplayerARPG
             return type.IsEnum || type == typeof(string) || !type.IsAbstract && !typeof(Delegate).IsAssignableFrom(type) && type.IsDefined(typeof(SerializableAttribute), false);
         }
 
+        private static bool IsEditorOnlyField(Type owner, string name)
+        {
+            // These NPC inspector helpers do not exist in player/server builds.
+            return typeof(NpcSellItem).IsAssignableFrom(owner) && (name == "inspectorTitle" || name == "unlockableGameData");
+        }
+
         private static bool IsProtected(FieldInfo field)
         {
             if (field.Name == "maxHp" && typeof(Harvestable).IsAssignableFrom(field.DeclaringType) || field.Name == "id" || field.Name == "patchId")
@@ -144,7 +150,7 @@ namespace MultiplayerARPG
             {
                 foreach (FieldInfo field in type.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.DeclaredOnly))
                 {
-                    if (field.IsStatic || field.IsInitOnly || field.IsLiteral || field.IsDefined(typeof(NonSerializedAttribute), false))
+                    if (IsEditorOnlyField(field.DeclaringType, field.Name) || field.IsStatic || field.IsInitOnly || field.IsLiteral || field.IsDefined(typeof(NonSerializedAttribute), false))
                         continue;
                     if (!(field.IsPublic || field.IsDefined(typeof(SerializeField), false)))
                         continue;
@@ -212,6 +218,9 @@ namespace MultiplayerARPG
             var fields = ReadableFields(target.GetType());
             foreach (JProperty entry in data.Properties())
             {
+                // Accept previously published snapshots without applying editor-only controls.
+                if (IsEditorOnlyField(target.GetType(), entry.Name))
+                    continue;
                 if (!fields.TryGetValue(entry.Name, out FieldInfo field))
                     throw new InvalidOperationException($"{target.GetType().Name}.{entry.Name} is not patchable.");
                 object value = ReadValue(field.FieldType, field.GetValue(target), entry.Value, registry, depth + 1, validate, reportWarning);
@@ -236,6 +245,8 @@ namespace MultiplayerARPG
                 if (!(target is ItemRandomByWeight empty && empty.item == null))
                     foreach (JProperty entry in data.Properties())
                     {
+                        if (IsEditorOnlyField(target.GetType(), entry.Name))
+                            continue;
                         if (target is DamageInfo damage && entry.Name == "hitFov" && (damage.damageType != DamageType.Melee || damage.hitDistance <= 0))
                             continue;
                         ValidateField(fields[entry.Name], fields[entry.Name].GetValue(target));

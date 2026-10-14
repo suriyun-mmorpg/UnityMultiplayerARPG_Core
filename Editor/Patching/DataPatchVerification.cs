@@ -76,6 +76,10 @@ namespace MultiplayerARPG
                 using (var engine = new DataPatchEngine(profile, refresh: false))
                 {
                     JObject snapshot = DataPatchSerializer.Export(shop);
+                    Check(snapshot["sellItems"][0]["inspectorTitle"] == null && snapshot["sellItems"][0]["unlockableGameData"] == null, "NPC inspector-only controls leaked into patch export.");
+                    // Existing uploaded releases must remain readable by players without UNITY_EDITOR.
+                    snapshot["sellItems"][0]["inspectorTitle"] = "legacy editor title";
+                    snapshot["sellItems"][0]["unlockableGameData"] = JValue.CreateNull();
                     snapshot["sellItems"][0]["sellPrice"] = 1000;
                     snapshot["sellItems"][1]["sellPrice"] = 2000;
                     await engine.PrepareAsync(Release(profile, "shop-price", new[]
