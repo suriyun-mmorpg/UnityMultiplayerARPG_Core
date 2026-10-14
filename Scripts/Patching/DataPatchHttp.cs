@@ -102,7 +102,7 @@ namespace MultiplayerARPG
                 throw new IOException("Patch chunk integrity check failed: " + chunk.index);
         }
 
-        public static IEnumerable<DataPatchEntry> ReadEntries(DataPatchRelease release)
+        public static IEnumerable<DataPatchEntry> ReadEntries(DataPatchRelease release, Dictionary<string, DataPatchEntry[]> chunkCache = null)
         {
             DataPatchManifest manifest = ValidateManifest(release);
             if (manifest == null)
@@ -119,7 +119,15 @@ namespace MultiplayerARPG
             for (int i = 0; i < manifest.chunks.Length; ++i)
             {
                 DataPatchChunk chunk = manifest.chunks[i];
-                var entries = JsonConvert.DeserializeObject<DataPatchEntry[]>(ReadChunkFile(release.chunkPaths[i], chunk));
+                DataPatchEntry[] entries;
+                if (chunkCache != null && chunkCache.TryGetValue(chunk.hash, out entries))
+                    ReadChunkBytes(release.chunkPaths[i], chunk);
+                else
+                {
+                    entries = JsonConvert.DeserializeObject<DataPatchEntry[]>(ReadChunkFile(release.chunkPaths[i], chunk));
+                    if (chunkCache != null)
+                        chunkCache[chunk.hash] = entries;
+                }
                 if (entries == null || entries.Length != chunk.entryCount)
                     throw new InvalidOperationException("Patch chunk record count mismatch.");
                 foreach (DataPatchEntry entry in entries)

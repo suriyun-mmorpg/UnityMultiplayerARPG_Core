@@ -28,8 +28,10 @@ namespace MultiplayerARPG
                     }
                 }
 
-                if (GUILayout.Button("Review Patch Data / Create Patch"))
+                if (GUILayout.Button("Preview Patch Data"))
                     DataPatchExportWindow.Open(profile);
+                if (GUILayout.Button("Upload Patch Data"))
+                    DataPatchUploadWindow.Open(profile);
             }
 
             using (new EditorGUI.DisabledScope(!DataPatchBuildLog.HasLog(profile)))

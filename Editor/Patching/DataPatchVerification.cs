@@ -645,6 +645,129 @@ namespace MultiplayerARPG
             VerifyJsonReviewScrolling();
         }
 
+        public static async UniTask VerifyPartialPublishingPreparation()
+        {
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            var profile = ScriptableObject.CreateInstance<DataPatchProfile>();
+            var shop = ScriptableObject.CreateInstance<NpcDialog>();
+            var currency = ScriptableObject.CreateInstance<Currency>();
+            currency.Id = "partial-currency-" + Guid.NewGuid().ToString("N");
+            var items = new JunkItem[3];
+            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "unity-partial-patch-" + Guid.NewGuid().ToString("N"));
+            System.IO.Directory.CreateDirectory(directory);
+            DataPatchRelease ChunkRelease(string id, string itemPayload, string shopPayload)
+            {
+                string[] payloads = itemPayload == null ? new[] { shopPayload } : new[] { itemPayload, shopPayload };
+                var chunks = new DataPatchChunk[payloads.Length];
+                var paths = new string[payloads.Length];
+                for (int i = 0; i < payloads.Length; ++i)
+                {
+                    paths[i] = System.IO.Path.Combine(directory, id + "-" + i + ".json");
+                    System.IO.File.WriteAllText(paths[i], payloads[i], new System.Text.UTF8Encoding(false));
+                    chunks[i] = new DataPatchChunk
+                    {
+                        index = i,
+                        dataType = itemPayload != null && i == 0 ? nameof(JunkItem) : nameof(NpcDialog),
+                        hash = DataPatchHttp.Hash(payloads[i]),
+                        bytes = System.Text.Encoding.UTF8.GetByteCount(payloads[i]),
+                        entryCount = JArray.Parse(payloads[i]).Count,
+                    };
+                }
+                string manifest = JsonConvert.SerializeObject(new DataPatchManifest { chunks = chunks });
+                return new DataPatchRelease
+                {
+                    id = id,
+                    databaseId = profile.patchDatabaseId,
+                    schemaVersion = 2,
+                    publishTime = DateTime.UtcNow.ToString("O"),
+                    manifestJson = manifest,
+                    payloadHash = DataPatchHttp.Hash(manifest),
+                    chunkPaths = paths,
+                };
+            }
+            try
+            {
+                for (int i = 0; i < items.Length; ++i)
+                {
+                    items[i] = ScriptableObject.CreateInstance<JunkItem>();
+                    items[i].Id = "partial-publishing-" + Guid.NewGuid().ToString("N");
+                    items[i].SellPrice = 10 + i;
+                }
+                database.items = items;
+                profile.database = database;
+                profile.patchDatabaseId = "partial-preparation-test";
+                shop.name = "partial-shop-" + Guid.NewGuid().ToString("N");
+                shop.type = NpcDialogType.Shop;
+                shop.sellItems = new[] { new NpcSellItem { item = items[0], amount = 1, sellPrice = 10 } };
+                profile.scannedData = new ScriptableObject[] { shop };
+                var selection = new System.Collections.Generic.HashSet<string> { nameof(NpcDialog) };
+                var selected = await DataPatchSnapshotBuilder.Build(profile, null, System.Threading.CancellationToken.None, selection);
+                Check(selected.Length == 1 && selected[0].dataType == nameof(NpcDialog), "Type selection exported unselected item records.");
+                string itemPayload = JsonConvert.SerializeObject(new[]
+                {
+                    new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[0].DataId, data = JObject.Parse("{\"sellPrice\":100}") },
+                    new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[1].DataId, data = JObject.Parse("{\"sellPrice\":200}") },
+                    new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[2].DataId, data = JObject.Parse("{\"sellPrice\":-1}") },
+                });
+                JObject shopData = DataPatchSerializer.Export(shop);
+                shopData["sellItems"][0]["sellPrice"] = 1000;
+                string firstShop = JsonConvert.SerializeObject(new[] { new DataPatchEntry { dataType = nameof(NpcDialog), dataId = shop.DataId, data = shopData } });
+                shopData["sellItems"][0]["sellPrice"] = 2000;
+                string nextShop = JsonConvert.SerializeObject(new[] { new DataPatchEntry { dataType = nameof(NpcDialog), dataId = shop.DataId, data = shopData } });
+                var second = ChunkRelease("partial-second", itemPayload, nextShop);
+                using (var engine = new DataPatchEngine(profile, refresh: false))
+                {
+                    await engine.PrepareAsync(ChunkRelease("partial-first", itemPayload, firstShop));
+                    engine.Commit();
+                    int firstCacheCount = engine.LastCacheTraversalCount;
+                    Check(items[0].SellPrice == 100 && items[1].SellPrice == 200 && shop.sellItems[0].sellPrice == 1000, "Initial complete snapshot did not apply.");
+                    // Scene loading may register unrelated assets after startup.
+                    profile.scannedData = new ScriptableObject[] { shop, currency };
+                    await engine.PrepareAsync(second);
+                    Check(engine.LastPreparationRecordCount == 2, "Partial reload prepared unchanged valid records or failed to retry a rejected record after registry growth.");
+                    Check(engine.LastCacheTraversalCount < firstCacheCount, "Partial reload rediscovered the complete cache graph.");
+                    engine.Commit();
+                    Check(items[0].SellPrice == 100 && items[1].SellPrice == 200 && shop.sellItems[0].sellPrice == 2000, "Partial reload reset retained item patches or failed to update the shop.");
+                    Check(engine.PreparationWarnings.Exists(warning => warning.Contains("Skipped record JunkItem")), "Unchanged rejected record lost its diagnostic.");
+                    await engine.PrepareAsync(second);
+                    Check(engine.LastPreparationRecordCount == 0 && engine.PreparedChangeCount == 0, "Repeated release was prepared again.");
+                    engine.Commit();
+                    await engine.PrepareAsync(ChunkRelease("full-replacement", null, nextShop));
+                    engine.Commit();
+                    Check(items[0].SellPrice == 10 && items[1].SellPrice == 11 && shop.sellItems[0].sellPrice == 2000, "Complete replacement stopped restoring omitted records to their baseline.");
+                }
+                Check(shop.sellItems[0].sellPrice == 10, "Rollback cache did not restore the shop baseline.");
+                using (var freshClient = new DataPatchEngine(profile, refresh: false))
+                {
+                    await freshClient.PrepareAsync(second);
+                    freshClient.Commit();
+                    Check(items[0].SellPrice == 100 && items[1].SellPrice == 200 && shop.sellItems[0].sellPrice == 2000, "Fresh client needed previous releases to load the merged snapshot.");
+                }
+            }
+            finally
+            {
+                if (GameInstance.NpcDialogs.TryGetValue(shop.DataId, out BaseNpcDialog registered) && registered == shop)
+                    GameInstance.NpcDialogs.Remove(shop.DataId);
+                foreach (JunkItem item in items)
+                {
+                    if (item == null)
+                        continue;
+                    if (GameInstance.Items.TryGetValue(item.DataId, out BaseItem registeredItem) && registeredItem == item)
+                        GameInstance.Items.Remove(item.DataId);
+                    UnityEngine.Object.DestroyImmediate(item);
+                }
+                if (GameInstance.Currencies.TryGetValue(currency.DataId, out Currency registeredCurrency) && registeredCurrency == currency)
+                    GameInstance.Currencies.Remove(currency.DataId);
+                UnityEngine.Object.DestroyImmediate(currency);
+                UnityEngine.Object.DestroyImmediate(shop);
+                UnityEngine.Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(database);
+                string resolved = System.IO.Path.GetFullPath(directory);
+                Check(resolved.StartsWith(System.IO.Path.GetFullPath(System.IO.Path.GetTempPath()), StringComparison.OrdinalIgnoreCase) && System.IO.Path.GetFileName(resolved).StartsWith("unity-partial-patch-", StringComparison.Ordinal), "Unsafe test cleanup path.");
+                System.IO.Directory.Delete(resolved, true);
+            }
+        }
+
         public static void VerifyPatchZip()
         {
             var entries = new[]{new DataPatchEntry{dataType = "BuildingItem", dataId = -123, data = JObject.Parse("{\"sellPrice\":10}")}, new DataPatchEntry{dataType = "JunkItem", dataId = -123, data = JObject.Parse("{\"sellPrice\":20}")}, new DataPatchEntry{dataType = "JunkItem", dataId = 456, data = JObject.Parse("{\"sellPrice\":30}")}};

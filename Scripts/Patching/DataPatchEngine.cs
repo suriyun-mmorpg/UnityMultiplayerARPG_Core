@@ -24,9 +24,27 @@ namespace MultiplayerARPG
         private readonly List<PreparedChange> changes = new List<PreparedChange>();
         private readonly List<object> cacheTargets = new List<object>();
         private int preparationVersion;
+        private Dictionary<string, RecordState> activeRecords = new Dictionary<string, RecordState>();
+        private readonly Dictionary<string, RecordState> preparedRecords = new Dictionary<string, RecordState>();
+        private Dictionary<string, ScriptableObject> activeRegistry = new Dictionary<string, ScriptableObject>();
+        private Dictionary<string, DataPatchEntry[]> activeChunks = new Dictionary<string, DataPatchEntry[]>();
+        private Dictionary<string, DataPatchEntry[]> preparedChunks;
+        private Dictionary<ScriptableObject, object[]> activeCacheRoots = new Dictionary<ScriptableObject, object[]>(UnityObjectComparer.Instance);
+        private readonly Dictionary<ScriptableObject, object[]> preparedCacheRoots = new Dictionary<ScriptableObject, object[]>(UnityObjectComparer.Instance);
+        private bool sameRegistry;
+        private bool registryRetainsPreviousAssets;
+
+        private sealed class RecordState
+        {
+            public ScriptableObject target;
+            public JObject input;
+            public string[] warnings;
+            public bool requiresRegistryRefresh;
+        }
         public int PreparedChangeCount => changes.Count;
         public int CapturedDefaultCount => defaults.Count;
         public int LastPreparationRecordCount { get; private set; }
+        public int LastCacheTraversalCount { get; private set; }
         public double LastRegistryMilliseconds { get; private set; }
         public double LastPreparationMilliseconds { get; private set; }
         public double LastCommitMilliseconds { get; private set; }
@@ -81,10 +99,12 @@ namespace MultiplayerARPG
             Discard();
             PreparationWarnings.Clear();
             LastPreparationRecordCount = 0;
+            LastCacheTraversalCount = 0;
             var timer = Stopwatch.StartNew();
             try
             {
                 RefreshRegistry();
+                BeginRecordCache();
                 ValidateScope(release);
                 var overrides = ReadOverrides(release);
                 foreach (var entry in PreparationTargets(overrides))
@@ -106,6 +126,7 @@ namespace MultiplayerARPG
             Discard();
             PreparationWarnings.Clear();
             LastPreparationRecordCount = 0;
+            LastCacheTraversalCount = 0;
             int version = preparationVersion;
             var timer = Stopwatch.StartNew();
             var frame = Stopwatch.StartNew();
@@ -117,7 +138,13 @@ namespace MultiplayerARPG
                 if (refreshRegistry || registry == null)
                     RefreshRegistry();
                 // Only JSON and files are handled on the worker; Unity assets stay on the main thread.
-                var records = release == null ? Array.Empty<DataPatchEntry>() : await DataPatchHttp.RunBackground(() => DataPatchHttp.ReadEntries(release).ToArray(), cancellationToken);
+                BeginRecordCache();
+                var chunkCache = new Dictionary<string, DataPatchEntry[]>(activeChunks);
+                var records = release == null ? Array.Empty<DataPatchEntry>() : await DataPatchHttp.RunBackground(() => DataPatchHttp.ReadEntries(release, chunkCache).ToArray(), cancellationToken);
+                CheckPreparation(version, cancellationToken);
+                var manifest = release == null ? null : DataPatchHttp.ValidateManifest(release);
+                var hashes = new HashSet<string>(manifest?.chunks.Select(chunk => chunk.hash) ?? Enumerable.Empty<string>());
+                preparedChunks = chunkCache.Where(pair => hashes.Contains(pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
                 CheckPreparation(version, cancellationToken);
                 var overrides = new Dictionary<string, JObject>();
                 foreach (DataPatchEntry record in records)
@@ -228,8 +255,26 @@ namespace MultiplayerARPG
                     yield return entry;
         }
 
+        private void BeginRecordCache()
+        {
+            registryRetainsPreviousAssets = activeRegistry.All(pair =>
+                registry.Targets.TryGetValue(pair.Key, out ScriptableObject current) && current == pair.Value);
+            sameRegistry = registryRetainsPreviousAssets && activeRegistry.Count == registry.Targets.Count;
+        }
+
         private void PrepareRecord(KeyValuePair<string, ScriptableObject> entry, Dictionary<string, JObject> overrides)
         {
+            overrides.TryGetValue(entry.Key, out JObject input);
+            if (activeRecords.TryGetValue(entry.Key, out RecordState previous) && previous.target == entry.Value &&
+                (sameRegistry || registryRetainsPreviousAssets && !previous.requiresRegistryRefresh) && JToken.DeepEquals(previous.input, input))
+            {
+                preparedRecords[entry.Key] = previous;
+                PreparationWarnings.AddRange(previous.warnings);
+                return;
+            }
+            var state = new RecordState { target = entry.Value, input = input, warnings = Array.Empty<string>() };
+            preparedRecords[entry.Key] = state;
+            int warningStart = PreparationWarnings.Count;
             ++LastPreparationRecordCount;
             JObject current = DataPatchSerializer.Export(entry.Value);
             if (!defaults.TryGetValue(entry.Key, out JObject bundled))
@@ -267,6 +312,11 @@ namespace MultiplayerARPG
                 staging.Remove(copy);
                 UnityEngine.Object.DestroyImmediate(copy);
             }
+            finally
+            {
+                state.warnings = PreparationWarnings.Skip(warningStart).ToArray();
+                state.requiresRegistryRefresh = state.warnings.Any(message => message.StartsWith("Skipped record ", StringComparison.Ordinal) || message.Contains("Skipped NPC shop row"));
+            }
         }
 
         private void FinishPreparation(DataPatchRelease release, Stopwatch timer)
@@ -279,7 +329,7 @@ namespace MultiplayerARPG
                 UnityEngine.Debug.LogWarning($"[Data Patch] Collected {PreparationWarnings.Count} preparation warnings. Full details: DataPatchRuntime.Engine.PreparationWarnings.\n" + string.Join("\n", details));
             }
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            UnityEngine.Debug.Log($"[Data Patch] Prepared {changes.Count} changed records in {LastPreparationMilliseconds:F1} ms across preparation frames; registry {LastRegistryMilliseconds:F1} ms, visited {LastPreparationRecordCount}/{registry.Targets.Count} records, retained {defaults.Count} rollback snapshots.");
+            UnityEngine.Debug.Log($"[Data Patch] Prepared {changes.Count} changed records in {LastPreparationMilliseconds:F1} ms across preparation frames; registry {LastRegistryMilliseconds:F1} ms, visited {LastPreparationRecordCount}/{registry.Targets.Count} records, visited {LastCacheTraversalCount} cache containers, retained {defaults.Count} rollback snapshots.");
 #endif
         }
 
@@ -361,6 +411,11 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            activeCacheRoots = new Dictionary<ScriptableObject, object[]>(preparedCacheRoots, UnityObjectComparer.Instance);
+            activeRecords = new Dictionary<string, RecordState>(preparedRecords);
+            activeRegistry = new Dictionary<string, ScriptableObject>(registry.Targets);
+            if (preparedChunks != null)
+                activeChunks = preparedChunks;
             ActiveReleaseId = PreparedRelease?.id ?? "";
             Discard();
             LastCommitMilliseconds = timer.Elapsed.TotalMilliseconds;
@@ -380,13 +435,34 @@ namespace MultiplayerARPG
 
         private IEnumerable<object> EnumerateCacheTargets()
         {
-            if (changes.Count == 0)
+            if (changes.Count == 0 && preparedRecords.Count == 0)
                 yield break;
             var copies = changes.ToDictionary(change => change.target, change => change.copy, UnityObjectComparer.Instance);
-            var visited = new HashSet<object>(ReferenceComparer.Instance);
+            var unique = new HashSet<object>(ReferenceComparer.Instance);
             foreach (ScriptableObject asset in registry.Targets.Values)
-                foreach (object value in EnumerateCacheTargets(asset, copies, visited))
+            {
+                if (!copies.ContainsKey(asset) && activeCacheRoots.TryGetValue(asset, out object[] cached))
+                {
+                    preparedCacheRoots[asset] = cached;
+                    foreach (object value in cached)
+                        if (unique.Add(value))
+                            yield return value;
+                    continue;
+                }
+                var targets = new List<object>();
+                foreach (object value in EnumerateCacheTargets(asset, copies, new HashSet<object>(ReferenceComparer.Instance)))
+                {
+                    if (IsCacheTarget(value))
+                    {
+                        targets.Add(value);
+                        if (!unique.Add(value))
+                            continue;
+                    }
+                    // Non-cache containers still yield while discovering a new or changed graph.
                     yield return value;
+                }
+                preparedCacheRoots[asset] = targets.ToArray();
+            }
         }
 
         private static IEnumerable<object> EnumerateCacheTargets(object value, Dictionary<ScriptableObject, ScriptableObject> copies, HashSet<object> visited)
@@ -424,8 +500,14 @@ namespace MultiplayerARPG
 
         private void AddCacheTarget(object value)
         {
-            if (value is IPatchableData || value is ItemDropManager || value is DamageInfo || value is EquipmentBonus)
+            ++LastCacheTraversalCount;
+            if (IsCacheTarget(value))
                 cacheTargets.Add(value);
+        }
+
+        private static bool IsCacheTarget(object value)
+        {
+            return value is IPatchableData || value is ItemDropManager || value is DamageInfo || value is EquipmentBonus;
         }
 
         private static void ClearCache(object value)
@@ -467,6 +549,9 @@ namespace MultiplayerARPG
             ++preparationVersion;
             changes.Clear();
             cacheTargets.Clear();
+            preparedRecords.Clear();
+            preparedCacheRoots.Clear();
+            preparedChunks = null;
             PreparedRelease = null;
             DestroyStaging();
         }

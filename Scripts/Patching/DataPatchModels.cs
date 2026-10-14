@@ -43,6 +43,15 @@ namespace MultiplayerARPG
     {
         public int schemaVersion = 2;
         public DataPatchChunk[] chunks;
+        public DataPatchPartialPublication partial;
+    }
+
+    [Serializable]
+    public sealed class DataPatchPartialPublication
+    {
+        public string uploadId;
+        public string baseReleaseId;
+        public string uploadHash;
     }
 
     [Serializable]

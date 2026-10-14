@@ -9,6 +9,7 @@ namespace MultiplayerARPG
         public string secretKey = "";
         public int requestTimeoutSeconds = 30;
         public string pendingUploadId = "";
+        public string pendingBaseReleaseId = "";
         public string pendingPayloadHash = "";
         public string pendingDatabaseId = "";
         public const string AssetPath = "Assets/Editor/Resources/DataPatching/PatchUploadConfig.asset";
