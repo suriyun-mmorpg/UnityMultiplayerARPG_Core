@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -17,13 +18,19 @@ namespace MultiplayerARPG
         public const int MaxChunkBytes = 1024 * 1024;
         public const int MaxReleaseBytes = 128 * 1024 * 1024;
         public const int MaxManifestBytes = 256 * 1024;
+        private const int ConcurrentDownloads = 4;
         private const int MaxResponseBytes = 8 * 1024 * 1024;
         public static event Action<float, string> DownloadProgress;
 
         public static string Hash(string text)
         {
+            return Hash(Encoding.UTF8.GetBytes(text));
+        }
+
+        private static string Hash(byte[] bytes)
+        {
             using (SHA256 sha = SHA256.Create())
-                return BitConverter.ToString(sha.ComputeHash(Encoding.UTF8.GetBytes(text))).Replace("-", "").ToLowerInvariant();
+                return BitConverter.ToString(sha.ComputeHash(bytes)).Replace("-", "").ToLowerInvariant();
         }
 
         public static DataPatchManifest ValidateManifest(DataPatchRelease release)
@@ -68,21 +75,30 @@ namespace MultiplayerARPG
             if (release.chunkPaths == null || release.chunkPaths.Length != manifest.chunks.Length)
                 throw new InvalidOperationException("Patch chunks have not finished downloading.");
             for (int i = 0; i < manifest.chunks.Length; ++i)
-                ReadChunkFile(release.chunkPaths[i], manifest.chunks[i]);
+                ReadChunkBytes(release.chunkPaths[i], manifest.chunks[i]);
         }
 
         private static string ReadChunkFile(string path, DataPatchChunk chunk)
         {
+            return Encoding.UTF8.GetString(ReadChunkBytes(path, chunk));
+        }
+
+        private static byte[] ReadChunkBytes(string path, DataPatchChunk chunk)
+        {
             if (string.IsNullOrEmpty(path) || !File.Exists(path) || new FileInfo(path).Length != chunk.bytes)
                 throw new IOException("Missing or incomplete patch chunk " + chunk.index);
-            string payload = File.ReadAllText(path, Encoding.UTF8);
-            ValidateChunkText(payload, chunk);
-            return payload;
+            byte[] bytes = File.ReadAllBytes(path);
+            if (bytes.Length != chunk.bytes || Hash(bytes) != chunk.hash)
+                throw new IOException("Patch chunk integrity check failed: " + chunk.index);
+            return bytes;
         }
 
         private static void ValidateChunkText(string payload, DataPatchChunk chunk)
         {
-            if (payload == null || Encoding.UTF8.GetByteCount(payload) != chunk.bytes || Hash(payload) != chunk.hash)
+            if (payload == null)
+                throw new IOException("Patch chunk integrity check failed: " + chunk.index);
+            byte[] bytes = Encoding.UTF8.GetBytes(payload);
+            if (bytes.Length != chunk.bytes || Hash(bytes) != chunk.hash)
                 throw new IOException("Patch chunk integrity check failed: " + chunk.index);
         }
 
@@ -117,6 +133,7 @@ namespace MultiplayerARPG
 
         public static async UniTask<DataPatchRelease> Load(DataPatchProfile database, string releaseId = "")
         {
+            var timer = Stopwatch.StartNew();
             DataPatchSettings settings = database.dataPatchSettings;
             if (!Uri.TryCreate(settings.serviceUrl, UriKind.Absolute, out Uri uri) || (uri.Scheme != "https" && !uri.IsLoopback))
                 throw new InvalidOperationException("Patch service requires HTTPS (HTTP allowed only on loopback).");
@@ -124,7 +141,7 @@ namespace MultiplayerARPG
             string baseUrl = settings.serviceUrl.TrimEnd('/') + "/game-data-patches/";
             DataPatchRelease release;
 #if UNITY_EDITOR
-            Debug.Log($"[Data Patch] Download started. Database: {database.patchDatabaseId}, release: {(string.IsNullOrEmpty(releaseId) ? "latest" : releaseId)}.");
+            UnityEngine.Debug.Log($"[Data Patch] Download started. Database: {database.patchDatabaseId}, release: {(string.IsNullOrEmpty(releaseId) ? "latest" : releaseId)}.");
 #endif
             ReportProgress(0, "Loading patch manifest");
             try
@@ -133,7 +150,7 @@ namespace MultiplayerARPG
                 if (json == null)
                 {
 #if UNITY_EDITOR
-                    Debug.Log($"[Data Patch] Download check finished. No published patch for database {database.patchDatabaseId}.");
+                    UnityEngine.Debug.Log($"[Data Patch] Download check finished. No published patch for database {database.patchDatabaseId}.");
 #endif
                     ReportProgress(1, "No published patch");
                     return null;
@@ -152,60 +169,93 @@ namespace MultiplayerARPG
             if ((!string.IsNullOrEmpty(releaseId) && release.id != releaseId) || release.databaseId != database.patchDatabaseId ||
                 string.IsNullOrEmpty(release.publishTime))
                 throw new InvalidOperationException("Patch ID, scope or publication mismatch.");
+            int cachedChunks = 0;
             if (manifest != null)
-            {
-                release.chunkPaths = new string[manifest.chunks.Length];
-                for (int i = 0; i < manifest.chunks.Length; ++i)
-                {
-                    DataPatchChunk chunk = manifest.chunks[i];
-                    string path = ChunkPath(chunk.hash);
-                    bool cached = false;
-                    try
-                    {
-                        await RunBackground(() => ReadChunkFile(path, chunk));
-                        cached = true;
-                    }
-                    catch (IOException)
-                    {
-                        // A truncated or corrupt cache entry is replaced only by verified data.
-                    }
-                    if (!cached)
-                    {
-                        string url = baseUrl + Uri.EscapeDataString(release.id) + "/chunks/" + i;
-                        for (int attempt = 0; ; ++attempt)
-                        {
-                            try
-                            {
-                                string response = await Get(url, settings.requestTimeoutSeconds, false);
-                                await RunBackground(() =>
-                                {
-                                    var body = JsonConvert.DeserializeObject<ChunkResponse>(response);
-                                    ValidateChunkText(body?.payloadJson, chunk);
-                                    AtomicWrite(path, body.payloadJson);
-                                    return true;
-                                });
-                                break;
-                            }
-                            catch (Exception ex) when (attempt < 2 && (ex is IOException || ex is UnityWebRequestException))
-                            {
-                                await UniTask.Delay(250 * (attempt + 1));
-                            }
-                        }
-                    }
-                    release.chunkPaths[i] = path;
-                    ReportProgress((float)(i + 1) / Math.Max(1, manifest.chunks.Length), "Patch chunk " + (i + 1) + "/" + manifest.chunks.Length);
-                }
-            }
-            await RunBackground(() =>
-            {
-                ValidateHash(release);
-                return true;
-            });
+                cachedChunks = await DownloadChunks(release, manifest, baseUrl, settings.requestTimeoutSeconds);
 #if UNITY_EDITOR
-            Debug.Log($"[Data Patch] Download finished and integrity verified. Release: {release.id}, version: {release.version}, database: {release.databaseId}.");
+            UnityEngine.Debug.Log($"[Data Patch] Download finished and integrity verified. Release: {release.id}, version: {release.version}, database: {release.databaseId}, cached chunks: {cachedChunks}/{manifest?.chunks.Length ?? 0}, elapsed: {timer.Elapsed.TotalMilliseconds:F1} ms.");
 #endif
             ReportProgress(1, "Patch download verified");
             return release;
+        }
+
+        private static async UniTask<int> DownloadChunks(DataPatchRelease release, DataPatchManifest manifest, string baseUrl, int timeout)
+        {
+            release.chunkPaths = new string[manifest.chunks.Length];
+            for (int i = 0; i < manifest.chunks.Length; ++i)
+                release.chunkPaths[i] = ChunkPath(manifest.chunks[i].hash);
+            // Check the entire local cache in one worker job, avoiding a frame round trip per chunk.
+            List<int> missing = await RunBackground(() =>
+            {
+                var result = new List<int>();
+                for (int i = 0; i < manifest.chunks.Length; ++i)
+                {
+                    try
+                    {
+                        ReadChunkBytes(release.chunkPaths[i], manifest.chunks[i]);
+                    }
+                    catch (IOException)
+                    {
+                        result.Add(i);
+                    }
+                }
+                return result;
+            });
+            int cached = manifest.chunks.Length - missing.Count;
+            int completed = cached;
+            int next = 0;
+            Exception failure = null;
+            ReportProgress((float)completed / Math.Max(1, manifest.chunks.Length), "Verified cached patch chunks");
+            // Workers return to Unity's main thread before queue/progress access or starting a request.
+            async UniTask Worker()
+            {
+                try
+                {
+                    while (failure == null && next < missing.Count)
+                    {
+                        int index = missing[next++];
+                        await DownloadChunk(baseUrl, release.id, manifest.chunks[index], release.chunkPaths[index], timeout);
+                        ++completed;
+                        ReportProgress((float)completed / Math.Max(1, manifest.chunks.Length), "Verified patch chunks " + completed + "/" + manifest.chunks.Length);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    failure = failure ?? ex;
+                }
+            }
+            var workers = new UniTask[Math.Min(ConcurrentDownloads, missing.Count)];
+            for (int i = 0; i < workers.Length; ++i)
+                workers[i] = Worker();
+            // Drain every in-flight worker on failure; no partial release is returned to the engine.
+            await UniTask.WhenAll(workers);
+            if (failure != null)
+                System.Runtime.ExceptionServices.ExceptionDispatchInfo.Capture(failure).Throw();
+            return cached;
+        }
+
+        private static async UniTask DownloadChunk(string baseUrl, string releaseId, DataPatchChunk chunk, string path, int timeout)
+        {
+            string url = baseUrl + Uri.EscapeDataString(releaseId) + "/chunks/" + chunk.index;
+            for (int attempt = 0; ; ++attempt)
+            {
+                try
+                {
+                    string response = await Get(url, timeout, false);
+                    await RunBackground(() =>
+                    {
+                        var body = JsonConvert.DeserializeObject<ChunkResponse>(response);
+                        ValidateChunkText(body?.payloadJson, chunk);
+                        AtomicWrite(path, body.payloadJson);
+                        return true;
+                    });
+                    return;
+                }
+                catch (Exception ex) when (attempt < 2 && (ex is IOException || ex is UnityWebRequestException))
+                {
+                    await UniTask.Delay(250 * (attempt + 1));
+                }
+            }
         }
 
         private static void ReportProgress(float value, string message)
@@ -216,7 +266,7 @@ namespace MultiplayerARPG
             }
             catch (Exception ex)
             {
-                Debug.LogException(ex);
+                UnityEngine.Debug.LogException(ex);
             }
         }
 
@@ -284,7 +334,17 @@ namespace MultiplayerARPG
                 if (File.Exists(path))
                     File.Replace(temp, path, null);
                 else
-                    File.Move(temp, path);
+                {
+                    try
+                    {
+                        File.Move(temp, path);
+                    }
+                    catch (IOException) when (File.Exists(path) && File.Exists(temp))
+                    {
+                        // Another worker may have saved the same content-addressed chunk.
+                        File.Replace(temp, path, null);
+                    }
+                }
             }
             finally
             {
@@ -318,7 +378,18 @@ namespace MultiplayerARPG
 #endif
         }
 
-        public static async UniTask CacheAsync(DataPatchProfile database, DataPatchRelease release)
+        public static UniTask CacheAsync(DataPatchProfile database, DataPatchRelease release)
+        {
+            return SaveCacheAsync(database, release, true);
+        }
+
+        internal static UniTask CachePreparedAsync(DataPatchProfile database, DataPatchRelease release)
+        {
+            // Preparation read and verified every chunk. This saves only release metadata.
+            return SaveCacheAsync(database, release, false);
+        }
+
+        private static async UniTask SaveCacheAsync(DataPatchProfile database, DataPatchRelease release, bool verifyChunks)
         {
             if (release == null)
                 return;
@@ -326,7 +397,10 @@ namespace MultiplayerARPG
             string path = CachePath(database, release.id);
             await RunBackground(() =>
             {
-                ValidateHash(release);
+                if (verifyChunks)
+                    ValidateHash(release);
+                else
+                    ValidateManifest(release);
                 AtomicWrite(path, JsonConvert.SerializeObject(release));
                 return true;
             });

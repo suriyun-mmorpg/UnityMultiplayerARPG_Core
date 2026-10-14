@@ -11,10 +11,23 @@ namespace MultiplayerARPG
     {
         public async UniTaskVoid LoadData(GameInstance gameInstance)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            var loading = System.Diagnostics.Stopwatch.StartNew();
+#endif
             await LoadDataImplement(gameInstance);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            double databaseMilliseconds = loading.Elapsed.TotalMilliseconds;
+#endif
+            // Start patch IO now; bundled data can open the home/login scene immediately.
+            if (this is GameDatabase database)
+                DataPatchRuntime.StartInitialization(gameInstance.DataPatchProfile, database);
             // Tell game instance that data loaded
             gameInstance.LoadedGameData();
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[Game Data] Initialization finished in {loading.Elapsed.TotalMilliseconds:F1} ms: bundled database {databaseMilliseconds:F1} ms, final setup {loading.Elapsed.TotalMilliseconds - databaseMilliseconds:F1} ms.");
+#endif
         }
+
         protected abstract UniTask LoadDataImplement(GameInstance gameInstance);
 
 #if UNITY_EDITOR

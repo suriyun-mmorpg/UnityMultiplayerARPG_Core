@@ -83,8 +83,11 @@ namespace MultiplayerARPG
         }
 #endif
 
-        protected override async UniTask LoadDataImplement(GameInstance gameInstance)
+        protected override UniTask LoadDataImplement(GameInstance gameInstance)
         {
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            var loading = System.Diagnostics.Stopwatch.StartNew();
+#endif
 #if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             GameInstance.AddPlayerCharacterEntities(playerCharacterEntities);
 #endif
@@ -134,7 +137,10 @@ namespace MultiplayerARPG
             GameInstance.AddFactions(factions);
             GameInstance.AddGachas(gachas);
             this.InvokeInstanceDevExtMethods("LoadDataImplement", gameInstance);
-            await DataPatchRuntime.Initialize(gameInstance.DataPatchProfile, this);
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            Debug.Log($"[Game Data] Bundled catalog registered in {loading.Elapsed.TotalMilliseconds:F1} ms; bundled data is ready.");
+#endif
+            return UniTask.CompletedTask;
         }
 
         public void LoadReferredData()

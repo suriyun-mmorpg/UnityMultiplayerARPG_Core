@@ -234,6 +234,7 @@ namespace MultiplayerARPG
 
         public override void OnStartServer()
         {
+            ResetGameDataPatchReloads();
             SetServerHandlersRef();
             this.InvokeInstanceDevExtMethods("OnStartServer");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
@@ -246,6 +247,7 @@ namespace MultiplayerARPG
 
         public override void OnStopServer()
         {
+            ResetGameDataPatchReloads();
             this.InvokeInstanceDevExtMethods("OnStopServer");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -276,6 +278,8 @@ namespace MultiplayerARPG
 
         public override void OnStopClient()
         {
+            ++patchClientSession;
+            patchClientNonce = "";
             this.InvokeInstanceDevExtMethods("OnStopClient");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -289,7 +293,8 @@ namespace MultiplayerARPG
 
         public override void OnClientConnected()
         {
-            patchClientReady = !PatchProtocolEnabled;
+            ++patchClientSession;
+            patchClientNonce = "";
             this.InvokeInstanceDevExtMethods("OnClientConnected");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -301,6 +306,8 @@ namespace MultiplayerARPG
 
         public override void OnClientDisconnected(DisconnectReason reason, SocketError socketError, byte[] data)
         {
+            ++patchClientSession;
+            patchClientNonce = "";
             UITextKeys message = UITextKeys.NONE;
             if (data != null && data.Length > 0)
             {
@@ -329,17 +336,12 @@ namespace MultiplayerARPG
                 component.OnPeerConnected(this, connectionId);
             }
             base.OnPeerConnected(connectionId);
-            if (!patchReloading)
-                SendPatchState(connectionId, 2, System.Guid.NewGuid().ToString("N"), DataPatchRuntime.ActiveReleaseId, DataPatchRuntime.ActiveHash);
-            else
-                patchQueuedPeers.Add(connectionId);
+            SendInitialPatchState(connectionId).Forget();
         }
 
         public override void OnPeerDisconnected(long connectionId, DisconnectReason reason, SocketError socketError)
         {
             patchPeerVersions.Remove(connectionId);
-            patchQueuedPeers.Remove(connectionId);
-            patchPreparedPeers.Remove(connectionId);
             this.InvokeInstanceDevExtMethods("OnPeerDisconnected", connectionId, reason, socketError);
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
             {
@@ -366,7 +368,7 @@ namespace MultiplayerARPG
 
         public override void SendClientReady()
         {
-            if (!IsClientConnected || !patchClientReady)
+            if (!IsClientConnected)
                 return;
             this.InvokeInstanceDevExtMethods("SendClientReady");
             foreach (BaseGameNetworkManagerComponent component in ManagerComponents)
@@ -1203,8 +1205,6 @@ namespace MultiplayerARPG
 
         public bool IsClientReadyToInstantiateObjects()
         {
-            if (!patchClientReady)
-                return false;
             if (!_isClientReadyToInstantiateObjects)
             {
                 _clientReadyToInstantiateObjectsStates[INSTANTIATES_OBJECTS_DELAY_STATE_KEY] = Time.unscaledTime - _clientSceneLoadedTime >= INSTANTIATES_OBJECTS_DELAY;

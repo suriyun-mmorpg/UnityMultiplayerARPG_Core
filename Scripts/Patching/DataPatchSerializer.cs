@@ -13,6 +13,7 @@ namespace MultiplayerARPG
     public static class DataPatchSerializer
     {
         private static readonly Dictionary<(Type, bool), FieldInfo[]> fieldCache = new Dictionary<(Type, bool), FieldInfo[]>();
+        private static readonly Dictionary<Type, FieldInfo[]> orderedFieldCache = new Dictionary<Type, FieldInfo[]>();
         private static readonly Dictionary<Type, Dictionary<string, FieldInfo>> readableFieldCache = new Dictionary<Type, Dictionary<string, FieldInfo>>();
 
         private static bool IsDataReference(Type type) => typeof(IPatchableData).IsAssignableFrom(type);
@@ -111,6 +112,19 @@ namespace MultiplayerARPG
             }
         }
 
+        private static FieldInfo[] OrderedFields(Type type)
+        {
+            lock (orderedFieldCache)
+            {
+                if (!orderedFieldCache.TryGetValue(type, out FieldInfo[] fields))
+                {
+                    fields = Fields(type).OrderBy(field => field.Name, StringComparer.Ordinal).ToArray();
+                    orderedFieldCache.Add(type, fields);
+                }
+                return fields;
+            }
+        }
+
         private static Dictionary<string, FieldInfo> ReadableFields(Type type)
         {
             lock (readableFieldCache)
@@ -180,18 +194,18 @@ namespace MultiplayerARPG
             if (!root && value is UnityEngine.Object)
                 throw new InvalidOperationException($"Unsupported patch reference: {type.Name}");
             var data = new JObject();
-            foreach (FieldInfo field in Fields(type).OrderBy(field => field.Name, StringComparer.Ordinal))
+            foreach (FieldInfo field in OrderedFields(type))
                 data.Add(field.Name, Write(field.GetValue(value), false, depth + 1));
             // Asset-only containers (for example SkillMount) intentionally export {}.
             return data;
         }
 
-        public static void ReadInto(object target, JObject data, DataPatchRegistry registry, bool validate = true)
+        public static void ReadInto(object target, JObject data, DataPatchRegistry registry, bool validate = true, Action<string> reportWarning = null)
         {
-            ReadObject(target, data, registry, 0, validate);
+            ReadObject(target, data, registry, 0, validate, reportWarning);
         }
 
-        private static void ReadObject(object target, JObject data, DataPatchRegistry registry, int depth, bool validate)
+        private static void ReadObject(object target, JObject data, DataPatchRegistry registry, int depth, bool validate, Action<string> reportWarning)
         {
             if (depth > 32)
                 throw new InvalidOperationException("Patch nesting exceeds 32 levels.");
@@ -200,7 +214,7 @@ namespace MultiplayerARPG
             {
                 if (!fields.TryGetValue(entry.Name, out FieldInfo field))
                     throw new InvalidOperationException($"{target.GetType().Name}.{entry.Name} is not patchable.");
-                object value = ReadValue(field.FieldType, field.GetValue(target), entry.Value, registry, depth + 1, validate);
+                object value = ReadValue(field.FieldType, field.GetValue(target), entry.Value, registry, depth + 1, validate, reportWarning);
                 field.SetValue(target, value);
             }
 
@@ -231,14 +245,14 @@ namespace MultiplayerARPG
             }
         }
 
-        private static object ReadValue(Type type, object current, JToken token, DataPatchRegistry registry, int depth, bool validate)
+        private static object ReadValue(Type type, object current, JToken token, DataPatchRegistry registry, int depth, bool validate, Action<string> reportWarning)
         {
             if (type == typeof(Vector2Int) || type == typeof(Vector3Int) || type == typeof(LayerMask) || type == typeof(Rect) || type == typeof(Bounds))
             {
                 string[] keys = type == typeof(LayerMask) ? new[]{"value"} : type == typeof(Bounds) ? new[]{"center", "size"} : type == typeof(Rect) ? new[]{"x", "y", "width", "height"} : type == typeof(Vector2Int) ? new[]{"x", "y"} : new[]{"x", "y", "z"};
                 if (!(token is JObject native) || native.Count != keys.Length || keys.Any(key => native[key] == null))
                     throw new InvalidOperationException("Invalid " + type.Name + " fields.");
-                object Part(string key, Type partType) => ReadValue(partType, null, native[key], registry, depth + 1, validate);
+                object Part(string key, Type partType) => ReadValue(partType, null, native[key], registry, depth + 1, validate, reportWarning);
                 if (type == typeof(LayerMask))
                     return (LayerMask)(int)Part("value", typeof(int));
                 if (type == typeof(Bounds))
@@ -254,14 +268,14 @@ namespace MultiplayerARPG
             {
                 if (!(token is JObject vector3) || vector3.Count != 3 || vector3["x"] == null || vector3["y"] == null || vector3["z"] == null)
                     throw new InvalidOperationException("Vector3 must contain only x, y and z.");
-                return new Vector3((float)ReadValue(typeof(float), null, vector3["x"], registry, depth + 1, validate), (float)ReadValue(typeof(float), null, vector3["y"], registry, depth + 1, validate), (float)ReadValue(typeof(float), null, vector3["z"], registry, depth + 1, validate));
+                return new Vector3((float)ReadValue(typeof(float), null, vector3["x"], registry, depth + 1, validate, reportWarning), (float)ReadValue(typeof(float), null, vector3["y"], registry, depth + 1, validate, reportWarning), (float)ReadValue(typeof(float), null, vector3["z"], registry, depth + 1, validate, reportWarning));
             }
 
             if (type == typeof(Vector2))
             {
                 if (!(token is JObject vector) || vector.Count != 2 || vector["x"] == null || vector["y"] == null)
                     throw new InvalidOperationException("Vector2 must contain only x and y.");
-                return new Vector2((float)ReadValue(typeof(float), null, vector["x"], registry, depth + 1, validate), (float)ReadValue(typeof(float), null, vector["y"], registry, depth + 1, validate));
+                return new Vector2((float)ReadValue(typeof(float), null, vector["x"], registry, depth + 1, validate, reportWarning), (float)ReadValue(typeof(float), null, vector["y"], registry, depth + 1, validate, reportWarning));
             }
 
             if (token.Type == JTokenType.Null)
@@ -293,7 +307,20 @@ namespace MultiplayerARPG
                     throw new InvalidOperationException($"{element.Name} row count is not patchable.");
                 Array result = Array.CreateInstance(element, array.Count);
                 for (int i = 0; i < array.Count; ++i)
-                    result.SetValue(ReadValue(element, previous != null && i < previous.Count ? previous[i] : null, array[i], registry, depth + 1, validate), i);
+                {
+                    object previousRow = previous != null && i < previous.Count ? previous[i] : null;
+                    try
+                    {
+                        result.SetValue(ReadValue(element, previousRow, array[i], registry, depth + 1, validate, reportWarning), i);
+                    }
+                    catch (Exception error) when (reportWarning != null && element == typeof(NpcSellItem) && previousRow != null &&
+                        (error is InvalidOperationException || error is ArgumentException || error is OverflowException || error is JsonException))
+                    {
+                        // Keep the original slot/index so other shop prices can update safely.
+                        result.SetValue(previousRow, i);
+                        reportWarning($"Skipped NPC shop row [{i}]; existing row retained. {error.Message}");
+                    }
+                }
                 if (type.IsArray)
                     return result;
                 IList list = (IList)Activator.CreateInstance(type);
@@ -356,7 +383,7 @@ namespace MultiplayerARPG
                 throw new InvalidOperationException($"Expected object for {type.Name}.");
             // Copy existing non-patchable state, but never mutate shared nested objects during staging.
             object copy = current == null ? Activator.CreateInstance(type) : typeof(object).GetMethod("MemberwiseClone", BindingFlags.Instance | BindingFlags.NonPublic).Invoke(current, null);
-            ReadObject(copy, nested, registry, depth, validate);
+            ReadObject(copy, nested, registry, depth, validate, reportWarning);
             return copy;
         }
 
@@ -867,7 +894,8 @@ namespace MultiplayerARPG
             foreach (FieldInfo field in Fields(typeof(ItemCraft)))
             {
                 object value = field.GetValue(craft);
-                if (value is int count && (count < 0 || field.Name == "amount" && count < 1))
+                // Serialized zero uses ItemCraft.Amount's one-item fallback, including unused NPC recipes.
+                if (value is int count && count < 0)
                     throw new InvalidOperationException($"Craft {field.Name} is invalid.");
             }
 

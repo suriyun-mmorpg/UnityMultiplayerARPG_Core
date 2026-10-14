@@ -34,11 +34,14 @@ namespace MultiplayerARPG
         {
             try
             {
+                await VerifyNpcShopPatching();
                 VerifyItemCategoryValidation();
                 VerifyTolerantRecords();
                 VerifyRegistrySecondaryLookups();
                 VerifyChunkedTransport();
                 await VerifyPreparationPerformance();
+                await VerifyStartupPreparation();
+                VerifyRegistryTraversal();
                 Debug.Log("DATA_PATCH_PREPARATION_PERFORMANCE_PASSED");
                 EditorApplication.Exit(0);
             }
@@ -46,6 +49,75 @@ namespace MultiplayerARPG
             {
                 Debug.LogException(ex);
                 EditorApplication.Exit(1);
+            }
+        }
+
+        public static async Cysharp.Threading.Tasks.UniTask VerifyNpcShopPatching()
+        {
+            var item = ScriptableObject.CreateInstance<JunkItem>();
+            var shop = ScriptableObject.CreateInstance<NpcDialog>();
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            var profile = ScriptableObject.CreateInstance<DataPatchProfile>();
+            item.Id = "patch-shop-item-" + Guid.NewGuid().ToString("N");
+            shop.name = "patch-shop-dialog-" + Guid.NewGuid().ToString("N");
+            shop.type = NpcDialogType.Shop;
+            shop.sellItems = new[]
+            {
+                new NpcSellItem { item = item, level = 1, amount = 1, sellPrice = 10 },
+                new NpcSellItem { item = null, level = 1, amount = 1, sellPrice = 40 },
+            };
+            typeof(ItemCraft).GetField("amount", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic).SetValue(shop.itemCraft, 0);
+            database.items = new BaseItem[] { item };
+            profile.database = database;
+            profile.patchDatabaseId = "shop-patch-verification";
+            profile.scannedData = new ScriptableObject[] { shop };
+            try
+            {
+                using (var engine = new DataPatchEngine(profile, refresh: false))
+                {
+                    JObject snapshot = DataPatchSerializer.Export(shop);
+                    snapshot["sellItems"][0]["sellPrice"] = 1000;
+                    snapshot["sellItems"][1]["sellPrice"] = 2000;
+                    await engine.PrepareAsync(Release(profile, "shop-price", new[]
+                    {
+                        new DataPatchEntry { dataType = nameof(NpcDialog), dataId = shop.DataId, data = snapshot },
+                    }));
+                    Check(engine.PreparedChangeCount == 1 && !engine.PreparationWarnings.Exists(warning => warning.StartsWith("Skipped record ", StringComparison.Ordinal)), "Shop price snapshot was skipped: " + string.Join("; ", engine.PreparationWarnings));
+                    Check(shop.sellItems[0].sellPrice == 10, "Shop price changed before activation.");
+                    engine.Commit();
+                    Check(shop.sellItems[0].sellPrice == 1000 && shop.itemCraft.Amount == 1, "Shop price or crafting fallback was not applied correctly.");
+                    Check(shop.sellItems.Length == 2 && shop.sellItems[1].item == null && shop.sellItems[1].sellPrice == 40, "Broken shop row was changed or its slot/index was removed.");
+                    Check(engine.PreparationWarnings.Exists(warning => warning.Contains("Skipped NPC shop row [1]")), "Broken shop row was not reported.");
+                    var allItems = typeof(NpcDialog).GetProperty("AllSellItems")?.GetValue(shop) as NpcSellItem[];
+                    Check(allItems == null || allItems.Length == 2 && allItems[0].sellPrice == 1000 && allItems[1].sellPrice == 40, "NPC purchase/UI cache retained the old shop price.");
+                    Check(GameInstance.NpcDialogs[shop.DataId] == shop, "Shop patch replaced the runtime dialog identity.");
+
+                    JObject invalid = snapshot.DeepClone() as JObject;
+                    invalid["itemCraft"]["amount"] = -1;
+                    await engine.PrepareAsync(Release(profile, "shop-invalid", new[]
+                    {
+                        new DataPatchEntry { dataType = nameof(NpcDialog), dataId = shop.DataId, data = invalid },
+                    }));
+                    Check(engine.PreparedChangeCount == 0 && engine.PreparationWarnings.Exists(warning => warning.StartsWith("Skipped record ", StringComparison.Ordinal)), "Negative crafting amount was accepted in a shop patch.");
+                    engine.Commit();
+                    Check(shop.sellItems[0].sellPrice == 1000, "Invalid shop snapshot replaced the active price.");
+                    await engine.PrepareAsync(null);
+                    engine.Commit();
+                    Check(shop.sellItems[0].sellPrice == 10, "Shop price baseline was not restored.");
+                    allItems = typeof(NpcDialog).GetProperty("AllSellItems")?.GetValue(shop) as NpcSellItem[];
+                    Check(allItems == null || allItems[0].sellPrice == 10, "NPC purchase/UI cache did not restore the baseline price.");
+                }
+            }
+            finally
+            {
+                if (GameInstance.Items.TryGetValue(item.DataId, out BaseItem registeredItem) && registeredItem == item)
+                    GameInstance.Items.Remove(item.DataId);
+                if (GameInstance.NpcDialogs.TryGetValue(shop.DataId, out BaseNpcDialog registeredShop) && registeredShop == shop)
+                    GameInstance.NpcDialogs.Remove(shop.DataId);
+                UnityEngine.Object.DestroyImmediate(shop);
+                UnityEngine.Object.DestroyImmediate(item);
+                UnityEngine.Object.DestroyImmediate(database);
+                UnityEngine.Object.DestroyImmediate(profile);
             }
         }
 
@@ -144,6 +216,153 @@ namespace MultiplayerARPG
                 UnityEngine.Object.DestroyImmediate(profile);
                 UnityEngine.Object.DestroyImmediate(database);
             }
+        }
+
+        public static async UniTask VerifyStartupPreparation()
+        {
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            var profile = ScriptableObject.CreateInstance<DataPatchProfile>();
+            var items = new JunkItem[128];
+            try
+            {
+                string prefix = "startup-patch-test-" + Guid.NewGuid().ToString("N");
+                for (int i = 0; i < items.Length; ++i)
+                {
+                    items[i] = ScriptableObject.CreateInstance<JunkItem>();
+                    items[i].Id = prefix + "-" + i;
+                    items[i].SellPrice = 10;
+                }
+                database.items = items;
+                profile.database = database;
+                profile.patchDatabaseId = prefix;
+                profile.dataPatchSettings.preparationFrameBudgetMilliseconds = 0.1f;
+                using (var engine = new DataPatchEngine(profile, false, refresh: false))
+                {
+                    await engine.PrepareAsync(null);
+                    Check(engine.CapturedDefaultCount == 0 && engine.LastPreparationRecordCount == 0, "Startup without a release captured or exported bundled records.");
+                    engine.Commit();
+                    var first = Release(profile, "startup-first", new[]
+                    {
+                        new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[0].DataId, data = JObject.Parse("{\"sellPrice\":1000}") },
+                    });
+                    await engine.PrepareAsync(first);
+                    Check(engine.CapturedDefaultCount == 1 && engine.LastPreparationRecordCount == 1, "One override captured unrelated rollback snapshots.");
+                    Check(items[0].SellPrice == 10, "Startup staging modified a live asset.");
+                    engine.Commit();
+                    Check(items[0].SellPrice == 1000, "First lazy override was not activated.");
+                    items[127].SellPrice = 33;
+                    var second = Release(profile, "startup-second", new[]
+                    {
+                        new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[1].DataId, data = JObject.Parse("{\"sellPrice\":2000}") },
+                    });
+                    await engine.PrepareAsync(second);
+                    Check(engine.CapturedDefaultCount == 2 && engine.LastPreparationRecordCount == 2, "A subsequent patch did not limit staging to current/prior targets.");
+                    engine.Commit();
+                    Check(items[0].SellPrice == 10 && items[1].SellPrice == 2000, "Omitted records did not roll back to bundled values.");
+                    Check(items[127].SellPrice == 33, "An untouched runtime asset was modified by patch preparation.");
+                    await engine.PrepareAsync(Release(profile, "startup-rollback", Array.Empty<DataPatchEntry>()));
+                    engine.Commit();
+                    Check(items[1].SellPrice == 10 && items[127].SellPrice == 33, "Rollback changed an untouched asset or kept an override.");
+                    uint revision = DataPatchEngine.Revision;
+                    await engine.PrepareAsync(null);
+                    Check(engine.PreparedChangeCount == 0 && engine.CapturedDefaultCount == 2, "No-op baseline captured more data or staged changes.");
+                    engine.Commit();
+                    Check(DataPatchEngine.Revision == revision, "No-op startup invalidated gameplay caches.");
+                    var invalid = Release(profile, "startup-invalid", new[]
+                    {
+                        new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[2].DataId, data = JObject.Parse("{\"sellPrice\":3000}") },
+                        new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[0].DataId, data = JObject.Parse("{\"sellPrice\":-1}") },
+                    });
+                    bool rejected = false;
+                    try
+                    {
+                        await engine.PrepareAsync(invalid);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        rejected = true;
+                    }
+                    Check(rejected && engine.PreparedChangeCount == 0 && items[2].SellPrice == 10, "A failed lazy patch partially modified live data.");
+                    // Explicit eager refresh remains available for tools that request a whole baseline.
+                    engine.Refresh();
+                    Check(engine.CapturedDefaultCount >= items.Length, "Explicit baseline refresh no longer captures all data.");
+                    Debug.Log("DATA_PATCH_LAZY_STARTUP_NOOP_ROLLBACK_FAILURE_PASSED");
+                }
+            }
+            finally
+            {
+                foreach (var item in items)
+                {
+                    if (item == null)
+                        continue;
+                    if (GameInstance.Items.TryGetValue(item.DataId, out BaseItem registered) && registered == item)
+                        GameInstance.Items.Remove(item.DataId);
+                    UnityEngine.Object.DestroyImmediate(item);
+                }
+                UnityEngine.Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(database);
+            }
+        }
+
+        public static void VerifyRegistryTraversal()
+        {
+            var first = ScriptableObject.CreateInstance<JunkItem>();
+            var second = ScriptableObject.CreateInstance<JunkItem>();
+            try
+            {
+                first.Id = "registry-first-" + Guid.NewGuid().ToString("N");
+                second.Id = "registry-second-" + Guid.NewGuid().ToString("N");
+                var graph = new RegistryTraversalGraph
+                {
+                    numbers = new RegistryNumericGraph { values = new float[20000] },
+                    rows = new[] { new RegistryReferenceRow { amounts = new[] { new ItemAmount { item = first, amount = 1 } } } },
+                    polymorphic = new RegistryTraversalDerived { item = second },
+                    unityReference = first,
+                };
+                var registry = new DataPatchRegistry(false);
+                registry.AddGraph(graph);
+                Check(registry.Targets.Count == 2, "Registry pruning dropped nested or polymorphic game-data references.");
+                Check(ReferenceEquals(registry.Resolve(typeof(BaseItem), first.DataId), first) &&
+                    ReferenceEquals(registry.Resolve(typeof(BaseItem), second.DataId), second), "Pruned registry changed data-reference identities.");
+                Debug.Log("DATA_PATCH_REGISTRY_STRUCT_POLYMORPHIC_REFERENCES_PASSED");
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(first);
+                UnityEngine.Object.DestroyImmediate(second);
+            }
+        }
+
+        [Serializable]
+        private struct RegistryNumericGraph
+        {
+            public float[] values;
+        }
+
+        [Serializable]
+        private struct RegistryReferenceRow
+        {
+            public ItemAmount[] amounts;
+        }
+
+        [Serializable]
+        private class RegistryTraversalBase
+        {
+        }
+
+        [Serializable]
+        private class RegistryTraversalDerived : RegistryTraversalBase
+        {
+            public BaseItem item;
+        }
+
+        [Serializable]
+        private class RegistryTraversalGraph
+        {
+            public RegistryNumericGraph numbers;
+            public RegistryReferenceRow[] rows;
+            public RegistryTraversalBase polymorphic;
+            public UnityEngine.Object unityReference;
         }
 
         public static void VerifyChunkedTransport()

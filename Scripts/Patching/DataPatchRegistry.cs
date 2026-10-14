@@ -2,12 +2,15 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Linq;
 using UnityEngine;
 
 namespace MultiplayerARPG
 {
     public sealed class DataPatchRegistry
     {
+        private static readonly Dictionary<Type, FieldInfo[]> graphFields = new Dictionary<Type, FieldInfo[]>();
+        private static readonly FieldInfo[] runtimeDataRegistries = FindRuntimeDataRegistries().ToArray();
         public readonly Dictionary<string, ScriptableObject> Targets = new Dictionary<string, ScriptableObject>();
         private readonly Dictionary<string, ScriptableObject> sharedRegistryIdentities = new Dictionary<string, ScriptableObject>();
         private readonly HashSet<object> visited = new HashSet<object>(ReferenceComparer.Instance);
@@ -62,12 +65,40 @@ namespace MultiplayerARPG
             }
 
             // Only serialized data: no properties, delegates, caches or native Unity state.
-            foreach (FieldInfo field in DataPatchSerializer.Fields(type, false))
-            {
-                if (typeof(Delegate).IsAssignableFrom(field.FieldType) || field.FieldType.Namespace?.StartsWith("UnityEngine.AddressableAssets", StringComparison.Ordinal) == true)
-                    continue;
+            foreach (FieldInfo field in GraphFields(type))
                 AddGraph(field.GetValue(value));
+        }
+
+        private static FieldInfo[] GraphFields(Type type)
+        {
+            if (!graphFields.TryGetValue(type, out FieldInfo[] fields))
+            {
+                fields = DataPatchSerializer.Fields(type, false)
+                    .Where(field => CanContainData(field.FieldType, new HashSet<Type>())).ToArray();
+                graphFields.Add(type, fields);
             }
+            return fields;
+        }
+
+        private static bool CanContainData(Type type, HashSet<Type> visitedTypes)
+        {
+            if (typeof(IPatchableData).IsAssignableFrom(type) || typeof(GameDatabase).IsAssignableFrom(type))
+                return true;
+            if (type.IsPrimitive || type.IsEnum || type == typeof(string) || typeof(Delegate).IsAssignableFrom(type) ||
+                type.Namespace?.StartsWith("UnityEngine.AddressableAssets", StringComparison.Ordinal) == true)
+                return false;
+            // Polymorphic fields and recursive structures are conservatively traversed.
+            if (type == typeof(object) || type.IsInterface || type == typeof(UnityEngine.Object) || type == typeof(ScriptableObject))
+                return true;
+            if (typeof(UnityEngine.Object).IsAssignableFrom(type))
+                return false;
+            if (type.IsArray)
+                return CanContainData(type.GetElementType(), visitedTypes);
+            if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(List<>))
+                return CanContainData(type.GetGenericArguments()[0], visitedTypes);
+            if (type.IsClass && !type.IsSealed || !visitedTypes.Add(type))
+                return true;
+            return DataPatchSerializer.Fields(type, false).Any(field => CanContainData(field.FieldType, visitedTypes));
         }
 
         private void Add(ScriptableObject asset, int id)
@@ -207,6 +238,11 @@ namespace MultiplayerARPG
         }
 
         private static IEnumerable<FieldInfo> RuntimeDataRegistries()
+        {
+            return runtimeDataRegistries;
+        }
+
+        private static IEnumerable<FieldInfo> FindRuntimeDataRegistries()
         {
             foreach (FieldInfo field in typeof(GameInstance).GetFields(BindingFlags.Public | BindingFlags.Static))
             {

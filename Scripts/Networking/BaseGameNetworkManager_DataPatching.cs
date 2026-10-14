@@ -11,16 +11,25 @@ namespace MultiplayerARPG
     public abstract partial class BaseGameNetworkManager
     {
         private readonly Dictionary<long, string> patchPeerVersions = new Dictionary<long, string>();
-        private readonly HashSet<long> patchPreparedPeers = new HashSet<long>();
-        private readonly HashSet<long> patchQueuedPeers = new HashSet<long>();
-        private bool patchClientReady;
+        private readonly Queue<PatchReloadRequest> patchReloadRequests = new Queue<PatchReloadRequest>();
+        private readonly HashSet<string> patchSeenRequests = new HashSet<string>();
+        private readonly Queue<string> patchSeenRequestOrder = new Queue<string>();
+        private int patchServerSession;
+        private int patchClientSession;
         private bool patchReloading;
-        private string patchReloadNonce = "";
-        private string patchRequiredId = "";
-        private string patchRequiredHash = "";
         private string patchClientNonce = "";
         private string patchClientPreparedId = "";
+        private string patchClientPreparedHash = "";
         private bool PatchProtocolEnabled => GameInstance.Singleton.DataPatchProfile?.dataPatchSettings.enabled == true;
+
+        private sealed class PatchReloadRequest
+        {
+            public string requestId;
+            public string databaseId;
+            public string releaseId;
+            public string payloadHash;
+            public bool broadcast;
+        }
 
         private void RegisterPatchMessages()
         {
@@ -39,9 +48,7 @@ namespace MultiplayerARPG
                 string nonce = message.Reader.GetString();
                 string id = message.Reader.GetString();
                 string hash = message.Reader.GetString();
-                if (mode == 0 && patchReloading && nonce == patchReloadNonce && id == patchRequiredId && hash == patchRequiredHash)
-                    patchPreparedPeers.Add(message.ConnectionId);
-                if (mode == 1 && id == DataPatchRuntime.ActiveReleaseId && hash == DataPatchRuntime.ActiveHash)
+                if (mode == 1 && DataPatchRuntime.IsReady && id == DataPatchRuntime.ActiveReleaseId && hash == DataPatchRuntime.ActiveHash)
                     patchPeerVersions[message.ConnectionId] = id + ":" + hash;
             });
         }
@@ -55,50 +62,73 @@ namespace MultiplayerARPG
                 writer.Put(nonce);
                 writer.Put(id);
                 writer.Put(hash);
-                writer.Put(database?.patchDatabaseId ?? "");
+                writer.Put(PatchProtocolEnabled ? database?.patchDatabaseId ?? "" : "");
             });
         }
 
         private async UniTaskVoid ReceivePatchState(byte mode, string nonce, string id, string hash, string databaseId)
         {
+            int session = patchClientSession;
             try
             {
                 if (mode == 3)
                 {
                     if (nonce == patchClientNonce && !IsServer)
-                        DataPatchRuntime.Engine?.Discard();
+                    {
+                        patchClientNonce = "";
+                        if (!DataPatchRuntime.IsLoading)
+                            DataPatchRuntime.Engine?.Discard();
+                    }
                     return;
                 }
 
                 if (mode == 1)
                 {
-                    if (patchClientNonce != nonce || patchClientPreparedId != id)
+                    if (patchClientNonce != nonce || patchClientPreparedId != id || patchClientPreparedHash != hash)
                         throw new InvalidOperationException("Patch commit was not prepared.");
                     if (!IsServer)
                         DataPatchRuntime.Commit();
-                    patchClientReady = true;
                     SendPatchAck(1, nonce, id, hash);
                     return;
                 }
 
                 if (mode != 0 && mode != 2)
                     throw new InvalidOperationException("Unknown patch protocol mode.");
-                if (mode == 2)
-                    patchClientReady = false;
                 patchClientNonce = nonce;
+                bool commitPrepared = false;
                 if (!IsServer)
                 {
-                    if (!string.IsNullOrEmpty(id))
+                    await DataPatchRuntime.WaitForInitialization(requireReady: false);
+                    if (this == null || session != patchClientSession || !IsClientConnected)
+                        return;
+                    while (DataPatchRuntime.IsLoading && patchClientNonce == nonce && IsClientConnected)
+                        await UniTask.Yield();
+                    if (this == null || session != patchClientSession || patchClientNonce != nonce || !IsClientConnected)
+                        return;
+                    if (!string.IsNullOrEmpty(databaseId) && databaseId != DataPatchRuntime.Profile?.patchDatabaseId)
+                        throw new InvalidOperationException("Server/client patch scope mismatch.");
+                    if (string.IsNullOrEmpty(id) && !string.IsNullOrEmpty(hash))
+                        throw new InvalidOperationException("Invalid server baseline patch hash.");
+                    if (mode == 2 && DataPatchRuntime.IsReady && id == DataPatchRuntime.ActiveReleaseId && hash == DataPatchRuntime.ActiveHash)
+                    {
+                        if (!string.IsNullOrEmpty(id) && databaseId != DataPatchRuntime.Profile?.patchDatabaseId)
+                            throw new InvalidOperationException("Server/client patch scope mismatch.");
+                    }
+                    else if (!string.IsNullOrEmpty(id))
                     {
                         if (DataPatchRuntime.Profile == null || databaseId != DataPatchRuntime.Profile.patchDatabaseId)
                             throw new InvalidOperationException("Server requires a patch scope unavailable on this client.");
-                        await DataPatchRuntime.Prepare(id);
+                        await DataPatchRuntime.Prepare(id, expectedHash: hash);
+                        commitPrepared = true;
                         if (DataPatchRuntime.Engine.PreparedRelease?.payloadHash != hash)
                             throw new InvalidOperationException("Server/client patch hash mismatch.");
                     }
                     else if (DataPatchRuntime.Engine != null)
+                    {
                         await DataPatchRuntime.Prepare("", true);
-                    if (patchClientNonce != nonce || !IsClientConnected)
+                        commitPrepared = true;
+                    }
+                    if (this == null || session != patchClientSession || patchClientNonce != nonce || !IsClientConnected)
                     {
                         DataPatchRuntime.Engine?.Discard();
                         return;
@@ -106,11 +136,11 @@ namespace MultiplayerARPG
                 }
 
                 patchClientPreparedId = id;
+                patchClientPreparedHash = hash;
                 if (mode == 2)
                 {
-                    if (!IsServer && DataPatchRuntime.Engine != null)
+                    if (!IsServer && commitPrepared)
                         DataPatchRuntime.Commit();
-                    patchClientReady = true;
                     SendPatchAck(1, nonce, id, hash);
                 }
                 else
@@ -118,12 +148,15 @@ namespace MultiplayerARPG
             }
             catch (Exception ex)
             {
-                patchClientReady = false;
+                // Ignore work belonging to a previous connection.
+                if (this == null || session != patchClientSession)
+                    return;
                 Debug.LogError("Game-data patch synchronization failed: " + ex.Message);
                 if (!IsServer)
                 {
-                    DataPatchRuntime.Engine?.Discard();
-                    StopClient();
+                    // Keep gameplay running with the last successfully applied data.
+                    if (!DataPatchRuntime.IsLoading)
+                        DataPatchRuntime.Engine?.Discard();
                 }
             }
         }
@@ -139,83 +172,157 @@ namespace MultiplayerARPG
             });
         }
 
-        public override UniTask<bool> SetPlayerReady(uint requestId, long connectionId, LiteNetLib.Utils.NetDataReader reader)
-        {
-            if (PatchProtocolEnabled && (!DataPatchRuntime.IsReady || !patchPeerVersions.TryGetValue(connectionId, out string version) || version != DataPatchRuntime.ActiveReleaseId + ":" + DataPatchRuntime.ActiveHash))
-                return UniTask.FromResult(false);
-            return base.SetPlayerReady(requestId, connectionId, reader);
-        }
-
-        public async UniTask<string> ReloadGameDataPatch(string id = "")
+        protected virtual string ValidateGameDataPatchReload()
         {
             if (!IsServer)
                 return "Patch commands require a game server.";
-            if (patchReloading || DataPatchRuntime.IsLoading)
-                return "A patch load is already in progress.";
-            patchReloading = true;
-            bool activated = false;
+            if (!PatchProtocolEnabled || DataPatchRuntime.Engine == null)
+                return "Enable data patching on the GameInstance patch profile first.";
+            return string.Empty;
+        }
+
+        public virtual UniTask<string> ReloadGameDataPatch(string id = "")
+        {
+            string error = ValidateGameDataPatchReload();
+            if (!string.IsNullOrEmpty(error))
+                return UniTask.FromResult(error);
+            string requestId = Guid.NewGuid().ToString("N");
+            if (!QueueGameDataPatchReload(requestId, DataPatchRuntime.Profile.patchDatabaseId, id, "", true))
+                return UniTask.FromResult("Patch reload queue is full; try again after the pending reloads finish.");
+            return UniTask.FromResult($"Queued data patch reload {requestId}; servers and clients apply it in the background.");
+        }
+
+        protected bool QueueGameDataPatchReload(string requestId, string databaseId, string releaseId, string payloadHash, bool broadcast = false)
+        {
+            if (!IsServer || !PatchProtocolEnabled || databaseId != DataPatchRuntime.Profile?.patchDatabaseId ||
+                string.IsNullOrEmpty(requestId) || patchSeenRequests.Contains(requestId) || patchReloadRequests.Count >= 64)
+                return false;
+            patchSeenRequests.Add(requestId);
+            patchSeenRequestOrder.Enqueue(requestId);
+            while (patchSeenRequestOrder.Count > 256)
+                patchSeenRequests.Remove(patchSeenRequestOrder.Dequeue());
+            patchReloadRequests.Enqueue(new PatchReloadRequest
+            {
+                requestId = requestId,
+                databaseId = databaseId,
+                releaseId = releaseId,
+                payloadHash = payloadHash,
+                broadcast = broadcast,
+            });
+            if (!patchReloading)
+            {
+                patchReloading = true;
+                ProcessGameDataPatchReloads(patchServerSession).Forget();
+            }
+            return true;
+        }
+
+        protected virtual UniTask BroadcastGameDataPatchReload(string requestId, string databaseId, string releaseId, string payloadHash)
+        {
+            // LAN games only have this server; MMO managers override the inter-server transport.
+            return UniTask.CompletedTask;
+        }
+
+        private async UniTaskVoid ProcessGameDataPatchReloads(int session)
+        {
             try
             {
-                await DataPatchRuntime.Prepare(id);
-                patchRequiredId = DataPatchRuntime.Engine.PreparedRelease?.id ?? "";
-                patchRequiredHash = DataPatchRuntime.Engine.PreparedRelease?.payloadHash ?? "";
-                patchReloadNonce = Guid.NewGuid().ToString("N");
-                patchPreparedPeers.Clear();
-                var connections = GetConnectionIds().ToArray();
-                foreach (long peer in connections)
+                while (this != null && IsServer && session == patchServerSession && patchReloadRequests.Count > 0)
                 {
-                    patchQueuedPeers.Remove(peer);
-                    SendPatchState(peer, 0, patchReloadNonce, patchRequiredId, patchRequiredHash);
+                    PatchReloadRequest request = patchReloadRequests.Dequeue();
+                    DataPatchEngine engine = DataPatchRuntime.Engine;
+                    try
+                    {
+                        // Only the background worker waits; gameplay and new connections keep running.
+                        await DataPatchRuntime.WaitForInitialization(requireReady: false);
+                        while (this != null && IsServer && session == patchServerSession && DataPatchRuntime.IsLoading)
+                            await UniTask.Yield();
+                        if (this == null || !IsServer || session != patchServerSession || engine != DataPatchRuntime.Engine)
+                            return;
+                        if (request.databaseId != DataPatchRuntime.Profile?.patchDatabaseId)
+                            throw new InvalidOperationException("Patch reload scope changed.");
+                        await DataPatchRuntime.Prepare(request.releaseId, baseline: !request.broadcast && string.IsNullOrEmpty(request.releaseId), expectedHash: request.broadcast ? null : request.payloadHash);
+                        if (this == null || !IsServer || session != patchServerSession || engine != DataPatchRuntime.Engine)
+                        {
+                            engine?.Discard();
+                            return;
+                        }
+                        string releaseId = engine.PreparedRelease?.id ?? "";
+                        string hash = engine.PreparedRelease?.payloadHash ?? "";
+                        if (!request.broadcast && hash != request.payloadHash)
+                            throw new InvalidOperationException("Broadcast patch hash does not match the downloaded release.");
+                        DataPatchRuntime.Commit();
+                        foreach (long peer in GetConnectionIds().ToArray())
+                            SendPatchState(peer, 2, request.requestId, releaseId, hash);
+                        if (request.broadcast)
+                        {
+                            bool sent = false;
+                            for (int attempt = 0; attempt < 3 && !sent; ++attempt)
+                            {
+                                if (this == null || !IsServer || session != patchServerSession)
+                                    return;
+                                try
+                                {
+                                    await BroadcastGameDataPatchReload(request.requestId, request.databaseId, releaseId, hash);
+                                    sent = true;
+                                }
+                                catch (Exception error)
+                                {
+                                    if (attempt == 2)
+                                        Debug.LogError($"[Data Patch] Reload {request.requestId} activated locally, but broadcasting to other servers failed: {error.Message}");
+                                    else
+                                        await UniTask.Delay(1000, ignoreTimeScale: true);
+                                }
+                            }
+                        }
+                        Debug.Log($"[Data Patch] Reload {request.requestId} activated {releaseId} and notified connected clients.");
+                    }
+                    catch (Exception ex)
+                    {
+                        if (this == null || session != patchServerSession)
+                            return;
+                        if (engine == DataPatchRuntime.Engine && !DataPatchRuntime.IsLoading)
+                            engine?.Discard();
+                        Debug.LogError($"[Data Patch] Reload {request.requestId} failed: {ex.Message}. Gameplay continues with current data.");
+                    }
                 }
-
-                float deadline = Time.realtimeSinceStartup + 30f;
-                while (connections.Any(peer => GetConnectionIds().Contains(peer) && !patchPreparedPeers.Contains(peer)) && Time.realtimeSinceStartup < deadline)
-                    await UniTask.Delay(100, ignoreTimeScale: true);
-                // Disconnect non-participating clients before changing authoritative values.
-                foreach (long peer in connections.Where(peer => GetConnectionIds().Contains(peer) && !patchPreparedPeers.Contains(peer)))
-                    KickClient(peer, UITextKeys.UI_ERROR_SERVER_CLOSE);
-                DataPatchRuntime.Commit();
-                activated = true;
-                patchPeerVersions.Clear();
-                foreach (long peer in connections.Where(peer => GetConnectionIds().Contains(peer) && patchPreparedPeers.Contains(peer)))
-                    SendPatchState(peer, 1, patchReloadNonce, patchRequiredId, patchRequiredHash);
-                // New connections during preparation receive the committed release.
-                SendQueuedPatchStates();
-                deadline = Time.realtimeSinceStartup + 30f;
-                string activeVersion = DataPatchRuntime.ActiveReleaseId + ":" + DataPatchRuntime.ActiveHash;
-                while (connections.Any(peer => GetConnectionIds().Contains(peer) && patchPreparedPeers.Contains(peer) && (!patchPeerVersions.TryGetValue(peer, out string acknowledged) || acknowledged != activeVersion)) && Time.realtimeSinceStartup < deadline)
-                    await UniTask.Delay(100, ignoreTimeScale: true);
-                foreach (long peer in connections.Where(peer => GetConnectionIds().Contains(peer) && (!patchPeerVersions.TryGetValue(peer, out string acknowledged) || acknowledged != activeVersion)))
-                    KickClient(peer, UITextKeys.UI_ERROR_SERVER_CLOSE);
-                Debug.Log($"GM activated game-data release {patchRequiredId}.");
-                return $"Activated data patch {patchRequiredId}.";
-            }
-            catch (Exception ex)
-            {
-                if (!activated)
-                {
-                    DataPatchRuntime.Engine?.Discard();
-                    foreach (long peer in GetConnectionIds().ToArray())
-                        SendPatchState(peer, 3, patchReloadNonce, "", "");
-                }
-
-                Debug.LogError("GM data patch reload failed: " + ex.Message);
-                return "Patch reload failed: " + ex.Message;
             }
             finally
             {
-                patchReloading = false;
-                patchPreparedPeers.Clear();
-                SendQueuedPatchStates();
+                if (this != null && session == patchServerSession)
+                    patchReloading = false;
             }
         }
 
-        private void SendQueuedPatchStates()
+        private void ResetGameDataPatchReloads()
         {
-            foreach (long peer in patchQueuedPeers.ToArray())
-                if (GetConnectionIds().Contains(peer))
-                    SendPatchState(peer, 2, Guid.NewGuid().ToString("N"), DataPatchRuntime.ActiveReleaseId, DataPatchRuntime.ActiveHash);
-            patchQueuedPeers.Clear();
+            ++patchServerSession;
+            patchReloading = false;
+            patchReloadRequests.Clear();
+            patchSeenRequests.Clear();
+            patchSeenRequestOrder.Clear();
+            patchPeerVersions.Clear();
+        }
+
+        private async UniTaskVoid SendInitialPatchState(long connectionId)
+        {
+            int session = patchServerSession;
+            // This only schedules patch synchronization; connection/game entry never awaits it.
+            try
+            {
+                if (PatchProtocolEnabled)
+                    await DataPatchRuntime.WaitForInitialization(requireReady: false);
+            }
+            catch (Exception ex)
+            {
+                Debug.LogWarning("Startup patch unavailable; gameplay continues with current data: " + ex.Message);
+            }
+
+            while (this != null && IsServer && session == patchServerSession && patchReloading && GetConnectionIds().Contains(connectionId))
+                await UniTask.Yield();
+            if (this == null || !IsServer || session != patchServerSession || !GetConnectionIds().Contains(connectionId))
+                return;
+            SendPatchState(connectionId, 2, Guid.NewGuid().ToString("N"), DataPatchRuntime.ActiveReleaseId, DataPatchRuntime.ActiveHash);
         }
     }
 }

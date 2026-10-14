@@ -25,6 +25,9 @@ namespace MultiplayerARPG
         private readonly List<object> cacheTargets = new List<object>();
         private int preparationVersion;
         public int PreparedChangeCount => changes.Count;
+        public int CapturedDefaultCount => defaults.Count;
+        public int LastPreparationRecordCount { get; private set; }
+        public double LastRegistryMilliseconds { get; private set; }
         public double LastPreparationMilliseconds { get; private set; }
         public double LastCommitMilliseconds { get; private set; }
         public string ActiveReleaseId { get; private set; } = "";
@@ -38,9 +41,16 @@ namespace MultiplayerARPG
                 Refresh();
         }
 
+        internal void RefreshRegistry()
+        {
+            var timer = Stopwatch.StartNew();
+            registry = DataPatchRegistry.Runtime(database.database, database.scannedData);
+            LastRegistryMilliseconds = timer.Elapsed.TotalMilliseconds;
+        }
+
         public void Refresh()
         {
-            registry = DataPatchRegistry.Runtime(database.database, database.scannedData);
+            RefreshRegistry();
             foreach (var entry in registry.Targets)
                 if (!defaults.ContainsKey(entry.Key) && DataPatchSerializer.Fields(entry.Value.GetType()).Any())
                     defaults.Add(entry.Key, DataPatchSerializer.Export(entry.Value));
@@ -51,7 +61,7 @@ namespace MultiplayerARPG
             int version = preparationVersion;
             var frame = Stopwatch.StartNew();
             double budget = Math.Max(0.1, database.dataPatchSettings.preparationFrameBudgetMilliseconds);
-            registry = DataPatchRegistry.Runtime(database.database, database.scannedData);
+            RefreshRegistry();
             foreach (var entry in registry.Targets)
             {
                 CheckPreparation(version, cancellationToken);
@@ -70,13 +80,14 @@ namespace MultiplayerARPG
         {
             Discard();
             PreparationWarnings.Clear();
+            LastPreparationRecordCount = 0;
             var timer = Stopwatch.StartNew();
             try
             {
-                Refresh();
+                RefreshRegistry();
                 ValidateScope(release);
                 var overrides = ReadOverrides(release);
-                foreach (var entry in registry.Targets)
+                foreach (var entry in PreparationTargets(overrides))
                     PrepareRecord(entry, overrides);
                 foreach (object value in EnumerateCacheTargets())
                     AddCacheTarget(value);
@@ -90,10 +101,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public async UniTask PrepareAsync(DataPatchRelease release, CancellationToken cancellationToken = default)
+        public async UniTask PrepareAsync(DataPatchRelease release, CancellationToken cancellationToken = default, bool refreshRegistry = true)
         {
             Discard();
             PreparationWarnings.Clear();
+            LastPreparationRecordCount = 0;
             int version = preparationVersion;
             var timer = Stopwatch.StartNew();
             var frame = Stopwatch.StartNew();
@@ -101,7 +113,9 @@ namespace MultiplayerARPG
             try
             {
                 ValidateScope(release);
-                await RefreshAsync(cancellationToken);
+                // Startup can reuse the catalog registered before the menu opened.
+                if (refreshRegistry || registry == null)
+                    RefreshRegistry();
                 // Only JSON and files are handled on the worker; Unity assets stay on the main thread.
                 var records = release == null ? Array.Empty<DataPatchEntry>() : await DataPatchHttp.RunBackground(() => DataPatchHttp.ReadEntries(release).ToArray(), cancellationToken);
                 CheckPreparation(version, cancellationToken);
@@ -117,7 +131,7 @@ namespace MultiplayerARPG
                     }
                 }
                 frame.Restart();
-                foreach (var entry in registry.Targets)
+                foreach (var entry in PreparationTargets(overrides))
                 {
                     CheckPreparation(version, cancellationToken);
                     PrepareRecord(entry, overrides);
@@ -200,16 +214,30 @@ namespace MultiplayerARPG
             if (entry == null)
                 throw new InvalidOperationException("Null patch record.");
             string key = DataPatchRegistry.Key(entry.dataType, entry.dataId);
-            if (entry.data == null || !defaults.ContainsKey(key) || overrides.ContainsKey(key))
+            if (entry.data == null || !registry.Targets.TryGetValue(key, out ScriptableObject target) ||
+                !DataPatchSerializer.Fields(target.GetType()).Any() || overrides.ContainsKey(key))
                 throw new InvalidOperationException($"Unknown or duplicate patch target: {key}");
             overrides.Add(key, entry.data);
         }
 
+        private IEnumerable<KeyValuePair<string, ScriptableObject>> PreparationTargets(Dictionary<string, JObject> overrides)
+        {
+            // Previously touched records must still be visited when a later patch omits them.
+            foreach (var entry in registry.Targets)
+                if (overrides.ContainsKey(entry.Key) || defaults.ContainsKey(entry.Key))
+                    yield return entry;
+        }
+
         private void PrepareRecord(KeyValuePair<string, ScriptableObject> entry, Dictionary<string, JObject> overrides)
         {
-            if (!defaults.TryGetValue(entry.Key, out JObject bundled))
-                return;
+            ++LastPreparationRecordCount;
             JObject current = DataPatchSerializer.Export(entry.Value);
+            if (!defaults.TryGetValue(entry.Key, out JObject bundled))
+            {
+                // Capture before the first override, and reuse this export for the current comparison.
+                bundled = current;
+                defaults.Add(entry.Key, bundled);
+            }
             if (!overrides.ContainsKey(entry.Key) && JToken.DeepEquals(current, bundled))
                 return;
             ScriptableObject copy = UnityEngine.Object.Instantiate(entry.Value);
@@ -222,7 +250,7 @@ namespace MultiplayerARPG
                 {
                     if (skipInvalidRecords)
                         data = (JObject)PreserveNullValues(data, current, entry.Key);
-                    DataPatchSerializer.ReadInto(copy, data, registry);
+                    DataPatchSerializer.ReadInto(copy, data, registry, reportWarning: skipInvalidRecords ? message => Warn(entry.Key + ": " + message) : (Action<string>)null);
                 }
                 if (JToken.DeepEquals(current, DataPatchSerializer.Export(copy)))
                 {
@@ -247,11 +275,11 @@ namespace MultiplayerARPG
             LastPreparationMilliseconds = timer.Elapsed.TotalMilliseconds;
             if (PreparationWarnings.Count > 0)
             {
-                var details = PreparationWarnings.Where(message => message.StartsWith("Skipped record ", StringComparison.Ordinal)).Take(10);
+                var details = PreparationWarnings.Where(message => message.StartsWith("Skipped record ", StringComparison.Ordinal) || message.Contains("Skipped NPC shop row")).Take(10);
                 UnityEngine.Debug.LogWarning($"[Data Patch] Collected {PreparationWarnings.Count} preparation warnings. Full details: DataPatchRuntime.Engine.PreparationWarnings.\n" + string.Join("\n", details));
             }
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            UnityEngine.Debug.Log($"[Data Patch] Prepared {changes.Count} changed records in {LastPreparationMilliseconds:F1} ms across preparation frames.");
+            UnityEngine.Debug.Log($"[Data Patch] Prepared {changes.Count} changed records in {LastPreparationMilliseconds:F1} ms across preparation frames; registry {LastRegistryMilliseconds:F1} ms, visited {LastPreparationRecordCount}/{registry.Targets.Count} records, retained {defaults.Count} rollback snapshots.");
 #endif
         }
 
@@ -363,10 +391,10 @@ namespace MultiplayerARPG
 
         private static IEnumerable<object> EnumerateCacheTargets(object value, Dictionary<ScriptableObject, ScriptableObject> copies, HashSet<object> visited)
         {
-            if (value == null || !visited.Add(value))
+            if (value == null)
                 yield break;
             Type type = value.GetType();
-            if (type.IsPrimitive || type.IsEnum || type == typeof(string))
+            if (type.IsPrimitive || type.IsEnum || type == typeof(string) || !visited.Add(value))
                 yield break;
             // Yield each container so even a large dependency graph can be budgeted across frames.
             yield return value;
@@ -375,6 +403,10 @@ namespace MultiplayerARPG
                 source = copy;
             foreach (FieldInfo field in DataPatchSerializer.Fields(type))
             {
+                Type element = field.FieldType.IsArray ? field.FieldType.GetElementType() :
+                    field.FieldType.IsGenericType && field.FieldType.GetGenericTypeDefinition() == typeof(List<>) ? field.FieldType.GetGenericArguments()[0] : null;
+                if (element != null && (element.IsPrimitive || element.IsEnum || element == typeof(string)))
+                    continue;
                 object child = field.GetValue(source);
                 if (child is System.Collections.IList list)
                 {
