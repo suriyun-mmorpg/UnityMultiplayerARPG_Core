@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using UnityEditor;
@@ -41,6 +41,11 @@ namespace MultiplayerARPG
                 VerifyChunkedTransport();
                 await VerifyPreparationPerformance();
                 await VerifyStartupPreparation();
+                await VerifyProgressivePatchLoading();
+                await VerifyCompactPatchMemory();
+                await VerifyChunkReloadScheduling();
+                await VerifyRuntimeLoadingEvents();
+                VerifyPrimitiveExportAllocations();
                 VerifyRegistryTraversal();
                 Debug.Log("DATA_PATCH_PREPARATION_PERFORMANCE_PASSED");
                 EditorApplication.Exit(0);
@@ -219,6 +224,570 @@ namespace MultiplayerARPG
                 UnityEngine.Object.DestroyImmediate(table);
                 UnityEngine.Object.DestroyImmediate(profile);
                 UnityEngine.Object.DestroyImmediate(database);
+            }
+        }
+
+        public static async UniTask VerifyProgressivePatchLoading()
+        {
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            var profile = ScriptableObject.CreateInstance<DataPatchProfile>();
+            var items = new JunkItem[2];
+            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "unity-progressive-patch-" + Guid.NewGuid().ToString("N"));
+            System.IO.Directory.CreateDirectory(directory);
+            DataPatchRelease MakeRelease(string id, int firstPrice, int secondPrice)
+            {
+                var chunks = new DataPatchChunk[2];
+                var paths = new string[2];
+                for (int i = 0; i < chunks.Length; ++i)
+                {
+                    string payload = JsonConvert.SerializeObject(new[]
+                    {
+                        new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[i].DataId, data = new JObject { ["sellPrice"] = i == 0 ? firstPrice : secondPrice } },
+                    });
+                    paths[i] = System.IO.Path.Combine(directory, id + "-" + i + ".json");
+                    System.IO.File.WriteAllText(paths[i], payload, new System.Text.UTF8Encoding(false));
+                    chunks[i] = new DataPatchChunk { index = i, dataType = nameof(JunkItem), hash = DataPatchHttp.Hash(payload), bytes = System.Text.Encoding.UTF8.GetByteCount(payload), entryCount = 1 };
+                }
+                string manifest = JsonConvert.SerializeObject(new DataPatchManifest { chunks = chunks });
+                return new DataPatchRelease { id = id, databaseId = profile.patchDatabaseId, schemaVersion = 2, publishTime = "published", manifestJson = manifest, payloadHash = DataPatchHttp.Hash(manifest), chunkPaths = paths };
+            }
+            try
+            {
+                for (int i = 0; i < items.Length; ++i)
+                {
+                    items[i] = ScriptableObject.CreateInstance<JunkItem>();
+                    items[i].Id = "progressive-item-" + Guid.NewGuid().ToString("N");
+                    items[i].SellPrice = 10;
+                }
+                database.items = items;
+                profile.database = database;
+                profile.patchDatabaseId = "progressive-test";
+                profile.dataPatchSettings.preparationFrameBudgetMilliseconds = 0.1f;
+                using (var engine = new DataPatchEngine(profile, false, refresh: false))
+                {
+                    await engine.PrepareAsync(MakeRelease("previous", 50, 60));
+                    engine.Commit();
+                    int originalCopies = System.Linq.Enumerable.Count(Resources.FindObjectsOfTypeAll<JunkItem>(), item => item.hideFlags == HideFlags.HideAndDontSave);
+                    await engine.PrepareAsync(MakeRelease("next", 100, 200), applyImmediately: true);
+                    Check(items[0].SellPrice == 100 && items[1].SellPrice == 200 && engine.LastAppliedChunkCount == 2, "Chunk values did not become live before release confirmation.");
+                    Check(engine.ActiveReleaseId == "previous" && engine.PendingUndoBytes > 0, "Release identity changed before confirmation or undo was discarded.");
+                    Check(System.Linq.Enumerable.Count(Resources.FindObjectsOfTypeAll<JunkItem>(), item => item.hideFlags == HideFlags.HideAndDontSave) == originalCopies, "Progressive loading retained native staging copies.");
+                    engine.Discard();
+                    Check(items[0].SellPrice == 50 && items[1].SellPrice == 60 && engine.PendingUndoBytes == 0, "Discard restored bundled data instead of the previously active values.");
+                    var failed = MakeRelease("failed", 300, 400);
+                    System.IO.File.WriteAllText(failed.chunkPaths[1], "[]");
+                    bool rejected = false;
+                    try
+                    {
+                        await engine.PrepareAsync(failed, applyImmediately: true);
+                    }
+                    catch (System.IO.IOException)
+                    {
+                        rejected = true;
+                    }
+                    Check(rejected && engine.LastAppliedChunkCount == 1 && items[0].SellPrice == 50 && items[1].SellPrice == 60 && engine.ActiveReleaseId == "previous", "A later chunk failure did not undo earlier applied chunks.");
+                    using (var cancellation = new System.Threading.CancellationTokenSource())
+                    {
+                        var task = engine.PrepareAsync(MakeRelease("cancel", 500, 600), cancellation.Token, applyImmediately: true).AsTask();
+                        while (engine.LastAppliedChunkCount == 0 && !task.IsCompleted)
+                            await UniTask.Delay(1, DelayType.Realtime);
+                        bool sawIntermediate = !task.IsCompleted && items[0].SellPrice == 500 && items[1].SellPrice == 60;
+                        cancellation.Cancel();
+                        bool canceled = false;
+                        try
+                        {
+                            await task;
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            canceled = true;
+                        }
+                        Check(sawIntermediate, "No intermediate chunk state was observable.");
+                        Check(canceled && items[0].SellPrice == 50 && items[1].SellPrice == 60 && engine.PendingUndoBytes == 0, "Cancellation left progressive values active.");
+                    }
+                    await engine.PrepareAsync(MakeRelease("confirmed", 700, 800), applyImmediately: true);
+                    engine.Commit();
+                    Check(items[0].SellPrice == 700 && items[1].SellPrice == 800 && engine.ActiveReleaseId == "confirmed" && engine.PendingUndoBytes == 0, "Confirmation reset applied values or retained undo buffers.");
+                    await engine.PrepareAsync(null, applyImmediately: true);
+                    Check(items[0].SellPrice == 10 && items[1].SellPrice == 10, "Progressive baseline restoration did not apply.");
+                    engine.Discard();
+                    Check(items[0].SellPrice == 700 && items[1].SellPrice == 800, "Canceled baseline restoration lost the previous patch.");
+                    Debug.Log("DATA_PATCH_PROGRESSIVE_CHUNK_UNDO_CANCELLATION_PASSED");
+                }
+                Check(items[0].SellPrice == 10 && items[1].SellPrice == 10, "Disposal failed to restore bundled values after progressive confirmation.");
+            }
+            finally
+            {
+                foreach (JunkItem item in items)
+                {
+                    if (item == null)
+                        continue;
+                    if (GameInstance.Items.TryGetValue(item.DataId, out BaseItem registered) && registered == item)
+                        GameInstance.Items.Remove(item.DataId);
+                    UnityEngine.Object.DestroyImmediate(item);
+                }
+                UnityEngine.Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(database);
+                string resolved = System.IO.Path.GetFullPath(directory);
+                Check(resolved.StartsWith(System.IO.Path.GetFullPath(System.IO.Path.GetTempPath()), StringComparison.OrdinalIgnoreCase), "Unsafe progressive test cleanup path.");
+                System.IO.Directory.Delete(resolved, true);
+            }
+        }
+
+        [Serializable]
+        private sealed class PrimitiveExportData
+        {
+            public bool boolean = true;
+            public char character = '\u754c';
+            public sbyte int8 = sbyte.MinValue;
+            public byte uint8 = byte.MaxValue;
+            public short int16 = short.MinValue;
+            public ushort uint16 = ushort.MaxValue;
+            public int int32 = int.MinValue;
+            public uint uint32 = uint.MaxValue;
+            public long int64 = long.MinValue;
+            public ulong uint64 = ulong.MaxValue;
+            public float single = float.MaxValue;
+            public double number = double.MaxValue;
+            public string text = "2026-10-15T00:00:00Z";
+            public int[] values = new int[512];
+        }
+
+        public static void VerifyPrimitiveExportAllocations()
+        {
+            var fixture = new PrimitiveExportData();
+            for (int i = 0; i < fixture.values.Length; ++i)
+                fixture.values[i] = i;
+            JObject expected = JObject.FromObject(fixture);
+            JObject exported = DataPatchSerializer.Export(fixture);
+            Check(JToken.DeepEquals(expected, exported), "Direct primitive JSON values changed exported numeric, character, boolean or text data.");
+            var registry = new DataPatchRegistry(false);
+            var restored = new PrimitiveExportData();
+            DataPatchSerializer.ReadInto(restored, exported, registry);
+            Check(JToken.DeepEquals(exported, DataPatchSerializer.Export(restored)), "Direct primitive reads changed numeric limits, text, characters, booleans or arrays.");
+            var invalid = new[]
+            {
+                new JObject { ["int8"] = 128 },
+                new JObject { ["uint8"] = -1 },
+                new JObject { ["int16"] = 32768 },
+                new JObject { ["uint16"] = -1 },
+                new JObject { ["int32"] = 2147483648L },
+                new JObject { ["uint32"] = -1 },
+                new JObject { ["int64"] = ulong.MaxValue },
+                new JObject { ["uint64"] = -1 },
+                new JObject { ["boolean"] = 1 },
+                new JObject { ["int32"] = 1.5 },
+                new JObject { ["single"] = double.MaxValue },
+                new JObject { ["number"] = double.PositiveInfinity },
+            };
+            foreach (JObject data in invalid)
+            {
+                bool rejected = false;
+                try
+                {
+                    DataPatchSerializer.ReadInto(restored, data, registry);
+                }
+                catch (Exception error) when (error is InvalidOperationException || error is OverflowException || error is ArgumentException || error is JsonException)
+                {
+                    rejected = true;
+                }
+                Check(rejected, "Direct primitive reads accepted overflow, a wrong JSON type, rounding or a non-finite number: " + data);
+            }
+            for (int i = 0; i < 3; ++i)
+                DataPatchSerializer.Export(fixture);
+            long before = GC.GetAllocatedBytesForCurrentThread();
+            for (int i = 0; i < 16; ++i)
+                DataPatchSerializer.Export(fixture);
+            long direct = GC.GetAllocatedBytesForCurrentThread() - before;
+            before = GC.GetAllocatedBytesForCurrentThread();
+            for (int i = 0; i < 16; ++i)
+            {
+                var values = new JArray();
+                foreach (int value in fixture.values)
+                    values.Add(JToken.FromObject(value));
+            }
+            long oldPrimitivePath = GC.GetAllocatedBytesForCurrentThread() - before;
+            if (oldPrimitivePath > 0)
+            {
+                Check(direct < oldPrimitivePath * 0.7, $"Primitive export allocation regression: full exports {direct}, old primitive path {oldPrimitivePath} bytes.");
+                Debug.Log($"DATA_PATCH_PRIMITIVE_ALLOCATION_PASSED: full direct exports {direct} bytes; old primitive array conversion alone {oldPrimitivePath} bytes.");
+            }
+            else
+            {
+                Debug.Log("DATA_PATCH_PRIMITIVE_VALUES_PASSED: allocation counter unavailable on this Unity runtime.");
+            }
+        }
+
+        public static async UniTask VerifyRuntimeLoadingEvents()
+        {
+            Check(DataPatchRuntime.Engine == null && !DataPatchRuntime.IsLoading, "Loading event checks require an idle patch runtime.");
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            var profile = ScriptableObject.CreateInstance<DataPatchProfile>();
+            var item = ScriptableObject.CreateInstance<JunkItem>();
+            item.Id = "patch-events-item-" + Guid.NewGuid().ToString("N");
+            item.SellPrice = 10;
+            database.items = new[] { item };
+            profile.database = database;
+            profile.patchDatabaseId = "patch-events-" + Guid.NewGuid().ToString("N");
+            int starts = 0;
+            int finishes = 0;
+            int mainThread = System.Threading.Thread.CurrentThread.ManagedThreadId;
+            bool statesValid = true;
+            bool lastSuccess = false;
+            string lastError = null;
+            Action started = () =>
+            {
+                ++starts;
+                statesValid &= DataPatchRuntime.IsLoading && DataPatchRuntime.LastError == "" && System.Threading.Thread.CurrentThread.ManagedThreadId == mainThread;
+            };
+            Action<bool, string> finished = (success, error) =>
+            {
+                ++finishes;
+                lastSuccess = success;
+                lastError = error;
+                statesValid &= !DataPatchRuntime.IsLoading && System.Threading.Thread.CurrentThread.ManagedThreadId == mainThread;
+            };
+            Action reset = () => DataPatchRuntime.Reset();
+            Action throwStarted = () => throw new InvalidOperationException("Expected patch-start subscriber failure.");
+            Action<bool, string> throwFinished = (success, error) => throw new InvalidOperationException("Expected patch-finish subscriber failure.");
+            try
+            {
+                var engine = new DataPatchEngine(profile, refresh: false);
+                engine.Prepare(Release(profile, "before-cleanup", new[]
+                {
+                    new DataPatchEntry { dataType = nameof(JunkItem), dataId = item.DataId, data = new JObject { ["sellPrice"] = 20 } },
+                }));
+                engine.Commit();
+                typeof(DataPatchRuntime).GetProperty(nameof(DataPatchRuntime.Engine)).SetValue(null, engine);
+                typeof(DataPatchRuntime).GetProperty(nameof(DataPatchRuntime.Profile)).SetValue(null, profile);
+                // Faulty subscribers precede healthy ones; all must still be invoked.
+                DataPatchRuntime.PatchingStarted += throwStarted;
+                DataPatchRuntime.PatchingFinished += throwFinished;
+                DataPatchRuntime.PatchingStarted += started;
+                DataPatchRuntime.PatchingFinished += finished;
+                await DataPatchRuntime.Prepare("", baseline: true);
+                Check(starts == 1 && finishes == 1 && lastSuccess && lastError == "" && statesValid, "Successful patch loading did not report one healthy event pair on the main thread.");
+                Check(item.SellPrice == 10, "Finished loading was announced before baseline values were applied.");
+                if (UnityEngine.Scripting.GarbageCollector.isIncremental && UnityEngine.Scripting.GarbageCollector.GCMode == UnityEngine.Scripting.GarbageCollector.Mode.Enabled)
+                    Check(DataPatchRuntime.LastCleanupMilliseconds > 0, "A changed patch did not run its budgeted temporary-memory cleanup.");
+                DataPatchRuntime.Commit();
+                Check(finishes == 1, "Release confirmation emitted a duplicate loading-finished event.");
+                DataPatchRuntime.PatchingStarted -= throwStarted;
+                DataPatchRuntime.PatchingFinished -= throwFinished;
+                bool rejected = false;
+                try
+                {
+                    await DataPatchRuntime.Prepare("", baseline: true, expectedHash: "mismatched-hash");
+                }
+                catch (InvalidOperationException)
+                {
+                    rejected = true;
+                }
+                Check(rejected && starts == 2 && finishes == 2 && !lastSuccess && !string.IsNullOrEmpty(lastError) && lastError == DataPatchRuntime.LastError, "Failed patch loading did not report its error and clear the loading state.");
+                DataPatchRuntime.PatchingStarted += reset;
+                bool canceled = false;
+                try
+                {
+                    await DataPatchRuntime.Prepare("", baseline: true);
+                }
+                catch (OperationCanceledException)
+                {
+                    canceled = true;
+                }
+                Check(canceled && starts == 3 && finishes == 3 && !lastSuccess && lastError == "Patch runtime was reset." && statesValid, "Reset did not finish an active load exactly once.");
+                DataPatchRuntime.PatchingStarted -= reset;
+                DataPatchRuntime.Reset();
+                await DataPatchRuntime.Initialize(null, database);
+                Check(starts == 3 && finishes == 3 && !DataPatchRuntime.IsLoading, "Idle reset or disabled startup emitted spurious patch-loading events.");
+                Debug.Log("DATA_PATCH_RUNTIME_LOADING_EVENTS_PASSED");
+            }
+            finally
+            {
+                DataPatchRuntime.PatchingStarted -= throwStarted;
+                DataPatchRuntime.PatchingStarted -= started;
+                DataPatchRuntime.PatchingStarted -= reset;
+                DataPatchRuntime.PatchingFinished -= throwFinished;
+                DataPatchRuntime.PatchingFinished -= finished;
+                DataPatchRuntime.Reset();
+                if (GameInstance.Items.TryGetValue(item.DataId, out BaseItem registered) && registered == item)
+                    GameInstance.Items.Remove(item.DataId);
+                UnityEngine.Object.DestroyImmediate(item);
+                UnityEngine.Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(database);
+            }
+        }
+
+        public static async UniTask VerifyChunkReloadScheduling()
+        {
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            var profile = ScriptableObject.CreateInstance<DataPatchProfile>();
+            var items = new JunkItem[128];
+            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "unity-patch-scheduling-" + Guid.NewGuid().ToString("N"));
+            System.IO.Directory.CreateDirectory(directory);
+            try
+            {
+                string prefix = "chunk-scheduling-" + Guid.NewGuid().ToString("N");
+                var chunks = new DataPatchChunk[items.Length];
+                var paths = new string[items.Length];
+                for (int i = 0; i < items.Length; ++i)
+                {
+                    items[i] = ScriptableObject.CreateInstance<JunkItem>();
+                    items[i].Id = prefix + "-" + i;
+                    items[i].SellPrice = 10;
+                    string payload = JsonConvert.SerializeObject(new[]
+                    {
+                        new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[i].DataId, data = new JObject { ["sellPrice"] = 20 } },
+                    });
+                    paths[i] = System.IO.Path.Combine(directory, i + ".json");
+                    System.IO.File.WriteAllText(paths[i], payload, new System.Text.UTF8Encoding(false));
+                    chunks[i] = new DataPatchChunk { index = i, dataType = nameof(JunkItem), hash = DataPatchHttp.Hash(payload), bytes = System.Text.Encoding.UTF8.GetByteCount(payload), entryCount = 1 };
+                }
+                database.items = items;
+                profile.database = database;
+                profile.patchDatabaseId = prefix;
+                profile.dataPatchSettings.preparationFrameBudgetMilliseconds = 2;
+                string manifest = JsonConvert.SerializeObject(new DataPatchManifest { chunks = chunks });
+                var release = new DataPatchRelease { id = prefix, databaseId = prefix, schemaVersion = 2, publishTime = "published", manifestJson = manifest, payloadHash = DataPatchHttp.Hash(manifest), chunkPaths = paths };
+                using (var engine = new DataPatchEngine(profile, false, refresh: false))
+                {
+                    await engine.PrepareAsync(release, applyImmediately: true);
+                    Check(engine.LastParsedChunkCount == items.Length && engine.LastAppliedChunkCount == items.Length, "Read-ahead skipped initial chunks or delayed progressive application.");
+                    engine.Commit();
+                    uint revision = DataPatchEngine.Revision;
+                    var timer = System.Diagnostics.Stopwatch.StartNew();
+                    await engine.PrepareAsync(release, applyImmediately: true);
+                    Check(engine.LastParsedChunkCount == 0 && engine.LastPreparationRecordCount == 0 && engine.PreparedChangeCount == 0, "Cached reload reparsed or restaged unchanged chunks.");
+                    Check(engine.LastReusedChunkCount == items.Length && engine.LastReuseVerificationPassCount == 1, "Cached reload used one verification pass per chunk.");
+                    engine.Commit();
+                    Check(DataPatchEngine.Revision == revision && System.Linq.Enumerable.All(items, item => item.SellPrice == 20), "Cached reload invalidated gameplay caches or lost applied prices.");
+                    Debug.Log($"DATA_PATCH_CHUNK_SCHEDULING_PASSED: {items.Length} unchanged chunks, one verification pass, {timer.Elapsed.TotalMilliseconds:F1} ms reload.");
+                }
+                Check(System.Linq.Enumerable.All(items, item => item.SellPrice == 10), "Read-ahead disposal did not restore bundled prices.");
+            }
+            finally
+            {
+                foreach (JunkItem item in items)
+                {
+                    if (item == null)
+                        continue;
+                    if (GameInstance.Items.TryGetValue(item.DataId, out BaseItem registered) && registered == item)
+                        GameInstance.Items.Remove(item.DataId);
+                    UnityEngine.Object.DestroyImmediate(item);
+                }
+                UnityEngine.Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(database);
+                string resolved = System.IO.Path.GetFullPath(directory);
+                Check(resolved.StartsWith(System.IO.Path.GetFullPath(System.IO.Path.GetTempPath()), StringComparison.OrdinalIgnoreCase), "Unsafe scheduling test cleanup path.");
+                System.IO.Directory.Delete(resolved, true);
+            }
+        }
+
+        public static async UniTask VerifyCompactPatchMemory()
+        {
+            var numeric = new JObject
+            {
+                ["exactDecimal"] = new JValue(12345678901234567890.123456789m),
+                ["largeDouble"] = new JValue(double.MaxValue),
+                ["largeFloat"] = new JValue(float.MaxValue),
+                ["signedInteger"] = new JValue(long.MaxValue),
+                ["unsignedInteger"] = new JValue(ulong.MaxValue),
+            };
+            Type storage = typeof(DataPatchEngine).Assembly.GetType("MultiplayerARPG.DataPatchStorage");
+            byte[] compressed = (byte[])storage.GetMethod("Compress").Invoke(null, new object[] { numeric });
+            var restored = (JObject)storage.GetMethod("Read").Invoke(null, new object[] { compressed });
+            Check(restored["exactDecimal"].Value<decimal>() == 12345678901234567890.123456789m &&
+                restored["largeDouble"].Value<double>() == double.MaxValue && restored["largeFloat"].Value<float>() == float.MaxValue &&
+                restored["signedInteger"].Value<long>() == long.MaxValue && restored["unsignedInteger"].ToObject<ulong>() == ulong.MaxValue,
+                "Compact snapshots rounded decimal, floating-point or integer values.");
+            var database = ScriptableObject.CreateInstance<GameDatabase>();
+            var profile = ScriptableObject.CreateInstance<DataPatchProfile>();
+            var items = new JunkItem[8];
+            string directory = System.IO.Path.Combine(System.IO.Path.GetTempPath(), "unity-compact-patch-" + Guid.NewGuid().ToString("N"));
+            System.IO.Directory.CreateDirectory(directory);
+            long rawBaselineBytes = 0;
+            DataPatchRelease MakeRelease(string id, bool changed)
+            {
+                var chunks = new DataPatchChunk[4];
+                var paths = new string[4];
+                for (int i = 0; i < chunks.Length; ++i)
+                {
+                    var records = new DataPatchEntry[2];
+                    for (int j = 0; j < records.Length; ++j)
+                    {
+                        JunkItem item = items[i * 2 + j];
+                        // Build from the bundled values even after earlier patches were applied.
+                        JObject data = DataPatchSerializer.Export(item);
+                        data["sellPrice"] = int.MaxValue - 7;
+                        data["dismantleReturnGold"] = int.MaxValue - 7;
+                        data["defaultDescription"] = new string('x', 32000) + "測試";
+                        if (changed && i == 0 && j == 0)
+                        {
+                            data["sellPrice"] = 123;
+                            data["dismantleReturnGold"] = 456;
+                            data["defaultDescription"] = "patched";
+                        }
+                        records[j] = new DataPatchEntry { dataType = nameof(JunkItem), dataId = item.DataId, data = data };
+                    }
+                    string payload = JsonConvert.SerializeObject(records);
+                    paths[i] = System.IO.Path.Combine(directory, id + "-" + i + ".json");
+                    System.IO.File.WriteAllText(paths[i], payload, new System.Text.UTF8Encoding(false));
+                    chunks[i] = new DataPatchChunk
+                    {
+                        index = i,
+                        dataType = nameof(JunkItem),
+                        hash = DataPatchHttp.Hash(payload),
+                        bytes = System.Text.Encoding.UTF8.GetByteCount(payload),
+                        entryCount = records.Length,
+                    };
+                }
+                string manifest = JsonConvert.SerializeObject(new DataPatchManifest { chunks = chunks });
+                return new DataPatchRelease
+                {
+                    id = id,
+                    databaseId = profile.patchDatabaseId,
+                    schemaVersion = 2,
+                    publishTime = "published",
+                    manifestJson = manifest,
+                    payloadHash = DataPatchHttp.Hash(manifest),
+                    chunkPaths = paths,
+                };
+            }
+            try
+            {
+                string prefix = "compact-patch-" + Guid.NewGuid().ToString("N");
+                for (int i = 0; i < items.Length; ++i)
+                {
+                    items[i] = ScriptableObject.CreateInstance<JunkItem>();
+                    items[i].Id = prefix + "-" + i;
+                    items[i].SellPrice = int.MaxValue - 7;
+                    items[i].DismantleReturnGold = int.MaxValue - 7;
+                    items[i].DefaultDescription = new string('x', 32000) + "測試";
+                    items[i].DefaultTitle = "2026-10-14T12:00:00Z";
+                    // Match normal database registration before exporting a no-op fixture.
+                    GameInstance.AddItems(items[i]);
+                    typeof(BaseItem).GetField("audioGenderUsingSFX")?.SetValue(items[i], null);
+                    rawBaselineBytes += System.Text.Encoding.UTF8.GetByteCount(DataPatchSerializer.Export(items[i]).ToString(Formatting.None));
+                }
+                database.items = items;
+                profile.database = database;
+                profile.patchDatabaseId = prefix;
+                profile.dataPatchSettings.preparationFrameBudgetMilliseconds = 0.1f;
+                var first = MakeRelease("compact-first", false);
+                var second = MakeRelease("compact-second", true);
+                var engine = new DataPatchEngine(profile, false, refresh: false);
+                try
+                {
+                    await engine.PrepareAsync(first);
+                    Check(engine.LastParsedChunkCount == 4 && engine.PreparedChangeCount == 0, "Initial chunks were not prepared as a no-op snapshot.");
+                    Check(engine.LastCacheTraversalCount == 0, "An unchanged patch rediscovered the complete cache graph.");
+                    Check(engine.RetainedSnapshotBytes < rawBaselineBytes / 8, "Rollback snapshots retain expanded JSON rather than compact bytes.");
+                    engine.Commit();
+                    long snapshotBytes = engine.RetainedSnapshotBytes;
+                    await engine.PrepareAsync(second);
+                    Check(engine.LastParsedChunkCount == 1 && engine.LastPreparationRecordCount == 1, "Changed-chunk reload reparsed unchanged chunks or prepared unchanged records.");
+                    Check(engine.LastReusedChunkCount == 3 && engine.LastReuseVerificationPassCount == 1, "Unchanged chunks required separate worker verification passes.");
+                    Check(items[0].SellPrice == int.MaxValue - 7, "Streaming preparation modified live values before activation.");
+                    engine.Commit();
+                    Check(items[0].SellPrice == 123 && items[0].DismantleReturnGold == 456 && items[0].DefaultDescription == "patched" && items[0].DefaultTitle == "2026-10-14T12:00:00Z", "Compact patch did not activate or changed date-like text.");
+                    Check(engine.RetainedSnapshotBytes == snapshotBytes, "Reload duplicated rollback snapshots.");
+                    await engine.PrepareAsync(second);
+                    Check(engine.LastParsedChunkCount == 0 && engine.LastPreparationRecordCount == 0, "An identical reload rebuilt parsed record trees.");
+                    Check(engine.LastReusedChunkCount == 4 && engine.LastReuseVerificationPassCount == 1, "An unchanged reload returned to the main thread for every file verification.");
+                    engine.Commit();
+                    // Reused chunks must still reject duplicated identities across descriptors.
+                    var originalManifest = JsonConvert.DeserializeObject<DataPatchManifest>(second.manifestJson);
+                    var duplicate = originalManifest.chunks[0];
+                    string duplicateManifest = JsonConvert.SerializeObject(new DataPatchManifest
+                    {
+                        chunks = new[]
+                        {
+                            duplicate,
+                            new DataPatchChunk { index = 1, dataType = duplicate.dataType, hash = duplicate.hash, bytes = duplicate.bytes, entryCount = duplicate.entryCount },
+                        },
+                    });
+                    var duplicateRelease = new DataPatchRelease
+                    {
+                        id = "compact-duplicate",
+                        databaseId = profile.patchDatabaseId,
+                        schemaVersion = 2,
+                        publishTime = "published",
+                        manifestJson = duplicateManifest,
+                        payloadHash = DataPatchHttp.Hash(duplicateManifest),
+                        chunkPaths = new[] { second.chunkPaths[0], second.chunkPaths[0] },
+                    };
+                    bool duplicateRejected = false;
+                    try
+                    {
+                        await engine.PrepareAsync(duplicateRelease);
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        duplicateRejected = true;
+                    }
+                    Check(duplicateRejected && engine.PreparedChangeCount == 0 && items[0].SellPrice == 123, "Reused chunks accepted duplicate identities or changed live values.");
+                    // Reused metadata must still detect corruption of an unchanged chunk.
+                    string original = System.IO.File.ReadAllText(second.chunkPaths[3]);
+                    System.IO.File.WriteAllText(second.chunkPaths[3], "[]");
+                    bool rejected = false;
+                    try
+                    {
+                        await engine.PrepareAsync(second);
+                    }
+                    catch (System.IO.IOException)
+                    {
+                        rejected = true;
+                    }
+                    finally
+                    {
+                        System.IO.File.WriteAllText(second.chunkPaths[3], original, new System.Text.UTF8Encoding(false));
+                    }
+                    Check(rejected && engine.PreparedChangeCount == 0 && items[0].SellPrice == 123, "Corrupt cached chunks bypassed integrity or changed live data.");
+                    using (var cancellation = new System.Threading.CancellationTokenSource())
+                    {
+                        cancellation.Cancel();
+                        bool canceled = false;
+                        try
+                        {
+                            await engine.PrepareAsync(first, cancellation.Token);
+                        }
+                        catch (OperationCanceledException)
+                        {
+                            canceled = true;
+                        }
+                        Check(canceled && engine.PreparedChangeCount == 0 && items[0].SellPrice == 123, "Canceled preparation changed active values.");
+                    }
+                    // Earlier published snapshots and complete omissions must still restore correctly.
+                    await engine.PrepareAsync(first);
+                    engine.Commit();
+                    Check(items[0].SellPrice == int.MaxValue - 7 && items[0].DismantleReturnGold == int.MaxValue - 7 && items[0].DefaultDescription == new string('x', 32000) + "測試", "Compressed rollback lost numeric precision or text.");
+                    await engine.PrepareAsync(second);
+                    engine.Commit();
+                    await engine.PrepareAsync(null);
+                    engine.Commit();
+                    Check(items[0].SellPrice == int.MaxValue - 7, "Full replacement did not restore omitted overrides.");
+                    Debug.Log($"DATA_PATCH_COMPACT_MEMORY_PASSED: raw baseline {rawBaselineBytes} bytes, retained snapshots {snapshotBytes} bytes.");
+                }
+                finally
+                {
+                    engine.Dispose();
+                }
+                Check(engine.RetainedSnapshotBytes == 0 && engine.CapturedDefaultCount == 0, "Disposed engine retained rollback buffers.");
+            }
+            finally
+            {
+                foreach (JunkItem item in items)
+                {
+                    if (item == null)
+                        continue;
+                    if (GameInstance.Items.TryGetValue(item.DataId, out BaseItem registered) && registered == item)
+                        GameInstance.Items.Remove(item.DataId);
+                    UnityEngine.Object.DestroyImmediate(item);
+                }
+                UnityEngine.Object.DestroyImmediate(profile);
+                UnityEngine.Object.DestroyImmediate(database);
+                string resolved = System.IO.Path.GetFullPath(directory);
+                Check(resolved.StartsWith(System.IO.Path.GetFullPath(System.IO.Path.GetTempPath()), StringComparison.OrdinalIgnoreCase), "Unsafe compact test cleanup path.");
+                System.IO.Directory.Delete(resolved, true);
             }
         }
 
@@ -409,6 +978,35 @@ namespace MultiplayerARPG
                 }
                 Check(count == 4, "Chunk reader dropped records.");
                 Check(!JObject.Parse(JsonConvert.SerializeObject(release)).ContainsKey("chunkPaths"), "Manifest cache contains local paths.");
+                string originalPayload = System.IO.File.ReadAllText(paths[0]);
+                string trailingPayload = originalPayload + " []";
+                System.IO.File.WriteAllText(paths[0], trailingPayload, new System.Text.UTF8Encoding(false));
+                string originalHash = chunks[0].hash;
+                int originalBytes = chunks[0].bytes;
+                chunks[0].hash = DataPatchHttp.Hash(trailingPayload);
+                chunks[0].bytes = System.Text.Encoding.UTF8.GetByteCount(trailingPayload);
+                release.manifestJson = JsonConvert.SerializeObject(new DataPatchManifest { chunks = chunks });
+                release.payloadHash = DataPatchHttp.Hash(release.manifestJson);
+                bool rejectedTrailingJson = false;
+                try
+                {
+                    foreach (DataPatchEntry ignored in DataPatchHttp.ReadEntries(release))
+                    {
+                    }
+                }
+                catch (JsonException)
+                {
+                    rejectedTrailingJson = true;
+                }
+                finally
+                {
+                    System.IO.File.WriteAllText(paths[0], originalPayload, new System.Text.UTF8Encoding(false));
+                    chunks[0].hash = originalHash;
+                    chunks[0].bytes = originalBytes;
+                    release.manifestJson = manifestJson;
+                    release.payloadHash = DataPatchHttp.Hash(manifestJson);
+                }
+                Check(rejectedTrailingJson, "Streaming chunk parsing accepted additional JSON after the record array.");
                 System.IO.File.WriteAllText(paths[3], "[]");
                 bool rejectedCorruptChunk = false;
                 try

@@ -175,6 +175,9 @@ namespace MultiplayerARPG
                     foreach (object value in dict.Values)
                         if (value is IPatchableData)
                             registry.AddGraph(value);
+            // Discovery keeps boxed containers only to avoid recursion; resolution uses Targets.
+            registry.visited.Clear();
+            registry.visited.TrimExcess();
             return registry;
         }
 

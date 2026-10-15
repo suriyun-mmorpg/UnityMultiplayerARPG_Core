@@ -78,11 +78,6 @@ namespace MultiplayerARPG
                 ReadChunkBytes(release.chunkPaths[i], manifest.chunks[i]);
         }
 
-        private static string ReadChunkFile(string path, DataPatchChunk chunk)
-        {
-            return Encoding.UTF8.GetString(ReadChunkBytes(path, chunk));
-        }
-
         private static byte[] ReadChunkBytes(string path, DataPatchChunk chunk)
         {
             if (string.IsNullOrEmpty(path) || !File.Exists(path) || new FileInfo(path).Length != chunk.bytes)
@@ -102,41 +97,56 @@ namespace MultiplayerARPG
                 throw new IOException("Patch chunk integrity check failed: " + chunk.index);
         }
 
-        public static IEnumerable<DataPatchEntry> ReadEntries(DataPatchRelease release, Dictionary<string, DataPatchEntry[]> chunkCache = null)
+        public static IEnumerable<DataPatchEntry> ReadEntries(DataPatchRelease release)
         {
             DataPatchManifest manifest = ValidateManifest(release);
             if (manifest == null)
             {
-                var entries = JsonConvert.DeserializeObject<DataPatchEntry[]>(release.payloadJson);
-                if (entries == null || entries.Length > 20000)
-                    throw new InvalidOperationException("Invalid patch entry count.");
-                foreach (DataPatchEntry entry in entries)
+                foreach (DataPatchEntry entry in ReadLegacyEntries(release))
                     yield return entry;
                 yield break;
             }
             if (release.chunkPaths == null || release.chunkPaths.Length != manifest.chunks.Length)
                 throw new InvalidOperationException("Patch chunks are incomplete.");
-            for (int i = 0; i < manifest.chunks.Length; ++i)
-            {
-                DataPatchChunk chunk = manifest.chunks[i];
-                DataPatchEntry[] entries;
-                if (chunkCache != null && chunkCache.TryGetValue(chunk.hash, out entries))
-                    ReadChunkBytes(release.chunkPaths[i], chunk);
-                else
-                {
-                    entries = JsonConvert.DeserializeObject<DataPatchEntry[]>(ReadChunkFile(release.chunkPaths[i], chunk));
-                    if (chunkCache != null)
-                        chunkCache[chunk.hash] = entries;
-                }
-                if (entries == null || entries.Length != chunk.entryCount)
-                    throw new InvalidOperationException("Patch chunk record count mismatch.");
-                foreach (DataPatchEntry entry in entries)
-                {
-                    if (entry == null || entry.dataType != chunk.dataType)
-                        throw new InvalidOperationException("Patch chunk data type mismatch.");
+            foreach (DataPatchChunk chunk in manifest.chunks)
+                foreach (DataPatchEntry entry in ReadChunkEntries(release, chunk))
                     yield return entry;
-                }
-            }
+        }
+
+        internal static DataPatchEntry[] ReadLegacyEntries(DataPatchRelease release)
+        {
+            var entries = JsonConvert.DeserializeObject<DataPatchEntry[]>(release.payloadJson, new JsonSerializerSettings { DateParseHandling = DateParseHandling.None });
+            if (entries == null || entries.Length > 20000)
+                throw new InvalidOperationException("Invalid patch entry count.");
+            return entries;
+        }
+
+        internal static void VerifyChunk(DataPatchRelease release, DataPatchChunk chunk)
+        {
+            ReadChunkBytes(ChunkFile(release, chunk), chunk);
+        }
+
+        private static string ChunkFile(DataPatchRelease release, DataPatchChunk chunk)
+        {
+            if (release.chunkPaths == null || chunk.index < 0 || chunk.index >= release.chunkPaths.Length)
+                throw new InvalidOperationException("Patch chunks are incomplete.");
+            return release.chunkPaths[chunk.index];
+        }
+
+        internal static DataPatchEntry[] ReadChunkEntries(DataPatchRelease release, DataPatchChunk chunk)
+        {
+            DataPatchEntry[] entries;
+            // Parse verified UTF-8 bytes directly, without allocating a whole UTF-16 chunk string.
+            using (var bytes = new MemoryStream(ReadChunkBytes(ChunkFile(release, chunk), chunk), false))
+            using (var text = new StreamReader(bytes, Encoding.UTF8))
+            using (var json = new JsonTextReader(text) { DateParseHandling = DateParseHandling.None })
+                entries = JsonSerializer.CreateDefault(new JsonSerializerSettings { DateParseHandling = DateParseHandling.None, CheckAdditionalContent = true }).Deserialize<DataPatchEntry[]>(json);
+            if (entries == null || entries.Length != chunk.entryCount)
+                throw new InvalidOperationException("Patch chunk record count mismatch.");
+            foreach (DataPatchEntry entry in entries)
+                if (entry == null || entry.dataType != chunk.dataType)
+                    throw new InvalidOperationException("Patch chunk data type mismatch.");
+            return entries;
         }
 
         public static async UniTask<DataPatchRelease> Load(DataPatchProfile database, string releaseId = "")

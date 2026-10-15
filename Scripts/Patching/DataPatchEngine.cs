@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -19,16 +19,19 @@ namespace MultiplayerARPG
         private readonly bool skipInvalidRecords;
         public readonly List<string> PreparationWarnings = new List<string>();
         private DataPatchRegistry registry;
-        private readonly Dictionary<string, JObject> defaults = new Dictionary<string, JObject>();
+        private readonly Dictionary<string, DefaultState> defaults = new Dictionary<string, DefaultState>();
         private readonly List<ScriptableObject> staging = new List<ScriptableObject>();
         private readonly List<PreparedChange> changes = new List<PreparedChange>();
         private readonly List<object> cacheTargets = new List<object>();
         private int preparationVersion;
+        private bool progressivePreparation;
+        private int progressiveChangedRecordCount;
+        private readonly Dictionary<string, DefaultState> chunkUndo = new Dictionary<string, DefaultState>();
         private Dictionary<string, RecordState> activeRecords = new Dictionary<string, RecordState>();
         private readonly Dictionary<string, RecordState> preparedRecords = new Dictionary<string, RecordState>();
         private Dictionary<string, ScriptableObject> activeRegistry = new Dictionary<string, ScriptableObject>();
-        private Dictionary<string, DataPatchEntry[]> activeChunks = new Dictionary<string, DataPatchEntry[]>();
-        private Dictionary<string, DataPatchEntry[]> preparedChunks;
+        private Dictionary<string, string[]> activeChunks = new Dictionary<string, string[]>();
+        private Dictionary<string, string[]> preparedChunks;
         private Dictionary<ScriptableObject, object[]> activeCacheRoots = new Dictionary<ScriptableObject, object[]>(UnityObjectComparer.Instance);
         private readonly Dictionary<ScriptableObject, object[]> preparedCacheRoots = new Dictionary<ScriptableObject, object[]>(UnityObjectComparer.Instance);
         private bool sameRegistry;
@@ -37,11 +40,31 @@ namespace MultiplayerARPG
         private sealed class RecordState
         {
             public ScriptableObject target;
-            public JObject input;
+            public string inputHash;
             public string[] warnings;
             public bool requiresRegistryRefresh;
         }
-        public int PreparedChangeCount => changes.Count;
+        private sealed class DefaultState
+        {
+            public ScriptableObject target;
+            public byte[] data;
+        }
+
+        private sealed class RecordInput
+        {
+            public DataPatchEntry entry;
+            public string hash;
+        }
+
+        public long RetainedSnapshotBytes => defaults.Values.Sum(state => (long)state.data.Length);
+        public int LastParsedChunkCount { get; private set; }
+        public int LastMemoryCollectionCount { get; private set; }
+        public long PeakPreparationManagedBytes { get; private set; }
+        public int LastReusedChunkCount { get; private set; }
+        public int LastReuseVerificationPassCount { get; private set; }
+        public int LastAppliedChunkCount { get; private set; }
+        public int PreparedChangeCount => changes.Count + progressiveChangedRecordCount;
+        public long PendingUndoBytes => chunkUndo.Values.Sum(state => (long)state.data.Length);
         public int CapturedDefaultCount => defaults.Count;
         public int LastPreparationRecordCount { get; private set; }
         public int LastCacheTraversalCount { get; private set; }
@@ -71,7 +94,7 @@ namespace MultiplayerARPG
             RefreshRegistry();
             foreach (var entry in registry.Targets)
                 if (!defaults.ContainsKey(entry.Key) && DataPatchSerializer.Fields(entry.Value.GetType()).Any())
-                    defaults.Add(entry.Key, DataPatchSerializer.Export(entry.Value));
+                    CaptureDefault(entry.Key, entry.Value, DataPatchSerializer.Export(entry.Value));
         }
 
         public async UniTask RefreshAsync(CancellationToken cancellationToken = default)
@@ -84,7 +107,7 @@ namespace MultiplayerARPG
             {
                 CheckPreparation(version, cancellationToken);
                 if (!defaults.ContainsKey(entry.Key) && DataPatchSerializer.Fields(entry.Value.GetType()).Any())
-                    defaults.Add(entry.Key, DataPatchSerializer.Export(entry.Value));
+                    CaptureDefault(entry.Key, entry.Value, DataPatchSerializer.Export(entry.Value));
                 if (frame.Elapsed.TotalMilliseconds >= budget)
                 {
                     await YieldPreparationFrame(cancellationToken);
@@ -100,15 +123,40 @@ namespace MultiplayerARPG
             PreparationWarnings.Clear();
             LastPreparationRecordCount = 0;
             LastCacheTraversalCount = 0;
+            LastParsedChunkCount = 0;
+            LastMemoryCollectionCount = 0;
+            PeakPreparationManagedBytes = 0;
+            LastReusedChunkCount = 0;
+            LastReuseVerificationPassCount = 0;
+            LastAppliedChunkCount = 0;
             var timer = Stopwatch.StartNew();
             try
             {
                 RefreshRegistry();
                 BeginRecordCache();
                 ValidateScope(release);
-                var overrides = ReadOverrides(release);
-                foreach (var entry in PreparationTargets(overrides))
-                    PrepareRecord(entry, overrides);
+                LogMemory("before preparation");
+                preparedChunks = new Dictionary<string, string[]>();
+                var seen = new HashSet<string>(StringComparer.Ordinal);
+                DataPatchManifest manifest = release == null ? null : DataPatchHttp.ValidateManifest(release);
+                if (release != null && manifest == null)
+                    PrepareBatch(ReadBatch(release, null), seen);
+                if (manifest != null)
+                {
+                    foreach (DataPatchChunk chunk in manifest.chunks)
+                    {
+                        if (CanReuseChunk(chunk, out string[] keys))
+                        {
+                            ++LastReuseVerificationPassCount;
+                            DataPatchHttp.VerifyChunk(release, chunk);
+                            ReuseChunk(chunk, keys, seen);
+                        }
+                        else
+                            preparedChunks[chunk.hash] = PrepareBatch(ReadBatch(release, chunk), seen);
+                    }
+                }
+                foreach (var entry in RestorationTargets(seen))
+                    PrepareRecord(entry, null, null);
                 foreach (object value in EnumerateCacheTargets())
                     AddCacheTarget(value);
                 DestroyStaging();
@@ -121,12 +169,19 @@ namespace MultiplayerARPG
             }
         }
 
-        public async UniTask PrepareAsync(DataPatchRelease release, CancellationToken cancellationToken = default, bool refreshRegistry = true)
+        public async UniTask PrepareAsync(DataPatchRelease release, CancellationToken cancellationToken = default, bool refreshRegistry = true, bool applyImmediately = false)
         {
             Discard();
+            progressivePreparation = applyImmediately;
             PreparationWarnings.Clear();
             LastPreparationRecordCount = 0;
             LastCacheTraversalCount = 0;
+            LastParsedChunkCount = 0;
+            LastMemoryCollectionCount = 0;
+            PeakPreparationManagedBytes = 0;
+            LastReusedChunkCount = 0;
+            LastReuseVerificationPassCount = 0;
+            LastAppliedChunkCount = 0;
             int version = preparationVersion;
             var timer = Stopwatch.StartNew();
             var frame = Stopwatch.StartNew();
@@ -139,29 +194,148 @@ namespace MultiplayerARPG
                     RefreshRegistry();
                 // Only JSON and files are handled on the worker; Unity assets stay on the main thread.
                 BeginRecordCache();
-                var chunkCache = new Dictionary<string, DataPatchEntry[]>(activeChunks);
-                var records = release == null ? Array.Empty<DataPatchEntry>() : await DataPatchHttp.RunBackground(() => DataPatchHttp.ReadEntries(release, chunkCache).ToArray(), cancellationToken);
-                CheckPreparation(version, cancellationToken);
-                var manifest = release == null ? null : DataPatchHttp.ValidateManifest(release);
-                var hashes = new HashSet<string>(manifest?.chunks.Select(chunk => chunk.hash) ?? Enumerable.Empty<string>());
-                preparedChunks = chunkCache.Where(pair => hashes.Contains(pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
-                CheckPreparation(version, cancellationToken);
-                var overrides = new Dictionary<string, JObject>();
-                foreach (DataPatchEntry record in records)
+                LogMemory("before preparation");
+                // Use existing free heap space (especially in the Editor), keeping headroom for a record.
+                long memoryCeiling = Math.Max(UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong() + 8 * 1024 * 1024,
+                    UnityEngine.Profiling.Profiler.GetMonoHeapSizeLong() - 24 * 1024 * 1024);
+                preparedChunks = new Dictionary<string, string[]>();
+                var seen = new HashSet<string>(StringComparer.Ordinal);
+                DataPatchManifest manifest = release == null ? null : DataPatchHttp.ValidateManifest(release);
+                int batchCount = release == null ? 0 : manifest?.chunks.Length ?? 1;
+                var cachedChunkKeys = new string[batchCount][];
+                if (manifest != null)
                 {
-                    CheckPreparation(version, cancellationToken);
-                    AddOverride(overrides, record);
-                    if (frame.Elapsed.TotalMilliseconds >= budget)
+                    for (int i = 0; i < batchCount; ++i)
                     {
-                        await YieldPreparationFrame(cancellationToken);
-                        frame.Restart();
+                        CheckPreparation(version, cancellationToken);
+                        if (CanReuseChunk(manifest.chunks[i], out string[] keys))
+                        {
+                            cachedChunkKeys[i] = keys;
+                            ++LastReusedChunkCount;
+                        }
+                    }
+                    if (LastReusedChunkCount > 0)
+                    {
+                        // Verify files sequentially in one worker pass instead of returning to Unity per chunk.
+                        ++LastReuseVerificationPassCount;
+                        await DataPatchHttp.RunBackground(() =>
+                        {
+                            for (int i = 0; i < batchCount; ++i)
+                            {
+                                cancellationToken.ThrowIfCancellationRequested();
+                                if (cachedChunkKeys[i] != null)
+                                    DataPatchHttp.VerifyChunk(release, manifest.chunks[i]);
+                            }
+                            return true;
+                        }, cancellationToken);
+                        CheckPreparation(version, cancellationToken);
+                    }
+                }
+                UniTask<RecordInput[]> pendingBatch = default;
+                bool hasPendingBatch = false;
+                int nextBatchIndex = 0;
+                void ReadAhead()
+                {
+                    while (nextBatchIndex < batchCount && cachedChunkKeys[nextBatchIndex] != null)
+                        ++nextBatchIndex;
+                    if (nextBatchIndex >= batchCount)
+                        return;
+                    CheckPreparation(version, cancellationToken);
+                    pendingBatch = ReadBatchAsync(release, manifest?.chunks[nextBatchIndex], cancellationToken).Preserve();
+                    hasPendingBatch = true;
+                    ++nextBatchIndex;
+                }
+                try
+                {
+                    ReadAhead();
+                    frame.Restart();
+                    for (int batchIndex = 0; batchIndex < batchCount; ++batchIndex)
+                    {
+                        CheckPreparation(version, cancellationToken);
+                        DataPatchChunk chunk = manifest?.chunks[batchIndex];
+                        string[] cachedKeys = cachedChunkKeys[batchIndex];
+                        if (cachedKeys != null)
+                        {
+                            foreach (string key in cachedKeys)
+                            {
+                                CheckPreparation(version, cancellationToken);
+                                ReuseRecord(key, seen);
+                                if (frame.Elapsed.TotalMilliseconds >= budget)
+                                {
+                                    await YieldPreparationFrame(cancellationToken);
+                                    frame.Restart();
+                                }
+                            }
+                            preparedChunks[chunk.hash] = cachedKeys;
+                            continue;
+                        }
+                        RecordInput[] batch = await pendingBatch;
+                        pendingBatch = default;
+                        hasPendingBatch = false;
+                        try
+                        {
+                            CheckPreparation(version, cancellationToken);
+                            // At most the current chunk and one read-ahead chunk hold parsed JSON.
+#if !UNITY_WEBGL || UNITY_EDITOR
+                            ReadAhead();
+#endif
+                            ++LastParsedChunkCount;
+                            if (LastParsedChunkCount == 1)
+                                LogMemory("after first chunk parsed");
+                            var keys = new string[batch.Length];
+                            frame.Restart();
+                            for (int i = 0; i < batch.Length; ++i)
+                            {
+                                CheckPreparation(version, cancellationToken);
+                                keys[i] = PrepareInput(batch[i], seen);
+                                batch[i].entry.data = null;
+                                batch[i] = null;
+                                if (frame.Elapsed.TotalMilliseconds >= budget)
+                                {
+                                    memoryCeiling = await MaintainPreparationMemory(memoryCeiling, version, cancellationToken);
+                                    await YieldPreparationFrame(cancellationToken);
+                                    frame.Restart();
+                                }
+                            }
+                            if (chunk != null)
+                                preparedChunks[chunk.hash] = keys;
+                            if (progressivePreparation)
+                                ApplyChunk();
+                        }
+                        finally
+                        {
+                            ClearBatch(batch);
+                        }
+                        memoryCeiling = await MaintainPreparationMemory(memoryCeiling, version, cancellationToken);
+#if UNITY_WEBGL && !UNITY_EDITOR
+                        // Web players have no worker threads; do not parse the next chunk early.
+                        ReadAhead();
+#endif
+                    }
+                }
+                finally
+                {
+                    if (hasPendingBatch)
+                    {
+                        // Observe an in-flight read even after cancellation/failure and release its JSON.
+                        try
+                        {
+                            ClearBatch(await pendingBatch);
+                        }
+                        catch (Exception)
+                        {
+                            // The preparation exception is reported by the outer catch.
+                        }
+                        pendingBatch = default;
                     }
                 }
                 frame.Restart();
-                foreach (var entry in PreparationTargets(overrides))
+                foreach (var entry in RestorationTargets(seen))
                 {
                     CheckPreparation(version, cancellationToken);
-                    PrepareRecord(entry, overrides);
+                    PrepareRecord(entry, null, null);
+                    if (progressivePreparation)
+                        ApplyChunk();
                     if (frame.Elapsed.TotalMilliseconds >= budget)
                     {
                         await YieldPreparationFrame(cancellationToken);
@@ -201,6 +375,30 @@ namespace MultiplayerARPG
             }
         }
 
+        private async UniTask<long> MaintainPreparationMemory(long ceiling, int version, CancellationToken cancellationToken)
+        {
+            long used = UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong();
+            PeakPreparationManagedBytes = Math.Max(PeakPreparationManagedBytes, used);
+            if (used < ceiling || !UnityEngine.Scripting.GarbageCollector.isIncremental ||
+                UnityEngine.Scripting.GarbageCollector.GCMode != UnityEngine.Scripting.GarbageCollector.Mode.Enabled)
+                return ceiling;
+            ++LastMemoryCollectionCount;
+            var timer = Stopwatch.StartNew();
+            // Reclaim temporary records before processing more data expands the managed heap.
+            for (int slice = 0; slice < 60 && timer.Elapsed.TotalMilliseconds < 1000; ++slice)
+            {
+                CheckPreparation(version, cancellationToken);
+                if (UnityEngine.Scripting.GarbageCollector.GCMode != UnityEngine.Scripting.GarbageCollector.Mode.Enabled ||
+                    !UnityEngine.Scripting.GarbageCollector.CollectIncremental(2000000))
+                    break;
+                await YieldPreparationFrame(cancellationToken);
+            }
+            CheckPreparation(version, cancellationToken);
+            // Account for live definitions and the bounded read-ahead batch without collecting continuously.
+            used = UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong();
+            return Math.Max(ceiling, used + 8 * 1024 * 1024);
+        }
+
         private static async UniTask YieldPreparationFrame(CancellationToken cancellationToken)
         {
 #if UNITY_EDITOR
@@ -225,34 +423,103 @@ namespace MultiplayerARPG
         {
             if (release != null && (release.databaseId != database.patchDatabaseId || (release.schemaVersion != 1 && release.schemaVersion != 2) || string.IsNullOrEmpty(release.publishTime)))
                 throw new InvalidOperationException("Patch scope, schema, or publication mismatch.");
+            if (release?.schemaVersion == 2 && (release.chunkPaths == null ||
+                release.chunkPaths.Length != DataPatchHttp.ValidateManifest(release).chunks.Length))
+                throw new InvalidOperationException("Patch chunks are incomplete.");
         }
 
-        private Dictionary<string, JObject> ReadOverrides(DataPatchRelease release)
+        private static UniTask<RecordInput[]> ReadBatchAsync(DataPatchRelease release, DataPatchChunk chunk, CancellationToken cancellationToken)
         {
-            var overrides = new Dictionary<string, JObject>();
-            if (release != null)
-                foreach (DataPatchEntry entry in DataPatchHttp.ReadEntries(release))
-                    AddOverride(overrides, entry);
-            return overrides;
+            // Once a read starts, return its result even if canceled so the caller can clear it.
+            return DataPatchHttp.RunBackground(() =>
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                return ReadBatch(release, chunk);
+            });
         }
 
-        private void AddOverride(Dictionary<string, JObject> overrides, DataPatchEntry entry)
+        private static void ClearBatch(RecordInput[] batch)
         {
-            if (entry == null)
+            foreach (RecordInput input in batch)
+                if (input?.entry != null)
+                    input.entry.data = null;
+            Array.Clear(batch, 0, batch.Length);
+        }
+
+        private static RecordInput[] ReadBatch(DataPatchRelease release, DataPatchChunk chunk)
+        {
+            DataPatchEntry[] entries = chunk == null ? DataPatchHttp.ReadLegacyEntries(release) : DataPatchHttp.ReadChunkEntries(release, chunk);
+            return entries.Select(entry => new RecordInput
+            {
+                entry = entry,
+                hash = entry?.data == null ? null : DataPatchStorage.Fingerprint(entry.data),
+            }).ToArray();
+        }
+
+        private string[] PrepareBatch(RecordInput[] batch, HashSet<string> seen)
+        {
+            ++LastParsedChunkCount;
+            if (LastParsedChunkCount == 1)
+                LogMemory("after first chunk parsed");
+            try
+            {
+                return batch.Select(input => PrepareInput(input, seen)).ToArray();
+            }
+            finally
+            {
+                ClearBatch(batch);
+            }
+        }
+
+        private string PrepareInput(RecordInput input, HashSet<string> seen)
+        {
+            DataPatchEntry record = input.entry;
+            if (record == null)
                 throw new InvalidOperationException("Null patch record.");
-            string key = DataPatchRegistry.Key(entry.dataType, entry.dataId);
-            if (entry.data == null || !registry.Targets.TryGetValue(key, out ScriptableObject target) ||
-                !DataPatchSerializer.Fields(target.GetType()).Any() || overrides.ContainsKey(key))
+            string key = DataPatchRegistry.Key(record.dataType, record.dataId);
+            if (record.data == null || !registry.Targets.TryGetValue(key, out ScriptableObject target) ||
+                !DataPatchSerializer.Fields(target.GetType()).Any() || !seen.Add(key))
                 throw new InvalidOperationException($"Unknown or duplicate patch target: {key}");
-            overrides.Add(key, entry.data);
+            PrepareRecord(new KeyValuePair<string, ScriptableObject>(key, target), record.data, input.hash);
+            return key;
         }
 
-        private IEnumerable<KeyValuePair<string, ScriptableObject>> PreparationTargets(Dictionary<string, JObject> overrides)
+        private bool CanReuseChunk(DataPatchChunk chunk, out string[] keys)
         {
-            // Previously touched records must still be visited when a later patch omits them.
+            return activeChunks.TryGetValue(chunk.hash, out keys) && keys.Length == chunk.entryCount && keys.All(key =>
+                key.StartsWith(chunk.dataType + ":", StringComparison.Ordinal) &&
+                activeRecords.TryGetValue(key, out RecordState previous) &&
+                registry.Targets.TryGetValue(key, out ScriptableObject target) && previous.target == target &&
+                (sameRegistry || registryRetainsPreviousAssets && !previous.requiresRegistryRefresh));
+        }
+
+        private void ReuseChunk(DataPatchChunk chunk, string[] keys, HashSet<string> seen)
+        {
+            ++LastReusedChunkCount;
+            foreach (string key in keys)
+                ReuseRecord(key, seen);
+            preparedChunks[chunk.hash] = keys;
+        }
+
+        private void ReuseRecord(string key, HashSet<string> seen)
+        {
+            if (!seen.Add(key))
+                throw new InvalidOperationException($"Duplicate patch target: {key}");
+            RecordState previous = activeRecords[key];
+            preparedRecords[key] = previous;
+            PreparationWarnings.AddRange(previous.warnings);
+        }
+
+        private IEnumerable<KeyValuePair<string, ScriptableObject>> RestorationTargets(HashSet<string> seen)
+        {
             foreach (var entry in registry.Targets)
-                if (overrides.ContainsKey(entry.Key) || defaults.ContainsKey(entry.Key))
+                if (!seen.Contains(entry.Key) && defaults.ContainsKey(entry.Key))
                     yield return entry;
+        }
+
+        private void CaptureDefault(string key, ScriptableObject target, JObject data)
+        {
+            defaults[key] = new DefaultState { target = target, data = DataPatchStorage.Compress(data) };
         }
 
         private void BeginRecordCache()
@@ -262,49 +529,55 @@ namespace MultiplayerARPG
             sameRegistry = registryRetainsPreviousAssets && activeRegistry.Count == registry.Targets.Count;
         }
 
-        private void PrepareRecord(KeyValuePair<string, ScriptableObject> entry, Dictionary<string, JObject> overrides)
+        private void PrepareRecord(KeyValuePair<string, ScriptableObject> entry, JObject input, string inputHash)
         {
-            overrides.TryGetValue(entry.Key, out JObject input);
             if (activeRecords.TryGetValue(entry.Key, out RecordState previous) && previous.target == entry.Value &&
-                (sameRegistry || registryRetainsPreviousAssets && !previous.requiresRegistryRefresh) && JToken.DeepEquals(previous.input, input))
+                (sameRegistry || registryRetainsPreviousAssets && !previous.requiresRegistryRefresh) && previous.inputHash == inputHash)
             {
                 preparedRecords[entry.Key] = previous;
                 PreparationWarnings.AddRange(previous.warnings);
                 return;
             }
-            var state = new RecordState { target = entry.Value, input = input, warnings = Array.Empty<string>() };
+            var state = new RecordState { target = entry.Value, inputHash = inputHash, warnings = Array.Empty<string>() };
             preparedRecords[entry.Key] = state;
             int warningStart = PreparationWarnings.Count;
             ++LastPreparationRecordCount;
             JObject current = DataPatchSerializer.Export(entry.Value);
-            if (!defaults.TryGetValue(entry.Key, out JObject bundled))
+            JObject bundled;
+            if (!defaults.TryGetValue(entry.Key, out DefaultState snapshot) || snapshot.target != entry.Value)
             {
-                // Capture before the first override, and reuse this export for the current comparison.
+                // Only compact bytes survive this record's preparation.
                 bundled = current;
-                defaults.Add(entry.Key, bundled);
+                CaptureDefault(entry.Key, entry.Value, current);
             }
-            if (!overrides.ContainsKey(entry.Key) && JToken.DeepEquals(current, bundled))
+            else
+                bundled = DataPatchStorage.Read(snapshot.data);
+            if (input == null && JToken.DeepEquals(current, bundled))
                 return;
             ScriptableObject copy = UnityEngine.Object.Instantiate(entry.Value);
             copy.hideFlags = HideFlags.HideAndDontSave;
             staging.Add(copy);
             try
             {
-                DataPatchSerializer.ReadInto(copy, bundled, registry, false);
-                if (overrides.TryGetValue(entry.Key, out JObject data))
+                if (!ReferenceEquals(current, bundled))
+                    DataPatchSerializer.ReadInto(copy, bundled, registry, false);
+                if (input != null)
                 {
+                    JObject data = input;
                     if (skipInvalidRecords)
                         data = (JObject)PreserveNullValues(data, current, entry.Key);
                     DataPatchSerializer.ReadInto(copy, data, registry, reportWarning: skipInvalidRecords ? message => Warn(entry.Key + ": " + message) : (Action<string>)null);
                 }
-                if (JToken.DeepEquals(current, DataPatchSerializer.Export(copy)))
+                JObject updated = DataPatchSerializer.Export(copy);
+                if (JToken.DeepEquals(current, updated))
                 {
                     staging.Remove(copy);
                     UnityEngine.Object.DestroyImmediate(copy);
                     return;
                 }
-                FieldInfo[] fields = DataPatchSerializer.Fields(copy.GetType()).ToArray();
-                changes.Add(new PreparedChange { target = entry.Value, copy = copy, fields = fields, values = fields.Select(field => field.GetValue(copy)).ToArray() });
+                FieldInfo[] fields = DataPatchSerializer.Fields(copy.GetType())
+                    .Where(field => !JToken.DeepEquals(current[field.Name], updated[field.Name])).ToArray();
+                changes.Add(new PreparedChange { target = entry.Value, fields = fields, values = fields.Select(field => field.GetValue(copy)).ToArray() });
             }
             catch (Exception ex) when (skipInvalidRecords && (ex is InvalidOperationException || ex is ArgumentException || ex is OverflowException || ex is Newtonsoft.Json.JsonException))
             {
@@ -323,20 +596,46 @@ namespace MultiplayerARPG
         {
             PreparedRelease = release;
             LastPreparationMilliseconds = timer.Elapsed.TotalMilliseconds;
+            LogMemory("after preparation");
             if (PreparationWarnings.Count > 0)
             {
                 var details = PreparationWarnings.Where(message => message.StartsWith("Skipped record ", StringComparison.Ordinal) || message.Contains("Skipped NPC shop row")).Take(10);
                 UnityEngine.Debug.LogWarning($"[Data Patch] Collected {PreparationWarnings.Count} preparation warnings. Full details: DataPatchRuntime.Engine.PreparationWarnings.\n" + string.Join("\n", details));
             }
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            UnityEngine.Debug.Log($"[Data Patch] Prepared {changes.Count} changed records in {LastPreparationMilliseconds:F1} ms across preparation frames; registry {LastRegistryMilliseconds:F1} ms, visited {LastPreparationRecordCount}/{registry.Targets.Count} records, visited {LastCacheTraversalCount} cache containers, retained {defaults.Count} rollback snapshots.");
+            UnityEngine.Debug.Log($"[Data Patch] Prepared {PreparedChangeCount} changed records in {LastPreparationMilliseconds:F1} ms across preparation frames; registry {LastRegistryMilliseconds:F1} ms, visited {LastPreparationRecordCount}/{registry.Targets.Count} records, visited {LastCacheTraversalCount} cache containers, retained {defaults.Count} compressed rollback snapshots ({RetainedSnapshotBytes / 1048576.0:F2} MiB), parsed {LastParsedChunkCount} chunks, reused {LastReusedChunkCount} chunks in {LastReuseVerificationPassCount} verification passes, sampled managed peak {PeakPreparationManagedBytes / 1048576.0:F1} MiB, incremental memory passes {LastMemoryCollectionCount}.");
 #endif
+        }
+
+        [Conditional("UNITY_EDITOR"), Conditional("DEVELOPMENT_BUILD")]
+        internal void LogMemory(string phase)
+        {
+            long managedUsed = UnityEngine.Profiling.Profiler.GetMonoUsedSizeLong();
+            long managedReserved = UnityEngine.Profiling.Profiler.GetMonoHeapSizeLong();
+            long unityUsed = UnityEngine.Profiling.Profiler.GetTotalAllocatedMemoryLong();
+            long unityReserved = UnityEngine.Profiling.Profiler.GetTotalReservedMemoryLong();
+            string processMemory = "";
+#if UNITY_EDITOR_WIN || UNITY_STANDALONE_WIN || UNITY_EDITOR_OSX || UNITY_STANDALONE_OSX || UNITY_STANDALONE_LINUX
+            try
+            {
+                using (Process process = Process.GetCurrentProcess())
+                {
+                    process.Refresh();
+                    if (process.WorkingSet64 > 0 || process.PrivateMemorySize64 > 0)
+                        processMemory = $", process working set {process.WorkingSet64 / 1048576.0:F1} MiB, private {process.PrivateMemorySize64 / 1048576.0:F1} MiB";
+                }
+            }
+            catch (Exception)
+            {
+                // Some player platforms do not expose process counters.
+            }
+#endif
+            UnityEngine.Debug.Log($"[Data Patch] Memory {phase}: managed used {managedUsed / 1048576.0:F1} MiB, reserved {managedReserved / 1048576.0:F1} MiB, Unity used {unityUsed / 1048576.0:F1} MiB, reserved {unityReserved / 1048576.0:F1} MiB, rollback bytes {RetainedSnapshotBytes / 1048576.0:F2} MiB, pending undo {PendingUndoBytes / 1048576.0:F2} MiB, staging copies {staging.Count}, pending changes {changes.Count}{processMemory}.");
         }
 
         private sealed class PreparedChange
         {
             public ScriptableObject target;
-            public ScriptableObject copy;
             public FieldInfo[] fields;
             public object[] values;
         }
@@ -345,33 +644,43 @@ namespace MultiplayerARPG
         {
             if (patch.Type == JTokenType.Null)
             {
-                Warn($"Skipped null value at {path}; existing value retained.");
+                Warn($"Skipped null value at {PatchValuePath(path, patch)}; existing value retained.");
                 return current?.DeepClone() ?? JValue.CreateNull();
             }
+            // The parsed input belongs only to this batch and is cleared after processing.
+            // Reuse its containers; only null replacements require a copy of current data.
             if (patch is JObject source)
             {
-                var result = new JObject();
                 foreach (JProperty property in source.Properties())
                 {
                     JToken previous = (current as JObject)?[property.Name];
-                    JToken value = PreserveNullValues(property.Value, previous, path + "." + property.Name);
-                    result.Add(property.Name, value);
+                    JToken value = PreserveNullValues(property.Value, previous, path);
+                    if (!ReferenceEquals(value, property.Value))
+                        property.Value = value;
                 }
-                return result;
+                return source;
             }
             if (patch is JArray array)
             {
-                var result = new JArray();
                 var previous = current as JArray;
                 for (int i = 0; i < array.Count; ++i)
                 {
                     if (array[i].Type == JTokenType.Null && (previous == null || i >= previous.Count))
-                        throw new InvalidOperationException($"Null row at {path}[{i}] has no existing value to preserve.");
-                    result.Add(PreserveNullValues(array[i], previous != null && i < previous.Count ? previous[i] : null, path + "[" + i + "]"));
+                        throw new InvalidOperationException($"Null row at {PatchValuePath(path, array[i])} has no existing value to preserve.");
+                    JToken value = PreserveNullValues(array[i], previous != null && i < previous.Count ? previous[i] : null, path);
+                    if (!ReferenceEquals(value, array[i]))
+                        array[i] = value;
                 }
-                return result;
+                return array;
             }
-            return patch.DeepClone();
+            return patch;
+        }
+
+        private static string PatchValuePath(string root, JToken value)
+        {
+            // Build a diagnostic path only for warnings/errors, not for every valid primitive.
+            string path = value.Path;
+            return path.Length == 0 ? root : root + "." + path;
         }
 
         private void Warn(string message)
@@ -381,35 +690,16 @@ namespace MultiplayerARPG
 
         public void Commit()
         {
-            // No awaits: transactions and drop rolls cannot interleave with this swap.
+            // Runtime chunks are already live. Staged tool callers still swap without yielding.
             var timer = Stopwatch.StartNew();
-            int changedCount = changes.Count;
-            foreach (var change in changes)
-                for (int i = 0; i < change.fields.Length; ++i)
-                    change.fields[i].SetValue(change.target, change.values[i]);
-            if (changedCount > 0)
+            int changedCount = PreparedChangeCount;
+            if (!progressivePreparation)
+                foreach (var change in changes)
+                    for (int i = 0; i < change.fields.Length; ++i)
+                        change.fields[i].SetValue(change.target, change.values[i]);
+            if (changedCount > 0 && !progressivePreparation)
             {
-                unchecked
-                {
-                    ++Revision;
-                }
-
-                foreach (object value in cacheTargets)
-                    ClearCache(value);
-                MemoryManager.CharacterItems.Clear();
-                // Buff caches are not cleared here; normal idle expiration still applies.
-                MemoryManager.CharacterSummons.Clear();
-                foreach (BasePlayerCharacterEntity player in UnityEngine.Object.FindObjectsByType<BasePlayerCharacterEntity>(FindObjectsSortMode.None))
-                {
-                    try
-                    {
-                        player.ForceMakeCaches();
-                    }
-                    catch (Exception ex)
-                    {
-                        UnityEngine.Debug.LogError("Player cache refresh failed after patch activation: " + ex.Message);
-                    }
-                }
+                RefreshGameplayCaches();
             }
             activeCacheRoots = new Dictionary<ScriptableObject, object[]>(preparedCacheRoots, UnityObjectComparer.Instance);
             activeRecords = new Dictionary<string, RecordState>(preparedRecords);
@@ -417,11 +707,90 @@ namespace MultiplayerARPG
             if (preparedChunks != null)
                 activeChunks = preparedChunks;
             ActiveReleaseId = PreparedRelease?.id ?? "";
+            // Chunks are already live; commit finalizes the release identity and forgets undo.
+            chunkUndo.Clear();
+            progressivePreparation = false;
+            progressiveChangedRecordCount = 0;
             Discard();
             LastCommitMilliseconds = timer.Elapsed.TotalMilliseconds;
+            LogMemory("after activation");
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
             UnityEngine.Debug.Log($"[Data Patch] Activated {changedCount} changed records in {LastCommitMilliseconds:F1} ms.");
 #endif
+        }
+
+        private void ApplyChunk()
+        {
+            if (changes.Count == 0)
+                return;
+            foreach (PreparedChange change in changes)
+            {
+                string key = DataPatchRegistry.Key(change.target.GetType().Name, DataPatchRegistry.DataId(change.target));
+                if (!chunkUndo.ContainsKey(key))
+                {
+                    JObject current = DataPatchSerializer.Export(change.target);
+                    var original = new JObject();
+                    foreach (FieldInfo field in change.fields)
+                        original.Add(field.Name, current[field.Name].DeepClone());
+                    chunkUndo[key] = new DefaultState { target = change.target, data = DataPatchStorage.Compress(original) };
+                }
+                for (int i = 0; i < change.fields.Length; ++i)
+                    change.fields[i].SetValue(change.target, change.values[i]);
+            }
+            // Resolve cache containers from the live values, not copies that will be destroyed.
+            foreach (object value in EnumerateCacheTargets(liveValues: true))
+                AddCacheTarget(value);
+            RefreshGameplayCaches();
+            activeCacheRoots = new Dictionary<ScriptableObject, object[]>(preparedCacheRoots, UnityObjectComparer.Instance);
+            progressiveChangedRecordCount += changes.Count;
+            ++LastAppliedChunkCount;
+#if UNITY_EDITOR || DEVELOPMENT_BUILD
+            UnityEngine.Debug.Log($"[Data Patch] Applied chunk {LastAppliedChunkCount}: {changes.Count} changed records are live; pending undo {PendingUndoBytes / 1048576.0:F2} MiB.");
+#endif
+            changes.Clear();
+            cacheTargets.Clear();
+            DestroyStaging();
+        }
+
+        private void UndoChunks()
+        {
+            if (chunkUndo.Count == 0)
+                return;
+            foreach (DefaultState undo in chunkUndo.Values)
+                if (undo.target != null)
+                    DataPatchSerializer.ReadInto(undo.target, DataPatchStorage.Read(undo.data), registry, false);
+            activeCacheRoots.Clear();
+            preparedCacheRoots.Clear();
+            changes.Clear();
+            cacheTargets.Clear();
+            foreach (object value in EnumerateCacheTargets(forceRefresh: true, liveValues: true))
+                AddCacheTarget(value);
+            RefreshGameplayCaches();
+        }
+
+        private void RefreshGameplayCaches()
+        {
+            unchecked
+            {
+                ++Revision;
+            }
+
+            foreach (object value in cacheTargets)
+                ClearCache(value);
+            MemoryManager.CharacterItems.Clear();
+            // Buff caches are not cleared here; normal idle expiration still applies.
+            MemoryManager.CharacterSummons.Clear();
+            foreach (BasePlayerCharacterEntity player in UnityEngine.Object.FindObjectsByType<BasePlayerCharacterEntity>(FindObjectsSortMode.None))
+            {
+                try
+                {
+                    player.ForceMakeCaches();
+                }
+                catch (Exception ex)
+                {
+                    UnityEngine.Debug.LogError("Player cache refresh failed after patch activation: " + ex.Message);
+                }
+            }
         }
 
         private sealed class ReferenceComparer : IEqualityComparer<object>
@@ -433,15 +802,21 @@ namespace MultiplayerARPG
             public int GetHashCode(object value) => System.Runtime.CompilerServices.RuntimeHelpers.GetHashCode(value);
         }
 
-        private IEnumerable<object> EnumerateCacheTargets()
+        private IEnumerable<object> EnumerateCacheTargets(bool forceRefresh = false, bool liveValues = false)
         {
-            if (changes.Count == 0 && preparedRecords.Count == 0)
+            if (changes.Count == 0 && !forceRefresh)
+            {
+                var retained = new HashSet<ScriptableObject>(registry.Targets.Values, UnityObjectComparer.Instance);
+                foreach (var cached in activeCacheRoots)
+                    if (retained.Contains(cached.Key))
+                        preparedCacheRoots[cached.Key] = cached.Value;
                 yield break;
-            var copies = changes.ToDictionary(change => change.target, change => change.copy, UnityObjectComparer.Instance);
+            }
+            var pending = changes.ToDictionary(change => change.target, UnityObjectComparer.Instance);
             var unique = new HashSet<object>(ReferenceComparer.Instance);
             foreach (ScriptableObject asset in registry.Targets.Values)
             {
-                if (!copies.ContainsKey(asset) && activeCacheRoots.TryGetValue(asset, out object[] cached))
+                if (!pending.ContainsKey(asset) && activeCacheRoots.TryGetValue(asset, out object[] cached))
                 {
                     preparedCacheRoots[asset] = cached;
                     foreach (object value in cached)
@@ -450,7 +825,7 @@ namespace MultiplayerARPG
                     continue;
                 }
                 var targets = new List<object>();
-                foreach (object value in EnumerateCacheTargets(asset, copies, new HashSet<object>(ReferenceComparer.Instance)))
+                foreach (object value in EnumerateCacheTargets(asset, pending, new HashSet<object>(ReferenceComparer.Instance), liveValues))
                 {
                     if (IsCacheTarget(value))
                     {
@@ -465,7 +840,7 @@ namespace MultiplayerARPG
             }
         }
 
-        private static IEnumerable<object> EnumerateCacheTargets(object value, Dictionary<ScriptableObject, ScriptableObject> copies, HashSet<object> visited)
+        private static IEnumerable<object> EnumerateCacheTargets(object value, Dictionary<ScriptableObject, PreparedChange> pending, HashSet<object> visited, bool liveValues)
         {
             if (value == null)
                 yield break;
@@ -474,25 +849,26 @@ namespace MultiplayerARPG
                 yield break;
             // Yield each container so even a large dependency graph can be budgeted across frames.
             yield return value;
-            object source = value;
-            if (value is ScriptableObject asset && copies.TryGetValue(asset, out ScriptableObject copy))
-                source = copy;
+            PreparedChange change = null;
+            if (!liveValues && value is ScriptableObject asset)
+                pending.TryGetValue(asset, out change);
             foreach (FieldInfo field in DataPatchSerializer.Fields(type))
             {
                 Type element = field.FieldType.IsArray ? field.FieldType.GetElementType() :
                     field.FieldType.IsGenericType && field.FieldType.GetGenericTypeDefinition() == typeof(List<>) ? field.FieldType.GetGenericArguments()[0] : null;
                 if (element != null && (element.IsPrimitive || element.IsEnum || element == typeof(string)))
                     continue;
-                object child = field.GetValue(source);
+                int index = change == null ? -1 : Array.IndexOf(change.fields, field);
+                object child = index >= 0 ? change.values[index] : field.GetValue(value);
                 if (child is System.Collections.IList list)
                 {
                     foreach (object item in list)
-                        foreach (object nested in EnumerateCacheTargets(item, copies, visited))
+                        foreach (object nested in EnumerateCacheTargets(item, pending, visited, liveValues))
                             yield return nested;
                 }
                 else if (!(child is UnityEngine.Object))
                 {
-                    foreach (object nested in EnumerateCacheTargets(child, copies, visited))
+                    foreach (object nested in EnumerateCacheTargets(child, pending, visited, liveValues))
                         yield return nested;
                 }
             }
@@ -547,13 +923,23 @@ namespace MultiplayerARPG
         public void Discard()
         {
             ++preparationVersion;
-            changes.Clear();
-            cacheTargets.Clear();
-            preparedRecords.Clear();
-            preparedCacheRoots.Clear();
-            preparedChunks = null;
-            PreparedRelease = null;
-            DestroyStaging();
+            try
+            {
+                UndoChunks();
+            }
+            finally
+            {
+                chunkUndo.Clear();
+                progressivePreparation = false;
+                progressiveChangedRecordCount = 0;
+                changes.Clear();
+                cacheTargets.Clear();
+                preparedRecords.Clear();
+                preparedCacheRoots.Clear();
+                preparedChunks = null;
+                PreparedRelease = null;
+                DestroyStaging();
+            }
         }
 
         public void Dispose()
@@ -564,6 +950,12 @@ namespace MultiplayerARPG
                 Prepare(null);
                 Commit();
             }
+            defaults.Clear();
+            activeRecords.Clear();
+            activeRegistry.Clear();
+            activeChunks.Clear();
+            activeCacheRoots.Clear();
+            PreparationWarnings.Clear();
         }
     }
 }

@@ -187,8 +187,10 @@ namespace MultiplayerARPG
                 return new JObject{["center"] = Write(bounds.center, false, depth + 1), ["size"] = Write(bounds.size, false, depth + 1)};
             if (type.IsEnum)
                 return new JValue(Convert.ToInt64(value, CultureInfo.InvariantCulture));
+            if (value is char character)
+                return new JValue(character.ToString());
             if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal))
-                return JToken.FromObject(value);
+                return new JValue(value);
             if (value is IList list)
             {
                 var result = new JArray();
@@ -209,6 +211,38 @@ namespace MultiplayerARPG
         public static void ReadInto(object target, JObject data, DataPatchRegistry registry, bool validate = true, Action<string> reportWarning = null)
         {
             ReadObject(target, data, registry, 0, validate, reportWarning);
+        }
+
+        private static object ReadPrimitive(Type type, JToken token)
+        {
+            // JToken's checked primitive operators avoid a serializer/settings/reader per value.
+            if (type == typeof(bool))
+                return (bool)token;
+            if (type == typeof(string))
+                return (string)token;
+            if (type == typeof(sbyte))
+                return (sbyte)token;
+            if (type == typeof(byte))
+                return (byte)token;
+            if (type == typeof(short))
+                return (short)token;
+            if (type == typeof(ushort))
+                return (ushort)token;
+            if (type == typeof(int))
+                return (int)token;
+            if (type == typeof(uint))
+                return (uint)token;
+            if (type == typeof(long))
+                return (long)token;
+            if (type == typeof(ulong))
+                return (ulong)token;
+            if (type == typeof(float))
+                return (float)token;
+            if (type == typeof(double))
+                return (double)token;
+            if (type == typeof(decimal))
+                return (decimal)token;
+            throw new InvalidOperationException($"Unsupported primitive patch type: {type.Name}");
         }
 
         private static void ReadObject(object target, JObject data, DataPatchRegistry registry, int depth, bool validate, Action<string> reportWarning)
@@ -384,7 +418,7 @@ namespace MultiplayerARPG
                 bool integral = type != typeof(float) && type != typeof(double) && type != typeof(decimal) && type != typeof(string) && type != typeof(bool);
                 if (integral && token.Type != JTokenType.Integer)
                     throw new InvalidOperationException("Expected integer without rounding.");
-                object result = token.ToObject(type, JsonSerializer.Create(new JsonSerializerSettings{TypeNameHandling = TypeNameHandling.None}));
+                object result = ReadPrimitive(type, token);
                 if (result is float f && (float.IsNaN(f) || float.IsInfinity(f)) || result is double d && (double.IsNaN(d) || double.IsInfinity(d)))
                     throw new InvalidOperationException("Non-finite number.");
                 return result;
