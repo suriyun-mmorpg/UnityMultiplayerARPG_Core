@@ -67,6 +67,7 @@ namespace MultiplayerARPG
         public long PendingUndoBytes => chunkUndo.Values.Sum(state => (long)state.data.Length);
         public int CapturedDefaultCount => defaults.Count;
         public int LastPreparationRecordCount { get; private set; }
+        public int LastReusedCurrentExportCount { get; private set; }
         public int LastCacheTraversalCount { get; private set; }
         public double LastRegistryMilliseconds { get; private set; }
         public double LastPreparationMilliseconds { get; private set; }
@@ -122,6 +123,7 @@ namespace MultiplayerARPG
             Discard();
             PreparationWarnings.Clear();
             LastPreparationRecordCount = 0;
+            LastReusedCurrentExportCount = 0;
             LastCacheTraversalCount = 0;
             LastParsedChunkCount = 0;
             LastMemoryCollectionCount = 0;
@@ -175,6 +177,7 @@ namespace MultiplayerARPG
             progressivePreparation = applyImmediately;
             PreparationWarnings.Clear();
             LastPreparationRecordCount = 0;
+            LastReusedCurrentExportCount = 0;
             LastCacheTraversalCount = 0;
             LastParsedChunkCount = 0;
             LastMemoryCollectionCount = 0;
@@ -542,16 +545,13 @@ namespace MultiplayerARPG
             preparedRecords[entry.Key] = state;
             int warningStart = PreparationWarnings.Count;
             ++LastPreparationRecordCount;
-            JObject current = DataPatchSerializer.Export(entry.Value);
-            JObject bundled;
-            if (!defaults.TryGetValue(entry.Key, out DefaultState snapshot) || snapshot.target != entry.Value)
-            {
-                // Only compact bytes survive this record's preparation.
-                bundled = current;
-                CaptureDefault(entry.Key, entry.Value, current);
-            }
-            else
-                bundled = DataPatchStorage.Read(snapshot.data);
+            // Full no-op exports already describe current values; do not allocate another tree.
+            bool inputMatchesCurrent = input != null && DataPatchSerializer.MatchesExport(entry.Value, input);
+            JObject current = inputMatchesCurrent ? input : DataPatchSerializer.Export(entry.Value);
+            if (inputMatchesCurrent)
+                ++LastReusedCurrentExportCount;
+            bool hasSnapshot = defaults.TryGetValue(entry.Key, out DefaultState snapshot) && snapshot.target == entry.Value;
+            JObject bundled = hasSnapshot ? DataPatchStorage.Read(snapshot.data) : current;
             if (input == null && JToken.DeepEquals(current, bundled))
                 return;
             ScriptableObject copy = UnityEngine.Object.Instantiate(entry.Value);
@@ -568,15 +568,17 @@ namespace MultiplayerARPG
                         data = (JObject)PreserveNullValues(data, current, entry.Key);
                     DataPatchSerializer.ReadInto(copy, data, registry, reportWarning: skipInvalidRecords ? message => Warn(entry.Key + ": " + message) : (Action<string>)null);
                 }
-                JObject updated = DataPatchSerializer.Export(copy);
-                if (JToken.DeepEquals(current, updated))
+                FieldInfo[] fields = DataPatchSerializer.Fields(copy.GetType())
+                    .Where(field => !DataPatchSerializer.MatchesExport(field.GetValue(copy), current[field.Name], false, 1)).ToArray();
+                if (fields.Length == 0)
                 {
                     staging.Remove(copy);
                     UnityEngine.Object.DestroyImmediate(copy);
                     return;
                 }
-                FieldInfo[] fields = DataPatchSerializer.Fields(copy.GetType())
-                    .Where(field => !JToken.DeepEquals(current[field.Name], updated[field.Name])).ToArray();
+                // Rollback is only necessary once a record has a real change to retain.
+                if (!hasSnapshot)
+                    CaptureDefault(entry.Key, entry.Value, inputMatchesCurrent ? DataPatchSerializer.Export(entry.Value) : current);
                 changes.Add(new PreparedChange { target = entry.Value, fields = fields, values = fields.Select(field => field.GetValue(copy)).ToArray() });
             }
             catch (Exception ex) when (skipInvalidRecords && (ex is InvalidOperationException || ex is ArgumentException || ex is OverflowException || ex is Newtonsoft.Json.JsonException))
@@ -603,7 +605,7 @@ namespace MultiplayerARPG
                 UnityEngine.Debug.LogWarning($"[Data Patch] Collected {PreparationWarnings.Count} preparation warnings. Full details: DataPatchRuntime.Engine.PreparationWarnings.\n" + string.Join("\n", details));
             }
 #if UNITY_EDITOR || DEVELOPMENT_BUILD
-            UnityEngine.Debug.Log($"[Data Patch] Prepared {PreparedChangeCount} changed records in {LastPreparationMilliseconds:F1} ms across preparation frames; registry {LastRegistryMilliseconds:F1} ms, visited {LastPreparationRecordCount}/{registry.Targets.Count} records, visited {LastCacheTraversalCount} cache containers, retained {defaults.Count} compressed rollback snapshots ({RetainedSnapshotBytes / 1048576.0:F2} MiB), parsed {LastParsedChunkCount} chunks, reused {LastReusedChunkCount} chunks in {LastReuseVerificationPassCount} verification passes, sampled managed peak {PeakPreparationManagedBytes / 1048576.0:F1} MiB, incremental memory passes {LastMemoryCollectionCount}.");
+            UnityEngine.Debug.Log($"[Data Patch] Prepared {PreparedChangeCount} changed records in {LastPreparationMilliseconds:F1} ms across preparation frames; registry {LastRegistryMilliseconds:F1} ms, visited {LastPreparationRecordCount}/{registry.Targets.Count} records, visited {LastCacheTraversalCount} cache containers, retained {defaults.Count} compressed rollback snapshots ({RetainedSnapshotBytes / 1048576.0:F2} MiB), reused {LastReusedCurrentExportCount} current JSON exports, parsed {LastParsedChunkCount} chunks, reused {LastReusedChunkCount} chunks in {LastReuseVerificationPassCount} verification passes, sampled managed peak {PeakPreparationManagedBytes / 1048576.0:F1} MiB, incremental memory passes {LastMemoryCollectionCount}.");
 #endif
         }
 

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public static class DataPatchSerializer
+    public static partial class DataPatchSerializer
     {
         private static readonly Dictionary<(Type, bool), FieldInfo[]> fieldCache = new Dictionary<(Type, bool), FieldInfo[]>();
         private static readonly Dictionary<Type, FieldInfo[]> orderedFieldCache = new Dictionary<Type, FieldInfo[]>();

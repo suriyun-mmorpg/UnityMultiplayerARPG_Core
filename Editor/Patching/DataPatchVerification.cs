@@ -10,6 +10,79 @@ namespace MultiplayerARPG
 {
     public static class DataPatchVerification
     {
+        [Serializable]
+        private sealed class ExportComparisonFixture
+        {
+            public int integer = 123;
+            public long largeInteger = long.MaxValue - 7;
+            public decimal exactDecimal = 12345678901234567890.12345678m;
+            public float fractional = 0.125f;
+            public double precise = double.MaxValue;
+            public char character = 'x';
+            public string dateLikeText = "2026-10-15T12:00:00Z";
+            public Vector2 vector2 = new Vector2(1, 2);
+            public Vector3 vector3 = new Vector3(1, 2, 3);
+            public Vector2Int vector2Int = new Vector2Int(1, 2);
+            public Vector3Int vector3Int = new Vector3Int(1, 2, 3);
+            public Rect rectangle = new Rect(1, 2, 3, 4);
+            public Bounds bounds = new Bounds(Vector3.one, Vector3.one * 2);
+            public LayerMask mask = 123;
+            public int[] array = new[] { 1, 2, 3 };
+            public System.Collections.Generic.List<string> list = new System.Collections.Generic.List<string> { "a", null, "b" };
+            public ItemAmount[] references;
+            public DamageType enumeration = DamageType.Melee;
+        }
+
+        public static void VerifyExportComparison()
+        {
+            var compare = (Func<object, JToken, bool, int, bool>)Delegate.CreateDelegate(
+                typeof(Func<object, JToken, bool, int, bool>), typeof(DataPatchSerializer).GetMethod(
+                    "MatchesExport", System.Reflection.BindingFlags.Static | System.Reflection.BindingFlags.NonPublic));
+            var fixture = new ExportComparisonFixture();
+            var item = ScriptableObject.CreateInstance<JunkItem>();
+            item.Id = "comparison-fixture-" + Guid.NewGuid().ToString("N");
+            fixture.references = new[] { new ItemAmount { item = item, amount = 10 } };
+            try
+            {
+                JObject snapshot = DataPatchSerializer.Export(fixture);
+                Check(compare(fixture, snapshot, true, 0), "Direct comparison rejected an identical export.");
+                var candidates = new JToken[] { JValue.CreateNull(), new JValue(false), new JValue(1L), new JValue(1d),
+                    new JValue(1m), new JValue("text"), new JObject(), new JArray(), new JObject { ["dataId"] = item.DataId } };
+                foreach (var field in DataPatchSerializer.Fields(fixture.GetType()))
+                {
+                    object value = field.GetValue(fixture);
+                    Check(compare(value, snapshot[field.Name], false, 1), "Direct comparison differs for " + field.Name);
+                    foreach (JToken candidate in candidates)
+                    {
+                        bool equal;
+                        try
+                        {
+                            equal = JToken.DeepEquals(snapshot[field.Name], candidate);
+                        }
+                        catch (OverflowException)
+                        {
+                            equal = false;
+                        }
+                        Check(compare(value, candidate, false, 1) == equal,
+                            "Direct comparison changed JSON equality for " + field.Name);
+                    }
+                }
+                JObject reordered = new JObject();
+                foreach (var property in System.Linq.Enumerable.Reverse(snapshot.Properties()))
+                    reordered.Add(property.Name, property.Value.DeepClone());
+                Check(compare(fixture, reordered, true, 0), "Property order changed export equality.");
+                snapshot["integer"] = 124;
+                Check(!compare(fixture, snapshot, true, 0), "Direct comparison missed a changed primitive.");
+                snapshot.Remove("integer");
+                Check(!compare(fixture, snapshot, true, 0), "Direct comparison accepted a partial export as full equality.");
+                Debug.Log("DATA_PATCH_DIRECT_EXPORT_COMPARISON_PASSED");
+            }
+            finally
+            {
+                UnityEngine.Object.DestroyImmediate(item);
+            }
+        }
+
         public static void Run()
         {
             try
@@ -39,6 +112,7 @@ namespace MultiplayerARPG
                 VerifyTolerantRecords();
                 VerifyRegistrySecondaryLookups();
                 VerifyChunkedTransport();
+                VerifyExportComparison();
                 await VerifyPreparationPerformance();
                 await VerifyStartupPreparation();
                 await VerifyProgressivePatchLoading();
@@ -689,11 +763,14 @@ namespace MultiplayerARPG
                     Check(items[0].SellPrice == int.MaxValue - 7, "Streaming preparation modified live values before activation.");
                     engine.Commit();
                     Check(items[0].SellPrice == 123 && items[0].DismantleReturnGold == 456 && items[0].DefaultDescription == "patched" && items[0].DefaultTitle == "2026-10-14T12:00:00Z", "Compact patch did not activate or changed date-like text.");
-                    Check(engine.RetainedSnapshotBytes == snapshotBytes, "Reload duplicated rollback snapshots.");
+                    Check(snapshotBytes == 0 && engine.CapturedDefaultCount == 1 && engine.RetainedSnapshotBytes > 0,
+                        "No-op records captured defaults, or the first real change lost its rollback snapshot.");
+                    snapshotBytes = engine.RetainedSnapshotBytes;
                     await engine.PrepareAsync(second);
                     Check(engine.LastParsedChunkCount == 0 && engine.LastPreparationRecordCount == 0, "An identical reload rebuilt parsed record trees.");
                     Check(engine.LastReusedChunkCount == 4 && engine.LastReuseVerificationPassCount == 1, "An unchanged reload returned to the main thread for every file verification.");
                     engine.Commit();
+                    Check(engine.RetainedSnapshotBytes == snapshotBytes, "Identical reload duplicated a rollback buffer.");
                     // Reused chunks must still reject duplicated identities across descriptors.
                     var originalManifest = JsonConvert.DeserializeObject<DataPatchManifest>(second.manifestJson);
                     var duplicate = originalManifest.chunks[0];
@@ -814,6 +891,29 @@ namespace MultiplayerARPG
                     await engine.PrepareAsync(null);
                     Check(engine.CapturedDefaultCount == 0 && engine.LastPreparationRecordCount == 0, "Startup without a release captured or exported bundled records.");
                     engine.Commit();
+                    await engine.PrepareAsync(Release(profile, "startup-full-noop", new[]
+                    {
+                        new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[0].DataId, data = DataPatchSerializer.Export(items[0]) },
+                    }));
+                    Check(engine.PreparedChangeCount == 0 && engine.CapturedDefaultCount == 0 && engine.LastReusedCurrentExportCount == 1,
+                        "A full no-op export allocated rollback data or missed the direct comparison path.");
+                    engine.Commit();
+                    items[0].SellPrice = -1;
+                    bool invalidNoopRejected = false;
+                    try
+                    {
+                        await engine.PrepareAsync(Release(profile, "startup-invalid-noop", new[]
+                        {
+                            new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[0].DataId, data = DataPatchSerializer.Export(items[0]) },
+                        }));
+                    }
+                    catch (InvalidOperationException)
+                    {
+                        invalidNoopRejected = true;
+                    }
+                    Check(invalidNoopRejected && engine.CapturedDefaultCount == 0,
+                        "An unchanged invalid value bypassed validation or captured a rollback buffer.");
+                    items[0].SellPrice = 10;
                     var first = Release(profile, "startup-first", new[]
                     {
                         new DataPatchEntry { dataType = nameof(JunkItem), dataId = items[0].DataId, data = JObject.Parse("{\"sellPrice\":1000}") },
@@ -1291,6 +1391,11 @@ namespace MultiplayerARPG
                     items[i].Id = "partial-publishing-" + Guid.NewGuid().ToString("N");
                     items[i].SellPrice = 10 + i;
                 }
+                // Give the retained items nested containers to skip on reload. Otherwise
+                // these flat fixtures cost one visit even when cached, and the newly
+                // registered currency alone makes the second traversal larger.
+                items[0].DismantleReturnItems = new[] { new ItemAmount { item = items[2], amount = 1 } };
+                items[1].DismantleReturnItems = new[] { new ItemAmount { item = items[2], amount = 1 } };
                 database.items = items;
                 profile.database = database;
                 profile.patchDatabaseId = "partial-preparation-test";
@@ -1323,7 +1428,8 @@ namespace MultiplayerARPG
                     profile.scannedData = new ScriptableObject[] { shop, currency };
                     await engine.PrepareAsync(second);
                     Check(engine.LastPreparationRecordCount == 2, "Partial reload prepared unchanged valid records or failed to retry a rejected record after registry growth.");
-                    Check(engine.LastCacheTraversalCount < firstCacheCount, "Partial reload rediscovered the complete cache graph.");
+                    Check(engine.LastCacheTraversalCount < firstCacheCount,
+                        $"Partial reload rediscovered the complete cache graph ({engine.LastCacheTraversalCount} containers, previously {firstCacheCount}).");
                     engine.Commit();
                     Check(items[0].SellPrice == 100 && items[1].SellPrice == 200 && shop.sellItems[0].sellPrice == 2000, "Partial reload reset retained item patches or failed to update the shop.");
                     Check(engine.PreparationWarnings.Exists(warning => warning.Contains("Skipped record JunkItem")), "Unchanged rejected record lost its diagnostic.");
