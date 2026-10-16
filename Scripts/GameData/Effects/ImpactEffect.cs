@@ -29,14 +29,12 @@ namespace MultiplayerARPG
 #if !DISABLE_ADDRESSABLES
             AssetReferenceGameEffect tempAddressablePrefab = addressableEffect;
 #endif
-            GameEffect loadedPrefab;
 #if !DISABLE_ADDRESSABLES
-            loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+            await ClientEffectPrefabs.SpawnAsync<GameEffect>(tempAddressablePrefab,
+                prefab => PoolSystem.GetInstance(prefab, position, rotation), fallback: tempPrefab);
 #else
-            loadedPrefab = tempPrefab;
+            PoolSystem.GetInstance(tempPrefab, position, rotation);
 #endif
-            if (loadedPrefab != null)
-                PoolSystem.GetInstance(loadedPrefab, position, rotation);
 #endif
             await UniTask.Yield();
         }

@@ -293,7 +293,21 @@ namespace MultiplayerARPG
         {
             if (effects == null)
                 return null;
-            return InstantiateEffect(await effects.GetOrLoadAssetsAsync<GameEffect>());
+            if (!PoolSystem.UseClientEffectPolicy)
+                return InstantiateEffect(await effects.GetOrLoadAssetsAsync<GameEffect>());
+            var token = gameObject.GetCancellationTokenOnDestroy();
+            var instances = new List<GameEffect>();
+            foreach (var reference in effects)
+            {
+                var instance = await ClientEffectPrefabs.SpawnAsync<GameEffect>(reference, prefab =>
+                {
+                    var added = InstantiateEffect(new[] {prefab});
+                    return added != null && added.Count > 0 ? added[0] : null;
+                }, token);
+                if (instance != null) instances.Add(instance);
+                if (token.IsCancellationRequested) break;
+            }
+            return instances;
         }
 #endif
         

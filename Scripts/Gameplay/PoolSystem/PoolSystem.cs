@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MultiplayerARPG
 {
-    public static class PoolSystem
+    public static partial class PoolSystem
     {
         private static readonly Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>> pooledObjects = new Dictionary<IPoolDescriptor, Queue<IPoolDescriptor>>();
 #if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
@@ -21,6 +21,7 @@ namespace MultiplayerARPG
 
         public static void Clear()
         {
+            RetireClientEffectPools();
             foreach (Queue<IPoolDescriptor> queue in pooledObjects.Values)
             {
                 while (queue.Count > 0)
@@ -52,10 +53,13 @@ namespace MultiplayerARPG
             prefab.InitPrefab();
 
             Queue<IPoolDescriptor> queue = new Queue<IPoolDescriptor>();
+            PrepareClientEffectPool(prefab);
 
             IPoolDescriptor obj;
 
-            for (int i = 0; i < prefab.PoolSize; ++i)
+            // Client effects allocate only when requested. Server/host pools keep their authored prewarm count.
+            int prewarmCount = IsClientEffect(prefab) ? 0 : prefab.PoolSize;
+            for (int i = 0; i < prewarmCount; ++i)
             {
                 obj = Object.Instantiate(prefab.gameObject).GetComponent<IPoolDescriptor>();
 #if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
@@ -86,18 +90,21 @@ namespace MultiplayerARPG
             Queue<IPoolDescriptor> queue;
             if (pooledObjects.TryGetValue(prefab, out queue))
             {
-                IPoolDescriptor obj;
-
-                if (queue.Count > 0)
-                {
+                TouchClientEffectPool(prefab);
+                IPoolDescriptor obj = null;
+                while (queue.Count > 0 && (Object)obj == null)
                     obj = queue.Dequeue();
-                }
-                else
+                if ((Object)obj == null)
                 {
                     obj = Object.Instantiate(prefab.gameObject).GetComponent<IPoolDescriptor>();
 #if UNITY_EDITOR && INIT_POOL_TO_TRANSFORM
                     obj.transform.SetParent(PoolingTransform);
 #endif
+                    if (IsClientEffect(prefab))
+                    {
+                        obj.gameObject.SetActive(false);
+                        RegisterClientEffectCopy(prefab, obj);
+                    }
                 }
                 if (onBeforeActivated != null)
                     onBeforeActivated.Invoke(obj as T);
@@ -122,6 +129,8 @@ namespace MultiplayerARPG
                 Debug.LogWarning($"[PoolSystem] Cannot push back. The instance's is empty.");
                 return;
             }
+            if (TryReturnRetiredClientEffect(instance))
+                return;
             if (instance.ObjectPrefab == null)
             {
                 Debug.LogWarning($"[PoolSystem] Cannot push back ({instance.gameObject}). The instance's prefab is empty");
@@ -137,8 +146,9 @@ namespace MultiplayerARPG
             {
                 return;
             }
-            if (queue.Count >= instance.ObjectPrefab.PoolSize)
+            if (queue.Count >= GetEffectRetentionCapacity(instance.ObjectPrefab))
             {
+                if (IsClientEffect(instance.ObjectPrefab)) instance.OnPushBack();
                 Object.Destroy(instance.gameObject);
             }
             else
@@ -151,6 +161,7 @@ namespace MultiplayerARPG
                 instance.OnPushBack();
                 instance.gameObject.SetActive(false);
                 queue.Enqueue(instance);
+                TouchClientEffectPool(instance.ObjectPrefab);
             }
         }
     }

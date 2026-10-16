@@ -20,6 +20,9 @@ namespace MultiplayerARPG
         public async void GetInstance()
         {
 #if !UNITY_SERVER
+            Transform target = container;
+            if (target == null) return;
+            var token = target.gameObject.GetCancellationTokenOnDestroy();
             GameEffect tempPrefab = null;
 #if !EXCLUDE_PREFAB_REFS || DISABLE_ADDRESSABLES
             tempPrefab = prefab;
@@ -27,15 +30,17 @@ namespace MultiplayerARPG
 #if !DISABLE_ADDRESSABLES
             AssetReferenceGameEffect tempAddressablePrefab = addressablePrefab;
 #endif
-            GameEffect loadedPrefab;
+            GameEffect instance;
 #if !DISABLE_ADDRESSABLES
-            loadedPrefab = await tempAddressablePrefab.GetOrLoadAssetAsyncOrUsePrefab(tempPrefab);
+            instance = await ClientEffectPrefabs.SpawnAsync<GameEffect>(tempAddressablePrefab,
+                prefab => PoolSystem.GetInstance(prefab, target.position, target.rotation), token, tempPrefab);
 #else
             await UniTask.Yield();
-            loadedPrefab = tempPrefab;
+            if (token.IsCancellationRequested) return;
+            instance = PoolSystem.GetInstance(tempPrefab, target.position, target.rotation);
 #endif
-            if (loadedPrefab != null)
-                PoolSystem.GetInstance(loadedPrefab, container.position, container.rotation).FollowingTarget = container;
+            if (instance != null && target != null)
+                instance.FollowingTarget = target;
 #endif
         }
 

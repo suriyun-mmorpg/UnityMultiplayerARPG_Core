@@ -426,19 +426,17 @@ namespace MultiplayerARPG
 #if !UNITY_SERVER
         private async void PlayProjectileEffect(Vector3 damagePosition, Quaternion damageRotation, float projectileDistance, List<ImpactEffectPlayingData> impactEffectsData)
         {
-            ProjectileEffect loadedProjectileEffect;
+            ProjectileEffect instance;
 #if !DISABLE_ADDRESSABLES
-            loadedProjectileEffect = await AddressableProjectEffect
-                .GetOrLoadAssetAsyncOrUsePrefab(ProjectileEffect);
+            instance = await ClientEffectPrefabs.SpawnAsync<ProjectileEffect>(AddressableProjectEffect,
+                prefab => PoolSystem.GetInstance(prefab, damagePosition, damageRotation), fallback: ProjectileEffect);
 #else
-            loadedProjectileEffect = ProjectileEffect;
+            instance = PoolSystem.GetInstance(ProjectileEffect, damagePosition, damageRotation);
 #endif
-
-            if (loadedProjectileEffect == null)
+            if (instance == null)
                 return;
 
-            PoolSystem.GetInstance(loadedProjectileEffect, damagePosition, damageRotation)
-                .Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
+            instance.Setup(projectileDistance, missileSpeed, impactEffects, damagePosition, impactEffectsData);
             await UniTask.Yield();
         }
 #endif
