@@ -11,6 +11,12 @@ namespace MultiplayerARPG
 {
     public partial class UICharacterItem : UIDataForCharacter<UICharacterItemData>
     {
+        public enum StackDisplayType
+        {
+            Simple,
+            Requirement
+        }
+        public int RequiredAmount { get; set; } = 0;
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public int Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
@@ -224,6 +230,7 @@ namespace MultiplayerARPG
         public UnityEvent onClickUseItem = new UnityEvent();
 
         [Header("Options")]
+        public StackDisplayType stackDisplayType;
         public UICharacterItemDragHandler uiDragging;
         [Tooltip("UI which will be shown if this item level not reached max level")]
         public UICharacterItem uiNextLevelItem;
@@ -957,6 +964,13 @@ namespace MultiplayerARPG
             if (uiTextStack != null)
             {
                 string stackString;
+                int itemMaxStack = Item != null ? Item.MaxStack : 0;
+                switch (stackDisplayType)
+                {
+                    case StackDisplayType.Requirement:
+                        itemMaxStack = RequiredAmount;
+                        break;
+                }
                 if (isEmpty)
                 {
                     stackString = ZString.Format(
@@ -966,21 +980,32 @@ namespace MultiplayerARPG
                 }
                 else
                 {
-                    if (CharacterItem.amount > Item.MaxStack || Item.MaxStack == int.MaxValue)
+                    switch (stackDisplayType)
                     {
-                        stackString = ZString.Format(
-                            LanguageManager.GetText(formatKeyAmount),
-                            CharacterItem.amount.ToString("N0"));
-                    }
-                    else
-                    {
-                        stackString = ZString.Format(
-                            LanguageManager.GetText(formatKeyStack),
-                            CharacterItem.amount.ToString("N0"),
-                            Item.MaxStack.ToString("N0"));
+                        case StackDisplayType.Requirement:
+                            stackString = ZString.Format(
+                                LanguageManager.GetText(formatKeyStack),
+                                CharacterItem.amount.ToString("N0"),
+                                itemMaxStack.ToString("N0"));
+                            break;
+                        default:
+                            if (CharacterItem.amount > itemMaxStack || itemMaxStack == int.MaxValue)
+                            {
+                                stackString = ZString.Format(
+                                    LanguageManager.GetText(formatKeyAmount),
+                                    CharacterItem.amount.ToString("N0"));
+                            }
+                            else
+                            {
+                                stackString = ZString.Format(
+                                    LanguageManager.GetText(formatKeyStack),
+                                    CharacterItem.amount.ToString("N0"),
+                                    itemMaxStack.ToString("N0"));
+                            }
+                            break;
                     }
                 }
-                uiTextStack.SetGameObjectActive(!CharacterItem.IsEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && (CharacterItem.amount > Item.MaxStack || Item.MaxStack > 1))));
+                uiTextStack.SetGameObjectActive(!CharacterItem.IsEmptySlot() && (showAmountWhenMaxIsOne || (Item != null && (CharacterItem.amount > itemMaxStack || itemMaxStack > 1))));
                 uiTextStack.text = stackString;
             }
 

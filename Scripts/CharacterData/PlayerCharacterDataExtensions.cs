@@ -480,6 +480,21 @@ namespace MultiplayerARPG
             return true;
         }
 
+        public static int GetCurrencyAmount(this IPlayerCharacterData data, Currency key)
+        {
+            if (data == null || key == null)
+                return 0;
+#if !DISABLE_CUSTOM_CHARACTER_CURRENCIES
+            foreach (CharacterCurrency characterCurrency in data.Currencies)
+            {
+                if (key != characterCurrency.GetCurrency())
+                    continue;
+                return characterCurrency.amount;
+            }
+#endif
+            return 0;
+        }
+
         public static CurrencyAmounts GetIndexedCurrencies(this IPlayerCharacterData data)
         {
             CurrencyAmounts result = default;
