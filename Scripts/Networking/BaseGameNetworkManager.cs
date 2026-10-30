@@ -97,6 +97,8 @@ namespace MultiplayerARPG
         protected readonly ConcurrentDictionary<uint, UITextKeys> _clientReadyRequestResponseMessages = new ConcurrentDictionary<uint, UITextKeys>();
         protected readonly ConcurrentDictionary<uint, IEntityMovementDataHandler> _entityMovementDataHandlers = new ConcurrentDictionary<uint, IEntityMovementDataHandler>();
         public ConcurrentDictionary<uint, IEntityMovementDataHandler> EntityMovementDataHandlers => _entityMovementDataHandlers;
+        // The handlers this tick's send pass wrote; their one-shot flags are consumed after its last player
+        protected readonly EntityMovementServerStateFlagsPass _serverStateFlagsPass = new EntityMovementServerStateFlagsPass();
 
         protected override void Awake()
         {
@@ -663,6 +665,8 @@ namespace MultiplayerARPG
 
             int tempLastPosition;
 
+            // One-shot flags reach every player, then are consumed once
+            _serverStateFlagsPass.Begin();
             foreach (KeyValuePair<long, LiteNetLibPlayer> playerKvp in Players)
             {
                 if (playerKvp.Key == ClientConnectionId)
@@ -693,6 +697,7 @@ namespace MultiplayerARPG
                     EntityMovementDataBuffers.StateDataWriter.Reset();
                     if (!dataHandler.WriteServerState(writeTimestamp, EntityMovementDataBuffers.StateDataWriter, out bool shouldSendReliably))
                         continue;
+                    _serverStateFlagsPass.Record(dataHandler);
                     // Increase data writing counter
                     if (shouldSendReliably)
                     {
@@ -754,6 +759,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            _serverStateFlagsPass.ConsumeAll();
         }
 
         public virtual void InitPrefabs()

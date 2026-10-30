@@ -9,7 +9,7 @@ using UnityEngine;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(Rigidbody2D))]
-    public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IEntityMovementDataHandler, IManagedUpdate
+    public class RigidBodyEntityMovement2D : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IEntityMovementDataHandler, IEntityMovementServerStateFlags, IManagedUpdate
     {
         protected const float MIN_DISTANCE_TO_SIMULATE_MOVEMENT = 0.01f;
         protected const float TIMESTAMP_TO_UNITY_TIME_MULTIPLIER = 0.001f;
@@ -549,10 +549,17 @@ namespace MultiplayerARPG
             }
             // Sync transform from server to all clients (include owner client)
             this.ServerWriteSyncTransform2D(_movementForceAppliers, writer);
+            // Called once per receiver, so the one-shot flags stay
+            // set for every receiver of this tick; the send loop consumes them once (ConsumeServerStateFlags)
+            return true;
+        }
+
+        // IEntityMovementServerStateFlags
+        public void ConsumeServerStateFlags()
+        {
             _sendingDash = false;
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
-            return true;
         }
 
         public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)

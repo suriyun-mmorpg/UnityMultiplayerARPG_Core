@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
-    public partial class BuiltInEntityMovementFunctions3D : IEntityMovementDataHandler
+    public partial class BuiltInEntityMovementFunctions3D : IEntityMovementDataHandler, IEntityMovementServerStateFlags
     {
         private const int FORCE_GROUNDED_FRAMES_AFTER_TELEPORT = 3;
         private const float MIN_DISTANCE_TO_SIMULATE_MOVEMENT = 0.01f;
@@ -1380,11 +1380,19 @@ namespace MultiplayerARPG
             else
                 Entity.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
             platformState.Write(writer);
+            // Called once per receiver, so the one-shot flags stay
+            // set for every receiver of this tick; the send loop consumes them once (ConsumeServerStateFlags)
+            return true;
+        }
+
+        // IEntityMovementServerStateFlags. The owner's teleport
+        // confirm (_isServerWaitingTeleportConfirm, _isClientConfirmingTeleport) is not a one-shot flag.
+        public void ConsumeServerStateFlags()
+        {
             _sendingJump = false;
             _sendingDash = false;
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
-            return true;
         }
 
         public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
@@ -1671,6 +1679,12 @@ namespace MultiplayerARPG
                 _isClientConfirmingTeleport = true;
             _lastTeleportFrame = Time.frameCount;
             _previousPosition = EntityTransform.position;
+            // Restart interpolation at the destination, as the
+            // snap in ReadServerStateAtClient does. Otherwise UpdateInterpolate drags a remote copy back to its last
+            // pre-teleport state, and the server checks (and, while dead, clamps) the owner's confirmation against it.
+            _startInterpPosition = position;
+            _endInterpPosition = position;
+            _interpElapsedTime = 0f;
         }
 
         public bool CanPredictMovement()
