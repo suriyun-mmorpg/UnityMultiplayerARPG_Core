@@ -443,31 +443,54 @@ namespace MultiplayerARPG
 
         public virtual bool CurrenciesEnoughToBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
-            float rate = 1f + character.GetCaches().BuyItemPriceRate;
-            int sellPrice = Mathf.CeilToInt(sellItem.sellPrice * rate);
-            int totalSellPrice = sellPrice * amount;
-            if (totalSellPrice < 0)
+            if (!TryGetBuyItemTotalPrices(character, sellItem, amount, out int totalSellPrice, out CurrencyAmounts totalSellPrices))
                 return false;
             if (character.Gold < totalSellPrice)
                 return false;
-            if (sellItem.sellPrices != null && sellItem.sellPrices.Length > 0)
-            {
-                CurrencyAmounts tempData = default;
-                GameDataHelpers.CombineCurrencies(sellItem.sellPrices, ref tempData, rate);
-                return character.HasEnoughCurrencyAmounts(tempData, out _, out CurrencyAmounts _, amount);
-            }
+            if (!totalSellPrices.IsEmpty)
+                return character.HasEnoughCurrencyAmounts(totalSellPrices, out _, out CurrencyAmounts _);
             return true;
         }
 
         public virtual void DecreaseCurrenciesWhenBuyItem(IPlayerCharacterData character, NpcSellItem sellItem, int amount)
         {
-            float rate = 1f + character.GetCaches().BuyItemPriceRate;
-            int sellPrice = Mathf.CeilToInt(sellItem.sellPrice * rate);
-            int totalSellPrice = sellPrice * amount;
+            if (!TryGetBuyItemTotalPrices(character, sellItem, amount, out int totalSellPrice, out CurrencyAmounts totalSellPrices))
+                return;
             if (totalSellPrice > 0)
                 character.Gold -= totalSellPrice;
+            if (!totalSellPrices.IsEmpty)
+                character.DecreaseCurrencies(totalSellPrices);
+        }
+
+        /// <summary>
+        /// Gold and currency totals for buying `amount` units at the character's buy price rate, shared by the check and the charge so they agree.
+        /// False when a total is negative or larger than an int, which no character can hold.
+        /// </summary>
+        protected bool TryGetBuyItemTotalPrices(IPlayerCharacterData character, NpcSellItem sellItem, int amount, out int totalSellPrice, out CurrencyAmounts totalSellPrices)
+        {
+            float rate = 1f + character.GetCaches().BuyItemPriceRate;
+            totalSellPrice = 0;
+            totalSellPrices = default;
+            long total = (long)Mathf.CeilToInt(sellItem.sellPrice * rate) * amount;
+            if (total < 0 || total > int.MaxValue)
+                return false;
+            totalSellPrice = (int)total;
             if (sellItem.sellPrices != null && sellItem.sellPrices.Length > 0)
-                character.DecreaseCurrencies(sellItem.sellPrices, amount);
+            {
+                CurrencyAmounts unitPrices = default;
+                GameDataHelpers.CombineCurrencies(sellItem.sellPrices, ref unitPrices, rate);
+                uint mask = unitPrices.OccupiedMask;
+                for (int slot = 0; slot < RuntimeGameDataSlots.CurrencyCount; ++slot)
+                {
+                    if ((mask & (1u << slot)) == 0)
+                        continue;
+                    total = (long)unitPrices[slot] * amount;
+                    if (total < 0 || total > int.MaxValue)
+                        return false;
+                    totalSellPrices[slot] = (int)total;
+                }
+            }
+            return true;
         }
 
         public virtual void IncreaseCurrenciesWhenSellItem(IPlayerCharacterData character, BaseItem item, int amount)

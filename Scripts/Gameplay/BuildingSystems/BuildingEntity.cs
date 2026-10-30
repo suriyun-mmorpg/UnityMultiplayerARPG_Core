@@ -461,8 +461,8 @@ namespace MultiplayerARPG
 
         public bool CanRepairByMenu()
         {
-            if (CacheRepairs.Count <= 0)
-                return false;
+            // Building CacheRepairs sets _repairDataForMenu, which it keeps out of the dictionary
+            _ = CacheRepairs;
             return _repairDataForMenu.HasValue;
         }
 
@@ -479,6 +479,11 @@ namespace MultiplayerARPG
         {
             if (!TryGetRepairAmount(repairPlayer, out int repairAmount, out errorMessage))
                 return false;
+            // Decrease currency
+            BuildingRepairData buildingRepairData = _repairDataForMenu.Value;
+            repairPlayer.Gold -= buildingRepairData.requireGold * repairAmount;
+            repairPlayer.DecreaseItems(buildingRepairData.requireItems, repairAmount);
+            repairPlayer.DecreaseCurrencies(buildingRepairData.requireCurrencies, repairAmount);
             CurrentHp += repairAmount;
             return true;
         }
