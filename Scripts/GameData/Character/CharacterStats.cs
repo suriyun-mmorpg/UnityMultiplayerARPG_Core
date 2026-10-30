@@ -370,7 +370,18 @@ namespace MultiplayerARPG
         public CharacterStats GetCharacterStats(int level)
         {
             if (statsIncreaseEachLevelByLevels == null || statsIncreaseEachLevelByLevels.Length == 0)
-                return baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0))) + ((baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0)))) * rateIncreaseEachLevel);
+            {
+                // Compound the rate once per level above 1, as IncrementalFloat.GetAmount does
+                if (level <= 1)
+                    return baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0)));
+                CharacterStats resultWithoutByLevel = baseStats;
+                for (int i = 2; i <= level; ++i)
+                {
+                    resultWithoutByLevel += statsIncreaseEachLevel;
+                    resultWithoutByLevel += resultWithoutByLevel * rateIncreaseEachLevel;
+                }
+                return resultWithoutByLevel;
+            }
             CharacterStats result = baseStats;
             int countLevel = 2;
             int indexOfIncremental = 0;

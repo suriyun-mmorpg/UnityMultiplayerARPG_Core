@@ -35,7 +35,9 @@ namespace MultiplayerARPG
                 return false;
             }
             System.Array.Sort(ItemRefine.RepairPrices);
-            for (int i = ItemRefine.RepairPrices.Length - 1; i >= 0; --i)
+            // A band's rate is the top of its band: the item pays the lowest band it is still under,
+            // or the highest band when it is above them all
+            for (int i = 0; i < ItemRefine.RepairPrices.Length; ++i)
             {
                 repairPrice = ItemRefine.RepairPrices[i];
                 if (durabilityRate < repairPrice.DurabilityRate)
