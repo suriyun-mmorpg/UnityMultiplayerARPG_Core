@@ -223,19 +223,6 @@ namespace MultiplayerARPG
             LeftHandWeaponAbilityIndexes = new Dictionary<string, int>();
         }
 
-        ~CharacterDataCache()
-        {
-            CleanCacheData();
-            RightHandWeaponAbilities.Clear();
-            RightHandWeaponAbilities = null;
-            RightHandWeaponAbilityIndexes.Clear();
-            RightHandWeaponAbilityIndexes = null;
-            LeftHandWeaponAbilities.Clear();
-            LeftHandWeaponAbilities = null;
-            LeftHandWeaponAbilityIndexes.Clear();
-            LeftHandWeaponAbilityIndexes = null;
-        }
-
         private void CleanCacheData()
         {
             _numericResultsReady = false;
