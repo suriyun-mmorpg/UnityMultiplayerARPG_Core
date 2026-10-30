@@ -655,19 +655,11 @@ namespace MultiplayerARPG
             NetDataWriter reliableWriter = EntityMovementDataBuffers.ReliablePacketWriter;
             NetDataWriter unreliableWriter = EntityMovementDataBuffers.UnreliablePacketWriter;
 
-            // Prepare packets
-            TransportHandler.WritePacket(reliableWriter, GameNetworkingConsts.EntityState);
-            reliableWriter.PutPackedLong(writeTimestamp);
-            int posBeforeWriteReliableStateCount = reliableWriter.Length;
-            int reliableStateCount = 0;
-            reliableWriter.Put(reliableStateCount);
-
-            TransportHandler.WritePacket(unreliableWriter, GameNetworkingConsts.EntityState);
-            unreliableWriter.PutPackedLong(writeTimestamp);
-            int posBeforeWriteUnreliableStateCount = unreliableWriter.Length;
-            int unreliableStateCount = 0;
-            unreliableWriter.Put(unreliableStateCount);
-            int posAfterWriteUnreliableStateCount = unreliableWriter.Length;
+            int posBeforeWriteReliableStateCount;
+            int reliableStateCount;
+            int posBeforeWriteUnreliableStateCount;
+            int unreliableStateCount;
+            int posAfterWriteUnreliableStateCount;
 
             int tempLastPosition;
 
@@ -677,6 +669,21 @@ namespace MultiplayerARPG
                     continue;
 
                 LiteNetLibPlayer player = playerKvp.Value;
+
+                // Prepare packets per player: WritePacket resets the shared writers, so each
+                // player gets a fresh header and counters instead of accumulating prior players' states.
+                TransportHandler.WritePacket(reliableWriter, GameNetworkingConsts.EntityState);
+                reliableWriter.PutPackedLong(writeTimestamp);
+                posBeforeWriteReliableStateCount = reliableWriter.Length;
+                reliableStateCount = 0;
+                reliableWriter.Put(reliableStateCount);
+
+                TransportHandler.WritePacket(unreliableWriter, GameNetworkingConsts.EntityState);
+                unreliableWriter.PutPackedLong(writeTimestamp);
+                posBeforeWriteUnreliableStateCount = unreliableWriter.Length;
+                unreliableStateCount = 0;
+                unreliableWriter.Put(unreliableStateCount);
+                posAfterWriteUnreliableStateCount = unreliableWriter.Length;
                 var objectIds = player.GetSubscribingObjectIds();
                 while (objectIds.MoveNext())
                 {
