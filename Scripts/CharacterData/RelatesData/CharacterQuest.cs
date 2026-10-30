@@ -59,8 +59,8 @@ namespace MultiplayerARPG
         public int GetProgress(IPlayerCharacterData character, int taskIndex, out string targetTitle, out int targetProgress, out bool isComplete)
         {
             Quest quest = GetQuest();
-            QuestTask[] tasks = quest.GetTasks(randomTasksIndex);
-            if (character == null || quest == null || taskIndex < 0 || taskIndex >= tasks.Length)
+            QuestTask[] tasks = quest == null ? null : quest.GetTasks(randomTasksIndex);
+            if (character == null || quest == null || tasks == null || taskIndex < 0 || taskIndex >= tasks.Length)
             {
                 targetTitle = string.Empty;
                 targetProgress = 0;

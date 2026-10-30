@@ -13,7 +13,7 @@ namespace MultiplayerARPG
         public override BaseCacheData<CharacterItem> Prepare(in CharacterItem source)
         {
             base.Prepare(in source);
-            if (source.dataId == _dataId && source.level == _level && source.randomSeed == _randomSeed && source.level == _version)
+            if (source.dataId == _dataId && source.level == _level && source.randomSeed == _randomSeed && source.version == _version)
                 return this;
             _dataId = source.dataId;
             _level = source.level;
