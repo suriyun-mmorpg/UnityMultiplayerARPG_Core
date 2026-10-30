@@ -252,10 +252,13 @@ namespace MultiplayerARPG
             }
             if (amount > 0)
                 return false;
-            foreach (KeyValuePair<int, int> decreasingItem in decreasingItemIndexes)
+            // Highest index first: an unlimited bag removes a used-up stack, which shifts every later index
+            List<int> sortedIndexes = new List<int>(decreasingItemIndexes.Keys);
+            sortedIndexes.Sort();
+            for (int i = sortedIndexes.Count - 1; i >= 0; --i)
             {
-                decreaseItems.Add(decreasingItem.Key, decreasingItem.Value);
-                itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value, isLimitInventorySlot, true);
+                decreaseItems.Add(sortedIndexes[i], decreasingItemIndexes[sortedIndexes[i]]);
+                itemList.DecreaseItemsByIndex(sortedIndexes[i], decreasingItemIndexes[sortedIndexes[i]], isLimitInventorySlot, true);
             }
             return true;
         }
