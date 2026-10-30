@@ -589,6 +589,14 @@ namespace MultiplayerARPG
                 uint objectId = reader.GetPackedUInt();
                 int dataLength = reader.GetInt();
                 int positionBeforeRead = reader.Position;
+                // Every state resumes at its length (ReadServerEntityState),
+                // so a length the packet can't hold leaves nothing after it to trust (a negative one would seek back
+                // on every state)
+                if (dataLength < 0 || dataLength > reader.AvailableBytes)
+                {
+                    if (LogWarn) Logging.LogWarning(LogTag, $"Unable to read entity movement states, invalid state length {dataLength}: {objectId}.");
+                    return;
+                }
                 if (!_entityMovementDataHandlers.TryGetValue(objectId, out IEntityMovementDataHandler dataHandler))
                 {
                     if (LogWarn) Logging.LogWarning(LogTag, $"Unable to read entity movement state properly, entity movement not found: {objectId}.");
@@ -597,16 +605,35 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                try
-                {
-                    dataHandler.ReadServerStateAtClient(peerTimestamp, reader);
-                }
-                catch
+                // Resumes at the state's end after every read, not only after a throw
+                if (!ReadServerEntityState(dataHandler, peerTimestamp, reader, dataLength))
                 {
                     if (LogWarn) Logging.LogWarning(LogTag, $"Unable to read entity movement state properly, error occurs while reading: {objectId}.");
-                    reader.SetPosition(positionBeforeRead);
-                    reader.SkipBytes(dataLength);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Reads one server state through its handler and always leaves the reader <paramref name="dataLength"/>
+        /// bytes after where the state starts, whether the handler read fewer bytes, more, or threw. The reader
+        /// used to be re-seeked only after a throw, so a handler that misread its state misread every state
+        /// after it. False when the handler threw.
+        /// </summary>
+        public static bool ReadServerEntityState(IEntityMovementDataHandler dataHandler, long peerTimestamp, NetDataReader reader, int dataLength)
+        {
+            int positionBeforeRead = reader.Position;
+            try
+            {
+                dataHandler.ReadServerStateAtClient(peerTimestamp, reader);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                reader.SetPosition(positionBeforeRead + dataLength);
             }
         }
 

@@ -610,9 +610,30 @@ namespace MultiplayerARPG
             }
         }
 
-        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
+            // Every byte is read here, synchronously, so a read error reaches
+            // the network manager's catch (BaseGameNetworkManager.ReadServerEntityState). The apply may await the teleport
+            // preparer, so it runs apart and logs its own exceptions: this reader was async void, whose exceptions
+            // never reached that catch.
             reader.ClientReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers);
+            ApplyServerStateAtClientAndForget(peerTimestamp, movementState, extraMovementState, position, yAngle, movementForceAppliers);
+        }
+
+        private async void ApplyServerStateAtClientAndForget(long peerTimestamp, MovementState movementState, ExtraMovementState extraMovementState, Vector3 position, float yAngle, List<EntityMovementForceApplier> movementForceAppliers)
+        {
+            try
+            {
+                await ApplyServerStateAtClient(peerTimestamp, movementState, extraMovementState, position, yAngle, movementForceAppliers);
+            }
+            catch (System.Exception ex)
+            {
+                Logging.LogException(nameof(NavMeshEntityMovement), ex);
+            }
+        }
+
+        private async UniTask ApplyServerStateAtClient(long peerTimestamp, MovementState movementState, ExtraMovementState extraMovementState, Vector3 position, float yAngle, List<EntityMovementForceApplier> movementForceAppliers)
+        {
             if (IsServer)
             {
                 // Don't read and apply transform, because it was done at server
