@@ -775,7 +775,7 @@ namespace MultiplayerARPG
                         leftHandWeapon = data.EquipWeapons.leftHand.GetWeaponItem();
                         leftHandWeaponDamageAmount = data.EquipWeapons.leftHand.GetDamageAmount();
                     }
-                    if (!data.EquipWeapons.rightHand.IsBroken())
+                    if (!data.EquipWeapons.leftHand.IsBroken())
                     {
                         resultArmors.Combine(data.EquipWeapons.leftHand.GetArmorAmount());
                         GetBuffs(data.EquipWeapons.leftHand,
