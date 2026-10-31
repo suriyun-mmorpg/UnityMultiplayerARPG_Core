@@ -73,20 +73,11 @@ namespace MultiplayerARPG
             string itemId = list[itemIndex].id;
             return RefineItem(character, list[itemIndex], enhancerDataIds, (refinedItem) =>
             {
-                list[IndexAfterShift(list, itemIndex, itemId)] = refinedItem;
+                list[list.IndexOfOrDefault(itemIndex, itemId)] = refinedItem;
             }, () =>
             {
-                list.RemoveOrPlaceEmptySlot(IndexAfterShift(list, itemIndex, itemId));
+                list.RemoveOrPlaceEmptySlot(list.IndexOfOrDefault(itemIndex, itemId));
             }, out gameMessageType);
-        }
-
-        /// <summary>
-        /// Where an item is now after materials used up earlier in the same action were removed: an unlimited bag closes their gaps
-        /// </summary>
-        private static int IndexAfterShift(IList<CharacterItem> list, int index, string id)
-        {
-            int currentIndex = list.IndexOf(id);
-            return currentIndex >= 0 ? currentIndex : index;
         }
 
         private static bool RefineItem(IPlayerCharacterData character, CharacterItem refiningItem, int[] enhancerDataIds, System.Action<CharacterItem> onRefine, System.Action onDestroy, out UITextKeys gameMessage)

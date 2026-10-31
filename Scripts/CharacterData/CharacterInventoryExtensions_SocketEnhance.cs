@@ -84,7 +84,7 @@ namespace MultiplayerARPG
             string itemId = list[index].id;
             return EnhanceSocketItem(character, list[index], enhancerId, socketIndex, (enhancedSocketItem) =>
             {
-                list[IndexAfterShift(list, index, itemId)] = enhancedSocketItem;
+                list[list.IndexOfOrDefault(index, itemId)] = enhancedSocketItem;
             }, out gameMessage);
         }
 
