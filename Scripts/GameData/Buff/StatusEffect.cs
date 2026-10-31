@@ -45,9 +45,12 @@ namespace MultiplayerARPG
         {
             if (MaxResistanceAmount > 0f && totalResistance > MaxResistanceAmount)
                 totalResistance = MaxResistanceAmount;
-            float resistance = totalResistance / level;
+            // Each whole point resists one level fully, the remainder partly resists the next (see the tooltips)
+            float resistance = totalResistance - (level - 1);
             if (resistance > 1f)
                 resistance = 1f;
+            if (resistance < 0f)
+                resistance = 0f;
             if (MaxResistanceAmountEachLevels == null || MaxResistanceAmountEachLevels.Length == 0)
                 return resistance;
             int index = level - 1;
