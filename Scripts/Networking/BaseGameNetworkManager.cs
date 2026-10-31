@@ -97,6 +97,8 @@ namespace MultiplayerARPG
         protected readonly ConcurrentDictionary<uint, UITextKeys> _clientReadyRequestResponseMessages = new ConcurrentDictionary<uint, UITextKeys>();
         protected readonly ConcurrentDictionary<uint, IEntityMovementDataHandler> _entityMovementDataHandlers = new ConcurrentDictionary<uint, IEntityMovementDataHandler>();
         public ConcurrentDictionary<uint, IEntityMovementDataHandler> EntityMovementDataHandlers => _entityMovementDataHandlers;
+        // The handlers this tick's send pass wrote; their one-shot flags are consumed after its last player
+        protected readonly EntityMovementServerStateFlagsPass _serverStateFlagsPass = new EntityMovementServerStateFlagsPass();
 
         protected override void Awake()
         {
@@ -587,6 +589,14 @@ namespace MultiplayerARPG
                 uint objectId = reader.GetPackedUInt();
                 int dataLength = reader.GetInt();
                 int positionBeforeRead = reader.Position;
+                // Every state resumes at its length (ReadServerEntityState),
+                // so a length the packet can't hold leaves nothing after it to trust (a negative one would seek back
+                // on every state)
+                if (dataLength < 0 || dataLength > reader.AvailableBytes)
+                {
+                    if (LogWarn) Logging.LogWarning(LogTag, $"Unable to read entity movement states, invalid state length {dataLength}: {objectId}.");
+                    return;
+                }
                 if (!_entityMovementDataHandlers.TryGetValue(objectId, out IEntityMovementDataHandler dataHandler))
                 {
                     if (LogWarn) Logging.LogWarning(LogTag, $"Unable to read entity movement state properly, entity movement not found: {objectId}.");
@@ -595,16 +605,35 @@ namespace MultiplayerARPG
                     continue;
                 }
 
-                try
-                {
-                    dataHandler.ReadServerStateAtClient(peerTimestamp, reader);
-                }
-                catch
+                // Resumes at the state's end after every read, not only after a throw
+                if (!ReadServerEntityState(dataHandler, peerTimestamp, reader, dataLength))
                 {
                     if (LogWarn) Logging.LogWarning(LogTag, $"Unable to read entity movement state properly, error occurs while reading: {objectId}.");
-                    reader.SetPosition(positionBeforeRead);
-                    reader.SkipBytes(dataLength);
                 }
+            }
+        }
+
+        /// <summary>
+        /// Reads one server state through its handler and always leaves the reader <paramref name="dataLength"/>
+        /// bytes after where the state starts, whether the handler read fewer bytes, more, or threw. The reader
+        /// used to be re-seeked only after a throw, so a handler that misread its state misread every state
+        /// after it. False when the handler threw.
+        /// </summary>
+        public static bool ReadServerEntityState(IEntityMovementDataHandler dataHandler, long peerTimestamp, NetDataReader reader, int dataLength)
+        {
+            int positionBeforeRead = reader.Position;
+            try
+            {
+                dataHandler.ReadServerStateAtClient(peerTimestamp, reader);
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+            finally
+            {
+                reader.SetPosition(positionBeforeRead + dataLength);
             }
         }
 
@@ -655,28 +684,37 @@ namespace MultiplayerARPG
             NetDataWriter reliableWriter = EntityMovementDataBuffers.ReliablePacketWriter;
             NetDataWriter unreliableWriter = EntityMovementDataBuffers.UnreliablePacketWriter;
 
-            // Prepare packets
-            TransportHandler.WritePacket(reliableWriter, GameNetworkingConsts.EntityState);
-            reliableWriter.PutPackedLong(writeTimestamp);
-            int posBeforeWriteReliableStateCount = reliableWriter.Length;
-            int reliableStateCount = 0;
-            reliableWriter.Put(reliableStateCount);
-
-            TransportHandler.WritePacket(unreliableWriter, GameNetworkingConsts.EntityState);
-            unreliableWriter.PutPackedLong(writeTimestamp);
-            int posBeforeWriteUnreliableStateCount = unreliableWriter.Length;
-            int unreliableStateCount = 0;
-            unreliableWriter.Put(unreliableStateCount);
-            int posAfterWriteUnreliableStateCount = unreliableWriter.Length;
+            int posBeforeWriteReliableStateCount;
+            int reliableStateCount;
+            int posBeforeWriteUnreliableStateCount;
+            int unreliableStateCount;
+            int posAfterWriteUnreliableStateCount;
 
             int tempLastPosition;
 
+            // One-shot flags reach every player, then are consumed once
+            _serverStateFlagsPass.Begin();
             foreach (KeyValuePair<long, LiteNetLibPlayer> playerKvp in Players)
             {
                 if (playerKvp.Key == ClientConnectionId)
                     continue;
 
                 LiteNetLibPlayer player = playerKvp.Value;
+
+                // Prepare packets per player: WritePacket resets the shared writers, so each
+                // player gets a fresh header and counters instead of accumulating prior players' states.
+                TransportHandler.WritePacket(reliableWriter, GameNetworkingConsts.EntityState);
+                reliableWriter.PutPackedLong(writeTimestamp);
+                posBeforeWriteReliableStateCount = reliableWriter.Length;
+                reliableStateCount = 0;
+                reliableWriter.Put(reliableStateCount);
+
+                TransportHandler.WritePacket(unreliableWriter, GameNetworkingConsts.EntityState);
+                unreliableWriter.PutPackedLong(writeTimestamp);
+                posBeforeWriteUnreliableStateCount = unreliableWriter.Length;
+                unreliableStateCount = 0;
+                unreliableWriter.Put(unreliableStateCount);
+                posAfterWriteUnreliableStateCount = unreliableWriter.Length;
                 var objectIds = player.GetSubscribingObjectIds();
                 while (objectIds.MoveNext())
                 {
@@ -686,6 +724,7 @@ namespace MultiplayerARPG
                     EntityMovementDataBuffers.StateDataWriter.Reset();
                     if (!dataHandler.WriteServerState(writeTimestamp, EntityMovementDataBuffers.StateDataWriter, out bool shouldSendReliably))
                         continue;
+                    _serverStateFlagsPass.Record(dataHandler);
                     // Increase data writing counter
                     if (shouldSendReliably)
                     {
@@ -747,6 +786,7 @@ namespace MultiplayerARPG
                     }
                 }
             }
+            _serverStateFlagsPass.ConsumeAll();
         }
 
         public virtual void InitPrefabs()

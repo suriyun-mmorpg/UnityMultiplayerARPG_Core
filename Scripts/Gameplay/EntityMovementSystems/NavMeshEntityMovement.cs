@@ -10,7 +10,7 @@ using UnityEngine.AI;
 namespace MultiplayerARPG
 {
     [RequireComponent(typeof(NavMeshAgent))]
-    public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IEntityMovementDataHandler, IManagedUpdate
+    public class NavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IEntityMovementDataHandler, IEntityMovementServerStateFlags, IManagedUpdate
     {
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
         protected const float MIN_DISTANCE_TO_SIMULATE_MOVEMENT = 0.01f;
@@ -582,9 +582,19 @@ namespace MultiplayerARPG
             }
             // Sync transform from server to all clients (include owner client)
             this.ServerWriteSyncTransform3D(_movementForceAppliers, writer);
+            // Called once per receiver, so the one-shot flags stay
+            // set for every receiver of this tick; the send loop consumes them once (ConsumeServerStateFlags)
+            return true;
+        }
+
+        // IEntityMovementServerStateFlags. Clears the one-shot flags the server writes send, including the dash
+        // flag, which a server never cleared before (after one dash, every state carried IsDash and went
+        // reliable).
+        public void ConsumeServerStateFlags()
+        {
+            _sendingDash = false;
             _isTeleporting = false;
             _stillMoveAfterTeleport = false;
-            return true;
         }
 
         public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
@@ -600,9 +610,30 @@ namespace MultiplayerARPG
             }
         }
 
-        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
+            // Every byte is read here, synchronously, so a read error reaches
+            // the network manager's catch (BaseGameNetworkManager.ReadServerEntityState). The apply may await the teleport
+            // preparer, so it runs apart and logs its own exceptions: this reader was async void, whose exceptions
+            // never reached that catch.
             reader.ClientReadSyncTransformMessage3D(out MovementState movementState, out ExtraMovementState extraMovementState, out Vector3 position, out float yAngle, out List<EntityMovementForceApplier> movementForceAppliers);
+            ApplyServerStateAtClientAndForget(peerTimestamp, movementState, extraMovementState, position, yAngle, movementForceAppliers);
+        }
+
+        private async void ApplyServerStateAtClientAndForget(long peerTimestamp, MovementState movementState, ExtraMovementState extraMovementState, Vector3 position, float yAngle, List<EntityMovementForceApplier> movementForceAppliers)
+        {
+            try
+            {
+                await ApplyServerStateAtClient(peerTimestamp, movementState, extraMovementState, position, yAngle, movementForceAppliers);
+            }
+            catch (System.Exception ex)
+            {
+                Logging.LogException(nameof(NavMeshEntityMovement), ex);
+            }
+        }
+
+        private async UniTask ApplyServerStateAtClient(long peerTimestamp, MovementState movementState, ExtraMovementState extraMovementState, Vector3 position, float yAngle, List<EntityMovementForceApplier> movementForceAppliers)
+        {
             if (IsServer)
             {
                 // Don't read and apply transform, because it was done at server
