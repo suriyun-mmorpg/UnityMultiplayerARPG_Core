@@ -371,37 +371,36 @@ namespace MultiplayerARPG
         {
             if (statsIncreaseEachLevelByLevels == null || statsIncreaseEachLevelByLevels.Length == 0)
             {
-                // Compound the rate once per level above 1, as IncrementalFloat.GetAmount does
-                if (level <= 1)
-                    return baseStats + (statsIncreaseEachLevel * (level - (level > 0 ? 1 : 0)));
-                CharacterStats resultWithoutByLevel = baseStats;
-                for (int i = 2; i <= level; ++i)
+                CharacterStats result = baseStats;
+                int countLevel = 2;
+                while (countLevel <= level)
                 {
-                    resultWithoutByLevel += statsIncreaseEachLevel;
-                    resultWithoutByLevel += resultWithoutByLevel * rateIncreaseEachLevel;
+                    result += statsIncreaseEachLevel;
+                    result += result * rateIncreaseEachLevel;
+                    countLevel++;
                 }
-                return resultWithoutByLevel;
+                return result;
             }
-            CharacterStats result = baseStats;
-            int countLevel = 2;
+            CharacterStats resultWithByLevel = baseStats;
+            int countByLevel = 2;
             int indexOfIncremental = 0;
             int firstMinLevel = statsIncreaseEachLevelByLevels[indexOfIncremental].minLevel;
-            while (countLevel <= level)
+            while (countByLevel <= level)
             {
                 CharacterStats flat = statsIncreaseEachLevel;
                 CharacterStats rate = rateIncreaseEachLevel;
-                if (countLevel >= firstMinLevel)
+                if (countByLevel >= firstMinLevel)
                 {
                     flat = statsIncreaseEachLevelByLevels[indexOfIncremental].statsIncreaseEachLevel;
                     rate = statsIncreaseEachLevelByLevels[indexOfIncremental].rateIncreaseEachLevel;
                 }
-                result += flat;
-                result += result * rate;
-                countLevel++;
-                if (indexOfIncremental + 1 < statsIncreaseEachLevelByLevels.Length && countLevel >= statsIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
+                resultWithByLevel += flat;
+                resultWithByLevel += resultWithByLevel * rate;
+                countByLevel++;
+                if (indexOfIncremental + 1 < statsIncreaseEachLevelByLevels.Length && countByLevel >= statsIncreaseEachLevelByLevels[indexOfIncremental + 1].minLevel)
                     indexOfIncremental++;
             }
-            return result;
+            return resultWithByLevel;
         }
 
         public CharacterStats GetCharacterLevelStats(int level)
