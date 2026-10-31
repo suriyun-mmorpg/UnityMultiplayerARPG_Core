@@ -85,7 +85,7 @@ namespace MultiplayerARPG
         /// </summary>
         private static int IndexAfterShift(IList<CharacterItem> list, int index, string id)
         {
-            int currentIndex = string.IsNullOrEmpty(id) ? -1 : list.IndexOf(id);
+            int currentIndex = list.IndexOf(id);
             return currentIndex >= 0 ? currentIndex : index;
         }
 
