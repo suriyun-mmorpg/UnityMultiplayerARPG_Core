@@ -487,8 +487,6 @@ namespace MultiplayerARPG
             int toIndex,
             out UITextKeys gameMessage)
         {
-            CharacterItem fromItem = storageItems[fromIndex];
-            CharacterItem toItem = storageItems[toIndex];
             if (fromIndex < 0 || fromIndex >= storageItems.Count ||
                 toIndex < 0 || toIndex >= storageItems.Count)
             {
@@ -496,6 +494,8 @@ namespace MultiplayerARPG
                 GameInstance.ServerLogHandlers.LogSwapOrMergeStorageItem(playerCharacter, storageId, storageIsLimitSlot, storageSlotLimit, storageItems, fromIndex, toIndex, false, gameMessage);
                 return false;
             }
+            CharacterItem fromItem = storageItems[fromIndex];
+            CharacterItem toItem = storageItems[toIndex];
 
             if (fromItem.dataId == toItem.dataId && !fromItem.IsFull() && !toItem.IsFull() && fromItem.level == toItem.level)
             {
@@ -957,12 +957,12 @@ namespace MultiplayerARPG
                     targetItem = character.EquipItems[index].Clone();
                     break;
                 case InventoryType.EquipWeaponRight:
-                    if (index >= character.SelectableWeaponSets.Count || !canUnEquipItem)
+                    if (equipSlotIndex >= character.SelectableWeaponSets.Count || !canUnEquipItem)
                         return false;
                     targetItem = character.SelectableWeaponSets[equipSlotIndex].rightHand.Clone();
                     break;
                 case InventoryType.EquipWeaponLeft:
-                    if (index >= character.SelectableWeaponSets.Count || !canUnEquipItem)
+                    if (equipSlotIndex >= character.SelectableWeaponSets.Count || !canUnEquipItem)
                         return false;
                     targetItem = character.SelectableWeaponSets[equipSlotIndex].leftHand.Clone();
                     break;
@@ -1003,13 +1003,13 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponRight:
                     if (amount == targetItem.amount)
                     {
-                        EquipWeapons equipWeapons = character.SelectableWeaponSets[index];
+                        EquipWeapons equipWeapons = character.SelectableWeaponSets[equipSlotIndex];
                         equipWeapons.rightHand = CharacterItem.Empty;
                         character.SelectableWeaponSets[equipSlotIndex] = equipWeapons;
                     }
                     else
                     {
-                        EquipWeapons equipWeapons = character.SelectableWeaponSets[index];
+                        EquipWeapons equipWeapons = character.SelectableWeaponSets[equipSlotIndex];
                         CharacterItem equipWeapon = equipWeapons.rightHand;
                         equipWeapon.amount -= amount;
                         equipWeapons.rightHand = equipWeapon;
@@ -1019,13 +1019,13 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponLeft:
                     if (amount == targetItem.amount)
                     {
-                        EquipWeapons equipWeapons = character.SelectableWeaponSets[index];
+                        EquipWeapons equipWeapons = character.SelectableWeaponSets[equipSlotIndex];
                         equipWeapons.leftHand = CharacterItem.Empty;
                         character.SelectableWeaponSets[equipSlotIndex] = equipWeapons;
                     }
                     else
                     {
-                        EquipWeapons equipWeapons = character.SelectableWeaponSets[index];
+                        EquipWeapons equipWeapons = character.SelectableWeaponSets[equipSlotIndex];
                         CharacterItem equipWeapon = equipWeapons.leftHand;
                         equipWeapon.amount -= amount;
                         equipWeapons.leftHand = equipWeapon;
@@ -1076,13 +1076,14 @@ namespace MultiplayerARPG
         public static bool SellItems(this IPlayerCharacterData character, int[] selectedIndexes, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            List<int> indexes = new List<int>(selectedIndexes);
+            // Each slot once: selling a slot again would sell whatever slid into it
+            List<int> indexes = new List<int>(new HashSet<int>(selectedIndexes));
             indexes.Sort();
             int tempIndex;
             for (int i = indexes.Count - 1; i >= 0; --i)
             {
                 tempIndex = indexes[i];
-                if (tempIndex >= character.NonEquipItems.Count)
+                if (tempIndex < 0 || tempIndex >= character.NonEquipItems.Count)
                     continue;
                 character.SellItem(InventoryType.NonEquipItems, tempIndex, 0, character.NonEquipItems[tempIndex].amount, out _);
             }

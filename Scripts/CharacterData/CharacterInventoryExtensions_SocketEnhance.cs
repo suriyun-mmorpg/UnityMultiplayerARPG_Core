@@ -81,9 +81,10 @@ namespace MultiplayerARPG
 
         private static bool EnhanceSocketItemByList(IPlayerCharacterData character, IList<CharacterItem> list, int index, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
+            string itemId = list[index].id;
             return EnhanceSocketItem(character, list[index], enhancerId, socketIndex, (enhancedSocketItem) =>
             {
-                list[index] = enhancedSocketItem;
+                list[IndexAfterShift(list, index, itemId)] = enhancedSocketItem;
             }, out gameMessage);
         }
 
@@ -103,10 +104,12 @@ namespace MultiplayerARPG
                 gameMessage = UITextKeys.UI_ERROR_ITEM_NOT_EQUIPMENT;
                 return false;
             }
+            // The sockets struct always has 8 entries; only the item's own socket types are real sockets
+            int socketCount = System.Math.Min(enhancingItem.sockets.Count, equipmentItem.AvailableSocketEnhancerTypes?.Length ?? 0);
             if (socketIndex >= 0)
             {
                 // Put enhancer to target socket
-                if (socketIndex >= enhancingItem.sockets.Count || enhancingItem.sockets[socketIndex] != 0)
+                if (socketIndex >= socketCount || enhancingItem.sockets[socketIndex] != 0)
                 {
                     gameMessage = UITextKeys.UI_ERROR_SOCKET_NOT_EMPTY;
                     return false;
@@ -115,18 +118,18 @@ namespace MultiplayerARPG
             else
             {
                 // Put enhancer to any empty socket
-                for (int index = 0; index < enhancingItem.sockets.Count; ++index)
+                for (int index = 0; index < socketCount; ++index)
                 {
                     if (enhancingItem.sockets[index] == 0)
                     {
                         socketIndex = index;
                         break;
                     }
-                    if (index == enhancingItem.sockets.Count - 1)
-                    {
-                        gameMessage = UITextKeys.UI_ERROR_NO_EMPTY_SOCKET;
-                        return false;
-                    }
+                }
+                if (socketIndex < 0)
+                {
+                    gameMessage = UITextKeys.UI_ERROR_NO_EMPTY_SOCKET;
+                    return false;
                 }
             }
             BaseItem enhancerItem;

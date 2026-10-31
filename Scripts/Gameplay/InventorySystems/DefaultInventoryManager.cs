@@ -229,34 +229,55 @@ namespace MultiplayerARPG
             return true;
         }
 
-        public override bool DecreaseItems(IList<CharacterItem> itemList, int dataId, int amount, bool isLimitInventorySlot, out Dictionary<int, int> decreaseItems)
+        public override bool DecreaseItems(
+            IList<CharacterItem> itemList,
+            int dataId,
+            int amount,
+            bool isLimitInventorySlot,
+            out Dictionary<int, int> decreaseItems)
         {
             decreaseItems = new Dictionary<int, int>();
-            Dictionary<int, int> decreasingItemIndexes = new Dictionary<int, int>();
-            int tempDecresingAmount;
-            CharacterItem tempItem;
+            var decreasingItems = new List<KeyValuePair<int, int>>();
+
+            // Collect changes in ascending index order.
             for (int i = 0; i < itemList.Count; ++i)
             {
-                tempItem = itemList[i];
-                if (tempItem.dataId == dataId)
+                CharacterItem item = itemList[i];
+
+                if (item.dataId == dataId)
                 {
-                    if (amount - tempItem.amount > 0)
-                        tempDecresingAmount = tempItem.amount;
-                    else
-                        tempDecresingAmount = amount;
-                    amount -= tempDecresingAmount;
-                    decreasingItemIndexes[i] = tempDecresingAmount;
+                    int decreasingAmount = amount > item.amount
+                        ? item.amount
+                        : amount;
+
+                    amount -= decreasingAmount;
+                    decreasingItems.Add(
+                        new KeyValuePair<int, int>(i, decreasingAmount));
                 }
+
                 if (amount == 0)
                     break;
             }
+
+            // Leave the inventory unchanged if there aren't enough items.
             if (amount > 0)
                 return false;
-            foreach (KeyValuePair<int, int> decreasingItem in decreasingItemIndexes)
+
+            // Highest index first: removing a stack shifts later indexes.
+            for (int i = decreasingItems.Count - 1; i >= 0; --i)
             {
-                decreaseItems.Add(decreasingItem.Key, decreasingItem.Value);
-                itemList.DecreaseItemsByIndex(decreasingItem.Key, decreasingItem.Value, isLimitInventorySlot, true);
+                var entry = decreasingItems[i];
+                int index = entry.Key;
+                int decreasingAmount = entry.Value;
+
+                decreaseItems.Add(index, decreasingAmount);
+                itemList.DecreaseItemsByIndex(
+                    index,
+                    decreasingAmount,
+                    isLimitInventorySlot,
+                    true);
             }
+
             return true;
         }
 
