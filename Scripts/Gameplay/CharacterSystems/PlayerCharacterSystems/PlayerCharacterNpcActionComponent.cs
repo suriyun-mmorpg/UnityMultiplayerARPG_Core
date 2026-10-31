@@ -395,9 +395,21 @@ namespace MultiplayerARPG
             int dataId = sellItem.item.DataId;
             int level = sellItem.level;
             int sellAmount = sellItem.amount > 0 ? sellItem.amount : sellItem.item.MaxStack;
+            int increaseAmount;
+            unchecked
+            {
+                increaseAmount = amount * sellAmount;
+            }
 
-            // Can carry or not? A free offer passes the price check at any amount, so the item count can still overflow
-            if ((long)amount * sellAmount > int.MaxValue || Entity.IncreasingItemsWillOverwhelming(dataId, amount * sellAmount))
+            // Invalid amount
+            if (increaseAmount < 0)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_DATA);
+                return;
+            }
+
+            // Can carry or not?
+            if (Entity.IncreasingItemsWillOverwhelming(dataId, increaseAmount))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return;
