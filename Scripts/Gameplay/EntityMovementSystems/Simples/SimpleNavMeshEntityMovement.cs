@@ -15,7 +15,7 @@ namespace MultiplayerARPG
     /// </summary>
     [RequireComponent(typeof(NavMeshAgent))]
     [RequireComponent(typeof(LiteNetLibTransform))]
-    public class SimpleNavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IEntityMovementDataHandler, IManagedUpdate
+    public class SimpleNavMeshEntityMovement : BaseNetworkedGameEntityComponent<BaseGameEntity>, IEntityMovementComponent, IEntityMovementDataHandler, IEntityMovementServerStateFlags, IManagedUpdate
     {
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
         protected const float MIN_DIRECTION_SQR_MAGNITUDE = 0.0001f;
@@ -552,11 +552,19 @@ namespace MultiplayerARPG
                 writer.Put(EntityTransform.position.y);
                 writer.Put(EntityTransform.position.z);
                 writer.PutPackedUShort(Mathf.FloatToHalf(EntityTransform.eulerAngles.y));
-                _serverTeleportState = MovementTeleportState.WaitingForResponse;
                 return true;
             }
             shouldSendReliably = false;
             return false;
+        }
+
+        public void ConsumeServerStateFlags()
+        {
+            // Every receiver needs the request before we wait for the owner's acknowledgement.
+            if (_serverTeleportState.Has(MovementTeleportState.Requesting))
+            {
+                _serverTeleportState = MovementTeleportState.WaitingForResponse;
+            }
         }
 
         public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)

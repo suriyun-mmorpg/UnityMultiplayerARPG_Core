@@ -7,7 +7,7 @@ using UnityEngine.AI;
 
 namespace MultiplayerARPG
 {
-    public partial class BuiltInSimpleEntityMovementFunctions3D : IEntityMovementDataHandler
+    public partial class BuiltInSimpleEntityMovementFunctions3D : IEntityMovementDataHandler, IEntityMovementServerStateFlags
     {
         protected const int FORCE_GROUNDED_FRAMES_AFTER_TELEPORT = 3;
         protected const float MIN_MAGNITUDE_TO_DETERMINE_MOVING = 0.01f;
@@ -1127,11 +1127,19 @@ namespace MultiplayerARPG
                 writer.Put(Entity.EntityTransform.position.y);
                 writer.Put(Entity.EntityTransform.position.z);
                 writer.PutPackedUShort(Mathf.FloatToHalf(Entity.EntityTransform.eulerAngles.y));
-                _serverTeleportState = MovementTeleportState.WaitingForResponse;
                 return true;
             }
             shouldSendReliably = false;
             return false;
+        }
+
+        public void ConsumeServerStateFlags()
+        {
+            // Every receiver needs the request before we wait for the owner's acknowledgement.
+            if (_serverTeleportState.Has(MovementTeleportState.Requesting))
+            {
+                _serverTeleportState = MovementTeleportState.WaitingForResponse;
+            }
         }
 
         public void ReadClientStateAtServer(long peerTimestamp, NetDataReader reader)
