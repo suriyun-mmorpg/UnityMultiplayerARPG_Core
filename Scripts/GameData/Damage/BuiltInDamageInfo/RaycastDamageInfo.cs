@@ -242,15 +242,6 @@ namespace MultiplayerARPG
             }
 
             tempHitCount = attacker.AttackPhysicFunctions.Raycast(damagePosition, damageDirection, missileDistance, layerMask, QueryTriggerInteraction.Collide, true);
-            if (tempHitCount <= 0)
-            {
-#if !UNITY_SERVER
-                // Spawn projectile effect, it will move to target but it won't apply damage because it is just effect
-                if (isClient)
-                    PlayProjectileEffectAtEffectTransform(attacker, isLeftHand, damagePosition, damageDirection, damageRotation, projectileDistance, impactEffectsData);
-#endif
-                return default;
-            }
 
             // Find characters that receiving damages
             for (tempLoopCounter = 0; tempLoopCounter < tempHitCount; ++tempLoopCounter)
@@ -285,6 +276,7 @@ namespace MultiplayerARPG
                     ))
                     break;
             }
+            // Also resolve the unset distance when the raycast hits nothing.
             if (projectileDistance <= 0f)
                 projectileDistance = missileDistance;
 #if !UNITY_SERVER
