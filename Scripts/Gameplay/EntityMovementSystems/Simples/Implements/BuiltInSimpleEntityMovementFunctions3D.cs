@@ -1144,8 +1144,11 @@ namespace MultiplayerARPG
             }
         }
 
-        public async void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
+        public void ReadServerStateAtClient(long peerTimestamp, NetDataReader reader)
         {
+            // Read synchronously, so a read error reaches the network manager's catch;
+            // the teleport's await moved to OnTeleportAndForget, which logs its own exceptions (this reader was
+            // async void, whose exceptions never reached that catch)
             MovementTeleportState movementTeleportState = (MovementTeleportState)reader.GetByte();
             if (movementTeleportState.Has(MovementTeleportState.Requesting))
             {
@@ -1156,8 +1159,20 @@ namespace MultiplayerARPG
                 float rotation = Mathf.HalfToFloat(reader.GetPackedUShort());
                 bool stillMoveAfterTeleport = movementTeleportState.Has(MovementTeleportState.StillMoveAfterTeleport);
                 if (!IsServer)
-                    await OnTeleport(position, Quaternion.Euler(0f, rotation, 0f), stillMoveAfterTeleport);
+                    OnTeleportAndForget(position, Quaternion.Euler(0f, rotation, 0f), stillMoveAfterTeleport);
                 return;
+            }
+        }
+
+        private async void OnTeleportAndForget(Vector3 position, Quaternion rotation, bool stillMoveAfterTeleport)
+        {
+            try
+            {
+                await OnTeleport(position, rotation, stillMoveAfterTeleport);
+            }
+            catch (System.Exception ex)
+            {
+                Logging.LogException(nameof(BuiltInSimpleEntityMovementFunctions3D), ex);
             }
         }
 
