@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using UnityEngine;
 
 namespace MultiplayerARPG
 {
@@ -8,6 +9,10 @@ namespace MultiplayerARPG
         /// Who do an attacking?
         /// </summary>
         public BaseGameEntity Attacker { get; set; }
+        /// <summary>
+        /// Server-side attacker position when the attack was prepared (not when the hit arrives)
+        /// </summary>
+        public Vector3 AttackerPosition { get; set; }
         /// <summary>
         /// Trigger durations (each trigger)
         /// </summary>

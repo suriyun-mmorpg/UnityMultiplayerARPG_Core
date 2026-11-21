@@ -21,6 +21,10 @@ namespace MultiplayerARPG
         public abstract Transform GetDamageTransform(BaseCharacterEntity attacker, bool isLeftHand);
         public abstract float GetDistance();
         public abstract float GetFov();
+        /// <summary>
+        /// Furthest distance from the attacker a hit may land (server hit validation). Override when GetDistance isn't the real reach.
+        /// </summary>
+        public virtual float GetMaxHitDistance() { return GetDistance(); }
         public abstract bool IsHitValid(HitValidateData hitValidateData, HitRegisterData hitData, DamageableHitBox hitBox);
         public virtual bool IsHeadshotInstantDeath()
         {

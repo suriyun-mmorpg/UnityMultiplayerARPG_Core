@@ -68,6 +68,12 @@ namespace MultiplayerARPG
             return throwForce * 0.5f;
         }
 
+        public override float GetMaxHitDistance()
+        {
+            // shortcut: ignores gravity/arc, uses straight-line max; upgrade if throws get falsely rejected
+            return throwForce * throwableLifeTime;
+        }
+
         public override float GetFov()
         {
             return 10f;

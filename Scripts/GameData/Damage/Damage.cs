@@ -193,6 +193,11 @@ namespace MultiplayerARPG
             return dist;
         }
 
+        public float GetMaxHitDistance()
+        {
+            return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.GetMaxHitDistance() : 0f;
+        }
+
         public float GetFov()
         {
             return TryGetDamageInfo(out BaseCustomDamageInfo dmgInfo) ? dmgInfo.GetFov() : 0f;
