@@ -42,6 +42,8 @@ namespace MultiplayerARPG
         public bool exportMinimalItemsAsJson;
         public void ExportMinimalItemsAsJson()
         {
+            // Singleton must be set first so ClearData reserves the default damage element slot
+            Singleton = this;
             ClearData();
             OnGameDataLoadedEvent += OnGameDataLoadedToExportMinimalItemsAsJson;
             gameDatabase.LoadData(this).Forget();
@@ -86,6 +88,8 @@ namespace MultiplayerARPG
         public bool exportCharacterCreationDataAsJson;
         public void ExportCharacterCreationDataAsJson()
         {
+            // Singleton must be set first so ClearData reserves the default damage element slot
+            Singleton = this;
             ClearData();
             OnGameDataLoadedEvent += OnGameDataLoadedToExportCharacterCreationDataAsJson;
             gameDatabase.LoadData(this).Forget();
@@ -94,8 +98,6 @@ namespace MultiplayerARPG
         private void OnGameDataLoadedToExportCharacterCreationDataAsJson()
         {
             OnGameDataLoadedEvent -= OnGameDataLoadedToExportCharacterCreationDataAsJson;
-
-            Singleton = this;
 
             DefaultArmorType = ScriptableObject.CreateInstance<ArmorType>()
                 .GenerateDefaultArmorType();
@@ -123,6 +125,21 @@ namespace MultiplayerARPG
 #endif
                     );
                 haveToClearDefaultDamageElement = true;
+            }
+
+            // Awake never runs in edit mode, so these managers would be null
+            bool haveToClearInventoryManager = false;
+            if (inventoryManager == null)
+            {
+                inventoryManager = ScriptableObject.CreateInstance<DefaultInventoryManager>();
+                haveToClearInventoryManager = true;
+            }
+
+            bool haveToClearGameplayRule = false;
+            if (gameplayRule == null)
+            {
+                gameplayRule = ScriptableObject.CreateInstance<DefaultGameplayRule>();
+                haveToClearGameplayRule = true;
             }
 
             CharacterCreationData data = new CharacterCreationData();
@@ -191,6 +208,18 @@ namespace MultiplayerARPG
             {
                 DestroyImmediate(defaultDamageElement);
                 defaultDamageElement = null;
+            }
+
+            if (haveToClearInventoryManager)
+            {
+                DestroyImmediate(inventoryManager);
+                inventoryManager = null;
+            }
+
+            if (haveToClearGameplayRule)
+            {
+                DestroyImmediate(gameplayRule);
+                gameplayRule = null;
             }
 
             string path = EditorUtility.SaveFilePanel("Export Character Creation Data", Application.dataPath, "characterCreationData", "json");
