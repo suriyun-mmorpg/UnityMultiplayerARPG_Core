@@ -224,7 +224,7 @@ namespace MultiplayerARPG
 
                 // Prepare hit register validation, it will be used later when receive attack start/end events from clients
                 if ((IsServer && !IsOwnerClient) || !IsOwnedByServer)
-                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, weaponItem.FireSpreadAmount, damageInfo, damageAmounts, weaponHandlingState, weapon, null, 0);
+                    HitRegistrationManager.PrepareHitRegValidation(Entity, simulateSeed, triggerDurations, GetFireSpreadAmount(Entity.GetCaches(), weaponItem.FireSpreadAmount), damageInfo, damageAmounts, weaponHandlingState, weapon, null, 0);
 
                 // Attack starts
                 if (_entityIsPlayer && IsServer)
@@ -394,6 +394,18 @@ namespace MultiplayerARPG
             ApplyAttack(Entity.GetCaches(), validateData.WeaponHandlingState, validateData.Weapon, data.simulateSeed, data.triggerIndex, validateData.DamageInfo, validateData.DamageAmounts, data.aimPosition);
         }
 
+        /// <summary>
+        /// Total spread amount (base + modifiers), clamped to 254 so `spreadIndex` (byte) never wraps.
+        /// Used by both attack launch and server hit validation so they always agree.
+        /// </summary>
+        public static byte GetFireSpreadAmount(CharacterDataCache entityCaches, byte baseAmount)
+        {
+            int amount = baseAmount;
+            amount += Mathf.CeilToInt(entityCaches.FireSpreadModifier);
+            amount += Mathf.CeilToInt(entityCaches.FireSpreadRate * baseAmount);
+            return (byte)Mathf.Clamp(amount, 0, 254);
+        }
+
         protected virtual async void ApplyAttack(CharacterDataCache entityCaches, WeaponHandlingState weaponHandlingState, CharacterItem weapon, int simulateSeed, byte triggerIndex, DamageInfo damageInfo, List<DamageElementMinMaxFloatAmounts> damageAmounts, AimPosition aimPosition)
         {
             if (triggerIndex >= damageAmounts.Count)
@@ -425,16 +437,14 @@ namespace MultiplayerARPG
                 }
             }
 
-            byte fireSpreadAmount = basefireSpreadAmount;
-            fireSpreadAmount += (byte)Mathf.CeilToInt(entityCaches.FireSpreadModifier);
-            fireSpreadAmount += (byte)Mathf.CeilToInt(entityCaches.FireSpreadRate * basefireSpreadAmount);
+            byte fireSpreadAmount = GetFireSpreadAmount(entityCaches, basefireSpreadAmount);
 
             Vector3 fireSpreadRange = baseFireSpreadRange;
             fireSpreadRange += Vector3.one * entityCaches.FireSpreadRangeModifier;
             fireSpreadRange += baseFireSpreadRange * entityCaches.FireSpreadRangeRate;
 
             // Make sure it won't increase damage to the wrong collction
-            for (byte spreadIndex = 0; spreadIndex < fireSpreadAmount + 1; ++spreadIndex)
+            for (int spreadIdx = 0; spreadIdx < fireSpreadAmount + 1; ++spreadIdx)
             {
                 await damageInfo.LaunchDamageEntity(
                     Entity,
@@ -442,7 +452,7 @@ namespace MultiplayerARPG
                     weapon,
                     simulateSeed,
                     triggerIndex,
-                    spreadIndex,
+                    (byte)spreadIdx,
                     fireSpreadRange,
                     damageAmounts,
                     null,

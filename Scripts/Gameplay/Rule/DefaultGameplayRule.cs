@@ -458,12 +458,16 @@ namespace MultiplayerARPG
         public override float GetTotalWeight(ICharacterData character, CharacterStats stats)
         {
             float result = character.EquipItems.GetTotalItemWeight() + character.NonEquipItems.GetTotalItemWeight();
-            // Weight from right hand equipment
-            if (!character.EquipWeapons.rightHand.IsEmptySlot())
-                result += character.EquipWeapons.rightHand.GetItem().Weight;
-            // Weight from left hand equipment
-            if (!character.EquipWeapons.leftHand.IsEmptySlot())
-                result += character.EquipWeapons.leftHand.GetItem().Weight;
+
+            foreach (EquipWeapons equipWeapons in character.SelectableWeaponSets)
+            {
+                // Weight from right hand equipment
+                if (!equipWeapons.rightHand.IsEmptySlot())
+                    result += equipWeapons.rightHand.GetItem().Weight;
+                // Weight from left hand equipment
+                if (!equipWeapons.leftHand.IsEmptySlot())
+                    result += equipWeapons.leftHand.GetItem().Weight;
+            }
             return result;
         }
 

@@ -245,7 +245,9 @@ namespace MultiplayerARPG
                         if (!_currentAmounts.TryGetValue(data.Key, out currentAmount))
                             currentAmount = 0;
                         tempUI.RequiredAmount = data.Value;
-                        tempUI.Data = new UICharacterItemData(CharacterItem.Create(data.Key, 1, currentAmount), InventoryType.Unknow);
+                        tempUI.OwnedAmount = currentAmount;
+                        // The entry keeps the required amount: an item with amount 0 is an empty slot, which draws no icon
+                        tempUI.Data = new UICharacterItemData(CharacterItem.Create(data.Key, 1, data.Value), InventoryType.Unknow);
                         break;
                     case DisplayType.Simple:
                         tempUI.stackDisplayType = UICharacterItem.StackDisplayType.Simple;
