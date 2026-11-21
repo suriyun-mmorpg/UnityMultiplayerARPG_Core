@@ -85,7 +85,7 @@ namespace MultiplayerARPG
             _items.Clear();
             foreach (StartVendingItem item in items)
             {
-                if (string.IsNullOrEmpty(item.id) || item.amount <= 0)
+                if (string.IsNullOrEmpty(item.id) || item.amount <= 0 || item.price < 0)
                     continue;
                 int index = Entity.NonEquipItems.IndexOf(item.id);
                 if (index < 0)
@@ -139,6 +139,7 @@ namespace MultiplayerARPG
             {
                 if (customer == null)
                     continue;
+                customer._store = null;
             }
             _customers.Clear();
         }
@@ -157,6 +158,13 @@ namespace MultiplayerARPG
                 return;
             if (!playerCharacterEntity.VendingComponent.Data.isStarted)
                 return;
+            if (playerCharacterEntity == Entity)
+                return;
+            if (!Entity.IsGameEntityInDistance(playerCharacterEntity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
             CmdUnsubscribe();
             _store = playerCharacterEntity.VendingComponent;
             _store.AddCustomer(this);
@@ -222,18 +230,35 @@ namespace MultiplayerARPG
         protected void CmdBuyItem(int index)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (_store == null || _store.Entity == null || !_store.Data.isStarted)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
+                return;
+            }
+            if (!Entity.IsGameEntityInDistance(_store.Entity))
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_TOO_FAR);
+                return;
+            }
             _store.SellItem(this, index);
 #endif
         }
 
         protected void SellItem(PlayerCharacterVendingComponent buyer, int index)
         {
-            if (buyer == null || index < 0 || index >= _items.Count)
+            if (buyer == null)
+                return;
+            if (index < 0 || index >= _items.Count)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_INDEX);
                 return;
             }
             int price = _items[index].price;
+            if (price < 0)
+            {
+                GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_INVALID_ITEM_DATA);
+                return;
+            }
             if (buyer.Entity.Gold < price)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_GOLD);
