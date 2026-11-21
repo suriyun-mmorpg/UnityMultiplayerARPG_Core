@@ -80,6 +80,9 @@ namespace MultiplayerARPG
 
         public float DealingRequestTime { get; private set; }
 
+        // Server only: true on the player who sent the pending request, who must not be able to accept it
+        protected bool _isDealingRequestSender;
+
         public bool DisableDealing
         {
             get
@@ -227,7 +230,10 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 return;
             }
-            if (targetCharacterEntity.DealingComponent.DealingCharacter != null)
+            if (targetCharacterEntity == Entity)
+                return;
+            if (DealingCharacter != null || DealingState != DealingState.None ||
+                targetCharacterEntity.DealingComponent.DealingCharacter != null)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_DEALING);
                 return;
@@ -239,6 +245,8 @@ namespace MultiplayerARPG
             }
             DealingCharacter = targetCharacterEntity;
             targetCharacterEntity.DealingComponent.DealingCharacter = Entity;
+            _isDealingRequestSender = true;
+            targetCharacterEntity.DealingComponent._isDealingRequestSender = false;
             // Send receive dealing request to player
             DealingCharacter.DealingComponent.CallOwnerReceiveDealingRequest(ObjectId);
 #endif
@@ -270,7 +278,7 @@ namespace MultiplayerARPG
         protected void CmdAcceptDealingRequest()
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (DealingCharacter == null)
+            if (DealingCharacter == null || _isDealingRequestSender || DealingState != DealingState.None)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCEPT_DEALING_REQUEST);
                 StopDealing();

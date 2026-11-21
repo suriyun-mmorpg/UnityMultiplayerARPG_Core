@@ -94,6 +94,9 @@ namespace MultiplayerARPG
 
         public float DuelingRequestTime { get; private set; }
 
+        // Server only: true on the player who sent the pending request, who must not be able to accept it
+        protected bool _isDuelingRequestSender;
+
         public bool DisableDueling
         {
             get
@@ -191,7 +194,9 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_NOT_FOUND);
                 return;
             }
-            if (targetCharacterEntity.DuelingComponent.DuelingCharacter != null)
+            if (targetCharacterEntity == Entity)
+                return;
+            if (DuelingCharacter != null || targetCharacterEntity.DuelingComponent.DuelingCharacter != null)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CHARACTER_IS_DUELING);
                 return;
@@ -208,6 +213,8 @@ namespace MultiplayerARPG
             }
             DuelingCharacter = targetCharacterEntity;
             targetCharacterEntity.DuelingComponent.DuelingCharacter = Entity;
+            _isDuelingRequestSender = true;
+            targetCharacterEntity.DuelingComponent._isDuelingRequestSender = false;
             // Send receive dueling request to player
             DuelingCharacter.DuelingComponent.CallOwnerReceiveDuelingRequest(ObjectId);
 #endif
@@ -239,7 +246,7 @@ namespace MultiplayerARPG
         protected void CmdAcceptDuelingRequest()
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (DuelingCharacter == null)
+            if (DuelingCharacter == null || _isDuelingRequestSender || DuelingStartingOrStarted)
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_CANNOT_ACCEPT_DUELING_REQUEST);
                 StopDueling();
