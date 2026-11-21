@@ -17,6 +17,10 @@ namespace MultiplayerARPG
             Requirement
         }
         public int RequiredAmount { get; set; } = 0;
+        /// <summary>
+        /// What the player owns, shown against <see cref="RequiredAmount"/> when the stack display type is Requirement
+        /// </summary>
+        public int OwnedAmount { get; set; } = 0;
         public CharacterItem CharacterItem { get { return Data.characterItem; } }
         public int Level { get { return Data.targetLevel; } }
         public InventoryType InventoryType { get { return Data.inventoryType; } }
@@ -985,7 +989,7 @@ namespace MultiplayerARPG
                         case StackDisplayType.Requirement:
                             stackString = ZString.Format(
                                 LanguageManager.GetText(formatKeyStack),
-                                CharacterItem.amount.ToString("N0"),
+                                OwnedAmount.ToString("N0"),
                                 itemMaxStack.ToString("N0"));
                             break;
                         default:
