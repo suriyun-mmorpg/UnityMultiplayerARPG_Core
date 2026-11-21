@@ -241,6 +241,10 @@ namespace MultiplayerARPG
             ResetPlatform();
             NavPaths = null;
             _simulatingKeyMovement = false;
+            // A re-owned entity must not keep applying the previous owner's last accepted position: it snapped the
+            // entity back to where the old client left it and rejected the new client's first syncs as an invalid timestamp.
+            _acceptedPositionTimestamp = 0;
+            _isServerWaitingTeleportConfirm = false;
         }
 
         public bool CanSimulateMovement()
