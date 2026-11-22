@@ -9,6 +9,11 @@ namespace MultiplayerARPG
         public static bool RefineItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int[] enhancerDataIds, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!character.IsValidWeaponSet(inventoryType, equipSlotIndex))
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                return false;
+            }
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:

@@ -228,12 +228,12 @@ namespace MultiplayerARPG
                     droppingItem = EquipItems[index].Clone();
                     break;
                 case InventoryType.EquipWeaponRight:
-                    if (index >= SelectableWeaponSets.Count || !canUnEquipItem)
+                    if (equipSlotIndex >= SelectableWeaponSets.Count || !canUnEquipItem)
                         return;
                     droppingItem = SelectableWeaponSets[equipSlotIndex].rightHand.Clone();
                     break;
                 case InventoryType.EquipWeaponLeft:
-                    if (index >= SelectableWeaponSets.Count || !canUnEquipItem)
+                    if (equipSlotIndex >= SelectableWeaponSets.Count || !canUnEquipItem)
                         return;
                     droppingItem = SelectableWeaponSets[equipSlotIndex].leftHand.Clone();
                     break;
@@ -262,13 +262,13 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponRight:
                     if (amount == droppingItem.amount)
                     {
-                        EquipWeapons equipWeapons = SelectableWeaponSets[index];
+                        EquipWeapons equipWeapons = SelectableWeaponSets[equipSlotIndex];
                         equipWeapons.rightHand = CharacterItem.Empty;
                         SelectableWeaponSets[equipSlotIndex] = equipWeapons;
                     }
                     else
                     {
-                        EquipWeapons equipWeapons = SelectableWeaponSets[index];
+                        EquipWeapons equipWeapons = SelectableWeaponSets[equipSlotIndex];
                         CharacterItem equipWeapon = equipWeapons.rightHand;
                         equipWeapon.amount -= amount;
                         equipWeapons.rightHand = equipWeapon;
@@ -278,13 +278,13 @@ namespace MultiplayerARPG
                 case InventoryType.EquipWeaponLeft:
                     if (amount == droppingItem.amount)
                     {
-                        EquipWeapons equipWeapons = SelectableWeaponSets[index];
+                        EquipWeapons equipWeapons = SelectableWeaponSets[equipSlotIndex];
                         equipWeapons.leftHand = CharacterItem.Empty;
                         SelectableWeaponSets[equipSlotIndex] = equipWeapons;
                     }
                     else
                     {
-                        EquipWeapons equipWeapons = SelectableWeaponSets[index];
+                        EquipWeapons equipWeapons = SelectableWeaponSets[equipSlotIndex];
                         CharacterItem equipWeapon = equipWeapons.leftHand;
                         equipWeapon.amount -= amount;
                         equipWeapons.leftHand = equipWeapon;

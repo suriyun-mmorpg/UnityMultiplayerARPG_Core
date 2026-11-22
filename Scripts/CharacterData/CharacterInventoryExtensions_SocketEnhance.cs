@@ -7,6 +7,11 @@ namespace MultiplayerARPG
         public static bool EnhanceSocketItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int enhancerId, int socketIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!character.IsValidWeaponSet(inventoryType, equipSlotIndex))
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                return false;
+            }
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
@@ -29,6 +34,11 @@ namespace MultiplayerARPG
         public static bool RemoveEnhancerFromItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int socketIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!character.IsValidWeaponSet(inventoryType, equipSlotIndex))
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                return false;
+            }
             bool returnEnhancer = GameInstance.Singleton.enhancerRemoval.ReturnEnhancerItem;
             switch (inventoryType)
             {
