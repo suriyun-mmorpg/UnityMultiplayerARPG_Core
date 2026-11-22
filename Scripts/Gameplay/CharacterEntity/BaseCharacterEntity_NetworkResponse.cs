@@ -207,7 +207,7 @@ namespace MultiplayerARPG
         protected virtual void CmdDropItem(InventoryType inventoryType, int index, byte equipSlotIndex, int amount)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
-            if (amount <= 0 || !CanDoActions())
+            if (amount <= 0 || !CanDoActions() || !CanDropItem())
                 return;
 
             bool canUnEquipItem = true;
