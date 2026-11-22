@@ -529,6 +529,8 @@ namespace MultiplayerARPG
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
+            // sendByServer is only trusted for server-internal calls (connectionId -1), never from the wire
+            message.sendByServer &= messageHandler.ConnectionId < 0;
             // Get character
             IPlayerCharacterData playerCharacter = null;
             if (!string.IsNullOrEmpty(message.senderName))
