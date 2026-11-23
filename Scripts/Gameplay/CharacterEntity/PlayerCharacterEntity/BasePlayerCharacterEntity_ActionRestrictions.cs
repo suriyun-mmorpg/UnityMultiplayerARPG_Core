@@ -125,6 +125,8 @@ namespace MultiplayerARPG
         {
             if (IsWarping)
                 return false;
+            if (IsUpdatingItems)
+                return false;
             if (IsDealing)
                 return false;
             if (IsVendingStarted)

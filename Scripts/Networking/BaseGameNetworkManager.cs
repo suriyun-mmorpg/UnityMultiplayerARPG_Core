@@ -526,13 +526,49 @@ namespace MultiplayerARPG
             }
         }
 
+        public const int CHAT_MAX_MESSAGE_LENGTH = 256;
+
+        /// <summary>
+        /// Overwrite client-controlled chat fields with server-known values. Returns false if message must be dropped.
+        /// </summary>
+        protected bool SanitizeClientChatMessage(ref ChatMessage message, IPlayerCharacterData playerCharacter)
+        {
+            if (string.IsNullOrEmpty(message.message) || message.message.Length > CHAT_MAX_MESSAGE_LENGTH)
+                return false;
+            if (message.channel == ChatChannel.System)
+            {
+                // Only GMs can announce; identity is trustworthy here because it came from the connection
+                if (!(playerCharacter is BasePlayerCharacterEntity entity) || entity.UserLevel <= 0)
+                    return false;
+            }
+            message.senderId = playerCharacter.Id;
+            message.senderUserId = playerCharacter.UserId;
+            message.senderName = playerCharacter.CharacterName;
+            if (message.channel == ChatChannel.Party)
+                message.channelId = playerCharacter.PartyId;
+            else if (message.channel == ChatChannel.Guild)
+                message.channelId = playerCharacter.GuildId;
+            return true;
+        }
+
         protected virtual void HandleChatAtServer(MessageHandlerData messageHandler)
         {
             ChatMessage message = messageHandler.ReadMessage<ChatMessage>().FillChannelId();
+            // sendByServer is only trusted for server-internal calls (connectionId -1), never from the wire
+            message.sendByServer &= messageHandler.ConnectionId < 0;
             // Get character
             IPlayerCharacterData playerCharacter = null;
-            if (!string.IsNullOrEmpty(message.senderName))
-                ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
+            if (message.sendByServer)
+            {
+                if (!string.IsNullOrEmpty(message.senderName))
+                    ServerUserHandlers.TryGetPlayerCharacterByName(message.senderName, out playerCharacter);
+            }
+            else if (!ServerUserHandlers.TryGetPlayerCharacter(messageHandler.ConnectionId, out playerCharacter) ||
+                !SanitizeClientChatMessage(ref message, playerCharacter))
+            {
+                // Sender is resolved by connection, never by client-sent name
+                return;
+            }
             // Set guild data
             if (playerCharacter != null)
             {

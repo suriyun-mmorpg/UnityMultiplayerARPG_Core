@@ -932,6 +932,16 @@ namespace MultiplayerARPG
             return true;
         }
 
+        /// <summary>
+        /// False when a weapon inventory type is paired with a non-existent weapon set (client-supplied index).
+        /// </summary>
+        public static bool IsValidWeaponSet(this IPlayerCharacterData character, InventoryType inventoryType, byte equipSlotIndex)
+        {
+            if (inventoryType != InventoryType.EquipWeaponRight && inventoryType != InventoryType.EquipWeaponLeft)
+                return true;
+            return equipSlotIndex < character.SelectableWeaponSets.Count;
+        }
+
         public static bool DecreaseItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, int amount, out UITextKeys gameMessage, out CharacterItem targetItem, System.Func<CharacterItem, UITextKeys> validateTargetItem)
         {
             targetItem = CharacterItem.Empty;

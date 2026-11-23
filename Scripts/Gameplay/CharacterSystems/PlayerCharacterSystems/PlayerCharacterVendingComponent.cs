@@ -96,7 +96,7 @@ namespace MultiplayerARPG
                 if (storeItem.GetItem().RestrictDealing)
                     continue;
                 storeItem = Entity.NonEquipItems[index].Clone(false);
-                storeItem.amount = item.amount;
+                storeItem.amount = Mathf.Min(item.amount, storeItem.amount);
                 _items.Add(new VendingItem()
                 {
                     item = storeItem,
@@ -251,7 +251,7 @@ namespace MultiplayerARPG
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(buyer.ConnectionId, UITextKeys.UI_ERROR_WILL_OVERWHELMING);
                 return;
             }
-            if (!Entity.DecreaseItemsByIndex(inventoryItemIndex, sellingItem.amount, true))
+            if (!Entity.DecreaseItemsByIndex(inventoryItemIndex, sellingItem.amount, false))
             {
                 GameInstance.ServerGameMessageHandlers.SendGameMessage(ConnectionId, UITextKeys.UI_ERROR_NOT_ENOUGH_ITEMS);
                 return;

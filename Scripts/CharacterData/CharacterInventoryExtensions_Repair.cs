@@ -7,6 +7,11 @@ namespace MultiplayerARPG
         public static bool RepairItem(this IPlayerCharacterData character, InventoryType inventoryType, int index, byte equipSlotIndex, out UITextKeys gameMessage)
         {
 #if UNITY_EDITOR || UNITY_SERVER || !EXCLUDE_SERVER_CODES
+            if (!character.IsValidWeaponSet(inventoryType, equipSlotIndex))
+            {
+                gameMessage = UITextKeys.UI_ERROR_INVALID_ITEM_DATA;
+                return false;
+            }
             switch (inventoryType)
             {
                 case InventoryType.NonEquipItems:
