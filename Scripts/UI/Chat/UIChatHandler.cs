@@ -111,6 +111,8 @@ namespace MultiplayerARPG
             HideEnterChatField();
             if (uiMessageField != null)
             {
+                // Server drops longer messages silently, so stop the user typing them
+                uiMessageField.characterLimit = BaseGameNetworkManager.CHAT_MAX_MESSAGE_LENGTH;
                 uiMessageField.onValueChanged.RemoveListener(OnMessageFieldValueChange);
                 uiMessageField.onValueChanged.AddListener(OnMessageFieldValueChange);
             }
